@@ -436,7 +436,7 @@ export default function App() {
                   <button
                     key={item.id}
                     onClick={() => { setActiveView(item.id); setSelectedProfId(null); }}
-                    className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer select-none group ${
+                    className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] font-medium transition-all duration-200 cursor-pointer select-none group ${
                       isActive ? 'text-blue-700' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                     }`}
                   >
