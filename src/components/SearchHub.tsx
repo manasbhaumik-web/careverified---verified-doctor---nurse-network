@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { 
-  Search, MapPin, BadgeCheck, Stethoscope, Clock, ShieldCheck, 
-  HeartPulse, UserCheck, Star, LayoutGrid, List, Eye, X, Sparkles, Activity 
+import {
+  Search, MapPin, BadgeCheck, Stethoscope, Clock, ShieldCheck,
+  HeartPulse, UserCheck, Star, LayoutGrid, List, Eye, X, Sparkles, Activity
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, UserRole } from '../types';
 
@@ -13,8 +13,8 @@ interface SearchHubProps {
   onClearSpecialtyFilter: () => void;
 }
 
-export default function SearchHub({ 
-  professionals, 
+export default function SearchHub({
+  professionals,
   onSelectProfessional,
   selectedSpecialtyFilter,
   onSelectSpecialtyFilter,
@@ -31,7 +31,7 @@ export default function SearchHub({
   // Filter logic
   const filteredList = professionals.filter(p => {
     // 1. Search term
-    const matchesSearch = searchTerm === '' || 
+    const matchesSearch = searchTerm === '' ||
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.specialization.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.bio.toLowerCase().includes(searchTerm.toLowerCase());
@@ -132,8 +132,8 @@ export default function SearchHub({
             {selectedSpecialtyFilter && (
               <div className="bg-teal-50 border border-teal-200 text-[#0d9488] text-[10px] font-black py-1 px-2.5 rounded-full flex items-center gap-2 animate-fade-in">
                 <span>Triage: {selectedSpecialtyFilter}</span>
-                <button 
-                  onClick={onClearSpecialtyFilter} 
+                <button
+                  onClick={onClearSpecialtyFilter}
                   className="hover:text-red-600 font-black text-xs cursor-pointer p-0.5 rounded-full hover:bg-teal-100/50"
                   title="Clear Specialty"
                 >
@@ -146,11 +146,10 @@ export default function SearchHub({
             <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-3xs shrink-0">
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-lg transition-all flex items-center gap-1 text-xs font-bold cursor-pointer ${
-                  viewMode === 'list'
+                className={`p-1.5 rounded-lg transition-all flex items-center gap-1 text-xs font-bold cursor-pointer ${viewMode === 'list'
                     ? 'bg-white text-blue-700 shadow-3xs'
                     : 'text-slate-500 hover:text-slate-800'
-                }`}
+                  }`}
                 title="List View"
                 id="toggle-list-view"
               >
@@ -159,11 +158,10 @@ export default function SearchHub({
               </button>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-lg transition-all flex items-center gap-1 text-xs font-bold cursor-pointer ${
-                  viewMode === 'grid'
+                className={`p-1.5 rounded-lg transition-all flex items-center gap-1 text-xs font-bold cursor-pointer ${viewMode === 'grid'
                     ? 'bg-white text-blue-700 shadow-3xs'
                     : 'text-slate-500 hover:text-slate-800'
-                }`}
+                  }`}
                 title="Grid View"
                 id="toggle-grid-view"
               >
@@ -198,11 +196,10 @@ export default function SearchHub({
           {/* "All Specialties" Pill */}
           <button
             onClick={onClearSpecialtyFilter}
-            className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border ${
-              selectedSpecialtyFilter === ''
+            className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border ${selectedSpecialtyFilter === ''
                 ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-500/15 scale-102 font-black'
                 : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-            }`}
+              }`}
           >
             <LayoutGrid className="h-3.5 w-3.5" />
             <span>All Specialties</span>
@@ -216,11 +213,10 @@ export default function SearchHub({
               <button
                 key={spec}
                 onClick={() => onSelectSpecialtyFilter(spec)}
-                className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border ${
-                  isSelected
+                className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border ${isSelected
                     ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-500/15 scale-102 font-black'
                     : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                }`}
+                  }`}
               >
                 <IconComponent className="h-3.5 w-3.5" />
                 <span>{spec}</span>
@@ -246,35 +242,33 @@ export default function SearchHub({
               {filteredList.map((prof) => {
                 const isDoc = prof.role === UserRole.DOCTOR;
                 return (
-                  <div 
+                  <div
                     key={prof.id}
                     onClick={() => setSelectedModalProf(prof)}
                     className="bg-white border border-slate-200 hover:border-blue-400 rounded-3xl p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-5 cursor-pointer relative overflow-hidden group"
                   >
                     {/* Floating Accent Border on Hover */}
-                    <div className={`absolute left-0 top-0 bottom-0 w-1 transition-all group-hover:w-1.5 ${
-                      isDoc ? 'bg-teal-500' : 'bg-indigo-500'
-                    }`}></div>
+                    <div className={`absolute left-0 top-0 bottom-0 w-1 transition-all group-hover:w-1.5 ${isDoc ? 'bg-teal-500' : 'bg-indigo-500'
+                      }`}></div>
 
                     <div className="flex items-center gap-4 flex-1 min-w-0">
                       {/* Avatar */}
-                      <img 
-                        src={prof.avatar} 
+                      <img
+                        src={prof.avatar}
                         alt={prof.name}
                         className="h-14 w-14 rounded-2xl object-cover border border-slate-100 shadow-3xs shrink-0"
                         referrerPolicy="no-referrer"
                       />
-                      
+
                       <div className="min-w-0 space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <h4 className="text-sm font-black text-slate-850 group-hover:text-blue-600 transition-colors truncate">
                             {prof.name}
                           </h4>
-                          <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${
-                            isDoc 
-                              ? "bg-teal-50 text-teal-800 border-teal-100" 
+                          <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${isDoc
+                              ? "bg-teal-50 text-teal-800 border-teal-100"
                               : "bg-indigo-50 text-indigo-800 border-indigo-100"
-                          }`}>
+                            }`}>
                             {isDoc ? "Doctor (MD/MBBS)" : "Registered Nurse (RN)"}
                           </span>
                           <span className="bg-emerald-50 text-emerald-800 text-[9px] font-black px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-0.5 shadow-3xs">
@@ -312,7 +306,7 @@ export default function SearchHub({
                         <span>{prof.rating}</span>
                         <span className="text-slate-400 font-bold">({prof.reviewCount})</span>
                       </div>
-                      
+
                       <div className="text-right">
                         <span className="text-[9px] text-slate-400 block font-bold uppercase leading-none">Consultation Fee</span>
                         <span className="text-sm font-extrabold text-blue-800 font-mono">
@@ -343,27 +337,25 @@ export default function SearchHub({
               {filteredList.map((prof) => {
                 const isDoc = prof.role === UserRole.DOCTOR;
                 return (
-                  <div 
+                  <div
                     key={prof.id}
                     onClick={() => onSelectProfessional(prof.id)}
                     className={`bg-white border border-slate-200 rounded-[24px] p-5 shadow-3xs hover:shadow-md hover:border-blue-400/80 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between group relative overflow-hidden`}
                   >
                     {/* Visual top highlighting stripe per role */}
-                    <div className={`absolute left-0 right-0 top-0 h-1.5 ${
-                      isDoc ? 'bg-teal-500/80' : 'bg-indigo-500/80'
-                    }`}></div>
+                    <div className={`absolute left-0 right-0 top-0 h-1.5 ${isDoc ? 'bg-teal-500/80' : 'bg-indigo-500/80'
+                      }`}></div>
 
                     <div className="space-y-4">
                       {/* Top Header: Role indicator and Verified Status */}
                       <div className="flex justify-between items-center pt-1.5">
-                        <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${
-                          isDoc 
-                            ? "bg-teal-50 text-teal-800 border-teal-100" 
+                        <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${isDoc
+                            ? "bg-teal-50 text-teal-800 border-teal-100"
                             : "bg-indigo-50 text-indigo-800 border-indigo-100"
-                        }`}>
+                          }`}>
                           {isDoc ? "Doctor" : "Registered Nurse"}
                         </span>
-                        
+
                         <span className="bg-emerald-50 text-emerald-800 text-[9px] font-black px-2 py-0.5 rounded-full border border-emerald-150 flex items-center gap-0.5 shadow-3xs">
                           <BadgeCheck className="h-3 w-3 text-emerald-500 fill-emerald-50" />
                           Verified
@@ -373,22 +365,21 @@ export default function SearchHub({
                       {/* Avatar, Name & Specialty info */}
                       <div className="flex gap-4">
                         <div className="relative shrink-0">
-                          <img 
-                            src={prof.avatar} 
+                          <img
+                            src={prof.avatar}
                             alt={prof.name}
                             className="h-14 w-14 rounded-2xl object-cover border border-slate-100 shadow-3xs"
                             referrerPolicy="no-referrer"
                           />
-                          <span className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white ${
-                            isDoc ? 'bg-teal-500' : 'bg-indigo-500'
-                          }`}></span>
+                          <span className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white ${isDoc ? 'bg-teal-500' : 'bg-indigo-500'
+                            }`}></span>
                         </div>
-                        
+
                         <div className="space-y-1 min-w-0">
                           <h4 className="text-sm font-black text-slate-850 group-hover:text-blue-600 transition-colors truncate leading-tight">
                             {prof.name}
                           </h4>
-                          
+
                           <div className="flex items-center gap-1 text-[11px] text-slate-500 font-bold">
                             <Stethoscope className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                             <span className="truncate">{prof.specialization}</span>
@@ -426,7 +417,7 @@ export default function SearchHub({
                         <span>{prof.rating}</span>
                         <span className="text-amber-600/70">({prof.reviewCount})</span>
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
                         <button
                           onClick={(e) => {
@@ -470,7 +461,7 @@ export default function SearchHub({
             {/* Custom Interactive Mock Map Grid */}
             <div className="flex-1 bg-slate-200/80 rounded-2xl border border-slate-300 relative overflow-hidden flex items-center justify-center">
               <div className="absolute inset-0 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
-              
+
               {/* Map road lines mock */}
               <div className="absolute top-1/3 left-0 right-0 h-1 bg-slate-300 transform -rotate-6 shadow-inner"></div>
               <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-slate-300 transform rotate-12 shadow-inner"></div>
@@ -488,7 +479,7 @@ export default function SearchHub({
                 const pos = offsets[i % offsets.length];
 
                 return (
-                  <div 
+                  <div
                     key={prof.id}
                     style={{ top: pos.top, left: pos.left }}
                     onClick={() => onSelectProfessional(prof.id)}
@@ -523,18 +514,18 @@ export default function SearchHub({
 
       {/* Verification Card Lightbox / Modal Popup */}
       {selectedModalProf && (
-        <div 
+        <div
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
           onClick={() => setSelectedModalProf(null)}
           id="credentials-modal-backdrop"
         >
           {/* Card Wrapper with responsive scaling */}
-          <div 
+          <div
             className="relative max-w-md w-full scale-100 md:hover:scale-[1.01] transition-all duration-300 ease-out"
             onClick={(e) => e.stopPropagation()}
           >
             {/* The precise, styled card matching user's image with a vibrant teal border */}
-            <div 
+            <div
               className="bg-white border-[3px] border-teal-400 rounded-[28px] p-6 shadow-[0_20px_50px_rgba(13,148,136,0.18)] flex flex-col justify-between relative overflow-hidden"
               style={{ minHeight: '380px' }}
               id="credentials-modal-card"
@@ -552,28 +543,27 @@ export default function SearchHub({
                 {/* Header layout: Avatar, Name & Specialization, Verified Badge */}
                 <div className="flex gap-4 pr-6">
                   {/* Avatar with rounded corners */}
-                  <img 
-                    src={selectedModalProf.avatar} 
+                  <img
+                    src={selectedModalProf.avatar}
                     alt={selectedModalProf.name}
                     className="h-20 w-20 rounded-2xl object-cover border border-slate-150 shadow-sm shrink-0"
                     referrerPolicy="no-referrer"
                   />
-                  
+
                   <div className="space-y-1">
                     {/* Role badge */}
-                    <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${
-                      selectedModalProf.role === UserRole.DOCTOR 
-                        ? "bg-teal-50 text-teal-800 border-teal-200/60" 
+                    <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${selectedModalProf.role === UserRole.DOCTOR
+                        ? "bg-teal-50 text-teal-800 border-teal-200/60"
                         : "bg-indigo-50 text-indigo-800 border-indigo-200/60"
-                    }`}>
+                      }`}>
                       {selectedModalProf.role === UserRole.DOCTOR ? "DOCTOR (MD/MBBS)" : "REGISTERED NURSE (RN)"}
                     </span>
-                    
+
                     {/* Name */}
                     <h3 className="text-lg font-black text-[#0d9488] leading-tight mt-1">
                       {selectedModalProf.name}
                     </h3>
-                    
+
                     {/* Specialty */}
                     <div className="flex items-center gap-1.5 text-xs text-slate-600 font-bold mt-1">
                       <Stethoscope className="h-3.5 w-3.5 text-teal-500 shrink-0" />
@@ -628,7 +618,7 @@ export default function SearchHub({
                   <span>{selectedModalProf.rating}</span>
                   <span className="text-slate-400 font-semibold">({selectedModalProf.reviewCount})</span>
                 </div>
-                
+
                 <div className="text-right">
                   <span className="text-[9px] text-slate-400 block font-extrabold uppercase tracking-wider leading-none">Consultation Fee</span>
                   <span className="text-sm font-extrabold text-teal-800 font-mono mt-1 block">

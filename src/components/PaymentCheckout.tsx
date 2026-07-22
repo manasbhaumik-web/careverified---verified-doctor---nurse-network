@@ -210,7 +210,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
                         value={cardName}
                         onChange={(e) => setCardName(e.target.value)}
                         placeholder="John Doe"
-                        className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-blue-500 font-bold text-slate-700 placeholder-slate-400"
+                        className="form-input"
                         required
                       />
                     </div>
@@ -224,7 +224,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
                           onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
                           maxLength={19}
                           placeholder="4123 4567 8901 2345"
-                          className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl pl-4 pr-10 py-2.5 outline-none focus:border-blue-500 font-mono font-bold text-slate-700 placeholder-slate-400"
+                          className="form-input font-mono pl-4 pr-10"
                           required
                         />
                         <div className="absolute right-4 top-3 flex gap-1">
@@ -242,7 +242,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
                           onChange={(e) => setExpiry(formatExpiry(e.target.value))}
                           maxLength={5}
                           placeholder="MM/YY"
-                          className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-blue-500 font-mono font-bold text-slate-700 placeholder-slate-400 text-center"
+                          className="form-input font-mono text-center"
                           required
                         />
                       </div>
@@ -254,7 +254,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
                           onChange={(e) => setCvv(e.target.value.replace(/[^0-9]/g, ''))}
                           maxLength={4}
                           placeholder="•••"
-                          className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-blue-500 font-mono font-bold text-slate-700 placeholder-slate-400 text-center"
+                          className="form-input font-mono text-center"
                           required
                         />
                       </div>

@@ -225,7 +225,7 @@ export default function PatientRegistrationForm({
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Ahmad Fauzi Bin Ramli"
-                    className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-1 focus:ring-blue-500 text-white font-bold placeholder-slate-600"
+                    className="form-input-dark pl-10 py-3"
                     required
                   />
                 </div>
@@ -240,7 +240,7 @@ export default function PatientRegistrationForm({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="ahmad@gmail.com"
-                    className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-1 focus:ring-blue-500 text-white font-bold placeholder-slate-600"
+                    className="form-input-dark pl-10 py-3"
                     required
                   />
                 </div>
@@ -257,7 +257,7 @@ export default function PatientRegistrationForm({
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-1 focus:ring-blue-500 text-white font-bold placeholder-slate-600"
+                    className="form-input-dark pl-10 py-3"
                     required
                   />
                 </div>
@@ -272,7 +272,7 @@ export default function PatientRegistrationForm({
                     value={icNumber}
                     onChange={(e) => setIcNumber(e.target.value)}
                     placeholder="720815-14-5399"
-                    className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-1 focus:ring-blue-500 text-white font-bold placeholder-slate-600"
+                    className="form-input-dark pl-10 py-3"
                     required
                   />
                 </div>
@@ -307,7 +307,7 @@ export default function PatientRegistrationForm({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+60123456789"
-                    className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-1 focus:ring-blue-500 text-white font-bold placeholder-slate-600"
+                    className="form-input-dark pl-10 py-3"
                     required
                   />
                 </div>
@@ -321,7 +321,7 @@ export default function PatientRegistrationForm({
                     type="number"
                     value={age}
                     onChange={(e) => setAge(Number(e.target.value))}
-                    className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-1 focus:ring-blue-500 text-white font-bold placeholder-slate-600"
+                    className="form-input-dark pl-10 py-3"
                     required
                     min="1"
                     max="120"
@@ -334,7 +334,7 @@ export default function PatientRegistrationForm({
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value)}
-                  className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-blue-500 text-white font-bold cursor-pointer"
+                  className="form-select-dark py-3"
                 >
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -402,7 +402,7 @@ export default function PatientRegistrationForm({
                 value={allergiesText}
                 onChange={(e) => setAllergiesText(e.target.value)}
                 placeholder="e.g. Penicillin, Seafood, Peanuts"
-                className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-blue-500 text-white font-bold placeholder-slate-600"
+                className="form-input-dark py-3"
               />
             </div>
 
@@ -417,7 +417,7 @@ export default function PatientRegistrationForm({
                     value={emergencyContactName}
                     onChange={(e) => setEmergencyContactName(e.target.value)}
                     placeholder="Fatimah Binti Fauzi"
-                    className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-blue-500 text-white font-bold placeholder-slate-600"
+                    className="form-input-dark py-3"
                     required
                   />
                 </div>
@@ -428,7 +428,7 @@ export default function PatientRegistrationForm({
                     value={emergencyContactPhone}
                     onChange={(e) => setEmergencyContactPhone(e.target.value)}
                     placeholder="+6017-987-6543"
-                    className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-blue-500 text-white font-bold placeholder-slate-600"
+                    className="form-input-dark py-3"
                     required
                   />
                 </div>

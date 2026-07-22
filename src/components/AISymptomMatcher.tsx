@@ -153,13 +153,12 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
 
             <div className="flex justify-between items-center p-3 rounded-lg border-2 border-slate-200/40">
               <span className="font-bold text-slate-700">Triage Urgency:</span>
-              <span className={`px-2.5 py-1 rounded-full font-extrabold text-[10px] ${
-                result.data.symptomSeverity === 'High/Urgent' 
-                  ? 'bg-red-50 text-red-700 border border-red-100' 
+              <span className={`px-2.5 py-1 rounded-full font-extrabold text-[10px] ${result.data.symptomSeverity === 'High/Urgent'
+                  ? 'bg-red-50 text-red-700 border border-red-100'
                   : result.data.symptomSeverity === 'Medium'
-                  ? 'bg-amber-50 text-amber-700 border border-amber-100'
-                  : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-              }`}>
+                    ? 'bg-amber-50 text-amber-700 border border-amber-100'
+                    : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                }`}>
                 {result.data.symptomSeverity}
               </span>
             </div>

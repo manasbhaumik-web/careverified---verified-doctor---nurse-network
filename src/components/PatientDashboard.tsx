@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { 
   Calendar, Heart, Activity, Sparkles, Plus, Trash2, Clock, FileText, 
   Stethoscope, MapPin, Star, BadgeCheck, RefreshCw, PlusCircle, 
   CheckCircle2, Printer, Video, BookOpen, HeartPulse, Info, 
-  TrendingUp, User, Phone, Mail, FileSignature, Eye, Check, X, FolderHeart, ShieldCheck, Ambulance
+  TrendingUp, User, Phone, Mail, FileSignature, Eye, Check, X, FolderHeart, ShieldCheck, Ambulance,
+  Lock, UserCheck, ScanLine, Bell, ArrowRight
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking, UserRole, ConsultationMode, OnCallDispatch } from '../types';
 import MedicalHistory from './MedicalHistory';
@@ -511,142 +513,186 @@ export default function PatientDashboard({
   return (
     <div className="space-y-8" id="patient-dashboard-root">
       
-      {/* Intro Header Banner with Merged Doctor-on-Call */}
-      <div className="relative overflow-hidden rounded-3xl border border-teal-900/50 bg-gradient-to-br from-teal-950 via-slate-900 to-emerald-950 p-6 md:p-8 text-white shadow-xl flex flex-col gap-6">
-        {/* Abstract subtle visual background glow */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
-        <div className="absolute bottom-0 left-1/3 w-60 h-60 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-          <div className="space-y-2 lg:max-w-xl">
-            <span className="inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider bg-teal-500/20 text-teal-300 border border-teal-500/30 px-3 py-1 rounded-full shadow-inner">
-              <Sparkles className="h-3 w-3 text-teal-400 animate-pulse" />
-              CareVerify Patient Console
+      {/* Standard Header */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 pb-6 border-b border-slate-100">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+          <div className="space-y-1.5 lg:max-w-xl">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-teal-700 bg-teal-50 border border-teal-100/50 px-2.5 py-0.5 rounded-md">
+              <Sparkles className="h-3 w-3" /> CareVerify Console
             </span>
-            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-white leading-tight mt-1">
-              {greetingText}, <span className="bg-gradient-to-r from-white via-slate-100 to-teal-200 bg-clip-text text-transparent">{userName}</span>
+            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 leading-tight">
+              {greetingText},{' '}
+              <span className="text-teal-600">
+                {userName}
+              </span>
             </h2>
-            <p className="text-xs text-slate-400 font-medium">
+            <p className="text-xs text-slate-500 font-medium max-w-xl leading-relaxed hidden md:block">
               Your centralized digital portal for certified telehealth, verified e-prescriptions, and smart clinical telemetry.
             </p>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto shrink-0">
-            {/* Merged Doctor-On-Call Card */}
-            <div className="flex-1 bg-rose-500/10 backdrop-blur-md p-3.5 rounded-2xl border border-rose-500/30 text-left flex items-center justify-between gap-4 shadow-xs relative overflow-hidden group hover:bg-rose-500/20 transition-colors duration-300">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-rose-500/20 rounded-full blur-xl pointer-events-none group-hover:bg-rose-500/30 transition-colors"></div>
-              <div className="flex items-center gap-3 relative z-10">
-                 <div className="bg-rose-600 text-white p-2.5 rounded-xl shadow-md shadow-rose-600/20 animate-pulse shrink-0">
-                   <Ambulance className="h-5 w-5"/>
-                 </div>
-                 <div>
-                   <div className="flex items-center gap-1.5 mb-0.5">
-                     <span className="text-[10px] text-rose-300 font-black uppercase tracking-wider block leading-none">Doctor-on-Call</span>
-                     <span className="inline-flex items-center text-[7px] bg-rose-500 text-white px-1.5 py-0.5 rounded-sm font-black tracking-widest uppercase animate-pulse leading-none">LIVE</span>
-                   </div>
-                   {activeDispatch ? (
-                     <span className="text-xs font-bold text-rose-100 block leading-none">{activeDispatch.doctorName} • <span className="text-white font-black">{activeDispatch.etaMinutes}m ETA</span></span>
-                   ) : (
-                     <span className="text-xs font-bold text-rose-100 block leading-none">24/7 Emergency Dispatch</span>
-                   )}
-                 </div>
-              </div>
-              <button onClick={() => setShowOnCallModal(true)} className="relative z-10 px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black rounded-xl transition-all shadow-md shrink-0 border border-rose-500 hover:scale-[1.02] active:scale-95 flex items-center gap-1.5">
-                {activeDispatch ? 'Track' : 'Request'}
-              </button>
+          {/* Circular Profile Completion */}
+          <div className="hidden lg:flex items-center gap-3 pl-6 border-l border-slate-200 h-16">
+            <div className="relative w-12 h-12 flex items-center justify-center bg-slate-50 rounded-full shrink-0 shadow-inner">
+              <svg className="w-12 h-12 transform -rotate-90">
+                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-200" />
+                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" strokeDasharray="125.6" strokeDashoffset="50.24" className="text-teal-500 transition-all duration-1000 ease-out" strokeLinecap="round" />
+              </svg>
+              <span className="absolute text-[9px] font-black text-slate-700">60%</span>
             </div>
-
-
+            <div>
+              <p className="text-[10px] font-bold text-slate-800 uppercase tracking-wider mb-0.5">Profile Setup</p>
+              <button onClick={() => setActiveTab('records')} className="text-[10px] font-bold text-teal-600 hover:text-teal-700 hover:underline">Add History &rarr;</button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row w-full lg:w-auto shrink-0 mt-2 lg:mt-0">
+          {/* Flat Doctor-On-Call Card */}
+          <div className="flex-1 bg-white p-3 rounded-2xl border border-rose-100 text-left flex items-center justify-between gap-4 shadow-sm group hover:border-rose-200 transition-all duration-300 hover:shadow-md">
+            <div className="flex items-center gap-3">
+               <div className="bg-rose-50 text-rose-600 p-2.5 rounded-xl border border-rose-100 shrink-0">
+                 <Ambulance className="h-5 w-5"/>
+               </div>
+               <div>
+                 <div className="flex items-center gap-2 mb-0.5">
+                   <span className="text-[10px] text-rose-500 font-black uppercase tracking-wider block leading-none">Emergency Dispatch</span>
+                   <span className="inline-flex items-center text-[9px] bg-rose-500 text-white px-1.5 py-0.5 rounded-full font-black tracking-widest uppercase animate-pulse leading-none shadow-sm shadow-rose-500/20">LIVE</span>
+                 </div>
+                 {activeDispatch ? (
+                   <span className="text-xs font-bold text-slate-700 block leading-none tracking-tight">{activeDispatch.doctorName} • <span className="text-rose-600 font-black">{activeDispatch.etaMinutes}m ETA</span></span>
+                 ) : (
+                   <span className="text-xs font-bold text-slate-700 block leading-none tracking-tight">24/7 Doctor-on-Call</span>
+                 )}
+               </div>
+            </div>
+            <button onClick={() => setShowOnCallModal(true)} className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-black rounded-xl transition-all shadow-sm shrink-0 active:scale-95 flex items-center gap-2 uppercase tracking-wider cursor-pointer">
+              {activeDispatch ? 'Track' : 'Request'}
+            </button>
           </div>
         </div>
       </div>
 
-      {/* SEGMENTED GLASSMORPHIC TABS SELECTOR */}
-      <div className="bg-white/80 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200/80 flex flex-wrap gap-1 shadow-sm sticky top-[132px] z-30">
-        <button
-          onClick={() => setActiveTab('appointments')}
-          className={`relative flex-1 min-w-[130px] py-2.5 px-4 text-xs font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer z-10 ${
-            activeTab === 'appointments' ? 'text-teal-900' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50/50'
-          }`}
-          id="tab-appointments-btn"
-        >
-          {activeTab === 'appointments' && (
-            <div className="absolute inset-0 bg-teal-50 border border-teal-100 rounded-xl shadow-3xs -z-10" />
-          )}
-          <Calendar className={`h-4 w-4 ${activeTab === 'appointments' ? 'text-teal-600' : ''}`} />
-          <span>Appointments</span>
-          <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
-            activeTab === 'appointments' ? 'bg-teal-100 text-teal-800' : 'bg-slate-100 text-slate-600'
-          }`}>
-            {upcomingBookings.length}
-          </span>
-        </button>
+      {/* "At a Glance" Overview Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* NBA Overview Card */}
+        {upcomingBookings.length > 0 ? (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-center gap-4">
+              <div className="bg-teal-50 p-2.5 rounded-xl text-teal-600 shrink-0 border border-teal-100">
+                <Bell className="h-5 w-5 animate-pulse" />
+              </div>
+              <div>
+                <h4 className="text-[10px] uppercase tracking-wider font-black text-slate-400 mb-0.5">Next Best Action</h4>
+                <p className="text-sm font-bold text-slate-800">Telehealth call with {upcomingBookings[0].professionalName}</p>
+              </div>
+            </div>
+            {upcomingBookings[0].mode === ConsultationMode.VIDEO ? (
+              <button 
+                onClick={() => setActiveTab('appointments')}
+                className="shrink-0 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-black px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shadow-md hover:-translate-y-0.5"
+              >
+                <Video className="h-4 w-4" />
+                Join Call
+              </button>
+            ) : (
+              <button 
+                onClick={() => setActiveTab('appointments')}
+                className="shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-black px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2 shadow-sm"
+              >
+                View Details
+                <ArrowRight className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </motion.div>
+        ) : (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-center gap-4">
+              <div className="bg-emerald-50 p-2.5 rounded-xl text-emerald-600 shrink-0 border border-emerald-100">
+                <Activity className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="text-[10px] uppercase tracking-wider font-black text-slate-400 mb-0.5">Next Best Action</h4>
+                <p className="text-sm font-bold text-slate-800">Log today's vitals for your health profile.</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setActiveTab('vitals')}
+              className="shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2 shadow-sm"
+            >
+              Log Vitals
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+          </motion.div>
+        )}
 
-        <button
-          onClick={() => setActiveTab('prescriptions')}
-          className={`relative flex-1 min-w-[130px] py-2.5 px-4 text-xs font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer z-10 ${
-            activeTab === 'prescriptions' ? 'text-teal-900' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50/50'
-          }`}
-          id="tab-prescriptions-btn"
+        {/* Quick Stats Placeholder Card */}
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow"
         >
-          {activeTab === 'prescriptions' && (
-            <div className="absolute inset-0 bg-teal-50 border border-teal-100 rounded-xl shadow-3xs -z-10" />
-          )}
-          <FileText className={`h-4 w-4 ${activeTab === 'prescriptions' ? 'text-teal-600' : ''}`} />
-          <span>Prescriptions</span>
-          <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
-            activeTab === 'prescriptions' ? 'bg-teal-100 text-teal-800' : 'bg-slate-100 text-slate-600'
-          }`}>
-            {prescriptionBookings.length}
-          </span>
-        </button>
+           <div className="flex items-center gap-4">
+              <div className="bg-blue-50 p-2.5 rounded-xl text-blue-600 shrink-0 border border-blue-100">
+                <FileText className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="text-[10px] uppercase tracking-wider font-black text-slate-400 mb-0.5">Recent Activity</h4>
+                <p className="text-sm font-bold text-slate-800">{prescriptionBookings.length} Active Prescriptions</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setActiveTab('prescriptions')}
+              className="shrink-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 text-[11px] font-black px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2"
+            >
+              View
+            </button>
+        </motion.div>
+      </div>
 
-        <button
-          onClick={() => setActiveTab('vitals')}
-          className={`relative flex-1 min-w-[130px] py-2.5 px-4 text-xs font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer z-10 ${
-            activeTab === 'vitals' ? 'text-teal-900' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50/50'
-          }`}
-          id="tab-vitals-btn"
-        >
-          {activeTab === 'vitals' && (
-            <div className="absolute inset-0 bg-teal-50 border border-teal-100 rounded-xl shadow-3xs -z-10" />
-          )}
-          <Activity className={`h-4 w-4 ${activeTab === 'vitals' ? 'text-teal-600' : ''}`} />
-          <span>Vitals & Logs</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('records')}
-          className={`relative flex-1 min-w-[130px] py-2.5 px-4 text-xs font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer z-10 ${
-            activeTab === 'records' ? 'text-teal-900' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50/50'
-          }`}
-          id="tab-records-btn"
-        >
-          {activeTab === 'records' && (
-            <div className="absolute inset-0 bg-teal-50 border border-teal-100 rounded-xl shadow-3xs -z-10" />
-          )}
-          <FolderHeart className={`h-4 w-4 ${activeTab === 'records' ? 'text-teal-600' : ''}`} />
-          <span>Medical History</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('saved')}
-          className={`relative flex-1 min-w-[130px] py-2.5 px-4 text-xs font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer z-10 ${
-            activeTab === 'saved' ? 'text-teal-900' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50/50'
-          }`}
-          id="tab-saved-btn"
-        >
-          {activeTab === 'saved' && (
-            <div className="absolute inset-0 bg-teal-50 border border-teal-100 rounded-xl shadow-3xs -z-10" />
-          )}
-          <Heart className={`h-4 w-4 ${activeTab === 'saved' ? 'text-teal-600' : ''}`} />
-          <span>Saved</span>
-          <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
-            activeTab === 'saved' ? 'bg-teal-100 text-teal-800' : 'bg-slate-100 text-slate-600'
-          }`}>
-            {savedProfessionals.length}
-          </span>
-        </button>
+      {/* SEGMENTED TABS SELECTOR (Themed) */}
+      <div className="bg-teal-50/60 p-1.5 rounded-2xl flex flex-wrap sm:flex-nowrap gap-1 shadow-inner sticky top-20 z-30 overflow-x-auto hide-scrollbar border border-teal-100/70">
+        {[
+          { id: 'appointments', label: 'Appointments', icon: Calendar, count: upcomingBookings.length },
+          { id: 'prescriptions', label: 'Prescriptions', icon: FileText, count: prescriptionBookings.length },
+          { id: 'vitals', label: 'Vitals & Logs', icon: Activity },
+          { id: 'records', label: 'Medical History', icon: FolderHeart },
+          { id: 'saved', label: 'Saved Docs', icon: Heart, count: savedProfessionals.length }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            className={`relative flex-1 min-w-[140px] py-2.5 px-4 text-[11px] font-black tracking-wide rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer z-10 ${
+              activeTab === tab.id ? 'text-teal-950' : 'text-teal-700/70 hover:text-teal-900 hover:bg-teal-100/50'
+            }`}
+          >
+            {activeTab === tab.id && (
+              <motion.div
+                layoutId="activeTabDashboard"
+                className="absolute inset-0 bg-white shadow-sm shadow-teal-900/5 border border-teal-100/80 rounded-xl -z-10"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
+            <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-emerald-600' : 'text-teal-600/60 group-hover:text-teal-700'}`} />
+            <span className="whitespace-nowrap">{tab.label}</span>
+            {tab.count !== undefined && (
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ml-auto ${
+                activeTab === tab.id ? 'bg-teal-50 text-teal-800' : 'bg-teal-100/60 text-teal-700'
+              }`}>
+                {tab.count}
+              </span>
+            )}
+          </button>
+        ))}
       </div>
 
       {/* MAIN VIEW CONTENT AREA */}
@@ -667,7 +713,7 @@ export default function PatientDashboard({
           <PrescriptionsTab
             prescriptionBookings={prescriptionBookings}
             onViewPrescription={setSelectedPrescriptionBooking}
-            onWritePrescription={() => setShowGenerateModal(true)}
+            onRequestRefill={() => setShowGenerateModal(true)}
           />
         )}
 
@@ -757,79 +803,111 @@ export default function PatientDashboard({
             )}
 
             {/* Prescription Slip Body */}
-            <div className="p-6 overflow-y-auto space-y-6 flex-1 text-slate-800" id="prescription-printable-area">
+            <div className="p-8 overflow-y-auto space-y-8 flex-1 text-slate-800 bg-white relative" id="prescription-printable-area">
               
-              {/* Rx Header */}
-              <div className="flex justify-between items-start border-b-2 border-slate-100 pb-5">
-                <div className="space-y-1">
-                  <h3 className="text-base font-extrabold text-blue-900 leading-none">CareVerified</h3>
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Licensing Certified Network</span>
-                  <p className="text-[10px] text-slate-500 font-semibold mt-1">CareVerified Registry &bull; swarnabhaumik@gmail.com</p>
+              {/* Official Watermark */}
+              <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] overflow-hidden z-0">
+                <ShieldCheck className="h-96 w-96 text-slate-900 rotate-[-20deg]" />
+              </div>
+
+              <div className="relative z-10">
+                {/* Rx Header */}
+                <div className="flex justify-between items-start border-b-2 border-slate-200 pb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-teal-900 text-teal-100 p-2.5 rounded-xl">
+                      <Stethoscope className="h-6 w-6" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h3 className="text-xl font-black text-teal-950 leading-none">CareVerify</h3>
+                      <span className="text-[11px] font-extrabold text-teal-700 uppercase tracking-[0.2em] block">Verified Medical Network</span>
+                    </div>
+                  </div>
+                  <div className="text-right space-y-2">
+                    <div className="inline-flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-500 text-xs font-bold px-2 py-1 rounded-md">
+                      <Lock className="h-3 w-3" />
+                      SECURE DIGITAL RX
+                    </div>
+                    <p className="text-[11px] text-slate-400 font-mono font-bold tracking-wider">REF: {selectedPrescriptionBooking.id.toUpperCase()}</p>
+                    <p className="text-xs text-slate-400 font-medium">{new Date(selectedPrescriptionBooking.prescription?.issuedAt || Date.now()).toLocaleString()}</p>
+                  </div>
                 </div>
-                <div className="text-right space-y-1.5">
-                  <span className="bg-emerald-50 border border-emerald-100 text-emerald-800 text-[8px] font-extrabold px-2.5 py-0.5 rounded-full inline-block">
-                    Verified Practitioner Certified
+
+                {/* Patient and Professional metadata */}
+                <div className="grid grid-cols-2 gap-0 border-b border-slate-200 my-6">
+                  <div className="space-y-1.5 border-r border-slate-200 pr-6 pb-6">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block">Patient Details</span>
+                    <p className="text-sm font-black text-slate-900">{selectedPrescriptionBooking.patientName}</p>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-slate-500 text-[11px] font-medium flex items-center gap-1.5"><Phone className="h-3 w-3"/> {selectedPrescriptionBooking.patientPhone}</span>
+                      <span className="text-slate-500 text-[11px] font-medium flex items-center gap-1.5"><Mail className="h-3 w-3"/> {selectedPrescriptionBooking.patientEmail}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5 pl-6 pb-6">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block">Prescriber Details</span>
+                    <p className="text-sm font-black text-slate-900">{selectedPrescriptionBooking.professionalName}</p>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-slate-500 text-[11px] font-medium flex items-center gap-1.5"><UserCheck className="h-3 w-3"/> Verified {selectedPrescriptionBooking.professionalRole}</span>
+                      <span className="text-slate-500 text-[11px] font-mono font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded w-max">MMC ID: MMC-87429</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Diagnosis detail */}
+                <div className="space-y-2 mb-6">
+                  <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest block">Clinical Diagnosis</span>
+                  <p className="text-base font-black text-slate-900 bg-slate-50 border border-slate-200 p-4 rounded-xl">
+                    {selectedPrescriptionBooking.prescription?.diagnosis}
+                  </p>
+                </div>
+
+                {/* Rx Medicine grid */}
+                <div className="space-y-3 mb-6 relative">
+                  <div className="absolute top-0 right-4 text-8xl font-black text-slate-100 pointer-events-none opacity-50 select-none font-serif">Rx</div>
+                  <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest block flex items-center gap-1.5">
+                    <FileSignature className="h-3.5 w-3.5" />
+                    Prescribed Medications
                   </span>
-                  <p className="text-[10px] text-slate-500 font-mono font-bold block">Rx ID: {selectedPrescriptionBooking.id}</p>
+                  <div className="border border-slate-200 rounded-xl p-5 bg-white whitespace-pre-line text-sm font-medium text-slate-800 leading-loose border-l-4 border-l-teal-600 relative z-10 shadow-sm">
+                    {selectedPrescriptionBooking.prescription?.medicines}
+                  </div>
                 </div>
-              </div>
 
-              {/* Patient and Professional metadata */}
-              <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-150/60 text-xs">
-                <div className="space-y-1 border-r border-slate-200/80 pr-2">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase block tracking-wider">Patient Details</span>
-                  <p className="font-extrabold text-slate-800">{selectedPrescriptionBooking.patientName}</p>
-                  <p className="text-slate-500 text-[10px] font-semibold">{selectedPrescriptionBooking.patientPhone}</p>
-                  <p className="text-slate-500 text-[10px] font-semibold">{selectedPrescriptionBooking.patientEmail}</p>
-                </div>
-                <div className="space-y-1 pl-2">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase block tracking-wider">Prescriber Details</span>
-                  <p className="font-extrabold text-slate-800">{selectedPrescriptionBooking.professionalName}</p>
-                  <p className="text-slate-500 text-[10px] font-semibold">Verified {selectedPrescriptionBooking.professionalRole}</p>
-                  <p className="text-slate-500 text-[10px] font-mono font-bold">Ref No: {selectedPrescriptionBooking.id}</p>
-                </div>
-              </div>
+                {/* Instructions detail */}
+                {selectedPrescriptionBooking.prescription?.instructions && (
+                  <div className="space-y-2 mb-8">
+                    <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest block">Care Instructions</span>
+                    <p className="text-sm font-medium text-slate-600 leading-relaxed">
+                      {selectedPrescriptionBooking.prescription.instructions}
+                    </p>
+                  </div>
+                )}
 
-              {/* Diagnosis detail */}
-              <div className="space-y-1.5">
-                <span className="text-[9px] font-extrabold text-blue-900 uppercase tracking-wide block">Primary Clinical Diagnosis</span>
-                <p className="text-sm font-extrabold text-slate-900 bg-blue-50/35 border border-blue-100/60 p-3 rounded-xl">
-                  {selectedPrescriptionBooking.prescription?.diagnosis}
-                </p>
-              </div>
-
-              {/* Rx Medicine grid */}
-              <div className="space-y-2">
-                <span className="text-[9px] font-extrabold text-blue-900 uppercase tracking-wide block flex items-center gap-1">
-                  <FileSignature className="h-3.5 w-3.5" />
-                  Prescribed Medication Rx Table
-                </span>
-                <div className="border border-slate-200 rounded-xl p-4 bg-white whitespace-pre-line text-xs font-semibold text-slate-700 leading-relaxed border-l-4 border-l-blue-600">
-                  {selectedPrescriptionBooking.prescription?.medicines}
-                </div>
-              </div>
-
-              {/* Instructions detail */}
-              {selectedPrescriptionBooking.prescription?.instructions && (
-                <div className="space-y-1.5">
-                  <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wide block">Special Instructions / Care Guidelines</span>
-                  <p className="text-xs font-medium text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200/50">
-                    {selectedPrescriptionBooking.prescription.instructions}
-                  </p>
-                </div>
-              )}
-
-              {/* Signature stamp with digital certificate badge */}
-              <div className="border-t border-slate-100 pt-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs">
-                <div className="flex items-center gap-1.5 text-emerald-700 font-extrabold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100 text-[10px]">
-                  <BadgeCheck className="h-4 w-4 text-emerald-600" />
-                  <span>State Council Registry Certified Slip</span>
-                </div>
-                <div className="text-right">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase block">Digital Stamp Certificate</p>
-                  <p className="font-mono text-[10px] font-bold text-slate-700 mt-1 italic">
-                    {selectedPrescriptionBooking.prescription?.digitalSignature}
-                  </p>
+                {/* Signature stamp with digital certificate badge */}
+                <div className="border-t-2 border-slate-100 pt-6 flex flex-col sm:flex-row justify-between items-end gap-6">
+                  <div className="flex flex-col gap-2">
+                    {/* Mock QR Code area for verification */}
+                    <div className="w-16 h-16 bg-slate-100 rounded-lg border border-slate-200 p-1 flex items-center justify-center relative overflow-hidden group cursor-help">
+                      <div className="absolute inset-0 bg-slate-200/50 transition-all group-hover:bg-teal-500/10"></div>
+                      <div className="w-full h-full border border-slate-300 border-dashed rounded relative flex items-center justify-center">
+                        <ScanLine className="h-6 w-6 text-slate-400" />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-emerald-700 font-extrabold bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100 text-[11px] uppercase tracking-wider">
+                      <BadgeCheck className="h-3.5 w-3.5 text-emerald-600" />
+                      <span>Valid Digital Signature</span>
+                    </div>
+                  </div>
+                  <div className="text-center sm:text-right flex flex-col items-end">
+                    <div className="w-40 border-b-2 border-slate-800 pb-2 mb-2">
+                      <span className="font-mono text-lg font-black text-slate-700 italic opacity-80" style={{ fontFamily: "'Dancing Script', cursive, serif" }}>
+                        {selectedPrescriptionBooking.professionalName}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider block">Authorized Signature</p>
+                    <p className="font-mono text-[11px] font-bold text-slate-400 mt-1">
+                      {selectedPrescriptionBooking.prescription?.digitalSignature}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -881,7 +959,7 @@ export default function PatientDashboard({
                   <h4 className="text-sm font-extrabold uppercase tracking-wide flex items-center gap-1.5">
                     Write Prescription
                   </h4>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                  <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-0.5">
                     Official digital prescription panel
                   </p>
                 </div>
@@ -907,12 +985,12 @@ export default function PatientDashboard({
                 
                 {/* Left Column: Patient & Prescribing Practitioner Details */}
                 <div className="space-y-4">
-                  <span className="text-[10px] font-extrabold text-blue-900 uppercase tracking-wider block border-b border-slate-100 pb-1">
+                  <span className="text-xs font-extrabold text-blue-900 uppercase tracking-wider block border-b border-slate-100 pb-1">
                     1. Patient & Practitioner Details
                   </span>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Patient Full Name</label>
+                    <label className="block text-xs font-bold text-slate-600 mb-1">Patient Full Name</label>
                     <input 
                       type="text" 
                       value={prescPatientName}
@@ -925,7 +1003,7 @@ export default function PatientDashboard({
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-600 mb-1">Patient Email</label>
+                      <label className="block text-xs font-bold text-slate-600 mb-1">Patient Email</label>
                       <input 
                         type="email" 
                         value={prescPatientEmail}
@@ -936,7 +1014,7 @@ export default function PatientDashboard({
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-600 mb-1">Patient Mobile Phone</label>
+                      <label className="block text-xs font-bold text-slate-600 mb-1">Patient Mobile Phone</label>
                       <input 
                         type="text" 
                         value={prescPatientPhone}
@@ -949,7 +1027,7 @@ export default function PatientDashboard({
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Prescribing Doctor</label>
+                    <label className="block text-xs font-bold text-slate-600 mb-1">Prescribing Doctor</label>
                     <select 
                       value={prescDoctorId}
                       onChange={(e) => setPrescDoctorId(e.target.value)}
@@ -964,7 +1042,7 @@ export default function PatientDashboard({
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-600 mb-1">MMC Registration Number</label>
+                    <label className="block text-xs font-bold text-slate-600 mb-1">MMC Registration Number</label>
                     <div className="w-full text-xs font-mono font-bold bg-slate-100 border-2 border-slate-200 rounded-xl py-2 px-3 text-slate-700">
                       {professionals.find(p => p.id === prescDoctorId)?.licenseNumber || 'MMC-99213'} (Malaysian Medical Council Verified)
                     </div>
@@ -973,12 +1051,12 @@ export default function PatientDashboard({
 
                 {/* Right Column: Diagnosis & Medicine Formulation */}
                 <div className="space-y-4">
-                  <span className="text-[10px] font-extrabold text-blue-900 uppercase tracking-wider block border-b border-slate-100 pb-1">
+                  <span className="text-xs font-extrabold text-blue-900 uppercase tracking-wider block border-b border-slate-100 pb-1">
                     2. Diagnosis & Medications
                   </span>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Primary Clinical Diagnosis</label>
+                    <label className="block text-xs font-bold text-slate-600 mb-1">Primary Clinical Diagnosis</label>
                     <input 
                       type="text" 
                       value={prescDiagnosis}
@@ -991,11 +1069,11 @@ export default function PatientDashboard({
 
                   {/* Added Medications Chip Area */}
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-600 mb-1">
+                    <label className="block text-xs font-bold text-slate-600 mb-1">
                       Medication List ({medsList.length})
                     </label>
                     {medsList.length === 0 ? (
-                      <p className="text-[10px] text-slate-400 font-semibold italic bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <p className="text-xs text-slate-400 font-semibold italic bg-slate-50 p-3 rounded-xl border border-slate-100">
                         No drugs or medicines added yet. Use formulation builder below.
                       </p>
                     ) : (
@@ -1003,7 +1081,7 @@ export default function PatientDashboard({
                         {medsList.map((med, idx) => (
                           <div 
                             key={idx}
-                            className="bg-white border border-slate-200 text-[10px] font-extrabold text-slate-700 rounded-xl px-2.5 py-1.5 flex items-center gap-1.5 shadow-xs"
+                            className="bg-white border border-slate-200 text-xs font-extrabold text-slate-700 rounded-xl px-2.5 py-1.5 flex items-center gap-1.5 shadow-xs"
                           >
                             <span className="text-emerald-600">💊</span>
                             <span>{med.name} ({med.dosage}) - {med.frequency} [{med.duration}]</span>
@@ -1023,11 +1101,11 @@ export default function PatientDashboard({
 
                   {/* Formulation Builder Box */}
                   <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-3">
-                    <span className="text-[9px] font-extrabold text-slate-500 uppercase block">Add Medication</span>
+                    <span className="text-[11px] font-extrabold text-slate-500 uppercase block">Add Medication</span>
                     
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-[9px] font-bold text-slate-500 mb-0.5">Medicine Name</label>
+                        <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Medicine Name</label>
                         <input 
                           type="text"
                           placeholder="e.g. Metformin"
@@ -1037,7 +1115,7 @@ export default function PatientDashboard({
                         />
                       </div>
                       <div>
-                        <label className="block text-[9px] font-bold text-slate-500 mb-0.5">Dosage / Strength</label>
+                        <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Dosage / Strength</label>
                         <input 
                           type="text"
                           placeholder="e.g. 500mg"
@@ -1050,7 +1128,7 @@ export default function PatientDashboard({
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-[9px] font-bold text-slate-500 mb-0.5">Frequency</label>
+                        <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Frequency</label>
                         <select
                           value={newMedFrequency}
                           onChange={(e) => setNewMedFrequency(e.target.value)}
@@ -1064,7 +1142,7 @@ export default function PatientDashboard({
                         </select>
                       </div>
                       <div>
-                        <label className="block text-[9px] font-bold text-slate-500 mb-0.5">Duration</label>
+                        <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Duration</label>
                         <select
                           value={newMedDuration}
                           onChange={(e) => setNewMedDuration(e.target.value)}
@@ -1083,7 +1161,7 @@ export default function PatientDashboard({
                     <button
                       type="button"
                       onClick={handleAddMedicineItem}
-                      className="w-full bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-extrabold py-1.5 rounded-lg transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer"
+                      className="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold py-1.5 rounded-lg transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <Plus className="h-3 w-3" />
                       Add Medication
@@ -1094,7 +1172,7 @@ export default function PatientDashboard({
 
               {/* Special instructions */}
               <div>
-                <label className="block text-[10px] font-bold text-slate-600 mb-1">Special Instructions</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Special Instructions</label>
                 <textarea 
                   value={prescInstructions}
                   onChange={(e) => setPrescInstructions(e.target.value)}
@@ -1109,10 +1187,10 @@ export default function PatientDashboard({
               <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-4">
                 <div className="flex justify-between items-center flex-wrap gap-2">
                   <div>
-                    <span className="text-[10px] font-extrabold text-blue-900 uppercase tracking-wide block">
+                    <span className="text-xs font-extrabold text-blue-900 uppercase tracking-wide block">
                       3. Digital Signature
                     </span>
-                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                    <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
                       Sign below using touch/mouse or type your name
                     </p>
                   </div>
@@ -1121,7 +1199,7 @@ export default function PatientDashboard({
                     <button
                       type="button"
                       onClick={() => setSigningMethod('draw')}
-                      className={`text-[10px] font-extrabold px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                      className={`text-xs font-extrabold px-3 py-1 rounded-lg transition-all cursor-pointer ${
                         signingMethod === 'draw' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
                       }`}
                     >
@@ -1130,7 +1208,7 @@ export default function PatientDashboard({
                     <button
                       type="button"
                       onClick={() => setSigningMethod('type')}
-                      className={`text-[10px] font-extrabold px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                      className={`text-xs font-extrabold px-3 py-1 rounded-lg transition-all cursor-pointer ${
                         signingMethod === 'type' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
                       }`}
                     >
@@ -1156,21 +1234,21 @@ export default function PatientDashboard({
                         className="w-full h-[100px] block cursor-crosshair bg-slate-50 rounded-lg touch-none border border-slate-100"
                         title="Draw signature with mouse or touch screen"
                       />
-                      <span className="absolute bottom-3 left-3 text-[9px] font-bold text-slate-300 pointer-events-none uppercase tracking-wider">
+                      <span className="absolute bottom-3 left-3 text-[11px] font-bold text-slate-300 pointer-events-none uppercase tracking-wider">
                         Sign within this box
                       </span>
                       {isSigned && (
-                        <span className="absolute top-3 right-3 text-[8px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 flex items-center gap-0.5">
+                        <span className="absolute top-3 right-3 text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 flex items-center gap-0.5">
                           <Check className="h-3 w-3" /> Signed
                         </span>
                       )}
                     </div>
                     <div className="flex justify-between items-center">
-                      <p className="text-[10px] text-slate-400 font-semibold">Use your cursor or touch screen to draw your signature.</p>
+                      <p className="text-xs text-slate-400 font-semibold">Use your cursor or touch screen to draw your signature.</p>
                       <button
                         type="button"
                         onClick={clearCanvas}
-                        className="text-[10px] font-extrabold text-red-600 hover:text-red-800 cursor-pointer bg-red-50 hover:bg-red-100 px-3 py-1 rounded-lg border border-red-200/50"
+                        className="text-xs font-extrabold text-red-600 hover:text-red-800 cursor-pointer bg-red-50 hover:bg-red-100 px-3 py-1 rounded-lg border border-red-200/50"
                       >
                         Clear Signature Pad
                       </button>
@@ -1179,7 +1257,7 @@ export default function PatientDashboard({
                 ) : (
                   <div className="space-y-2">
                     <div>
-                      <label className="block text-[9px] font-bold text-slate-500 mb-1">Doctor Name</label>
+                      <label className="block text-[11px] font-bold text-slate-500 mb-1">Doctor Name</label>
                       <input 
                         type="text"
                         placeholder="e.g. Dr. Ananya Sen"
@@ -1189,7 +1267,7 @@ export default function PatientDashboard({
                       />
                     </div>
                     <div className="bg-slate-100 border border-slate-200 p-4 rounded-xl text-center">
-                      <span className="text-[8px] font-bold text-slate-400 uppercase block mb-1">Signature Preview</span>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Signature Preview</span>
                       <p className="font-serif italic text-xl text-blue-900 tracking-wide select-none">
                         {typedSignature || (professionals.find(p => p.id === prescDoctorId)?.name || 'Dr. Ananya Sen')}
                       </p>
@@ -1202,7 +1280,7 @@ export default function PatientDashboard({
 
             {/* Actions Footer */}
             <div className="bg-slate-50 border-t border-slate-200 p-4 flex justify-between items-center shrink-0">
-              <span className="text-[9px] text-slate-400 font-mono font-bold leading-relaxed max-w-[250px]">
+              <span className="text-[11px] text-slate-400 font-mono font-bold leading-relaxed max-w-[250px]">
                 🔒 Securely processed under Malaysian cyberlaws.
               </span>
               <div className="flex gap-2.5">
@@ -1239,7 +1317,7 @@ export default function PatientDashboard({
             <div className="p-4 bg-gradient-to-b from-blue-950/80 to-transparent flex justify-between items-center z-10 absolute top-0 left-0 right-0">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping"></span>
-                <span className="bg-rose-500 text-white font-extrabold text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-md">
+                <span className="bg-rose-500 text-white font-extrabold text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-md">
                   LIVE SECURED TELEHEALTH
                 </span>
                 {videoConnected && (
@@ -1248,7 +1326,7 @@ export default function PatientDashboard({
                   </span>
                 )}
               </div>
-              <div className="bg-blue-900/60 backdrop-blur-xs px-3 py-1.5 rounded-lg border border-white/10 text-[10px] font-semibold text-slate-300">
+              <div className="bg-blue-900/60 backdrop-blur-xs px-3 py-1.5 rounded-lg border border-white/10 text-xs font-semibold text-slate-300">
                 Patient: {userName} &bull; PDPA Compliant
               </div>
             </div>
@@ -1289,7 +1367,7 @@ export default function PatientDashboard({
                         <div className="absolute inset-0 bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center">
                           <User className="h-10 w-10 text-white/50" />
                         </div>
-                        <div className="absolute bottom-1 right-1 bg-blue-950/60 px-1 text-[8px] rounded text-white font-mono">
+                        <div className="absolute bottom-1 right-1 bg-blue-950/60 px-1 text-[10px] rounded text-white font-mono">
                           You (Self)
                         </div>
                       </div>
@@ -1401,7 +1479,7 @@ export default function PatientDashboard({
                   
                   <div className="space-y-1">
                     {/* Role badge */}
-                    <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${
+                    <span className={`text-[11px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${
                       selectedModalProf.role === UserRole.DOCTOR 
                         ? "bg-teal-50 text-teal-800 border-teal-200/60" 
                         : "bg-slate-100 text-slate-800 border-slate-200"
@@ -1430,7 +1508,7 @@ export default function PatientDashboard({
 
                 {/* Verified badge pill */}
                 <div className="mt-4 flex justify-between items-center bg-teal-50/10 px-3.5 py-1.5 rounded-xl border border-teal-100/50">
-                  <div className="text-[10px] font-bold text-slate-500">Registry Verification Status</div>
+                  <div className="text-xs font-bold text-slate-500">Registry Verification Status</div>
                   <div className="border border-emerald-500/80 text-emerald-600 bg-emerald-50/40 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-3xs">
                     <span>Verified</span>
                     <span className="text-emerald-500">☑</span>
@@ -1444,14 +1522,14 @@ export default function PatientDashboard({
 
                 {/* License credentials details */}
                 <div className="bg-slate-50/60 rounded-xl p-3.5 mt-4 space-y-2 border border-slate-150">
-                  <div className="flex justify-between items-center text-[10px]">
+                  <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-500 flex items-center gap-1.5 font-bold">
                       <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
                       {selectedModalProf.role === UserRole.DOCTOR ? "MMC Registration:" : "LJM Nurse Registry:"}
                     </span>
                     <code className="font-mono font-bold text-[11px] text-slate-800 bg-white border border-slate-200 px-2 py-0.5 rounded shadow-3xs">{selectedModalProf.licenseNumber}</code>
                   </div>
-                  <div className="flex justify-between items-center text-[10px]">
+                  <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-500 flex items-center gap-1.5 font-bold">
                       <Clock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                       Clinical Experience:
@@ -1470,10 +1548,10 @@ export default function PatientDashboard({
                 </div>
                 
                 <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-extrabold uppercase tracking-wider leading-none">Consultation Fee</span>
+                  <span className="text-[11px] text-slate-400 block font-extrabold uppercase tracking-wider leading-none">Consultation Fee</span>
                   <span className="text-sm font-extrabold text-teal-800 font-mono mt-1 block">
                     RM {selectedModalProf.fee}
-                    <span className="text-[10px] font-semibold text-slate-500 font-sans">{selectedModalProf.role === UserRole.DOCTOR ? "" : "/hr"}</span>
+                    <span className="text-xs font-semibold text-slate-500 font-sans">{selectedModalProf.role === UserRole.DOCTOR ? "" : "/hr"}</span>
                   </span>
                 </div>
               </div>

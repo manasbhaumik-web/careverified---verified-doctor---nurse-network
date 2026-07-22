@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  ShieldCheck, Search, Users, ShieldAlert, Award, FileText, 
-  Sparkles, Calendar, BookOpen, Globe, CheckCircle2, RefreshCw, 
-  Heart, MessageSquare, AlertTriangle, Menu, X, PlusCircle, UserCheck, 
-  Stethoscope, ChevronRight, ChevronLeft, Puzzle, Plus, Trash2, 
-  Settings, Download, Activity, CreditCard, TrendingUp
+import {
+  ShieldCheck, Search, Users, ShieldAlert, Award, FileText,
+  Sparkles, Calendar, BookOpen, Globe, CheckCircle2, RefreshCw,
+  Heart, MessageSquare, AlertTriangle, Menu, X, PlusCircle, UserCheck,
+  Stethoscope, ChevronRight, ChevronLeft, Puzzle, Plus, Trash2,
+  Settings, Download, Activity, CreditCard, TrendingUp, Bell
 } from 'lucide-react';
+
 
 // Subcomponents import
 import SearchHub from './components/SearchHub';
@@ -264,14 +265,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans antialiased selection:bg-blue-100 selection:text-blue-900">
-      
+
       {/* Sleek, Dark Mode Top Header */}
       <header className="bg-teal-900 border-b border-teal-800 sticky top-0 z-40 px-4 sm:px-6 lg:px-8 py-3 shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          
+
           {/* Brand Logo */}
-          <div 
-            className="flex items-center gap-3 cursor-pointer" 
+          <div
+            className="flex items-center gap-3 cursor-pointer"
             onClick={() => {
               if (currentUser.role === 'patient') setActiveView('patient_dashboard');
               else if (currentUser.role === 'practitioner') setActiveView('onboard');
@@ -301,16 +302,24 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-3 border-l border-slate-700 pl-5">
-              <div className="text-right">
+              <button
+                className="relative p-2 text-slate-300 hover:text-white hover:bg-teal-800 rounded-full transition-all"
+                title="Notifications"
+              >
+                <Bell className="h-4.5 w-4.5" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-teal-900"></span>
+              </button>
+
+              <div className="text-right ml-2 hidden xl:block">
                 <p className="text-xs font-black text-white leading-none">{currentUser.name}</p>
                 <p className="text-[10px] text-slate-400 font-bold capitalize mt-1">
                   {currentUser.role === 'admin' ? 'Board Admin' : currentUser.role === 'practitioner' ? 'Practitioner Account' : 'Patient Account'}
                 </p>
               </div>
-              <img 
-                src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120'} 
+              <img
+                src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120'}
                 alt={currentUser.name}
-                className="w-9 h-9 rounded-full object-cover border-2 border-slate-700"
+                className="w-9 h-9 rounded-full object-cover border-2 border-slate-700 ml-1"
                 referrerPolicy="no-referrer"
               />
               <button
@@ -325,7 +334,7 @@ export default function App() {
 
           {/* Mobile Navigation Toggler */}
           <div className="flex lg:hidden items-center gap-3">
-            <button 
+            <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-300"
             >
@@ -337,7 +346,7 @@ export default function App() {
         {/* Mobile Horizontal Dropdown Drawer */}
         <AnimatePresence>
           {mobileMenuOpen && (
-            <motion.div 
+            <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -352,25 +361,24 @@ export default function App() {
                     <button
                       key={item.id}
                       onClick={() => { setActiveView(item.id); setSelectedProfId(null); setMobileMenuOpen(false); }}
-                      className={`w-full text-left py-2.5 px-3.5 rounded-xl flex items-center justify-between transition-all ${
-                        isActive 
-                          ? 'bg-blue-600/20 text-blue-400 font-extrabold shadow-sm border border-blue-500/20' 
-                          : 'hover:bg-slate-800 text-slate-400'
-                      }`}
+                      className={`w-full text-left py-2.5 px-3.5 rounded-xl flex items-center justify-between transition-all ${isActive
+                        ? 'bg-teal-600/20 text-teal-400 font-extrabold shadow-sm border border-teal-500/20'
+                        : 'hover:bg-slate-800 text-slate-400'
+                        }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-blue-400' : 'text-slate-500'}`} />
+                        <Icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-teal-400' : 'text-slate-500'}`} />
                         <span>{item.name}</span>
                       </div>
-                      
+
                       {/* Premium status badges for mobile */}
                       {item.id === 'messages' && (
-                        <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${isActive ? 'bg-blue-500 text-white' : 'bg-blue-500/20 text-blue-400'}`}>
+                        <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${isActive ? 'bg-teal-500 text-white' : 'bg-teal-500/20 text-teal-400'}`}>
                           2 new
                         </span>
                       )}
                       {item.id === 'recruitment' && (
-                        <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${isActive ? 'bg-blue-500 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                        <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${isActive ? 'bg-teal-500 text-white' : 'bg-slate-800 text-slate-400'}`}>
                           9 Open
                         </span>
                       )}
@@ -382,11 +390,11 @@ export default function App() {
                     </button>
                   );
                 })}
-                
+
                 <div className="border-t border-slate-800 pt-3.5 mt-3 px-3.5 flex items-center justify-between bg-slate-800/50 p-3 rounded-2xl border border-slate-700/50">
                   <div className="flex items-center gap-2.5">
-                    <img 
-                      src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120'} 
+                    <img
+                      src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120'}
                       alt={currentUser.name}
                       className="w-8 h-8 rounded-full object-cover border border-slate-700 shadow-3xs"
                       referrerPolicy="no-referrer"
@@ -413,12 +421,12 @@ export default function App() {
       <div className="hidden lg:block bg-white/95 backdrop-blur-md border-b border-slate-200/80 py-3 px-8 shadow-[0_4px_12px_rgba(0,0,0,0.02)] shrink-0 sticky top-[60px] z-30">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-5">
-            
+
             {/* Left: Perspective Identification Tag */}
             <div className="flex items-center gap-2 bg-slate-50 border border-slate-200/80 px-3 py-1.5 rounded-lg text-[10px] font-bold text-slate-600 tracking-wide shadow-3xs uppercase">
               <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-600"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-600"></span>
               </span>
               <span>
                 {currentUser.role === 'patient' && 'Patient Hub'}
@@ -436,38 +444,37 @@ export default function App() {
                   <button
                     key={item.id}
                     onClick={() => { setActiveView(item.id); setSelectedProfId(null); }}
-                    className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] font-medium transition-all duration-200 cursor-pointer select-none group ${
-                      isActive ? 'text-blue-700' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-                    }`}
+                    className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] font-medium transition-all duration-200 cursor-pointer select-none group ${isActive ? 'text-teal-800' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                      }`}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="activeNavBackground"
-                        className="absolute inset-0 rounded-lg -z-10 bg-blue-50/80 border border-blue-100/50 shadow-[0_1px_2px_rgba(0,0,0,0.01)]"
+                        className="absolute inset-0 rounded-lg -z-10 bg-teal-50/80 border border-teal-100/50 shadow-[0_1px_2px_rgba(0,0,0,0.01)]"
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
-                    <Icon className={`h-4 w-4 transition-transform duration-200 ${isActive ? 'text-blue-600' : 'text-slate-400 group-hover:scale-110'}`} />
+                    <Icon className={`h-4 w-4 transition-transform duration-200 ${isActive ? 'text-teal-600' : 'text-slate-400 group-hover:scale-110'}`} />
                     <span>{item.name}</span>
-                    
+
                     {/* Glowing status count notifications */}
                     {item.id === 'messages' && (
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ml-1 transition-colors duration-200 ${isActive ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ml-1 transition-colors duration-200 ${isActive ? 'bg-teal-100 text-teal-800' : 'bg-slate-100 text-slate-600'}`}>
                         2 new
                       </span>
                     )}
                     {item.id === 'recruitment' && (
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ml-1 transition-colors duration-200 ${isActive ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ml-1 transition-colors duration-200 ${isActive ? 'bg-teal-100 text-teal-800' : 'bg-slate-100 text-slate-600'}`}>
                         9 Open
                       </span>
                     )}
                     {item.id === 'onboard' && (
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ml-1 transition-colors duration-200 ${isActive ? 'bg-blue-100 text-blue-700' : 'bg-emerald-50 text-emerald-700'}`}>
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ml-1 transition-colors duration-200 ${isActive ? 'bg-teal-100 text-teal-800' : 'bg-emerald-50 text-emerald-700'}`}>
                         MMC
                       </span>
                     )}
                     {item.id === 'seo' && (
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ml-1 transition-colors duration-200 ${isActive ? 'bg-blue-100 text-blue-700' : 'bg-amber-50 text-amber-700'}`}>
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ml-1 transition-colors duration-200 ${isActive ? 'bg-teal-100 text-teal-800' : 'bg-amber-50 text-amber-700'}`}>
                         98%
                       </span>
                     )}
@@ -496,7 +503,7 @@ export default function App() {
           </div>
         ) : (
           <div className="space-y-8 animate-fade-in">
-            
+
             {/* VIEW 1: REGISTRY & SYMPTOM MATCHER */}
             {activeView === 'registry' && !selectedProfId && (
               <div className="space-y-8">
@@ -549,7 +556,7 @@ export default function App() {
 
             {/* VIEW 3: MULTI-STEP ONBOARDING */}
             {activeView === 'onboard' && (
-              <VerificationTerminal 
+              <VerificationTerminal
                 currentUser={currentUser}
                 professionals={professionals}
                 reviews={reviews}
@@ -637,8 +644,8 @@ export default function App() {
 
                       {/* Author credentials card */}
                       <div className="flex gap-3 items-center bg-slate-50 p-3.5 rounded-xl border-2 border-slate-200/60 hover:border-blue-200/50 transition-all duration-200">
-                        <img 
-                          src={art.authorAvatar} 
+                        <img
+                          src={art.authorAvatar}
                           alt={art.authorName}
                           className="h-10 w-10 rounded-full object-cover border-2 border-slate-200 shadow-xs shrink-0"
                           referrerPolicy="no-referrer"
@@ -774,7 +781,7 @@ export default function App() {
       {/* Footer Sitemap */}
       <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 pt-10 pb-6 text-xs mt-12 shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          
+
           {/* Detailed Sitemap Grid */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-slate-800/80">
             {/* Column 1: Brand & Description */}
@@ -804,9 +811,8 @@ export default function App() {
                     <li key={item.id}>
                       <button
                         onClick={() => { setActiveView(item.id); setSelectedProfId(null); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                        className={`flex items-center gap-2 text-[11px] transition-colors hover:text-white cursor-pointer ${
-                          isActive ? 'text-blue-400 font-extrabold' : 'text-slate-400'
-                        }`}
+                        className={`flex items-center gap-2 text-[11px] transition-colors hover:text-white cursor-pointer ${isActive ? 'text-blue-400 font-extrabold' : 'text-slate-400'
+                          }`}
                       >
                         <Icon className="h-3.5 w-3.5 shrink-0 text-slate-500" />
                         <span>{item.name}</span>
