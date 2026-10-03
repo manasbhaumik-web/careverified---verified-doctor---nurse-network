@@ -496,11 +496,11 @@ export default function MedicalHistory() {
       {/* MODAL / DRAWER: UPLOAD SECURE DOCUMENT            */}
       {/* ================================================= */}
       {isUploadingOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
+        <div className="fixed inset-0 bg-slate-100/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-white rounded-3xl w-full max-w-lg border-2 border-slate-200/80 shadow-2xl overflow-hidden flex flex-col justify-between max-h-[90vh]">
             
             {/* Header */}
-            <div className="bg-slate-900 text-white p-5 flex justify-between items-center shrink-0">
+            <div className="bg-blue-700 text-white p-5 flex justify-between items-center shrink-0">
               <div className="space-y-1">
                 <h4 className="text-sm font-extrabold tracking-tight flex items-center gap-1.5">
                   <UploadCloud className="h-4.5 w-4.5 text-blue-400" />
@@ -700,11 +700,11 @@ export default function MedicalHistory() {
       {/* MODAL: VIEW DETAILED STRUCTURED CLINICAL REPORT  */}
       {/* ================================================= */}
       {activeRecordDetail && (
-        <div className="fixed inset-0 bg-slate-800/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
+        <div className="fixed inset-0 bg-slate-100/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-white rounded-3xl w-full max-w-2xl border-2 border-slate-200/80 shadow-2xl overflow-hidden flex flex-col justify-between max-h-[90vh]">
             
             {/* Topbar */}
-            <div className="bg-blue-900 text-white p-5 flex justify-between items-center shrink-0">
+            <div className="bg-blue-700 text-white p-5 flex justify-between items-center shrink-0">
               <div className="space-y-1">
                 <span className="text-[9px] font-extrabold uppercase bg-blue-500/25 text-blue-300 border border-blue-500/30 px-2.5 py-0.5 rounded-full tracking-wider">
                   {activeRecordDetail.category}
@@ -778,7 +778,7 @@ export default function MedicalHistory() {
                 {/* CASE A: LAB RESULT RESULTS LIST */}
                 {activeRecordDetail.structuredData?.results && (
                   <div className="bg-white border-2 border-slate-200/60 rounded-2xl overflow-hidden shadow-xs">
-                    <div className="bg-blue-900 text-white px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-wider">
+                    <div className="bg-blue-700 text-white px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-wider">
                       {activeRecordDetail.structuredData.testName || 'Laboratory Analysis Breakdown'}
                     </div>
                     <div className="divide-y divide-slate-100">

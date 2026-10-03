@@ -4,6 +4,7 @@ import {
   CheckCircle2, Loader, Tag, Users, ShieldCheck, Heart, LayoutGrid, List, Eye, X, Clock 
 } from 'lucide-react';
 import { JobPost, UserRole } from '../types';
+import PageBanner, { BannerStat } from './PageBanner';
 
 interface JobMarketProps {
   jobs: JobPost[];
@@ -114,26 +115,27 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
   return (
     <div className="space-y-8" id="job-market-section">
       {/* Intro Header banner */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-6 text-white gap-4 border-2 border-slate-800">
-        <div>
-          <span className="text-[10px] font-extrabold uppercase bg-blue-500/25 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-full tracking-wider shadow-xs">
-            B2B Shift & Staff Recruitment
-          </span>
-          <h2 className="text-xl font-extrabold tracking-tight mt-2">Hospital Staffing & Nurse Shift Marketplace</h2>
-          <p className="text-xs text-slate-300 font-semibold">Clinics can source verified credential-verified staff for temporary/full contract roles</p>
-        </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-2.5 px-5 text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02]"
-        >
-          <PlusCircle className="h-4 w-4" />
-          {showForm ? "View Active Shifts" : "Post Hospital Vacancy"}
-        </button>
-      </div>
+      <PageBanner
+        eyebrow="B2B Shift & Staff Recruitment"
+        title="Hospital Staffing & Nurse Shift Marketplace"
+        description="Clinics can source credential-verified staff for temporary and full contract roles."
+        actions={
+          <>
+            <BannerStat value={jobs.length} label="Open listings" />
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="min-h-11 px-5 border-[1.5px] border-cross text-cross hover:bg-cross hover:text-white rounded-md text-sm font-bold transition-colors cursor-pointer flex items-center gap-2"
+            >
+              <PlusCircle className="h-4 w-4" />
+              {showForm ? "View Active Shifts" : "Post Hospital Vacancy"}
+            </button>
+          </>
+        }
+      />
 
       {/* JOB POSTING FORM */}
       {showForm && (
-        <form onSubmit={handleCreateJob} className="bg-white border-2 border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-6 animate-slide-down">
+        <form onSubmit={handleCreateJob} className="bg-white border-2 border-slate-200/80 rounded-xl p-6 shadow-sm space-y-6 animate-slide-down">
           <h3 className="text-sm font-extrabold text-slate-900 border-b-2 border-slate-100 pb-3">Publish Shift Openings & Vacancies</h3>
           
           {formSuccess ? (
@@ -283,7 +285,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
       )}
 
       {/* FILTER CONTROLS */}
-      <div className="bg-white border-2 border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row gap-3">
+      <div className="bg-white border-2 border-slate-200/80 rounded-xl p-4 shadow-sm flex flex-col md:flex-row gap-3">
         <div className="flex-1 relative">
           <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
           <input
@@ -359,7 +361,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
       {/* ACTIVE SHIFTS CONTAINER */}
       <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "flex flex-col gap-4"}>
         {filteredJobs.length === 0 ? (
-          <div className="col-span-full bg-white border-2 border-slate-200/80 rounded-2xl p-12 text-center space-y-3">
+          <div className="col-span-full bg-white border-2 border-slate-200/80 rounded-xl p-12 text-center space-y-3">
             <Briefcase className="h-12 w-12 text-slate-300 mx-auto animate-pulse" />
             <h4 className="text-sm font-extrabold text-slate-800">No shift posts match active filters</h4>
             <p className="text-xs text-slate-500 font-semibold">Modify filters to explore other contract categories.</p>
@@ -373,7 +375,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                 <div 
                   key={job.id}
                   onClick={() => setSelectedModalJob(job)}
-                  className={`bg-white border-2 border-slate-200/80 hover:border-blue-300 rounded-2xl p-4 shadow-xs hover:shadow-sm transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 cursor-pointer ${
+                  className={`bg-white border-2 border-slate-200/80 hover:border-blue-300 rounded-xl p-4 shadow-xs hover:shadow-sm transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 cursor-pointer ${
                     job.type === 'Shift-based' ? 'border-l-red-500' : 'border-l-blue-600'
                   }`}
                 >
@@ -402,7 +404,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   <div className="flex items-center justify-between md:justify-end gap-4 shrink-0 border-t md:border-t-0 pt-3 md:pt-0 border-slate-100">
                     <div className="text-left md:text-right mr-2">
                       <span className="text-[9px] text-slate-400 block font-bold leading-none uppercase">Offered Allowance</span>
-                      <span className="text-xs font-extrabold text-blue-900 leading-relaxed block">{job.salaryRange}</span>
+                      <span className="font-mono text-xs font-extrabold text-blue-900 leading-relaxed block">{job.salaryRange}</span>
                     </div>
 
                     <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
@@ -442,7 +444,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
             return (
               <div 
                 key={job.id}
-                className={`bg-white border-2 border-slate-200/80 hover:border-blue-300 rounded-2xl p-6 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between border-l-4 ${
+                className={`bg-white border-2 border-slate-200/80 hover:border-blue-300 rounded-xl p-6 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between border-l-4 ${
                   job.type === 'Shift-based' ? 'border-l-red-500' : 'border-l-blue-600'
                 }`}
               >
@@ -493,13 +495,13 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                 <div className="flex justify-between items-center border-t-2 border-slate-100/80 pt-4 mt-5">
                   <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold">
                     <Users className="h-4 w-4 text-slate-400" />
-                    <span>{job.applicantsCount} Applicants</span>
+                    <span><span className="font-mono tabular-nums">{job.applicantsCount}</span> Applicants</span>
                   </div>
 
                   <div className="flex items-center gap-3">
                     <div className="text-right">
                       <span className="text-[9px] text-slate-400 block font-bold leading-none uppercase">Offered Allowance</span>
-                      <span className="text-xs font-extrabold text-blue-900 leading-relaxed block">{job.salaryRange}</span>
+                      <span className="font-mono text-xs font-extrabold text-blue-900 leading-relaxed block">{job.salaryRange}</span>
                     </div>
 
                     <button
@@ -533,17 +535,17 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
       {/* ========================================== */}
       {selectedModalJob && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-800/60 backdrop-blur-xs animate-fade-in"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-100/80 backdrop-blur-xs animate-fade-in"
           onClick={() => setSelectedModalJob(null)}
         >
           <div 
-            className="bg-white border-2 border-slate-200 rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden animate-slide-down flex flex-col max-h-[90vh]"
+            className="bg-white border-2 border-slate-200 rounded-xl w-full max-w-xl shadow-2xl overflow-hidden animate-slide-down flex flex-col max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header banner */}
-            <div className="bg-blue-900 text-white p-5 flex justify-between items-center shrink-0">
+            <div className="bg-blue-700 text-white p-5 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-slate-800 border border-slate-700 rounded-xl flex items-center justify-center text-lg shadow-xs shrink-0">
+                <div className="h-10 w-10 bg-blue-600 border border-slate-700 rounded-xl flex items-center justify-center text-lg shadow-xs shrink-0">
                   {selectedModalJob.hospitalLogo}
                 </div>
                 <div>
@@ -568,10 +570,10 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
             <div className="p-6 overflow-y-auto space-y-6 flex-1 text-slate-800">
               
               {/* Allowance Badge Panel */}
-              <div className="flex flex-wrap justify-between items-center gap-3 bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
+              <div className="flex flex-wrap justify-between items-center gap-3 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
                 <div>
                   <span className="text-[9px] text-blue-800 block font-black uppercase tracking-wider">Estimated Allowance</span>
-                  <span className="text-base font-extrabold text-blue-900 leading-tight block">{selectedModalJob.salaryRange}</span>
+                  <span className="font-mono text-base font-extrabold text-blue-900 leading-tight block">{selectedModalJob.salaryRange}</span>
                 </div>
                 <span className="bg-blue-600 text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-lg tracking-wider">
                   {selectedModalJob.type}
@@ -610,7 +612,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   <ShieldCheck className="h-4.5 w-4.5 text-emerald-600" />
                   Mandated Licensing & Clinical Credentials Check:
                 </span>
-                <div className="bg-emerald-50/20 border border-emerald-100/50 rounded-2xl p-4 space-y-2">
+                <div className="bg-emerald-50/20 border border-emerald-100/50 rounded-xl p-4 space-y-2">
                   <ul className="text-xs text-slate-700 list-disc list-inside space-y-1.5">
                     {selectedModalJob.requirements.map((req, idx) => (
                       <li key={idx} className="font-semibold leading-relaxed">{req}</li>

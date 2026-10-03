@@ -67,9 +67,9 @@ export default function SecureMessenger() {
   };
 
   return (
-    <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden flex flex-col h-[520px]" id="secure-messenger-panel">
+    <div className="bg-white border border-slate-100 rounded-xl shadow-sm overflow-hidden flex flex-col h-[520px]" id="secure-messenger-panel">
       {/* Header Panel */}
-      <div className="bg-blue-900 p-4 text-white flex items-center justify-between border-b border-blue-800">
+      <div className="bg-blue-700 p-4 text-white flex items-center justify-between border-b border-blue-800">
         <div className="flex items-center gap-2.5">
           <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
           <div>
@@ -79,7 +79,7 @@ export default function SecureMessenger() {
             <span className="text-[10px] text-blue-200 block font-medium">HIPAA Compliant End-to-End Encryption</span>
           </div>
         </div>
-        <div className="flex items-center gap-1 bg-blue-950/40 border border-blue-400/20 rounded-lg px-2.5 py-1">
+        <div className="flex items-center gap-1 bg-blue-800/40 border border-blue-400/20 rounded-lg px-2.5 py-1">
           <Lock className="h-3 w-3 text-blue-300" />
           <span className="text-[9px] font-bold text-blue-200">SECURE DISPATCH</span>
         </div>
@@ -101,15 +101,15 @@ export default function SecureMessenger() {
               key={msg.id}
               className={`flex flex-col max-w-[75%] ${isMe ? "ml-auto items-end" : "mr-auto items-start"}`}
             >
-              <span className="text-[9px] text-slate-400 font-bold mb-0.5 px-1">{msg.senderName}</span>
-              <div className={`p-3 rounded-2xl text-xs font-medium leading-relaxed shadow-sm ${
-                isMe 
-                  ? "bg-blue-600 text-white rounded-tr-none" 
+              <span className="font-serif text-[10px] text-slate-500 font-semibold mb-0.5 px-1">{msg.senderName}</span>
+              <div className={`p-3 rounded-xl text-xs font-medium leading-relaxed shadow-sm ${
+                isMe
+                  ? "bg-blue-600 text-white rounded-tr-none"
                   : "bg-white border border-slate-200 text-slate-800 rounded-tl-none"
               }`}>
                 {msg.text}
               </div>
-              <span className="text-[8px] text-slate-400 font-semibold mt-1 flex items-center gap-1 px-1">
+              <span className="font-mono tabular-nums text-[8px] text-slate-400 font-semibold mt-1 flex items-center gap-1 px-1">
                 {msg.timestamp}
                 {isMe && <Check className="h-3 w-3 text-blue-600" />}
               </span>

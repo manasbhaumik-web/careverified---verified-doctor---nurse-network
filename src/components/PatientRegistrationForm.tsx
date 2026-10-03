@@ -138,14 +138,14 @@ export default function PatientRegistrationForm({
         </div>
         <button 
           onClick={onCancel} 
-          className="text-slate-400 hover:text-white transition-all text-xs font-black py-1.5 px-3 hover:bg-slate-800 rounded-xl cursor-pointer"
+          className="text-slate-400 hover:text-white transition-all text-xs font-black py-1.5 px-3 hover:bg-blue-600 rounded-xl cursor-pointer"
         >
           Sign In Instead
         </button>
       </div>
 
       {/* Stepped Progress Guide Indicator */}
-      <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4.5 space-y-3.5">
+      <div className="bg-white/10 border border-slate-800 rounded-2xl p-4.5 space-y-3.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-blue-400 tracking-wider">
             <Sparkles className="h-4 w-4" />
@@ -162,15 +162,15 @@ export default function PatientRegistrationForm({
               step > 1 
                 ? 'bg-blue-600 border-2 border-blue-600 text-white shadow-md shadow-blue-500/10' 
                 : step === 1 
-                  ? 'bg-slate-950 border-2 border-blue-500 text-blue-400 ring-4 ring-blue-500/10' 
-                  : 'bg-slate-950 border-2 border-slate-800 text-slate-500'
+                  ? 'bg-blue-800 border-2 border-blue-500 text-blue-400 ring-4 ring-blue-500/10' 
+                  : 'bg-blue-800 border-2 border-slate-800 text-slate-500'
             }`}>
               {step > 1 ? <Check className="h-4 w-4 font-black" /> : <span className="text-xs font-black">1</span>}
             </div>
             <span className={`text-[9px] font-black uppercase mt-1.5 ${step === 1 ? 'text-blue-400' : 'text-slate-500'}`}>Account Setup</span>
           </div>
 
-          <div className={`flex-1 h-0.5 mx-2 transition-all ${step > 1 ? 'bg-blue-600' : 'bg-slate-800'}`}></div>
+          <div className={`flex-1 h-0.5 mx-2 transition-all ${step > 1 ? 'bg-blue-600' : 'bg-blue-600'}`}></div>
 
           {/* Step 2 Indicator */}
           <div className="flex flex-col items-center z-10">
@@ -178,22 +178,22 @@ export default function PatientRegistrationForm({
               step > 2 
                 ? 'bg-blue-600 border-2 border-blue-600 text-white shadow-md shadow-blue-500/10' 
                 : step === 2 
-                  ? 'bg-slate-950 border-2 border-blue-500 text-blue-400 ring-4 ring-blue-500/10' 
-                  : 'bg-slate-950 border-2 border-slate-800 text-slate-500'
+                  ? 'bg-blue-800 border-2 border-blue-500 text-blue-400 ring-4 ring-blue-500/10' 
+                  : 'bg-blue-800 border-2 border-slate-800 text-slate-500'
             }`}>
               {step > 2 ? <Check className="h-4 w-4 font-black" /> : <span className="text-xs font-black">2</span>}
             </div>
             <span className={`text-[9px] font-black uppercase mt-1.5 ${step === 2 ? 'text-blue-400' : 'text-slate-500'}`}>Demographics</span>
           </div>
 
-          <div className={`flex-1 h-0.5 mx-2 transition-all ${step > 2 ? 'bg-blue-600' : 'bg-slate-800'}`}></div>
+          <div className={`flex-1 h-0.5 mx-2 transition-all ${step > 2 ? 'bg-blue-600' : 'bg-blue-600'}`}></div>
 
           {/* Step 3 Indicator */}
           <div className="flex flex-col items-center z-10">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
               step === 3 
-                ? 'bg-slate-950 border-2 border-blue-500 text-blue-400 ring-4 ring-blue-500/10' 
-                : 'bg-slate-950 border-2 border-slate-800 text-slate-500'
+                ? 'bg-blue-800 border-2 border-blue-500 text-blue-400 ring-4 ring-blue-500/10' 
+                : 'bg-blue-800 border-2 border-slate-800 text-slate-500'
             }`}>
               <span className="text-xs font-black">3</span>
             </div>
@@ -285,7 +285,7 @@ export default function PatientRegistrationForm({
                 type="button"
                 onClick={handleNextStep}
                 disabled={!isStep1Valid()}
-                className="py-2.5 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-800 disabled:text-slate-500 text-white rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-blue-500/10"
+                className="py-2.5 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600 disabled:text-slate-500 text-white rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-blue-500/10"
               >
                 <span>Continue</span>
                 <ArrowRight className="h-4 w-4" />
@@ -348,7 +348,7 @@ export default function PatientRegistrationForm({
               <button
                 type="button"
                 onClick={handlePrevStep}
-                className="py-2.5 px-5 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer"
+                className="py-2.5 px-5 border border-slate-800 text-slate-300 hover:text-white hover:bg-blue-600 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Back</span>
@@ -358,7 +358,7 @@ export default function PatientRegistrationForm({
                 type="button"
                 onClick={handleNextStep}
                 disabled={!isStep2Valid()}
-                className="py-2.5 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-800 disabled:text-slate-500 text-white rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-blue-500/10"
+                className="py-2.5 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600 disabled:text-slate-500 text-white rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-blue-500/10"
               >
                 <span>Continue</span>
                 <ArrowRight className="h-4 w-4" />
@@ -384,7 +384,7 @@ export default function PatientRegistrationForm({
                       className={`text-[10px] font-bold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
                         isChecked 
                           ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/10 scale-102 font-black' 
-                          : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-white'
+                          : 'bg-blue-800 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-white'
                       }`}
                     >
                       {cond}
@@ -440,7 +440,7 @@ export default function PatientRegistrationForm({
               <button
                 type="button"
                 onClick={handlePrevStep}
-                className="py-2.5 px-5 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer"
+                className="py-2.5 px-5 border border-slate-800 text-slate-300 hover:text-white hover:bg-blue-600 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Back</span>
@@ -449,7 +449,7 @@ export default function PatientRegistrationForm({
               <button
                 type="submit"
                 disabled={loading || !isStep3Valid()}
-                className="py-2.5 px-6 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-800 disabled:text-slate-500 text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-emerald-500/10"
+                className="py-2.5 px-6 bg-emerald-600 hover:bg-emerald-700 disabled:bg-blue-600 disabled:text-slate-500 text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-emerald-500/10"
               >
                 {loading ? (
                   <>

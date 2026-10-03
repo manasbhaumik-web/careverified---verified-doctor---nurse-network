@@ -58,7 +58,7 @@ export default function AppointmentsTab({
           animate={{ opacity: 1, scale: 1 }}
           className="bg-white border border-slate-200/60 rounded-[32px] py-20 px-8 text-center space-y-5 shadow-sm max-w-2xl mx-auto"
         >
-          <div className="h-16 w-16 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+          <div className="h-16 w-16 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center mx-auto shadow-sm">
             <Calendar className="h-8 w-8 text-slate-400" />
           </div>
           <div className="space-y-2">
@@ -122,13 +122,13 @@ export default function AppointmentsTab({
                         <img 
                           src={matchedProf.avatar} 
                           alt={b.professionalName} 
-                          className={`h-14 w-14 rounded-2xl object-cover border-2 shadow-sm shrink-0 transition-transform duration-300 group-hover:scale-105 ${
+                          className={`h-14 w-14 rounded-xl object-cover border-2 shadow-sm shrink-0 transition-transform duration-300 group-hover:scale-105 ${
                             isVideo ? 'border-teal-100' : 'border-indigo-100'
                           }`}
                           referrerPolicy="no-referrer"
                         />
                       ) : (
-                        <div className="h-14 w-14 rounded-2xl bg-slate-50 text-slate-400 font-bold flex items-center justify-center text-lg border border-slate-200 shadow-sm shrink-0">
+                        <div className="h-14 w-14 rounded-xl bg-slate-50 text-slate-400 font-bold flex items-center justify-center text-lg border border-slate-200 shadow-sm shrink-0">
                           <User className="h-6 w-6" />
                         </div>
                       )}
@@ -159,7 +159,7 @@ export default function AppointmentsTab({
                   </div>
 
                   {/* Consultation Timing grid */}
-                  <div className="grid grid-cols-2 gap-3 text-xs font-bold text-slate-700 bg-slate-50/80 border border-slate-100 p-3.5 rounded-2xl group-hover:bg-teal-50/30 transition-colors duration-300">
+                  <div className="grid grid-cols-2 gap-3 text-xs font-bold text-slate-700 bg-slate-50/80 border border-slate-100 p-3.5 rounded-xl group-hover:bg-teal-50/30 transition-colors duration-300">
                     <div className="flex items-center gap-2.5">
                       <div className="bg-white p-1.5 rounded-lg border border-slate-200 shadow-xs">
                         <Calendar className="h-4 w-4 text-teal-600" />
@@ -182,7 +182,7 @@ export default function AppointmentsTab({
 
                   {/* Patient Symptom Brief */}
                   {b.symptoms && (
-                    <div className="text-[11px] text-slate-600 bg-white border border-slate-200 p-3.5 rounded-2xl shadow-xs">
+                    <div className="text-[11px] text-slate-600 bg-white border border-slate-200 p-3.5 rounded-xl shadow-xs">
                       <strong className="text-slate-700 block text-[11px] font-black uppercase tracking-wider mb-1">Stated Symptoms & Concerns:</strong>
                       <span className="italic font-medium text-slate-500">"{b.symptoms}"</span>
                     </div>
@@ -190,7 +190,7 @@ export default function AppointmentsTab({
 
                   {/* In-person Clinic Address Details */}
                   {!isVideo && matchedProf && (
-                    <div className="text-[11px] text-slate-600 bg-indigo-50/30 border border-indigo-100 p-3.5 rounded-2xl space-y-1.5">
+                    <div className="text-[11px] text-slate-600 bg-indigo-50/30 border border-indigo-100 p-3.5 rounded-xl space-y-1.5">
                       <span className="text-[11px] uppercase tracking-widest text-indigo-700 block font-black">Clinic Practice Address:</span>
                       <p className="flex items-start gap-2 text-slate-800 font-bold">
                         <MapPin className="h-4 w-4 text-indigo-600 shrink-0 mt-0.5" />

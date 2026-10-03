@@ -23,6 +23,7 @@ import LandingPage from './components/LandingPage';
 
 // Types import
 import { DoctorProfile, NurseProfile, Booking, Review, JobPost, Article, UserRole, AppPackage } from './types';
+import PageBanner from './components/PageBanner';
 
 export default function App() {
   // Navigation & View State
@@ -266,9 +267,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans antialiased selection:bg-blue-100 selection:text-blue-900">
 
-      {/* Sleek, Dark Mode Top Header */}
-      <header className="bg-teal-900 border-b border-teal-800 sticky top-0 z-40 px-4 sm:px-6 lg:px-8 py-3 shrink-0">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      {/* Red Cross header: white bar under a red signal rule */}
+      <header className="bg-cross border-b border-cross-dark sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0">
+        <div className="max-w-7xl mx-auto flex items-center justify-between h-16">
 
           {/* Brand Logo */}
           <div
@@ -280,52 +281,54 @@ export default function App() {
               setSelectedProfId(null);
             }}
           >
-            <div className="bg-teal-600 text-white p-2 rounded-xl shadow-sm shrink-0">
-              <Stethoscope className="h-5 w-5" />
+            <div className="w-10 h-10 rounded-lg bg-white text-cross flex items-center justify-center shrink-0">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
             </div>
-            <div>
-              <span className="text-base font-extrabold text-white tracking-tight flex items-center gap-2 leading-none">
+            <div className="leading-none">
+              <span className="font-display font-black text-[21px] text-white tracking-tight flex items-center gap-2.5">
                 CareVerify
-                <span className="text-[9px] bg-teal-500/20 text-teal-300 border border-teal-500/30 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wide">
+                <span className="text-[10px] text-white border-[1.5px] border-white/80 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider font-body">
                   {currentUser.role === 'admin' ? 'Board' : currentUser.role === 'practitioner' ? 'Clinical' : 'Patient'}
                 </span>
               </span>
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mt-1">Verified Network</span>
+              <span className="text-[11px] font-semibold text-cross-tint uppercase tracking-[0.16em] block mt-1.5">Verified Network</span>
             </div>
           </div>
 
           {/* Right-Side Desktop Actions & User Session Details */}
           <div className="hidden lg:flex items-center gap-5">
-            <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-emerald-400">
-              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+            <div className="flex items-center gap-2 border-[1.5px] border-white/60 px-3 py-1.5 rounded-md text-[11px] font-bold text-white">
+              <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
               <span>Regulatory Aligned</span>
             </div>
 
-            <div className="flex items-center gap-3 border-l border-slate-700 pl-5">
+            <div className="flex items-center gap-3 border-l border-white/30 pl-5">
               <button
-                className="relative p-2 text-slate-300 hover:text-white hover:bg-teal-800 rounded-full transition-all"
+                className="relative p-2 text-white hover:bg-white/15 rounded-md transition-colors cursor-pointer"
                 title="Notifications"
+                aria-label="Notifications"
               >
-                <Bell className="h-4.5 w-4.5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-teal-900"></span>
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-white rounded-full ring-2 ring-cross"></span>
               </button>
 
-              <div className="text-right ml-2 hidden xl:block">
-                <p className="text-xs font-black text-white leading-none">{currentUser.name}</p>
-                <p className="text-[10px] text-slate-400 font-bold capitalize mt-1">
+              <div className="text-right ml-1 hidden xl:block">
+                <p className="text-sm font-bold text-white leading-none">{currentUser.name}</p>
+                <p className="text-[11px] text-cross-tint font-semibold mt-1">
                   {currentUser.role === 'admin' ? 'Board Admin' : currentUser.role === 'practitioner' ? 'Practitioner Account' : 'Patient Account'}
                 </p>
               </div>
               <img
                 src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120'}
                 alt={currentUser.name}
-                className="w-9 h-9 rounded-full object-cover border-2 border-slate-700 ml-1"
+                className="w-10 h-10 rounded-full object-cover border-2 border-white ml-1"
                 referrerPolicy="no-referrer"
               />
               <button
                 onClick={handleLogout}
-                className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all ml-1 cursor-pointer"
+                className="p-2 text-white hover:bg-white hover:text-cross rounded-md transition-colors ml-1 cursor-pointer"
                 title="Sign Out"
+                aria-label="Sign out"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -336,14 +339,15 @@ export default function App() {
           <div className="flex lg:hidden items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-300"
+              className="min-h-11 min-w-11 flex items-center justify-center rounded-md border-[1.5px] border-white text-white hover:bg-white/15 cursor-pointer"
+              aria-label="Toggle navigation"
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Horizontal Dropdown Drawer */}
+        {/* Mobile Dropdown Drawer */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
@@ -351,9 +355,9 @@ export default function App() {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="lg:hidden border-t border-slate-800 mt-3 overflow-hidden"
+              className="lg:hidden bg-white text-slate-700 -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-cross-dark overflow-hidden"
             >
-              <div className="pt-3 pb-3 px-1 space-y-1.5 text-xs font-bold text-slate-300">
+              <div className="py-3 space-y-1 text-sm font-semibold text-slate-700">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeView === item.id;
@@ -361,29 +365,28 @@ export default function App() {
                     <button
                       key={item.id}
                       onClick={() => { setActiveView(item.id); setSelectedProfId(null); setMobileMenuOpen(false); }}
-                      className={`w-full text-left py-2.5 px-3.5 rounded-xl flex items-center justify-between transition-all ${isActive
-                        ? 'bg-teal-600/20 text-teal-400 font-extrabold shadow-sm border border-teal-500/20'
-                        : 'hover:bg-slate-800 text-slate-400'
+                      className={`w-full text-left min-h-11 py-2.5 px-3.5 rounded-md flex items-center justify-between transition-colors cursor-pointer ${isActive
+                        ? 'bg-cross text-white font-bold'
+                        : 'hover:bg-slate-100 text-slate-700'
                         }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-teal-400' : 'text-slate-500'}`} />
+                        <Icon className={`h-5 w-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-500'}`} />
                         <span>{item.name}</span>
                       </div>
 
-                      {/* Premium status badges for mobile */}
                       {item.id === 'messages' && (
-                        <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${isActive ? 'bg-teal-500 text-white' : 'bg-teal-500/20 text-teal-400'}`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${isActive ? 'bg-white text-cross' : 'bg-cross-tint text-cross'}`}>
                           2 new
                         </span>
                       )}
                       {item.id === 'recruitment' && (
-                        <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${isActive ? 'bg-teal-500 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${isActive ? 'bg-white text-cross' : 'bg-slate-100 text-slate-700'}`}>
                           9 Open
                         </span>
                       )}
                       {item.id === 'onboard' && (
-                        <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${isActive ? 'bg-blue-500 text-white' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${isActive ? 'bg-white text-cross' : 'bg-slate-100 text-slate-700'}`}>
                           MMC
                         </span>
                       )}
@@ -391,22 +394,22 @@ export default function App() {
                   );
                 })}
 
-                <div className="border-t border-slate-800 pt-3.5 mt-3 px-3.5 flex items-center justify-between bg-slate-800/50 p-3 rounded-2xl border border-slate-700/50">
-                  <div className="flex items-center gap-2.5">
+                <div className="pt-3 mt-3 border-t border-slate-200 flex items-center justify-between gap-3 px-1">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     <img
                       src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120'}
                       alt={currentUser.name}
-                      className="w-8 h-8 rounded-full object-cover border border-slate-700 shadow-3xs"
+                      className="w-9 h-9 rounded-full object-cover border-2 border-cross shrink-0"
                       referrerPolicy="no-referrer"
                     />
-                    <div>
-                      <p className="text-[11px] font-black text-white leading-none">{currentUser.name}</p>
-                      <p className="text-[9px] text-slate-400 font-bold capitalize mt-1">{currentUser.role} Account</p>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-ink leading-none truncate">{currentUser.name}</p>
+                      <p className="text-[11px] text-slate-600 font-semibold capitalize mt-1">{currentUser.role} Account</p>
                     </div>
                   </div>
                   <button
                     onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
-                    className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg text-[10px] font-black transition-colors border border-rose-500/20"
+                    className="min-h-11 px-4 border-[1.5px] border-cross text-cross hover:bg-cross hover:text-white rounded-md text-xs font-bold transition-colors cursor-pointer"
                   >
                     Sign Out
                   </button>
@@ -417,17 +420,14 @@ export default function App() {
         </AnimatePresence>
       </header>
 
-      {/* Redesigned Navigation Menu (Sitemap Bar) */}
-      <div className="hidden lg:block bg-white/95 backdrop-blur-md border-b border-slate-200/80 py-3 px-8 shadow-[0_4px_12px_rgba(0,0,0,0.02)] shrink-0 sticky top-[60px] z-30">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-5">
+      {/* Navigation bar: underline tabs, red signal on the active one */}
+      <div className="hidden lg:block bg-white border-b border-slate-200 px-8 shrink-0 sticky top-[65px] z-30">
+        <div className="max-w-7xl mx-auto flex items-stretch justify-between">
+          <div className="flex items-stretch gap-6">
 
             {/* Left: Perspective Identification Tag */}
-            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200/80 px-3 py-1.5 rounded-lg text-[10px] font-bold text-slate-600 tracking-wide shadow-3xs uppercase">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-600"></span>
-              </span>
+            <div className="flex items-center gap-2 self-center bg-cross text-white px-3 py-1.5 rounded-md text-[11px] font-bold tracking-wider uppercase">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
               <span>
                 {currentUser.role === 'patient' && 'Patient Hub'}
                 {currentUser.role === 'practitioner' && 'Practitioner Space'}
@@ -435,8 +435,8 @@ export default function App() {
               </span>
             </div>
 
-            {/* Middle: Segmented sliding nav tab layout */}
-            <nav className="flex items-center gap-1 bg-transparent relative z-0">
+            {/* Tabs */}
+            <nav className="flex items-stretch gap-1 relative z-0">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeView === item.id;
@@ -444,39 +444,39 @@ export default function App() {
                   <button
                     key={item.id}
                     onClick={() => { setActiveView(item.id); setSelectedProfId(null); }}
-                    className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] font-medium transition-all duration-200 cursor-pointer select-none group ${isActive ? 'text-teal-800' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                    className={`relative flex items-center gap-2 px-3.5 py-4 text-[13px] font-semibold transition-colors duration-200 cursor-pointer select-none group ${isActive ? 'text-cross' : 'text-slate-700 hover:text-ink hover:bg-slate-50'
                       }`}
                   >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeNavBackground"
-                        className="absolute inset-0 rounded-lg -z-10 bg-teal-50/80 border border-teal-100/50 shadow-[0_1px_2px_rgba(0,0,0,0.01)]"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                    <Icon className={`h-4 w-4 transition-transform duration-200 ${isActive ? 'text-teal-600' : 'text-slate-400 group-hover:scale-110'}`} />
+                    <Icon className={`h-4 w-4 ${isActive ? 'text-cross' : 'text-slate-500'}`} />
                     <span>{item.name}</span>
 
-                    {/* Glowing status count notifications */}
                     {item.id === 'messages' && (
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ml-1 transition-colors duration-200 ${isActive ? 'bg-teal-100 text-teal-800' : 'bg-slate-100 text-slate-600'}`}>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ml-0.5 ${isActive ? 'bg-cross text-white' : 'bg-cross-tint text-cross'}`}>
                         2 new
                       </span>
                     )}
                     {item.id === 'recruitment' && (
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ml-1 transition-colors duration-200 ${isActive ? 'bg-teal-100 text-teal-800' : 'bg-slate-100 text-slate-600'}`}>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ml-0.5 ${isActive ? 'bg-cross text-white' : 'bg-slate-100 text-slate-700'}`}>
                         9 Open
                       </span>
                     )}
                     {item.id === 'onboard' && (
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ml-1 transition-colors duration-200 ${isActive ? 'bg-teal-100 text-teal-800' : 'bg-emerald-50 text-emerald-700'}`}>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ml-0.5 ${isActive ? 'bg-cross text-white' : 'bg-slate-100 text-slate-700'}`}>
                         MMC
                       </span>
                     )}
                     {item.id === 'seo' && (
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ml-1 transition-colors duration-200 ${isActive ? 'bg-teal-100 text-teal-800' : 'bg-amber-50 text-amber-700'}`}>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ml-0.5 ${isActive ? 'bg-cross text-white' : 'bg-slate-100 text-slate-700'}`}>
                         98%
                       </span>
+                    )}
+
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeNavUnderline"
+                        className="absolute left-0 right-0 -bottom-px h-[3px] bg-cross"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
                     )}
                   </button>
                 );
@@ -485,8 +485,8 @@ export default function App() {
           </div>
 
           {/* Right: National medical connection active indicator */}
-          <div className="flex items-center gap-2 text-[10px] font-semibold text-slate-500">
-            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20"></div>
+          <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-700">
+            <div className="h-2 w-2 rounded-full bg-emerald-600"></div>
             <span>LJM Sync Active</span>
           </div>
 
@@ -498,7 +498,7 @@ export default function App() {
         {loading ? (
           <div className="text-center py-20 space-y-4">
             <RefreshCw className="h-10 w-10 text-blue-600 animate-spin mx-auto" />
-            <h3 className="text-sm font-bold text-slate-800">Loading MediCert...</h3>
+            <h3 className="text-sm font-bold text-slate-800">Loading CareVerify...</h3>
             <p className="text-xs text-slate-500 font-semibold">Connecting to medical registry...</p>
           </div>
         ) : (
@@ -508,17 +508,12 @@ export default function App() {
             {activeView === 'registry' && !selectedProfId && (
               <div className="space-y-8">
                 {/* Hero Banner Intro */}
-                <div className="text-center max-w-3xl mx-auto space-y-4 py-4">
-                  <span className="text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-full">
-                    Verified Medical Network
-                  </span>
-                  <h1 className="text-3xl font-extrabold tracking-tight text-slate-800 sm:text-4xl leading-tight">
-                    Find Certified Doctors and Nurses
-                  </h1>
-                  <p className="text-xs text-slate-500 font-medium leading-relaxed">
-                    Direct directory of practitioners with active, verified MMC and LJM licensing registration codes.
-                  </p>
-                </div>
+                <PageBanner
+                  as="h1"
+                  eyebrow="Verified Medical Network"
+                  title="Find Certified Doctors and Nurses"
+                  description="Direct directory of practitioners with active, verified MMC and LJM licensing registration codes."
+                />
 
                 {/* AI Symptom Evaluator widget on top of search */}
                 <div className="max-w-3xl mx-auto">
@@ -533,6 +528,7 @@ export default function App() {
                   </h3>
                   <SearchHub
                     professionals={professionals}
+                    reviews={reviews}
                     onSelectProfessional={(id) => setSelectedProfId(id)}
                     selectedSpecialtyFilter={selectedSpecialtyFilter}
                     onSelectSpecialtyFilter={(spec) => setSelectedSpecialtyFilter(spec)}
@@ -610,15 +606,11 @@ export default function App() {
             {/* VIEW 8: HEALTH ARTICLES / EDUCATION */}
             {activeView === 'articles' && (
               <div className="space-y-8">
-                <div className="text-center max-w-2xl mx-auto space-y-3 py-4">
-                  <span className="text-[10px] font-extrabold bg-blue-50 text-blue-800 border-2 border-blue-200/50 px-3.5 py-1 rounded-full uppercase tracking-wider shadow-xs">
-                    Verified Medical Library
-                  </span>
-                  <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Clinical Library</h2>
-                  <p className="text-xs text-slate-500 font-semibold leading-relaxed">
-                    Clinical papers and health guidance written by licensed practitioners.
-                  </p>
-                </div>
+                <PageBanner
+                  eyebrow="Verified Medical Library"
+                  title="Clinical Library"
+                  description="Clinical papers and health guidance written by licensed practitioners."
+                />
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {articles.map((art) => (
@@ -661,7 +653,7 @@ export default function App() {
 
                       {/* Citations Box */}
                       {art.citations && (
-                        <div className="bg-blue-950 text-blue-100 rounded-xl p-4 space-y-2 text-xs border-2 border-blue-900">
+                        <div className="bg-slate-100 text-slate-800 rounded-xl p-4 space-y-2 text-xs border-2 border-slate-300">
                           <span className="text-[9px] font-extrabold text-blue-400 uppercase tracking-wide block">
                             Peer-Reviewed Medical Citations (E-E-A-T Compliant):
                           </span>
@@ -704,24 +696,20 @@ export default function App() {
                 return (
                   <div className="space-y-8 animate-fade-in text-slate-800">
                     <div className="bg-white border-2 border-slate-200/85 p-8 rounded-2xl shadow-sm space-y-6">
-                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-5">
-                        <div className="flex items-center gap-4">
-                          <div className="p-3.5 bg-purple-50 text-purple-600 rounded-2xl border border-purple-100">
-                            <Puzzle className="h-6 w-6 animate-pulse" />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h2 className="text-xl font-black text-slate-900">{activePkg.name}</h2>
-                              <span className="bg-purple-50 text-purple-700 text-[10px] font-extrabold px-2 py-0.5 rounded-lg border border-purple-100">v{activePkg.version}</span>
-                            </div>
-                            <p className="text-xs text-slate-500 font-semibold mt-1">Compiled & hot-loaded by {activePkg.author}</p>
-                          </div>
-                        </div>
-                        <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-3 py-1.5 rounded-full border border-emerald-200 uppercase tracking-wider flex items-center gap-1.5 shrink-0">
-                          <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                          <span>Active Runtime Package</span>
-                        </span>
-                      </div>
+                      <PageBanner
+                        eyebrow="Marketplace Module"
+                        title={activePkg.name}
+                        description={`Compiled & hot-loaded by ${activePkg.author}`}
+                        actions={
+                          <>
+                            <span className="bg-purple-50 text-purple-700 text-[10px] font-extrabold px-2 py-0.5 rounded-lg border border-purple-100">v{activePkg.version}</span>
+                            <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-3 py-1.5 rounded-full border border-emerald-200 uppercase tracking-wider inline-flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                              <span>Active Runtime Package</span>
+                            </span>
+                          </>
+                        }
+                      />
 
                       <div className="space-y-3">
                         <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider">Functional Package Description</h4>
@@ -749,7 +737,7 @@ export default function App() {
                             </div>
                           </div>
 
-                          <div className="bg-slate-900 text-slate-200 font-mono p-4 rounded-xl text-[10px] leading-relaxed shadow-inner overflow-x-auto max-h-40">
+                          <div className="bg-slate-100 text-slate-800 border border-slate-300 font-mono p-4 rounded-xl text-[10px] leading-relaxed shadow-inner overflow-x-auto max-h-40">
                             <p className="text-emerald-400">[INFO] Hot-mounting package: {activePkg.id}</p>
                             <p className="text-slate-400">[OK] Injecting dynamic layout nodes...</p>
                             <p className="text-slate-400">[OK] Instantiating core API controllers...</p>
@@ -779,22 +767,22 @@ export default function App() {
       </main>
 
       {/* Footer Sitemap */}
-      <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 pt-10 pb-6 text-xs mt-12 shrink-0">
+      <footer className="bg-slate-100 text-slate-700 border-t border-slate-300 pt-10 pb-6 text-xs mt-12 shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
           {/* Detailed Sitemap Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-slate-800/80">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-slate-300">
             {/* Column 1: Brand & Description */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2 text-white">
-                <Stethoscope className="h-5 w-5 text-blue-500 animate-pulse" />
-                <span className="font-extrabold text-sm tracking-tight">MediCert</span>
-                <span className="text-[9px] bg-slate-800 text-blue-400 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Registry</span>
+              <div className="flex items-center gap-2 text-ink">
+                <Stethoscope className="h-5 w-5 text-blue-600 animate-pulse" />
+                <span className="font-extrabold text-sm tracking-tight">CareVerify</span>
+                <span className="text-[9px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Registry</span>
               </div>
-              <p className="text-[11px] text-slate-500 leading-relaxed font-semibold">
+              <p className="text-[11px] text-slate-600 leading-relaxed font-semibold">
                 National Medical Directory & Verification network connecting licensed doctors and nurses with direct compliance protocols and shift management.
               </p>
-              <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-bold bg-emerald-950/20 w-max px-2 py-1 rounded border border-emerald-900/30">
+              <div className="flex items-center gap-1.5 text-[10px] text-emerald-700 font-bold bg-emerald-950/20 w-max px-2 py-1 rounded border border-emerald-900/30">
                 <span className="w-1 h-1 bg-emerald-500 rounded-full animate-ping"></span>
                 <span>Active Core Sync</span>
               </div>
@@ -802,7 +790,7 @@ export default function App() {
 
             {/* Column 2: Portal Sitemap */}
             <div className="space-y-3">
-              <h4 className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Portal Sitemap</h4>
+              <h4 className="text-[10px] font-black uppercase text-slate-600 tracking-wider">Portal Sitemap</h4>
               <ul className="space-y-2 font-semibold">
                 {navItems.map((item) => {
                   const Icon = item.icon;
@@ -811,10 +799,10 @@ export default function App() {
                     <li key={item.id}>
                       <button
                         onClick={() => { setActiveView(item.id); setSelectedProfId(null); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                        className={`flex items-center gap-2 text-[11px] transition-colors hover:text-white cursor-pointer ${isActive ? 'text-blue-400 font-extrabold' : 'text-slate-400'
+                        className={`flex items-center gap-2 text-[11px] transition-colors hover:text-ink cursor-pointer ${isActive ? 'text-blue-600 font-extrabold' : 'text-slate-700'
                           }`}
                       >
-                        <Icon className="h-3.5 w-3.5 shrink-0 text-slate-500" />
+                        <Icon className="h-3.5 w-3.5 shrink-0 text-slate-600" />
                         <span>{item.name}</span>
                       </button>
                     </li>
@@ -825,20 +813,20 @@ export default function App() {
 
             {/* Column 3: Medical Compliance */}
             <div className="space-y-3">
-              <h4 className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Compliance Registry</h4>
-              <ul className="space-y-2 text-[11px] font-semibold text-slate-500">
-                <li className="hover:text-slate-400 cursor-pointer">Malaysian Medical Council (MMC)</li>
-                <li className="hover:text-slate-400 cursor-pointer">Lembaga Jururawat Malaysia (LJM)</li>
-                <li className="hover:text-slate-400 cursor-pointer">HIPAA Secured Encrypted Pipeline</li>
-                <li className="hover:text-slate-400 cursor-pointer">E-E-A-T Medical Content Standards</li>
-                <li className="hover:text-slate-400 cursor-pointer">Kementerian Kesihatan Malaysia (KKM)</li>
+              <h4 className="text-[10px] font-black uppercase text-slate-600 tracking-wider">Compliance Registry</h4>
+              <ul className="space-y-2 text-[11px] font-semibold text-slate-600">
+                <li className="hover:text-slate-700 cursor-pointer">Malaysian Medical Council (MMC)</li>
+                <li className="hover:text-slate-700 cursor-pointer">Lembaga Jururawat Malaysia (LJM)</li>
+                <li className="hover:text-slate-700 cursor-pointer">HIPAA Secured Encrypted Pipeline</li>
+                <li className="hover:text-slate-700 cursor-pointer">E-E-A-T Medical Content Standards</li>
+                <li className="hover:text-slate-700 cursor-pointer">Kementerian Kesihatan Malaysia (KKM)</li>
               </ul>
             </div>
 
             {/* Column 4: Practitioner & Patient Links */}
             <div className="space-y-3">
-              <h4 className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Global Resources</h4>
-              <p className="text-[11px] text-slate-500 leading-relaxed">
+              <h4 className="text-[10px] font-black uppercase text-slate-600 tracking-wider">Global Resources</h4>
+              <p className="text-[11px] text-slate-600 leading-relaxed">
                 Log in to alternate credentials to inspect verification terminals, board review portals, and clinical shift scheduling pipelines.
               </p>
               <div className="pt-1">
@@ -847,7 +835,7 @@ export default function App() {
                   onClick={() => {
                     handleLogout();
                   }}
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] font-extrabold rounded-lg border border-slate-700 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 bg-white hover:bg-blue-50 text-slate-800 hover:text-blue-700 text-[10px] font-extrabold rounded-lg border border-slate-700 transition-colors cursor-pointer"
                 >
                   Switch Perspective
                 </button>
@@ -857,16 +845,16 @@ export default function App() {
 
           {/* Copyright & Badges */}
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[11px]">
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-slate-500 font-bold justify-center">
-              <span className="hover:text-slate-400 cursor-pointer transition-colors">HIPAA Secured</span>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-slate-600 font-bold justify-center">
+              <span className="hover:text-slate-700 cursor-pointer transition-colors">HIPAA Secured</span>
               <span>&bull;</span>
-              <span className="hover:text-slate-400 cursor-pointer transition-colors">MMC Compliance</span>
+              <span className="hover:text-slate-700 cursor-pointer transition-colors">MMC Compliance</span>
               <span>&bull;</span>
-              <span className="hover:text-slate-400 cursor-pointer transition-colors">LJM Registered</span>
+              <span className="hover:text-slate-700 cursor-pointer transition-colors">LJM Registered</span>
             </div>
 
-            <div className="text-slate-500 font-bold">
-              &copy; {new Date().getFullYear()} MediCert. All rights reserved.
+            <div className="text-slate-600 font-bold">
+              &copy; {new Date().getFullYear()} CareVerify. All rights reserved.
             </div>
           </div>
 

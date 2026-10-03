@@ -203,7 +203,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
     { ref: uptimeCount.ref, count: uptimeCount.count, suffix: '.9%', label: 'Uptime SLA' },
   ];
 
-  const inputClass = 'w-full bg-white border-[1.5px] border-ink rounded-md px-4 h-[52px] text-base font-medium text-ink placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cross/40 focus:border-cross transition-all';
+  const inputClass = 'w-full bg-white/5 border-[1.5px] border-white/30 rounded-md px-4 h-[52px] text-base font-medium text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cross/60 focus:border-white transition-all';
 
   return (
     <div className="min-h-screen bg-white text-ink font-body flex flex-col antialiased selection:bg-cross-tint selection:text-cross-dark">
@@ -312,7 +312,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
             <div className="bg-white text-ink rounded-xl p-8 shadow-2xl shadow-black/40">
               <div className="flex justify-between items-center gap-3 mb-6">
                 <span className="text-xs font-bold uppercase tracking-[0.14em] text-slate-600">Credential check</span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-ink text-white text-xs font-bold">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cross text-white text-xs font-bold">
                   <CheckCircle2 className="h-3.5 w-3.5" /> Verified active
                 </span>
               </div>
@@ -464,7 +464,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                               </div>
                             </div>
                             <div className="text-right shrink-0">
-                              <span className="bg-ink text-white text-[11px] font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1.5">
+                              <span className="bg-cross text-white text-[11px] font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1.5">
                                 <CheckCircle2 className="h-3 w-3" />
                                 Verified active
                               </span>
@@ -521,135 +521,159 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
 
       {/* ═══════════ LOGIN PORTAL ═══════════ */}
       <section id="login-section" className="relative mt-28 bg-cross text-white overflow-hidden scroll-mt-16">
-        <Cross className="absolute -left-36 -top-32 h-[460px] w-[460px] text-white opacity-10 pointer-events-none" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-20 flex flex-wrap items-center gap-12">
-          <div className="flex-[1_1_340px] min-w-0">
-            <h2 className="font-display font-black text-4xl sm:text-5xl lg:text-[56px] leading-none tracking-tighter mb-4">
+        <Cross className="absolute -right-24 -bottom-28 h-[420px] w-[420px] text-white opacity-10 pointer-events-none" />
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-12 py-20">
+          {/* Heading */}
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white text-cross mb-6">
+              <Cross className="h-6 w-6" />
+            </span>
+            <h2 className="font-display font-black text-4xl sm:text-5xl leading-none tracking-tighter mb-4">
               Access the CareVerify portal.
             </h2>
-            <p className="text-lg text-cross-tint max-w-md">
-              Sign in with your registered account to open your personalized dashboard.
+            <p className="text-lg text-cross-tint">
+              Choose your role and sign in to open your personalized dashboard.
             </p>
           </div>
 
+          {/* Split card: role picker + form */}
           <div
-            className="flex-[1_1_380px] min-w-0 max-w-[520px] bg-ink text-white rounded-xl p-7 sm:p-8 shadow-2xl shadow-black/40"
+            className="grid md:grid-cols-[260px_1fr] bg-blue-700 text-white rounded-2xl overflow-hidden border border-white/25 shadow-2xl shadow-blue-900/40"
             style={PORTAL_RED_SCALE}
           >
-            {/* Tab Selectors */}
-            <div className="grid grid-cols-3 gap-1.5 p-1.5 bg-black/60 rounded-lg">
-              {[
-                { key: 'patient' as const, label: 'Patient', icon: Heart },
-                { key: 'practitioner' as const, label: 'Practitioner', icon: PlusCircle },
-                { key: 'admin' as const, label: 'Board Admin', icon: Building },
-              ].map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => { setActiveTab(tab.key); setError(''); setIsRegistering(false); }}
-                  className={`min-h-11 px-3 text-center text-xs font-bold rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                    activeTab === tab.key
-                      ? 'bg-cross text-white'
-                      : 'text-slate-300 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  <tab.icon className="h-3.5 w-3.5 shrink-0" />
-                  <span className="hidden sm:inline">{tab.label}</span>
-                  <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
-                </button>
-              ))}
+            {/* Role picker */}
+            <div className="p-4 md:p-5 bg-blue-800/60 md:border-r border-b md:border-b-0 border-white/10">
+              <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400 px-2 pb-3 hidden md:block">
+                I am a
+              </div>
+              <div className="grid grid-cols-3 md:grid-cols-1 gap-2">
+                {[
+                  { key: 'patient' as const, label: 'Patient', desc: 'Appointments, prescriptions, vitals', icon: Heart },
+                  { key: 'practitioner' as const, label: 'Practitioner', desc: 'Verification, shifts, patient files', icon: PlusCircle },
+                  { key: 'admin' as const, label: 'Board Admin', desc: 'License audit, modules, analytics', icon: Building },
+                ].map((tab) => {
+                  const active = activeTab === tab.key;
+                  return (
+                    <button
+                      key={tab.key}
+                      type="button"
+                      onClick={() => { setActiveTab(tab.key); setError(''); setIsRegistering(false); }}
+                      aria-pressed={active}
+                      className={`rounded-lg p-3 md:p-4 transition-colors cursor-pointer flex flex-col md:flex-row md:items-start items-center text-center md:text-left gap-2 md:gap-3 border-[1.5px] ${
+                        active
+                          ? 'bg-cross border-cross text-white'
+                          : 'border-white/15 text-slate-200 hover:bg-white/5 hover:border-white/30'
+                      }`}
+                    >
+                      <tab.icon className="h-5 w-5 shrink-0 md:mt-0.5" />
+                      <span className="min-w-0">
+                        <span className="block text-sm font-bold">{tab.label}</span>
+                        <span className={`hidden md:block text-xs mt-0.5 leading-snug ${active ? 'text-cross-tint' : 'text-slate-400'}`}>
+                          {tab.desc}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            <AnimatePresence mode="wait">
-              {isRegistering && activeTab === 'patient' ? (
-                <motion.div
-                  key="register"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  className="pt-7"
-                >
-                  <PatientRegistrationForm
-                    onRegisterSuccess={(user) => {
-                      onLoginSuccess(user);
-                      setIsRegistering(false);
-                    }}
-                    onCancel={() => setIsRegistering(false)}
-                  />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="login"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                >
-                  <form onSubmit={handleStandardSubmit} className="space-y-5 pt-7">
-                    {error && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-white/10 border border-cross text-white p-3.5 rounded-md flex gap-2.5 text-xs font-medium"
-                      >
-                        <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-[#ff8a98]" />
-                        <span>{error}</span>
-                      </motion.div>
-                    )}
+            {/* Form pane */}
+            <div className="p-6 sm:p-10 min-w-0">
+              <AnimatePresence mode="wait">
+                {isRegistering && activeTab === 'patient' ? (
+                  <motion.div
+                    key="register"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                  >
+                    <PatientRegistrationForm
+                      onRegisterSuccess={(user) => {
+                        onLoginSuccess(user);
+                        setIsRegistering(false);
+                      }}
+                      onCancel={() => setIsRegistering(false)}
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key={`login-${activeTab}`}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                  >
+                    <h3 className="font-display font-extrabold text-2xl tracking-tight">
+                      Sign in as {activeTab === 'patient' ? 'a patient' : activeTab === 'practitioner' ? 'a practitioner' : 'a board admin'}
+                    </h3>
+                    <p className="text-sm text-slate-400 mt-1">Use the email and password registered with CareVerify.</p>
 
-                    <div className="space-y-2">
-                      <label htmlFor="login-email" className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
-                        Email address
-                      </label>
-                      <input
-                        id="login-email"
-                        type="email"
-                        placeholder={
-                          activeTab === 'patient' ? 'patient@careverify.com' :
-                          activeTab === 'practitioner' ? 'doctor@careverify.com' : 'admin@careverify.com'
-                        }
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className={inputClass}
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label htmlFor="login-password" className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
-                        Password
-                      </label>
-                      <input
-                        id="login-password"
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className={inputClass}
-                        required
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full h-[54px] rounded-md text-base font-bold transition-colors cursor-pointer flex justify-center items-center gap-2.5 bg-cross hover:bg-cross-dark disabled:opacity-70 text-white"
-                    >
-                      {loading ? (
-                        <>
-                          <RefreshCw className="h-4 w-4 animate-spin" />
-                          Authenticating...
-                        </>
-                      ) : (
-                        <>
-                          Sign in to {activeTab === 'patient' ? 'Patient Portal' : activeTab === 'practitioner' ? 'Practitioner Hub' : 'Admin Panel'}
-                          <ArrowRight className="h-4 w-4" />
-                        </>
+                    <form onSubmit={handleStandardSubmit} className="space-y-5 mt-7">
+                      {error && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="bg-white/10 border border-cross text-white p-3.5 rounded-md flex gap-2.5 text-xs font-medium"
+                        >
+                          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-[#ff8a98]" />
+                          <span>{error}</span>
+                        </motion.div>
                       )}
-                    </button>
-                  </form>
 
-                  {activeTab === 'patient' && (
-                    <div className="pt-5 text-center">
-                      <span className="text-sm text-slate-300">
+                      <div className="space-y-2">
+                        <label htmlFor="login-email" className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
+                          Email address
+                        </label>
+                        <input
+                          id="login-email"
+                          type="email"
+                          placeholder={
+                            activeTab === 'patient' ? 'patient@careverify.com' :
+                            activeTab === 'practitioner' ? 'doctor@careverify.com' : 'admin@careverify.com'
+                          }
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className={inputClass}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="login-password" className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
+                          Password
+                        </label>
+                        <input
+                          id="login-password"
+                          type="password"
+                          placeholder="••••••••"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className={inputClass}
+                          required
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full h-[54px] rounded-md text-base font-bold transition-colors cursor-pointer flex justify-center items-center gap-2.5 bg-cross hover:bg-cross-dark disabled:opacity-70 text-white"
+                      >
+                        {loading ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 animate-spin" />
+                            Authenticating...
+                          </>
+                        ) : (
+                          <>
+                            Sign in to {activeTab === 'patient' ? 'Patient Portal' : activeTab === 'practitioner' ? 'Practitioner Hub' : 'Admin Panel'}
+                            <ArrowRight className="h-4 w-4" />
+                          </>
+                        )}
+                      </button>
+                    </form>
+
+                    {activeTab === 'patient' && (
+                      <p className="pt-5 text-center text-sm text-slate-300">
                         Need an account?{' '}
                         <button
                           type="button"
@@ -658,68 +682,47 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                         >
                           Register as a new patient
                         </button>
-                      </span>
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Sandbox Access Bypass */}
-            <div className="pt-6 border-t border-white/15 mt-7">
-              <button
-                type="button"
-                onClick={() => setShowSandbox(!showSandbox)}
-                className="w-full text-center text-[11px] font-bold uppercase text-slate-400 tracking-widest cursor-pointer hover:text-white transition-colors flex items-center justify-center gap-2"
-              >
-                <Zap className="h-3 w-3" />
-                {showSandbox ? 'Hide' : 'Show'} quick access demo logins
-                <ChevronRight className={`h-3 w-3 transition-transform ${showSandbox ? 'rotate-90' : ''}`} />
-              </button>
-
-              <AnimatePresence>
-                {showSandbox && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: 'easeInOut' }}
-                    className="overflow-hidden"
-                  >
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4">
-                      {[
-                        { role: 'patient' as const, icon: Heart, label: 'Test Patient Hub', who: '(Ahmad Fauzi)' },
-                        { role: 'practitioner' as const, icon: PlusCircle, label: 'Test Practitioner', who: '(Dr. Tan Seng Hock)' },
-                        { role: 'admin' as const, icon: Building, label: 'Test Board Admin', who: '(Sharifah Noor)' },
-                      ].map((d) => (
-                        <button
-                          key={d.role}
-                          type="button"
-                          onClick={() => handleSandboxLogin(d.role)}
-                          className="bg-white/5 hover:bg-white/10 text-white border border-white/20 p-3.5 rounded-md text-[11px] font-bold transition-colors flex flex-col items-center gap-1.5 cursor-pointer"
-                        >
-                          <d.icon className="h-4 w-4 text-[#ff8a98]" />
-                          <span>{d.label}</span>
-                          <span className="text-[10px] text-slate-400 font-medium">{d.who}</span>
-                        </button>
-                      ))}
-                    </div>
+                      </p>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
           </div>
+
+          {/* Demo logins */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-cross-tint">
+              <Zap className="h-3.5 w-3.5" /> Quick access demo logins
+            </span>
+            {[
+              { role: 'patient' as const, icon: Heart, label: 'Patient' },
+              { role: 'practitioner' as const, icon: PlusCircle, label: 'Practitioner' },
+              { role: 'admin' as const, icon: Building, label: 'Board Admin' },
+            ].map((d) => (
+              <button
+                key={d.role}
+                type="button"
+                onClick={() => handleSandboxLogin(d.role)}
+                disabled={loading}
+                className="inline-flex items-center gap-2 min-h-11 px-4 text-sm font-semibold text-white border-[1.5px] border-white/70 hover:bg-white hover:text-cross rounded-md transition-colors cursor-pointer disabled:opacity-60"
+              >
+                <d.icon className="h-4 w-4" />
+                {d.label}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ═══════════ FOOTER ═══════════ */}
-      <footer className="bg-ink text-slate-300 shrink-0">
+      <footer className="bg-slate-100 text-slate-700 border-t border-slate-200 shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-14 pb-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 pb-10 border-b border-white/15">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 pb-10 border-b border-slate-300">
             <div>
               <div className="flex items-center gap-2.5">
-                <Cross className="h-5 w-5 text-white" />
-                <span className="font-display font-black text-xl text-white">CareVerify</span>
+                <Cross className="h-5 w-5 text-ink" />
+                <span className="font-display font-black text-xl text-ink">CareVerify</span>
               </div>
               <p className="text-sm mt-3 max-w-xs">
                 Enterprise-grade medical credential verification. Connecting licensed practitioners with patients through regulatory-aligned infrastructure.
@@ -727,22 +730,22 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
             </div>
 
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-3.5">Platform</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-ink mb-3.5">Platform</h4>
               <ul className="space-y-2.5 text-sm">
                 {['Patient Dashboard', 'Doctor Registry', 'Nurse Registry', 'Clinical Shifts', 'Medical Library'].map((link) => (
                   <li key={link}>
-                    <a href="#login-section" className="hover:text-white transition-colors cursor-pointer">{link}</a>
+                    <a href="#login-section" className="hover:text-cross transition-colors cursor-pointer">{link}</a>
                   </li>
                 ))}
               </ul>
             </div>
 
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-3.5">Compliance</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-ink mb-3.5">Compliance</h4>
               <ul className="space-y-2.5 text-sm">
                 {['HIPAA Security', 'MMC Regulatory', 'LJM Standards', 'AES-256 Encryption', 'SOC-2 Type II'].map((item) => (
                   <li key={item} className="flex items-center gap-2">
-                    {item.startsWith('AES') ? <Lock className="h-3 w-3 text-slate-400" /> : <ShieldCheck className="h-3 w-3 text-slate-400" />}
+                    {item.startsWith('AES') ? <Lock className="h-3 w-3 text-slate-600" /> : <ShieldCheck className="h-3 w-3 text-slate-600" />}
                     {item}
                   </li>
                 ))}
@@ -750,11 +753,11 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
             </div>
 
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-3.5">Legal</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-ink mb-3.5">Legal</h4>
               <ul className="space-y-2.5 text-sm">
                 {['Privacy Policy', 'Terms of Service', 'Data Processing Agreement', 'Cookie Policy', 'Contact Support'].map((link) => (
                   <li key={link}>
-                    <a href="#" className="hover:text-white transition-colors cursor-pointer">{link}</a>
+                    <a href="#" className="hover:text-cross transition-colors cursor-pointer">{link}</a>
                   </li>
                 ))}
               </ul>
@@ -765,7 +768,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
             <p>
               &copy; {new Date().getFullYear()} CareVerify Sdn Bhd. Regulated under the Malaysian Medical Act 1971.
             </p>
-            <div className="flex items-center gap-4 text-xs font-semibold text-white">
+            <div className="flex items-center gap-4 text-xs font-semibold text-ink">
               <span className="flex items-center gap-1.5"><Globe className="h-3 w-3" /> EN</span>
               <span className="text-slate-500">|</span>
               <span className="flex items-center gap-1.5"><Globe className="h-3 w-3" /> BM</span>

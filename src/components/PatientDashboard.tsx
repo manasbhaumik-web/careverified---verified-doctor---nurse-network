@@ -14,6 +14,7 @@ import AppointmentsTab from './patient/AppointmentsTab';
 import PrescriptionsTab from './patient/PrescriptionsTab';
 import VitalsTab from './patient/VitalsTab';
 import SavedTab from './patient/SavedTab';
+import PageBanner from './PageBanner';
 
 interface PatientDashboardProps {
   bookings: Booking[];
@@ -510,27 +511,36 @@ export default function PatientDashboard({
     return 'Good evening';
   })();
 
+  const patientTabs: { id: 'appointments' | 'prescriptions' | 'vitals' | 'records' | 'saved'; label: string; icon: React.ComponentType<any>; count?: number }[] = [
+    { id: 'appointments', label: 'Appointments', icon: Calendar, count: upcomingBookings.length },
+    { id: 'prescriptions', label: 'Prescriptions', icon: FileText, count: prescriptionBookings.length },
+    { id: 'vitals', label: 'Vitals & Logs', icon: Activity },
+    { id: 'records', label: 'Medical History', icon: FolderHeart },
+    { id: 'saved', label: 'Saved Docs', icon: Heart, count: savedProfessionals.length }
+  ];
+  const handlePatientTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    const ids = patientTabs.map(t => t.id);
+    const currentIndex = ids.indexOf(activeTab);
+    let nextIndex = currentIndex;
+    if (e.key === 'ArrowRight') nextIndex = (currentIndex + 1) % ids.length;
+    else if (e.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + ids.length) % ids.length;
+    else if (e.key === 'Home') nextIndex = 0;
+    else if (e.key === 'End') nextIndex = ids.length - 1;
+    else return;
+    e.preventDefault();
+    setActiveTab(ids[nextIndex]);
+  };
+
   return (
     <div className="space-y-8" id="patient-dashboard-root">
       
       {/* Standard Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 pb-6 border-b border-slate-100">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-          <div className="space-y-1.5 lg:max-w-xl">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-teal-700 bg-teal-50 border border-teal-100/50 px-2.5 py-0.5 rounded-md">
-              <Sparkles className="h-3 w-3" /> CareVerify Console
-            </span>
-            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 leading-tight">
-              {greetingText},{' '}
-              <span className="text-teal-600">
-                {userName}
-              </span>
-            </h2>
-            <p className="text-xs text-slate-500 font-medium max-w-xl leading-relaxed hidden md:block">
-              Your centralized digital portal for certified telehealth, verified e-prescriptions, and smart clinical telemetry.
-            </p>
-          </div>
-          
+      <PageBanner
+        eyebrow="CareVerify Console"
+        title={<>{greetingText}, <span className="text-cross">{userName}</span></>}
+        description="Your centralized digital portal for certified telehealth, verified e-prescriptions, and smart clinical telemetry."
+        actions={
+          <>
           {/* Circular Profile Completion */}
           <div className="hidden lg:flex items-center gap-3 pl-6 border-l border-slate-200 h-16">
             <div className="relative w-12 h-12 flex items-center justify-center bg-slate-50 rounded-full shrink-0 shadow-inner">
@@ -538,18 +548,16 @@ export default function PatientDashboard({
                 <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-200" />
                 <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" strokeDasharray="125.6" strokeDashoffset="50.24" className="text-teal-500 transition-all duration-1000 ease-out" strokeLinecap="round" />
               </svg>
-              <span className="absolute text-[9px] font-black text-slate-700">60%</span>
+              <span className="absolute font-mono tabular-nums text-[9px] font-black text-slate-700">60%</span>
             </div>
             <div>
               <p className="text-[10px] font-bold text-slate-800 uppercase tracking-wider mb-0.5">Profile Setup</p>
               <button onClick={() => setActiveTab('records')} className="text-[10px] font-bold text-teal-600 hover:text-teal-700 hover:underline">Add History &rarr;</button>
             </div>
           </div>
-        </div>
-        
         <div className="flex flex-col sm:flex-row w-full lg:w-auto shrink-0 mt-2 lg:mt-0">
           {/* Flat Doctor-On-Call Card */}
-          <div className="flex-1 bg-white p-3 rounded-2xl border border-rose-100 text-left flex items-center justify-between gap-4 shadow-sm group hover:border-rose-200 transition-all duration-300 hover:shadow-md">
+          <div className="flex-1 bg-white p-3 rounded-xl border border-rose-100 text-left flex items-center justify-between gap-4 shadow-sm group hover:border-rose-200 transition-all duration-300 hover:shadow-md">
             <div className="flex items-center gap-3">
                <div className="bg-rose-50 text-rose-600 p-2.5 rounded-xl border border-rose-100 shrink-0">
                  <Ambulance className="h-5 w-5"/>
@@ -560,7 +568,7 @@ export default function PatientDashboard({
                    <span className="inline-flex items-center text-[9px] bg-rose-500 text-white px-1.5 py-0.5 rounded-full font-black tracking-widest uppercase animate-pulse leading-none shadow-sm shadow-rose-500/20">LIVE</span>
                  </div>
                  {activeDispatch ? (
-                   <span className="text-xs font-bold text-slate-700 block leading-none tracking-tight">{activeDispatch.doctorName} • <span className="text-rose-600 font-black">{activeDispatch.etaMinutes}m ETA</span></span>
+                   <span className="text-xs font-bold text-slate-700 block leading-none tracking-tight">{activeDispatch.doctorName} • <span className="font-mono tabular-nums text-rose-600 font-black">{activeDispatch.etaMinutes}m ETA</span></span>
                  ) : (
                    <span className="text-xs font-bold text-slate-700 block leading-none tracking-tight">24/7 Doctor-on-Call</span>
                  )}
@@ -571,7 +579,9 @@ export default function PatientDashboard({
             </button>
           </div>
         </div>
-      </div>
+          </>
+        }
+      />
 
       {/* "At a Glance" Overview Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -580,7 +590,7 @@ export default function PatientDashboard({
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow"
+            className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="flex items-center gap-4">
               <div className="bg-teal-50 p-2.5 rounded-xl text-teal-600 shrink-0 border border-teal-100">
@@ -613,7 +623,7 @@ export default function PatientDashboard({
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow"
+            className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="flex items-center gap-4">
               <div className="bg-emerald-50 p-2.5 rounded-xl text-emerald-600 shrink-0 border border-emerald-100">
@@ -639,7 +649,7 @@ export default function PatientDashboard({
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow"
+          className="bg-white border border-slate-200 rounded-xl p-5 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow"
         >
            <div className="flex items-center gap-4">
               <div className="bg-blue-50 p-2.5 rounded-xl text-blue-600 shrink-0 border border-blue-100">
@@ -647,7 +657,7 @@ export default function PatientDashboard({
               </div>
               <div>
                 <h4 className="text-[10px] uppercase tracking-wider font-black text-slate-400 mb-0.5">Recent Activity</h4>
-                <p className="text-sm font-bold text-slate-800">{prescriptionBookings.length} Active Prescriptions</p>
+                <p className="text-sm font-bold text-slate-800"><span className="font-mono tabular-nums">{prescriptionBookings.length}</span> Active Prescriptions</p>
               </div>
             </div>
             <button 
@@ -659,35 +669,30 @@ export default function PatientDashboard({
         </motion.div>
       </div>
 
-      {/* SEGMENTED TABS SELECTOR (Themed) */}
-      <div className="bg-teal-50/60 p-1.5 rounded-2xl flex flex-wrap sm:flex-nowrap gap-1 shadow-inner sticky top-20 z-30 overflow-x-auto hide-scrollbar border border-teal-100/70">
-        {[
-          { id: 'appointments', label: 'Appointments', icon: Calendar, count: upcomingBookings.length },
-          { id: 'prescriptions', label: 'Prescriptions', icon: FileText, count: prescriptionBookings.length },
-          { id: 'vitals', label: 'Vitals & Logs', icon: Activity },
-          { id: 'records', label: 'Medical History', icon: FolderHeart },
-          { id: 'saved', label: 'Saved Docs', icon: Heart, count: savedProfessionals.length }
-        ].map(tab => (
+      {/* UNDERLINE TAB NAVIGATION */}
+      <div
+        role="tablist"
+        aria-label="Patient hub sections"
+        className="flex flex-wrap gap-5 border-b border-slate-200 sticky top-20 bg-slate-50/95 backdrop-blur-sm z-30 overflow-x-auto"
+      >
+        {patientTabs.map(tab => (
           <button
             key={tab.id}
+            role="tab"
+            id={`tab-${tab.id}`}
+            aria-controls={`panel-${tab.id}`}
+            aria-selected={activeTab === tab.id}
+            tabIndex={activeTab === tab.id ? 0 : -1}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`relative flex-1 min-w-[140px] py-2.5 px-4 text-[11px] font-black tracking-wide rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer z-10 ${
-              activeTab === tab.id ? 'text-teal-950' : 'text-teal-700/70 hover:text-teal-900 hover:bg-teal-100/50'
+            onKeyDown={handlePatientTabKeyDown}
+            className={`shrink-0 py-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer border-b-2 -mb-px transition-colors ${
+              activeTab === tab.id ? 'text-teal-800 border-teal-600' : 'text-slate-500 border-transparent hover:text-slate-800 hover:border-slate-300'
             }`}
           >
-            {activeTab === tab.id && (
-              <motion.div
-                layoutId="activeTabDashboard"
-                className="absolute inset-0 bg-white shadow-sm shadow-teal-900/5 border border-teal-100/80 rounded-xl -z-10"
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              />
-            )}
-            <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-emerald-600' : 'text-teal-600/60 group-hover:text-teal-700'}`} />
+            <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-teal-600' : 'text-slate-400'}`} />
             <span className="whitespace-nowrap">{tab.label}</span>
-            {tab.count !== undefined && (
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ml-auto ${
-                activeTab === tab.id ? 'bg-teal-50 text-teal-800' : 'bg-teal-100/60 text-teal-700'
-              }`}>
+            {tab.count !== undefined && tab.count > 0 && (
+              <span className="font-mono tabular-nums text-[10px] px-1.5 py-0.5 rounded-full font-black bg-rose-500 text-white leading-none">
                 {tab.count}
               </span>
             )}
@@ -697,69 +702,77 @@ export default function PatientDashboard({
 
       {/* MAIN VIEW CONTENT AREA */}
       <div className="space-y-6">
-        
+
         {/* TAB 1: UPCOMING BOOKINGS */}
         {activeTab === 'appointments' && (
-          <AppointmentsTab
-            upcomingBookings={upcomingBookings}
-            professionals={professionals}
-            onCancelBooking={handleCancelBooking}
-            onStartVideoCall={handleStartVideoCall}
-          />
+          <div id="panel-appointments" role="tabpanel" aria-labelledby="tab-appointments" tabIndex={0}>
+            <AppointmentsTab
+              upcomingBookings={upcomingBookings}
+              professionals={professionals}
+              onCancelBooking={handleCancelBooking}
+              onStartVideoCall={handleStartVideoCall}
+            />
+          </div>
         )}
 
         {/* TAB 2: MY E-PRESCRIPTIONS */}
         {activeTab === 'prescriptions' && (
-          <PrescriptionsTab
-            prescriptionBookings={prescriptionBookings}
-            onViewPrescription={setSelectedPrescriptionBooking}
-            onRequestRefill={() => setShowGenerateModal(true)}
-          />
+          <div id="panel-prescriptions" role="tabpanel" aria-labelledby="tab-prescriptions" tabIndex={0}>
+            <PrescriptionsTab
+              prescriptionBookings={prescriptionBookings}
+              onViewPrescription={setSelectedPrescriptionBooking}
+              onRequestRefill={() => setShowGenerateModal(true)}
+            />
+          </div>
         )}
 
         {/* TAB 3: HEALTH TRACKING & VITALS JOURNEY */}
         {activeTab === 'vitals' && (
-          <VitalsTab
-            vitalsList={vitalsList}
-            systolic={systolic}
-            setSystolic={setSystolic}
-            diastolic={diastolic}
-            setDiastolic={setDiastolic}
-            bloodSugar={bloodSugar}
-            setBloodSugar={setBloodSugar}
-            heartRate={heartRate}
-            setHeartRate={setHeartRate}
-            mood={mood}
-            setMood={setMood}
-            vitalsNotes={vitalsNotes}
-            setVitalsNotes={setVitalsNotes}
-            vitalsSuccess={vitalsSuccess}
-            onSubmitVitals={handleAddVitals}
-            onDeleteVital={handleDeleteVital}
-            journalEntry={journalEntry}
-            setJournalEntry={setJournalEntry}
-            journalFeedback={journalFeedback}
-            journalFeedbackLoading={journalFeedbackLoading}
-            onSubmitJournal={handleJournalAnalysis}
-            getBPFeedback={getBPFeedback}
-            getSugarFeedback={getSugarFeedback}
-          />
+          <div id="panel-vitals" role="tabpanel" aria-labelledby="tab-vitals" tabIndex={0}>
+            <VitalsTab
+              vitalsList={vitalsList}
+              systolic={systolic}
+              setSystolic={setSystolic}
+              diastolic={diastolic}
+              setDiastolic={setDiastolic}
+              bloodSugar={bloodSugar}
+              setBloodSugar={setBloodSugar}
+              heartRate={heartRate}
+              setHeartRate={setHeartRate}
+              mood={mood}
+              setMood={setMood}
+              vitalsNotes={vitalsNotes}
+              setVitalsNotes={setVitalsNotes}
+              vitalsSuccess={vitalsSuccess}
+              onSubmitVitals={handleAddVitals}
+              onDeleteVital={handleDeleteVital}
+              journalEntry={journalEntry}
+              setJournalEntry={setJournalEntry}
+              journalFeedback={journalFeedback}
+              journalFeedbackLoading={journalFeedbackLoading}
+              onSubmitJournal={handleJournalAnalysis}
+              getBPFeedback={getBPFeedback}
+              getSugarFeedback={getSugarFeedback}
+            />
+          </div>
         )}
 
         {/* TAB 4: SAVED PRACTITIONERS */}
         {activeTab === 'saved' && (
-          <SavedTab
-            savedProfessionals={savedProfessionals}
-            onRemoveSaved={handleRemoveSaved}
-            onNavigateToMessages={onNavigateToMessages}
-            onSelectProfessional={onSelectProfessional}
-            onVerifyCredentials={setSelectedModalProf}
-          />
+          <div id="panel-saved" role="tabpanel" aria-labelledby="tab-saved" tabIndex={0}>
+            <SavedTab
+              savedProfessionals={savedProfessionals}
+              onRemoveSaved={handleRemoveSaved}
+              onNavigateToMessages={onNavigateToMessages}
+              onSelectProfessional={onSelectProfessional}
+              onVerifyCredentials={setSelectedModalProf}
+            />
+          </div>
         )}
 
         {/* TAB 5: SECURED MEDICAL RECORDS / CLINICAL HISTORY */}
         {activeTab === 'records' && (
-          <div className="space-y-6 animate-fade-in bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+          <div id="panel-records" role="tabpanel" aria-labelledby="tab-records" tabIndex={0} className="space-y-6 animate-fade-in bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
             <div className="border-b border-slate-150 pb-3.5">
               <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
                 <FolderHeart className="h-4.5 w-4.5 text-indigo-600" />
@@ -778,10 +791,10 @@ export default function PatientDashboard({
       {/* MODAL: FULL E-PRESCRIPTION VIEW SLIP       */}
       {/* ========================================== */}
       {selectedPrescriptionBooking && (
-        <div className="fixed inset-0 bg-slate-800/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
+        <div className="fixed inset-0 bg-slate-100/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-white border-2 border-slate-200 rounded-3xl w-full max-w-xl shadow-xl overflow-hidden animate-slide-down flex flex-col max-h-[90vh]">
             {/* Header */}
-            <div className="bg-blue-900 text-white p-5 flex justify-between items-center">
+            <div className="bg-blue-700 text-white p-5 flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-blue-400" />
                 <h4 className="text-sm font-extrabold uppercase tracking-wide">Verified Digital Rx Slip</h4>
@@ -814,7 +827,7 @@ export default function PatientDashboard({
                 {/* Rx Header */}
                 <div className="flex justify-between items-start border-b-2 border-slate-200 pb-6">
                   <div className="flex items-center gap-3">
-                    <div className="bg-teal-900 text-teal-100 p-2.5 rounded-xl">
+                    <div className="bg-teal-700 text-teal-100 p-2.5 rounded-xl">
                       <Stethoscope className="h-6 w-6" />
                     </div>
                     <div className="space-y-0.5">
@@ -946,11 +959,11 @@ export default function PatientDashboard({
       {/* MODAL: SECURE E-PRESCRIPTION GENERATOR     */}
       {/* ========================================== */}
       {showGenerateModal && (
-        <div className="fixed inset-0 bg-slate-800/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
+        <div className="fixed inset-0 bg-slate-100/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-white border-2 border-slate-200 rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden animate-slide-down flex flex-col max-h-[92vh]">
             
             {/* Header banner */}
-            <div className="bg-blue-900 text-white p-5 flex justify-between items-center shrink-0">
+            <div className="bg-blue-700 text-white p-5 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
                 <div className="bg-blue-600 p-2 rounded-xl text-white shadow-md">
                   <FileSignature className="h-5 w-5" />
@@ -1310,11 +1323,11 @@ export default function PatientDashboard({
       {/* MODAL: LIVE TELEHEALTH CONSULTATION ROOM   */}
       {/* ========================================== */}
       {activeVideoBooking && (
-        <div className="fixed inset-0 bg-blue-950/95 flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-blue-900 rounded-3xl w-full max-w-2xl border border-blue-700 shadow-2xl overflow-hidden aspect-video flex flex-col justify-between relative text-white">
+        <div className="fixed inset-0 bg-blue-700/95 flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-blue-700 rounded-3xl w-full max-w-2xl border border-blue-700 shadow-2xl overflow-hidden aspect-video flex flex-col justify-between relative text-white">
             
             {/* Top Bar overlay */}
-            <div className="p-4 bg-gradient-to-b from-blue-950/80 to-transparent flex justify-between items-center z-10 absolute top-0 left-0 right-0">
+            <div className="p-4 bg-gradient-to-b from-blue-800/80 to-transparent flex justify-between items-center z-10 absolute top-0 left-0 right-0">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping"></span>
                 <span className="bg-rose-500 text-white font-extrabold text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-md">
@@ -1326,13 +1339,13 @@ export default function PatientDashboard({
                   </span>
                 )}
               </div>
-              <div className="bg-blue-900/60 backdrop-blur-xs px-3 py-1.5 rounded-lg border border-white/10 text-xs font-semibold text-slate-300">
+              <div className="bg-blue-700/60 backdrop-blur-xs px-3 py-1.5 rounded-lg border border-white/10 text-xs font-semibold text-slate-300">
                 Patient: {userName} &bull; PDPA Compliant
               </div>
             </div>
 
             {/* Video Feed Workspace */}
-            <div className="flex-1 flex items-center justify-center relative bg-blue-950">
+            <div className="flex-1 flex items-center justify-center relative bg-blue-800">
               
               {!videoConnected ? (
                 <div className="text-center space-y-4 p-8">
@@ -1347,7 +1360,7 @@ export default function PatientDashboard({
               ) : (
                 <div className="absolute inset-0 w-full h-full">
                   {/* Remote Video Stream (Simulated Practitioner) */}
-                  <div className="w-full h-full bg-slate-800 relative overflow-hidden flex items-center justify-center">
+                  <div className="w-full h-full bg-blue-600 relative overflow-hidden flex items-center justify-center">
                     <img 
                       src={professionals.find(p => p.id === activeVideoBooking.professionalId)?.avatar || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=600"}
                       alt={activeVideoBooking.professionalName}
@@ -1355,24 +1368,24 @@ export default function PatientDashboard({
                     />
                     
                     {/* Practitioner Name tag */}
-                    <div className="absolute bottom-4 left-4 bg-blue-950/70 border border-white/10 px-3 py-1.5 rounded-xl backdrop-blur-xs text-xs font-bold">
+                    <div className="absolute bottom-4 left-4 bg-blue-800/70 border border-white/10 px-3 py-1.5 rounded-xl backdrop-blur-xs text-xs font-bold">
                       {activeVideoBooking.professionalName} (Consultant)
                     </div>
                   </div>
 
                   {/* Local Video Stream Pip (Self-view) */}
-                  <div className="absolute bottom-4 right-4 w-32 sm:w-40 aspect-video bg-blue-950 border-2 border-blue-500 rounded-xl overflow-hidden shadow-md">
+                  <div className="absolute bottom-4 right-4 w-32 sm:w-40 aspect-video bg-blue-800 border-2 border-blue-500 rounded-xl overflow-hidden shadow-md">
                     {!cameraOff ? (
-                      <div className="w-full h-full relative bg-slate-700 flex items-center justify-center">
-                        <div className="absolute inset-0 bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center">
+                      <div className="w-full h-full relative bg-blue-500 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-gradient-to-br from-slate-600 to-blue-600 flex items-center justify-center">
                           <User className="h-10 w-10 text-white/50" />
                         </div>
-                        <div className="absolute bottom-1 right-1 bg-blue-950/60 px-1 text-[10px] rounded text-white font-mono">
+                        <div className="absolute bottom-1 right-1 bg-blue-800/60 px-1 text-[10px] rounded text-white font-mono">
                           You (Self)
                         </div>
                       </div>
                     ) : (
-                      <div className="w-full h-full bg-blue-900 flex items-center justify-center text-slate-500">
+                      <div className="w-full h-full bg-blue-700 flex items-center justify-center text-slate-500">
                         <X className="h-5 w-5" />
                       </div>
                     )}
@@ -1382,7 +1395,7 @@ export default function PatientDashboard({
             </div>
 
             {/* Bottom Call Controls Overlay */}
-            <div className="p-4 bg-gradient-to-t from-blue-950/90 to-transparent z-10">
+            <div className="p-4 bg-gradient-to-t from-blue-800/90 to-transparent z-10">
               <div className="flex justify-center items-center gap-3">
                 <button
                   onClick={() => setVideoMuted(!videoMuted)}
@@ -1442,7 +1455,7 @@ export default function PatientDashboard({
       {/* Verification Card Lightbox / Modal Popup */}
       {selectedModalProf && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-800/60 backdrop-blur-xs animate-fade-in"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-100/80 backdrop-blur-xs animate-fade-in"
           onClick={() => setSelectedModalProf(null)}
           id="credentials-modal-backdrop"
         >
@@ -1488,7 +1501,7 @@ export default function PatientDashboard({
                     </span>
                     
                     {/* Name */}
-                    <h3 className="text-lg font-extrabold text-[#0d9488] leading-tight mt-1">
+                    <h3 className="text-lg font-extrabold text-[#c8102e] leading-tight mt-1">
                       {selectedModalProf.name}
                     </h3>
                     
@@ -1570,7 +1583,7 @@ export default function PatientDashboard({
                   onSelectProfessional(selectedModalProf.id);
                   setSelectedModalProf(null);
                 }}
-                className="px-5 py-2.5 bg-[#0d9488] hover:bg-[#0f766e] text-white text-xs font-extrabold rounded-xl shadow-md shadow-teal-500/10 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-5 py-2.5 bg-[#c8102e] hover:bg-[#a50f2a] text-white text-xs font-extrabold rounded-xl shadow-md shadow-teal-500/10 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Full Profile & Appointments</span>
               </button>

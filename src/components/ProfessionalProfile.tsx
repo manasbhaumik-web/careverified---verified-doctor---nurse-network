@@ -174,7 +174,7 @@ export default function ProfessionalProfile({
       <div className="bg-white border border-slate-100 rounded-2xl p-10 text-center space-y-4 shadow-sm">
         <ShieldAlert className="h-10 w-10 text-red-500 mx-auto animate-pulse" />
         <h4 className="text-sm font-bold text-slate-800">Credential profile not found or suspended</h4>
-        <button onClick={onBack} className="text-xs font-semibold bg-slate-900 text-white rounded-lg py-2 px-4 hover:bg-slate-800">
+        <button onClick={onBack} className="text-xs font-semibold bg-blue-700 text-white rounded-lg py-2 px-4 hover:bg-blue-600">
           Back to Directory
         </button>
       </div>
@@ -183,17 +183,21 @@ export default function ProfessionalProfile({
 
   const isDoc = prof.role === UserRole.DOCTOR;
   const filteredReviews = reviews.filter(r => r.professionalId === prof.id);
+  const hasReviews = filteredReviews.length > 0;
 
-  // Compute breakdown scores
-  const scorePunctuality = filteredReviews.length > 0 
-    ? Number((filteredReviews.reduce((s, r) => s + r.punctuality, 0) / filteredReviews.length).toFixed(1)) 
-    : 5;
-  const scoreCommunication = filteredReviews.length > 0 
-    ? Number((filteredReviews.reduce((s, r) => s + r.communication, 0) / filteredReviews.length).toFixed(1)) 
-    : 5;
-  const scoreSatisfaction = filteredReviews.length > 0 
-    ? Number((filteredReviews.reduce((s, r) => s + r.satisfaction, 0) / filteredReviews.length).toFixed(1)) 
-    : 5;
+  // Compute breakdown scores from real reviews only — no fabricated fallback
+  const avgOverall = hasReviews
+    ? Number((filteredReviews.reduce((s, r) => s + r.rating, 0) / filteredReviews.length).toFixed(1))
+    : null;
+  const scorePunctuality = hasReviews
+    ? Number((filteredReviews.reduce((s, r) => s + r.punctuality, 0) / filteredReviews.length).toFixed(1))
+    : null;
+  const scoreCommunication = hasReviews
+    ? Number((filteredReviews.reduce((s, r) => s + r.communication, 0) / filteredReviews.length).toFixed(1))
+    : null;
+  const scoreSatisfaction = hasReviews
+    ? Number((filteredReviews.reduce((s, r) => s + r.satisfaction, 0) / filteredReviews.length).toFixed(1))
+    : null;
 
   return (
     <div className="space-y-6" id={`professional-profile-${prof.id}`}>
@@ -360,25 +364,25 @@ export default function ProfessionalProfile({
             {/* Metrics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50 p-5 rounded-2xl border border-slate-100">
               <div className="text-center md:border-r border-slate-200/50">
-                <span className="text-3xl font-extrabold text-slate-900 block">{prof.rating}</span>
+                <span className="text-3xl font-extrabold text-slate-900 block">{avgOverall ?? "New"}</span>
                 <div className="flex justify-center my-1">
                   <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
                 </div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">{prof.reviewCount} Reviews</span>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">{filteredReviews.length} Review{filteredReviews.length === 1 ? '' : 's'}</span>
               </div>
 
               <div className="text-center md:border-r border-slate-200/50">
-                <span className="text-lg font-extrabold text-blue-800 block">⭐ {scorePunctuality} / 5</span>
+                <span className="text-lg font-extrabold text-blue-800 block">{hasReviews ? `⭐ ${scorePunctuality} / 5` : '—'}</span>
                 <span className="text-[10px] text-slate-500 font-bold uppercase block mt-1">Punctuality</span>
               </div>
 
               <div className="text-center md:border-r border-slate-200/50">
-                <span className="text-lg font-extrabold text-blue-800 block">⭐ {scoreCommunication} / 5</span>
+                <span className="text-lg font-extrabold text-blue-800 block">{hasReviews ? `⭐ ${scoreCommunication} / 5` : '—'}</span>
                 <span className="text-[10px] text-slate-500 font-bold uppercase block mt-1">Communication</span>
               </div>
 
               <div className="text-center">
-                <span className="text-lg font-extrabold text-blue-800 block">⭐ {scoreSatisfaction} / 5</span>
+                <span className="text-lg font-extrabold text-blue-800 block">{hasReviews ? `⭐ ${scoreSatisfaction} / 5` : '—'}</span>
                 <span className="text-[10px] text-slate-500 font-bold uppercase block mt-1">Satisfaction</span>
               </div>
             </div>
@@ -534,7 +538,7 @@ export default function ProfessionalProfile({
 
                 <button
                   onClick={() => setBookingSuccess(null)}
-                  className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl py-2 text-xs font-bold shadow-sm transition-colors"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-2 text-xs font-bold shadow-sm transition-colors"
                 >
                   Book Another Appointment
                 </button>

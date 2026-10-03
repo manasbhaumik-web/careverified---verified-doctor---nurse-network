@@ -240,10 +240,10 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
                 </svg>
 
                 {/* Left/Right marker tags */}
-                <div className="absolute top-4 left-4 bg-slate-900 border border-slate-800 text-emerald-400 font-black px-2 py-0.5 rounded text-[10px]">
+                <div className="absolute top-4 left-4 bg-blue-700 border border-slate-800 text-emerald-400 font-black px-2 py-0.5 rounded text-[10px]">
                   R
                 </div>
-                <div className="absolute top-4 right-4 bg-slate-900 border border-slate-800 text-emerald-400 font-black px-2 py-0.5 rounded text-[10px]">
+                <div className="absolute top-4 right-4 bg-blue-700 border border-slate-800 text-emerald-400 font-black px-2 py-0.5 rounded text-[10px]">
                   L
                 </div>
 

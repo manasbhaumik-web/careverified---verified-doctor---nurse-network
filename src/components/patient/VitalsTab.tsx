@@ -46,7 +46,7 @@ interface VitalsTabProps {
 function BPTrendChart({ vitals }: { vitals: VitalsRecord[] }) {
   if (vitals.length < 2) {
     return (
-      <div className="h-48 w-full bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center">
+      <div className="h-48 w-full bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center">
         <p className="text-xs text-slate-400 font-bold">Add at least 2 entries to see BP trends.</p>
       </div>
     );
@@ -298,14 +298,14 @@ export default function VitalsTab({
               </select>
             </div>
 
-            <button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-black py-4 px-4 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 duration-150">
+            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-black py-4 px-4 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 duration-150">
               <Plus className="h-4 w-4" />
               <span>Commit Telemetry Entry</span>
             </button>
           </motion.form>
 
           {/* AI Wellness Journal */}
-          <motion.div variants={itemVariants} className="relative overflow-hidden bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-[32px] p-8 text-white space-y-5 shadow-2xl">
+          <motion.div variants={itemVariants} className="relative overflow-hidden bg-gradient-to-br from-blue-700 to-blue-800 border border-slate-800 rounded-[32px] p-8 text-white space-y-5 shadow-2xl">
             <div className="absolute top-0 right-0 w-48 h-48 bg-teal-500/10 rounded-full blur-[40px] pointer-events-none"></div>
             
             <div className="space-y-2 relative z-10">
@@ -348,8 +348,8 @@ export default function VitalsTab({
             </div>
 
             {vitalsList.length === 0 ? (
-              <div className="text-center py-24 space-y-4 bg-white rounded-3xl border border-slate-100 shadow-xs">
-                <div className="h-16 w-16 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+              <div className="text-center py-24 space-y-4 bg-white rounded-xl border border-slate-100 shadow-xs">
+                <div className="h-16 w-16 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center mx-auto shadow-sm">
                   <HeartPulse className="h-8 w-8 text-slate-300" />
                 </div>
                 <p className="text-xs text-slate-400 font-bold max-w-sm mx-auto">No telemetry records found. Commit your first entry.</p>
@@ -393,7 +393,7 @@ export default function VitalsTab({
                   <span className="text-xs font-black text-slate-500 uppercase tracking-widest block px-2">Historical Logs</span>
                   <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                     {vitalsList.map((v) => (
-                      <div key={v.id} className="group relative border border-slate-200 p-5 rounded-2xl bg-white shadow-sm hover:shadow-md hover:border-teal-500/30 transition-all duration-300">
+                      <div key={v.id} className="group relative border border-slate-200 p-5 rounded-xl bg-white shadow-sm hover:shadow-md hover:border-teal-500/30 transition-all duration-300">
                         <div className="flex justify-between items-center mb-3">
                           <div className="flex gap-2 items-center">
                             <span className="font-black text-slate-800 bg-slate-50 px-3 py-1 rounded-lg text-xs border border-slate-200">{v.date}</span>

@@ -129,11 +129,11 @@ Notarized Secure Block under HIPAA Audit standards.`);
   };
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-800/65 backdrop-blur-xs animate-fade-in" id="payment-gateway-modal">
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-100/80 backdrop-blur-xs animate-fade-in" id="payment-gateway-modal">
       <div className="bg-white rounded-3xl border-2 border-slate-200 w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[95vh] animate-slide-down">
         
         {/* Header */}
-        <div className="bg-blue-900 text-white p-5 flex justify-between items-center shrink-0">
+        <div className="bg-blue-700 text-white p-5 flex justify-between items-center shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="p-2 bg-white/10 rounded-xl">
               <CreditCard className="h-5 w-5 text-blue-300" />
