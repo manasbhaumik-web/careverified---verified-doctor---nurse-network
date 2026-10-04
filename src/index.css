@@ -76,16 +76,24 @@ html, body {
 
 /* -------------------------------------------------------------
  * GEOMETRY RULES:
- * 1. ALL Profile Pictures: MUST have circular round corner effect (border-radius: 9999px)
- * 2. ALL Blinking / Pulse Indicator Dots: MUST have circular round corner effect (border-radius: 9999px)
- * 3. ALL OTHER CONTAINERS, CARDS, BUTTONS, INPUTS, BADGES, TABS, MODALS: STRICTLY ZERO ROUND CORNERS (border-radius: 0px)
+ * 1. Profile Pictures, Notification Badges & Active Status Signals:
+ *    Circular round corner effect (border-radius: 9999px)
+ * 2. ALL OTHER CONTAINERS, CARDS, BUTTONS, INPUTS, BADGES, TABS, MODALS:
+ *    Strictly rectangular sharp geometry (border-radius: 0px)
  * ------------------------------------------------------------- */
 
-/* Profile Picture Round Corner Effect across all components */
+/* Profile Pictures, Notification Badges, & Active Green Signal Status Dots */
 img, 
 .avatar, 
 .profile-pic, 
-.avatar-img {
+.avatar-img,
+.rounded-full,
+[class*="rounded-full"],
+.status-dot,
+.live-dot,
+.pulse-dot,
+.notification-icon,
+.active-signal {
   border-radius: 9999px !important;
 }
 
@@ -93,45 +101,25 @@ img,
 .animate-ping,
 .animate-pulse,
 [class*="animate-ping"],
-[class*="animate-pulse"],
-.status-dot,
-.live-dot,
-.pulse-dot {
+[class*="animate-pulse"] {
   border-radius: 9999px !important;
 }
 
-/* ALL OTHER UI ELEMENTS: STRICTLY ZERO ROUNDED CORNERS (rectangular sharp geometry) */
-button,
-input,
+/* ALL OTHER UI ELEMENTS: RECTANGULAR SHARP GEOMETRY */
+button:not(.rounded-full):not([class*="rounded-full"]),
+input:not(.rounded-full):not([class*="rounded-full"]),
 select,
 textarea,
-div:not(.animate-ping):not(.animate-pulse):not(.status-dot):not(.live-dot):not(.pulse-dot),
-span:not(.animate-ping):not(.animate-pulse):not(.status-dot):not(.live-dot):not(.pulse-dot),
+div:not(.animate-ping):not(.animate-pulse):not(.status-dot):not(.live-dot):not(.pulse-dot):not(.notification-icon):not(.active-signal):not(.rounded-full):not([class*="rounded-full"]),
+span:not(.animate-ping):not(.animate-pulse):not(.status-dot):not(.live-dot):not(.pulse-dot):not(.notification-icon):not(.active-signal):not(.rounded-full):not([class*="rounded-full"]),
 header,
 nav,
 aside,
 section,
 form,
 article,
-main,
-a {
+main {
   border-radius: 0px !important;
-}
-
-/* -------------------------------------------------------------
- * ZERO BLACK BACKGROUND ENFORCEMENT & LIGHT SURFACE REMAPPING
- * Transforms dark card surfaces across the app to light CareVerified surfaces
- * EXCEPTION: Application Footer is explicitly styled with a dark contrasting palette
- * ------------------------------------------------------------- */
-
-:not(footer):not(.app-dark-footer).bg-slate-900,
-:not(footer):not(.app-dark-footer).bg-slate-950,
-:not(footer):not(.app-dark-footer).bg-black,
-:not(footer):not(.app-dark-footer).bg-zinc-900,
-:not(footer):not(.app-dark-footer).bg-gray-900 {
-  background-color: #FFF0F2 !important;
-  color: #1E293B !important;
-  border-color: #FECDD3 !important;
 }
 
 /* -------------------------------------------------------------
