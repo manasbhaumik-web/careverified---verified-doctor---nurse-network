@@ -433,7 +433,7 @@ export default function App() {
           <div className="flex items-stretch gap-4 py-2">
 
             {/* Left: Perspective Badge */}
-            <div className="flex items-center gap-2 self-center bg-[#DC2626] text-white px-3.5 py-2 rounded-xl text-xs font-extrabold tracking-wider uppercase border border-[#B91C1C] shadow-xs">
+            <div className="flex items-center gap-2 self-center bg-[#DC2626] text-white px-3.5 py-2 rounded-none text-xs font-extrabold tracking-wider uppercase border border-[#B91C1C] shadow-xs">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
               <span>
                 {currentUser.role === 'patient' && 'Patient Hub'}
@@ -451,7 +451,7 @@ export default function App() {
                   <button
                     key={item.id}
                     onClick={() => { setActiveView(item.id); setSelectedProfId(null); }}
-                    className={`relative flex items-center gap-2 px-4 py-2 text-xs font-extrabold transition-all duration-200 cursor-pointer select-none rounded-lg border ${
+                    className={`relative flex items-center gap-2 px-4 py-2 text-xs font-extrabold transition-all duration-200 cursor-pointer select-none rounded-none border ${
                       isActive
                         ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs'
                         : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
@@ -845,7 +845,7 @@ export default function App() {
                   onClick={() => {
                     handleLogout();
                   }}
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-extrabold rounded-lg border border-slate-700 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-extrabold rounded-none border border-slate-700 transition-colors cursor-pointer"
                 >
                   Switch Perspective
                 </button>
