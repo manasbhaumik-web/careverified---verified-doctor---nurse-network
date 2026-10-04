@@ -30,6 +30,7 @@ export default function App() {
   const [activeView, setActiveView] = useState<'registry' | 'profile' | 'onboard' | 'recruitment' | 'messages' | 'admin' | 'seo' | 'articles' | 'patient_dashboard' | string>('patient_dashboard');
   const [selectedProfId, setSelectedProfId] = useState<string | null>(null);
   const [selectedSpecialtyFilter, setSelectedSpecialtyFilter] = useState<string>('');
+  const [registryTab, setRegistryTab] = useState<'directory' | 'triage'>('directory');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
 
@@ -525,26 +526,75 @@ export default function App() {
                   description="Direct directory of practitioners with active, verified MMC and LJM licensing registration codes."
                 />
 
-                {/* Clinical Symptom Evaluator widget on top of search */}
-                <div className="max-w-3xl mx-auto">
-                  <AISymptomMatcher onSelectSpecialty={(spec) => setSelectedSpecialtyFilter(spec)} />
+                {/* Tab Button Group to switch between Directory List and AI Symptom Triage */}
+                <div className="flex flex-col sm:flex-row items-center justify-between bg-white border border-[#FECDD3] p-3 rounded-none shadow-3xs gap-3">
+                  <div className="inline-flex bg-slate-100 p-1 border border-slate-200 rounded-none gap-1 w-full sm:w-auto">
+                    <button
+                      onClick={() => setRegistryTab('directory')}
+                      className={`flex-1 sm:flex-initial px-5 py-2.5 text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer rounded-none ${
+                        registryTab === 'directory'
+                          ? 'bg-[#DC2626] text-white shadow-3xs'
+                          : 'text-slate-700 bg-white hover:bg-slate-50'
+                      }`}
+                    >
+                      <UserCheck className="h-4 w-4" />
+                      <span>Medical Directory List</span>
+                      {selectedSpecialtyFilter && (
+                        <span className="bg-[#FFF0F2] text-[#DC2626] border border-[#FECDD3] text-[9px] px-2 py-0.5 font-black uppercase rounded-none">
+                          {selectedSpecialtyFilter}
+                        </span>
+                      )}
+                    </button>
+
+                    <button
+                      onClick={() => setRegistryTab('triage')}
+                      className={`flex-1 sm:flex-initial px-5 py-2.5 text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer rounded-none ${
+                        registryTab === 'triage'
+                          ? 'bg-[#DC2626] text-white shadow-3xs'
+                          : 'text-slate-700 bg-white hover:bg-slate-50'
+                      }`}
+                    >
+                      <Activity className="h-4 w-4 text-[#DC2626]" />
+                      <span>AI Symptom Triage &amp; Search</span>
+                    </button>
+                  </div>
+
+                  {selectedSpecialtyFilter && (
+                    <button
+                      onClick={() => setSelectedSpecialtyFilter('')}
+                      className="text-xs font-extrabold text-[#DC2626] bg-[#FFF0F2] border border-[#FECDD3] px-3 py-1.5 hover:bg-[#DC2626] hover:text-white transition-all cursor-pointer rounded-none flex items-center gap-1.5 shrink-0"
+                    >
+                      <span>Clear Filter ({selectedSpecialtyFilter})</span>
+                      <span>&times;</span>
+                    </button>
+                  )}
                 </div>
 
-                {/* National Directory List */}
-                <div className="border-t border-slate-100 pt-8">
-                  <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-1.5 uppercase tracking-wide">
-                    <UserCheck className="h-4 w-4 text-[#DC2626]" />
-                    Medical Registry Directory
-                  </h3>
-                  <SearchHub
-                    professionals={professionals}
-                    reviews={reviews}
-                    onSelectProfessional={(id) => setSelectedProfId(id)}
-                    selectedSpecialtyFilter={selectedSpecialtyFilter}
-                    onSelectSpecialtyFilter={(spec) => setSelectedSpecialtyFilter(spec)}
-                    onClearSpecialtyFilter={() => setSelectedSpecialtyFilter('')}
-                  />
-                </div>
+                {/* TAB CONTENT 1: AI Symptom Triage Search Panel */}
+                {registryTab === 'triage' && (
+                  <div className="max-w-3xl mx-auto animate-fade-in">
+                    <AISymptomMatcher
+                      onSelectSpecialty={(spec) => {
+                        setSelectedSpecialtyFilter(spec);
+                        setRegistryTab('directory');
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* TAB CONTENT 2: National Directory List */}
+                {registryTab === 'directory' && (
+                  <div className="animate-fade-in">
+                    <SearchHub
+                      professionals={professionals}
+                      reviews={reviews}
+                      onSelectProfessional={(id) => setSelectedProfId(id)}
+                      selectedSpecialtyFilter={selectedSpecialtyFilter}
+                      onSelectSpecialtyFilter={(spec) => setSelectedSpecialtyFilter(spec)}
+                      onClearSpecialtyFilter={() => setSelectedSpecialtyFilter('')}
+                    />
+                  </div>
+                )}
               </div>
             )}
 

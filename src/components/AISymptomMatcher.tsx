@@ -35,6 +35,9 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
       const data = await response.json();
       if (data.status === 'success') {
         setResult(data);
+        if (data.data?.recommendedSpecialty) {
+          onSelectSpecialty(data.data.recommendedSpecialty);
+        }
       } else {
         throw new Error(data.message || 'Failed to complete symptom matching.');
       }
