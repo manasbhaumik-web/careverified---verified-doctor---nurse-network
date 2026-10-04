@@ -356,7 +356,7 @@ export default function VerificationTerminal({
 
 
           {/* ═══════════ MERGED EXECUTIVE CRIMSON HERO BANNER ═══════════ */}
-          <div className="bg-gradient-to-r from-[#FFF1F2] via-[#FFF5F5] to-[#FFE4E6] border-l-8 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 rounded-2xl p-5 sm:p-6 shadow-sm relative overflow-hidden space-y-4">
+          <div className="bg-gradient-to-r from-[#FFF1F2] via-[#FFF5F5] to-[#FFE4E6] border-l-8 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 rounded-none p-5 sm:p-6 shadow-sm relative overflow-hidden space-y-4">
             {/* Integrated Top Bar: Dynamic Time-of-Day Greeting & Date Badge */}
             <div className="flex items-center justify-between gap-4 border-b border-[#FECDD3]/80 pb-3 flex-wrap">
               <div className="flex items-center gap-2 text-slate-600">
@@ -437,7 +437,7 @@ export default function VerificationTerminal({
 
               {/* Right High-Contrast KPI Executive Strip */}
               <div className="flex items-center gap-4 flex-wrap lg:justify-end border-t lg:border-t-0 border-[#FECDD3]/80 pt-4 lg:pt-0">
-                <div className="grid grid-cols-3 gap-3 bg-white/90 p-3 border border-[#FECDD3] rounded-xl text-center min-w-[280px] shadow-xs">
+                <div className="grid grid-cols-3 gap-3 bg-white/90 p-3 border border-[#FECDD3] rounded-none text-center min-w-[280px] shadow-xs">
                   <div>
                     <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{patientsAttendedCount}</span>
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Patients</span>
@@ -456,7 +456,7 @@ export default function VerificationTerminal({
                   <button
                     type="button"
                     onClick={() => setShowPublicProfilePreview(true)}
-                    className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black px-4 py-3 rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-2 border border-[#B91C1C]"
+                    className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black px-4 py-3 rounded-none shadow-sm transition-all cursor-pointer flex items-center gap-2 border border-[#B91C1C]"
                   >
                     <Eye className="h-4 w-4" />
                     <span>View Public Profile</span>
@@ -467,7 +467,7 @@ export default function VerificationTerminal({
                       navigator.clipboard.writeText(`https://medicert.com/practitioner/${matchedProfile.id}`);
                       showToast("Profile link copied to clipboard!");
                     }}
-                    className="bg-white hover:bg-[#FFF1F2] text-[#DC2626] border border-[#FECDD3] text-xs font-bold px-4 py-3 rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-xs"
+                    className="bg-white hover:bg-[#FFF1F2] text-[#DC2626] border border-[#FECDD3] text-xs font-bold px-4 py-3 rounded-none transition-all cursor-pointer flex items-center gap-2 shadow-xs"
                   >
                     <Send className="h-3.5 w-3.5 text-white" />
                     <span>Share Link</span>
@@ -500,7 +500,7 @@ export default function VerificationTerminal({
               <div
                 role="tablist"
                 aria-label="Practitioner workspace sections"
-                className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-xl sticky top-[72px] bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs"
+                className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-none sticky top-[72px] bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs"
               >
                 <button
                   role="tab"
@@ -510,7 +510,7 @@ export default function VerificationTerminal({
                   tabIndex={activeDashboardTab === 'home' ? 0 : -1}
                   onClick={() => setActiveDashboardTab('home')}
                   onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-none border transition-all ${
                     activeDashboardTab === 'home' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
                   }`}
                 >

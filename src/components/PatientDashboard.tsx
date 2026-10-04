@@ -535,7 +535,7 @@ export default function PatientDashboard({
     <div className="w-full max-w-[1920px] mx-auto space-y-8" id="patient-dashboard-root">
       
       {/* EXECUTIVE CRIMSON METRIC BANNER (CONCEPT 3) */}
-      <div className="bg-gradient-to-r from-[#FFF1F2] via-[#FFF5F5] to-[#FFE4E6] border-l-8 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 rounded-2xl p-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-[#FFF1F2] via-[#FFF5F5] to-[#FFE4E6] border-l-8 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 rounded-none p-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 text-[#DC2626] text-xs font-black uppercase tracking-wider">
             <ShieldCheck className="h-4 w-4 text-emerald-600" />
@@ -551,7 +551,7 @@ export default function PatientDashboard({
 
         {/* High-Contrast Executive Metric Strip & Quick Actions */}
         <div className="flex flex-wrap items-center gap-4 shrink-0">
-          <div className="grid grid-cols-4 gap-3 bg-white/90 backdrop-blur-xs p-3 border border-[#FECDD3] rounded-xl text-center min-w-[320px] shadow-xs">
+          <div className="grid grid-cols-4 gap-3 bg-white/90 backdrop-blur-xs p-3 border border-[#FECDD3] rounded-none text-center min-w-[320px] shadow-xs">
             <div>
               <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{upcomingBookings.length}</span>
               <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Bookings</span>
@@ -573,7 +573,7 @@ export default function PatientDashboard({
           <div className="flex items-center gap-2">
             <button 
               onClick={() => setShowOnCallModal(true)} 
-              className="px-4 py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black rounded-xl border border-[#DC2626] transition-all flex items-center gap-2 uppercase tracking-wider cursor-pointer shadow-sm hover:shadow-md"
+              className="px-4 py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black rounded-none border border-[#DC2626] transition-all flex items-center gap-2 uppercase tracking-wider cursor-pointer shadow-sm hover:shadow-md"
             >
               <Ambulance className="h-4 w-4 text-white animate-bounce" />
               <span>{activeDispatch ? 'Track Triage' : 'Request On-Call'}</span>
@@ -672,7 +672,7 @@ export default function PatientDashboard({
       <div
         role="tablist"
         aria-label="Patient hub sections"
-        className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-xl sticky top-20 bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs"
+        className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-none sticky top-20 bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs"
       >
         {patientTabs.map(tab => (
           <button
@@ -684,7 +684,7 @@ export default function PatientDashboard({
             tabIndex={activeTab === tab.id ? 0 : -1}
             onClick={() => setActiveTab(tab.id as any)}
             onKeyDown={handlePatientTabKeyDown}
-            className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+            className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-none border transition-all ${
               activeTab === tab.id
                 ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs'
                 : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'

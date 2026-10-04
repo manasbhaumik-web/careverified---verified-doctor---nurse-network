@@ -249,7 +249,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
   return (
     <div className="w-full max-w-[1920px] mx-auto space-y-6" id="national-registry-admin-panel">
       {/* EXECUTIVE CRIMSON METRIC BANNER (CONCEPT 3) */}
-      <div className="bg-gradient-to-r from-[#FFF1F2] via-[#FFF5F5] to-[#FFE4E6] border-l-8 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 rounded-2xl p-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-[#FFF1F2] via-[#FFF5F5] to-[#FFE4E6] border-l-8 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 rounded-none p-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 text-[#DC2626] text-xs font-black uppercase tracking-wider">
             <ShieldAlert className="h-4 w-4 text-emerald-600" />
@@ -263,7 +263,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 bg-white/90 backdrop-blur-xs p-3 border border-[#FECDD3] rounded-xl text-center min-w-[300px] shadow-xs">
+        <div className="grid grid-cols-3 gap-3 bg-white/90 backdrop-blur-xs p-3 border border-[#FECDD3] rounded-none text-center min-w-[300px] shadow-xs">
           <div>
             <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{pendingRequests.length}</span>
             <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Pending</span>
@@ -279,7 +279,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
         </div>
       </div>
       {/* Dynamic Module Tabs */}
-      <div role="tablist" aria-label="Admin panel sections" className="flex gap-3 border border-[#FECDD3] rounded-xl sticky top-20 bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs">
+      <div role="tablist" aria-label="Admin panel sections" className="flex gap-3 border border-[#FECDD3] rounded-none sticky top-20 bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs">
         <button
           type="button"
           role="tab"
@@ -289,7 +289,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
           tabIndex={activeTab === 'approvals' ? 0 : -1}
           onClick={() => setActiveTab('approvals')}
           onKeyDown={(e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); setActiveTab(activeTab === 'approvals' ? 'packages' : 'approvals'); } }}
-          className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+          className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-none border transition-all ${
             activeTab === 'approvals' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
           }`}
         >

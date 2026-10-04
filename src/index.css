@@ -88,7 +88,7 @@ img,
   border-right-width: 1px;
   border-color: #FECDD3;
   color: #0F172A;
-  border-radius: 1rem;
+  border-radius: 0px;
   padding: 1.5rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
@@ -99,7 +99,7 @@ img,
   font-weight: 700;
   font-size: 0.75rem;
   padding: 0.625rem 1rem;
-  border-radius: 0.75rem;
+  border-radius: 0px;
   border: 1px solid #DC2626;
   transition: all 0.2s ease-in-out;
   cursor: pointer;
@@ -116,7 +116,7 @@ img,
   font-weight: 700;
   font-size: 0.75rem;
   padding: 0.625rem 1rem;
-  border-radius: 0.75rem;
+  border-radius: 0px;
   border: 1px solid #FECDD3;
   transition: all 0.2s ease-in-out;
   cursor: pointer;
@@ -130,7 +130,7 @@ img,
 .card-elevated {
   background-color: #FFFFFF;
   border: 1px solid #FECDD3;
-  border-radius: 1rem;
+  border-radius: 0px;
   padding: 1.5rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease-in-out;
