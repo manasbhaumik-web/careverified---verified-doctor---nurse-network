@@ -399,23 +399,23 @@ export default function MedicalHistory() {
                     setActiveRecordDetail(record);
                   }
                 }}
-                className="bg-white border-2 border-slate-200/80 hover:border-blue-400 rounded-2xl p-5 shadow-xs transition-all duration-200 flex flex-col justify-between hover:scale-[1.01] cursor-pointer group relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="bg-white border-2 border-slate-200/80 hover:border-blue-400 rounded-none p-5 shadow-xs transition-all duration-200 flex flex-col justify-between hover:scale-[1.01] cursor-pointer group relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
                 {/* Visual Category Accent strip */}
                 <div className={`absolute top-0 left-0 right-0 h-1 ${
-                  record.category === 'Lab Result' ? 'bg-indigo-500' :
+                  record.category === 'Lab Result' ? 'bg-cyan-600' :
                   record.category === 'Vaccination Card' ? 'bg-emerald-500' :
-                  record.category === 'Imaging/Scan' ? 'bg-purple-500' :
+                  record.category === 'Imaging/Scan' ? 'bg-rose-600' :
                   record.category === 'Prescription' ? 'bg-amber-500' : 'bg-slate-400'
                 }`} />
 
                 <div className="space-y-4">
                   {/* Category & Status Badges */}
                   <div className="flex items-center justify-between">
-                    <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md tracking-wider ${
-                      record.category === 'Lab Result' ? 'bg-indigo-50 text-indigo-700' :
+                    <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-none tracking-wider ${
+                      record.category === 'Lab Result' ? 'bg-cyan-50 text-cyan-800' :
                       record.category === 'Vaccination Card' ? 'bg-emerald-50 text-emerald-700' :
-                      record.category === 'Imaging/Scan' ? 'bg-purple-50 text-purple-700' :
+                      record.category === 'Imaging/Scan' ? 'bg-rose-50 text-rose-800' :
                       record.category === 'Prescription' ? 'bg-amber-50 text-amber-700' : 'bg-slate-50 text-slate-600'
                     }`}>
                       {record.category}
@@ -849,12 +849,12 @@ export default function MedicalHistory() {
 
                 {/* CASE C: IMAGING FINDINGS TEXT */}
                 {activeRecordDetail.structuredData?.imagingFindings && (
-                  <div className="bg-white border-2 border-slate-200/60 rounded-2xl p-4.5 shadow-xs space-y-3">
+                  <div className="bg-white border-2 border-slate-200/60 rounded-none p-4.5 shadow-xs space-y-3">
                     <div className="flex items-center gap-2 border-b border-slate-100 pb-2.5">
-                      <span className="text-xs font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">PA View</span>
+                      <span className="text-xs font-extrabold text-rose-800 bg-rose-50 px-2 py-0.5 rounded-none">PA View</span>
                       <span className="text-xs font-extrabold text-slate-800">{activeRecordDetail.structuredData.testName}</span>
                     </div>
-                    <div className="text-xs text-slate-700 font-semibold leading-relaxed font-mono bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                    <div className="text-xs text-slate-700 font-semibold leading-relaxed font-mono bg-slate-50 p-3.5 rounded-none border border-slate-100">
                       {activeRecordDetail.structuredData.imagingFindings}
                     </div>
                   </div>
@@ -862,7 +862,7 @@ export default function MedicalHistory() {
 
                 {/* GENERAL NOTE IF PRESENT */}
                 {activeRecordDetail.notes && (
-                  <div className="bg-white border-2 border-slate-200/60 rounded-2xl p-4 shadow-xs space-y-1.5">
+                  <div className="bg-white border-2 border-slate-200/60 rounded-none p-4 shadow-xs space-y-1.5">
                     <span className="text-[9px] uppercase font-extrabold text-slate-400 block tracking-wide">Patient Clinical Remarks</span>
                     <p className="text-xs text-slate-600 font-semibold italic">
                       "{activeRecordDetail.notes}"

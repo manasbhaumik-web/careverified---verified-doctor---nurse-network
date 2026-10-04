@@ -712,8 +712,8 @@ export default function App() {
                         description={`Compiled & hot-loaded by ${activePkg.author}`}
                         actions={
                           <>
-                            <span className="bg-purple-50 text-purple-700 text-[10px] font-extrabold px-2 py-0.5 rounded-lg border border-purple-100">v{activePkg.version}</span>
-                            <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-3 py-1.5 rounded-xs border border-emerald-200 uppercase tracking-wider inline-flex items-center gap-1.5">
+                            <span className="bg-rose-50 text-rose-700 text-[10px] font-extrabold px-2 py-0.5 rounded-none border border-rose-100">v{activePkg.version}</span>
+                            <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-3 py-1.5 rounded-none border border-emerald-200 uppercase tracking-wider inline-flex items-center gap-1.5">
                               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-xs animate-pulse"></span>
                               <span>Active Runtime Package</span>
                             </span>
@@ -723,35 +723,35 @@ export default function App() {
 
                       <div className="space-y-3">
                         <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider">Functional Package Description</h4>
-                        <p className="text-sm font-semibold text-slate-600 leading-relaxed bg-slate-50 border border-slate-100 p-4.5 rounded-xl">
+                        <p className="text-sm font-semibold text-slate-600 leading-relaxed bg-slate-50 border border-slate-100 p-4.5 rounded-none">
                           {activePkg.description}
                         </p>
                       </div>
 
                       {/* Interactive sandbox demonstration for custom module */}
-                      <div className="border border-slate-200/60 rounded-2xl p-6 bg-slate-50/50 space-y-5">
+                      <div className="border border-slate-200/60 rounded-none p-6 bg-slate-50/50 space-y-5">
                         <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                          <Settings className="h-4.5 w-4.5 text-purple-600 animate-spin" />
+                          <Settings className="h-4.5 w-4.5 text-rose-600 animate-spin" />
                           <h4 className="text-xs font-black uppercase text-slate-800 tracking-wider">Interactive Package Terminal & Diagnostics</h4>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                           <div className="space-y-4">
-                            <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
+                            <div className="bg-white border border-slate-200 rounded-none p-4 space-y-2">
                               <span className="text-[10px] text-slate-400 font-extrabold uppercase">Mountpoint Hook</span>
                               <p className="text-xs font-mono font-bold text-blue-600">/src/modules/{activePkg.id}/index.tsx</p>
                             </div>
-                            <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
+                            <div className="bg-white border border-slate-200 rounded-none p-4 space-y-2">
                               <span className="text-[10px] text-slate-400 font-extrabold uppercase">HIPAA / Security Shield</span>
                               <p className="text-xs font-mono font-bold text-emerald-600">Sandbox Isolated & AES-256 Encrypted</p>
                             </div>
                           </div>
 
-                          <div className="bg-slate-100 text-slate-800 border border-slate-300 font-mono p-4 rounded-xl text-[10px] leading-relaxed shadow-inner overflow-x-auto max-h-40">
+                          <div className="bg-slate-100 text-slate-800 border border-slate-300 font-mono p-4 rounded-none text-[10px] leading-relaxed shadow-inner overflow-x-auto max-h-40">
                             <p className="text-emerald-400">[INFO] Hot-mounting package: {activePkg.id}</p>
                             <p className="text-slate-400">[OK] Injecting dynamic layout nodes...</p>
                             <p className="text-slate-400">[OK] Instantiating core API controllers...</p>
-                            <p className="text-purple-400">[DEBUG] Package Category: {activePkg.category}</p>
+                            <p className="text-rose-400">[DEBUG] Package Category: {activePkg.category}</p>
                             <p className="text-slate-300">[LIVE] Module {activePkg.name} is running healthy.</p>
                           </div>
                         </div>
@@ -760,7 +760,7 @@ export default function App() {
                           <button
                             type="button"
                             onClick={() => alert(`Dynamic simulation for "${activePkg.name}" triggered successfully!`)}
-                            className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm shadow-purple-500/10 cursor-pointer"
+                            className="px-4 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold rounded-none transition-all shadow-sm cursor-pointer"
                           >
                             Execute Package Dynamic Simulation
                           </button>

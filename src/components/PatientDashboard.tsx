@@ -773,10 +773,10 @@ export default function PatientDashboard({
 
         {/* TAB 5: SECURED MEDICAL RECORDS / CLINICAL HISTORY */}
         {activeTab === 'records' && (
-          <div id="panel-records" role="tabpanel" aria-labelledby="tab-records" tabIndex={0} className="space-y-6 animate-fade-in bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+          <div id="panel-records" role="tabpanel" aria-labelledby="tab-records" tabIndex={0} className="space-y-6 animate-fade-in bg-white border border-slate-200 rounded-none p-6 shadow-sm">
             <div className="border-b border-slate-150 pb-3.5">
               <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                <FolderHeart className="h-4.5 w-4.5 text-indigo-600" />
+                <FolderHeart className="h-4.5 w-4.5 text-rose-600" />
                 Medical Record Ledger
               </h3>
               <p className="text-[11px] text-slate-500 font-medium mt-0.5">

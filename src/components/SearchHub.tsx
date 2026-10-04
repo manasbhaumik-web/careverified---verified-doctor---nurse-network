@@ -254,10 +254,10 @@ export default function SearchHub({
                   <div
                     key={prof.id}
                     onClick={() => setSelectedModalProf(prof)}
-                    className="bg-white border border-slate-200 hover:border-blue-400 rounded-3xl p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-5 cursor-pointer relative overflow-hidden group"
+                    className="bg-white border border-slate-200 hover:border-blue-400 rounded-none p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-5 cursor-pointer relative overflow-hidden group"
                   >
                     {/* Floating Accent Border on Hover */}
-                    <div className={`absolute left-0 top-0 bottom-0 w-1 transition-all group-hover:w-1.5 ${isDoc ? 'bg-teal-500' : 'bg-indigo-500'
+                    <div className={`absolute left-0 top-0 bottom-0 w-1 transition-all group-hover:w-1.5 ${isDoc ? 'bg-teal-500' : 'bg-rose-500'
                       }`}></div>
 
                     <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -274,9 +274,9 @@ export default function SearchHub({
                           <h4 className="text-sm font-black text-slate-850 group-hover:text-blue-600 transition-colors truncate">
                             {prof.name}
                           </h4>
-                          <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${isDoc
+                          <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-none border ${isDoc
                               ? "bg-teal-50 text-teal-800 border-teal-100"
-                              : "bg-indigo-50 text-indigo-800 border-indigo-100"
+                              : "bg-rose-50 text-rose-800 border-rose-100"
                             }`}>
                             {isDoc ? "Doctor (MD/MBBS)" : "Registered Nurse (RN)"}
                           </span>
@@ -349,18 +349,18 @@ export default function SearchHub({
                   <div
                     key={prof.id}
                     onClick={() => onSelectProfessional(prof.id)}
-                    className={`bg-white border border-slate-200 rounded-[24px] p-5 shadow-3xs hover:shadow-md hover:border-blue-400/80 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between group relative overflow-hidden`}
+                    className={`bg-white border border-slate-200 rounded-none p-5 shadow-3xs hover:shadow-md hover:border-blue-400/80 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between group relative overflow-hidden`}
                   >
                     {/* Visual top highlighting stripe per role */}
-                    <div className={`absolute left-0 right-0 top-0 h-1.5 ${isDoc ? 'bg-teal-500/80' : 'bg-indigo-500/80'
+                    <div className={`absolute left-0 right-0 top-0 h-1.5 ${isDoc ? 'bg-teal-500/80' : 'bg-rose-500/80'
                       }`}></div>
 
                     <div className="space-y-4">
                       {/* Top Header: Role indicator and Verified Status */}
                       <div className="flex justify-between items-center pt-1.5">
-                        <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${isDoc
+                        <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-none border ${isDoc
                             ? "bg-teal-50 text-teal-800 border-teal-100"
-                            : "bg-indigo-50 text-indigo-800 border-indigo-100"
+                            : "bg-rose-50 text-rose-800 border-rose-100"
                           }`}>
                           {isDoc ? "Doctor" : "Registered Nurse"}
                         </span>
@@ -377,10 +377,10 @@ export default function SearchHub({
                           <img
                             src={prof.avatar}
                             alt={prof.name}
-                            className="h-14 w-14 rounded-2xl object-cover border border-slate-100 shadow-3xs"
+                            className="h-14 w-14 rounded-full object-cover border border-slate-100 shadow-3xs"
                             referrerPolicy="no-referrer"
                           />
-                          <span className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white ${isDoc ? 'bg-teal-500' : 'bg-indigo-500'
+                          <span className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white ${isDoc ? 'bg-teal-500' : 'bg-rose-500'
                             }`}></span>
                         </div>
 
@@ -561,9 +561,9 @@ export default function SearchHub({
 
                   <div className="space-y-1">
                     {/* Role badge */}
-                    <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${selectedModalProf.role === UserRole.DOCTOR
+                    <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-none border ${selectedModalProf.role === UserRole.DOCTOR
                         ? "bg-teal-50 text-teal-800 border-teal-200/60"
-                        : "bg-indigo-50 text-indigo-800 border-indigo-200/60"
+                        : "bg-rose-50 text-rose-800 border-rose-200/60"
                       }`}>
                       {selectedModalProf.role === UserRole.DOCTOR ? "DOCTOR (MD/MBBS)" : "REGISTERED NURSE (RN)"}
                     </span>

@@ -175,14 +175,14 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
             <img 
               src={record.fileDataUrl} 
               alt={record.title}
-              className="max-h-[75vh] max-w-[85vw] object-contain rounded-xl pointer-events-none border border-slate-200 bg-white"
+              className="max-h-[75vh] max-w-[85vw] object-contain rounded-none pointer-events-none border border-slate-200 bg-white"
               referrerPolicy="no-referrer"
             />
           ) : isImageFile && record.id === 'rec-3' ? (
             /* Chest X-Ray SVG High Fidelity Radiograph Panel */
-            <div className="w-[450px] aspect-[3/4] bg-indigo-950 border-4 border-indigo-900 rounded-2xl p-5 flex flex-col justify-between font-mono text-white relative shadow-2xl overflow-hidden pointer-events-none">
+            <div className="w-[450px] aspect-[3/4] bg-slate-950 border-4 border-slate-900 rounded-none p-5 flex flex-col justify-between font-mono text-white relative shadow-2xl overflow-hidden pointer-events-none">
               {/* Backglow glow layer for clinical look */}
-              <div className="absolute inset-0 bg-radial-gradient from-indigo-900 to-indigo-950 pointer-events-none opacity-40"></div>
+              <div className="absolute inset-0 bg-radial-gradient from-slate-900 to-slate-950 pointer-events-none opacity-40"></div>
               
               {/* Radiograph Technical Header */}
               <div className="flex justify-between text-[8px] text-emerald-400 border-b border-slate-800/80 pb-2 z-10">
@@ -436,7 +436,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
                 </div>
 
                 {/* Scannable secure QR code block */}
-                <div className="h-10 w-10 bg-indigo-900 p-0.5 rounded-md flex items-center justify-center border border-amber-200 shrink-0">
+                <div className="h-10 w-10 bg-slate-900 p-0.5 rounded-none flex items-center justify-center border border-amber-200 shrink-0">
                   <svg className="w-full h-full text-white" viewBox="0 0 24 24" fill="currentColor">
                     <rect x="2" y="2" width="6" height="6" />
                     <rect x="4" y="4" width="2" height="2" fill="black" />

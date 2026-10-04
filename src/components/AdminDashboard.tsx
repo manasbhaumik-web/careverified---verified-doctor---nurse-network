@@ -698,13 +698,13 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
         <div id="panel-packages" role="tabpanel" aria-labelledby="tab-packages" tabIndex={0} className="space-y-8 animate-fade-in text-slate-800">
           {/* Package Overview Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div className="bg-white border-2 border-slate-200/80 border-l-4 border-l-purple-600 rounded-xl p-5 shadow-xs flex items-start justify-between gap-4">
+            <div className="bg-white border-2 border-slate-200/80 border-l-4 border-l-[#DC2626] rounded-none p-5 shadow-xs flex items-start justify-between gap-4">
               <div className="space-y-2">
                 <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider">Installed packages</span>
-                <span className="font-mono tabular-nums text-2xl font-black block text-purple-700">{packages.length} Active Modules</span>
+                <span className="font-mono tabular-nums text-2xl font-black block text-[#DC2626]">{packages.length} Active Modules</span>
                 <p className="text-[10px] text-slate-500 font-semibold leading-normal">Clinical packages compiled & mounted.</p>
               </div>
-              <div className="p-2.5 bg-purple-50 text-purple-600 rounded-xl border border-purple-100 shrink-0">
+              <div className="p-2.5 bg-rose-50 text-[#DC2626] rounded-none border border-rose-100 shrink-0">
                 <Puzzle className="h-5 w-5" />
               </div>
             </div>
@@ -906,7 +906,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
           {/* Installed Packages List */}
           <div className="space-y-4">
             <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
-              <Puzzle className="h-4 w-4 text-purple-600" />
+              <Puzzle className="h-4 w-4 text-rose-600" />
               <span>Installed Packages ({packages.length})</span>
             </h3>
 

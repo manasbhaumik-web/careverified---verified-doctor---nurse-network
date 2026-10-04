@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Star, MessageSquare, ShieldCheck, Shield, X, Loader, Send } from 'lucide-react';
 import { Review } from '../../types';
 
@@ -52,9 +52,9 @@ export default function PractitionerFeedbackTab({
 
         <div className="bg-white border border-[#FECDD3] p-5 rounded-none shadow-3xs space-y-1">
           <span className="text-[10px] text-slate-400 font-bold uppercase block">Bedside Manners</span>
-          <span className="font-mono tabular-nums text-xl font-bold text-indigo-700">{hasReviews ? `${avgComm} / 5.0` : '—'}</span>
+          <span className="font-mono tabular-nums text-xl font-bold text-[#DC2626]">{hasReviews ? `${avgComm} / 5.0` : '—'}</span>
           <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
-            <div className="bg-indigo-600 h-full rounded-none" style={{ width: `${hasReviews ? (Number(avgComm)/5)*100 : 0}%` }}></div>
+            <div className="bg-[#DC2626] h-full rounded-none" style={{ width: `${hasReviews ? (Number(avgComm)/5)*100 : 0}%` }}></div>
           </div>
         </div>
 

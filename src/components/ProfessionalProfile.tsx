@@ -246,8 +246,8 @@ export default function ProfessionalProfile({
                     </span>
                   </div>
 
-                  <span className={`inline-block text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md ${
-                    isDoc ? "bg-blue-50 text-blue-800 border border-blue-100" : "bg-indigo-50 text-indigo-800 border border-indigo-100"
+                  <span className={`inline-block text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-none ${
+                    isDoc ? "bg-blue-50 text-blue-800 border border-blue-100" : "bg-rose-50 text-rose-800 border border-rose-100"
                   }`}>
                     {isDoc ? "Doctor (MD/MBBS)" : "Registered Nurse (RN)"}
                   </span>
@@ -316,12 +316,12 @@ export default function ProfessionalProfile({
 
               <div className="space-y-3">
                 <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                  <Languages className="h-4 w-4 text-indigo-600" />
+                  <Languages className="h-4 w-4 text-rose-600" />
                   Languages & Accessibility
                 </h4>
                 <div className="flex flex-wrap gap-1.5">
                   {prof.languages.map((lang: string, i: number) => (
-                    <span key={i} className="bg-indigo-50 border border-indigo-100 text-indigo-800 text-[10px] font-bold py-1 px-2.5 rounded-lg">
+                    <span key={i} className="bg-rose-50 border border-rose-100 text-rose-800 text-[10px] font-bold py-1 px-2.5 rounded-none">
                       {lang}
                     </span>
                   ))}
@@ -532,7 +532,7 @@ export default function ProfessionalProfile({
                   </div>
                   <div className="flex justify-between font-semibold text-slate-600">
                     <span>Mode:</span>
-                    <span className="font-bold text-indigo-700">{bookingSuccess.mode}</span>
+                    <span className="font-bold text-rose-700">{bookingSuccess.mode}</span>
                   </div>
                 </div>
 
