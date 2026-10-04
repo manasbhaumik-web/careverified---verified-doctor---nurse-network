@@ -256,7 +256,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
               {/* Technical Footer */}
               <div className="text-[7px] text-slate-500 border-t border-slate-800/80 pt-2 flex justify-between z-10">
                 <span>DIGITAL RADIOGRAPHY UNIT 4B</span>
-                <span>PANTAI HOSP IMAGING &bull; SECURE LEDGER PROOFED</span>
+                <span>METROPOLITAN HOSP IMAGING &bull; SECURE LEDGER PROOFED</span>
               </div>
             </div>
           ) : record.id === 'rec-1' ? (

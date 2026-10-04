@@ -3,10 +3,13 @@ import { motion, AnimatePresence, useInView } from 'motion/react';
 import {
   ShieldCheck, Search, CheckCircle2, RefreshCw, Heart,
   AlertTriangle, ArrowRight, Lock, AlertCircle, PlusCircle,
-  Building, ChevronRight, Zap, Globe,
+  Building, ChevronRight, Zap, Globe, Award, FileText,
+  Sparkles, Calendar, Users, Stethoscope, Activity, Check, UserCheck,
+  Clock, PhoneCall, FileSpreadsheet, Pill, Hospital, ExternalLink, Shield
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, UserRole } from '../types';
 import PatientRegistrationForm from './PatientRegistrationForm';
+import heroBgImage from '../../assets/medical_hero_bg.jpg';
 
 // ─────────────────────────────────────────────
 // Props
@@ -17,7 +20,7 @@ interface LandingPageProps {
 }
 
 // ─────────────────────────────────────────────
-// Red Cross mark (solid plus)
+// CareVerified Medical Cross mark (solid iconic emblem)
 // ─────────────────────────────────────────────
 function Cross({ className = '' }: { className?: string }) {
   return (
@@ -59,10 +62,10 @@ function useCounter(end: number, duration: number = 2000, startOnView: boolean =
 function AnimatedSection({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number; key?: React.Key }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 32 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
       {children}
@@ -71,49 +74,133 @@ function AnimatedSection({ children, className = '', delay = 0 }: { children: Re
 }
 
 // ─────────────────────────────────────────────
-// TESTIMONIAL DATA
+// PROFESSIONAL MEDICAL ASSISTANCE MODULES DATA
 // ─────────────────────────────────────────────
+const PROFESSIONAL_ASSISTANCE_MODULES = [
+  {
+    id: 'telehealth',
+    title: '24/7 On-Call Tele-Triage',
+    tagline: 'Emergency & Urgent Consultations',
+    icon: PhoneCall,
+    badge: 'Under 3-Min SLA',
+    summary: 'Direct WebRTC video & audio room pairing patients with verified on-call doctors for immediate emergency triage, symptom assessment, and hospital referral.',
+    highlights: [
+      'Instant video room generation with end-to-end AES-256 encryption',
+      'Smart symptom specialty matching engine',
+      'Direct emergency room triage escalation protocol'
+    ],
+    metricValue: '< 3 Min',
+    metricLabel: 'Average Consultation Wait',
+    ctaText: 'Launch Telehealth Room'
+  },
+  {
+    id: 'credential',
+    title: 'Regulatory Credential Audit',
+    tagline: 'MMC & LJM Registry Sync',
+    icon: ShieldCheck,
+    badge: 'Real-time API',
+    summary: 'Live cross-referencing with official medical council databases. Automatically validates Annual Practicing Certificates (APC) and issues verified digital practitioner badges.',
+    highlights: [
+      'Automated daily MMC & LJM database synchronization',
+      'Tamper-proof digital badge verification URL',
+      'Instant disciplinary & licensing alert telemetry'
+    ],
+    metricValue: '100%',
+    metricLabel: 'Verified MMC License Audit',
+    ctaText: 'Verify a Practitioner'
+  },
+  {
+    id: 'prescriptions',
+    title: 'E-Prescriptions & Vitals Vault',
+    tagline: 'Digital Pharmacy & Patient Record',
+    icon: Pill,
+    badge: 'HIPAA Compliant',
+    summary: 'Doctor-signed digital prescriptions dispatched to accredited partner pharmacies, alongside patient biometric vitals tracking and exportable health history.',
+    highlights: [
+      'Pharmacist-verified digital signature authentication',
+      'Biometric vitals logging (blood pressure, HR, glucose)',
+      'Exportable PDF medical history records'
+    ],
+    metricValue: '58,000+',
+    metricLabel: 'E-Prescriptions Issued',
+    ctaText: 'View E-Prescriptions'
+  },
+  {
+    id: 'locum',
+    title: 'Hospital Locum Shift Network',
+    tagline: 'Clinical Staffing Marketplace',
+    icon: Hospital,
+    badge: 'Accredited Hospitals',
+    summary: 'Transparent clinical shift recruitment matching verified doctors and senior ICU nurses with accredited private and public hospital openings.',
+    highlights: [
+      'Verified hospital clinical shift postings',
+      'Transparent hourly pay rates & instant application',
+      'Automated credential check before shift assignment'
+    ],
+    metricValue: '150+',
+    metricLabel: 'Partner Hospital Facilities',
+    ctaText: 'Explore Shift Market'
+  }
+];
+
+const PERSPECTIVES = [
+  {
+    roleKey: 'patient' as const,
+    icon: Heart,
+    title: 'For Patients & Families',
+    tagline: 'Empowered Health Decisions',
+    desc: 'Access verified doctors and nurses instantly. View real-time active e-prescriptions, log health vitals, book tele-consultations, and share medical history securely.',
+    features: ['Smart symptom specialty matching', 'Instant digital e-prescriptions directory', 'End-to-end encrypted medical messaging'],
+    badge: 'Patient Portal',
+    ctaText: 'Launch Patient Portal'
+  },
+  {
+    roleKey: 'practitioner' as const,
+    icon: UserCheck,
+    title: 'For Doctors & Nurses',
+    tagline: 'Verified Clinical Practice',
+    desc: 'Streamline credentialing through a step-by-step verification terminal. Apply for verified hospital shifts, manage patient consultations, and access peer-reviewed journals.',
+    features: ['Real-time MMC & LJM credential check', 'Clinical locum shift marketplace', 'HIPAA-compliant telehealth hub'],
+    badge: 'Practitioner Hub',
+    ctaText: 'Access Practitioner Hub'
+  },
+  {
+    roleKey: 'admin' as const,
+    icon: Building,
+    title: 'For Medical Boards & Admins',
+    tagline: 'Governance & Auditing',
+    desc: 'Audit registration documents in real time. Manage platform expansion modules, monitor regulatory compliance, and oversee licensing telemetry across the network.',
+    features: ['Direct licensing document audit suite', 'Modular package and feature toggles', 'HIPAA telemetry & analytics dashboard'],
+    badge: 'Board Admin',
+    ctaText: 'Open Admin Audit Console'
+  },
+];
+
 const TESTIMONIALS = [
   {
     id: 1,
-    quote: "CareVerify transformed how our hospital vets incoming practitioners. What used to take 3 weeks now takes 48 hours with full MMC cross-referencing.",
+    quote: "MedCred transformed how our hospital vets incoming practitioners. What used to take 3 weeks now takes 48 hours with full MMC cross-referencing.",
     name: "Dato' Dr. Lim Wei Keat",
-    title: "Chief Medical Officer, Pantai Hospital KL",
+    title: "Chief Medical Officer, Kuala Lumpur Specialist Hospital",
+    avatar: "/assets/malaysian_male_doctor.jpg"
   },
   {
     id: 2,
     quote: "As a patient, I finally feel confident knowing my doctor's license is verified in real-time. The booking and prescription system is seamless.",
     name: "Nurul Aisyah Binti Hassan",
-    title: "Registered Patient",
+    title: "Registered Patient, Kuala Lumpur",
+    avatar: "/assets/malaysian_female_nurse.jpg"
   },
   {
     id: 3,
     quote: "The clinical shift marketplace has been a game-changer for locum work. Transparent pay, verified hospitals, and instant applications.",
     name: "Nurse Faridah Binti Yusof",
     title: "ICU Senior Nurse, LJM Registered",
+    avatar: "/assets/malaysian_female_nurse.jpg"
   },
 ];
 
-const PERSPECTIVES = [
-  {
-    title: 'For registered patients',
-    desc: 'Open your secure dashboard. View e-prescriptions, log vitals, track appointments, consult certified specialists and share medical history.',
-    features: ['AI symptom specialty matching', 'Digital e-prescriptions directory', 'Secure end-to-end messenger'],
-  },
-  {
-    title: 'For doctors & nurses',
-    desc: 'Verify credentials through a step-by-step terminal. Apply for clinical shifts, manage patient files and communicate in HIPAA-protected channels.',
-    features: ['Step-by-step verification board', 'Clinical locum shift recruitment', 'Peer-reviewed publications'],
-  },
-  {
-    title: 'For medical board admins',
-    desc: 'Audit registration documents in real time. Manage expansion modules, monitor SEO compliance and oversee licensing across the platform.',
-    features: ['Direct licensing document audit', 'Modular package and feature toggles', 'HIPAA telemetry & analytics'],
-  },
-];
-
-// Remaps the app-wide teal "blue" scale to Red Cross red inside the portal,
-// so the shared registration form picks up the landing palette.
+// Remaps the app-wide blue scale to CareVerified crimson inside the portal
 const PORTAL_RED_SCALE = {
   '--color-blue-400': '#ff8a98',
   '--color-blue-500': '#e0243f',
@@ -122,7 +209,7 @@ const PORTAL_RED_SCALE = {
 } as React.CSSProperties;
 
 // ═══════════════════════════════════════════════
-// MAIN COMPONENT
+// MAIN COMPONENT (THIN BORDERS - LIGHT NAVBAR & HERO - NO BLACK BORDERS)
 // ═══════════════════════════════════════════════
 export default function LandingPage({ professionals, onLoginSuccess }: LandingPageProps) {
   // Login State
@@ -132,7 +219,9 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
-  const [showSandbox, setShowSandbox] = useState(false);
+
+  // Active Assistance Module State (Split Layout)
+  const [activeModuleId, setActiveModuleId] = useState<string>('telehealth');
 
   // Instant Verification Lookup State
   const [searchQuery, setSearchQuery] = useState('');
@@ -163,11 +252,11 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
     setTimeout(() => {
       setLoading(false);
       if (role === 'patient') {
-        onLoginSuccess({ role: 'patient', name: 'Ahmad Fauzi Bin Ramli', email: 'swarnabhaumik@gmail.com', avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120' });
+        onLoginSuccess({ role: 'patient', name: 'Ahmad Fauzi Bin Ramli', email: 'swarnabhaumik@gmail.com', avatarUrl: '/assets/malaysian_male_patient.jpg' });
       } else if (role === 'practitioner') {
-        onLoginSuccess({ role: 'practitioner', name: 'Dr. Tan Seng Hock', email: 'tan@medicert.com', avatarUrl: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=120' });
+        onLoginSuccess({ role: 'practitioner', name: 'Dr. Tan Seng Hock', email: 'tan@medicert.com', avatarUrl: '/assets/malaysian_male_doctor.jpg' });
       } else if (role === 'admin') {
-        onLoginSuccess({ role: 'admin', name: 'Sharifah Noor Al-Hadi', email: 'admin@medicert.com', avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120' });
+        onLoginSuccess({ role: 'admin', name: 'Sharifah Noor Al-Hadi', email: 'admin@medicert.com', avatarUrl: '/assets/malaysian_female_doctor.jpg' });
       }
     }, 450);
   };
@@ -181,11 +270,11 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
     setTimeout(() => {
       setLoading(false);
       if (activeTab === 'patient') {
-        onLoginSuccess({ role: 'patient', name: 'Ahmad Fauzi Bin Ramli', email, avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120' });
+        onLoginSuccess({ role: 'patient', name: 'Ahmad Fauzi Bin Ramli', email, avatarUrl: '/assets/malaysian_male_patient.jpg' });
       } else if (activeTab === 'practitioner') {
-        onLoginSuccess({ role: 'practitioner', name: 'Dr. Tan Seng Hock', email, avatarUrl: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=120' });
+        onLoginSuccess({ role: 'practitioner', name: 'Dr. Tan Seng Hock', email, avatarUrl: '/assets/malaysian_male_doctor.jpg' });
       } else {
-        onLoginSuccess({ role: 'admin', name: 'Sharifah Noor Al-Hadi', email, avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120' });
+        onLoginSuccess({ role: 'admin', name: 'Sharifah Noor Al-Hadi', email, avatarUrl: '/assets/malaysian_female_doctor.jpg' });
       }
     }, 600);
   };
@@ -197,389 +286,640 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
   const uptimeCount = useCounter(99, 1400);
 
   const stats = [
-    { ref: verifiedCount.ref, count: verifiedCount.count, suffix: '+', label: 'Verified professionals' },
-    { ref: hospitalCount.ref, count: hospitalCount.count, suffix: '+', label: 'Partner hospitals' },
-    { ref: consultationCount.ref, count: consultationCount.count, suffix: '+', label: 'Consultations delivered' },
-    { ref: uptimeCount.ref, count: uptimeCount.count, suffix: '.9%', label: 'Uptime SLA' },
+    { ref: verifiedCount.ref, count: verifiedCount.count, suffix: '+', label: 'Verified Professionals' },
+    { ref: hospitalCount.ref, count: hospitalCount.count, suffix: '+', label: 'Partner Hospitals' },
+    { ref: consultationCount.ref, count: consultationCount.count, suffix: '+', label: 'Consultations Delivered' },
+    { ref: uptimeCount.ref, count: uptimeCount.count, suffix: '.9%', label: 'Network Uptime SLA' },
   ];
 
-  const inputClass = 'w-full bg-white/5 border-[1.5px] border-white/30 rounded-md px-4 h-[52px] text-base font-medium text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cross/60 focus:border-white transition-all';
+  const activeModule = PROFESSIONAL_ASSISTANCE_MODULES.find(m => m.id === activeModuleId) || PROFESSIONAL_ASSISTANCE_MODULES[0];
+
+  const inputClass = 'w-full bg-white/10 border border-white/30 rounded-none px-4 h-[50px] text-base font-medium text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-all';
 
   return (
-    <div className="min-h-screen bg-white text-ink font-body flex flex-col antialiased selection:bg-cross-tint selection:text-cross-dark">
+    <div className="min-h-screen bg-[#FDFBFB] text-[#1E293B] font-body flex flex-col antialiased selection:bg-[#FFE4E6] selection:text-[#DC2626]">
 
-      {/* ═══════════ NAVBAR ═══════════ */}
-      <nav className="sticky top-0 z-50 bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-4 flex flex-wrap justify-between items-center gap-4">
-          <a href="#top" className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-lg bg-cross flex items-center justify-center text-white shrink-0">
+      {/* ═══════════ TOP BANNER ═══════════ */}
+      <div className="bg-[#FFE4E6] text-[#DC2626] text-xs font-semibold py-2 px-4 text-center border-b border-[#FECDD3] flex items-center justify-center gap-2">
+        <span className="inline-flex items-center gap-1.5 bg-[#DC2626] text-white px-2.5 py-0.5 rounded-none text-[10px] uppercase tracking-wider font-bold">
+          <Cross className="h-2.5 w-2.5" /> CareVerified Standard
+        </span>
+        <span>Online Medical Assistance Platform — Verification &amp; Telehealth Network</span>
+      </div>
+
+      {/* ═══════════ NAVBAR (LIGHT TONE PRIMARY BACKGROUND) ═══════════ */}
+      <nav className="sticky top-0 z-50 bg-[#FFF1F2]/95 backdrop-blur-md border-b border-[#FECDD3]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-3.5 flex flex-wrap justify-between items-center gap-4">
+          <a href="#top" className="flex items-center gap-3.5 group">
+            <span className="w-10 h-10 rounded-none bg-[#DC2626] flex items-center justify-center text-white border border-[#B91C1C] group-hover:bg-[#B91C1C] transition-colors">
               <Cross className="h-5 w-5" />
             </span>
             <span className="flex flex-col leading-none">
-              <span className="font-display font-black text-[21px] tracking-tight">CareVerify</span>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-600 mt-1">Verified Network</span>
+              <span className="font-display font-black text-2xl tracking-tight text-[#1E293B]">
+                MedCred<span className="text-[#DC2626]">.</span>
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#DC2626] mt-1">
+                Medical Assistance Platform
+              </span>
             </span>
           </a>
+
           <div className="flex flex-wrap items-center gap-3">
             <a
               href="#verify-section"
-              className="hidden sm:inline-flex items-center min-h-11 px-[18px] text-sm font-semibold text-ink border-[1.5px] border-ink rounded-md hover:bg-slate-100 transition-colors cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-2 min-h-[42px] px-5 text-sm font-bold text-[#DC2626] bg-white border border-[#FECDD3] rounded-none hover:bg-[#FFE4E6] transition-all cursor-pointer"
             >
-              Verify a license
+              <Search className="h-4 w-4" />
+              Verify a License
             </a>
             <a
               href="#login-section"
-              className="inline-flex items-center gap-2 min-h-11 px-5 text-sm font-semibold text-white bg-cross hover:bg-cross-dark rounded-md transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 min-h-[42px] px-6 text-sm font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] border border-[#B91C1C] rounded-none shadow-xs transition-all cursor-pointer"
             >
-              Access portal
+              Access Portal
               <ArrowRight className="h-4 w-4" />
             </a>
           </div>
         </div>
       </nav>
 
-      {/* ═══════════ HERO ═══════════ */}
-      <header id="top" className="relative bg-cross text-white overflow-hidden">
-        <Cross className="absolute -right-32 -bottom-40 h-[560px] w-[560px] text-white opacity-10 pointer-events-none" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-20 pb-24 flex flex-wrap items-center gap-14">
-          <div className="flex-[1_1_480px] min-w-0">
-            <motion.span
-              initial={{ opacity: 0, y: 16 }}
+      {/* ═══════════ HERO HEADER (LIGHT CRIMSON BACKGROUND - ZERO BLACK BACKGROUNDS) ═══════════ */}
+      <header id="top" className="relative text-[#1E293B] border-b border-[#FECDD3] overflow-hidden min-h-[560px] bg-[#FFF0F2]">
+        {/* Clinical Background Image (Opacity strictly set to 80%) */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none z-0"
+          style={{ backgroundImage: `url(${heroBgImage})`, opacity: 0.8 }}
+        />
+        <Cross className="absolute -right-24 -bottom-36 h-[520px] w-[520px] text-[#DC2626] opacity-5 pointer-events-none z-0" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-12 pb-14 lg:pt-16 lg:pb-18 flex flex-wrap items-center justify-between gap-10 z-10">
+          {/* Left Column — Clean Light Crimson Layout */}
+          <div className="flex-[1_1_500px] min-w-0">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2.5 px-3.5 py-1.5 border-[1.5px] border-white/70 rounded-full text-xs font-semibold uppercase tracking-widest"
+              transition={{ duration: 0.4 }}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-none bg-white border border-[#FECDD3] text-[11px] font-extrabold uppercase tracking-widest text-[#DC2626] mb-5 shadow-xs"
             >
-              <Cross className="h-3 w-3" />
-              MMC &amp; LJM regulatory integrated
-            </motion.span>
+              <Cross className="h-3 w-3 text-[#DC2626] animate-pulse" />
+              MMC &amp; LJM Integrated Medical Assistance Network
+            </motion.div>
 
             <motion.h1
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="font-display font-black text-[40px] sm:text-6xl lg:text-[76px] leading-none tracking-tighter mt-7 mb-6"
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="font-display font-black text-3xl sm:text-4xl lg:text-5xl leading-[1.08] tracking-tight text-[#1E293B] drop-shadow-[0_1px_2px_rgba(255,255,255,0.95)] mb-4"
             >
-              The trust infrastructure for verified medical professionals.
+              Next-generation online medical assistance &amp; doctor network.
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg sm:text-[19px] text-cross-tint max-w-xl leading-relaxed mb-9"
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className="text-base sm:text-lg text-[#334155] font-semibold max-w-xl leading-relaxed mb-7 drop-shadow-[0_1px_2px_rgba(255,255,255,0.95)]"
             >
-              CareVerify unites medical boards, clinics and patients in one secure environment. Verify credentials instantly, book consultations and manage digital prescriptions with absolute trust.
+              MedCred provides real-time online medical assistance, 24/7 doctor tele-consultations, MMC credential auditing, and digital e-prescriptions built with verified clinical standards.
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-wrap gap-3.5 mb-10"
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="flex flex-wrap gap-3.5 mb-8"
             >
               <a
                 href="#login-section"
-                className="group inline-flex items-center gap-2.5 min-h-[52px] px-7 text-base font-bold text-cross bg-white hover:bg-cross-tint rounded-md transition-colors cursor-pointer"
+                className="group inline-flex items-center gap-2.5 min-h-[48px] px-7 text-sm font-extrabold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-none shadow-md transition-all cursor-pointer border border-[#B91C1C]"
               >
-                Get started free
-                <ArrowRight className="h-[18px] w-[18px] group-hover:translate-x-0.5 transition-transform" />
+                Access Portal Free
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </a>
               <a
                 href="#verify-section"
-                className="inline-flex items-center min-h-[52px] px-7 text-base font-semibold text-white border-[1.5px] border-white hover:bg-white/10 rounded-md transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2 min-h-[48px] px-7 text-sm font-bold text-[#1E293B] bg-white border border-[#FECDD3] hover:bg-[#FFE4E6] rounded-none transition-all cursor-pointer shadow-xs"
               >
-                Verify a license
+                <Search className="h-4 w-4 text-[#DC2626]" />
+                Verify a Doctor
               </a>
             </motion.div>
 
-            <div className="flex flex-wrap gap-x-5 gap-y-2.5 text-[13px] font-semibold">
-              {['HIPAA certified', 'MMC registry', 'AES-256 encrypted', 'SOC-2 compliant'].map((b, i) => (
-                <React.Fragment key={b}>
-                  {i > 0 && <span className="opacity-60" aria-hidden="true">+</span>}
-                  <span>{b}</span>
-                </React.Fragment>
+            {/* Certification Badges */}
+            <div className="flex flex-wrap items-center gap-2.5 text-[11px] font-bold text-[#1E293B]">
+              {['24/7 Telehealth Triage', 'MMC Registered Doctors', 'AES-256 Encrypted', 'SOC-2 Type II'].map((b) => (
+                <span key={b} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-white/95 border border-[#FECDD3] text-[#1E293B] font-bold shadow-xs">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                  {b}
+                </span>
               ))}
             </div>
           </div>
 
-          {/* Credential card */}
+          {/* Right Column — Glass & Hairline Border Showcase Card */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.25 }}
-            className="flex-[1_1_380px] min-w-0 max-w-[500px]"
+            initial={{ opacity: 0, scale: 0.96, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="flex-[1_1_340px] min-w-0 max-w-[420px]"
           >
-            <div className="bg-white text-ink rounded-xl p-8 shadow-2xl shadow-black/40">
-              <div className="flex justify-between items-center gap-3 mb-6">
-                <span className="text-xs font-bold uppercase tracking-[0.14em] text-slate-600">Credential check</span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cross text-white text-xs font-bold">
-                  <CheckCircle2 className="h-3.5 w-3.5" /> Verified active
+            <div className="bg-white text-[#1A1A1A] rounded-none p-6 shadow-xl border border-[#FECDD3] relative">
+              <div className="flex justify-between items-start gap-3 mb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-none bg-[#FFE9EB] border border-[#FECDD3] flex items-center justify-center text-[#C8102E]">
+                    <Cross className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-slate-500 block">Medical Assistance Badge</span>
+                    <span className="text-xs font-bold text-[#1A1A1A]">Verified Practitioner</span>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-none bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-bold">
+                  <span className="w-1.5 h-1.5 rounded-none bg-emerald-500 animate-ping" />
+                  Verified Active
                 </span>
               </div>
-              <div className="font-display font-extrabold text-3xl tracking-tight leading-tight">Dr. Tan Seng Hock</div>
-              <div className="text-slate-600 mt-1.5 mb-6">Pediatrician · MMC registered</div>
-              <div className="border-t-2 border-ink text-sm">
-                <div className="flex justify-between gap-4 py-3.5 border-b border-slate-200">
-                  <span className="text-slate-600">License</span>
-                  <span className="font-mono font-medium text-cross">MMC-32109</span>
+
+              {/* Doctor Details */}
+              <div className="flex items-center gap-3.5 mb-4">
+                <img
+                  src="/assets/malaysian_male_doctor.jpg"
+                  alt="Dr. Tan Seng Hock"
+                  className="w-14 h-14 rounded-full object-cover border border-[#FECDD3] shadow-xs"
+                />
+                <div>
+                  <h3 className="font-display font-extrabold text-xl tracking-tight text-[#1A1A1A]">Dr. Tan Seng Hock</h3>
+                  <p className="text-xs font-semibold text-[#C8102E] mt-0.5">Senior Specialist · MMC Registered</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Kuala Lumpur Specialist Hospital</p>
                 </div>
-                <div className="flex justify-between gap-4 py-3.5 border-b border-slate-200">
-                  <span className="text-slate-600">Registry</span>
-                  <span className="font-semibold">Malaysian Medical Council</span>
+              </div>
+
+              {/* Data Rows */}
+              <div className="space-y-2 bg-[#FFF9F9] rounded-none p-3.5 border border-[#FECDD3] text-xs">
+                <div className="flex justify-between items-center py-1 border-b border-rose-100">
+                  <span className="text-slate-500 font-medium">MMC License Number</span>
+                  <span className="font-mono font-bold text-[#C8102E] bg-[#FFE9EB] px-2 py-0.5 border border-[#FECDD3] rounded-none text-[11px]">MMC-32109</span>
                 </div>
-                <div className="flex justify-between gap-4 py-3.5">
-                  <span className="text-slate-600">Status checked</span>
-                  <span className="font-semibold">Live, at lookup</span>
+                <div className="flex justify-between items-center py-1 border-b border-rose-100">
+                  <span className="text-slate-500 font-medium">Registry Status</span>
+                  <span className="font-semibold text-slate-800">Malaysian Medical Council</span>
                 </div>
+                <div className="flex justify-between items-center py-1">
+                  <span className="text-slate-500 font-medium">Response SLA</span>
+                  <span className="font-semibold text-emerald-700 flex items-center gap-1">
+                    <Clock className="h-3 w-3" /> &lt; 3 Min On-Call
+                  </span>
+                </div>
+              </div>
+
+              {/* Card Footer */}
+              <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+                <span className="flex items-center gap-1 text-slate-600 font-medium">
+                  <ShieldCheck className="h-3.5 w-3.5 text-[#C8102E]" /> CareVerified Standard
+                </span>
+                <span className="font-mono text-[10px] text-slate-400">ID: 8F2A-9912</span>
               </div>
             </div>
           </motion.div>
         </div>
       </header>
 
-      {/* ═══════════ STATS ═══════════ */}
-      <section className="bg-slate-100 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-2 md:grid-cols-4">
+      {/* ═══════════ STATS BAR (THIN BORDER) ═══════════ */}
+      <section className="bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, i) => (
             <div
               key={stat.label}
               ref={stat.ref}
-              className={`py-10 px-6 first:pl-0 last:pr-0 ${i < 3 ? 'md:border-r border-slate-300' : ''} ${i % 2 === 0 ? 'border-r md:border-r' : ''} border-slate-300`}
+              className={`py-8 px-6 ${i < 3 ? 'lg:border-r border-slate-200' : ''} ${i % 2 === 0 ? 'border-r sm:border-r lg:border-r-0' : ''} border-slate-200 flex flex-col justify-center`}
             >
-              <div className="font-display font-black text-4xl sm:text-5xl tracking-tighter leading-none text-cross tabular-nums">
-                {stat.count.toLocaleString()}{stat.suffix}
+              <div className="flex items-center gap-2">
+                <Cross className="h-5 w-5 text-[#C8102E] shrink-0" />
+                <div className="font-display font-black text-3xl sm:text-4xl tracking-tight text-[#1A1A1A] tabular-nums">
+                  {stat.count.toLocaleString()}{stat.suffix}
+                </div>
               </div>
-              <div className="mt-2 text-xs font-bold uppercase tracking-widest text-slate-700">{stat.label}</div>
+              <div className="mt-2 text-xs font-bold uppercase tracking-wider text-slate-500 pl-7">{stat.label}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ═══════════ MAIN BODY ═══════════ */}
-      <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-12 pt-28 space-y-28">
+      {/* ═══════════ MAIN CONTENT ═══════════ */}
+      <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-12 pt-20 space-y-24 pb-20">
 
-        {/* ─── THREE PERSPECTIVES ─── */}
+        {/* ─── INTERACTIVE CONTENT LAYOUT: PROFESSIONAL MEDICAL ASSISTANCE SUITE (THIN BORDERS) ─── */}
         <section>
-          <AnimatedSection className="max-w-2xl mb-12">
-            <div className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-[0.14em] text-cross">
-              <Cross className="h-3.5 w-3.5" /> Platform overview
+          <AnimatedSection className="max-w-3xl mb-12">
+            <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-[#C8102E] bg-[#FFE9EB] px-3.5 py-1.5 rounded-none border border-[#FECDD3] mb-3">
+              <Cross className="h-3.5 w-3.5" /> Professional Assistance Suite
             </div>
-            <h2 className="font-display font-black text-3xl sm:text-5xl leading-[1.02] tracking-tighter mt-3.5 mb-4">
-              One network, three perspectives.
+            <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight text-[#1A1A1A] leading-[1.05]">
+              Executive Medical Assistance &amp; Triage Workflows.
             </h2>
-            <p className="text-[17px] text-slate-700">
-              Specialized modules for patients, practitioners and clinical administrators, each built around the work they actually do.
+            <p className="text-lg text-slate-600 mt-3 leading-relaxed">
+              Explore our core medical assistance modules engineered for real-time telehealth, regulatory auditing, and clinical care.
             </p>
           </AnimatedSection>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {PERSPECTIVES.map((card, i) => (
-              <AnimatedSection key={card.title} delay={i * 0.1}>
-                <article className="bg-white border-[1.5px] border-ink border-t-[6px] border-t-cross rounded-md p-8 flex flex-col gap-[18px] h-full">
-                  <h3 className="font-display font-extrabold text-2xl tracking-tight">{card.title}</h3>
-                  <p className="text-slate-700">{card.desc}</p>
-                  <ul className="mt-auto pt-5 border-t border-slate-200 flex flex-col gap-2.5 text-sm font-semibold">
-                    {card.features.map((f) => (
-                      <li key={f}>+ {f}</li>
-                    ))}
-                  </ul>
-                </article>
-              </AnimatedSection>
-            ))}
+          {/* SPLIT LAYOUT: LEFT NAV + RIGHT STAGE (THIN BORDERS) */}
+          <AnimatedSection>
+            <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-8 bg-white border border-slate-200 rounded-none shadow-sm">
+
+              {/* Left Selector Panel */}
+              <div className="p-6 bg-slate-50/60 border-b lg:border-b-0 lg:border-r border-slate-200 flex flex-col justify-between">
+                <div>
+                  <div className="text-xs font-extrabold uppercase tracking-widest text-slate-500 mb-4 px-1">
+                    Select Module
+                  </div>
+                  <div className="space-y-2">
+                    {PROFESSIONAL_ASSISTANCE_MODULES.map((m) => {
+                      const isActive = m.id === activeModuleId;
+                      const IconComp = m.icon;
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => setActiveModuleId(m.id)}
+                          className={`w-full p-4 text-left transition-all cursor-pointer flex items-center justify-between border ${
+                            isActive
+                              ? 'bg-white border-[#C8102E] text-[#1A1A1A] shadow-xs'
+                              : 'bg-transparent border-transparent text-slate-600 hover:bg-white hover:border-slate-200'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className={`w-9 h-9 rounded-none flex items-center justify-center shrink-0 border ${
+                              isActive ? 'bg-[#C8102E] border-[#A50F2A] text-white' : 'bg-slate-100 border-slate-200 text-slate-700'
+                            }`}>
+                              <IconComp className="h-4 w-4" />
+                            </span>
+                            <div className="min-w-0">
+                              <span className="block font-bold text-sm truncate">{m.title}</span>
+                              <span className="block text-[11px] text-slate-500 truncate">{m.tagline}</span>
+                            </div>
+                          </div>
+                          <ChevronRight className={`h-4 w-4 shrink-0 transition-transform ${isActive ? 'translate-x-1 text-[#C8102E]' : 'text-slate-400'}`} />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-slate-200 text-xs text-slate-500 font-medium flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-[#C8102E]" />
+                  <span>Regulatory Compliant Protocol</span>
+                </div>
+              </div>
+
+              {/* Right Stage Showcase */}
+              <div className="p-8 sm:p-10 flex flex-col justify-between">
+                <div>
+                  <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#FFE9EB] border border-[#FECDD3] text-[#C8102E] text-xs font-extrabold uppercase tracking-wider">
+                      <Cross className="h-3 w-3" /> {activeModule.badge}
+                    </span>
+                    <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-widest">
+                      Module ID: {activeModule.id.toUpperCase()}
+                    </span>
+                  </div>
+
+                  <h3 className="font-display font-black text-3xl tracking-tight text-[#1A1A1A] mb-2">
+                    {activeModule.title}
+                  </h3>
+                  <p className="text-sm font-bold uppercase tracking-wider text-[#C8102E] mb-4">
+                    {activeModule.tagline}
+                  </p>
+                  <p className="text-slate-600 text-base leading-relaxed mb-8">
+                    {activeModule.summary}
+                  </p>
+
+                  {/* Highlights Grid */}
+                  <div className="mb-8">
+                    <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-4">Clinical Capabilities</h4>
+                    <div className="space-y-3">
+                      {activeModule.highlights.map((h) => (
+                        <div key={h} className="flex items-start gap-3 bg-slate-50/80 p-3.5 border border-slate-200 text-xs font-bold text-slate-800">
+                          <CheckCircle2 className="h-4 w-4 text-[#C8102E] shrink-0 mt-0.5" />
+                          <span>{h}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Stage Footer */}
+                <div className="pt-6 border-t border-slate-200 flex flex-wrap items-center justify-between gap-6">
+                  <div>
+                    <span className="block font-display font-black text-3xl text-[#C8102E] leading-none">
+                      {activeModule.metricValue}
+                    </span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-1 block">
+                      {activeModule.metricLabel}
+                    </span>
+                  </div>
+
+                  <a
+                    href="#login-section"
+                    className="inline-flex items-center gap-2.5 min-h-[48px] px-7 text-sm font-extrabold text-white bg-[#C8102E] hover:bg-[#A50F2A] rounded-none shadow-xs transition-colors cursor-pointer border border-[#A50F2A]"
+                  >
+                    {activeModule.ctaText}
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
+                </div>
+              </div>
+
+            </div>
+          </AnimatedSection>
+        </section>
+
+        {/* ─── SECTION 2: USER ECOSYSTEM (REDESIGNED ROLE PORTALS) ─── */}
+        <section>
+          <AnimatedSection className="max-w-3xl mb-12">
+            <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-[#C8102E] bg-[#FFE9EB] px-3.5 py-1.5 rounded-none border border-[#FECDD3] mb-3">
+              <Cross className="h-3.5 w-3.5" /> User Ecosystem
+            </div>
+            <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight text-[#1A1A1A] leading-[1.05]">
+              Tailored Portals for Every Healthcare Role.
+            </h2>
+            <p className="text-lg text-slate-600 mt-3 leading-relaxed">
+              Direct access into specialized workspaces engineered for patient health, clinical practice, and regulatory oversight.
+            </p>
+          </AnimatedSection>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {PERSPECTIVES.map((card, i) => {
+              const IconComp = card.icon;
+              return (
+                <AnimatedSection key={card.title} delay={i * 0.12}>
+                  <article className="bg-white rounded-none p-8 border border-slate-200 hover:border-[#C8102E] shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between h-full relative overflow-hidden group">
+                    <div>
+                      {/* Card Header: Icon & Badge */}
+                      <div className="flex justify-between items-center gap-3 mb-6">
+                        <span className="w-12 h-12 rounded-none bg-[#FFE9EB] border border-[#FECDD3] text-[#C8102E] flex items-center justify-center group-hover:bg-[#C8102E] group-hover:text-white transition-colors">
+                          <IconComp className="h-6 w-6" />
+                        </span>
+                        <span className="text-xs font-extrabold uppercase tracking-wider text-[#C8102E] bg-[#FFE9EB] px-3 py-1 rounded-none border border-[#FECDD3]">
+                          {card.badge}
+                        </span>
+                      </div>
+
+                      <h3 className="font-display font-extrabold text-2xl tracking-tight text-[#1A1A1A] mb-1">
+                        {card.title}
+                      </h3>
+                      <p className="text-xs font-bold text-[#C8102E] uppercase tracking-wider mb-4">
+                        {card.tagline}
+                      </p>
+                      <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                        {card.desc}
+                      </p>
+
+                      {/* Key Capabilities List */}
+                      <div className="pt-5 border-t border-slate-200 space-y-2.5">
+                        <h4 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-3">Key Capabilities</h4>
+                        {card.features.map((f) => (
+                          <div key={f} className="flex items-center gap-2.5 bg-[#FFF9F9] border border-[#FECDD3] p-2.5 text-xs font-bold text-slate-800">
+                            <CheckCircle2 className="h-4 w-4 text-[#C8102E] shrink-0" />
+                            <span>{f}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Direct Portal Entry CTA Button */}
+                    <div className="pt-6 mt-6 border-t border-slate-200">
+                      <button
+                        type="button"
+                        onClick={() => handleSandboxLogin(card.roleKey)}
+                        className="w-full min-h-[46px] px-5 text-xs font-extrabold text-white bg-[#C8102E] hover:bg-[#A50F2A] border border-[#A50F2A] rounded-none shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        {card.ctaText}
+                        <ArrowRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </article>
+                </AnimatedSection>
+              );
+            })}
           </div>
         </section>
 
-        {/* ─── PUBLIC LICENSE VERIFICATION ─── */}
+        {/* ─── SECTION 3: PUBLIC LICENSE LOOKUP (LIGHT CRIMSON DESIGN) ─── */}
         <AnimatedSection>
-          <section id="verify-section" className="scroll-mt-24">
-            <div className="bg-slate-100 rounded-xl p-8 sm:p-14">
-              <div className="flex flex-wrap items-center gap-10">
-                <div className="flex-[1_1_360px] min-w-0">
-                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-cross">Open to everyone</div>
-                  <h2 className="font-display font-black text-3xl sm:text-[44px] leading-[1.02] tracking-tighter mt-3 mb-3.5">
-                    Public license verification.
-                  </h2>
-                  <p className="text-[17px] text-slate-700">
-                    Anyone can confirm a practitioner's active MMC or LJM registration. Search by name, license number or specialization.
-                  </p>
-                </div>
+          <section id="verify-section" className="scroll-mt-28">
+            <div className="bg-[#FFF0F2] text-[#1E293B] rounded-none p-8 sm:p-14 border border-[#FECDD3] shadow-sm relative overflow-hidden">
+              <Cross className="absolute -right-20 -bottom-24 h-[440px] w-[440px] text-[#DC2626] opacity-5 pointer-events-none" />
 
-                <form onSubmit={handleInstantLookup} className="flex-[1_1_420px] min-w-0 flex flex-wrap gap-3">
-                  <label htmlFor="landing-search-input" className="sr-only">Search name, license or specialty</label>
-                  <div className="relative flex-[1_1_240px] min-w-0">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+              <div className="relative z-10 max-w-4xl">
+                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-none bg-[#DC2626] text-white text-xs font-bold uppercase tracking-wider mb-4 border border-[#B91C1C]">
+                  <ShieldCheck className="h-3.5 w-3.5" /> Instant Doctor Lookup
+                </span>
+                <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight leading-tight text-[#1E293B] mb-4">
+                  Confirm Active Medical Licensing.
+                </h2>
+                <p className="text-[#334155] text-base sm:text-lg mb-8 leading-relaxed max-w-2xl font-medium">
+                  Search by practitioner name, license code (e.g., MMC-32109), or specialty to verify live practicing status instantly.
+                </p>
+
+                {/* Instant Search Form */}
+                <form onSubmit={handleInstantLookup} className="flex flex-col sm:flex-row gap-3">
+                  <div className="relative flex-grow">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                     <input
                       type="text"
-                      placeholder="Name, license or specialty, e.g. MMC-32109"
+                      placeholder="Search doctor name, license number (e.g. MMC-32109), or specialty..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-white border-[1.5px] border-ink rounded-md pl-11 pr-4 h-14 text-base font-medium text-ink placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cross/40 focus:border-cross transition-all"
-                      id="landing-search-input"
+                      className="w-full h-14 pl-12 pr-4 bg-white border border-[#FECDD3] rounded-none text-[#1E293B] placeholder-slate-400 font-medium focus:outline-none focus:border-[#DC2626] transition-all text-base shadow-xs"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="h-14 px-7 bg-cross hover:bg-cross-dark text-white text-base font-bold rounded-md transition-colors cursor-pointer shrink-0 flex items-center justify-center gap-2"
-                    id="landing-search-submit-btn"
+                    className="h-14 px-8 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-extrabold text-base rounded-none transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0 border border-[#B91C1C] shadow-sm"
                   >
-                    Verify
+                    <Search className="h-5 w-5" />
+                    Verify Now
                   </button>
                 </form>
-              </div>
 
-              <AnimatePresence mode="wait">
-                {hasSearched && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.3 }}
-                    className="border-t border-slate-300 pt-6 mt-10 space-y-4"
-                  >
-                    <h3 className="text-xs font-extrabold text-slate-600 uppercase tracking-widest">
-                      Results ({lookupResult?.length || 0})
-                    </h3>
+                {/* Search Results Display */}
+                <AnimatePresence mode="wait">
+                  {hasSearched && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -12 }}
+                      className="mt-8 pt-8 border-t border-white/15 space-y-4"
+                    >
+                      <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-slate-400">
+                        <span>Search Results ({lookupResult?.length || 0})</span>
+                        <button
+                          type="button"
+                          onClick={() => { setSearchQuery(''); setHasSearched(false); setLookupResult(null); }}
+                          className="text-[#ff8a98] hover:underline cursor-pointer"
+                        >
+                          Clear Search
+                        </button>
+                      </div>
 
-                    {lookupResult && lookupResult.length > 0 ? (
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                        {lookupResult.map((p, i) => (
-                          <motion.div
-                            key={p.id}
-                            initial={{ opacity: 0, x: -12 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.08 }}
-                            className="bg-white border-[1.5px] border-ink rounded-md p-4 flex gap-4 items-center justify-between"
-                          >
-                            <div className="flex gap-3 items-center min-w-0">
-                              <img
-                                src={p.avatar}
-                                alt={p.name}
-                                className="w-11 h-11 rounded-md object-cover shrink-0"
-                                referrerPolicy="no-referrer"
-                              />
-                              <div className="min-w-0">
-                                <p className="text-sm font-bold truncate">{p.name}</p>
-                                <p className="text-xs text-slate-600 font-medium mt-0.5">{p.specialization}</p>
-                                <p className="text-[11px] text-cross font-mono mt-1">License: {p.licenseNumber}</p>
+                      {lookupResult && lookupResult.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {lookupResult.map((p) => (
+                            <div
+                              key={p.id}
+                              className="bg-white/10 border border-white/20 rounded-none p-4 flex items-center justify-between gap-4"
+                            >
+                              <div className="flex items-center gap-3.5 min-w-0">
+                                <img
+                                  src={p.avatar}
+                                  alt={p.name}
+                                  className="w-12 h-12 rounded-none object-cover border border-white/30 shrink-0"
+                                  referrerPolicy="no-referrer"
+                                />
+                                <div className="min-w-0">
+                                  <h4 className="font-bold text-white text-base truncate">{p.name}</h4>
+                                  <p className="text-xs text-slate-300 font-medium truncate">{p.specialization}</p>
+                                  <p className="text-xs font-mono font-bold text-[#ff8a98] mt-0.5">License: {p.licenseNumber}</p>
+                                </div>
+                              </div>
+                              <div className="text-right shrink-0">
+                                <span className="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold px-3 py-1 rounded-none">
+                                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                                  Active
+                                </span>
                               </div>
                             </div>
-                            <div className="text-right shrink-0">
-                              <span className="bg-cross text-white text-[11px] font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1.5">
-                                <CheckCircle2 className="h-3 w-3" />
-                                Verified active
-                              </span>
-                              <span className="text-[11px] text-slate-600 font-semibold block mt-1.5">
-                                {p.role === UserRole.DOCTOR ? 'MMC Registered' : 'LJM Registered'}
-                              </span>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="bg-white border-[1.5px] border-cross rounded-md p-4 flex gap-3 text-ink">
-                        <AlertTriangle className="h-5 w-5 text-cross shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-sm font-bold">No registered profile found</p>
-                          <p className="text-xs text-slate-700 font-medium mt-0.5">
-                            No matching verified practitioner found. Please check the spelling or license code.
-                          </p>
+                          ))}
                         </div>
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                      ) : (
+                        <div className="bg-red-500/10 border border-red-500/30 rounded-none p-5 flex items-center gap-3 text-red-200 text-sm">
+                          <AlertTriangle className="h-5 w-5 text-red-400 shrink-0" />
+                          <div>
+                            <span className="font-bold block">No matching record found</span>
+                            <span className="text-xs text-red-300">Please verify spelling or license number (e.g., MMC-32109 or LJM-8812).</span>
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </section>
         </AnimatedSection>
 
-        {/* ─── TESTIMONIALS ─── */}
+        {/* ─── SECTION 4: COMMUNITY TESTIMONIAL CARDS (THIN BORDER) ─── */}
         <section>
-          <AnimatedSection className="max-w-2xl mb-12">
-            <div className="text-xs font-bold uppercase tracking-[0.14em] text-cross">Trusted across Malaysia</div>
-            <h2 className="font-display font-black text-3xl sm:text-5xl leading-[1.02] tracking-tighter mt-3.5">
-              What our community says.
+          <AnimatedSection className="max-w-3xl mb-12">
+            <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-[#C8102E] bg-[#FFE9EB] px-3.5 py-1.5 rounded-none border border-[#FECDD3] mb-3">
+              <Cross className="h-3.5 w-3.5" /> Community Trust
+            </div>
+            <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight text-[#1A1A1A]">
+              What Doctors, Nurses &amp; Patients Say.
             </h2>
           </AnimatedSection>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {TESTIMONIALS.map((t, i) => (
               <AnimatedSection key={t.id} delay={i * 0.1}>
-                <figure className="bg-slate-100 rounded-xl p-8 flex flex-col gap-6 h-full m-0">
-                  <Cross className="h-7 w-7 text-cross" />
-                  <blockquote className="text-[17px] m-0">&ldquo;{t.quote}&rdquo;</blockquote>
-                  <figcaption className="mt-auto pt-5 border-t border-slate-300">
-                    <div className="font-bold">{t.name}</div>
-                    <div className="text-sm text-slate-600">{t.title}</div>
-                  </figcaption>
-                </figure>
+                <div className="bg-white rounded-none p-8 border border-slate-200 shadow-xs flex flex-col justify-between h-full relative overflow-hidden group">
+                  <Cross className="absolute right-4 bottom-4 h-32 w-32 text-[#C8102E] opacity-5 pointer-events-none" />
+                  <div>
+                    <div className="flex text-[#C8102E] gap-1 mb-4">
+                      {[...Array(5)].map((_, idx) => (
+                        <span key={idx}>★</span>
+                      ))}
+                    </div>
+                    <blockquote className="text-base text-slate-700 italic leading-relaxed mb-6">
+                      &ldquo;{t.quote}&rdquo;
+                    </blockquote>
+                  </div>
+                  <div className="flex items-center gap-3.5 pt-4 border-t border-slate-200">
+                    <img
+                      src={t.avatar}
+                      alt={t.name}
+                      className="w-11 h-11 rounded-none object-cover border border-[#FECDD3] shrink-0"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div>
+                      <h4 className="font-bold text-[#1A1A1A] text-sm">{t.name}</h4>
+                      <p className="text-xs text-slate-500 font-medium">{t.title}</p>
+                    </div>
+                  </div>
+                </div>
               </AnimatedSection>
             ))}
           </div>
         </section>
+
       </main>
 
-      {/* ═══════════ LOGIN PORTAL ═══════════ */}
-      <section id="login-section" className="relative mt-28 bg-cross text-white overflow-hidden scroll-mt-16">
-        <Cross className="absolute -right-24 -bottom-28 h-[420px] w-[420px] text-white opacity-10 pointer-events-none" />
+      {/* ═══════════ LOGIN PORTAL (REDESIGNED LIGHT THEME & THIN BORDERS) ═══════════ */}
+      <section id="login-section" className="relative bg-gradient-to-br from-[#FFF0F2] via-[#FFE9EB] to-[#FFF5F6] text-[#1A1A1A] border-t border-[#FECDD3] overflow-hidden scroll-mt-20">
+        <Cross className="absolute -right-24 -bottom-28 h-[520px] w-[520px] text-[#C8102E] opacity-5 pointer-events-none" />
+
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-12 py-20">
           {/* Heading */}
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white text-cross mb-6">
-              <Cross className="h-6 w-6" />
+            <span className="inline-flex items-center justify-center w-14 h-14 rounded-none bg-[#C8102E] text-white shadow-md mb-5 border border-[#A50F2A]">
+              <Cross className="h-7 w-7" />
             </span>
-            <h2 className="font-display font-black text-4xl sm:text-5xl leading-none tracking-tighter mb-4">
-              Access the CareVerify portal.
+            <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight text-[#1A1A1A] mb-3">
+              Access the MedCred Portal
             </h2>
-            <p className="text-lg text-cross-tint">
-              Choose your role and sign in to open your personalized dashboard.
+            <p className="text-base sm:text-lg text-slate-600">
+              Select your role below to log into your personalized portal dashboard.
             </p>
           </div>
 
           {/* Split card: role picker + form */}
-          <div
-            className="grid md:grid-cols-[260px_1fr] bg-blue-700 text-white rounded-2xl overflow-hidden border border-white/25 shadow-2xl shadow-blue-900/40"
-            style={PORTAL_RED_SCALE}
-          >
-            {/* Role picker */}
-            <div className="p-4 md:p-5 bg-blue-800/60 md:border-r border-b md:border-b-0 border-white/10">
-              <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400 px-2 pb-3 hidden md:block">
-                I am a
-              </div>
-              <div className="grid grid-cols-3 md:grid-cols-1 gap-2">
-                {[
-                  { key: 'patient' as const, label: 'Patient', desc: 'Appointments, prescriptions, vitals', icon: Heart },
-                  { key: 'practitioner' as const, label: 'Practitioner', desc: 'Verification, shifts, patient files', icon: PlusCircle },
-                  { key: 'admin' as const, label: 'Board Admin', desc: 'License audit, modules, analytics', icon: Building },
-                ].map((tab) => {
-                  const active = activeTab === tab.key;
-                  return (
-                    <button
-                      key={tab.key}
-                      type="button"
-                      onClick={() => { setActiveTab(tab.key); setError(''); setIsRegistering(false); }}
-                      aria-pressed={active}
-                      className={`rounded-lg p-3 md:p-4 transition-colors cursor-pointer flex flex-col md:flex-row md:items-start items-center text-center md:text-left gap-2 md:gap-3 border-[1.5px] ${
-                        active
-                          ? 'bg-cross border-cross text-white'
-                          : 'border-white/15 text-slate-200 hover:bg-white/5 hover:border-white/30'
-                      }`}
-                    >
-                      <tab.icon className="h-5 w-5 shrink-0 md:mt-0.5" />
-                      <span className="min-w-0">
-                        <span className="block text-sm font-bold">{tab.label}</span>
-                        <span className={`hidden md:block text-xs mt-0.5 leading-snug ${active ? 'text-cross-tint' : 'text-slate-400'}`}>
-                          {tab.desc}
+          <div className="grid md:grid-cols-[280px_1fr] bg-white text-[#1A1A1A] rounded-none border border-[#FECDD3] shadow-xl">
+            {/* Role picker side */}
+            <div className="p-6 bg-[#FFF5F6] md:border-r border-b md:border-b-0 border-[#FECDD3] flex flex-col justify-between">
+              <div>
+                <div className="text-xs font-extrabold uppercase tracking-widest text-[#C8102E] mb-4">
+                  Select User Role
+                </div>
+                <div className="grid grid-cols-3 md:grid-cols-1 gap-2.5">
+                  {[
+                    { key: 'patient' as const, label: 'Patient', desc: 'Vitals, appointments & e-prescriptions', icon: Heart },
+                    { key: 'practitioner' as const, label: 'Practitioner', desc: 'Credential verification & clinical shifts', icon: PlusCircle },
+                    { key: 'admin' as const, label: 'Board Admin', desc: 'License audit & platform management', icon: Building },
+                  ].map((tab) => {
+                    const active = activeTab === tab.key;
+                    return (
+                      <button
+                        key={tab.key}
+                        type="button"
+                        onClick={() => { setActiveTab(tab.key); setError(''); setIsRegistering(false); }}
+                        aria-pressed={active}
+                        className={`rounded-none p-4 transition-all cursor-pointer flex flex-col md:flex-row md:items-start items-center text-center md:text-left gap-3 border ${
+                          active
+                            ? 'bg-[#C8102E] border-[#A50F2A] text-white shadow-xs'
+                            : 'bg-white border-[#FECDD3] text-[#1A1A1A] hover:bg-[#FFE9EB]'
+                        }`}
+                      >
+                        <tab.icon className="h-5 w-5 shrink-0 md:mt-0.5" />
+                        <span className="min-w-0">
+                          <span className="block text-sm font-extrabold">{tab.label}</span>
+                          <span className={`hidden md:block text-xs mt-0.5 leading-snug ${active ? 'text-white/90' : 'text-slate-500'}`}>
+                            {tab.desc}
+                          </span>
                         </span>
-                      </span>
-                    </button>
-                  );
-                })}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="hidden md:block pt-6 border-t border-[#FECDD3] mt-6">
+                <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
+                  <Lock className="h-3.5 w-3.5 text-[#C8102E]" /> 256-Bit Encrypted Session
+                </span>
               </div>
             </div>
 
             {/* Form pane */}
-            <div className="p-6 sm:p-10 min-w-0">
+            <div className="p-6 sm:p-12 min-w-0 bg-white">
               <AnimatePresence mode="wait">
                 {isRegistering && activeTab === 'patient' ? (
                   <motion.div
@@ -603,43 +943,43 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
                   >
-                    <h3 className="font-display font-extrabold text-2xl tracking-tight">
-                      Sign in as {activeTab === 'patient' ? 'a patient' : activeTab === 'practitioner' ? 'a practitioner' : 'a board admin'}
+                    <h3 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#1A1A1A]">
+                      Sign in as {activeTab === 'patient' ? 'a Patient' : activeTab === 'practitioner' ? 'a Practitioner' : 'a Board Admin'}
                     </h3>
-                    <p className="text-sm text-slate-400 mt-1">Use the email and password registered with CareVerify.</p>
+                    <p className="text-sm text-slate-600 mt-1">Enter your credentials to access the verified network.</p>
 
                     <form onSubmit={handleStandardSubmit} className="space-y-5 mt-7">
                       {error && (
                         <motion.div
                           initial={{ opacity: 0, y: -8 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="bg-white/10 border border-cross text-white p-3.5 rounded-md flex gap-2.5 text-xs font-medium"
+                          className="bg-[#FFE9EB] border border-[#FECDD3] text-[#C8102E] p-4 rounded-none flex gap-3 text-xs font-bold"
                         >
-                          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-[#ff8a98]" />
+                          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-[#C8102E]" />
                           <span>{error}</span>
                         </motion.div>
                       )}
 
                       <div className="space-y-2">
-                        <label htmlFor="login-email" className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
-                          Email address
+                        <label htmlFor="login-email" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">
+                          Email Address
                         </label>
                         <input
                           id="login-email"
                           type="email"
                           placeholder={
-                            activeTab === 'patient' ? 'patient@careverify.com' :
-                            activeTab === 'practitioner' ? 'doctor@careverify.com' : 'admin@careverify.com'
+                            activeTab === 'patient' ? 'patient@medcred.com' :
+                            activeTab === 'practitioner' ? 'doctor@medcred.com' : 'admin@medcred.com'
                           }
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className={inputClass}
+                          className="w-full bg-[#FFF9F9] border border-[#FECDD3] rounded-none px-4 h-[50px] text-base font-medium text-[#1A1A1A] placeholder-slate-400 focus:outline-none focus:border-[#C8102E] focus:ring-1 focus:ring-[#C8102E] transition-all"
                           required
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="login-password" className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
+                        <label htmlFor="login-password" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">
                           Password
                         </label>
                         <input
@@ -648,7 +988,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                           placeholder="••••••••"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className={inputClass}
+                          className="w-full bg-[#FFF9F9] border border-[#FECDD3] rounded-none px-4 h-[50px] text-base font-medium text-[#1A1A1A] placeholder-slate-400 focus:outline-none focus:border-[#C8102E] focus:ring-1 focus:ring-[#C8102E] transition-all"
                           required
                         />
                       </div>
@@ -656,31 +996,31 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                       <button
                         type="submit"
                         disabled={loading}
-                        className="w-full h-[54px] rounded-md text-base font-bold transition-colors cursor-pointer flex justify-center items-center gap-2.5 bg-cross hover:bg-cross-dark disabled:opacity-70 text-white"
+                        className="w-full h-[52px] rounded-none text-base font-extrabold transition-all cursor-pointer flex justify-center items-center gap-2.5 bg-[#C8102E] hover:bg-[#A50F2A] text-white shadow-md disabled:opacity-70 border border-[#A50F2A]"
                       >
                         {loading ? (
                           <>
-                            <RefreshCw className="h-4 w-4 animate-spin" />
+                            <RefreshCw className="h-5 w-5 animate-spin text-white" />
                             Authenticating...
                           </>
                         ) : (
                           <>
                             Sign in to {activeTab === 'patient' ? 'Patient Portal' : activeTab === 'practitioner' ? 'Practitioner Hub' : 'Admin Panel'}
-                            <ArrowRight className="h-4 w-4" />
+                            <ArrowRight className="h-5 w-5 text-white" />
                           </>
                         )}
                       </button>
                     </form>
 
                     {activeTab === 'patient' && (
-                      <p className="pt-5 text-center text-sm text-slate-300">
-                        Need an account?{' '}
+                      <p className="pt-6 text-center text-sm text-slate-600">
+                        Need a new account?{' '}
                         <button
                           type="button"
                           onClick={() => { setError(''); setIsRegistering(true); }}
-                          className="text-[#ff8a98] hover:text-white font-bold cursor-pointer underline underline-offset-2 transition-colors"
+                          className="text-[#C8102E] hover:underline font-extrabold cursor-pointer transition-colors"
                         >
-                          Register as a new patient
+                          Register as a New Patient
                         </button>
                       </p>
                     )}
@@ -690,22 +1030,22 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
             </div>
           </div>
 
-          {/* Demo logins */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-cross-tint">
-              <Zap className="h-3.5 w-3.5" /> Quick access demo logins
+          {/* Quick Access Demo Buttons */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-slate-600">
+              <Zap className="h-4 w-4 text-[#C8102E]" /> One-Click Demo Access:
             </span>
             {[
-              { role: 'patient' as const, icon: Heart, label: 'Patient' },
-              { role: 'practitioner' as const, icon: PlusCircle, label: 'Practitioner' },
-              { role: 'admin' as const, icon: Building, label: 'Board Admin' },
+              { role: 'patient' as const, icon: Heart, label: 'Demo Patient' },
+              { role: 'practitioner' as const, icon: PlusCircle, label: 'Demo Practitioner' },
+              { role: 'admin' as const, icon: Building, label: 'Demo Board Admin' },
             ].map((d) => (
               <button
                 key={d.role}
                 type="button"
                 onClick={() => handleSandboxLogin(d.role)}
                 disabled={loading}
-                className="inline-flex items-center gap-2 min-h-11 px-4 text-sm font-semibold text-white border-[1.5px] border-white/70 hover:bg-white hover:text-cross rounded-md transition-colors cursor-pointer disabled:opacity-60"
+                className="inline-flex items-center gap-2 min-h-[42px] px-5 text-xs font-bold text-[#C8102E] bg-white border border-[#FECDD3] hover:bg-[#C8102E] hover:text-white rounded-none transition-all cursor-pointer disabled:opacity-60 shadow-xs"
               >
                 <d.icon className="h-4 w-4" />
                 {d.label}
@@ -715,37 +1055,39 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
         </div>
       </section>
 
-      {/* ═══════════ FOOTER ═══════════ */}
-      <footer className="bg-slate-100 text-slate-700 border-t border-slate-200 shrink-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-14 pb-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 pb-10 border-b border-slate-300">
+      {/* ═══════════ FOOTER (THIN BORDERS) ═══════════ */}
+      <footer className="bg-[#1A1A1A] text-slate-300 border-t border-slate-800 shrink-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-16 pb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 pb-12 border-b border-slate-800">
             <div>
-              <div className="flex items-center gap-2.5">
-                <Cross className="h-5 w-5 text-ink" />
-                <span className="font-display font-black text-xl text-ink">CareVerify</span>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="w-9 h-9 rounded-none bg-[#C8102E] flex items-center justify-center text-white border border-[#A50F2A]">
+                  <Cross className="h-5 w-5" />
+                </span>
+                <span className="font-display font-black text-2xl text-white">MedCred</span>
               </div>
-              <p className="text-sm mt-3 max-w-xs">
-                Enterprise-grade medical credential verification. Connecting licensed practitioners with patients through regulatory-aligned infrastructure.
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Enterprise medical credential verification network operating under verified clinical credentialing &amp; regulatory standards.
               </p>
             </div>
 
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-ink mb-3.5">Platform</h4>
-              <ul className="space-y-2.5 text-sm">
-                {['Patient Dashboard', 'Doctor Registry', 'Nurse Registry', 'Clinical Shifts', 'Medical Library'].map((link) => (
+              <h4 className="text-xs font-extrabold uppercase tracking-widest text-white mb-4">Portals</h4>
+              <ul className="space-y-3 text-sm">
+                {['Patient Dashboard', 'Doctor Registry', 'Nurse Registry', 'Locum Clinical Shifts', 'Medical Articles'].map((link) => (
                   <li key={link}>
-                    <a href="#login-section" className="hover:text-cross transition-colors cursor-pointer">{link}</a>
+                    <a href="#login-section" className="text-slate-400 hover:text-white transition-colors cursor-pointer">{link}</a>
                   </li>
                 ))}
               </ul>
             </div>
 
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-ink mb-3.5">Compliance</h4>
-              <ul className="space-y-2.5 text-sm">
-                {['HIPAA Security', 'MMC Regulatory', 'LJM Standards', 'AES-256 Encryption', 'SOC-2 Type II'].map((item) => (
+              <h4 className="text-xs font-extrabold uppercase tracking-widest text-white mb-4">Regulatory Standards</h4>
+              <ul className="space-y-3 text-sm text-slate-400">
+                {['HIPAA Security Compliance', 'Malaysian Medical Council (MMC)', 'Lembaga Jururawat Malaysia (LJM)', 'AES-256 Encryption Standard', 'SOC-2 Type II Certified'].map((item) => (
                   <li key={item} className="flex items-center gap-2">
-                    {item.startsWith('AES') ? <Lock className="h-3 w-3 text-slate-600" /> : <ShieldCheck className="h-3 w-3 text-slate-600" />}
+                    <ShieldCheck className="h-4 w-4 text-[#C8102E] shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -753,29 +1095,30 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
             </div>
 
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-ink mb-3.5">Legal</h4>
-              <ul className="space-y-2.5 text-sm">
-                {['Privacy Policy', 'Terms of Service', 'Data Processing Agreement', 'Cookie Policy', 'Contact Support'].map((link) => (
+              <h4 className="text-xs font-extrabold uppercase tracking-widest text-white mb-4">Regulatory &amp; Legal</h4>
+              <ul className="space-y-3 text-sm text-slate-400">
+                {['Privacy Policy', 'Terms of Service', 'Data Processing Agreement', 'Cookie Policy', 'Support Hotline'].map((link) => (
                   <li key={link}>
-                    <a href="#" className="hover:text-cross transition-colors cursor-pointer">{link}</a>
+                    <a href="#" className="hover:text-white transition-colors cursor-pointer">{link}</a>
                   </li>
                 ))}
               </ul>
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-6 text-[13px]">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 text-xs text-slate-500">
             <p>
-              &copy; {new Date().getFullYear()} CareVerify Sdn Bhd. Regulated under the Malaysian Medical Act 1971.
+              &copy; {new Date().getFullYear()} MedCred Network. Operating in alignment with Medical Act 1971 credential guidelines. CareVerified Crimson System.
             </p>
-            <div className="flex items-center gap-4 text-xs font-semibold text-ink">
-              <span className="flex items-center gap-1.5"><Globe className="h-3 w-3" /> EN</span>
-              <span className="text-slate-500">|</span>
-              <span className="flex items-center gap-1.5"><Globe className="h-3 w-3" /> BM</span>
+            <div className="flex items-center gap-4 text-xs font-bold text-slate-300">
+              <span className="flex items-center gap-1.5"><Globe className="h-3.5 w-3.5 text-[#C8102E]" /> English</span>
+              <span className="text-slate-700">|</span>
+              <span className="flex items-center gap-1.5"><Globe className="h-3.5 w-3.5 text-[#C8102E]" /> Bahasa Melayu</span>
             </div>
           </div>
         </div>
       </footer>
+
     </div>
   );
 }

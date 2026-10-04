@@ -91,60 +91,58 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border-2 border-slate-200/80 shadow-sm overflow-hidden" id="seo-dashboard-panel">
+    <div className="space-y-8 w-full max-w-[1920px] mx-auto" id="seo-dashboard-panel">
       {/* Header Banner */}
-      <div className="p-6 pb-0">
-        <PageBanner
-          eyebrow="SEO & Schema Engine"
-          title="Active SEO Strategy & Schema Engine"
-          description="Programmatic landing page generators and YMYL E-E-A-T compliant meta engines."
-        />
-      </div>
+      <PageBanner
+        eyebrow="SEO & Schema Engine"
+        title="Active SEO Strategy & Schema Engine"
+        description="Programmatic landing page generators and YMYL E-E-A-T compliant meta engines."
+      />
 
       {/* Tabs */}
-      <div className="flex border-b-2 border-slate-200 bg-slate-50/50 p-1.5 gap-1">
+      <div role="tablist" aria-label="SEO engine sections" className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-xl bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs">
         <button
           onClick={() => setActiveTab('schema')}
-          className={`flex-1 py-3 px-4 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+          className={`flex-1 py-2.5 px-4 text-xs font-extrabold rounded-lg transition-all flex items-center gap-2 cursor-pointer border ${
             activeTab === 'schema' 
-              ? 'bg-white text-blue-900 shadow-xs border-2 border-slate-200' 
-              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
+              ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' 
+              : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
           }`}
         >
-          <Code className="h-4 w-4" />
+          <Code className={`h-4 w-4 ${activeTab === 'schema' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           JSON-LD Structured Schema
         </button>
         <button
           onClick={() => setActiveTab('programmatic')}
-          className={`flex-1 py-3 px-4 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+          className={`flex-1 py-2.5 px-4 text-xs font-extrabold rounded-lg transition-all flex items-center gap-2 cursor-pointer border ${
             activeTab === 'programmatic' 
-              ? 'bg-white text-blue-900 shadow-xs border-2 border-slate-200' 
-              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
+              ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' 
+              : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
           }`}
         >
-          <Search className="h-4 w-4" />
+          <Search className={`h-4 w-4 ${activeTab === 'programmatic' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           Programmatic Landing Pages
         </button>
         <button
           onClick={() => setActiveTab('vitals')}
-          className={`flex-1 py-3 px-4 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+          className={`flex-1 py-2.5 px-4 text-xs font-extrabold rounded-lg transition-all flex items-center gap-2 cursor-pointer border ${
             activeTab === 'vitals' 
-              ? 'bg-white text-blue-900 shadow-xs border-2 border-slate-200' 
-              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
+              ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' 
+              : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
           }`}
         >
-          <Zap className="h-4 w-4" />
+          <Zap className={`h-4 w-4 ${activeTab === 'vitals' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           Core Web Vitals Scoring
         </button>
         <button
           onClick={() => setActiveTab('sitemap')}
-          className={`flex-1 py-3 px-4 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+          className={`flex-1 py-2.5 px-4 text-xs font-extrabold rounded-lg transition-all flex items-center gap-2 cursor-pointer border ${
             activeTab === 'sitemap' 
-              ? 'bg-white text-blue-900 shadow-xs border-2 border-slate-200' 
-              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
+              ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' 
+              : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
           }`}
         >
-          <FileSpreadsheet className="h-4 w-4" />
+          <FileSpreadsheet className={`h-4 w-4 ${activeTab === 'sitemap' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           Sitemap Generator
         </button>
       </div>

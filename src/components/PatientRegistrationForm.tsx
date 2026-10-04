@@ -111,7 +111,7 @@ export default function PatientRegistrationForm({
           role: 'patient',
           name: data.data.name,
           email: data.data.email,
-          avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120'
+          avatarUrl: '/assets/malaysian_male_patient.jpg'
         });
       } else {
         setError(data.message || 'Registration failed.');

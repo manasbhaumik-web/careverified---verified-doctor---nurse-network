@@ -6,7 +6,7 @@ import {
   TrendingUp, Sparkles, RefreshCw, Heart, Search, Calendar, 
   BookOpen, PlusCircle, MessageSquare, Globe
 } from 'lucide-react';
-import { DoctorProfile, NurseProfile, UserRole, AppPackage } from '../types';
+import { DoctorProfile, NurseProfile, UserRole, AppPackage, VerificationStatus } from '../types';
 
 interface AdminDashboardProps {
   onProfessionalApproved: (prof: DoctorProfile | NurseProfile) => void;
@@ -42,12 +42,12 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
   const MARKETPLACE_ADDONS = [
     {
       id: "symptom_matcher_pro",
-      name: "AI Symptom Matcher Pro Extension",
+      name: "Clinical Symptom Matcher Pro Extension",
       description: "Upgrade the core triage matching with advanced diagnostic reasoning logs, clinical parameter parsing, and pediatric-optimized indicators.",
       icon: "Activity",
       category: "Patient Services",
       version: "1.1.0",
-      author: "MediCert AI Labs",
+      author: "MediCert Clinical Labs",
       isRemovable: true
     },
     {
@@ -247,9 +247,39 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
   };
 
   return (
-    <div className="space-y-6" id="national-registry-admin-panel">
+    <div className="w-full max-w-[1920px] mx-auto space-y-6" id="national-registry-admin-panel">
+      {/* EXECUTIVE CRIMSON METRIC BANNER (CONCEPT 3) */}
+      <div className="bg-gradient-to-r from-[#FFF1F2] via-[#FFF5F5] to-[#FFE4E6] border-l-8 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 rounded-2xl p-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 text-[#DC2626] text-xs font-black uppercase tracking-wider">
+            <ShieldAlert className="h-4 w-4 text-emerald-600" />
+            <span>National Medical Registry Audit Terminal</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
+            Registry Administrative Control Desk
+          </h1>
+          <p className="text-xs text-slate-600 font-medium max-w-xl">
+            Real-time MMC/LJM license verification, accreditation moderation queue, and modular extension management.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3 bg-white/90 backdrop-blur-xs p-3 border border-[#FECDD3] rounded-xl text-center min-w-[300px] shadow-xs">
+          <div>
+            <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{pendingRequests.length}</span>
+            <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Pending</span>
+          </div>
+          <div className="border-x border-rose-200">
+            <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{professionals.filter(p => p.verificationStatus === VerificationStatus.VERIFIED).length}</span>
+            <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Verified</span>
+          </div>
+          <div>
+            <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{packages.filter(p => (p as any).installed).length || 3}</span>
+            <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Modules</span>
+          </div>
+        </div>
+      </div>
       {/* Dynamic Module Tabs */}
-      <div role="tablist" aria-label="Admin panel sections" className="flex gap-5 border-b border-slate-200">
+      <div role="tablist" aria-label="Admin panel sections" className="flex gap-3 border border-[#FECDD3] rounded-xl sticky top-20 bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs">
         <button
           type="button"
           role="tab"
@@ -259,14 +289,14 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
           tabIndex={activeTab === 'approvals' ? 0 : -1}
           onClick={() => setActiveTab('approvals')}
           onKeyDown={(e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); setActiveTab(activeTab === 'approvals' ? 'packages' : 'approvals'); } }}
-          className={`shrink-0 py-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer border-b-2 -mb-px transition-colors ${
-            activeTab === 'approvals' ? 'text-teal-800 border-teal-600' : 'text-slate-500 border-transparent hover:text-slate-800 hover:border-slate-300'
+          className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+            activeTab === 'approvals' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
           }`}
         >
-          <ShieldCheck className={`h-4 w-4 ${activeTab === 'approvals' ? 'text-teal-600' : 'text-slate-400'}`} />
+          <ShieldCheck className={`h-4 w-4 ${activeTab === 'approvals' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           <span>Practitioner Approvals</span>
           {pendingRequests.length > 0 && (
-            <span className="font-mono tabular-nums text-[10px] px-1.5 py-0.5 rounded-full font-black bg-rose-500 text-white leading-none">{pendingRequests.length}</span>
+            <span className="font-mono tabular-nums text-[10px] px-2 py-0.5 rounded-full font-extrabold bg-[#DC2626] text-white leading-none">{pendingRequests.length}</span>
           )}
         </button>
         <button
@@ -278,13 +308,13 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
           tabIndex={activeTab === 'packages' ? 0 : -1}
           onClick={() => setActiveTab('packages')}
           onKeyDown={(e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); setActiveTab(activeTab === 'approvals' ? 'packages' : 'approvals'); } }}
-          className={`shrink-0 py-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer border-b-2 -mb-px transition-colors ${
-            activeTab === 'packages' ? 'text-teal-800 border-teal-600' : 'text-slate-500 border-transparent hover:text-slate-800 hover:border-slate-300'
+          className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+            activeTab === 'packages' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
           }`}
         >
-          <Puzzle className={`h-4 w-4 ${activeTab === 'packages' ? 'text-teal-600' : 'text-slate-400'}`} />
+          <Puzzle className={`h-4 w-4 ${activeTab === 'packages' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           <span>Package Manager</span>
-          <span className="font-mono tabular-nums text-[10px] px-1.5 py-0.5 rounded-full font-black bg-slate-100 text-slate-600 leading-none">{packages.length}</span>
+          <span className="font-mono tabular-nums text-[10px] px-2 py-0.5 rounded-full font-extrabold bg-[#FFE4E6] text-[#DC2626] border border-[#FECDD3] leading-none">{packages.length}</span>
         </button>
       </div>
 
@@ -292,10 +322,10 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
         <div id="panel-approvals" role="tabpanel" aria-labelledby="tab-approvals" tabIndex={0} className="space-y-6">
           {/* Overview stats cards with high visual distinction */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-white border-2 border-slate-200/80 border-l-4 border-l-blue-600 rounded-xl p-5 shadow-xs flex items-start justify-between gap-4">
+        <div className="bg-white border border-[#FECDD3] border-l-4 border-l-[#DC2626] rounded-none p-5 shadow-xs flex items-start justify-between gap-4">
           <div className="space-y-2">
             <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider">Accredited Directory</span>
-            <span className="font-mono tabular-nums text-2xl font-black block text-blue-700">{professionals.length} Verified</span>
+            <span className="font-mono tabular-nums text-2xl font-black block text-[#DC2626]">{professionals.length} Verified</span>
             <p className="text-[10px] text-slate-500 font-semibold leading-normal">Registered with medical & nursing councils.</p>
           </div>
           <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl border border-blue-100 shrink-0">
@@ -387,7 +417,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
           <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-5" : "space-y-4"}>
             {pendingRequests.map((req) => {
               const isApprovedInLoop = votedId === req.id;
-              const reqAvatar = req.avatar || (req.userType === UserRole.DOCTOR || req.role === UserRole.DOCTOR ? "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=250" : "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=250");
+              const reqAvatar = req.avatar || (req.userType === UserRole.DOCTOR || req.role === UserRole.DOCTOR ? "/assets/malaysian_female_doctor.jpg" : "/assets/malaysian_female_nurse.jpg");
               const reqName = req.userName || req.name || "Practitioner";
               const reqRole = req.userType || req.role || UserRole.DOCTOR;
               const reqSpecialization = req.specialization || (reqRole === UserRole.DOCTOR ? "General Medicine" : "Registered Nurse");
@@ -566,7 +596,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
             <div className="space-y-6">
               <div className="flex items-center gap-4">
                 <img 
-                  src={selectedModalRequest.avatar || (selectedModalRequest.userType === UserRole.DOCTOR || selectedModalRequest.role === UserRole.DOCTOR ? "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=250" : "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=250")} 
+                  src={selectedModalRequest.avatar || (selectedModalRequest.userType === UserRole.DOCTOR || selectedModalRequest.role === UserRole.DOCTOR ? "/assets/malaysian_female_doctor.jpg" : "/assets/malaysian_female_nurse.jpg")} 
                   alt={selectedModalRequest.userName || selectedModalRequest.name}
                   className="h-20 w-20 rounded-xl object-cover border border-slate-200 shadow-sm"
                   referrerPolicy="no-referrer"
@@ -981,7 +1011,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 <p className="text-xs text-slate-500 font-semibold leading-relaxed">Expand clinical compliance and services with certified, HIPAA-compliant plug-ins.</p>
               </div>
               <div className="bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-xl text-[10px] font-bold text-blue-700 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-xs animate-pulse"></span>
                 <span>Registry Server Active</span>
               </div>
             </div>

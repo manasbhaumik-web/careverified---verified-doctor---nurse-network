@@ -103,7 +103,7 @@ export default function SavedTab({
                         <img 
                           src={p.avatar} 
                           alt={p.name} 
-                          className={`h-14 w-14 rounded-xl object-cover border-2 shadow-sm shrink-0 group-hover:scale-105 transition-transform duration-300 ${isDoc ? 'border-teal-100' : 'border-indigo-100'}`}
+                          className={`h-14 w-14 rounded-full object-cover border-2 shadow-sm shrink-0 group-hover:scale-105 transition-transform duration-300 ${isDoc ? 'border-teal-100' : 'border-indigo-100'}`}
                           referrerPolicy="no-referrer"
                         />
                         <span className="absolute -bottom-1 -right-1 bg-emerald-500 border-2 border-white rounded-full h-3.5 w-3.5 shadow-sm" />

@@ -1,28 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Archivo:wght@800;900&family=Public+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  /* Red Cross landing palette */
-  --color-cross: #c8102e;
-  --color-cross-dark: #a50f2a;
-  --color-cross-tint: #ffe9eb;
-  --color-ink: #1a1a1a;
-  --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  /* -------------------------------------------------------------
+   * UNIFIED APPLICATION DESIGN SYSTEM TOKENS
+   * Layer 1: Primitives
+   * Layer 2: Semantic System Tokens
+   * Layer 3: Component Specifications & Typography
+   * ------------------------------------------------------------- */
 
+  /* Layer 1: Primitives */
+  --color-cross: #dc2626;
+  --color-cross-dark: #b91c1c;
+  --color-cross-tint: #ffe4e6;
+  --color-ink: #1e293b;
+  --color-ink-body: #334155;
+
+  /* Layer 2: Semantic System Tokens */
+  --sys-bg-hero: #fff0f2;
+  --sys-border-hairline: #fecdd3;
+  --sys-text-primary: #1e293b;
+  --sys-text-body: #334155;
+  --sys-brand-red: #dc2626;
+  --sys-brand-red-dark: #b91c1c;
+
+  /* Layer 3: Typography (100% Inter across display & body) */
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  /* Red Cross theme: every brand/accent hue resolves to the Red Cross red scale.
-     Semantic colours (emerald = success, rose/red = danger, amber = warning) keep their own hues. */
+  /* Unified App-Wide Color Scale Remapping: CareVerified Crimson + Modern Slate Theme */
   --color-blue-50: #fff1f2;
   --color-blue-100: #ffe4e6;
   --color-blue-200: #fecdd3;
   --color-blue-300: #fda4af;
   --color-blue-400: #ff8a98;
   --color-blue-500: #e0243f;
-  --color-blue-600: #c8102e;
-  --color-blue-700: #a50f2a;
+  --color-blue-600: #dc2626;
+  --color-blue-700: #b91c1c;
   --color-blue-800: #86102a;
   --color-blue-900: #6b0f24;
   --color-blue-950: #3d0713;
@@ -33,8 +49,8 @@
   --color-teal-300: #fda4af;
   --color-teal-400: #ff8a98;
   --color-teal-500: #e0243f;
-  --color-teal-600: #c8102e;
-  --color-teal-700: #a50f2a;
+  --color-teal-600: #dc2626;
+  --color-teal-700: #b91c1c;
   --color-teal-800: #86102a;
   --color-teal-900: #6b0f24;
   --color-teal-950: #3d0713;
@@ -45,8 +61,8 @@
   --color-indigo-300: #fda4af;
   --color-indigo-400: #ff8a98;
   --color-indigo-500: #e0243f;
-  --color-indigo-600: #c8102e;
-  --color-indigo-700: #a50f2a;
+  --color-indigo-600: #dc2626;
+  --color-indigo-700: #b91c1c;
   --color-indigo-800: #86102a;
   --color-indigo-900: #6b0f24;
   --color-indigo-950: #3d0713;
@@ -57,11 +73,10 @@
   --color-purple-300: #fda4af;
   --color-purple-400: #ff8a98;
   --color-purple-500: #e0243f;
-  --color-purple-600: #c8102e;
-  --color-purple-700: #a50f2a;
+  --color-purple-600: #dc2626;
+  --color-purple-700: #b91c1c;
   --color-purple-800: #86102a;
   --color-purple-900: #6b0f24;
-  --color-purple-950: #3d0713;
 
   --color-sky-50: #fff1f2;
   --color-sky-100: #ffe4e6;
@@ -69,22 +84,155 @@
   --color-sky-300: #fda4af;
   --color-sky-400: #ff8a98;
   --color-sky-500: #e0243f;
-  --color-sky-600: #c8102e;
-  --color-sky-700: #a50f2a;
-  --color-sky-800: #86102a;
-  --color-sky-900: #6b0f24;
-  --color-sky-950: #3d0713;
+  --color-sky-600: #dc2626;
+  --color-sky-700: #b91c1c;
 
-  /* Neutral ink scale in place of blue-tinted slate */
-  --color-slate-50: #fafafa;
-  --color-slate-100: #f4f4f4;
-  --color-slate-200: #e3e3e3;
-  --color-slate-300: #d4d4d4;
-  --color-slate-400: #a3a3a3;
-  --color-slate-500: #737373;
-  --color-slate-600: #595959;
-  --color-slate-700: #404040;
-  --color-slate-800: #262626;
-  --color-slate-900: #1a1a1a;
-  --color-slate-950: #0d0d0d;
+  --color-cyan-50: #fff1f2;
+  --color-cyan-100: #ffe4e6;
+  --color-cyan-200: #fecdd3;
+  --color-cyan-300: #fda4af;
+  --color-cyan-400: #ff8a98;
+  --color-cyan-500: #e0243f;
+  --color-cyan-600: #dc2626;
+  --color-cyan-700: #b91c1c;
+
+  /* Neutral Modern Slate Ink scale */
+  --color-slate-50: #fdfbfb;
+  --color-slate-100: #fff0f2;
+  --color-slate-200: #ffe4e6;
+  --color-slate-300: #fecdd3;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+}
+
+/* -------------------------------------------------------------
+ * GLOBAL UNIFIED BASE STYLES & APPLICATION-WIDE OVERRIDES
+ * ------------------------------------------------------------- */
+
+:root {
+  color-scheme: light;
+}
+
+html, body {
+  background-color: #FDFBFB;
+  color: #1E293B;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* -------------------------------------------------------------
+ * GEOMETRY RULES:
+ * 1. ALL Profile Pictures: MUST have circular round corner effect (border-radius: 9999px)
+ * 2. ALL Blinking / Pulse Indicator Dots: MUST have circular round corner effect (border-radius: 9999px)
+ * 3. ALL OTHER CONTAINERS, CARDS, BUTTONS, INPUTS, BADGES, TABS, MODALS: STRICTLY ZERO ROUND CORNERS (border-radius: 0px)
+ * ------------------------------------------------------------- */
+
+/* Profile Picture Round Corner Effect across all components */
+img, 
+.avatar, 
+.profile-pic, 
+.avatar-img {
+  border-radius: 9999px !important;
+}
+
+/* Blinking Dots & Live Pulse Indicator Round Corner Effect across all components */
+.animate-ping,
+.animate-pulse,
+[class*="animate-ping"],
+[class*="animate-pulse"],
+.status-dot,
+.live-dot,
+.pulse-dot {
+  border-radius: 9999px !important;
+}
+
+/* ALL OTHER UI ELEMENTS: STRICTLY ZERO ROUNDED CORNERS (rectangular sharp geometry) */
+button,
+input,
+select,
+textarea,
+div:not(.animate-ping):not(.animate-pulse):not(.status-dot):not(.live-dot):not(.pulse-dot),
+span:not(.animate-ping):not(.animate-pulse):not(.status-dot):not(.live-dot):not(.pulse-dot),
+header,
+nav,
+aside,
+section,
+form,
+article,
+main,
+a {
+  border-radius: 0px !important;
+}
+
+/* -------------------------------------------------------------
+ * ZERO BLACK BACKGROUND ENFORCEMENT & LIGHT SURFACE REMAPPING
+ * Transforms dark card surfaces across the app to light CareVerified surfaces
+ * EXCEPTION: Application Footer is explicitly styled with a dark contrasting palette
+ * ------------------------------------------------------------- */
+
+:not(footer):not(.app-dark-footer).bg-slate-900,
+:not(footer):not(.app-dark-footer).bg-slate-950,
+:not(footer):not(.app-dark-footer).bg-black,
+:not(footer):not(.app-dark-footer).bg-zinc-900,
+:not(footer):not(.app-dark-footer).bg-gray-900 {
+  background-color: #FFF0F2 !important;
+  color: #1E293B !important;
+  border-color: #FECDD3 !important;
+}
+
+/* -------------------------------------------------------------
+ * APPLICATION DARK FOOTER SYSTEM (High Contrast Dark Slate Palette)
+ * ------------------------------------------------------------- */
+
+footer,
+footer.app-dark-footer,
+.app-dark-footer {
+  background-color: #0F172A !important;
+  color: #CBD5E1 !important;
+  border-top: 1px solid #1E293B !important;
+}
+
+footer *,
+.app-dark-footer * {
+  border-color: #1E293B !important;
+}
+
+footer p,
+.app-dark-footer p {
+  color: #94A3B8 !important;
+}
+
+footer h4,
+.app-dark-footer h4 {
+  color: #94A3B8 !important;
+}
+
+footer a,
+.app-dark-footer a {
+  color: #CBD5E1 !important;
+}
+
+footer a:hover,
+.app-dark-footer a:hover {
+  color: #FFFFFF !important;
+}
+
+footer button.bg-slate-800,
+.app-dark-footer button.bg-slate-800 {
+  background-color: #1E293B !important;
+  color: #FFFFFF !important;
+  border-color: #334155 !important;
+}
+
+footer button.bg-slate-800:hover,
+.app-dark-footer button.bg-slate-800:hover {
+  background-color: #334155 !important;
 }

@@ -155,8 +155,8 @@ export default function VerificationTerminal({
           practiceAddress,
           city,
           avatar: role === UserRole.DOCTOR 
-            ? "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=250"
-            : "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=250"
+            ? "/assets/malaysian_female_doctor.jpg"
+            : "/assets/malaysian_female_nurse.jpg"
         })
       });
 
@@ -343,7 +343,7 @@ export default function VerificationTerminal({
     };
 
     return (
-      <div className="bg-slate-50/50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-8 min-h-screen" id="practitioner-dashboard-root">
+      <div className="space-y-8 w-full max-w-[1920px] mx-auto" id="practitioner-dashboard-root">
         {/* Absolute Toast Alert */}
         {toastMessage && (
           <div className="fixed bottom-6 right-6 bg-blue-700 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-lg border border-slate-850 flex items-center gap-2 animate-bounce z-50">
@@ -352,152 +352,138 @@ export default function VerificationTerminal({
           </div>
         )}
 
-        <div className="max-w-[1200px] mx-auto space-y-6">
 
 
-          <div className="flex flex-col lg:flex-row gap-8 items-start">
-            
-            {/* LEFT COLUMN: 30% - Sticky Sidebar */}
-            <aside className="w-full lg:w-[340px] shrink-0 lg:sticky lg:top-24 space-y-6">
-              
-              {/* [ PROFILE CARD ] */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs text-center relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-teal-500 to-emerald-500"></div>
-                
-                {/* Profile Photo */}
-                <div className="relative inline-block mt-2 animate-fade-in">
+
+          {/* ═══════════ MERGED EXECUTIVE CRIMSON HERO BANNER ═══════════ */}
+          <div className="bg-gradient-to-r from-[#FFF1F2] via-[#FFF5F5] to-[#FFE4E6] border-l-8 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 rounded-2xl p-5 sm:p-6 shadow-sm relative overflow-hidden space-y-4">
+            {/* Integrated Top Bar: Dynamic Time-of-Day Greeting & Date Badge */}
+            <div className="flex items-center justify-between gap-4 border-b border-[#FECDD3]/80 pb-3 flex-wrap">
+              <div className="flex items-center gap-2 text-slate-600">
+                <span className="text-xs font-black tracking-wider uppercase font-mono text-[#DC2626]">Practitioner Terminal</span>
+                <span className="text-slate-300">&bull;</span>
+                <span className="text-sm sm:text-base font-black text-slate-900 tracking-tight">
+                  {(() => {
+                    const hour = new Date().getHours();
+                    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+                    return `${greeting}, ${matchedProfile.name}.`;
+                  })()}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono font-bold text-[#DC2626] bg-white border border-[#FECDD3] px-3 py-1 rounded-full tabular-nums shadow-xs">
+                  {new Date().toLocaleDateString('en-MY', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pt-1">
+              {/* Left Practitioner Identity */}
+              <div className="flex items-center gap-5">
+                <div className="relative shrink-0">
                   <img 
                     src={matchedProfile.avatar} 
                     alt={matchedProfile.name}
-                    className="h-24 w-24 rounded-full object-cover border-4 border-slate-50 shadow-md mx-auto hover:rotate-3 transition-transform"
+                    className="h-20 w-20 rounded-full object-cover border-4 border-white shadow-md"
                     referrerPolicy="no-referrer"
                   />
-                  {/* Verified Checkmark Shield */}
                   {isVerified && (
                     <span 
-                      className="absolute bottom-0 right-0 bg-gradient-to-tr from-emerald-600 to-teal-500 text-white p-2 rounded-full border-2 border-white shadow-md flex items-center justify-center cursor-pointer hover:scale-115 transition-transform duration-300"
-                      title="Verified Medical Practitioner"
+                      className="absolute -bottom-1 -right-1 bg-white text-[#DC2626] p-1.5 rounded-full shadow-md flex items-center justify-center border border-[#FECDD3]"
+                      title="Verified Licensed Practitioner"
                     >
-                      <Shield className="h-3.5 w-3.5 fill-current text-white animate-pulse" />
+                      <Shield className="h-3.5 w-3.5 fill-current text-[#DC2626]" />
                     </span>
                   )}
                 </div>
 
-                <div className="mt-4 space-y-1">
-                  <h3 className="font-serif text-lg font-semibold text-slate-850 leading-tight">{matchedProfile.name}</h3>
-                  <div className="flex items-center justify-center gap-2 pt-1">
-                    <span className="bg-indigo-50 text-indigo-700 border border-indigo-100 text-[10px] font-black uppercase px-2 py-0.5 rounded-md">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">{matchedProfile.name}</h2>
+                    <span className="bg-white text-[#DC2626] border border-[#FECDD3] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-2xs">
                       {isDoc ? "Physician Account" : "Nurse Account"}
                     </span>
                     {isVerified && (
-                      <span className="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] font-black uppercase px-2 py-0.5 rounded-md flex items-center gap-0.5 shadow-3xs animate-fade-in">
-                        <Check className="h-3 w-3 text-emerald-600 stroke-[3]" /> Verified
+                      <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                        <Check className="h-3 w-3 text-emerald-600 stroke-[3]" /> Verified Active
                       </span>
                     )}
                   </div>
-                </div>
-              </div>
 
-              {/* PRACTICE STATUS */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
-                <h4 className="text-xs font-black text-slate-950 uppercase tracking-wider border-b border-slate-100 pb-2 flex items-center gap-1.5">
-                  <Activity className="h-4 w-4 text-teal-600" />
-                  Practice Status
-                </h4>
-                
-                <div className="space-y-3 text-xs text-slate-600 font-semibold">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Registry Connection</span>
-                    <span className="flex items-center gap-2 font-extrabold text-slate-850">
-                      <span className="relative flex h-2.5 w-2.5">
+                  {/* Integrated Essential Practice Metadata Strip */}
+                  <div className="flex items-center gap-2.5 text-xs text-slate-700 font-semibold flex-wrap">
+                    <span className="font-extrabold text-slate-900">{matchedProfile.specialization}</span>
+                    <span className="text-slate-300">&bull;</span>
+                    <span className="font-mono text-slate-700">{matchedProfile.experienceYears} Years Exp.</span>
+                    <span className="text-slate-300">&bull;</span>
+                    <span className="font-mono font-bold text-slate-900 bg-white px-2 py-0.5 border border-[#FECDD3] text-[10px] rounded-md shadow-2xs">
+                      {matchedProfile.licenseNumber}
+                    </span>
+                    <span className="text-slate-300">&bull;</span>
+                    <span className="font-mono text-slate-700 text-[10px] bg-white px-1.5 py-0.5 border border-slate-200 rounded-md">
+                      ID: {matchedProfile.id}
+                    </span>
+                    <span className="text-slate-300">&bull;</span>
+                    <span className="text-emerald-700 font-extrabold flex items-center gap-1.5">
+                      <span className="relative flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-xs shadow-emerald-500/50"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </span>
-                      <span>Active</span>
+                      MMC/LJM Connected (Active)
                     </span>
                   </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Specialized</span>
-                    <span className="font-extrabold text-slate-800">{matchedProfile.specialization}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Experience</span>
-                    <span className="font-mono tabular-nums font-extrabold text-slate-800">{matchedProfile.experienceYears} Years</span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Practitioner ID</span>
-                    <span className="font-mono font-bold text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded text-[10px]">{matchedProfile.id}</span>
-                  </div>
                 </div>
               </div>
 
-              {/* PROFILE STRENGTH */}
-              {(() => {
-                const strength = Math.min(
-                  55 + 
-                  (editBio.length > 20 ? 15 : 0) + 
-                  (certifications.length * 10) + 
-                  (editSlots.length > 0 ? 10 : 0),
-                  100
-                );
-                return (
-                  <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-3">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-black text-slate-900 uppercase tracking-wider">Profile Strength</span>
-                      <span className="font-mono tabular-nums font-extrabold text-teal-700">{strength}%</span>
-                    </div>
-                    
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-gradient-to-r from-teal-500 to-emerald-500 h-full rounded-full transition-all duration-500" style={{ width: `${strength}%` }}></div>
-                    </div>
-
-                    <p className="text-[10px] text-slate-400 font-bold leading-normal italic">
-                      {strength === 100 
-                        ? "🎉 Your practitioner registry card is fully optimized!"
-                        : "Engagement: Add certifications and bio to reach 100% and rank higher."}
-                    </p>
+              {/* Right High-Contrast KPI Executive Strip */}
+              <div className="flex items-center gap-4 flex-wrap lg:justify-end border-t lg:border-t-0 border-[#FECDD3]/80 pt-4 lg:pt-0">
+                <div className="grid grid-cols-3 gap-3 bg-white/90 p-3 border border-[#FECDD3] rounded-xl text-center min-w-[280px] shadow-xs">
+                  <div>
+                    <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{patientsAttendedCount}</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Patients</span>
                   </div>
-                );
-              })()}
+                  <div className="border-x border-slate-200">
+                    <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{upcomingBookingsCount}</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Upcoming</span>
+                  </div>
+                  <div>
+                    <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{avgOverall ?? '5.0'}</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Rating</span>
+                  </div>
+                </div>
 
-              {/* QUICK ACTIONS */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-2.5">
-                <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">
-                  Quick Actions
-                </h4>
-                
-                <button
-                  type="button"
-                  onClick={() => setShowPublicProfilePreview(true)}
-                  className="w-full py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-extrabold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
-                >
-                  <Eye className="h-4 w-4" />
-                  <span>View Public Profile</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(`https://medicert.com/practitioner/${matchedProfile.id}`);
-                    showToast("Profile link copied to clipboard!");
-                  }}
-                  className="w-full py-2.5 px-3 bg-white hover:bg-slate-55/60 text-slate-700 border border-slate-200 text-[11px] font-extrabold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-3xs"
-                >
-                  <Send className="h-3.5 w-3.5 text-slate-500" />
-                  <span>Share Profile Link</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowPublicProfilePreview(true)}
+                    className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black px-4 py-3 rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-2 border border-[#B91C1C]"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>View Public Profile</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`https://medicert.com/practitioner/${matchedProfile.id}`);
+                      showToast("Profile link copied to clipboard!");
+                    }}
+                    className="bg-white hover:bg-[#FFF1F2] text-[#DC2626] border border-[#FECDD3] text-xs font-bold px-4 py-3 rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-xs"
+                  >
+                    <Send className="h-3.5 w-3.5 text-white" />
+                    <span>Share Link</span>
+                  </button>
+                </div>
               </div>
+            </div>
+          </div>
 
-            </aside>
+          <div className="w-full space-y-6">
+            
 
-            {/* RIGHT COLUMN: 70% - Scrollable Content */}
-            <div className="flex-grow w-full space-y-6">
 
-              {/* Workspace Greeting */}
-              <div className="flex items-baseline justify-between gap-4 flex-wrap">
+              
+              {/* Merged Banner Greeting */}
+              <div className="hidden">
                 <h3 className="font-serif text-2xl font-semibold text-slate-900 tracking-tight">
                   {(() => {
                     const hour = new Date().getHours();
@@ -514,7 +500,7 @@ export default function VerificationTerminal({
               <div
                 role="tablist"
                 aria-label="Practitioner workspace sections"
-                className="flex flex-wrap gap-5 border-b border-slate-200 sticky top-[80px] bg-slate-50/95 backdrop-blur-sm z-30 overflow-x-auto"
+                className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-xl sticky top-[72px] bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs"
               >
                 <button
                   role="tab"
@@ -524,11 +510,11 @@ export default function VerificationTerminal({
                   tabIndex={activeDashboardTab === 'home' ? 0 : -1}
                   onClick={() => setActiveDashboardTab('home')}
                   onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer border-b-2 -mb-px transition-colors ${
-                    activeDashboardTab === 'home' ? 'text-teal-800 border-teal-600' : 'text-slate-500 border-transparent hover:text-slate-800 hover:border-slate-300'
+                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+                    activeDashboardTab === 'home' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
                   }`}
                 >
-                  <LayoutGrid className={`h-4 w-4 ${activeDashboardTab === 'home' ? 'text-teal-600' : 'text-slate-400'}`} />
+                  <LayoutGrid className={`h-4 w-4 ${activeDashboardTab === 'home' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
                   <span>Overview</span>
                 </button>
 
@@ -540,14 +526,14 @@ export default function VerificationTerminal({
                   tabIndex={activeDashboardTab === 'bookings' ? 0 : -1}
                   onClick={() => setActiveDashboardTab('bookings')}
                   onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer border-b-2 -mb-px transition-colors ${
-                    activeDashboardTab === 'bookings' ? 'text-teal-800 border-teal-600' : 'text-slate-500 border-transparent hover:text-slate-800 hover:border-slate-300'
+                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+                    activeDashboardTab === 'bookings' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
                   }`}
                 >
-                  <Calendar className={`h-4 w-4 ${activeDashboardTab === 'bookings' ? 'text-teal-600' : 'text-slate-400'}`} />
+                  <Calendar className={`h-4 w-4 ${activeDashboardTab === 'bookings' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
                   <span>Bookings</span>
                   {upcomingBookingsCount > 0 && (
-                    <span className="font-mono tabular-nums text-[10px] px-1.5 py-0.5 rounded-full font-black bg-rose-500 text-white leading-none">
+                    <span className="font-mono tabular-nums text-[10px] px-2 py-0.5 rounded-full font-black bg-[#DC2626] text-white leading-none">
                       {upcomingBookingsCount}
                     </span>
                   )}
@@ -561,11 +547,11 @@ export default function VerificationTerminal({
                   tabIndex={activeDashboardTab === 'accreditation' ? 0 : -1}
                   onClick={() => setActiveDashboardTab('accreditation')}
                   onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer border-b-2 -mb-px transition-colors ${
-                    activeDashboardTab === 'accreditation' ? 'text-teal-800 border-teal-600' : 'text-slate-500 border-transparent hover:text-slate-800 hover:border-slate-300'
+                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+                    activeDashboardTab === 'accreditation' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
                   }`}
                 >
-                  <Award className={`h-4 w-4 ${activeDashboardTab === 'accreditation' ? 'text-teal-600' : 'text-slate-400'}`} />
+                  <Award className={`h-4 w-4 ${activeDashboardTab === 'accreditation' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
                   <span>Accreditation</span>
                 </button>
 
@@ -577,11 +563,11 @@ export default function VerificationTerminal({
                   tabIndex={activeDashboardTab === 'reviews' ? 0 : -1}
                   onClick={() => setActiveDashboardTab('reviews')}
                   onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer border-b-2 -mb-px transition-colors ${
-                    activeDashboardTab === 'reviews' ? 'text-teal-800 border-teal-600' : 'text-slate-500 border-transparent hover:text-slate-800 hover:border-slate-300'
+                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+                    activeDashboardTab === 'reviews' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
                   }`}
                 >
-                  <MessageSquare className={`h-4 w-4 ${activeDashboardTab === 'reviews' ? 'text-teal-600' : 'text-slate-400'}`} />
+                  <MessageSquare className={`h-4 w-4 ${activeDashboardTab === 'reviews' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
                   <span>Feedback</span>
                 </button>
 
@@ -593,11 +579,11 @@ export default function VerificationTerminal({
                   tabIndex={activeDashboardTab === 'analytics' ? 0 : -1}
                   onClick={() => setActiveDashboardTab('analytics')}
                   onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer border-b-2 -mb-px transition-colors ${
-                    activeDashboardTab === 'analytics' ? 'text-teal-800 border-teal-600' : 'text-slate-500 border-transparent hover:text-slate-800 hover:border-slate-300'
+                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+                    activeDashboardTab === 'analytics' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
                   }`}
                 >
-                  <TrendingUp className={`h-4 w-4 ${activeDashboardTab === 'analytics' ? 'text-teal-600' : 'text-slate-400'}`} />
+                  <TrendingUp className={`h-4 w-4 ${activeDashboardTab === 'analytics' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
                   <span>Analytics</span>
                 </button>
 
@@ -609,11 +595,11 @@ export default function VerificationTerminal({
                   tabIndex={activeDashboardTab === 'settings' ? 0 : -1}
                   onClick={() => setActiveDashboardTab('settings')}
                   onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer border-b-2 -mb-px transition-colors ${
-                    activeDashboardTab === 'settings' ? 'text-teal-800 border-teal-600' : 'text-slate-500 border-transparent hover:text-slate-800 hover:border-slate-300'
+                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+                    activeDashboardTab === 'settings' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
                   }`}
                 >
-                  <Edit className={`h-4 w-4 ${activeDashboardTab === 'settings' ? 'text-teal-600' : 'text-slate-400'}`} />
+                  <Edit className={`h-4 w-4 ${activeDashboardTab === 'settings' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
                   <span>Settings</span>
                 </button>
               </div>
@@ -818,8 +804,8 @@ export default function VerificationTerminal({
               </div>
             )}
 
-            </div>
-          </div>
+
+
         </div>
       </div>
     );
@@ -1159,7 +1145,7 @@ export default function VerificationTerminal({
           <div className="space-y-1.5">
             <h3 className="text-base font-black text-slate-900">Application Lodged Successfully!</h3>
             <p className="text-xs text-slate-500 font-medium max-w-md mx-auto leading-relaxed">
-              Dr./Sister {name}, your registry profile has been established on CareVerify. 
+              Dr./Sister {name}, your registry profile has been established on MedCred. 
               Admin moderators will complete verification of your state license number <strong>{licenseNumber}</strong> shortly.
             </p>
           </div>

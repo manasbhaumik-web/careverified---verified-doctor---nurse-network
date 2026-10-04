@@ -304,13 +304,13 @@ export default function VitalsTab({
             </button>
           </motion.form>
 
-          {/* AI Wellness Journal */}
+          {/* Clinical Wellness Journal */}
           <motion.div variants={itemVariants} className="relative overflow-hidden bg-gradient-to-br from-blue-700 to-blue-800 border border-slate-800 rounded-[32px] p-8 text-white space-y-5 shadow-2xl">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-teal-500/10 rounded-full blur-[40px] pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-48 h-48 bg-teal-500/10 rounded-xs blur-[40px] pointer-events-none"></div>
             
             <div className="space-y-2 relative z-10">
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest bg-teal-500/20 text-teal-300 border border-teal-500/30 px-3 py-1 rounded-full shadow-inner">
-                <Sparkles className="h-3.5 w-3.5 text-teal-400" /> AI Wellness Interpreter
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest bg-teal-500/20 text-teal-300 border border-teal-500/30 px-3 py-1 rounded-xs shadow-inner">
+                <Sparkles className="h-3.5 w-3.5 text-teal-400" /> Clinical Wellness Interpreter
               </span>
               <h5 className="text-sm font-black uppercase tracking-wider mt-2">Self-Care Journal</h5>
             </div>

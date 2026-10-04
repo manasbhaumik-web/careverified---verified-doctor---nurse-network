@@ -68,9 +68,9 @@ const INITIAL_RECORDS: MedicalRecord[] = [
     structuredData: {
       vaccineName: 'Comirnaty (Pfizer-BioNTech)',
       doses: [
-        { doseNumber: 1, date: '2021-06-15', batch: 'AA0129', center: 'Pantai Hospital Kuala Lumpur' },
-        { doseNumber: 2, date: '2021-07-06', batch: 'AA0135', center: 'Pantai Hospital Kuala Lumpur' },
-        { doseNumber: 3, date: '2022-01-20', batch: 'BA0294', center: 'BP Healthcare Bangsar' }
+        { doseNumber: 1, date: '2021-06-15', batch: 'AA0129', center: 'Kuala Lumpur Specialist Hospital' },
+        { doseNumber: 2, date: '2021-07-06', batch: 'AA0135', center: 'Kuala Lumpur Specialist Hospital' },
+        { doseNumber: 3, date: '2022-01-20', batch: 'BA0294', center: 'Metro Healthcare Bangsar' }
       ]
     }
   },
@@ -79,7 +79,7 @@ const INITIAL_RECORDS: MedicalRecord[] = [
     title: 'Chest Radiograph (X-Ray) Report',
     category: 'Imaging/Scan',
     date: '2026-05-14',
-    providerName: 'Pantai Hospital Medical Imaging Dept',
+    providerName: 'Kuala Lumpur Specialist Hospital Medical Imaging Dept',
     fileName: 'chest_xray_radiography_john_doe.png',
     fileSize: '4.8 MB',
     fileType: 'image/png',
@@ -547,7 +547,7 @@ export default function MedicalHistory() {
 
                   {attachedFile ? (
                     <>
-                      <div className="bg-emerald-100 text-emerald-800 p-2.5 rounded-full border border-emerald-200">
+                      <div className="bg-emerald-100 text-emerald-800 p-2.5 rounded-xs border border-emerald-200">
                         <FileCheck className="h-6 w-6" />
                       </div>
                       <div className="space-y-1 text-center">
@@ -625,7 +625,7 @@ export default function MedicalHistory() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Pantai Hospital Kuala Lumpur, BP Lab"
+                    placeholder="e.g. Kuala Lumpur Specialist Hospital, Metro Lab"
                     value={newProvider}
                     onChange={(e) => setNewProvider(e.target.value)}
                     className="w-full text-xs font-semibold py-2.5 px-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-150"
@@ -823,7 +823,7 @@ export default function MedicalHistory() {
                       {activeRecordDetail.structuredData.doses.map((dose) => (
                         <div key={dose.doseNumber} className="bg-white border-2 border-slate-200/60 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                           <div className="flex items-center gap-3">
-                            <div className="h-9 w-9 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-extrabold border border-emerald-100 text-xs">
+                            <div className="h-9 w-9 rounded-xs bg-emerald-50 text-emerald-600 flex items-center justify-center font-extrabold border border-emerald-100 text-xs">
                               #{dose.doseNumber}
                             </div>
                             <div>

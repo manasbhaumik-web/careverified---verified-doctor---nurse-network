@@ -145,8 +145,8 @@ export default function DoctorOnCallModal({
       // Auto-assign first available
       assignedDoctor = availableDoctors[0] || {
         id: 'doc-emergency',
-        name: 'Dr. Sarah Al-Jafri',
-        avatar: 'https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=250'
+        name: 'Dr. Sarah Binti Al-Jafri',
+        avatar: '/assets/malaysian_female_doctor.jpg'
       };
     } else {
       assignedDoctor = availableDoctors.find(d => d.id === selectedDoctorId);

@@ -532,79 +532,78 @@ export default function PatientDashboard({
   };
 
   return (
-    <div className="space-y-8" id="patient-dashboard-root">
+    <div className="w-full max-w-[1920px] mx-auto space-y-8" id="patient-dashboard-root">
       
-      {/* Standard Header */}
-      <PageBanner
-        eyebrow="CareVerify Console"
-        title={<>{greetingText}, <span className="text-cross">{userName}</span></>}
-        description="Your centralized digital portal for certified telehealth, verified e-prescriptions, and smart clinical telemetry."
-        actions={
-          <>
-          {/* Circular Profile Completion */}
-          <div className="hidden lg:flex items-center gap-3 pl-6 border-l border-slate-200 h-16">
-            <div className="relative w-12 h-12 flex items-center justify-center bg-slate-50 rounded-full shrink-0 shadow-inner">
-              <svg className="w-12 h-12 transform -rotate-90">
-                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-200" />
-                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" strokeDasharray="125.6" strokeDashoffset="50.24" className="text-teal-500 transition-all duration-1000 ease-out" strokeLinecap="round" />
-              </svg>
-              <span className="absolute font-mono tabular-nums text-[9px] font-black text-slate-700">60%</span>
-            </div>
+      {/* EXECUTIVE CRIMSON METRIC BANNER (CONCEPT 3) */}
+      <div className="bg-gradient-to-r from-[#FFF1F2] via-[#FFF5F5] to-[#FFE4E6] border-l-8 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 rounded-2xl p-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 text-[#DC2626] text-xs font-black uppercase tracking-wider">
+            <ShieldCheck className="h-4 w-4 text-emerald-600" />
+            <span>MedCred Verified Health Console</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
+            {greetingText}, <span className="underline decoration-rose-400">{userName}</span>
+          </h1>
+          <p className="text-xs text-slate-600 font-medium max-w-xl">
+            Centralized clinical telemetry, verified e-prescriptions, and 24/7 doctor-on-call emergency triage.
+          </p>
+        </div>
+
+        {/* High-Contrast Executive Metric Strip & Quick Actions */}
+        <div className="flex flex-wrap items-center gap-4 shrink-0">
+          <div className="grid grid-cols-4 gap-3 bg-white/90 backdrop-blur-xs p-3 border border-[#FECDD3] rounded-xl text-center min-w-[320px] shadow-xs">
             <div>
-              <p className="text-[10px] font-bold text-slate-800 uppercase tracking-wider mb-0.5">Profile Setup</p>
-              <button onClick={() => setActiveTab('records')} className="text-[10px] font-bold text-teal-600 hover:text-teal-700 hover:underline">Add History &rarr;</button>
+              <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{upcomingBookings.length}</span>
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Bookings</span>
+            </div>
+            <div className="border-l border-rose-200">
+              <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{prescriptionBookings.length}</span>
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Rx Active</span>
+            </div>
+            <div className="border-l border-rose-200">
+              <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{vitalsList.length}</span>
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Vitals Logs</span>
+            </div>
+            <div className="border-l border-rose-200">
+              <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">60%</span>
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Profile</span>
             </div>
           </div>
-        <div className="flex flex-col sm:flex-row w-full lg:w-auto shrink-0 mt-2 lg:mt-0">
-          {/* Flat Doctor-On-Call Card */}
-          <div className="flex-1 bg-white p-3 rounded-xl border border-rose-100 text-left flex items-center justify-between gap-4 shadow-sm group hover:border-rose-200 transition-all duration-300 hover:shadow-md">
-            <div className="flex items-center gap-3">
-               <div className="bg-rose-50 text-rose-600 p-2.5 rounded-xl border border-rose-100 shrink-0">
-                 <Ambulance className="h-5 w-5"/>
-               </div>
-               <div>
-                 <div className="flex items-center gap-2 mb-0.5">
-                   <span className="text-[10px] text-rose-500 font-black uppercase tracking-wider block leading-none">Emergency Dispatch</span>
-                   <span className="inline-flex items-center text-[9px] bg-rose-500 text-white px-1.5 py-0.5 rounded-full font-black tracking-widest uppercase animate-pulse leading-none shadow-sm shadow-rose-500/20">LIVE</span>
-                 </div>
-                 {activeDispatch ? (
-                   <span className="text-xs font-bold text-slate-700 block leading-none tracking-tight">{activeDispatch.doctorName} • <span className="font-mono tabular-nums text-rose-600 font-black">{activeDispatch.etaMinutes}m ETA</span></span>
-                 ) : (
-                   <span className="text-xs font-bold text-slate-700 block leading-none tracking-tight">24/7 Doctor-on-Call</span>
-                 )}
-               </div>
-            </div>
-            <button onClick={() => setShowOnCallModal(true)} className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-black rounded-xl transition-all shadow-sm shrink-0 active:scale-95 flex items-center gap-2 uppercase tracking-wider cursor-pointer">
-              {activeDispatch ? 'Track' : 'Request'}
+
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setShowOnCallModal(true)} 
+              className="px-4 py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black rounded-xl border border-[#DC2626] transition-all flex items-center gap-2 uppercase tracking-wider cursor-pointer shadow-sm hover:shadow-md"
+            >
+              <Ambulance className="h-4 w-4 text-white animate-bounce" />
+              <span>{activeDispatch ? 'Track Triage' : 'Request On-Call'}</span>
             </button>
           </div>
         </div>
-          </>
-        }
-      />
+      </div>
 
-      {/* "At a Glance" Overview Grid */}
+      {/* Overview Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* NBA Overview Card */}
+        {/* Next Best Action Card */}
         {upcomingBookings.length > 0 ? (
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow"
+            className="bg-white border border-[#FECDD3] rounded-none p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs hover:border-[#DC2626] transition-all"
           >
             <div className="flex items-center gap-4">
-              <div className="bg-teal-50 p-2.5 rounded-xl text-teal-600 shrink-0 border border-teal-100">
+              <div className="bg-[#FFF0F2] p-2.5 rounded-none text-[#DC2626] shrink-0 border border-[#FECDD3]">
                 <Bell className="h-5 w-5 animate-pulse" />
               </div>
               <div>
-                <h4 className="text-[10px] uppercase tracking-wider font-black text-slate-400 mb-0.5">Next Best Action</h4>
-                <p className="text-sm font-bold text-slate-800">Telehealth call with {upcomingBookings[0].professionalName}</p>
+                <h4 className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 mb-0.5">Next Best Action</h4>
+                <p className="text-sm font-bold text-[#1E293B]">Telehealth consultation with {upcomingBookings[0].professionalName}</p>
               </div>
             </div>
             {upcomingBookings[0].mode === ConsultationMode.VIDEO ? (
               <button 
                 onClick={() => setActiveTab('appointments')}
-                className="shrink-0 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-black px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 shadow-md hover:-translate-y-0.5"
+                className="shrink-0 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-extrabold px-4 py-2.5 rounded-none border border-[#B91C1C] transition-all flex items-center gap-2 shadow-xs cursor-pointer"
               >
                 <Video className="h-4 w-4" />
                 Join Call
@@ -612,10 +611,10 @@ export default function PatientDashboard({
             ) : (
               <button 
                 onClick={() => setActiveTab('appointments')}
-                className="shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-black px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2 shadow-sm"
+                className="shrink-0 bg-white hover:bg-[#FFE4E6] text-[#1E293B] border border-[#FECDD3] text-[11px] font-extrabold px-4 py-2.5 rounded-none transition-all flex items-center gap-2 shadow-xs cursor-pointer"
               >
                 View Details
-                <ArrowRight className="h-3.5 w-3.5" />
+                <ArrowRight className="h-3.5 w-3.5 text-[#DC2626]" />
               </button>
             )}
           </motion.div>
@@ -623,20 +622,20 @@ export default function PatientDashboard({
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow"
+            className="bg-white border border-[#FECDD3] rounded-none p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs hover:border-[#DC2626] transition-all"
           >
             <div className="flex items-center gap-4">
-              <div className="bg-emerald-50 p-2.5 rounded-xl text-emerald-600 shrink-0 border border-emerald-100">
+              <div className="bg-[#FFF0F2] p-2.5 rounded-none text-[#DC2626] shrink-0 border border-[#FECDD3]">
                 <Activity className="h-5 w-5" />
               </div>
               <div>
-                <h4 className="text-[10px] uppercase tracking-wider font-black text-slate-400 mb-0.5">Next Best Action</h4>
-                <p className="text-sm font-bold text-slate-800">Log today's vitals for your health profile.</p>
+                <h4 className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 mb-0.5">Next Best Action</h4>
+                <p className="text-sm font-bold text-[#1E293B]">Log today's biometric vitals for your health profile.</p>
               </div>
             </div>
             <button 
               onClick={() => setActiveTab('vitals')}
-              className="shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2 shadow-sm"
+              className="shrink-0 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-extrabold px-4 py-2.5 rounded-none border border-[#B91C1C] transition-all flex items-center gap-2 shadow-xs cursor-pointer"
             >
               Log Vitals
               <ArrowRight className="h-3.5 w-3.5" />
@@ -644,36 +643,36 @@ export default function PatientDashboard({
           </motion.div>
         )}
 
-        {/* Quick Stats Placeholder Card */}
+        {/* Recent Activity Card */}
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white border border-slate-200 rounded-xl p-5 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow"
+          className="bg-white border border-[#FECDD3] rounded-none p-5 flex items-center justify-between shadow-xs hover:border-[#DC2626] transition-all"
         >
            <div className="flex items-center gap-4">
-              <div className="bg-blue-50 p-2.5 rounded-xl text-blue-600 shrink-0 border border-blue-100">
+              <div className="bg-[#FFF0F2] p-2.5 rounded-none text-[#DC2626] shrink-0 border border-[#FECDD3]">
                 <FileText className="h-5 w-5" />
               </div>
               <div>
-                <h4 className="text-[10px] uppercase tracking-wider font-black text-slate-400 mb-0.5">Recent Activity</h4>
-                <p className="text-sm font-bold text-slate-800"><span className="font-mono tabular-nums">{prescriptionBookings.length}</span> Active Prescriptions</p>
+                <h4 className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 mb-0.5">Recent Activity</h4>
+                <p className="text-sm font-bold text-[#1E293B]"><span className="font-mono tabular-nums text-[#DC2626]">{prescriptionBookings.length}</span> Active E-Prescriptions</p>
               </div>
             </div>
             <button 
               onClick={() => setActiveTab('prescriptions')}
-              className="shrink-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 text-[11px] font-black px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2"
+              className="shrink-0 text-[#DC2626] bg-white border border-[#FECDD3] hover:bg-[#FFE4E6] text-[11px] font-extrabold px-4 py-2.5 rounded-none transition-all flex items-center gap-2 cursor-pointer shadow-xs"
             >
               View
             </button>
         </motion.div>
       </div>
 
-      {/* UNDERLINE TAB NAVIGATION */}
+      {/* TAB NAVIGATION */}
       <div
         role="tablist"
         aria-label="Patient hub sections"
-        className="flex flex-wrap gap-5 border-b border-slate-200 sticky top-20 bg-slate-50/95 backdrop-blur-sm z-30 overflow-x-auto"
+        className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-xl sticky top-20 bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs"
       >
         {patientTabs.map(tab => (
           <button
@@ -685,14 +684,16 @@ export default function PatientDashboard({
             tabIndex={activeTab === tab.id ? 0 : -1}
             onClick={() => setActiveTab(tab.id as any)}
             onKeyDown={handlePatientTabKeyDown}
-            className={`shrink-0 py-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer border-b-2 -mb-px transition-colors ${
-              activeTab === tab.id ? 'text-teal-800 border-teal-600' : 'text-slate-500 border-transparent hover:text-slate-800 hover:border-slate-300'
+            className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+              activeTab === tab.id
+                ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs'
+                : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
             }`}
           >
-            <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-teal-600' : 'text-slate-400'}`} />
+            <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-[#DC2626]' : 'text-slate-400'}`} />
             <span className="whitespace-nowrap">{tab.label}</span>
             {tab.count !== undefined && tab.count > 0 && (
-              <span className="font-mono tabular-nums text-[10px] px-1.5 py-0.5 rounded-full font-black bg-rose-500 text-white leading-none">
+              <span className="font-mono tabular-nums text-[10px] px-2 py-0.5 rounded-full font-extrabold bg-[#DC2626] text-white leading-none">
                 {tab.count}
               </span>
             )}
@@ -831,7 +832,7 @@ export default function PatientDashboard({
                       <Stethoscope className="h-6 w-6" />
                     </div>
                     <div className="space-y-0.5">
-                      <h3 className="text-xl font-black text-teal-950 leading-none">CareVerify</h3>
+                      <h3 className="text-xl font-black text-teal-950 leading-none">MedCred</h3>
                       <span className="text-[11px] font-extrabold text-teal-700 uppercase tracking-[0.2em] block">Verified Medical Network</span>
                     </div>
                   </div>
@@ -1362,7 +1363,7 @@ export default function PatientDashboard({
                   {/* Remote Video Stream (Simulated Practitioner) */}
                   <div className="w-full h-full bg-blue-600 relative overflow-hidden flex items-center justify-center">
                     <img 
-                      src={professionals.find(p => p.id === activeVideoBooking.professionalId)?.avatar || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=600"}
+                      src={professionals.find(p => p.id === activeVideoBooking.professionalId)?.avatar || "/assets/malaysian_female_doctor.jpg"}
                       alt={activeVideoBooking.professionalName}
                       className="w-full h-full object-cover brightness-95 opacity-90"
                     />
@@ -1522,7 +1523,7 @@ export default function PatientDashboard({
                 {/* Verified badge pill */}
                 <div className="mt-4 flex justify-between items-center bg-teal-50/10 px-3.5 py-1.5 rounded-xl border border-teal-100/50">
                   <div className="text-xs font-bold text-slate-500">Registry Verification Status</div>
-                  <div className="border border-emerald-500/80 text-emerald-600 bg-emerald-50/40 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-3xs">
+                  <div className="border border-emerald-500/80 text-emerald-600 bg-emerald-50/40 px-3 py-1 rounded-xs text-xs font-bold flex items-center gap-1 shadow-3xs">
                     <span>Verified</span>
                     <span className="text-emerald-500">☑</span>
                   </div>

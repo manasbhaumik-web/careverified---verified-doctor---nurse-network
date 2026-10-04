@@ -45,7 +45,7 @@ export default function SearchHub({
       p.specialization.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.bio.toLowerCase().includes(searchTerm.toLowerCase());
 
-    // 2. Specialty Filter from AI Matcher or Pill Rail
+    // 2. Specialty Filter from Clinical Matcher or Pill Rail
     const matchesSpecialtyFilter = selectedSpecialtyFilter === '' ||
       p.specialization.toLowerCase().includes(selectedSpecialtyFilter.toLowerCase());
 
@@ -139,11 +139,11 @@ export default function SearchHub({
 
           <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
             {selectedSpecialtyFilter && (
-              <div className="bg-teal-50 border border-teal-200 text-[#c8102e] text-[10px] font-black py-1 px-2.5 rounded-full flex items-center gap-2 animate-fade-in">
+              <div className="bg-teal-50 border border-teal-200 text-[#c8102e] text-[10px] font-black py-1 px-2.5 rounded-xs flex items-center gap-2 animate-fade-in">
                 <span>Triage: {selectedSpecialtyFilter}</span>
                 <button
                   onClick={onClearSpecialtyFilter}
-                  className="hover:text-red-600 font-black text-xs cursor-pointer p-0.5 rounded-full hover:bg-teal-100/50"
+                  className="hover:text-red-600 font-black text-xs cursor-pointer p-0.5 rounded-xs hover:bg-teal-100/50"
                   title="Clear Specialty"
                 >
                   &times;
@@ -201,16 +201,16 @@ export default function SearchHub({
             Swipe left/right to browse &bull; {specialties.length + 1} categories
           </span>
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-2 pt-1 scrollbar-none select-none -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div role="tablist" aria-label="Specialty directory categories" className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-xl bg-[#FFF0F2]/95 backdrop-blur-md p-1.5 shadow-xs">
           {/* "All Specialties" Pill */}
           <button
             onClick={onClearSpecialtyFilter}
-            className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border ${selectedSpecialtyFilter === ''
-                ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-500/15 scale-102 font-black'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+            className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer border ${selectedSpecialtyFilter === ''
+                ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs'
+                : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
               }`}
           >
-            <LayoutGrid className="h-3.5 w-3.5" />
+            <LayoutGrid className={`h-3.5 w-3.5 ${selectedSpecialtyFilter === '' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
             <span>All Specialties</span>
           </button>
 
@@ -222,12 +222,12 @@ export default function SearchHub({
               <button
                 key={spec}
                 onClick={() => onSelectSpecialtyFilter(spec)}
-                className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border ${isSelected
-                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-500/15 scale-102 font-black'
-                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer border ${isSelected
+                    ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs'
+                    : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
                   }`}
               >
-                <IconComponent className="h-3.5 w-3.5" />
+                <IconComponent className={`h-3.5 w-3.5 ${isSelected ? 'text-[#DC2626]' : 'text-slate-400'}`} />
                 <span>{spec}</span>
               </button>
             );
@@ -265,7 +265,7 @@ export default function SearchHub({
                       <img
                         src={prof.avatar}
                         alt={prof.name}
-                        className="h-14 w-14 rounded-2xl object-cover border border-slate-100 shadow-3xs shrink-0"
+                        className="h-14 w-14 rounded-full object-cover border border-[#FECDD3] shadow-3xs shrink-0"
                         referrerPolicy="no-referrer"
                       />
 
@@ -280,7 +280,7 @@ export default function SearchHub({
                             }`}>
                             {isDoc ? "Doctor (MD/MBBS)" : "Registered Nurse (RN)"}
                           </span>
-                          <span className="bg-emerald-50 text-emerald-800 text-[9px] font-black px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-0.5 shadow-3xs">
+                          <span className="bg-emerald-50 text-emerald-800 text-[9px] font-black px-2 py-0.5 rounded-xs border border-emerald-100 flex items-center gap-0.5 shadow-3xs">
                             <BadgeCheck className="h-3 w-3 text-emerald-600" />
                             Verified ✅
                           </span>
@@ -365,7 +365,7 @@ export default function SearchHub({
                           {isDoc ? "Doctor" : "Registered Nurse"}
                         </span>
 
-                        <span className="bg-emerald-50 text-emerald-800 text-[9px] font-black px-2 py-0.5 rounded-full border border-emerald-150 flex items-center gap-0.5 shadow-3xs">
+                        <span className="bg-emerald-50 text-emerald-800 text-[9px] font-black px-2 py-0.5 rounded-xs border border-emerald-150 flex items-center gap-0.5 shadow-3xs">
                           <BadgeCheck className="h-3 w-3 text-emerald-500 fill-emerald-50" />
                           Verified
                         </span>
@@ -590,7 +590,7 @@ export default function SearchHub({
                 {/* Verified badge pill */}
                 <div className="mt-4 flex justify-between items-center bg-teal-50/10 px-3.5 py-1.5 rounded-xl border border-teal-100/50">
                   <div className="text-[10px] font-bold text-slate-500">Registry Verification Status</div>
-                  <div className="border border-emerald-500/80 text-emerald-600 bg-emerald-50/40 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-3xs">
+                  <div className="border border-emerald-500/80 text-emerald-600 bg-emerald-50/40 px-3 py-1 rounded-xs text-xs font-bold flex items-center gap-1 shadow-3xs">
                     <span>Verified</span>
                     <span className="text-emerald-500">☑</span>
                   </div>

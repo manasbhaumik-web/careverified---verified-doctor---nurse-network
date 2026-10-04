@@ -150,7 +150,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   <label className="block text-xs font-bold text-slate-600 mb-1.5">Clinic / Hospital Name</label>
                   <input
                     type="text"
-                    placeholder="Pantai Hospital Kuala Lumpur"
+                    placeholder="Kuala Lumpur Specialist Hospital"
                     value={hospitalName}
                     onChange={(e) => setHospitalName(e.target.value)}
                     className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold transition-all"

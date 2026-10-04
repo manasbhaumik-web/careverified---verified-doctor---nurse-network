@@ -356,7 +356,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
           {receipt && (
             <div className="space-y-6 py-2">
               <div className="text-center space-y-2">
-                <div className="h-12 w-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+                <div className="h-12 w-12 bg-emerald-100 text-emerald-600 rounded-xs flex items-center justify-center mx-auto">
                   <CheckCircle2 className="h-6 w-6" />
                 </div>
                 <h4 className="text-sm font-black text-slate-900">Payment Successfully Notarized!</h4>
@@ -366,7 +366,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
               {/* Structured receipt block */}
               <div className="border border-slate-200 bg-slate-50 rounded-2xl p-4 space-y-3 font-mono text-[10px] text-slate-700 leading-normal relative overflow-hidden">
                 {/* Backglow element */}
-                <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/5 rounded-full filter blur-xl pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/5 rounded-xs filter blur-xl pointer-events-none"></div>
 
                 <div className="flex justify-between border-b border-dashed border-slate-200 pb-2">
                   <span className="text-slate-400 font-bold">RECEIPT ID:</span>

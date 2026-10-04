@@ -240,7 +240,7 @@ export default function ProfessionalProfile({
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
                     <h2 className="text-xl font-extrabold text-slate-900">{prof.name}</h2>
-                    <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-0.5 shadow-sm">
+                    <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-xs border border-emerald-100 flex items-center gap-0.5 shadow-sm">
                       <BadgeCheck className="h-3.5 w-3.5 text-emerald-600" />
                       Verified
                     </span>
@@ -509,7 +509,7 @@ export default function ProfessionalProfile({
 
             {bookingSuccess ? (
               <div className="space-y-4 text-center py-4">
-                <div className="h-12 w-12 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600">
+                <div className="h-12 w-12 bg-emerald-50 border border-emerald-100 rounded-xs flex items-center justify-center mx-auto text-emerald-600">
                   <CheckCircle2 className="h-6 w-6" />
                 </div>
                 <div>

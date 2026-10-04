@@ -116,7 +116,7 @@ export default function PrescriptionsTab({
                     </span>
                     <h4 className="text-base font-black text-slate-900 group-hover:text-teal-700 transition-colors duration-200">{b.professionalName}</h4>
                   </div>
-                  <span className="bg-emerald-50 text-emerald-800 text-[11px] font-black px-2.5 py-1 rounded-full border border-emerald-100 flex items-center gap-1.5 shrink-0 shadow-xs">
+                  <span className="bg-emerald-50 text-emerald-800 text-[11px] font-black px-2.5 py-1 rounded-xs border border-emerald-100 flex items-center gap-1.5 shrink-0 shadow-xs">
                     <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> 
                     <span>Verified Registry Rx</span>
                   </span>
