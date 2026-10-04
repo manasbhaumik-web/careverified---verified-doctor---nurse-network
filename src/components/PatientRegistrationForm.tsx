@@ -285,7 +285,7 @@ export default function PatientRegistrationForm({
                 type="button"
                 onClick={handleNextStep}
                 disabled={!isStep1Valid()}
-                className="py-2.5 px-6 bg-[#DC2626] hover:bg-[#0F172A] disabled:bg-[#DC2626] disabled:text-slate-500 text-white rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-rose-500/10"
+                className="py-2.5 px-6 bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-[#DC2626] disabled:text-slate-500 text-white rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-rose-500/10"
               >
                 <span>Continue</span>
                 <ArrowRight className="h-4 w-4" />
@@ -358,7 +358,7 @@ export default function PatientRegistrationForm({
                 type="button"
                 onClick={handleNextStep}
                 disabled={!isStep2Valid()}
-                className="py-2.5 px-6 bg-[#DC2626] hover:bg-[#0F172A] disabled:bg-[#DC2626] disabled:text-slate-500 text-white rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-rose-500/10"
+                className="py-2.5 px-6 bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-[#DC2626] disabled:text-slate-500 text-white rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-rose-500/10"
               >
                 <span>Continue</span>
                 <ArrowRight className="h-4 w-4" />

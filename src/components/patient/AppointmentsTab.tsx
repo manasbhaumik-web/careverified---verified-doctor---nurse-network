@@ -69,7 +69,7 @@ export default function AppointmentsTab({
             <div className="pt-2">
               <button 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#DC2626] hover:bg-[#0F172A] text-white text-sm font-bold rounded-xl transition-all shadow-sm shadow-rose-500/20"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold rounded-xl transition-all shadow-sm shadow-rose-500/20"
               >
                 <Search className="h-4 w-4" />
                 Find a Doctor
@@ -212,7 +212,7 @@ export default function AppointmentsTab({
                   {isVideo ? (
                     <button
                       onClick={() => onStartVideoCall(b)}
-                      className="bg-[#DC2626] hover:bg-[#0F172A] text-white text-[11px] font-black px-5 py-3 rounded-xl transition-all shadow-md shadow-rose-600/20 flex items-center gap-2 hover:scale-[1.02] active:scale-95 duration-200 cursor-pointer"
+                      className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-black px-5 py-3 rounded-xl transition-all shadow-md shadow-rose-600/20 flex items-center gap-2 hover:scale-[1.02] active:scale-95 duration-200 cursor-pointer"
                     >
                       <Video className="h-4 w-4 shrink-0" />
                       <span>Join Telehealth Room</span>

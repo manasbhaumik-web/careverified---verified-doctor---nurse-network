@@ -310,7 +310,7 @@ export default function MedicalHistory() {
         </div>
         <button
           onClick={() => setIsUploadingOpen(true)}
-          className="bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 hover:scale-[1.01] shrink-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#DC2626]"
+          className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 hover:scale-[1.01] shrink-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#DC2626]"
         >
           <Plus className="h-4 w-4" />
           Add Medical Record
@@ -684,7 +684,7 @@ export default function MedicalHistory() {
                   type="button"
                   onClick={handleUploadSubmit}
                   disabled={uploadProgress !== null || isUploadSuccess}
-                  className="bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-bold py-2.5 px-5 rounded-xl transition-all shadow-md flex items-center gap-1.5 disabled:opacity-55 disabled:cursor-not-allowed hover:scale-[1.01] cursor-pointer"
+                  className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold py-2.5 px-5 rounded-xl transition-all shadow-md flex items-center gap-1.5 disabled:opacity-55 disabled:cursor-not-allowed hover:scale-[1.01] cursor-pointer"
                 >
                   <FileText className="h-4 w-4" />
                   Save Record
@@ -887,7 +887,7 @@ export default function MedicalHistory() {
                         e.preventDefault();
                         setActivePreviewRecord(activeRecordDetail);
                       }}
-                      className="bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:ring-offset-2"
+                      className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:ring-offset-2"
                     >
                       <Eye className="h-3.5 w-3.5" />
                       Interactive Lightbox Preview

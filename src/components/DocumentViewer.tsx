@@ -353,7 +353,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
                 <div>
                   <span className="font-bold block">LAB CHIEF SIGNATURE</span>
                   <div className="h-6 flex items-end">
-                    <span className="font-serif italic text-xs text-slate-700 font-bold tracking-widest">A.K. Saini</span>
+                    <span className="font-sans italic text-xs text-slate-700 font-bold tracking-widest">A.K. Saini</span>
                   </div>
                   <span className="text-[7px]">Dr. Amit K. Saini, FRCPath</span>
                 </div>

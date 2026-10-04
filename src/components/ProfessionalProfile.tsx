@@ -488,7 +488,7 @@ export default function ProfessionalProfile({
 
                     <button
                       type="submit"
-                      className="w-full bg-[#DC2626] hover:bg-[#0F172A] text-white rounded-xl py-2.5 text-xs font-bold shadow-sm transition-colors"
+                      className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl py-2.5 text-xs font-bold shadow-sm transition-colors"
                     >
                       Publish Patient Review
                     </button>
@@ -538,7 +538,7 @@ export default function ProfessionalProfile({
 
                 <button
                   onClick={() => setBookingSuccess(null)}
-                  className="w-full bg-[#DC2626] hover:bg-[#0F172A] text-white rounded-xl py-2 text-xs font-bold shadow-sm transition-colors"
+                  className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl py-2 text-xs font-bold shadow-sm transition-colors"
                 >
                   Book Another Appointment
                 </button>
@@ -623,7 +623,7 @@ export default function ProfessionalProfile({
                 <button
                   type="submit"
                   disabled={bookingLoading || !bookingDate || !bookingSlot}
-                  className="w-full bg-[#DC2626] hover:bg-[#0F172A] disabled:bg-rose-400 text-white rounded-xl py-3 text-xs font-bold shadow-sm transition-all"
+                  className="w-full bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-rose-400 text-white rounded-xl py-3 text-xs font-bold shadow-sm transition-all"
                 >
                   {bookingLoading ? "Securing booking slot..." : `Secure Slot • RM ${prof.fee}`}
                 </button>

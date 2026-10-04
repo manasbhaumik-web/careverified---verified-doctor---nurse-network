@@ -484,7 +484,7 @@ export default function VerificationTerminal({
               
               {/* Merged Banner Greeting */}
               <div className="hidden">
-                <h3 className="font-serif text-2xl font-semibold text-slate-900 tracking-tight">
+                <h3 className="font-sans text-2xl font-semibold text-slate-900 tracking-tight">
                   {(() => {
                     const hour = new Date().getHours();
                     const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
@@ -746,7 +746,7 @@ export default function VerificationTerminal({
                     
                     <div className="space-y-1">
                       <div className="flex items-center justify-center gap-1.5">
-                        <h3 className="font-serif text-xl font-semibold text-slate-900">{matchedProfile.name}</h3>
+                        <h3 className="font-sans text-xl font-semibold text-slate-900">{matchedProfile.name}</h3>
                         {isVerified && <Shield className="h-4.5 w-4.5 text-emerald-500 fill-emerald-500" />}
                       </div>
                       <p className="text-xs font-bold text-[#DC2626] uppercase tracking-widest">{matchedProfile.specialization}</p>
@@ -794,7 +794,7 @@ export default function VerificationTerminal({
                     <button
                       type="button"
                       onClick={() => setShowPublicProfilePreview(false)}
-                      className="w-full py-3 bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-black rounded-xl transition-all shadow-md cursor-pointer"
+                      className="w-full py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black rounded-xl transition-all shadow-md cursor-pointer"
                     >
                       Close Public Profile Preview
                     </button>
@@ -967,7 +967,7 @@ export default function VerificationTerminal({
             <button
               onClick={() => setStep(2)}
               disabled={!name || !experienceYears}
-              className="bg-[#DC2626] hover:bg-[#0F172A] disabled:bg-slate-300 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer"
+              className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-slate-300 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer"
             >
               Continue to Credentials
             </button>
@@ -1069,7 +1069,7 @@ export default function VerificationTerminal({
             <button
               onClick={() => setStep(3)}
               disabled={!licenseNumber || !education || !fee || !practiceAddress}
-              className="bg-[#DC2626] hover:bg-[#0F172A] disabled:bg-slate-300 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-colors cursor-pointer"
+              className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-slate-300 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-colors cursor-pointer"
             >
               Continue to Documentation
             </button>
@@ -1120,7 +1120,7 @@ export default function VerificationTerminal({
             <button
               type="submit"
               disabled={loading || !fileAttached}
-              className="bg-[#DC2626] hover:bg-[#0F172A] disabled:bg-slate-300 text-white text-xs font-bold px-8 py-2.5 rounded-xl transition-all flex items-center gap-1.5 shadow-md cursor-pointer"
+              className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-slate-300 text-white text-xs font-bold px-8 py-2.5 rounded-xl transition-all flex items-center gap-1.5 shadow-md cursor-pointer"
             >
               {loading ? (
                 <>
@@ -1170,7 +1170,7 @@ export default function VerificationTerminal({
 
           <button
             onClick={() => setStep(1)}
-            className="bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-colors shadow-sm cursor-pointer"
+            className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-colors shadow-sm cursor-pointer"
           >
             Submit Another Application
           </button>

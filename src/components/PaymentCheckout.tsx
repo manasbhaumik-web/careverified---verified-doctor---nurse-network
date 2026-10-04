@@ -316,7 +316,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
 
                 <button
                   type="submit"
-                  className="w-full py-3 bg-[#DC2626] hover:bg-[#0F172A] text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md mt-6"
+                  className="w-full py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md mt-6"
                 >
                   <Lock className="h-4 w-4" />
                   <span>

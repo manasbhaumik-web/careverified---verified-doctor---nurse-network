@@ -67,7 +67,7 @@ export default function SavedTab({
             <div className="pt-2">
               <button 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#DC2626] hover:bg-[#0F172A] text-white text-sm font-bold rounded-xl transition-all shadow-sm shadow-rose-500/20"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold rounded-xl transition-all shadow-sm shadow-rose-500/20"
               >
                 <Search className="h-4 w-4" />
                 Explore Registry

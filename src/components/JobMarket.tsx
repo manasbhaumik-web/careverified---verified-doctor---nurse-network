@@ -273,7 +273,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                 <button
                   type="submit"
                   disabled={formLoading}
-                  className="bg-[#DC2626] hover:bg-[#0F172A] disabled:bg-rose-400 text-white text-xs font-bold px-8 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] cursor-pointer"
+                  className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-rose-400 text-white text-xs font-bold px-8 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] cursor-pointer"
                 >
                   {formLoading && <Loader className="h-3 w-3 animate-spin" />}
                   Publish Job Vacancy
@@ -423,7 +423,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                         className={`text-xs font-bold py-2 px-4 rounded-xl transition-all shadow-sm flex items-center gap-1 cursor-pointer ${
                           hasApplied 
                             ? "bg-emerald-50 border-2 border-emerald-100 text-emerald-800 cursor-not-allowed" 
-                            : "bg-[#DC2626] hover:bg-[#0F172A] text-white hover:scale-[1.02]"
+                            : "bg-[#DC2626] hover:bg-[#B91C1C] text-white hover:scale-[1.02]"
                         }`}
                       >
                         {hasApplied ? (
@@ -510,7 +510,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                       className={`text-xs font-bold py-2 px-4 rounded-xl transition-all shadow-sm flex items-center gap-1 cursor-pointer ${
                         hasApplied 
                           ? "bg-emerald-50 border-2 border-emerald-100 text-emerald-800 cursor-not-allowed" 
-                          : "bg-[#DC2626] hover:bg-[#0F172A] text-white hover:scale-[1.02]"
+                          : "bg-[#DC2626] hover:bg-[#B91C1C] text-white hover:scale-[1.02]"
                       }`}
                     >
                       {hasApplied ? (
@@ -652,7 +652,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                 className={`flex-1 text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer ${
                   appliedJobs.includes(selectedModalJob.id) 
                     ? "bg-emerald-50 border-2 border-emerald-100 text-emerald-800 cursor-not-allowed" 
-                    : "bg-[#DC2626] hover:bg-[#0F172A] text-white hover:scale-[1.01]"
+                    : "bg-[#DC2626] hover:bg-[#B91C1C] text-white hover:scale-[1.01]"
                 }`}
               >
                 {appliedJobs.includes(selectedModalJob.id) ? (

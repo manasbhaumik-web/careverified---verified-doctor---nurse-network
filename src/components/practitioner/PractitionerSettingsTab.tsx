@@ -410,7 +410,7 @@ export default function PractitionerSettingsTab({
               />
               <div className="space-y-1 flex-1 min-w-0">
                 <div className="flex items-center gap-1 flex-wrap">
-                  <h4 className="font-serif text-sm font-semibold text-slate-850 truncate leading-snug">{matchedProfile.name}</h4>
+                  <h4 className="font-sans text-sm font-semibold text-slate-850 truncate leading-snug">{matchedProfile.name}</h4>
                   {isVerified && <Shield className="h-3.5 w-3.5 text-emerald-500 fill-emerald-500 shrink-0" />}
                 </div>
 

@@ -245,7 +245,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
               </pre>
               <button
                 onClick={copyToClipboard}
-                className="absolute top-4 right-4 bg-[#DC2626] hover:bg-[#0F172A] text-white rounded-lg px-3.5 py-2 text-xs font-bold flex items-center gap-1.5 transition-all hover:scale-[1.02] shadow-md cursor-pointer"
+                className="absolute top-4 right-4 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-lg px-3.5 py-2 text-xs font-bold flex items-center gap-1.5 transition-all hover:scale-[1.02] shadow-md cursor-pointer"
               >
                 {copied ? <CheckCircle className="h-3.5 w-3.5 text-white" /> : <Copy className="h-3.5 w-3.5 text-white" />}
                 {copied ? 'Copied!' : 'Copy Code'}
@@ -492,7 +492,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }}
-                  className="absolute top-3 right-3 bg-[#DC2626] hover:bg-[#0F172A] text-white rounded-lg px-2.5 py-1.5 text-[10px] font-bold flex items-center gap-1 shadow-md transition-all cursor-pointer"
+                  className="absolute top-3 right-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-lg px-2.5 py-1.5 text-[10px] font-bold flex items-center gap-1 shadow-md transition-all cursor-pointer"
                 >
                   {copied ? <CheckCircle className="h-3 w-3 text-white" /> : <Copy className="h-3 w-3 text-white" />}
                   {copied ? 'Copied!' : 'Copy Schema'}

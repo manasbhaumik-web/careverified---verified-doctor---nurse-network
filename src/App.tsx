@@ -526,21 +526,25 @@ export default function App() {
                   description="Direct directory of practitioners with active, verified MMC and LJM licensing registration codes."
                 />
 
-                {/* Tab Button Group to switch between Directory List and AI Symptom Triage */}
-                <div className="flex flex-col sm:flex-row items-center justify-between bg-white border border-[#FECDD3] p-3 rounded-none shadow-3xs gap-3">
-                  <div className="inline-flex bg-slate-100 p-1 border border-slate-200 rounded-none gap-1 w-full sm:w-auto">
+                {/* Standardized Tab Button Group */}
+                <div className="flex flex-col sm:flex-row items-center justify-between bg-[#FFF0F2]/50 border border-[#FECDD3] p-2.5 rounded-none shadow-3xs gap-3">
+                  <div className="inline-flex bg-white p-1 border border-[#FECDD3] rounded-none gap-1 w-full sm:w-auto">
                     <button
                       onClick={() => setRegistryTab('directory')}
-                      className={`flex-1 sm:flex-initial px-5 py-2.5 text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer rounded-none ${
+                      className={`flex-1 sm:flex-initial px-5 py-2 text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer border rounded-none ${
                         registryTab === 'directory'
-                          ? 'bg-[#DC2626] text-white shadow-3xs'
-                          : 'text-slate-700 bg-white hover:bg-slate-50'
+                          ? 'bg-[#DC2626] text-white border-[#B91C1C] shadow-3xs'
+                          : 'bg-white text-slate-700 border-transparent hover:text-[#DC2626] hover:bg-[#FFF0F2]'
                       }`}
                     >
-                      <UserCheck className="h-4 w-4" />
+                      <UserCheck className={`h-4 w-4 ${registryTab === 'directory' ? 'text-white' : 'text-[#DC2626]'}`} />
                       <span>Medical Directory List</span>
                       {selectedSpecialtyFilter && (
-                        <span className="bg-[#FFF0F2] text-[#DC2626] border border-[#FECDD3] text-[9px] px-2 py-0.5 font-black uppercase rounded-none">
+                        <span className={`text-[9px] px-2 py-0.5 font-black uppercase rounded-none border ${
+                          registryTab === 'directory'
+                            ? 'bg-white text-[#DC2626] border-white'
+                            : 'bg-[#FFF0F2] text-[#DC2626] border-[#FECDD3]'
+                        }`}>
                           {selectedSpecialtyFilter}
                         </span>
                       )}
@@ -548,13 +552,13 @@ export default function App() {
 
                     <button
                       onClick={() => setRegistryTab('triage')}
-                      className={`flex-1 sm:flex-initial px-5 py-2.5 text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer rounded-none ${
+                      className={`flex-1 sm:flex-initial px-5 py-2 text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer border rounded-none ${
                         registryTab === 'triage'
-                          ? 'bg-[#DC2626] text-white shadow-3xs'
-                          : 'text-slate-700 bg-white hover:bg-slate-50'
+                          ? 'bg-[#DC2626] text-white border-[#B91C1C] shadow-3xs'
+                          : 'bg-white text-slate-700 border-transparent hover:text-[#DC2626] hover:bg-[#FFF0F2]'
                       }`}
                     >
-                      <Activity className="h-4 w-4 text-[#DC2626]" />
+                      <Activity className={`h-4 w-4 ${registryTab === 'triage' ? 'text-white' : 'text-[#DC2626]'}`} />
                       <span>AI Symptom Triage &amp; Search</span>
                     </button>
                   </div>
@@ -562,7 +566,7 @@ export default function App() {
                   {selectedSpecialtyFilter && (
                     <button
                       onClick={() => setSelectedSpecialtyFilter('')}
-                      className="text-xs font-extrabold text-[#DC2626] bg-[#FFF0F2] border border-[#FECDD3] px-3 py-1.5 hover:bg-[#DC2626] hover:text-white transition-all cursor-pointer rounded-none flex items-center gap-1.5 shrink-0"
+                      className="text-xs font-extrabold text-[#DC2626] bg-white border border-[#FECDD3] px-3 py-1.5 hover:bg-[#DC2626] hover:text-white transition-all cursor-pointer rounded-none flex items-center gap-1.5 shrink-0 shadow-3xs"
                     >
                       <span>Clear Filter ({selectedSpecialtyFilter})</span>
                       <span>&times;</span>

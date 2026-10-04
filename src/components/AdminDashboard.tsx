@@ -442,7 +442,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                       />
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <h4 className="font-serif text-sm font-semibold text-slate-800 truncate">{reqName}</h4>
+                          <h4 className="font-sans text-sm font-semibold text-slate-800 truncate">{reqName}</h4>
                           <span className={`text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
                             reqRole === UserRole.DOCTOR ? "bg-[#FFF0F2] text-[#B91C1C] border border-[#FECDD3]" : "bg-emerald-50 text-emerald-800 border border-emerald-100"
                           }`}>
@@ -470,7 +470,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                       <button
                         type="button"
                         onClick={() => handleApprove(req.id)}
-                        className="bg-[#DC2626] hover:bg-[#0F172A] text-white rounded-xl py-2 px-3 text-xs font-bold flex items-center gap-1 shadow-3xs transition-all cursor-pointer"
+                        className="bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl py-2 px-3 text-xs font-bold flex items-center gap-1 shadow-3xs transition-all cursor-pointer"
                       >
                         <Check className="h-3.5 w-3.5" />
                         <span>Approve</span>
@@ -552,7 +552,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                   <div className="flex flex-row justify-end gap-2 shrink-0 border-t border-slate-100 pt-4 mt-2">
                     <button
                       onClick={() => handleApprove(req.id)}
-                      className="bg-[#DC2626] hover:bg-[#0F172A] text-white rounded-xl py-2 px-5 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all"
+                      className="bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl py-2 px-5 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all"
                     >
                       <Check className="h-4 w-4" />
                       Approve & Publish
@@ -609,7 +609,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                   }`}>
                     {(selectedModalRequest.userType || selectedModalRequest.role) === UserRole.DOCTOR ? "Doctor Application" : "Nurse Application"}
                   </span>
-                  <h3 className="font-serif text-xl font-semibold text-slate-800 leading-tight">
+                  <h3 className="font-sans text-xl font-semibold text-slate-800 leading-tight">
                     {selectedModalRequest.userName || selectedModalRequest.name}
                   </h3>
                   <p className="text-xs text-slate-500 font-bold flex items-center gap-1.5">
@@ -682,7 +682,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                   handleApprove(selectedModalRequest.id);
                   setSelectedModalRequest(null);
                 }}
-                className="px-5 py-2.5 bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-extrabold rounded-xl shadow-md shadow-rose-500/10 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-5 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-extrabold rounded-xl shadow-md shadow-rose-500/10 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <Check className="h-4 w-4" />
                 <span>Approve & Publish</span>
@@ -752,7 +752,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 <button
                   type="button"
                   onClick={() => setShowCustomForm(!showCustomForm)}
-                  className="w-full sm:w-auto px-4 py-2.5 bg-[#DC2626] hover:bg-[#0F172A] text-white rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
                   <Plus className="h-4 w-4" />
                   <span>Compile Custom Package</span>
@@ -894,7 +894,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 <button
                   type="submit"
                   disabled={isCompiling}
-                  className="px-5 py-2 bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-extrabold rounded-xl shadow-md flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-extrabold rounded-xl shadow-md flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
                 >
                   {isCompiling ? <Loader className="h-4 w-4 animate-spin" /> : <Settings className="h-4 w-4 animate-spin" />}
                   <span>Compile & Hot-Install Package</span>

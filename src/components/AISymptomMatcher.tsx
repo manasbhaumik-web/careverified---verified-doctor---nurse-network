@@ -112,7 +112,7 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
         <button
           type="submit"
           disabled={loading || !symptoms.trim()}
-          className="w-full bg-[#DC2626] hover:bg-[#0F172A] disabled:bg-rose-400 text-white rounded-xl py-3 text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+          className="w-full bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-rose-400 text-white rounded-xl py-3 text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
         >
           {loading ? (
             <>
@@ -179,7 +179,7 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
             </span>
             <button
               onClick={handleApplyFilter}
-              className="bg-[#DC2626] hover:bg-[#0F172A] text-white rounded-lg px-4 py-2 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all hover:scale-[1.02]"
+              className="bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-lg px-4 py-2 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all hover:scale-[1.02]"
             >
               Filter Doctors & Nurses
               <ChevronRight className="h-3 w-3" />

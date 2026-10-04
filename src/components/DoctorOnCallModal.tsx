@@ -420,7 +420,7 @@ export default function DoctorOnCallModal({
                   <button
                     type="button"
                     onClick={addCustomSymptom}
-                    className="bg-[#DC2626] hover:bg-[#0F172A] text-white text-[11px] font-extrabold px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-3xs"
+                    className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-extrabold px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-3xs"
                   >
                     Add
                   </button>
@@ -430,7 +430,7 @@ export default function DoctorOnCallModal({
               {/* Action */}
               <button
                 type="submit"
-                className="w-full py-3 bg-[#DC2626] hover:bg-[#0F172A] text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                className="w-full py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
               >
                 <span>Find Near-Home Medical Dispatchers</span>
                 <ArrowRight className="h-4 w-4" />
@@ -519,7 +519,7 @@ export default function DoctorOnCallModal({
                 <button
                   type="button"
                   onClick={() => setStep(3)}
-                  className="flex-1 py-2.5 bg-[#DC2626] hover:bg-[#0F172A] text-white rounded-xl text-xs font-black transition-all cursor-pointer shadow-md text-center"
+                  className="flex-1 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl text-xs font-black transition-all cursor-pointer shadow-md text-center"
                 >
                   Proceed to Secure Checkout
                 </button>
@@ -572,7 +572,7 @@ export default function DoctorOnCallModal({
                 <button
                   type="button"
                   onClick={() => setShowCheckout(true)}
-                  className="flex-1 py-3 bg-[#DC2626] hover:bg-[#0F172A] text-white rounded-xl text-xs font-black transition-all cursor-pointer shadow-md flex items-center justify-center gap-2"
+                  className="flex-1 py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl text-xs font-black transition-all cursor-pointer shadow-md flex items-center justify-center gap-2"
                 >
                   <CreditCard className="h-4 w-4" />
                   <span>Launch Secure Payment</span>
@@ -734,7 +734,7 @@ export default function DoctorOnCallModal({
           {step === 4 && (
             <button
               onClick={onClose}
-              className="px-5 py-2 bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-black rounded-xl transition-all cursor-pointer"
+              className="px-5 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black rounded-xl transition-all cursor-pointer"
             >
               Minimize Tracker
             </button>

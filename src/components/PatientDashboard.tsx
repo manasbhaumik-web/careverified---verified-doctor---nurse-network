@@ -876,7 +876,7 @@ export default function PatientDashboard({
 
                 {/* Rx Medicine grid */}
                 <div className="space-y-3 mb-6 relative">
-                  <div className="absolute top-0 right-4 text-8xl font-black text-slate-100 pointer-events-none opacity-50 select-none font-serif">Rx</div>
+                  <div className="absolute top-0 right-4 text-8xl font-black text-slate-100 pointer-events-none opacity-50 select-none font-sans">Rx</div>
                   <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest block flex items-center gap-1.5">
                     <FileSignature className="h-3.5 w-3.5" />
                     Prescribed Medications
@@ -913,7 +913,7 @@ export default function PatientDashboard({
                   </div>
                   <div className="text-center sm:text-right flex flex-col items-end">
                     <div className="w-40 border-b-2 border-slate-800 pb-2 mb-2">
-                      <span className="font-mono text-lg font-black text-slate-700 italic opacity-80" style={{ fontFamily: "'Dancing Script', cursive, serif" }}>
+                      <span className="font-sans text-lg font-black text-slate-700 italic opacity-80">
                         {selectedPrescriptionBooking.professionalName}
                       </span>
                     </div>
@@ -937,7 +937,7 @@ export default function PatientDashboard({
               <button
                 onClick={handlePrintPrescription}
                 disabled={isPrinting}
-                className="flex-1 bg-[#DC2626] hover:bg-[#0F172A] disabled:bg-rose-400 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 hover:scale-[1.01] cursor-pointer"
+                className="flex-1 bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-rose-400 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 hover:scale-[1.01] cursor-pointer"
               >
                 {isPrinting ? (
                   <>
@@ -1282,7 +1282,7 @@ export default function PatientDashboard({
                     </div>
                     <div className="bg-slate-100 border border-slate-200 p-4 rounded-xl text-center">
                       <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Signature Preview</span>
-                      <p className="font-serif italic text-xl text-[#0F172A] tracking-wide select-none">
+                      <p className="font-sans italic text-xl text-[#0F172A] tracking-wide select-none">
                         {typedSignature || (professionals.find(p => p.id === prescDoctorId)?.name || 'Dr. Ananya Sen')}
                       </p>
                     </div>
@@ -1308,7 +1308,7 @@ export default function PatientDashboard({
                 <button
                   type="button"
                   onClick={handleIssueEPrescriptionSubmit}
-                  className="bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-bold py-2.5 px-6 rounded-xl transition-all shadow-md flex items-center gap-1.5 hover:scale-[1.01] cursor-pointer"
+                  className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold py-2.5 px-6 rounded-xl transition-all shadow-md flex items-center gap-1.5 hover:scale-[1.01] cursor-pointer"
                 >
                   <FileSignature className="h-4 w-4" />
                   Issue Prescription
@@ -1428,7 +1428,7 @@ export default function PatientDashboard({
                     }
                     setShowGenerateModal(true);
                   }}
-                  className="bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-bold py-3.5 px-6 rounded-full transition-all shadow-md hover:scale-105 cursor-pointer flex items-center gap-1.5"
+                  className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold py-3.5 px-6 rounded-full transition-all shadow-md hover:scale-105 cursor-pointer flex items-center gap-1.5"
                   title="Draft digital prescription for active patient"
                 >
                   <FileSignature className="h-4 w-4" />
