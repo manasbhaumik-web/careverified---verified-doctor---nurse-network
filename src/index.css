@@ -3,100 +3,24 @@
 
 @theme {
   /* -------------------------------------------------------------
-   * UNIFIED APPLICATION DESIGN SYSTEM TOKENS
-   * Layer 1: Primitives
-   * Layer 2: Semantic System Tokens
-   * Layer 3: Component Specifications & Typography
+   * CAREVERIFIED UNIFIED DESIGN SYSTEM TOKENS
    * ------------------------------------------------------------- */
 
-  /* Layer 1: Primitives */
-  --color-cross: #dc2626;
-  --color-cross-dark: #b91c1c;
-  --color-cross-tint: #ffe4e6;
-  --color-ink: #1e293b;
+  /* Brand Colors */
+  --color-primary: #dc2626;
+  --color-primary-hover: #b91c1c;
+  --color-primary-light: #fff1f2;
+  --color-primary-border: #fecdd3;
+  --color-ink-heading: #0f172a;
   --color-ink-body: #334155;
 
-  /* Layer 2: Semantic System Tokens */
-  --sys-bg-hero: #fff0f2;
-  --sys-border-hairline: #fecdd3;
-  --sys-text-primary: #1e293b;
-  --sys-text-body: #334155;
-  --sys-brand-red: #dc2626;
-  --sys-brand-red-dark: #b91c1c;
-
-  /* Layer 3: Typography (100% Inter across display & body) */
-  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* Typography */
+  --font-display: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  /* Unified App-Wide Color Scale Remapping: CareVerified Crimson + Modern Slate Theme */
-  --color-blue-50: #fff1f2;
-  --color-blue-100: #ffe4e6;
-  --color-blue-200: #fecdd3;
-  --color-blue-300: #fda4af;
-  --color-blue-400: #ff8a98;
-  --color-blue-500: #e0243f;
-  --color-blue-600: #dc2626;
-  --color-blue-700: #b91c1c;
-  --color-blue-800: #86102a;
-  --color-blue-900: #6b0f24;
-  --color-blue-950: #3d0713;
-
-  --color-teal-50: #fff1f2;
-  --color-teal-100: #ffe4e6;
-  --color-teal-200: #fecdd3;
-  --color-teal-300: #fda4af;
-  --color-teal-400: #ff8a98;
-  --color-teal-500: #e0243f;
-  --color-teal-600: #dc2626;
-  --color-teal-700: #b91c1c;
-  --color-teal-800: #86102a;
-  --color-teal-900: #6b0f24;
-  --color-teal-950: #3d0713;
-
-  --color-indigo-50: #fff1f2;
-  --color-indigo-100: #ffe4e6;
-  --color-indigo-200: #fecdd3;
-  --color-indigo-300: #fda4af;
-  --color-indigo-400: #ff8a98;
-  --color-indigo-500: #e0243f;
-  --color-indigo-600: #dc2626;
-  --color-indigo-700: #b91c1c;
-  --color-indigo-800: #86102a;
-  --color-indigo-900: #6b0f24;
-  --color-indigo-950: #3d0713;
-
-  --color-purple-50: #fff1f2;
-  --color-purple-100: #ffe4e6;
-  --color-purple-200: #fecdd3;
-  --color-purple-300: #fda4af;
-  --color-purple-400: #ff8a98;
-  --color-purple-500: #e0243f;
-  --color-purple-600: #dc2626;
-  --color-purple-700: #b91c1c;
-  --color-purple-800: #86102a;
-  --color-purple-900: #6b0f24;
-
-  --color-sky-50: #fff1f2;
-  --color-sky-100: #ffe4e6;
-  --color-sky-200: #fecdd3;
-  --color-sky-300: #fda4af;
-  --color-sky-400: #ff8a98;
-  --color-sky-500: #e0243f;
-  --color-sky-600: #dc2626;
-  --color-sky-700: #b91c1c;
-
-  --color-cyan-50: #fff1f2;
-  --color-cyan-100: #ffe4e6;
-  --color-cyan-200: #fecdd3;
-  --color-cyan-300: #fda4af;
-  --color-cyan-400: #ff8a98;
-  --color-cyan-500: #e0243f;
-  --color-cyan-600: #dc2626;
-  --color-cyan-700: #b91c1c;
-
-  /* Neutral Modern Slate Ink scale */
+  /* Neutral Slate Palette Override */
   --color-slate-50: #fdfbfb;
   --color-slate-100: #fff0f2;
   --color-slate-200: #ffe4e6;
@@ -111,7 +35,7 @@
 }
 
 /* -------------------------------------------------------------
- * GLOBAL UNIFIED BASE STYLES & APPLICATION-WIDE OVERRIDES
+ * GLOBAL UNIFIED BASE STYLES
  * ------------------------------------------------------------- */
 
 :root {
@@ -129,13 +53,10 @@ html, body {
 }
 
 /* -------------------------------------------------------------
- * GEOMETRY RULES:
- * 1. ALL Profile Pictures: MUST have circular round corner effect (border-radius: 9999px)
- * 2. ALL Blinking / Pulse Indicator Dots: MUST have circular round corner effect (border-radius: 9999px)
- * 3. ALL OTHER CONTAINERS, CARDS, BUTTONS, INPUTS, BADGES, TABS, MODALS: STRICTLY ZERO ROUND CORNERS (border-radius: 0px)
+ * GEOMETRY RULES
  * ------------------------------------------------------------- */
 
-/* Profile Picture Round Corner Effect across all components */
+/* Circular geometry for profile pictures and avatars */
 img, 
 .avatar, 
 .profile-pic, 
@@ -143,7 +64,7 @@ img,
   border-radius: 9999px !important;
 }
 
-/* Blinking Dots & Live Pulse Indicator Round Corner Effect across all components */
+/* Circular geometry for live status indicators and pulse dots */
 .animate-ping,
 .animate-pulse,
 [class*="animate-ping"],
@@ -154,42 +75,100 @@ img,
   border-radius: 9999px !important;
 }
 
-/* ALL OTHER UI ELEMENTS: STRICTLY ZERO ROUNDED CORNERS (rectangular sharp geometry) */
-button,
-input,
-select,
-textarea,
-div:not(.animate-ping):not(.animate-pulse):not(.status-dot):not(.live-dot):not(.pulse-dot),
-span:not(.animate-ping):not(.animate-pulse):not(.status-dot):not(.live-dot):not(.pulse-dot),
-header,
-nav,
-aside,
-section,
-form,
-article,
-main,
-a {
-  border-radius: 0px !important;
-}
-
 /* -------------------------------------------------------------
- * ZERO BLACK BACKGROUND ENFORCEMENT & LIGHT SURFACE REMAPPING
- * Transforms dark card surfaces across the app to light CareVerified surfaces
- * EXCEPTION: Application Footer is explicitly styled with a dark contrasting palette
+ * UNIFIED COMPONENT UTILITY CLASSES
  * ------------------------------------------------------------- */
 
-:not(footer):not(.app-dark-footer).bg-slate-900,
-:not(footer):not(.app-dark-footer).bg-slate-950,
-:not(footer):not(.app-dark-footer).bg-black,
-:not(footer):not(.app-dark-footer).bg-zinc-900,
-:not(footer):not(.app-dark-footer).bg-gray-900 {
-  background-color: #FFF0F2 !important;
-  color: #1E293B !important;
-  border-color: #FECDD3 !important;
+.hero-banner-rose {
+  background-image: linear-gradient(to right, #FFF1F2, #FFF5F5, #FFE4E6);
+  border-left-width: 8px;
+  border-left-color: #DC2626;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+  border-color: #FECDD3;
+  color: #0F172A;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.btn-primary {
+  background-color: #DC2626;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.625rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #DC2626;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #B91C1C;
+  border-color: #B91C1C;
+}
+
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: #DC2626;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.625rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #FECDD3;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: #FFF0F2;
+  border-color: #DC2626;
+}
+
+.card-elevated {
+  background-color: #FFFFFF;
+  border: 1px solid #FECDD3;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.card-elevated:hover {
+  border-color: #DC2626;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.badge-status-green {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background-color: #ECFDF5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+}
+
+.badge-status-red {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background-color: #FFF1F2;
+  color: #BE123C;
+  border: 1px solid #FECDD3;
 }
 
 /* -------------------------------------------------------------
- * APPLICATION DARK FOOTER SYSTEM (High Contrast Dark Slate Palette)
+ * APPLICATION DARK FOOTER SYSTEM
  * ------------------------------------------------------------- */
 
 footer,
