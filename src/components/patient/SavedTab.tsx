@@ -88,11 +88,11 @@ export default function SavedTab({
               <motion.div 
                 variants={itemVariants}
                 key={p.id} 
-                className="group relative bg-white border border-slate-200/80 hover:border-teal-500/40 rounded-none p-6 shadow-sm transition-all duration-300 flex flex-col justify-between space-y-5 hover:shadow-lg overflow-hidden"
+                className="group relative bg-white border border-slate-200/80 hover:border-teal-500/40 rounded-[28px] p-6 shadow-sm transition-all duration-300 flex flex-col justify-between space-y-5 hover:shadow-lg overflow-hidden"
               >
                 {/* Accent top border */}
                 <div className={`absolute top-0 left-0 right-0 h-[4px] transition-colors duration-300 ${
-                  isDoc ? 'bg-teal-500/80' : 'bg-rose-500/80'
+                  isDoc ? 'bg-teal-500/80' : 'bg-[#DC2626]/80'
                 }`} />
 
                 <div className="space-y-5 pt-1">
@@ -103,14 +103,14 @@ export default function SavedTab({
                         <img 
                           src={p.avatar} 
                           alt={p.name} 
-                          className={`h-14 w-14 rounded-full object-cover border-2 shadow-sm shrink-0 group-hover:scale-105 transition-transform duration-300 ${isDoc ? 'border-teal-100' : 'border-rose-100'}`}
+                          className={`h-14 w-14 rounded-full object-cover border-2 shadow-sm shrink-0 group-hover:scale-105 transition-transform duration-300 ${isDoc ? 'border-teal-100' : 'border-[#FECDD3]'}`}
                           referrerPolicy="no-referrer"
                         />
                         <span className="absolute -bottom-1 -right-1 bg-emerald-500 border-2 border-white rounded-full h-3.5 w-3.5 shadow-sm" />
                       </div>
                       <div className="space-y-1">
-                        <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-none border ${
-                          isDoc ? "bg-teal-50 text-teal-700 border-teal-100" : "bg-rose-50 text-rose-700 border-rose-100"
+                        <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-md border ${
+                          isDoc ? "bg-teal-50 text-teal-700 border-teal-100" : "bg-[#FFF0F2] text-[#DC2626] border-[#FECDD3]"
                         }`}>
                           {isDoc ? "Verified Doctor" : "Clinical Nurse"}
                           <CheckCircle2 className="h-3 w-3 shrink-0" />
@@ -163,7 +163,7 @@ export default function SavedTab({
                     </button>
                     <button
                       onClick={() => onSelectProfessional(p.id)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black py-3 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow-md active:scale-95"
+                      className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-black py-3 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow-md active:scale-95"
                     >
                       <CalendarRange className="h-3.5 w-3.5" />
                       <span>Book Slot</span>

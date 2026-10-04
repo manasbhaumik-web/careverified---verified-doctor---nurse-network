@@ -301,7 +301,7 @@ export default function MedicalHistory() {
       <div className="border-b-2 border-slate-200/80 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
-            <Lock className="h-4.5 w-4.5 text-blue-600" />
+            <Lock className="h-4.5 w-4.5 text-[#DC2626]" />
             SECURED PATIENT CLINICAL HISTORY
           </h3>
           <p className="text-[11px] text-slate-500 font-semibold mt-0.5">
@@ -310,7 +310,7 @@ export default function MedicalHistory() {
         </div>
         <button
           onClick={() => setIsUploadingOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 hover:scale-[1.01] shrink-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 hover:scale-[1.01] shrink-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#DC2626]"
         >
           <Plus className="h-4 w-4" />
           Add Medical Record
@@ -327,7 +327,7 @@ export default function MedicalHistory() {
             placeholder="Search documents, diagnostics, or providers..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full text-xs font-semibold pl-10 pr-4 py-2.5 bg-slate-50 border-2 border-slate-150 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-150"
+            className="w-full text-xs font-semibold pl-10 pr-4 py-2.5 bg-slate-50 border-2 border-slate-150 rounded-xl focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/20 focus:outline-none transition-all duration-150"
           />
         </div>
 
@@ -338,9 +338,9 @@ export default function MedicalHistory() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all duration-150 cursor-pointer border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all duration-150 cursor-pointer border focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-rose-300 ${
                 selectedCategory === cat 
-                  ? 'bg-blue-50 border-blue-200 text-blue-800 font-extrabold' 
+                  ? 'bg-[#FFF0F2] border-[#FECDD3] text-[#B91C1C] font-extrabold' 
                   : 'bg-transparent border-transparent text-slate-500 hover:bg-slate-100 hover:text-slate-800'
               }`}
             >
@@ -362,7 +362,7 @@ export default function MedicalHistory() {
           </div>
           <button
             onClick={() => setIsUploadingOpen(true)}
-            className="text-xs font-bold text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-4 py-2 rounded-xl transition-all cursor-pointer"
+            className="text-xs font-bold text-[#DC2626] hover:text-[#B91C1C] hover:bg-[#FFF0F2] px-4 py-2 rounded-xl transition-all cursor-pointer"
           >
             Upload first document
           </button>
@@ -399,23 +399,23 @@ export default function MedicalHistory() {
                     setActiveRecordDetail(record);
                   }
                 }}
-                className="bg-white border-2 border-slate-200/80 hover:border-blue-400 rounded-none p-5 shadow-xs transition-all duration-200 flex flex-col justify-between hover:scale-[1.01] cursor-pointer group relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="bg-white border-2 border-slate-200/80 hover:border-[#FECDD3] rounded-2xl p-5 shadow-xs transition-all duration-200 flex flex-col justify-between hover:scale-[1.01] cursor-pointer group relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626]"
               >
                 {/* Visual Category Accent strip */}
                 <div className={`absolute top-0 left-0 right-0 h-1 ${
-                  record.category === 'Lab Result' ? 'bg-cyan-600' :
+                  record.category === 'Lab Result' ? 'bg-[#DC2626]' :
                   record.category === 'Vaccination Card' ? 'bg-emerald-500' :
-                  record.category === 'Imaging/Scan' ? 'bg-rose-600' :
+                  record.category === 'Imaging/Scan' ? 'bg-[#DC2626]' :
                   record.category === 'Prescription' ? 'bg-amber-500' : 'bg-slate-400'
                 }`} />
 
                 <div className="space-y-4">
                   {/* Category & Status Badges */}
                   <div className="flex items-center justify-between">
-                    <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-none tracking-wider ${
-                      record.category === 'Lab Result' ? 'bg-cyan-50 text-cyan-800' :
+                    <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md tracking-wider ${
+                      record.category === 'Lab Result' ? 'bg-[#FFF0F2] text-[#DC2626]' :
                       record.category === 'Vaccination Card' ? 'bg-emerald-50 text-emerald-700' :
-                      record.category === 'Imaging/Scan' ? 'bg-rose-50 text-rose-800' :
+                      record.category === 'Imaging/Scan' ? 'bg-[#FFF0F2] text-[#DC2626]' :
                       record.category === 'Prescription' ? 'bg-amber-50 text-amber-700' : 'bg-slate-50 text-slate-600'
                     }`}>
                       {record.category}
@@ -430,7 +430,7 @@ export default function MedicalHistory() {
 
                   {/* Document Title & Provider */}
                   <div>
-                    <h4 className="text-xs font-extrabold text-slate-900 group-hover:text-blue-700 transition-colors line-clamp-1">{record.title}</h4>
+                    <h4 className="text-xs font-extrabold text-slate-900 group-hover:text-[#DC2626] transition-colors line-clamp-1">{record.title}</h4>
                     <p className="text-[10px] text-slate-400 font-semibold mt-1 flex items-center gap-1.5">
                       <Building className="h-3 w-3 shrink-0" />
                       <span className="truncate">{record.providerName}</span>
@@ -460,7 +460,7 @@ export default function MedicalHistory() {
                 {/* Card Actions */}
                 <div className="border-t border-slate-100 pt-3.5 mt-4 flex items-center justify-between text-xs font-bold text-slate-600">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-blue-600 font-extrabold group-hover:underline flex items-center gap-1">
+                    <span className="text-[10px] text-[#DC2626] font-extrabold group-hover:underline flex items-center gap-1">
                       <Eye className="h-3 w-3" />
                       Review Report
                     </span>
@@ -500,10 +500,10 @@ export default function MedicalHistory() {
           <div className="bg-white rounded-3xl w-full max-w-lg border-2 border-slate-200/80 shadow-2xl overflow-hidden flex flex-col justify-between max-h-[90vh]">
             
             {/* Header */}
-            <div className="bg-blue-700 text-white p-5 flex justify-between items-center shrink-0">
+            <div className="bg-[#0F172A] text-white p-5 flex justify-between items-center shrink-0">
               <div className="space-y-1">
                 <h4 className="text-sm font-extrabold tracking-tight flex items-center gap-1.5">
-                  <UploadCloud className="h-4.5 w-4.5 text-blue-400" />
+                  <UploadCloud className="h-4.5 w-4.5 text-rose-400" />
                   UPLOAD PATIENT HEALTH RECORD
                 </h4>
                 <p className="text-[10px] text-slate-300 font-semibold leading-relaxed">
@@ -531,7 +531,7 @@ export default function MedicalHistory() {
                   onClick={() => fileInputRef.current?.click()}
                   className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center space-y-2 ${
                     isDragging 
-                      ? 'border-blue-500 bg-blue-50/50' 
+                      ? 'border-[#DC2626] bg-[#FFF0F2]' 
                       : attachedFile 
                         ? 'border-emerald-300 bg-emerald-50/10 hover:bg-emerald-50/20' 
                         : 'border-slate-300 bg-slate-50 hover:bg-slate-100/50'
@@ -559,7 +559,7 @@ export default function MedicalHistory() {
                     </>
                   ) : (
                     <>
-                      <div className="bg-blue-50 text-blue-600 p-2.5 rounded-full border border-blue-100">
+                      <div className="bg-[#FFF0F2] text-[#DC2626] p-2.5 rounded-full border border-[#FECDD3]">
                         <UploadCloud className="h-6 w-6" />
                       </div>
                       <div className="space-y-1">
@@ -585,7 +585,7 @@ export default function MedicalHistory() {
                     placeholder="e.g. Fasting Lipid Panel, Pfizer Dose 3 Certificate"
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
-                    className="w-full text-xs font-semibold py-2.5 px-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-150"
+                    className="w-full text-xs font-semibold py-2.5 px-3 border-2 border-slate-200 rounded-xl focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/20 focus:outline-none transition-all duration-150"
                   />
                 </div>
 
@@ -596,7 +596,7 @@ export default function MedicalHistory() {
                     <select
                       value={newCategory}
                       onChange={(e) => setNewCategory(e.target.value as any)}
-                      className="w-full text-xs font-bold py-2.5 px-3 border-2 border-slate-200 rounded-xl bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-150"
+                      className="w-full text-xs font-bold py-2.5 px-3 border-2 border-slate-200 rounded-xl bg-white focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/20 focus:outline-none transition-all duration-150"
                     >
                       <option value="Lab Result">Lab Result</option>
                       <option value="Vaccination Card">Vaccination Card</option>
@@ -614,7 +614,7 @@ export default function MedicalHistory() {
                       required
                       value={newDate}
                       onChange={(e) => setNewDate(e.target.value)}
-                      className="w-full text-xs font-semibold py-2.5 px-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-150"
+                      className="w-full text-xs font-semibold py-2.5 px-3 border-2 border-slate-200 rounded-xl focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/20 focus:outline-none transition-all duration-150"
                     />
                   </div>
                 </div>
@@ -628,7 +628,7 @@ export default function MedicalHistory() {
                     placeholder="e.g. Kuala Lumpur Specialist Hospital, Metro Lab"
                     value={newProvider}
                     onChange={(e) => setNewProvider(e.target.value)}
-                    className="w-full text-xs font-semibold py-2.5 px-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-150"
+                    className="w-full text-xs font-semibold py-2.5 px-3 border-2 border-slate-200 rounded-xl focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/20 focus:outline-none transition-all duration-150"
                   />
                 </div>
 
@@ -640,20 +640,20 @@ export default function MedicalHistory() {
                     placeholder="Add brief details about the diagnostics, dosage rules, or clinician recommendations..."
                     value={newNotes}
                     onChange={(e) => setNewNotes(e.target.value)}
-                    className="w-full text-xs font-semibold p-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-150 resize-none"
+                    className="w-full text-xs font-semibold p-3 border-2 border-slate-200 rounded-xl focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/20 focus:outline-none transition-all duration-150 resize-none"
                   />
                 </div>
               </div>
 
               {/* Progress and status overlays */}
               {uploadProgress !== null && (
-                <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 space-y-1.5">
-                  <div className="flex justify-between items-center text-[10px] font-bold text-blue-800">
+                <div className="bg-[#FFF0F2] border border-[#FECDD3] rounded-xl p-3 space-y-1.5">
+                  <div className="flex justify-between items-center text-[10px] font-bold text-[#B91C1C]">
                     <span>Securing document files and hashing to MediCert Registry...</span>
                     <span>{uploadProgress}%</span>
                   </div>
-                  <div className="w-full bg-blue-100 h-2 rounded-full overflow-hidden">
-                    <div className="bg-blue-600 h-full transition-all duration-150" style={{ width: `${uploadProgress}%` }}></div>
+                  <div className="w-full bg-[#FFF0F2] h-2 rounded-full overflow-hidden">
+                    <div className="bg-[#DC2626] h-full transition-all duration-150" style={{ width: `${uploadProgress}%` }}></div>
                   </div>
                 </div>
               )}
@@ -684,7 +684,7 @@ export default function MedicalHistory() {
                   type="button"
                   onClick={handleUploadSubmit}
                   disabled={uploadProgress !== null || isUploadSuccess}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-5 rounded-xl transition-all shadow-md flex items-center gap-1.5 disabled:opacity-55 disabled:cursor-not-allowed hover:scale-[1.01] cursor-pointer"
+                  className="bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-bold py-2.5 px-5 rounded-xl transition-all shadow-md flex items-center gap-1.5 disabled:opacity-55 disabled:cursor-not-allowed hover:scale-[1.01] cursor-pointer"
                 >
                   <FileText className="h-4 w-4" />
                   Save Record
@@ -704,9 +704,9 @@ export default function MedicalHistory() {
           <div className="bg-white rounded-3xl w-full max-w-2xl border-2 border-slate-200/80 shadow-2xl overflow-hidden flex flex-col justify-between max-h-[90vh]">
             
             {/* Topbar */}
-            <div className="bg-blue-700 text-white p-5 flex justify-between items-center shrink-0">
+            <div className="bg-[#0F172A] text-white p-5 flex justify-between items-center shrink-0">
               <div className="space-y-1">
-                <span className="text-[9px] font-extrabold uppercase bg-blue-500/25 text-blue-300 border border-blue-500/30 px-2.5 py-0.5 rounded-full tracking-wider">
+                <span className="text-[9px] font-extrabold uppercase bg-[#DC2626]/25 text-rose-300 border border-[#DC2626]/30 px-2.5 py-0.5 rounded-full tracking-wider">
                   {activeRecordDetail.category}
                 </span>
                 <h4 className="text-sm font-extrabold tracking-tight mt-1">{activeRecordDetail.title}</h4>
@@ -726,7 +726,7 @@ export default function MedicalHistory() {
               <div className="bg-white border-2 border-slate-200/60 rounded-2xl p-4 shadow-xs space-y-3.5">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-2">
-                    <div className="h-8.5 w-8.5 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                    <div className="h-8.5 w-8.5 rounded-xl bg-[#FFF0F2] text-[#DC2626] flex items-center justify-center border border-[#FECDD3]">
                       <ShieldCheck className="h-4.5 w-4.5" />
                     </div>
                     <div>
@@ -778,7 +778,7 @@ export default function MedicalHistory() {
                 {/* CASE A: LAB RESULT RESULTS LIST */}
                 {activeRecordDetail.structuredData?.results && (
                   <div className="bg-white border-2 border-slate-200/60 rounded-2xl overflow-hidden shadow-xs">
-                    <div className="bg-blue-700 text-white px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-wider">
+                    <div className="bg-[#0F172A] text-white px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-wider">
                       {activeRecordDetail.structuredData.testName || 'Laboratory Analysis Breakdown'}
                     </div>
                     <div className="divide-y divide-slate-100">
@@ -849,12 +849,12 @@ export default function MedicalHistory() {
 
                 {/* CASE C: IMAGING FINDINGS TEXT */}
                 {activeRecordDetail.structuredData?.imagingFindings && (
-                  <div className="bg-white border-2 border-slate-200/60 rounded-none p-4.5 shadow-xs space-y-3">
+                  <div className="bg-white border-2 border-slate-200/60 rounded-2xl p-4.5 shadow-xs space-y-3">
                     <div className="flex items-center gap-2 border-b border-slate-100 pb-2.5">
-                      <span className="text-xs font-extrabold text-rose-800 bg-rose-50 px-2 py-0.5 rounded-none">PA View</span>
+                      <span className="text-xs font-extrabold text-[#DC2626] bg-[#FFF0F2] px-2 py-0.5 rounded">PA View</span>
                       <span className="text-xs font-extrabold text-slate-800">{activeRecordDetail.structuredData.testName}</span>
                     </div>
-                    <div className="text-xs text-slate-700 font-semibold leading-relaxed font-mono bg-slate-50 p-3.5 rounded-none border border-slate-100">
+                    <div className="text-xs text-slate-700 font-semibold leading-relaxed font-mono bg-slate-50 p-3.5 rounded-xl border border-slate-100">
                       {activeRecordDetail.structuredData.imagingFindings}
                     </div>
                   </div>
@@ -862,7 +862,7 @@ export default function MedicalHistory() {
 
                 {/* GENERAL NOTE IF PRESENT */}
                 {activeRecordDetail.notes && (
-                  <div className="bg-white border-2 border-slate-200/60 rounded-none p-4 shadow-xs space-y-1.5">
+                  <div className="bg-white border-2 border-slate-200/60 rounded-2xl p-4 shadow-xs space-y-1.5">
                     <span className="text-[9px] uppercase font-extrabold text-slate-400 block tracking-wide">Patient Clinical Remarks</span>
                     <p className="text-xs text-slate-600 font-semibold italic">
                       "{activeRecordDetail.notes}"
@@ -887,7 +887,7 @@ export default function MedicalHistory() {
                         e.preventDefault();
                         setActivePreviewRecord(activeRecordDetail);
                       }}
-                      className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      className="bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:ring-offset-2"
                     >
                       <Eye className="h-3.5 w-3.5" />
                       Interactive Lightbox Preview
@@ -895,7 +895,7 @@ export default function MedicalHistory() {
                     <a 
                       href="#" 
                       onClick={(e) => { e.preventDefault(); alert("Preparing digital download zip with verified GPG signature hash..."); }}
-                      className="bg-white border border-slate-200 hover:border-blue-500 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-bold px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="bg-white border border-slate-200 hover:border-[#DC2626] hover:bg-[#FFF0F2] text-slate-700 hover:text-[#DC2626] text-xs font-bold px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#DC2626]"
                     >
                       <Download className="h-3.5 w-3.5" />
                       Download Raw Document
@@ -921,7 +921,7 @@ export default function MedicalHistory() {
                 </button>
                 <button
                   onClick={() => setActiveRecordDetail(null)}
-                  className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 px-5 rounded-xl transition-all cursor-pointer"
+                  className="bg-[#DC2626] hover:bg-[#DC2626] text-white text-xs font-bold py-2.5 px-5 rounded-xl transition-all cursor-pointer"
                 >
                   Close Report
                 </button>

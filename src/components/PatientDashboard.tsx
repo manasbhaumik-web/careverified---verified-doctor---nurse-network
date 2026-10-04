@@ -183,7 +183,7 @@ export default function PatientDashboard({
     const rect = canvas.getBoundingClientRect();
     ctx.lineWidth = 2.5;
     ctx.lineCap = 'round';
-    ctx.strokeStyle = '#1e3a8a'; // dark blue
+    ctx.strokeStyle = '#0F172A'; // dark slate
     ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
     ctx.stroke();
   };
@@ -215,7 +215,7 @@ export default function PatientDashboard({
     const touch = e.touches[0];
     ctx.lineWidth = 2.5;
     ctx.lineCap = 'round';
-    ctx.strokeStyle = '#1e3a8a';
+    ctx.strokeStyle = '#0F172A';
     ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
     ctx.stroke();
   };
@@ -535,7 +535,7 @@ export default function PatientDashboard({
     <div className="w-full max-w-[1920px] mx-auto space-y-8" id="patient-dashboard-root">
       
       {/* EXECUTIVE CRIMSON METRIC BANNER (CONCEPT 3) */}
-      <div className="bg-gradient-to-r from-[#FFF1F2] via-[#FFF5F5] to-[#FFE4E6] border-l-8 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 rounded-none p-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-[#FFF1F2] via-[#FFF5F5] to-[#FFE4E6] border-l-8 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 rounded-2xl p-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 text-[#DC2626] text-xs font-black uppercase tracking-wider">
             <ShieldCheck className="h-4 w-4 text-emerald-600" />
@@ -551,7 +551,7 @@ export default function PatientDashboard({
 
         {/* High-Contrast Executive Metric Strip & Quick Actions */}
         <div className="flex flex-wrap items-center gap-4 shrink-0">
-          <div className="grid grid-cols-4 gap-3 bg-white/90 backdrop-blur-xs p-3 border border-[#FECDD3] rounded-none text-center min-w-[320px] shadow-xs">
+          <div className="grid grid-cols-4 gap-3 bg-white/90 backdrop-blur-xs p-3 border border-[#FECDD3] rounded-xl text-center min-w-[320px] shadow-xs">
             <div>
               <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{upcomingBookings.length}</span>
               <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Bookings</span>
@@ -573,7 +573,7 @@ export default function PatientDashboard({
           <div className="flex items-center gap-2">
             <button 
               onClick={() => setShowOnCallModal(true)} 
-              className="px-4 py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black rounded-none border border-[#DC2626] transition-all flex items-center gap-2 uppercase tracking-wider cursor-pointer shadow-sm hover:shadow-md"
+              className="px-4 py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black rounded-xl border border-[#DC2626] transition-all flex items-center gap-2 uppercase tracking-wider cursor-pointer shadow-sm hover:shadow-md"
             >
               <Ambulance className="h-4 w-4 text-white animate-bounce" />
               <span>{activeDispatch ? 'Track Triage' : 'Request On-Call'}</span>
@@ -672,7 +672,7 @@ export default function PatientDashboard({
       <div
         role="tablist"
         aria-label="Patient hub sections"
-        className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-none sticky top-20 bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs"
+        className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-xl sticky top-20 bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs"
       >
         {patientTabs.map(tab => (
           <button
@@ -684,7 +684,7 @@ export default function PatientDashboard({
             tabIndex={activeTab === tab.id ? 0 : -1}
             onClick={() => setActiveTab(tab.id as any)}
             onKeyDown={handlePatientTabKeyDown}
-            className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-none border transition-all ${
+            className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
               activeTab === tab.id
                 ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs'
                 : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
@@ -773,10 +773,10 @@ export default function PatientDashboard({
 
         {/* TAB 5: SECURED MEDICAL RECORDS / CLINICAL HISTORY */}
         {activeTab === 'records' && (
-          <div id="panel-records" role="tabpanel" aria-labelledby="tab-records" tabIndex={0} className="space-y-6 animate-fade-in bg-white border border-slate-200 rounded-none p-6 shadow-sm">
+          <div id="panel-records" role="tabpanel" aria-labelledby="tab-records" tabIndex={0} className="space-y-6 animate-fade-in bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
             <div className="border-b border-slate-150 pb-3.5">
               <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                <FolderHeart className="h-4.5 w-4.5 text-rose-600" />
+                <FolderHeart className="h-4.5 w-4.5 text-[#DC2626]" />
                 Medical Record Ledger
               </h3>
               <p className="text-[11px] text-slate-500 font-medium mt-0.5">
@@ -795,9 +795,9 @@ export default function PatientDashboard({
         <div className="fixed inset-0 bg-slate-100/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-white border-2 border-slate-200 rounded-3xl w-full max-w-xl shadow-xl overflow-hidden animate-slide-down flex flex-col max-h-[90vh]">
             {/* Header */}
-            <div className="bg-blue-700 text-white p-5 flex justify-between items-center">
+            <div className="bg-[#0F172A] text-white p-5 flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-blue-400" />
+                <FileText className="h-5 w-5 text-rose-400" />
                 <h4 className="text-sm font-extrabold uppercase tracking-wide">Verified Digital Rx Slip</h4>
               </div>
               <button 
@@ -937,7 +937,7 @@ export default function PatientDashboard({
               <button
                 onClick={handlePrintPrescription}
                 disabled={isPrinting}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 hover:scale-[1.01] cursor-pointer"
+                className="flex-1 bg-[#DC2626] hover:bg-[#0F172A] disabled:bg-rose-400 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 hover:scale-[1.01] cursor-pointer"
               >
                 {isPrinting ? (
                   <>
@@ -964,9 +964,9 @@ export default function PatientDashboard({
           <div className="bg-white border-2 border-slate-200 rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden animate-slide-down flex flex-col max-h-[92vh]">
             
             {/* Header banner */}
-            <div className="bg-blue-700 text-white p-5 flex justify-between items-center shrink-0">
+            <div className="bg-[#0F172A] text-white p-5 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <div className="bg-blue-600 p-2 rounded-xl text-white shadow-md">
+                <div className="bg-[#DC2626] p-2 rounded-xl text-white shadow-md">
                   <FileSignature className="h-5 w-5" />
                 </div>
                 <div>
@@ -990,7 +990,7 @@ export default function PatientDashboard({
             {/* Form Container */}
             <form onSubmit={handleIssueEPrescriptionSubmit} className="flex-1 overflow-y-auto p-6 space-y-6 text-slate-800">
               
-              <div className="bg-blue-50/50 border border-blue-100 p-3.5 rounded-xl text-xs font-semibold text-blue-900 leading-relaxed">
+              <div className="bg-[#FFF0F2] border border-[#FECDD3] p-3.5 rounded-xl text-xs font-semibold text-[#0F172A] leading-relaxed">
                 ℹ️ Enter medication and dosage details below to issue an e-prescription.
               </div>
 
@@ -999,7 +999,7 @@ export default function PatientDashboard({
                 
                 {/* Left Column: Patient & Prescribing Practitioner Details */}
                 <div className="space-y-4">
-                  <span className="text-xs font-extrabold text-blue-900 uppercase tracking-wider block border-b border-slate-100 pb-1">
+                  <span className="text-xs font-extrabold text-[#0F172A] uppercase tracking-wider block border-b border-slate-100 pb-1">
                     1. Patient & Practitioner Details
                   </span>
 
@@ -1009,7 +1009,7 @@ export default function PatientDashboard({
                       type="text" 
                       value={prescPatientName}
                       onChange={(e) => setPrescPatientName(e.target.value)}
-                      className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 bg-slate-50 focus:border-blue-500 focus:bg-white outline-none"
+                      className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 bg-slate-50 focus:border-[#DC2626] focus:bg-white outline-none"
                       required
                       placeholder="Enter patient's full name"
                     />
@@ -1022,7 +1022,7 @@ export default function PatientDashboard({
                         type="email" 
                         value={prescPatientEmail}
                         onChange={(e) => setPrescPatientEmail(e.target.value)}
-                        className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 bg-slate-50 focus:border-blue-500 focus:bg-white outline-none"
+                        className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 bg-slate-50 focus:border-[#DC2626] focus:bg-white outline-none"
                         required
                         placeholder="patient@email.com"
                       />
@@ -1033,7 +1033,7 @@ export default function PatientDashboard({
                         type="text" 
                         value={prescPatientPhone}
                         onChange={(e) => setPrescPatientPhone(e.target.value)}
-                        className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 bg-slate-50 focus:border-blue-500 focus:bg-white outline-none"
+                        className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 bg-slate-50 focus:border-[#DC2626] focus:bg-white outline-none"
                         required
                         placeholder="+601xxxxxxxx"
                       />
@@ -1045,7 +1045,7 @@ export default function PatientDashboard({
                     <select 
                       value={prescDoctorId}
                       onChange={(e) => setPrescDoctorId(e.target.value)}
-                      className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2.5 px-3 bg-slate-50 focus:border-blue-500 focus:bg-white outline-none cursor-pointer"
+                      className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2.5 px-3 bg-slate-50 focus:border-[#DC2626] focus:bg-white outline-none cursor-pointer"
                     >
                       {doctorsList.map((doc) => (
                         <option key={doc.id} value={doc.id}>
@@ -1065,7 +1065,7 @@ export default function PatientDashboard({
 
                 {/* Right Column: Diagnosis & Medicine Formulation */}
                 <div className="space-y-4">
-                  <span className="text-xs font-extrabold text-blue-900 uppercase tracking-wider block border-b border-slate-100 pb-1">
+                  <span className="text-xs font-extrabold text-[#0F172A] uppercase tracking-wider block border-b border-slate-100 pb-1">
                     2. Diagnosis & Medications
                   </span>
 
@@ -1075,7 +1075,7 @@ export default function PatientDashboard({
                       type="text" 
                       value={prescDiagnosis}
                       onChange={(e) => setPrescDiagnosis(e.target.value)}
-                      className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 bg-slate-50 focus:border-blue-500 focus:bg-white outline-none"
+                      className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 bg-slate-50 focus:border-[#DC2626] focus:bg-white outline-none"
                       required
                       placeholder="e.g. Hypertension stage 1 / Acute bronchitis"
                     />
@@ -1125,7 +1125,7 @@ export default function PatientDashboard({
                           placeholder="e.g. Metformin"
                           value={newMedName}
                           onChange={(e) => setNewMedName(e.target.value)}
-                          className="w-full text-xs font-bold border border-slate-200 rounded-lg py-1 px-2 outline-none focus:border-blue-500"
+                          className="w-full text-xs font-bold border border-slate-200 rounded-lg py-1 px-2 outline-none focus:border-[#DC2626]"
                         />
                       </div>
                       <div>
@@ -1135,7 +1135,7 @@ export default function PatientDashboard({
                           placeholder="e.g. 500mg"
                           value={newMedDosage}
                           onChange={(e) => setNewMedDosage(e.target.value)}
-                          className="w-full text-xs font-bold border border-slate-200 rounded-lg py-1 px-2 outline-none focus:border-blue-500"
+                          className="w-full text-xs font-bold border border-slate-200 rounded-lg py-1 px-2 outline-none focus:border-[#DC2626]"
                         />
                       </div>
                     </div>
@@ -1175,7 +1175,7 @@ export default function PatientDashboard({
                     <button
                       type="button"
                       onClick={handleAddMedicineItem}
-                      className="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold py-1.5 rounded-lg transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer"
+                      className="w-full bg-[#DC2626] hover:bg-[#DC2626] text-white text-xs font-extrabold py-1.5 rounded-lg transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <Plus className="h-3 w-3" />
                       Add Medication
@@ -1192,7 +1192,7 @@ export default function PatientDashboard({
                   onChange={(e) => setPrescInstructions(e.target.value)}
                   placeholder="e.g. Take plenty of fluids. Do not drink dairy within 2 hours of antibiotics."
                   rows={2}
-                  className="w-full text-xs font-semibold border-2 border-slate-200 rounded-xl p-3 bg-slate-50 focus:border-blue-500 focus:bg-white outline-none"
+                  className="w-full text-xs font-semibold border-2 border-slate-200 rounded-xl p-3 bg-slate-50 focus:border-[#DC2626] focus:bg-white outline-none"
                   required
                 />
               </div>
@@ -1201,7 +1201,7 @@ export default function PatientDashboard({
               <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-4">
                 <div className="flex justify-between items-center flex-wrap gap-2">
                   <div>
-                    <span className="text-xs font-extrabold text-blue-900 uppercase tracking-wide block">
+                    <span className="text-xs font-extrabold text-[#0F172A] uppercase tracking-wide block">
                       3. Digital Signature
                     </span>
                     <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
@@ -1277,12 +1277,12 @@ export default function PatientDashboard({
                         placeholder="e.g. Dr. Ananya Sen"
                         value={typedSignature}
                         onChange={(e) => setTypedSignature(e.target.value)}
-                        className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 focus:border-blue-500 outline-none"
+                        className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 focus:border-[#DC2626] outline-none"
                       />
                     </div>
                     <div className="bg-slate-100 border border-slate-200 p-4 rounded-xl text-center">
                       <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Signature Preview</span>
-                      <p className="font-serif italic text-xl text-blue-900 tracking-wide select-none">
+                      <p className="font-serif italic text-xl text-[#0F172A] tracking-wide select-none">
                         {typedSignature || (professionals.find(p => p.id === prescDoctorId)?.name || 'Dr. Ananya Sen')}
                       </p>
                     </div>
@@ -1308,7 +1308,7 @@ export default function PatientDashboard({
                 <button
                   type="button"
                   onClick={handleIssueEPrescriptionSubmit}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-6 rounded-xl transition-all shadow-md flex items-center gap-1.5 hover:scale-[1.01] cursor-pointer"
+                  className="bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-bold py-2.5 px-6 rounded-xl transition-all shadow-md flex items-center gap-1.5 hover:scale-[1.01] cursor-pointer"
                 >
                   <FileSignature className="h-4 w-4" />
                   Issue Prescription
@@ -1324,11 +1324,11 @@ export default function PatientDashboard({
       {/* MODAL: LIVE TELEHEALTH CONSULTATION ROOM   */}
       {/* ========================================== */}
       {activeVideoBooking && (
-        <div className="fixed inset-0 bg-blue-700/95 flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-blue-700 rounded-3xl w-full max-w-2xl border border-blue-700 shadow-2xl overflow-hidden aspect-video flex flex-col justify-between relative text-white">
+        <div className="fixed inset-0 bg-[#0F172A]/95 flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-[#0F172A] rounded-3xl w-full max-w-2xl border border-[#DC2626] shadow-2xl overflow-hidden aspect-video flex flex-col justify-between relative text-white">
             
             {/* Top Bar overlay */}
-            <div className="p-4 bg-gradient-to-b from-blue-800/80 to-transparent flex justify-between items-center z-10 absolute top-0 left-0 right-0">
+            <div className="p-4 bg-gradient-to-b from-slate-900/80 to-transparent flex justify-between items-center z-10 absolute top-0 left-0 right-0">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping"></span>
                 <span className="bg-rose-500 text-white font-extrabold text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-md">
@@ -1340,17 +1340,17 @@ export default function PatientDashboard({
                   </span>
                 )}
               </div>
-              <div className="bg-blue-700/60 backdrop-blur-xs px-3 py-1.5 rounded-lg border border-white/10 text-xs font-semibold text-slate-300">
+              <div className="bg-[#0F172A]/60 backdrop-blur-xs px-3 py-1.5 rounded-lg border border-white/10 text-xs font-semibold text-slate-300">
                 Patient: {userName} &bull; PDPA Compliant
               </div>
             </div>
 
             {/* Video Feed Workspace */}
-            <div className="flex-1 flex items-center justify-center relative bg-blue-800">
+            <div className="flex-1 flex items-center justify-center relative bg-[#0F172A]">
               
               {!videoConnected ? (
                 <div className="text-center space-y-4 p-8">
-                  <RefreshCw className="h-10 w-10 text-blue-500 animate-spin mx-auto" />
+                  <RefreshCw className="h-10 w-10 text-[#DC2626] animate-spin mx-auto" />
                   <div className="space-y-1">
                     <h4 className="text-sm font-extrabold text-slate-200">Establishing Secured Telehealth Room</h4>
                     <p className="text-xs text-slate-500 font-semibold max-w-sm mx-auto">
@@ -1361,7 +1361,7 @@ export default function PatientDashboard({
               ) : (
                 <div className="absolute inset-0 w-full h-full">
                   {/* Remote Video Stream (Simulated Practitioner) */}
-                  <div className="w-full h-full bg-blue-600 relative overflow-hidden flex items-center justify-center">
+                  <div className="w-full h-full bg-[#DC2626] relative overflow-hidden flex items-center justify-center">
                     <img 
                       src={professionals.find(p => p.id === activeVideoBooking.professionalId)?.avatar || "/assets/malaysian_female_doctor.jpg"}
                       alt={activeVideoBooking.professionalName}
@@ -1369,24 +1369,24 @@ export default function PatientDashboard({
                     />
                     
                     {/* Practitioner Name tag */}
-                    <div className="absolute bottom-4 left-4 bg-blue-800/70 border border-white/10 px-3 py-1.5 rounded-xl backdrop-blur-xs text-xs font-bold">
+                    <div className="absolute bottom-4 left-4 bg-[#0F172A]/70 border border-white/10 px-3 py-1.5 rounded-xl backdrop-blur-xs text-xs font-bold">
                       {activeVideoBooking.professionalName} (Consultant)
                     </div>
                   </div>
 
                   {/* Local Video Stream Pip (Self-view) */}
-                  <div className="absolute bottom-4 right-4 w-32 sm:w-40 aspect-video bg-blue-800 border-2 border-blue-500 rounded-xl overflow-hidden shadow-md">
+                  <div className="absolute bottom-4 right-4 w-32 sm:w-40 aspect-video bg-[#0F172A] border-2 border-[#DC2626] rounded-xl overflow-hidden shadow-md">
                     {!cameraOff ? (
-                      <div className="w-full h-full relative bg-blue-500 flex items-center justify-center">
-                        <div className="absolute inset-0 bg-gradient-to-br from-slate-600 to-blue-600 flex items-center justify-center">
+                      <div className="w-full h-full relative bg-[#DC2626] flex items-center justify-center">
+                        <div className="absolute inset-0 bg-gradient-to-br from-slate-600 to-[#DC2626] flex items-center justify-center">
                           <User className="h-10 w-10 text-white/50" />
                         </div>
-                        <div className="absolute bottom-1 right-1 bg-blue-800/60 px-1 text-[10px] rounded text-white font-mono">
+                        <div className="absolute bottom-1 right-1 bg-slate-800 px-1 text-[10px] rounded text-white font-mono">
                           You (Self)
                         </div>
                       </div>
                     ) : (
-                      <div className="w-full h-full bg-blue-700 flex items-center justify-center text-slate-500">
+                      <div className="w-full h-full bg-[#0F172A] flex items-center justify-center text-slate-500">
                         <X className="h-5 w-5" />
                       </div>
                     )}
@@ -1396,7 +1396,7 @@ export default function PatientDashboard({
             </div>
 
             {/* Bottom Call Controls Overlay */}
-            <div className="p-4 bg-gradient-to-t from-blue-800/90 to-transparent z-10">
+            <div className="p-4 bg-gradient-to-t from-slate-900/90 to-transparent z-10">
               <div className="flex justify-center items-center gap-3">
                 <button
                   onClick={() => setVideoMuted(!videoMuted)}
@@ -1428,7 +1428,7 @@ export default function PatientDashboard({
                     }
                     setShowGenerateModal(true);
                   }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-3.5 px-6 rounded-full transition-all shadow-md hover:scale-105 cursor-pointer flex items-center gap-1.5"
+                  className="bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-bold py-3.5 px-6 rounded-full transition-all shadow-md hover:scale-105 cursor-pointer flex items-center gap-1.5"
                   title="Draft digital prescription for active patient"
                 >
                   <FileSignature className="h-4 w-4" />

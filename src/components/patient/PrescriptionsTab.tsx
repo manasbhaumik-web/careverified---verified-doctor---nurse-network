@@ -56,7 +56,7 @@ export default function PrescriptionsTab({
           </button>
           <button
             onClick={onRequestRefill}
-            className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-5 py-3.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-95 duration-200 cursor-pointer shrink-0"
+            className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black px-5 py-3.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-95 duration-200 cursor-pointer shrink-0"
           >
             <RefreshCw className="h-4 w-4 text-teal-400" />
             <span>Request Rx Refill</span>

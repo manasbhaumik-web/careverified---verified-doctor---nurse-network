@@ -265,7 +265,7 @@ export default function App() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans antialiased selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans antialiased selection:bg-[#FFE4E6] selection:text-[#DC2626]">
 
       {/* CareVerified Elevated Primary Header */}
       <header className="bg-[#DC2626] border-b border-[#B91C1C] sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-md">
@@ -433,7 +433,7 @@ export default function App() {
           <div className="flex items-stretch gap-4 py-2">
 
             {/* Left: Perspective Badge */}
-            <div className="flex items-center gap-2 self-center bg-[#DC2626] text-white px-3.5 py-2 rounded-none text-xs font-extrabold tracking-wider uppercase border border-[#B91C1C] shadow-xs">
+            <div className="flex items-center gap-2 self-center bg-[#DC2626] text-white px-3.5 py-2 rounded-xl text-xs font-extrabold tracking-wider uppercase border border-[#B91C1C] shadow-xs">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
               <span>
                 {currentUser.role === 'patient' && 'Patient Hub'}
@@ -451,7 +451,7 @@ export default function App() {
                   <button
                     key={item.id}
                     onClick={() => { setActiveView(item.id); setSelectedProfId(null); }}
-                    className={`relative flex items-center gap-2 px-4 py-2 text-xs font-extrabold transition-all duration-200 cursor-pointer select-none rounded-none border ${
+                    className={`relative flex items-center gap-2 px-4 py-2 text-xs font-extrabold transition-all duration-200 cursor-pointer select-none rounded-lg border ${
                       isActive
                         ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs'
                         : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
@@ -507,7 +507,7 @@ export default function App() {
       <main className="flex-grow py-8 px-4 sm:px-6 lg:px-8 w-full max-w-[1920px] mx-auto">
         {loading ? (
           <div className="text-center py-20 space-y-4">
-            <RefreshCw className="h-10 w-10 text-blue-600 animate-spin mx-auto" />
+            <RefreshCw className="h-10 w-10 text-[#DC2626] animate-spin mx-auto" />
             <h3 className="text-sm font-bold text-slate-800">Loading MedCred...</h3>
             <p className="text-xs text-slate-500 font-semibold">Connecting to medical registry...</p>
           </div>
@@ -533,7 +533,7 @@ export default function App() {
                 {/* National Directory List */}
                 <div className="border-t border-slate-100 pt-8">
                   <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-1.5 uppercase tracking-wide">
-                    <UserCheck className="h-4 w-4 text-blue-600" />
+                    <UserCheck className="h-4 w-4 text-[#DC2626]" />
                     Medical Registry Directory
                   </h3>
                   <SearchHub
@@ -624,15 +624,15 @@ export default function App() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {articles.map((art) => (
-                    <div key={art.id} className="bg-white border-2 border-slate-200/80 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-blue-300 hover:-translate-y-0.5 transition-all duration-300 ease-in-out space-y-4">
+                    <div key={art.id} className="bg-white border-2 border-slate-200/80 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-[#FECDD3] hover:-translate-y-0.5 transition-all duration-300 ease-in-out space-y-4">
                       <div className="flex justify-between items-center">
-                        <span className="bg-blue-50 text-blue-800 text-[10px] font-extrabold px-2.5 py-1 rounded-lg border border-blue-100/50">
+                        <span className="bg-[#FFF0F2] text-[#DC2626] text-[10px] font-extrabold px-2.5 py-1 rounded-lg border border-[#FECDD3]">
                           {art.category}
                         </span>
                         <span className="text-slate-400 text-xs font-semibold">{art.date}</span>
                       </div>
 
-                      <h3 className="text-base font-extrabold text-slate-900 hover:text-blue-600 transition-colors">
+                      <h3 className="text-base font-extrabold text-slate-900 hover:text-[#DC2626] transition-colors">
                         {art.title}
                       </h3>
 
@@ -645,7 +645,7 @@ export default function App() {
                       </div>
 
                       {/* Author credentials card */}
-                      <div className="flex gap-3 items-center bg-slate-50 p-3.5 rounded-xl border-2 border-slate-200/60 hover:border-blue-200/50 transition-all duration-200">
+                      <div className="flex gap-3 items-center bg-slate-50 p-3.5 rounded-xl border-2 border-slate-200/60 hover:border-[#FECDD3] transition-all duration-200">
                         <img
                           src={art.authorAvatar}
                           alt={art.authorName}
@@ -664,7 +664,7 @@ export default function App() {
                       {/* Citations Box */}
                       {art.citations && (
                         <div className="bg-slate-100 text-slate-800 rounded-xl p-4 space-y-2 text-xs border-2 border-slate-300">
-                          <span className="text-[9px] font-extrabold text-blue-400 uppercase tracking-wide block">
+                          <span className="text-[9px] font-extrabold text-rose-500 uppercase tracking-wide block">
                             Peer-Reviewed Medical Citations (E-E-A-T Compliant):
                           </span>
                           <ul className="list-decimal list-inside space-y-1 font-mono text-[10px] leading-normal">
@@ -683,7 +683,7 @@ export default function App() {
                             <details key={idx} className="group border-2 border-slate-200/60 rounded-xl p-3 bg-slate-50/50 cursor-pointer hover:border-slate-300 transition-all duration-200">
                               <summary className="text-xs font-extrabold text-slate-800 flex justify-between items-center outline-none list-none">
                                 {faqItem.question}
-                                <span className="text-blue-600 group-open:rotate-180 transition-transform font-bold">+</span>
+                                <span className="text-[#DC2626] group-open:rotate-180 transition-transform font-bold">+</span>
                               </summary>
                               <p className="text-xs text-slate-600 leading-relaxed font-normal mt-2 border-t-2 border-slate-100/80 pt-2">
                                 {faqItem.answer}
@@ -712,8 +712,8 @@ export default function App() {
                         description={`Compiled & hot-loaded by ${activePkg.author}`}
                         actions={
                           <>
-                            <span className="bg-rose-50 text-rose-700 text-[10px] font-extrabold px-2 py-0.5 rounded-none border border-rose-100">v{activePkg.version}</span>
-                            <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-3 py-1.5 rounded-none border border-emerald-200 uppercase tracking-wider inline-flex items-center gap-1.5">
+                            <span className="bg-[#FFF0F2] text-[#DC2626] text-[10px] font-extrabold px-2 py-0.5 rounded-lg border border-[#FECDD3]">v{activePkg.version}</span>
+                            <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-3 py-1.5 rounded-xs border border-emerald-200 uppercase tracking-wider inline-flex items-center gap-1.5">
                               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-xs animate-pulse"></span>
                               <span>Active Runtime Package</span>
                             </span>
@@ -723,31 +723,31 @@ export default function App() {
 
                       <div className="space-y-3">
                         <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider">Functional Package Description</h4>
-                        <p className="text-sm font-semibold text-slate-600 leading-relaxed bg-slate-50 border border-slate-100 p-4.5 rounded-none">
+                        <p className="text-sm font-semibold text-slate-600 leading-relaxed bg-slate-50 border border-slate-100 p-4.5 rounded-xl">
                           {activePkg.description}
                         </p>
                       </div>
 
                       {/* Interactive sandbox demonstration for custom module */}
-                      <div className="border border-slate-200/60 rounded-none p-6 bg-slate-50/50 space-y-5">
+                      <div className="border border-slate-200/60 rounded-2xl p-6 bg-slate-50/50 space-y-5">
                         <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                          <Settings className="h-4.5 w-4.5 text-rose-600 animate-spin" />
+                          <Settings className="h-4.5 w-4.5 text-[#DC2626] animate-spin" />
                           <h4 className="text-xs font-black uppercase text-slate-800 tracking-wider">Interactive Package Terminal & Diagnostics</h4>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                           <div className="space-y-4">
-                            <div className="bg-white border border-slate-200 rounded-none p-4 space-y-2">
+                            <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
                               <span className="text-[10px] text-slate-400 font-extrabold uppercase">Mountpoint Hook</span>
-                              <p className="text-xs font-mono font-bold text-blue-600">/src/modules/{activePkg.id}/index.tsx</p>
+                              <p className="text-xs font-mono font-bold text-[#DC2626]">/src/modules/{activePkg.id}/index.tsx</p>
                             </div>
-                            <div className="bg-white border border-slate-200 rounded-none p-4 space-y-2">
+                            <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
                               <span className="text-[10px] text-slate-400 font-extrabold uppercase">HIPAA / Security Shield</span>
                               <p className="text-xs font-mono font-bold text-emerald-600">Sandbox Isolated & AES-256 Encrypted</p>
                             </div>
                           </div>
 
-                          <div className="bg-slate-100 text-slate-800 border border-slate-300 font-mono p-4 rounded-none text-[10px] leading-relaxed shadow-inner overflow-x-auto max-h-40">
+                          <div className="bg-slate-100 text-slate-800 border border-slate-300 font-mono p-4 rounded-xl text-[10px] leading-relaxed shadow-inner overflow-x-auto max-h-40">
                             <p className="text-emerald-400">[INFO] Hot-mounting package: {activePkg.id}</p>
                             <p className="text-slate-400">[OK] Injecting dynamic layout nodes...</p>
                             <p className="text-slate-400">[OK] Instantiating core API controllers...</p>
@@ -760,7 +760,7 @@ export default function App() {
                           <button
                             type="button"
                             onClick={() => alert(`Dynamic simulation for "${activePkg.name}" triggered successfully!`)}
-                            className="px-4 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold rounded-none transition-all shadow-sm cursor-pointer"
+                            className="px-4 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold rounded-xl transition-all shadow-sm shadow-rose-500/10 cursor-pointer"
                           >
                             Execute Package Dynamic Simulation
                           </button>
@@ -845,7 +845,7 @@ export default function App() {
                   onClick={() => {
                     handleLogout();
                   }}
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-extrabold rounded-none border border-slate-700 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-extrabold rounded-lg border border-slate-700 transition-colors cursor-pointer"
                 >
                   Switch Perspective
                 </button>

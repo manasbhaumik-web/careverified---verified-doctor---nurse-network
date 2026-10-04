@@ -200,13 +200,6 @@ const TESTIMONIALS = [
   },
 ];
 
-// Remaps the app-wide blue scale to CareVerified crimson inside the portal
-const PORTAL_RED_SCALE = {
-  '--color-blue-400': '#ff8a98',
-  '--color-blue-500': '#e0243f',
-  '--color-blue-600': '#c8102e',
-  '--color-blue-700': '#a50f2a',
-} as React.CSSProperties;
 
 // ═══════════════════════════════════════════════
 // MAIN COMPONENT (THIN BORDERS - LIGHT NAVBAR & HERO - NO BLACK BORDERS)

@@ -153,7 +153,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                     placeholder="Kuala Lumpur Specialist Hospital"
                     value={hospitalName}
                     onChange={(e) => setHospitalName(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold transition-all"
+                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
                     required
                   />
                 </div>
@@ -165,7 +165,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                     placeholder="ICU Nurse Night Duty Focus"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold transition-all"
+                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
                     required
                   />
                 </div>
@@ -175,7 +175,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   <select
                     value={type}
                     onChange={(e) => setType(e.target.value as any)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-extrabold text-slate-700 cursor-pointer transition-all"
+                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-extrabold text-slate-700 cursor-pointer transition-all"
                   >
                     <option value="Full-time">Full-time Vacancy</option>
                     <option value="Part-time">Part-time Role</option>
@@ -191,7 +191,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                     placeholder="e.g. RM 5,000 - RM 8,000 / month"
                     value={salaryRange}
                     onChange={(e) => setSalaryRange(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold transition-all"
+                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
                     required
                   />
                 </div>
@@ -203,7 +203,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                     placeholder="ICU Department, Ground Floor"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold transition-all"
+                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
                     required
                   />
                 </div>
@@ -213,7 +213,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   <select
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-extrabold text-slate-700 cursor-pointer transition-all"
+                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-extrabold text-slate-700 cursor-pointer transition-all"
                   >
                     <option value="Kuala Lumpur">Kuala Lumpur</option>
                     <option value="Petaling Jaya">Petaling Jaya</option>
@@ -227,7 +227,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   <select
                     value={specialtyRequired}
                     onChange={(e) => setSpecialtyRequired(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-extrabold text-slate-700 cursor-pointer transition-all"
+                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-extrabold text-slate-700 cursor-pointer transition-all"
                   >
                     <option value="ICU & Critical Care">ICU & Critical Care</option>
                     <option value="Geriatric & Eldercare">Geriatric & Eldercare</option>
@@ -245,7 +245,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   placeholder="Outline shift schedules, clinical assignments, equipment operation needed, and team scope..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full text-xs border-2 border-slate-200/80 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold transition-all"
+                  className="w-full text-xs border-2 border-slate-200/80 rounded-xl p-3 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
                   required
                 />
               </div>
@@ -257,7 +257,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   placeholder="e.g. Registered with state nursing council with active license"
                   value={requirementText}
                   onChange={(e) => setRequirementText(e.target.value)}
-                  className="w-full text-xs border-2 border-slate-200/80 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold transition-all"
+                  className="w-full text-xs border-2 border-slate-200/80 rounded-xl p-3 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
                   required
                 />
               </div>
@@ -273,7 +273,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                 <button
                   type="submit"
                   disabled={formLoading}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-xs font-bold px-8 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] cursor-pointer"
+                  className="bg-[#DC2626] hover:bg-[#0F172A] disabled:bg-rose-400 text-white text-xs font-bold px-8 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] cursor-pointer"
                 >
                   {formLoading && <Loader className="h-3 w-3 animate-spin" />}
                   Publish Job Vacancy
@@ -293,7 +293,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
             placeholder="Search shift descriptions, requirements or hospital hubs..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl py-2.5 pl-10 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold"
+            className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl py-2.5 pl-10 pr-4 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold"
           />
         </div>
 
@@ -301,7 +301,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-bold text-slate-700 cursor-pointer"
+            className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl py-2.5 px-4 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-bold text-slate-700 cursor-pointer"
           >
             <option value="all">📁 All Job Formats</option>
             <option value="Full-time">Full-time</option>
@@ -315,7 +315,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
           <select
             value={selectedCity}
             onChange={(e) => setSelectedCity(e.target.value)}
-            className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-bold text-slate-700 cursor-pointer"
+            className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl py-2.5 px-4 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-bold text-slate-700 cursor-pointer"
           >
             <option value="all">📍 All Cities</option>
             <option value="Kuala Lumpur">Kuala Lumpur</option>
@@ -332,7 +332,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
             onClick={() => setViewMode('list')}
             className={`p-1.5 rounded-lg transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
               viewMode === 'list'
-                ? 'bg-white text-blue-800 shadow-xs'
+                ? 'bg-white text-[#B91C1C] shadow-xs'
                 : 'text-slate-500 hover:text-slate-800'
             }`}
             title="List View"
@@ -346,7 +346,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
             onClick={() => setViewMode('grid')}
             className={`p-1.5 rounded-lg transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
               viewMode === 'grid'
-                ? 'bg-white text-blue-800 shadow-xs'
+                ? 'bg-white text-[#B91C1C] shadow-xs'
                 : 'text-slate-500 hover:text-slate-800'
             }`}
             title="Grid View"
@@ -375,8 +375,8 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                 <div 
                   key={job.id}
                   onClick={() => setSelectedModalJob(job)}
-                  className={`bg-white border-2 border-slate-200/80 hover:border-blue-300 rounded-xl p-4 shadow-xs hover:shadow-sm transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 cursor-pointer ${
-                    job.type === 'Shift-based' ? 'border-l-red-500' : 'border-l-blue-600'
+                  className={`bg-white border-2 border-slate-200/80 hover:border-rose-300 rounded-xl p-4 shadow-xs hover:shadow-sm transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 cursor-pointer ${
+                    job.type === 'Shift-based' ? 'border-l-red-500' : 'border-l-[#DC2626]'
                   }`}
                 >
                   <div className="flex items-center gap-4 flex-1">
@@ -390,7 +390,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 flex-1">
-                    <span className="bg-blue-50 border border-blue-100 text-blue-800 text-[9px] font-extrabold px-2.5 py-0.5 rounded-full shrink-0">
+                    <span className="bg-[#FFF0F2] border border-[#FECDD3] text-[#B91C1C] text-[9px] font-extrabold px-2.5 py-0.5 rounded-full shrink-0">
                       {job.type}
                     </span>
                     <span className="bg-slate-50 border border-slate-200 text-slate-600 text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0">
@@ -404,7 +404,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   <div className="flex items-center justify-between md:justify-end gap-4 shrink-0 border-t md:border-t-0 pt-3 md:pt-0 border-slate-100">
                     <div className="text-left md:text-right mr-2">
                       <span className="text-[9px] text-slate-400 block font-bold leading-none uppercase">Offered Allowance</span>
-                      <span className="font-mono text-xs font-extrabold text-blue-900 leading-relaxed block">{job.salaryRange}</span>
+                      <span className="font-mono text-xs font-extrabold text-[#0F172A] leading-relaxed block">{job.salaryRange}</span>
                     </div>
 
                     <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
@@ -423,7 +423,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                         className={`text-xs font-bold py-2 px-4 rounded-xl transition-all shadow-sm flex items-center gap-1 cursor-pointer ${
                           hasApplied 
                             ? "bg-emerald-50 border-2 border-emerald-100 text-emerald-800 cursor-not-allowed" 
-                            : "bg-blue-600 hover:bg-blue-700 text-white hover:scale-[1.02]"
+                            : "bg-[#DC2626] hover:bg-[#0F172A] text-white hover:scale-[1.02]"
                         }`}
                       >
                         {hasApplied ? (
@@ -444,8 +444,8 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
             return (
               <div 
                 key={job.id}
-                className={`bg-white border-2 border-slate-200/80 hover:border-blue-300 rounded-xl p-6 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between border-l-4 ${
-                  job.type === 'Shift-based' ? 'border-l-red-500' : 'border-l-blue-600'
+                className={`bg-white border-2 border-slate-200/80 hover:border-rose-300 rounded-xl p-6 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between border-l-4 ${
+                  job.type === 'Shift-based' ? 'border-l-red-500' : 'border-l-[#DC2626]'
                 }`}
               >
                 <div className="space-y-4">
@@ -459,7 +459,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                         <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{job.hospitalName}</span>
                       </div>
                     </div>
-                    <span className="bg-blue-50 border border-blue-100 text-blue-800 text-[9px] font-extrabold px-2.5 py-0.5 rounded-full">
+                    <span className="bg-[#FFF0F2] border border-[#FECDD3] text-[#B91C1C] text-[9px] font-extrabold px-2.5 py-0.5 rounded-full">
                       {job.type}
                     </span>
                   </div>
@@ -501,7 +501,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   <div className="flex items-center gap-3">
                     <div className="text-right">
                       <span className="text-[9px] text-slate-400 block font-bold leading-none uppercase">Offered Allowance</span>
-                      <span className="font-mono text-xs font-extrabold text-blue-900 leading-relaxed block">{job.salaryRange}</span>
+                      <span className="font-mono text-xs font-extrabold text-[#0F172A] leading-relaxed block">{job.salaryRange}</span>
                     </div>
 
                     <button
@@ -510,7 +510,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                       className={`text-xs font-bold py-2 px-4 rounded-xl transition-all shadow-sm flex items-center gap-1 cursor-pointer ${
                         hasApplied 
                           ? "bg-emerald-50 border-2 border-emerald-100 text-emerald-800 cursor-not-allowed" 
-                          : "bg-blue-600 hover:bg-blue-700 text-white hover:scale-[1.02]"
+                          : "bg-[#DC2626] hover:bg-[#0F172A] text-white hover:scale-[1.02]"
                       }`}
                     >
                       {hasApplied ? (
@@ -543,9 +543,9 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header banner */}
-            <div className="bg-blue-700 text-white p-5 flex justify-between items-center shrink-0">
+            <div className="bg-[#0F172A] text-white p-5 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-blue-600 border border-slate-700 rounded-xl flex items-center justify-center text-lg shadow-xs shrink-0">
+                <div className="h-10 w-10 bg-[#DC2626] border border-slate-700 rounded-xl flex items-center justify-center text-lg shadow-xs shrink-0">
                   {selectedModalJob.hospitalLogo}
                 </div>
                 <div>
@@ -570,12 +570,12 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
             <div className="p-6 overflow-y-auto space-y-6 flex-1 text-slate-800">
               
               {/* Allowance Badge Panel */}
-              <div className="flex flex-wrap justify-between items-center gap-3 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+              <div className="flex flex-wrap justify-between items-center gap-3 bg-[#FFF0F2] p-4 rounded-xl border border-[#FECDD3]">
                 <div>
-                  <span className="text-[9px] text-blue-800 block font-black uppercase tracking-wider">Estimated Allowance</span>
-                  <span className="font-mono text-base font-extrabold text-blue-900 leading-tight block">{selectedModalJob.salaryRange}</span>
+                  <span className="text-[9px] text-[#B91C1C] block font-black uppercase tracking-wider">Estimated Allowance</span>
+                  <span className="font-mono text-base font-extrabold text-[#0F172A] leading-tight block">{selectedModalJob.salaryRange}</span>
                 </div>
-                <span className="bg-blue-600 text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-lg tracking-wider">
+                <span className="bg-[#DC2626] text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-lg tracking-wider">
                   {selectedModalJob.type}
                 </span>
               </div>
@@ -652,7 +652,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                 className={`flex-1 text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer ${
                   appliedJobs.includes(selectedModalJob.id) 
                     ? "bg-emerald-50 border-2 border-emerald-100 text-emerald-800 cursor-not-allowed" 
-                    : "bg-blue-600 hover:bg-blue-700 text-white hover:scale-[1.01]"
+                    : "bg-[#DC2626] hover:bg-[#0F172A] text-white hover:scale-[1.01]"
                 }`}
               >
                 {appliedJobs.includes(selectedModalJob.id) ? (

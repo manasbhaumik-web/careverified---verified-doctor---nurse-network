@@ -92,24 +92,24 @@ export default function AppointmentsTab({
               <motion.div 
                 variants={itemVariants}
                 key={b.id} 
-                className="group relative bg-white border border-slate-200/80 hover:border-teal-500/40 rounded-none p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-6 overflow-hidden"
+                className="group relative bg-white border border-slate-200/80 hover:border-teal-500/40 rounded-[28px] p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-6 overflow-hidden"
               >
                 {/* Visual Accent Bar */}
                 <div className={`absolute top-0 left-0 right-0 h-[4px] transition-all duration-300 ${
-                  isVideo ? 'bg-teal-500' : 'bg-rose-500'
+                  isVideo ? 'bg-teal-500' : 'bg-[#DC2626]'
                 }`} />
 
                 {/* Top Badge Indicators */}
                 <div className="flex justify-between items-center">
-                  <span className={`inline-flex items-center gap-1.5 text-[11px] font-black uppercase px-2.5 py-1 rounded-none tracking-wider border ${
+                  <span className={`inline-flex items-center gap-1.5 text-[11px] font-black uppercase px-2.5 py-1 rounded-full tracking-wider border ${
                     isVideo 
                       ? 'bg-teal-50 text-teal-700 border-teal-100' 
-                      : 'bg-rose-50 text-rose-700 border-rose-100'
+                      : 'bg-[#FFF0F2] text-[#DC2626] border-[#FECDD3]'
                   }`}>
                     {isVideo ? '📹 Secure Telehealth' : '🏥 In-Clinic Visit'}
                   </span>
 
-                  <span className="text-xs font-bold text-slate-400 font-mono uppercase bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-none">
+                  <span className="text-xs font-bold text-slate-400 font-mono uppercase bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-md">
                     REF: {b.id.substring(0, 8)}
                   </span>
                 </div>
@@ -122,8 +122,8 @@ export default function AppointmentsTab({
                         <img 
                           src={matchedProf.avatar} 
                           alt={b.professionalName} 
-                          className={`h-14 w-14 rounded-full object-cover border-2 shadow-sm shrink-0 transition-transform duration-300 group-hover:scale-105 ${
-                            isVideo ? 'border-teal-100' : 'border-rose-100'
+                          className={`h-14 w-14 rounded-xl object-cover border-2 shadow-sm shrink-0 transition-transform duration-300 group-hover:scale-105 ${
+                            isVideo ? 'border-teal-100' : 'border-[#FECDD3]'
                           }`}
                           referrerPolicy="no-referrer"
                         />
@@ -182,7 +182,7 @@ export default function AppointmentsTab({
 
                   {/* Patient Symptom Brief */}
                   {b.symptoms && (
-                    <div className="text-[11px] text-slate-600 bg-white border border-slate-200 p-3.5 rounded-none shadow-xs">
+                    <div className="text-[11px] text-slate-600 bg-white border border-slate-200 p-3.5 rounded-xl shadow-xs">
                       <strong className="text-slate-700 block text-[11px] font-black uppercase tracking-wider mb-1">Stated Symptoms & Concerns:</strong>
                       <span className="italic font-medium text-slate-500">"{b.symptoms}"</span>
                     </div>
@@ -190,10 +190,10 @@ export default function AppointmentsTab({
 
                   {/* In-person Clinic Address Details */}
                   {!isVideo && matchedProf && (
-                    <div className="text-[11px] text-slate-600 bg-rose-50/30 border border-rose-100 p-3.5 rounded-none space-y-1.5">
-                      <span className="text-[11px] uppercase tracking-widest text-rose-700 block font-black">Clinic Practice Address:</span>
+                    <div className="text-[11px] text-slate-600 bg-[#FFF0F2]/50 border border-[#FECDD3] p-3.5 rounded-xl space-y-1.5">
+                      <span className="text-[11px] uppercase tracking-widest text-[#DC2626] block font-black">Clinic Practice Address:</span>
                       <p className="flex items-start gap-2 text-slate-800 font-bold">
-                        <MapPin className="h-4 w-4 text-rose-600 shrink-0 mt-0.5" />
+                        <MapPin className="h-4 w-4 text-[#DC2626] shrink-0 mt-0.5" />
                         <span>{matchedProf.practiceAddress}, {matchedProf.city}</span>
                       </p>
                     </div>
@@ -204,7 +204,7 @@ export default function AppointmentsTab({
                 <div className="border-t border-slate-100 pt-5 flex items-center justify-between gap-3">
                   <button
                     onClick={() => onCancelBooking(b.id)}
-                    className="text-[11px] font-black text-slate-400 hover:text-rose-600 hover:bg-rose-50 px-4 py-2.5 rounded-none transition-colors duration-200 cursor-pointer"
+                    className="text-[11px] font-black text-slate-400 hover:text-rose-600 hover:bg-rose-50 px-4 py-2.5 rounded-xl transition-colors duration-200 cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -212,14 +212,14 @@ export default function AppointmentsTab({
                   {isVideo ? (
                     <button
                       onClick={() => onStartVideoCall(b)}
-                      className="bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-black px-5 py-3 rounded-none transition-all shadow-md shadow-teal-600/20 flex items-center gap-2 hover:scale-[1.02] active:scale-95 duration-200 cursor-pointer"
+                      className="bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-black px-5 py-3 rounded-xl transition-all shadow-md shadow-teal-600/20 flex items-center gap-2 hover:scale-[1.02] active:scale-95 duration-200 cursor-pointer"
                     >
                       <Video className="h-4 w-4 shrink-0" />
                       <span>Join Telehealth Room</span>
                     </button>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 text-xs text-rose-800 bg-rose-50 font-black uppercase border border-rose-200 px-4 py-2.5 rounded-none">
-                      <span className="w-1.5 h-1.5 bg-rose-600 rounded-none"></span>
+                    <span className="inline-flex items-center gap-1.5 text-xs text-[#DC2626] bg-[#FFF0F2] font-black uppercase border border-[#FECDD3] px-4 py-2.5 rounded-xl">
+                      <span className="w-1.5 h-1.5 bg-[#DC2626] rounded-full"></span>
                       Outpatient Walk-In
                     </span>
                   )}

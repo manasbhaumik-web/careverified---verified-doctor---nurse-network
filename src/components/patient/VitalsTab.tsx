@@ -82,8 +82,8 @@ function BPTrendChart({ vitals }: { vitals: VitalsRecord[] }) {
           <div className="flex items-center gap-1.5 text-[11px] font-black uppercase text-rose-500">
             <div className="w-2 h-2 rounded-full bg-rose-500"></div> Systolic
           </div>
-          <div className="flex items-center gap-1.5 text-[11px] font-black uppercase text-blue-500">
-            <div className="w-2 h-2 rounded-full bg-blue-500"></div> Diastolic
+          <div className="flex items-center gap-1.5 text-[11px] font-black uppercase text-rose-500">
+            <div className="w-2 h-2 rounded-full bg-rose-500"></div> Diastolic
           </div>
         </div>
       </div>
@@ -114,7 +114,7 @@ function BPTrendChart({ vitals }: { vitals: VitalsRecord[] }) {
             animate={{ pathLength: 1 }}
             transition={{ duration: 1.5, ease: "easeInOut", delay: 0.2 }}
             d={`M ${diaPoints}`} 
-            className="stroke-blue-500 fill-none" 
+            className="stroke-rose-400 fill-none" 
             strokeWidth="3" 
             strokeLinecap="round" 
             strokeLinejoin="round" 
@@ -129,7 +129,7 @@ function BPTrendChart({ vitals }: { vitals: VitalsRecord[] }) {
               />
               <motion.circle 
                 initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1.7 + (i * 0.1) }}
-                cx={getX(i)} cy={getY(v.diastolic)} r="4" className="fill-white stroke-blue-500" strokeWidth="2" 
+                cx={getX(i)} cy={getY(v.diastolic)} r="4" className="fill-white stroke-rose-400" strokeWidth="2" 
               />
             </g>
           ))}
@@ -298,14 +298,14 @@ export default function VitalsTab({
               </select>
             </div>
 
-            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-black py-4 px-4 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 duration-150">
+            <button type="submit" className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black py-4 px-4 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 duration-150">
               <Plus className="h-4 w-4" />
               <span>Commit Telemetry Entry</span>
             </button>
           </motion.form>
 
           {/* Clinical Wellness Journal */}
-          <motion.div variants={itemVariants} className="relative overflow-hidden bg-gradient-to-br from-blue-700 to-blue-800 border border-slate-800 rounded-[32px] p-8 text-white space-y-5 shadow-2xl">
+          <motion.div variants={itemVariants} className="relative overflow-hidden bg-gradient-to-br from-[#B91C1C] to-[#86102a] border border-slate-800 rounded-[32px] p-8 text-white space-y-5 shadow-2xl">
             <div className="absolute top-0 right-0 w-48 h-48 bg-teal-500/10 rounded-xs blur-[40px] pointer-events-none"></div>
             
             <div className="space-y-2 relative z-10">
@@ -378,9 +378,9 @@ export default function VitalsTab({
                   <VitalsGauge
                     label="Heart Rate" value={String(vitalsList[0].heartRate)} unit="BPM"
                     percentage={((vitalsList[0].heartRate - 40) / (140 - 40)) * 100}
-                    colorClass={vitalsList[0].heartRate > 100 ? 'stroke-amber-500' : vitalsList[0].heartRate < 60 ? 'stroke-blue-500' : 'stroke-rose-500'}
+                    colorClass={vitalsList[0].heartRate > 100 ? 'stroke-amber-500' : vitalsList[0].heartRate < 60 ? 'stroke-rose-400' : 'stroke-rose-500'}
                     feedbackText={vitalsList[0].heartRate > 100 ? '⚡ Tachycardia' : vitalsList[0].heartRate < 60 ? '💤 Bradycardia' : '❤️ HR Optimal'}
-                    feedbackColor={vitalsList[0].heartRate > 100 ? 'bg-amber-50 text-amber-800 border-amber-100' : vitalsList[0].heartRate < 60 ? 'bg-blue-50 text-blue-800 border-blue-100' : 'bg-emerald-50 text-emerald-800 border-emerald-100'}
+                    feedbackColor={vitalsList[0].heartRate > 100 ? 'bg-amber-50 text-amber-800 border-amber-100' : vitalsList[0].heartRate < 60 ? 'bg-[#FFF0F2] text-[#DC2626] border-[#FECDD3]' : 'bg-emerald-50 text-emerald-800 border-emerald-100'}
                     icon={Heart} pulse={true}
                   />
                 </div>

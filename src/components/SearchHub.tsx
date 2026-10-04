@@ -89,7 +89,7 @@ export default function SearchHub({
               placeholder="Search by practitioner name, specialty, or treatment keywords..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl py-3 pl-11 pr-4 outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 font-semibold text-slate-700 placeholder-slate-400 transition-all"
+              className="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl py-3 pl-11 pr-4 outline-none focus:ring-1 focus:ring-[#DC2626] focus:border-[#DC2626] font-semibold text-slate-700 placeholder-slate-400 transition-all"
             />
           </div>
 
@@ -97,7 +97,7 @@ export default function SearchHub({
             <select
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
-              className="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 font-bold text-slate-700 cursor-pointer transition-all"
+              className="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 outline-none focus:ring-1 focus:ring-[#DC2626] focus:border-[#DC2626] font-bold text-slate-700 cursor-pointer transition-all"
             >
               <option value="all">📍 All Cities</option>
               <option value="Kuala Lumpur">Kuala Lumpur</option>
@@ -112,7 +112,7 @@ export default function SearchHub({
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value as any)}
-              className="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 font-bold text-slate-700 cursor-pointer transition-all"
+              className="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 outline-none focus:ring-1 focus:ring-[#DC2626] focus:border-[#DC2626] font-bold text-slate-700 cursor-pointer transition-all"
             >
               <option value="all">👨‍⚕️ Doctors & Nurses</option>
               <option value="doctor">Doctors (MD/MBBS)</option>
@@ -132,9 +132,9 @@ export default function SearchHub({
               step="10"
               value={maxFee}
               onChange={(e) => setMaxFee(Number(e.target.value))}
-              className="w-full sm:w-48 accent-blue-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer"
+              className="w-full sm:w-48 accent-[#DC2626] h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer"
             />
-            <span className="text-xs font-black text-blue-700 shrink-0 bg-blue-50/70 border border-blue-100/50 px-2.5 py-1 rounded-xl font-mono">RM {maxFee}</span>
+            <span className="text-xs font-black text-[#DC2626] shrink-0 bg-[#FFF0F2]/70 border border-[#FECDD3]/50 px-2.5 py-1 rounded-xl font-mono">RM {maxFee}</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
@@ -156,7 +156,7 @@ export default function SearchHub({
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-1.5 rounded-lg transition-all flex items-center gap-1 text-xs font-bold cursor-pointer ${viewMode === 'list'
-                    ? 'bg-white text-blue-700 shadow-3xs'
+                    ? 'bg-white text-[#DC2626] shadow-3xs'
                     : 'text-slate-500 hover:text-slate-800'
                   }`}
                 title="List View"
@@ -168,7 +168,7 @@ export default function SearchHub({
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-1.5 rounded-lg transition-all flex items-center gap-1 text-xs font-bold cursor-pointer ${viewMode === 'grid'
-                    ? 'bg-white text-blue-700 shadow-3xs'
+                    ? 'bg-white text-[#DC2626] shadow-3xs'
                     : 'text-slate-500 hover:text-slate-800'
                   }`}
                 title="Grid View"
@@ -183,7 +183,7 @@ export default function SearchHub({
               onClick={() => setShowMap(!showMap)}
               className="text-xs font-extrabold border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 py-1.5 px-3 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-3xs"
             >
-              <MapPin className="h-3.5 w-3.5 text-blue-500" />
+              <MapPin className="h-3.5 w-3.5 text-[#DC2626]" />
               <span>{showMap ? "Hide Map" : "Show Map"}</span>
             </button>
           </div>
@@ -194,7 +194,7 @@ export default function SearchHub({
       <div className="space-y-2 border-b border-slate-100 pb-2">
         <div className="flex items-center justify-between px-1">
           <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
-            <Stethoscope className="h-4 w-4 text-blue-600" />
+            <Stethoscope className="h-4 w-4 text-[#DC2626]" />
             Specialty Directory Categories
           </span>
           <span className="text-[9px] font-semibold text-slate-400 hidden sm:inline-block">
@@ -254,10 +254,10 @@ export default function SearchHub({
                   <div
                     key={prof.id}
                     onClick={() => setSelectedModalProf(prof)}
-                    className="bg-white border border-slate-200 hover:border-blue-400 rounded-none p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-5 cursor-pointer relative overflow-hidden group"
+                    className="bg-white border border-slate-200 hover:border-[#FECDD3] rounded-3xl p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-5 cursor-pointer relative overflow-hidden group"
                   >
                     {/* Floating Accent Border on Hover */}
-                    <div className={`absolute left-0 top-0 bottom-0 w-1 transition-all group-hover:w-1.5 ${isDoc ? 'bg-teal-500' : 'bg-rose-500'
+                    <div className={`absolute left-0 top-0 bottom-0 w-1 transition-all group-hover:w-1.5 ${isDoc ? 'bg-teal-500' : 'bg-[#DC2626]'
                       }`}></div>
 
                     <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -271,12 +271,12 @@ export default function SearchHub({
 
                       <div className="min-w-0 space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="text-sm font-black text-slate-850 group-hover:text-blue-600 transition-colors truncate">
+                          <h4 className="text-sm font-black text-slate-850 group-hover:text-[#DC2626] transition-colors truncate">
                             {prof.name}
                           </h4>
-                          <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-none border ${isDoc
+                          <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${isDoc
                               ? "bg-teal-50 text-teal-800 border-teal-100"
-                              : "bg-rose-50 text-rose-800 border-rose-100"
+                              : "bg-[#FFF0F2] text-[#B91C1C] border-[#FECDD3]"
                             }`}>
                             {isDoc ? "Doctor (MD/MBBS)" : "Registered Nurse (RN)"}
                           </span>
@@ -318,7 +318,7 @@ export default function SearchHub({
 
                       <div className="text-right">
                         <span className="text-[9px] text-slate-400 block font-bold uppercase leading-none">Consultation Fee</span>
-                        <span className="text-sm font-extrabold text-blue-800 font-mono">
+                        <span className="text-sm font-extrabold text-[#B91C1C] font-mono">
                           RM {prof.fee}
                           <span className="text-[10px] font-semibold text-slate-500 font-sans">{isDoc ? "" : "/hr"}</span>
                         </span>
@@ -329,7 +329,7 @@ export default function SearchHub({
                           e.stopPropagation();
                           setSelectedModalProf(prof);
                         }}
-                        className="text-xs font-extrabold bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 px-3.5 rounded-xl border border-blue-200/60 shadow-3xs transition-all flex items-center gap-1.5 cursor-pointer"
+                        className="text-xs font-extrabold bg-[#FFF0F2] hover:bg-[#FFF0F2] text-[#DC2626] py-2 px-3.5 rounded-xl border border-[#FECDD3] shadow-3xs transition-all flex items-center gap-1.5 cursor-pointer"
                         id={`view-credentials-btn-${prof.id}`}
                       >
                         <Eye className="h-3.5 w-3.5" />
@@ -349,18 +349,18 @@ export default function SearchHub({
                   <div
                     key={prof.id}
                     onClick={() => onSelectProfessional(prof.id)}
-                    className={`bg-white border border-slate-200 rounded-none p-5 shadow-3xs hover:shadow-md hover:border-blue-400/80 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between group relative overflow-hidden`}
+                    className={`bg-white border border-slate-200 rounded-[24px] p-5 shadow-3xs hover:shadow-md hover:border-[#FECDD3]/80 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between group relative overflow-hidden`}
                   >
                     {/* Visual top highlighting stripe per role */}
-                    <div className={`absolute left-0 right-0 top-0 h-1.5 ${isDoc ? 'bg-teal-500/80' : 'bg-rose-500/80'
+                    <div className={`absolute left-0 right-0 top-0 h-1.5 ${isDoc ? 'bg-teal-500/80' : 'bg-[#DC2626]/80'
                       }`}></div>
 
                     <div className="space-y-4">
                       {/* Top Header: Role indicator and Verified Status */}
                       <div className="flex justify-between items-center pt-1.5">
-                        <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-none border ${isDoc
+                        <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${isDoc
                             ? "bg-teal-50 text-teal-800 border-teal-100"
-                            : "bg-rose-50 text-rose-800 border-rose-100"
+                            : "bg-[#FFF0F2] text-[#B91C1C] border-[#FECDD3]"
                           }`}>
                           {isDoc ? "Doctor" : "Registered Nurse"}
                         </span>
@@ -377,15 +377,15 @@ export default function SearchHub({
                           <img
                             src={prof.avatar}
                             alt={prof.name}
-                            className="h-14 w-14 rounded-full object-cover border border-slate-100 shadow-3xs"
+                            className="h-14 w-14 rounded-2xl object-cover border border-slate-100 shadow-3xs"
                             referrerPolicy="no-referrer"
                           />
-                          <span className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white ${isDoc ? 'bg-teal-500' : 'bg-rose-500'
+                          <span className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white ${isDoc ? 'bg-teal-500' : 'bg-[#DC2626]'
                             }`}></span>
                         </div>
 
                         <div className="space-y-1 min-w-0">
-                          <h4 className="text-sm font-black text-slate-850 group-hover:text-blue-600 transition-colors truncate leading-tight">
+                          <h4 className="text-sm font-black text-slate-850 group-hover:text-[#DC2626] transition-colors truncate leading-tight">
                             {prof.name}
                           </h4>
 
@@ -433,7 +433,7 @@ export default function SearchHub({
                             e.stopPropagation();
                             setSelectedModalProf(prof);
                           }}
-                          className="text-[10px] font-extrabold text-blue-600 bg-blue-50/70 hover:bg-blue-100 px-2.5 py-1.5 rounded-lg border border-blue-250/30 transition-all cursor-pointer flex items-center gap-1 shadow-3xs"
+                          className="text-[10px] font-extrabold text-[#DC2626] bg-[#FFF0F2]/70 hover:bg-[#FFF0F2] px-2.5 py-1.5 rounded-lg border border-[#FECDD3]/30 transition-all cursor-pointer flex items-center gap-1 shadow-3xs"
                           title="View Credentials Card"
                         >
                           <Eye className="h-3 w-3" />
@@ -442,7 +442,7 @@ export default function SearchHub({
 
                         <div className="text-right">
                           <span className="text-[9px] text-slate-400 block font-bold uppercase leading-none">Consultation Fee</span>
-                          <span className="text-xs font-black text-blue-800 font-mono">
+                          <span className="text-xs font-black text-[#B91C1C] font-mono">
                             RM {prof.fee}
                             <span className="text-[9px] font-semibold text-slate-500 font-sans">{isDoc ? "" : "/hr"}</span>
                           </span>
@@ -461,7 +461,7 @@ export default function SearchHub({
           <div className="lg:col-span-4 bg-slate-50 border border-slate-200 rounded-3xl p-4 shadow-3xs flex flex-col h-[520px] justify-between relative overflow-hidden sticky top-20">
             <div className="space-y-1 mb-4 z-10">
               <h4 className="text-xs font-black text-slate-800 flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5 text-blue-600" />
+                <MapPin className="h-3.5 w-3.5 text-[#DC2626]" />
                 Clinic & Home Care Coordinates
               </h4>
               <p className="text-[10px] text-slate-500 font-semibold">Active geolocations within KL, Selangor, Penang, and Johor</p>
@@ -494,15 +494,15 @@ export default function SearchHub({
                     onClick={() => onSelectProfessional(prof.id)}
                     className="absolute cursor-pointer group flex flex-col items-center justify-center z-20"
                   >
-                    <div className="bg-blue-700 text-white rounded-full p-1 border border-white shadow-lg animate-bounce hover:scale-110 transition-transform">
+                    <div className="bg-[#0F172A] text-white rounded-full p-1 border border-white shadow-lg animate-bounce hover:scale-110 transition-transform">
                       {prof.role === UserRole.DOCTOR ? (
-                        <Stethoscope className="h-3 w-3 text-blue-300" />
+                        <Stethoscope className="h-3 w-3 text-rose-300" />
                       ) : (
                         <HeartPulse className="h-3 w-3 text-slate-300" />
                       )}
                     </div>
                     {/* Tooltip */}
-                    <div className="absolute bottom-6 scale-0 group-hover:scale-100 transition-all bg-blue-700 text-white text-[9px] font-bold px-2 py-1 rounded shadow-md whitespace-nowrap">
+                    <div className="absolute bottom-6 scale-0 group-hover:scale-100 transition-all bg-[#0F172A] text-white text-[9px] font-bold px-2 py-1 rounded shadow-md whitespace-nowrap">
                       {prof.name}
                     </div>
                   </div>
@@ -511,7 +511,7 @@ export default function SearchHub({
 
               <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur p-3 rounded-xl border border-slate-200 shadow-md">
                 <span className="text-[10px] font-extrabold text-slate-800 flex items-center gap-1 mb-1">
-                  <UserCheck className="h-3.5 w-3.5 text-blue-600" />
+                  <UserCheck className="h-3.5 w-3.5 text-[#DC2626]" />
                   Showing {filteredList.length} verified listings
                 </span>
                 <p className="text-[9px] text-slate-500 font-semibold">Pins represent registered medical council practitioner clinic coordinates.</p>
@@ -561,9 +561,9 @@ export default function SearchHub({
 
                   <div className="space-y-1">
                     {/* Role badge */}
-                    <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-none border ${selectedModalProf.role === UserRole.DOCTOR
+                    <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${selectedModalProf.role === UserRole.DOCTOR
                         ? "bg-teal-50 text-teal-800 border-teal-200/60"
-                        : "bg-rose-50 text-rose-800 border-rose-200/60"
+                        : "bg-[#FFF0F2] text-[#B91C1C] border-[#FECDD3]"
                       }`}>
                       {selectedModalProf.role === UserRole.DOCTOR ? "DOCTOR (MD/MBBS)" : "REGISTERED NURSE (RN)"}
                     </span>

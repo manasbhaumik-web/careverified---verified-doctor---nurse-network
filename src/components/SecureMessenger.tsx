@@ -69,19 +69,19 @@ export default function SecureMessenger() {
   return (
     <div className="bg-white border border-slate-100 rounded-xl shadow-sm overflow-hidden flex flex-col h-[520px]" id="secure-messenger-panel">
       {/* Header Panel */}
-      <div className="bg-blue-700 p-4 text-white flex items-center justify-between border-b border-blue-800">
+      <div className="bg-[#0F172A] p-4 text-white flex items-center justify-between border-b border-slate-700">
         <div className="flex items-center gap-2.5">
           <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
           <div>
             <h3 className="text-xs font-bold flex items-center gap-1.5">
               Secure Practitioner Consultation Channel
             </h3>
-            <span className="text-[10px] text-blue-200 block font-medium">HIPAA Compliant End-to-End Encryption</span>
+            <span className="text-[10px] text-slate-300 block font-medium">HIPAA Compliant End-to-End Encryption</span>
           </div>
         </div>
-        <div className="flex items-center gap-1 bg-blue-800/40 border border-blue-400/20 rounded-lg px-2.5 py-1">
-          <Lock className="h-3 w-3 text-blue-300" />
-          <span className="text-[9px] font-bold text-blue-200">SECURE DISPATCH</span>
+        <div className="flex items-center gap-1 bg-white/10 border border-white/20 rounded-lg px-2.5 py-1">
+          <Lock className="h-3 w-3 text-rose-300" />
+          <span className="text-[9px] font-bold text-slate-300">SECURE DISPATCH</span>
         </div>
       </div>
 
@@ -89,7 +89,7 @@ export default function SecureMessenger() {
       <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-slate-50/50">
         <div className="text-center py-2">
           <span className="text-[9px] font-bold bg-slate-200/60 text-slate-600 px-3 py-1 rounded-full uppercase tracking-wider flex items-center justify-center gap-1.5 mx-auto max-w-fit">
-            <Shield className="h-3 w-3 text-blue-600" />
+            <Shield className="h-3 w-3 text-[#DC2626]" />
             Medical council identity confirmed
           </span>
         </div>
@@ -104,14 +104,14 @@ export default function SecureMessenger() {
               <span className="font-serif text-[10px] text-slate-500 font-semibold mb-0.5 px-1">{msg.senderName}</span>
               <div className={`p-3 rounded-xl text-xs font-medium leading-relaxed shadow-sm ${
                 isMe
-                  ? "bg-blue-600 text-white rounded-tr-none"
+                  ? "bg-[#DC2626] text-white rounded-tr-none"
                   : "bg-white border border-slate-200 text-slate-800 rounded-tl-none"
               }`}>
                 {msg.text}
               </div>
               <span className="font-mono tabular-nums text-[8px] text-slate-400 font-semibold mt-1 flex items-center gap-1 px-1">
                 {msg.timestamp}
-                {isMe && <Check className="h-3 w-3 text-blue-600" />}
+                {isMe && <Check className="h-3 w-3 text-[#DC2626]" />}
               </span>
             </div>
           );
@@ -132,12 +132,12 @@ export default function SecureMessenger() {
           placeholder="Type secure diagnostic or care consultation message..."
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="flex-1 text-xs border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-blue-500 font-medium bg-slate-50"
+          className="flex-1 text-xs border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-[#DC2626] font-medium bg-slate-50"
         />
         <button
           type="submit"
           disabled={!text.trim() || loading}
-          className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white rounded-xl p-2.5 shadow-md transition-all shrink-0"
+          className="bg-[#DC2626] hover:bg-[#0F172A] disabled:bg-slate-300 text-white rounded-xl p-2.5 shadow-md transition-all shrink-0"
         >
           <Send className="h-4 w-4" />
         </button>
