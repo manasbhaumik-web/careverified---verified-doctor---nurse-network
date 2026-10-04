@@ -238,7 +238,7 @@ export default function PractitionerBookingsTab({
                     {dispatch.dispatchStatus === 'Arrived' && isClaimedByMe && (
                       <button
                         onClick={() => onUpdateDispatchStatus(dispatch.id, 'Completed')}
-                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black py-2 rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                        className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-black py-2 rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         <CheckCircle2 className="h-4 w-4" />
                         <span>✅ COMPLETE CRITICAL CARE DISPATCH</span>

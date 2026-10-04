@@ -35,11 +35,11 @@ export default function PrescriptionsTab({
       {/* Header Area */}
       <div className="border-b border-slate-100 pb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.15em] text-teal-700 bg-teal-50 border border-teal-100/50 px-2.5 py-0.5 rounded-md mb-2">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.15em] text-[#DC2626] bg-[#FFF0F2] border border-[#FECDD3] px-2.5 py-0.5 rounded-md mb-2">
             Secure Pharmacotherapy
           </span>
           <h3 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <FileText className="h-5 w-5 text-teal-600" />
+            <FileText className="h-5 w-5 text-[#DC2626]" />
             E-Prescriptions & Rx Plans
           </h3>
           <p className="text-xs text-slate-500 font-medium mt-1">
@@ -58,7 +58,7 @@ export default function PrescriptionsTab({
             onClick={onRequestRefill}
             className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black px-5 py-3.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-95 duration-200 cursor-pointer shrink-0"
           >
-            <RefreshCw className="h-4 w-4 text-teal-400" />
+            <RefreshCw className="h-4 w-4 text-rose-500" />
             <span>Request Rx Refill</span>
           </button>
         </div>
@@ -81,7 +81,7 @@ export default function PrescriptionsTab({
             <div className="pt-2">
               <button 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold rounded-xl transition-all shadow-sm shadow-teal-500/20"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#DC2626] hover:bg-[#0F172A] text-white text-sm font-bold rounded-xl transition-all shadow-sm shadow-rose-500/20"
               >
                 <Stethoscope className="h-4 w-4" />
                 Book Consultation
@@ -100,10 +100,10 @@ export default function PrescriptionsTab({
             <motion.div 
               variants={itemVariants}
               key={b.id} 
-              className="group relative bg-white border border-slate-200/80 hover:border-teal-500/40 rounded-[28px] p-6 shadow-sm transition-all duration-300 flex flex-col justify-between space-y-5 overflow-hidden hover:shadow-lg"
+              className="group relative bg-white border border-slate-200/80 hover:border-[#FECDD3] rounded-[28px] p-6 shadow-sm transition-all duration-300 flex flex-col justify-between space-y-5 overflow-hidden hover:shadow-lg"
             >
               {/* Rx background watermark styling */}
-              <div className="absolute top-8 right-6 text-slate-50 text-7xl font-black select-none pointer-events-none group-hover:text-teal-50/50 transition-colors duration-300">
+              <div className="absolute top-8 right-6 text-slate-50 text-7xl font-black select-none pointer-events-none group-hover:text-slate-100/50 transition-colors duration-300">
                 Rx
               </div>
 
@@ -114,7 +114,7 @@ export default function PrescriptionsTab({
                     <span className="text-[11px] text-slate-400 font-extrabold uppercase tracking-widest block">
                       Licensed Practitioner
                     </span>
-                    <h4 className="text-base font-black text-slate-900 group-hover:text-teal-700 transition-colors duration-200">{b.professionalName}</h4>
+                    <h4 className="text-base font-black text-slate-900 group-hover:text-[#DC2626] transition-colors duration-200">{b.professionalName}</h4>
                   </div>
                   <span className="bg-emerald-50 text-emerald-800 text-[11px] font-black px-2.5 py-1 rounded-xs border border-emerald-100 flex items-center gap-1.5 shrink-0 shadow-xs">
                     <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> 
@@ -123,7 +123,7 @@ export default function PrescriptionsTab({
                 </div>
 
                 {/* Patient / Diagnosis Board */}
-                <div className="bg-slate-50/80 border border-slate-200/80 p-4 rounded-xl text-xs space-y-3 group-hover:bg-teal-50/30 transition-colors duration-300">
+                <div className="bg-slate-50/80 border border-slate-200/80 p-4 rounded-xl text-xs space-y-3 group-hover:bg-[#FFF0F2] transition-colors duration-300">
                   <div className="flex justify-between items-center font-bold text-slate-400 text-[11px] uppercase tracking-wider">
                     <span>Clinical Diagnosis</span>
                     <span>Issued Date</span>
@@ -133,7 +133,7 @@ export default function PrescriptionsTab({
                       {b.prescription?.diagnosis}
                     </span>
                     <span className="shrink-0 font-mono text-xs text-slate-500 bg-white border border-slate-200/80 px-2 py-1.5 rounded-lg shadow-xs flex items-center gap-1.5">
-                      <Calendar className="h-3.5 w-3.5 text-teal-600" />
+                      <Calendar className="h-3.5 w-3.5 text-[#DC2626]" />
                       {b.prescription?.issuedAt ? b.prescription.issuedAt.split('T')[0] : b.date}
                     </span>
                   </div>
@@ -142,8 +142,8 @@ export default function PrescriptionsTab({
                 {/* Prescribed Pharmacotherapy List */}
                 <div className="space-y-2">
                   <span className="text-[11px] text-slate-500 font-black uppercase tracking-widest block px-1">Active Medical Plan & Dosage:</span>
-                  <div className="text-xs font-semibold text-slate-700 bg-white border border-slate-200/80 p-4 rounded-xl italic shadow-xs border-l-4 border-l-teal-500 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-teal-50/50 via-transparent to-transparent opacity-50 pointer-events-none"></div>
+                  <div className="text-xs font-semibold text-slate-700 bg-white border border-slate-200/80 p-4 rounded-xl italic shadow-xs border-l-4 border-l-[#DC2626] relative overflow-hidden">
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#FFF0F2]/50 via-transparent to-transparent opacity-50 pointer-events-none"></div>
                     <span className="relative z-10 block whitespace-pre-wrap leading-relaxed">"{b.prescription?.medicines}"</span>
                   </div>
                 </div>
@@ -156,7 +156,7 @@ export default function PrescriptionsTab({
                 </span>
                 <button
                   onClick={() => onViewPrescription(b)}
-                  className="bg-white hover:bg-teal-600 text-slate-700 hover:text-white text-xs font-black px-4 py-2.5 rounded-xl transition-all border border-slate-200 hover:border-teal-600 flex items-center gap-2 hover:scale-[1.02] active:scale-95 cursor-pointer shadow-sm"
+                  className="bg-white hover:bg-[#DC2626] text-slate-700 hover:text-white text-xs font-black px-4 py-2.5 rounded-xl transition-all border border-slate-200 hover:border-[#DC2626] flex items-center gap-2 hover:scale-[1.02] active:scale-95 cursor-pointer shadow-sm"
                 >
                   <Eye className="h-4 w-4" />
                   <span>View Print Rx Slip</span>

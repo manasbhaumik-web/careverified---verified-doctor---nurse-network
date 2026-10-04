@@ -828,12 +828,12 @@ export default function PatientDashboard({
                 {/* Rx Header */}
                 <div className="flex justify-between items-start border-b-2 border-slate-200 pb-6">
                   <div className="flex items-center gap-3">
-                    <div className="bg-teal-700 text-teal-100 p-2.5 rounded-xl">
+                    <div className="bg-[#0F172A] text-rose-100 p-2.5 rounded-xl">
                       <Stethoscope className="h-6 w-6" />
                     </div>
                     <div className="space-y-0.5">
-                      <h3 className="text-xl font-black text-teal-950 leading-none">MedCred</h3>
-                      <span className="text-[11px] font-extrabold text-teal-700 uppercase tracking-[0.2em] block">Verified Medical Network</span>
+                      <h3 className="text-xl font-black text-rose-950 leading-none">MedCred</h3>
+                      <span className="text-[11px] font-extrabold text-[#DC2626] uppercase tracking-[0.2em] block">Verified Medical Network</span>
                     </div>
                   </div>
                   <div className="text-right space-y-2">
@@ -881,7 +881,7 @@ export default function PatientDashboard({
                     <FileSignature className="h-3.5 w-3.5" />
                     Prescribed Medications
                   </span>
-                  <div className="border border-slate-200 rounded-xl p-5 bg-white whitespace-pre-line text-sm font-medium text-slate-800 leading-loose border-l-4 border-l-teal-600 relative z-10 shadow-sm">
+                  <div className="border border-slate-200 rounded-xl p-5 bg-white whitespace-pre-line text-sm font-medium text-slate-800 leading-loose border-l-4 border-l-[#DC2626] relative z-10 shadow-sm">
                     {selectedPrescriptionBooking.prescription?.medicines}
                   </div>
                 </div>
@@ -901,7 +901,7 @@ export default function PatientDashboard({
                   <div className="flex flex-col gap-2">
                     {/* Mock QR Code area for verification */}
                     <div className="w-16 h-16 bg-slate-100 rounded-lg border border-slate-200 p-1 flex items-center justify-center relative overflow-hidden group cursor-help">
-                      <div className="absolute inset-0 bg-slate-200/50 transition-all group-hover:bg-teal-500/10"></div>
+                      <div className="absolute inset-0 bg-slate-200/50 transition-all group-hover:bg-[#FFF0F2]"></div>
                       <div className="w-full h-full border border-slate-300 border-dashed rounded relative flex items-center justify-center">
                         <ScanLine className="h-6 w-6 text-slate-400" />
                       </div>
@@ -1465,9 +1465,9 @@ export default function PatientDashboard({
             className="relative max-w-md w-full scale-100 md:hover:scale-[1.01] transition-all duration-300 ease-out"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* The precise, styled card matching user's image with a vibrant teal border */}
+            {/* The precise, styled card matching user's image with a vibrant crimson border */}
             <div 
-              className="bg-white border-[3px] border-teal-300 rounded-[28px] p-6 shadow-[0_20px_50px_rgba(13,148,136,0.15)] flex flex-col justify-between relative overflow-hidden"
+              className="bg-white border-[3px] border-rose-300 rounded-[28px] p-6 shadow-[0_20px_50px_rgba(13,148,136,0.15)] flex flex-col justify-between relative overflow-hidden"
               style={{ minHeight: '380px' }}
               id="credentials-modal-card"
             >
@@ -1495,7 +1495,7 @@ export default function PatientDashboard({
                     {/* Role badge */}
                     <span className={`text-[11px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${
                       selectedModalProf.role === UserRole.DOCTOR 
-                        ? "bg-teal-50 text-teal-800 border-teal-200/60" 
+                        ? "bg-[#FFF0F2] text-[#B91C1C] border-[#FECDD3]/60" 
                         : "bg-slate-100 text-slate-800 border-slate-200"
                     }`}>
                       {selectedModalProf.role === UserRole.DOCTOR ? "DOCTOR (MD/MBBS)" : "REGISTERED NURSE (RN)"}
@@ -1508,7 +1508,7 @@ export default function PatientDashboard({
                     
                     {/* Specialty */}
                     <div className="flex items-center gap-1.5 text-xs text-slate-600 font-bold mt-1">
-                      <Stethoscope className="h-3.5 w-3.5 text-teal-500 shrink-0" />
+                      <Stethoscope className="h-3.5 w-3.5 text-[#DC2626] shrink-0" />
                       <span>{selectedModalProf.specialization}</span>
                     </div>
 
@@ -1521,7 +1521,7 @@ export default function PatientDashboard({
                 </div>
 
                 {/* Verified badge pill */}
-                <div className="mt-4 flex justify-between items-center bg-teal-50/10 px-3.5 py-1.5 rounded-xl border border-teal-100/50">
+                <div className="mt-4 flex justify-between items-center bg-[#FFF0F2]/10 px-3.5 py-1.5 rounded-xl border border-[#FECDD3]">
                   <div className="text-xs font-bold text-slate-500">Registry Verification Status</div>
                   <div className="border border-emerald-500/80 text-emerald-600 bg-emerald-50/40 px-3 py-1 rounded-xs text-xs font-bold flex items-center gap-1 shadow-3xs">
                     <span>Verified</span>
@@ -1563,7 +1563,7 @@ export default function PatientDashboard({
                 
                 <div className="text-right">
                   <span className="text-[11px] text-slate-400 block font-extrabold uppercase tracking-wider leading-none">Consultation Fee</span>
-                  <span className="text-sm font-extrabold text-teal-800 font-mono mt-1 block">
+                  <span className="text-sm font-extrabold text-[#B91C1C] font-mono mt-1 block">
                     RM {selectedModalProf.fee}
                     <span className="text-xs font-semibold text-slate-500 font-sans">{selectedModalProf.role === UserRole.DOCTOR ? "" : "/hr"}</span>
                   </span>
@@ -1584,7 +1584,7 @@ export default function PatientDashboard({
                   onSelectProfessional(selectedModalProf.id);
                   setSelectedModalProf(null);
                 }}
-                className="px-5 py-2.5 bg-[#c8102e] hover:bg-[#a50f2a] text-white text-xs font-extrabold rounded-xl shadow-md shadow-teal-500/10 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-5 py-2.5 bg-[#c8102e] hover:bg-[#a50f2a] text-white text-xs font-extrabold rounded-xl shadow-md shadow-rose-500/10 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Full Profile & Appointments</span>
               </button>

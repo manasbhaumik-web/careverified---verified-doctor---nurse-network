@@ -73,7 +73,7 @@ function BPTrendChart({ vitals }: { vitals: VitalsRecord[] }) {
       <div className="flex justify-between items-center mb-4">
         <div>
           <h4 className="text-sm font-black text-slate-900 flex items-center gap-2">
-            <Activity className="h-4 w-4 text-teal-600" />
+            <Activity className="h-4 w-4 text-[#DC2626]" />
             Blood Pressure Trend
           </h4>
           <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Sys / Dia (mmHg)</span>
@@ -217,11 +217,11 @@ export default function VitalsTab({
       {/* Header section */}
       <div className="border-b border-slate-100 pb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.15em] text-teal-700 bg-teal-50 border border-teal-100/50 px-2.5 py-0.5 rounded-md mb-2">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.15em] text-[#DC2626] bg-[#FFF0F2] border border-[#FECDD3] px-2.5 py-0.5 rounded-md mb-2">
             Clinical Telemetry Logs
           </span>
           <h3 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <HeartPulse className="h-5 w-5 text-teal-600" />
+            <HeartPulse className="h-5 w-5 text-[#DC2626]" />
             Vitals & Bio-Telemetry
           </h3>
           <p className="text-xs text-slate-500 font-medium mt-1">
@@ -242,7 +242,7 @@ export default function VitalsTab({
         <div className="lg:col-span-5 space-y-6">
           <motion.form variants={itemVariants} onSubmit={onSubmitVitals} className="bg-white border border-slate-200/80 rounded-[32px] p-8 shadow-sm space-y-6">
             <h4 className="text-sm font-black text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-4 flex items-center gap-2">
-              <PlusCircle className="h-5 w-5 text-teal-600" />
+              <PlusCircle className="h-5 w-5 text-[#DC2626]" />
               Record Markers
             </h4>
 
@@ -257,14 +257,14 @@ export default function VitalsTab({
               <div className="space-y-2">
                 <label className="block text-xs font-extrabold text-slate-500 uppercase tracking-widest">Sys pressure</label>
                 <div className="relative">
-                  <input type="number" value={systolic} onChange={(e) => setSystolic(Number(e.target.value))} className="w-full text-sm font-bold border border-slate-200 rounded-xl py-3 pl-4 pr-12 bg-slate-50 focus:bg-white focus:border-teal-500 outline-none transition-all shadow-xs" required min="70" max="220" />
+                  <input type="number" value={systolic} onChange={(e) => setSystolic(Number(e.target.value))} className="w-full text-sm font-bold border border-slate-200 rounded-xl py-3 pl-4 pr-12 bg-slate-50 focus:bg-white focus:border-[#DC2626] outline-none transition-all shadow-xs" required min="70" max="220" />
                   <span className="absolute right-4 top-3.5 text-[11px] font-black text-slate-400">mmHg</span>
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="block text-xs font-extrabold text-slate-500 uppercase tracking-widest">Dia pressure</label>
                 <div className="relative">
-                  <input type="number" value={diastolic} onChange={(e) => setDiastolic(Number(e.target.value))} className="w-full text-sm font-bold border border-slate-200 rounded-xl py-3 pl-4 pr-12 bg-slate-50 focus:bg-white focus:border-teal-500 outline-none transition-all shadow-xs" required min="40" max="140" />
+                  <input type="number" value={diastolic} onChange={(e) => setDiastolic(Number(e.target.value))} className="w-full text-sm font-bold border border-slate-200 rounded-xl py-3 pl-4 pr-12 bg-slate-50 focus:bg-white focus:border-[#DC2626] outline-none transition-all shadow-xs" required min="40" max="140" />
                   <span className="absolute right-4 top-3.5 text-[11px] font-black text-slate-400">mmHg</span>
                 </div>
               </div>
@@ -274,14 +274,14 @@ export default function VitalsTab({
               <div className="space-y-2">
                 <label className="block text-xs font-extrabold text-slate-500 uppercase tracking-widest">Glucose</label>
                 <div className="relative">
-                  <input type="number" value={bloodSugar} onChange={(e) => setBloodSugar(Number(e.target.value))} className="w-full text-sm font-bold border border-slate-200 rounded-xl py-3 pl-4 pr-12 bg-slate-50 focus:bg-white focus:border-teal-500 outline-none transition-all shadow-xs" required min="50" max="400" />
+                  <input type="number" value={bloodSugar} onChange={(e) => setBloodSugar(Number(e.target.value))} className="w-full text-sm font-bold border border-slate-200 rounded-xl py-3 pl-4 pr-12 bg-slate-50 focus:bg-white focus:border-[#DC2626] outline-none transition-all shadow-xs" required min="50" max="400" />
                   <span className="absolute right-4 top-3.5 text-[11px] font-black text-slate-400">mg/dL</span>
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="block text-xs font-extrabold text-slate-500 uppercase tracking-widest">Heart Rate</label>
                 <div className="relative">
-                  <input type="number" value={heartRate} onChange={(e) => setHeartRate(Number(e.target.value))} className="w-full text-sm font-bold border border-slate-200 rounded-xl py-3 pl-4 pr-12 bg-slate-50 focus:bg-white focus:border-teal-500 outline-none transition-all shadow-xs" required min="40" max="200" />
+                  <input type="number" value={heartRate} onChange={(e) => setHeartRate(Number(e.target.value))} className="w-full text-sm font-bold border border-slate-200 rounded-xl py-3 pl-4 pr-12 bg-slate-50 focus:bg-white focus:border-[#DC2626] outline-none transition-all shadow-xs" required min="40" max="200" />
                   <span className="absolute right-4 top-3.5 text-[11px] font-black text-slate-400">BPM</span>
                 </div>
               </div>
@@ -289,7 +289,7 @@ export default function VitalsTab({
 
             <div className="space-y-2">
               <label className="block text-xs font-extrabold text-slate-500 uppercase tracking-widest">Baseline Mood</label>
-              <select value={mood} onChange={(e) => setMood(e.target.value)} className="w-full text-sm font-bold border border-slate-200 rounded-xl py-3 px-4 bg-slate-50 focus:bg-white focus:border-teal-500 outline-none cursor-pointer transition-all shadow-xs">
+              <select value={mood} onChange={(e) => setMood(e.target.value)} className="w-full text-sm font-bold border border-slate-200 rounded-xl py-3 px-4 bg-slate-50 focus:bg-white focus:border-[#DC2626] outline-none cursor-pointer transition-all shadow-xs">
                 <option value="Energetic">✨ Energetic & Vibrant</option>
                 <option value="Restful">🧘 Restful & Calmed</option>
                 <option value="Calm">⚖ Stable & Calm</option>
@@ -306,11 +306,11 @@ export default function VitalsTab({
 
           {/* Clinical Wellness Journal */}
           <motion.div variants={itemVariants} className="relative overflow-hidden bg-gradient-to-br from-[#B91C1C] to-[#86102a] border border-slate-800 rounded-[32px] p-8 text-white space-y-5 shadow-2xl">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-teal-500/10 rounded-xs blur-[40px] pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-48 h-48 bg-[#FFF0F2] rounded-xs blur-[40px] pointer-events-none"></div>
             
             <div className="space-y-2 relative z-10">
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest bg-teal-500/20 text-teal-300 border border-teal-500/30 px-3 py-1 rounded-xs shadow-inner">
-                <Sparkles className="h-3.5 w-3.5 text-teal-400" /> Clinical Wellness Interpreter
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest bg-[#FFF0F2] text-rose-400 border border-[#FECDD3] px-3 py-1 rounded-xs shadow-inner">
+                <Sparkles className="h-3.5 w-3.5 text-rose-500" /> Clinical Wellness Interpreter
               </span>
               <h5 className="text-sm font-black uppercase tracking-wider mt-2">Self-Care Journal</h5>
             </div>
@@ -320,17 +320,17 @@ export default function VitalsTab({
                 value={journalEntry} onChange={(e) => setJournalEntry(e.target.value)}
                 placeholder="Describe active symptoms or wellness observations..."
                 rows={3}
-                className="w-full text-sm font-medium bg-white/5 border border-white/10 rounded-xl p-4 outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400/30 text-white placeholder-slate-500 transition-all shadow-inner"
+                className="w-full text-sm font-medium bg-white/5 border border-white/10 rounded-xl p-4 outline-none focus:border-rose-400 focus:ring-1 focus:ring-[#DC2626]/30 text-white placeholder-slate-500 transition-all shadow-inner"
                 required
               />
-              <button disabled={journalFeedbackLoading} type="submit" className="w-full bg-teal-600 hover:bg-teal-500 disabled:bg-teal-800 text-white text-xs font-black py-4 px-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95">
+              <button disabled={journalFeedbackLoading} type="submit" className="w-full bg-[#DC2626] hover:bg-[#DC2626] disabled:bg-[#0F172A] text-white text-xs font-black py-4 px-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95">
                 {journalFeedbackLoading && <RefreshCw className="h-4 w-4 animate-spin" />}
                 <span>{journalFeedbackLoading ? 'Evaluating Parameters...' : 'Analyze Health Entry'}</span>
               </button>
             </form>
 
             {journalFeedback && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="bg-white/5 border border-teal-500/30 rounded-xl p-4 text-[11px] text-teal-50 leading-relaxed font-bold whitespace-pre-line relative z-10 border-l-4 border-l-teal-400 shadow-inner">
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="bg-white/5 border border-[#FECDD3] rounded-xl p-4 text-[11px] text-slate-100 leading-relaxed font-bold whitespace-pre-line relative z-10 border-l-4 border-l-[#DC2626] shadow-inner">
                 {journalFeedback}
               </motion.div>
             )}
@@ -342,7 +342,7 @@ export default function VitalsTab({
           <motion.div variants={itemVariants} className="bg-slate-50/50 border border-slate-200/80 rounded-[32px] p-6 shadow-sm space-y-6">
             <div className="flex items-center justify-between border-b border-slate-200 pb-4">
               <h4 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                <Activity className="h-5 w-5 text-teal-600" />
+                <Activity className="h-5 w-5 text-[#DC2626]" />
                 Metrics Dashboard
               </h4>
             </div>
@@ -362,7 +362,7 @@ export default function VitalsTab({
                   <VitalsGauge
                     label="Blood Pressure" value={String(vitalsList[0].systolic)} subValue={`/${vitalsList[0].diastolic}`} unit="mmHg"
                     percentage={((vitalsList[0].systolic - 70) / (190 - 70)) * 100}
-                    colorClass={vitalsList[0].systolic > 140 ? 'stroke-rose-500' : vitalsList[0].systolic > 125 ? 'stroke-amber-500' : 'stroke-teal-500'}
+                    colorClass={vitalsList[0].systolic > 140 ? 'stroke-rose-500' : vitalsList[0].systolic > 125 ? 'stroke-amber-500' : 'stroke-rose-500'}
                     feedbackText={getBPFeedback(vitalsList[0].systolic, vitalsList[0].diastolic).label}
                     feedbackColor={getBPFeedback(vitalsList[0].systolic, vitalsList[0].diastolic).color}
                     icon={Activity}
@@ -370,7 +370,7 @@ export default function VitalsTab({
                   <VitalsGauge
                     label="Fasting Glucose" value={String(vitalsList[0].bloodSugar)} unit="mg/dL"
                     percentage={((vitalsList[0].bloodSugar - 50) / (250 - 50)) * 100}
-                    colorClass={vitalsList[0].bloodSugar > 140 ? 'stroke-rose-500' : vitalsList[0].bloodSugar > 110 ? 'stroke-amber-500' : 'stroke-teal-500'}
+                    colorClass={vitalsList[0].bloodSugar > 140 ? 'stroke-rose-500' : vitalsList[0].bloodSugar > 110 ? 'stroke-amber-500' : 'stroke-rose-500'}
                     feedbackText={getSugarFeedback(vitalsList[0].bloodSugar).label}
                     feedbackColor={getSugarFeedback(vitalsList[0].bloodSugar).color}
                     icon={Activity}
@@ -393,7 +393,7 @@ export default function VitalsTab({
                   <span className="text-xs font-black text-slate-500 uppercase tracking-widest block px-2">Historical Logs</span>
                   <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                     {vitalsList.map((v) => (
-                      <div key={v.id} className="group relative border border-slate-200 p-5 rounded-xl bg-white shadow-sm hover:shadow-md hover:border-teal-500/30 transition-all duration-300">
+                      <div key={v.id} className="group relative border border-slate-200 p-5 rounded-xl bg-white shadow-sm hover:shadow-md hover:border-[#FECDD3] transition-all duration-300">
                         <div className="flex justify-between items-center mb-3">
                           <div className="flex gap-2 items-center">
                             <span className="font-black text-slate-800 bg-slate-50 px-3 py-1 rounded-lg text-xs border border-slate-200">{v.date}</span>

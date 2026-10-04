@@ -39,11 +39,11 @@ export default function AppointmentsTab({
       {/* Header section with modern pill title */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.15em] text-teal-700 bg-teal-50 border border-teal-100/50 px-2.5 py-0.5 rounded-md mb-2">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.15em] text-[#DC2626] bg-[#FFF0F2] border border-[#FECDD3] px-2.5 py-0.5 rounded-md mb-2">
             Secure Live Schedule
           </span>
           <h3 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Clock className="h-5 w-5 text-teal-600" />
+            <Clock className="h-5 w-5 text-[#DC2626]" />
             Upcoming Consultations
           </h3>
           <p className="text-xs text-slate-500 font-medium mt-1">
@@ -69,7 +69,7 @@ export default function AppointmentsTab({
             <div className="pt-2">
               <button 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold rounded-xl transition-all shadow-sm shadow-teal-500/20"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#DC2626] hover:bg-[#0F172A] text-white text-sm font-bold rounded-xl transition-all shadow-sm shadow-rose-500/20"
               >
                 <Search className="h-4 w-4" />
                 Find a Doctor
@@ -92,18 +92,18 @@ export default function AppointmentsTab({
               <motion.div 
                 variants={itemVariants}
                 key={b.id} 
-                className="group relative bg-white border border-slate-200/80 hover:border-teal-500/40 rounded-[28px] p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-6 overflow-hidden"
+                className="group relative bg-white border border-slate-200/80 hover:border-[#FECDD3] rounded-[28px] p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-6 overflow-hidden"
               >
                 {/* Visual Accent Bar */}
                 <div className={`absolute top-0 left-0 right-0 h-[4px] transition-all duration-300 ${
-                  isVideo ? 'bg-teal-500' : 'bg-[#DC2626]'
+                  isVideo ? 'bg-[#DC2626]' : 'bg-[#DC2626]'
                 }`} />
 
                 {/* Top Badge Indicators */}
                 <div className="flex justify-between items-center">
                   <span className={`inline-flex items-center gap-1.5 text-[11px] font-black uppercase px-2.5 py-1 rounded-full tracking-wider border ${
                     isVideo 
-                      ? 'bg-teal-50 text-teal-700 border-teal-100' 
+                      ? 'bg-[#FFF0F2] text-[#DC2626] border-[#FECDD3]' 
                       : 'bg-[#FFF0F2] text-[#DC2626] border-[#FECDD3]'
                   }`}>
                     {isVideo ? '📹 Secure Telehealth' : '🏥 In-Clinic Visit'}
@@ -123,7 +123,7 @@ export default function AppointmentsTab({
                           src={matchedProf.avatar} 
                           alt={b.professionalName} 
                           className={`h-14 w-14 rounded-xl object-cover border-2 shadow-sm shrink-0 transition-transform duration-300 group-hover:scale-105 ${
-                            isVideo ? 'border-teal-100' : 'border-[#FECDD3]'
+                            isVideo ? 'border-[#FECDD3]' : 'border-[#FECDD3]'
                           }`}
                           referrerPolicy="no-referrer"
                         />
@@ -147,9 +147,9 @@ export default function AppointmentsTab({
                         <span className="text-[11px] text-slate-400 font-black uppercase tracking-wider block">
                           {b.professionalRole === UserRole.DOCTOR ? 'Medical Specialist (MD)' : 'Clinical Specialist Nurse'}
                         </span>
-                        <CheckCircle2 className="h-3 w-3 text-teal-500" />
+                        <CheckCircle2 className="h-3 w-3 text-[#DC2626]" />
                       </div>
-                      <h4 className="text-base font-black text-slate-900 group-hover:text-teal-700 transition-colors duration-200">{b.professionalName}</h4>
+                      <h4 className="text-base font-black text-slate-900 group-hover:text-[#DC2626] transition-colors duration-200">{b.professionalName}</h4>
                       {matchedProf && (
                         <p className="text-xs font-bold text-slate-400 font-mono bg-slate-50 px-1.5 py-0.5 rounded w-max">
                           MMC REG: {matchedProf.licenseNumber}
@@ -159,10 +159,10 @@ export default function AppointmentsTab({
                   </div>
 
                   {/* Consultation Timing grid */}
-                  <div className="grid grid-cols-2 gap-3 text-xs font-bold text-slate-700 bg-slate-50/80 border border-slate-100 p-3.5 rounded-xl group-hover:bg-teal-50/30 transition-colors duration-300">
+                  <div className="grid grid-cols-2 gap-3 text-xs font-bold text-slate-700 bg-slate-50/80 border border-slate-100 p-3.5 rounded-xl group-hover:bg-[#FFF0F2] transition-colors duration-300">
                     <div className="flex items-center gap-2.5">
                       <div className="bg-white p-1.5 rounded-lg border border-slate-200 shadow-xs">
-                        <Calendar className="h-4 w-4 text-teal-600" />
+                        <Calendar className="h-4 w-4 text-[#DC2626]" />
                       </div>
                       <div>
                         <span className="block text-[10px] text-slate-400 font-black uppercase tracking-widest">Date</span>
@@ -171,7 +171,7 @@ export default function AppointmentsTab({
                     </div>
                     <div className="flex items-center gap-2.5">
                       <div className="bg-white p-1.5 rounded-lg border border-slate-200 shadow-xs">
-                        <Clock className="h-4 w-4 text-teal-600" />
+                        <Clock className="h-4 w-4 text-[#DC2626]" />
                       </div>
                       <div>
                         <span className="block text-[10px] text-slate-400 font-black uppercase tracking-widest">Time Slot</span>
@@ -212,7 +212,7 @@ export default function AppointmentsTab({
                   {isVideo ? (
                     <button
                       onClick={() => onStartVideoCall(b)}
-                      className="bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-black px-5 py-3 rounded-xl transition-all shadow-md shadow-teal-600/20 flex items-center gap-2 hover:scale-[1.02] active:scale-95 duration-200 cursor-pointer"
+                      className="bg-[#DC2626] hover:bg-[#0F172A] text-white text-[11px] font-black px-5 py-3 rounded-xl transition-all shadow-md shadow-rose-600/20 flex items-center gap-2 hover:scale-[1.02] active:scale-95 duration-200 cursor-pointer"
                     >
                       <Video className="h-4 w-4 shrink-0" />
                       <span>Join Telehealth Room</span>

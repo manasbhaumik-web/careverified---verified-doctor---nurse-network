@@ -38,7 +38,7 @@ export default function SavedTab({
     <div className="space-y-6" id="patient-saved-tab-root">
       {/* Header Panel */}
       <div className="border-b border-slate-100 pb-5">
-        <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.15em] text-teal-700 bg-teal-50 border border-teal-100/50 px-2.5 py-0.5 rounded-md mb-2">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.15em] text-[#DC2626] bg-[#FFF0F2] border border-[#FECDD3] px-2.5 py-0.5 rounded-md mb-2">
           Clinical Network Directory
         </span>
         <h3 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
@@ -67,7 +67,7 @@ export default function SavedTab({
             <div className="pt-2">
               <button 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold rounded-xl transition-all shadow-sm shadow-teal-500/20"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#DC2626] hover:bg-[#0F172A] text-white text-sm font-bold rounded-xl transition-all shadow-sm shadow-rose-500/20"
               >
                 <Search className="h-4 w-4" />
                 Explore Registry
@@ -88,11 +88,11 @@ export default function SavedTab({
               <motion.div 
                 variants={itemVariants}
                 key={p.id} 
-                className="group relative bg-white border border-slate-200/80 hover:border-teal-500/40 rounded-[28px] p-6 shadow-sm transition-all duration-300 flex flex-col justify-between space-y-5 hover:shadow-lg overflow-hidden"
+                className="group relative bg-white border border-slate-200/80 hover:border-[#FECDD3] rounded-[28px] p-6 shadow-sm transition-all duration-300 flex flex-col justify-between space-y-5 hover:shadow-lg overflow-hidden"
               >
                 {/* Accent top border */}
                 <div className={`absolute top-0 left-0 right-0 h-[4px] transition-colors duration-300 ${
-                  isDoc ? 'bg-teal-500/80' : 'bg-[#DC2626]/80'
+                  isDoc ? 'bg-[#DC2626]/80' : 'bg-[#DC2626]/80'
                 }`} />
 
                 <div className="space-y-5 pt-1">
@@ -103,19 +103,19 @@ export default function SavedTab({
                         <img 
                           src={p.avatar} 
                           alt={p.name} 
-                          className={`h-14 w-14 rounded-full object-cover border-2 shadow-sm shrink-0 group-hover:scale-105 transition-transform duration-300 ${isDoc ? 'border-teal-100' : 'border-[#FECDD3]'}`}
+                          className={`h-14 w-14 rounded-full object-cover border-2 shadow-sm shrink-0 group-hover:scale-105 transition-transform duration-300 ${isDoc ? 'border-[#FECDD3]' : 'border-[#FECDD3]'}`}
                           referrerPolicy="no-referrer"
                         />
                         <span className="absolute -bottom-1 -right-1 bg-emerald-500 border-2 border-white rounded-full h-3.5 w-3.5 shadow-sm" />
                       </div>
                       <div className="space-y-1">
                         <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-md border ${
-                          isDoc ? "bg-teal-50 text-teal-700 border-teal-100" : "bg-[#FFF0F2] text-[#DC2626] border-[#FECDD3]"
+                          isDoc ? "bg-[#FFF0F2] text-[#DC2626] border-[#FECDD3]" : "bg-[#FFF0F2] text-[#DC2626] border-[#FECDD3]"
                         }`}>
                           {isDoc ? "Verified Doctor" : "Clinical Nurse"}
                           <CheckCircle2 className="h-3 w-3 shrink-0" />
                         </span>
-                        <h4 className="text-base font-black text-slate-900 leading-tight group-hover:text-teal-700 transition-colors">{p.name}</h4>
+                        <h4 className="text-base font-black text-slate-900 leading-tight group-hover:text-[#DC2626] transition-colors">{p.name}</h4>
                       </div>
                     </div>
                     
@@ -129,13 +129,13 @@ export default function SavedTab({
                   </div>
 
                   {/* Specialty and clinical baseline */}
-                  <div className="space-y-2.5 text-xs text-slate-600 font-semibold bg-slate-50/80 group-hover:bg-teal-50/30 p-4 rounded-xl border border-slate-200/80 transition-colors duration-300">
+                  <div className="space-y-2.5 text-xs text-slate-600 font-semibold bg-slate-50/80 group-hover:bg-[#FFF0F2] p-4 rounded-xl border border-slate-200/80 transition-colors duration-300">
                     <p className="flex items-center gap-2.5 text-slate-800 font-black">
-                      <div className="bg-white p-1 rounded border border-slate-200 shadow-3xs"><Stethoscope className="h-3.5 w-3.5 text-teal-600" /></div>
+                      <div className="bg-white p-1 rounded border border-slate-200 shadow-3xs"><Stethoscope className="h-3.5 w-3.5 text-[#DC2626]" /></div>
                       <span>{p.specialization}</span>
                     </p>
                     <p className="flex items-center gap-2.5 text-slate-500">
-                      <div className="bg-white p-1 rounded border border-slate-200 shadow-3xs"><MapPin className="h-3.5 w-3.5 text-teal-600" /></div>
+                      <div className="bg-white p-1 rounded border border-slate-200 shadow-3xs"><MapPin className="h-3.5 w-3.5 text-[#DC2626]" /></div>
                       <span className="truncate">{p.city} &bull; {p.practiceAddress.split(',')[0]}</span>
                     </p>
                     <div className="flex items-center justify-between border-t border-slate-200/80 pt-2.5 mt-2 flex-wrap gap-2">
@@ -144,7 +144,7 @@ export default function SavedTab({
                         <span className="text-slate-800 font-black">{p.rating}</span>
                         <span className="text-slate-400 font-medium">({p.reviewCount} reviews)</span>
                       </p>
-                      <span className="text-xs font-mono text-teal-700 bg-teal-50 border border-teal-100 px-2 py-0.5 rounded shadow-3xs">
+                      <span className="text-xs font-mono text-[#DC2626] bg-[#FFF0F2] border border-[#FECDD3] px-2 py-0.5 rounded shadow-3xs">
                         RM {p.fee}/consult
                       </span>
                     </div>
@@ -158,7 +158,7 @@ export default function SavedTab({
                       onClick={onNavigateToMessages}
                       className="bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-[11px] font-black py-3 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow-md"
                     >
-                      <MessageSquare className="h-3.5 w-3.5 text-teal-600" />
+                      <MessageSquare className="h-3.5 w-3.5 text-[#DC2626]" />
                       <span>Send Chat</span>
                     </button>
                     <button
@@ -171,7 +171,7 @@ export default function SavedTab({
                   </div>
                   <button
                     onClick={() => onVerifyCredentials(p)}
-                    className="w-full bg-teal-50 border border-teal-200 hover:bg-teal-600 hover:text-white text-teal-700 text-[11px] font-black py-3 px-3 rounded-xl transition-all text-center cursor-pointer flex items-center justify-center gap-2 shadow-sm"
+                    className="w-full bg-[#FFF0F2] border border-[#FECDD3] hover:bg-[#DC2626] hover:text-white text-[#DC2626] text-[11px] font-black py-3 px-3 rounded-xl transition-all text-center cursor-pointer flex items-center justify-center gap-2 shadow-sm"
                   >
                     <ShieldCheck className="h-4 w-4" />
                     <span>Verify Board License Credentials</span>

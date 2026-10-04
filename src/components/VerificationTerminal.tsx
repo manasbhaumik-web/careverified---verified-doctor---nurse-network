@@ -740,7 +740,7 @@ export default function VerificationTerminal({
                     <img
                       src={matchedProfile.avatar}
                       alt={matchedProfile.name}
-                      className="h-24 w-24 rounded-full object-cover border-4 border-teal-500/20 shadow-md mx-auto"
+                      className="h-24 w-24 rounded-full object-cover border-4 border-[#DC2626]/20 shadow-md mx-auto"
                       referrerPolicy="no-referrer"
                     />
                     
@@ -749,7 +749,7 @@ export default function VerificationTerminal({
                         <h3 className="font-serif text-xl font-semibold text-slate-900">{matchedProfile.name}</h3>
                         {isVerified && <Shield className="h-4.5 w-4.5 text-emerald-500 fill-emerald-500" />}
                       </div>
-                      <p className="text-xs font-bold text-teal-700 uppercase tracking-widest">{matchedProfile.specialization}</p>
+                      <p className="text-xs font-bold text-[#DC2626] uppercase tracking-widest">{matchedProfile.specialization}</p>
                     </div>
                   </div>
 
@@ -776,7 +776,7 @@ export default function VerificationTerminal({
                         <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Verified Clinical Credentials</span>
                         <div className="flex flex-wrap gap-1.5">
                           {certifications.map(cert => (
-                            <span key={cert} className="bg-teal-50 text-teal-800 border border-teal-100 text-[10px] font-bold px-2.5 py-1 rounded-md">
+                            <span key={cert} className="bg-[#FFF0F2] text-[#B91C1C] border border-[#FECDD3] text-[10px] font-bold px-2.5 py-1 rounded-md">
                               {cert}
                             </span>
                           ))}
@@ -794,7 +794,7 @@ export default function VerificationTerminal({
                     <button
                       type="button"
                       onClick={() => setShowPublicProfilePreview(false)}
-                      className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white text-xs font-black rounded-xl transition-all shadow-md cursor-pointer"
+                      className="w-full py-3 bg-[#DC2626] hover:bg-[#0F172A] text-white text-xs font-black rounded-xl transition-all shadow-md cursor-pointer"
                     >
                       Close Public Profile Preview
                     </button>
