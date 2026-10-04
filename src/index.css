@@ -13,6 +13,10 @@
   --color-cross: #dc2626;
   --color-cross-dark: #b91c1c;
   --color-cross-tint: #ffe4e6;
+  --color-emerald-primary: #059669;
+  --color-emerald-bright: #10b981;
+  --color-emerald-mint: #ecfdf5;
+  --color-emerald-border: #a7f3d0;
   --color-ink: #1e293b;
   --color-ink-body: #334155;
 
@@ -23,6 +27,9 @@
   --sys-text-body: #334155;
   --sys-brand-red: #dc2626;
   --sys-brand-red-dark: #b91c1c;
+  --sys-brand-emerald: #059669;
+  --sys-bg-mint: #ecfdf5;
+  --sys-border-emerald: #a7f3d0;
 
   /* Layer 3: Typography (100% Inter across display & body) */
   --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;

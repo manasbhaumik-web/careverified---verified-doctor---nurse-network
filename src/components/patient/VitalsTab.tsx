@@ -82,8 +82,8 @@ function BPTrendChart({ vitals }: { vitals: VitalsRecord[] }) {
           <div className="flex items-center gap-1.5 text-[11px] font-black uppercase text-rose-500">
             <div className="w-2 h-2 rounded-full bg-rose-500"></div> Systolic
           </div>
-          <div className="flex items-center gap-1.5 text-[11px] font-black uppercase text-rose-500">
-            <div className="w-2 h-2 rounded-full bg-rose-500"></div> Diastolic
+          <div className="flex items-center gap-1.5 text-[11px] font-black uppercase text-emerald-600">
+            <div className="w-2 h-2 rounded-full bg-emerald-500"></div> Diastolic
           </div>
         </div>
       </div>
