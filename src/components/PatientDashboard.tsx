@@ -534,53 +534,39 @@ export default function PatientDashboard({
   return (
     <div className="w-full max-w-[1920px] mx-auto space-y-8" id="patient-dashboard-root">
       
-      {/* EXECUTIVE CRIMSON METRIC BANNER (CONCEPT 3) */}
-      <div className="bg-gradient-to-r from-[#FFF1F2] via-[#FFF5F5] to-[#FFE4E6] border-l-8 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 rounded-2xl p-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2 text-[#DC2626] text-xs font-black uppercase tracking-wider">
-            <ShieldCheck className="h-4 w-4 text-emerald-600" />
-            <span>MedCred Verified Health Console</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
+      {/* Standardized Compact Page Banner */}
+      <PageBanner
+        as="h1"
+        eyebrow="MedCred Verified Health Console"
+        title={
+          <span>
             {greetingText}, <span className="underline decoration-rose-400">{userName}</span>
-          </h1>
-          <p className="text-xs text-slate-600 font-medium max-w-xl">
-            Centralized clinical telemetry, verified e-prescriptions, and 24/7 doctor-on-call emergency triage.
-          </p>
-        </div>
+          </span>
+        }
+        description="Centralized clinical telemetry, verified e-prescriptions, and 24/7 doctor-on-call emergency triage."
+        actions={
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 bg-white px-3 py-1.5 border border-[#FECDD3] rounded-none shadow-3xs text-xs">
+              <span className="font-mono text-base font-black text-[#DC2626]">{upcomingBookings.length}</span>
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase">Bookings</span>
+              <span className="text-slate-300 mx-1">|</span>
+              <span className="font-mono text-base font-black text-[#DC2626]">{prescriptionBookings.length}</span>
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase">Rx</span>
+              <span className="text-slate-300 mx-1">|</span>
+              <span className="font-mono text-base font-black text-[#DC2626]">{vitalsList.length}</span>
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase">Vitals</span>
+            </div>
 
-        {/* High-Contrast Executive Metric Strip & Quick Actions */}
-        <div className="flex flex-wrap items-center gap-4 shrink-0">
-          <div className="grid grid-cols-4 gap-3 bg-white/90 backdrop-blur-xs p-3 border border-[#FECDD3] rounded-xl text-center min-w-[320px] shadow-xs">
-            <div>
-              <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{upcomingBookings.length}</span>
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Bookings</span>
-            </div>
-            <div className="border-l border-rose-200">
-              <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{prescriptionBookings.length}</span>
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Rx Active</span>
-            </div>
-            <div className="border-l border-rose-200">
-              <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{vitalsList.length}</span>
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Vitals Logs</span>
-            </div>
-            <div className="border-l border-rose-200">
-              <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">60%</span>
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Profile</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
             <button 
               onClick={() => setShowOnCallModal(true)} 
-              className="px-4 py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black rounded-xl border border-[#DC2626] transition-all flex items-center gap-2 uppercase tracking-wider cursor-pointer shadow-sm hover:shadow-md"
+              className="px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black rounded-none border border-[#B91C1C] transition-all flex items-center gap-1.5 uppercase tracking-wider cursor-pointer shadow-3xs"
             >
               <Ambulance className="h-4 w-4 text-white animate-bounce" />
-              <span>{activeDispatch ? 'Track Triage' : 'Request On-Call'}</span>
+              <span>{activeDispatch ? 'Track Triage' : 'On-Call Doctor'}</span>
             </button>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* Overview Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -500,7 +500,7 @@ export default function VerificationTerminal({
               <div
                 role="tablist"
                 aria-label="Practitioner workspace sections"
-                className="flex flex-wrap gap-1.5 border border-[#FECDD3] rounded-none sticky top-[72px] bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-3xs"
+                className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-xl sticky top-[72px] bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs"
               >
                 <button
                   role="tab"
@@ -510,11 +510,11 @@ export default function VerificationTerminal({
                   tabIndex={activeDashboardTab === 'home' ? 0 : -1}
                   onClick={() => setActiveDashboardTab('home')}
                   onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-none border transition-all ${
-                    activeDashboardTab === 'home' ? 'bg-[#DC2626] text-white border-[#B91C1C] shadow-3xs' : 'bg-white text-slate-700 border-[#FECDD3] hover:text-[#DC2626] hover:bg-[#FFF0F2]'
+                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+                    activeDashboardTab === 'home' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
                   }`}
                 >
-                  <LayoutGrid className={`h-4 w-4 ${activeDashboardTab === 'home' ? 'text-white' : 'text-slate-400'}`} />
+                  <LayoutGrid className={`h-4 w-4 ${activeDashboardTab === 'home' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
                   <span>Overview</span>
                 </button>
 
@@ -526,11 +526,11 @@ export default function VerificationTerminal({
                   tabIndex={activeDashboardTab === 'bookings' ? 0 : -1}
                   onClick={() => setActiveDashboardTab('bookings')}
                   onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-none border transition-all ${
-                    activeDashboardTab === 'bookings' ? 'bg-[#DC2626] text-white border-[#B91C1C] shadow-3xs' : 'bg-white text-slate-700 border-[#FECDD3] hover:text-[#DC2626] hover:bg-[#FFF0F2]'
+                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+                    activeDashboardTab === 'bookings' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
                   }`}
                 >
-                  <Calendar className={`h-4 w-4 ${activeDashboardTab === 'bookings' ? 'text-white' : 'text-slate-400'}`} />
+                  <Calendar className={`h-4 w-4 ${activeDashboardTab === 'bookings' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
                   <span>Bookings</span>
                   {upcomingBookingsCount > 0 && (
                     <span className="font-mono tabular-nums text-[10px] px-2 py-0.5 rounded-full font-black bg-[#DC2626] text-white leading-none">
@@ -547,11 +547,11 @@ export default function VerificationTerminal({
                   tabIndex={activeDashboardTab === 'accreditation' ? 0 : -1}
                   onClick={() => setActiveDashboardTab('accreditation')}
                   onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-none border transition-all ${
-                    activeDashboardTab === 'accreditation' ? 'bg-[#DC2626] text-white border-[#B91C1C] shadow-3xs' : 'bg-white text-slate-700 border-[#FECDD3] hover:text-[#DC2626] hover:bg-[#FFF0F2]'
+                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+                    activeDashboardTab === 'accreditation' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
                   }`}
                 >
-                  <Award className={`h-4 w-4 ${activeDashboardTab === 'accreditation' ? 'text-white' : 'text-slate-400'}`} />
+                  <Award className={`h-4 w-4 ${activeDashboardTab === 'accreditation' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
                   <span>Accreditation</span>
                 </button>
 
@@ -563,11 +563,11 @@ export default function VerificationTerminal({
                   tabIndex={activeDashboardTab === 'reviews' ? 0 : -1}
                   onClick={() => setActiveDashboardTab('reviews')}
                   onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-none border transition-all ${
-                    activeDashboardTab === 'reviews' ? 'bg-[#DC2626] text-white border-[#B91C1C] shadow-3xs' : 'bg-white text-slate-700 border-[#FECDD3] hover:text-[#DC2626] hover:bg-[#FFF0F2]'
+                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+                    activeDashboardTab === 'reviews' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
                   }`}
                 >
-                  <MessageSquare className={`h-4 w-4 ${activeDashboardTab === 'reviews' ? 'text-white' : 'text-slate-400'}`} />
+                  <MessageSquare className={`h-4 w-4 ${activeDashboardTab === 'reviews' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
                   <span>Feedback</span>
                 </button>
 
@@ -579,11 +579,11 @@ export default function VerificationTerminal({
                   tabIndex={activeDashboardTab === 'analytics' ? 0 : -1}
                   onClick={() => setActiveDashboardTab('analytics')}
                   onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-none border transition-all ${
-                    activeDashboardTab === 'analytics' ? 'bg-[#DC2626] text-white border-[#B91C1C] shadow-3xs' : 'bg-white text-slate-700 border-[#FECDD3] hover:text-[#DC2626] hover:bg-[#FFF0F2]'
+                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+                    activeDashboardTab === 'analytics' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
                   }`}
                 >
-                  <TrendingUp className={`h-4 w-4 ${activeDashboardTab === 'analytics' ? 'text-white' : 'text-slate-400'}`} />
+                  <TrendingUp className={`h-4 w-4 ${activeDashboardTab === 'analytics' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
                   <span>Analytics</span>
                 </button>
 
@@ -595,11 +595,11 @@ export default function VerificationTerminal({
                   tabIndex={activeDashboardTab === 'settings' ? 0 : -1}
                   onClick={() => setActiveDashboardTab('settings')}
                   onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-none border transition-all ${
-                    activeDashboardTab === 'settings' ? 'bg-[#DC2626] text-white border-[#B91C1C] shadow-3xs' : 'bg-white text-slate-700 border-[#FECDD3] hover:text-[#DC2626] hover:bg-[#FFF0F2]'
+                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
+                    activeDashboardTab === 'settings' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
                   }`}
                 >
-                  <Edit className={`h-4 w-4 ${activeDashboardTab === 'settings' ? 'text-white' : 'text-slate-400'}`} />
+                  <Edit className={`h-4 w-4 ${activeDashboardTab === 'settings' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
                   <span>Settings</span>
                 </button>
               </div>
