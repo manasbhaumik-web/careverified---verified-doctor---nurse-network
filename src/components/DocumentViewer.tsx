@@ -240,10 +240,10 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
                 </svg>
 
                 {/* Left/Right marker tags */}
-                <div className="absolute top-4 left-4 bg-slate-900 border border-slate-800 text-emerald-400 font-black px-2 py-0.5 rounded text-[10px]">
+                <div className="absolute top-4 left-4 bg-blue-700 border border-slate-800 text-emerald-400 font-black px-2 py-0.5 rounded text-[10px]">
                   R
                 </div>
-                <div className="absolute top-4 right-4 bg-slate-900 border border-slate-800 text-emerald-400 font-black px-2 py-0.5 rounded text-[10px]">
+                <div className="absolute top-4 right-4 bg-blue-700 border border-slate-800 text-emerald-400 font-black px-2 py-0.5 rounded text-[10px]">
                   L
                 </div>
 
@@ -256,7 +256,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
               {/* Technical Footer */}
               <div className="text-[7px] text-slate-500 border-t border-slate-800/80 pt-2 flex justify-between z-10">
                 <span>DIGITAL RADIOGRAPHY UNIT 4B</span>
-                <span>PANTAI HOSP IMAGING &bull; SECURE LEDGER PROOFED</span>
+                <span>METROPOLITAN HOSP IMAGING &bull; SECURE LEDGER PROOFED</span>
               </div>
             </div>
           ) : record.id === 'rec-1' ? (

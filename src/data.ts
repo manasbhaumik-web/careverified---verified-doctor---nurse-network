@@ -4,7 +4,7 @@ export const INITIAL_DOCTORS: DoctorProfile[] = [
   {
     id: "doc-1",
     name: "Dr. Siti Aminah Binti Ahmad",
-    avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=250",
+    avatar: "/assets/malaysian_female_doctor.jpg",
     role: UserRole.DOCTOR,
     specialization: "Cardiologist",
     licenseNumber: "MMC-87429",
@@ -18,7 +18,7 @@ export const INITIAL_DOCTORS: DoctorProfile[] = [
     rating: 4.9,
     reviewCount: 38,
     verificationStatus: VerificationStatus.VERIFIED,
-    practiceAddress: "Pantai Hospital Kuala Lumpur, 8 Jalan Bukit Pantai",
+    practiceAddress: "Kuala Lumpur Specialist Hospital, 8 Jalan Bukit Pantai",
     city: "Kuala Lumpur",
     availability: {
       days: ["Monday", "Wednesday", "Friday"],
@@ -29,7 +29,7 @@ export const INITIAL_DOCTORS: DoctorProfile[] = [
   {
     id: "doc-2",
     name: "Dr. Tan Seng Hock",
-    avatar: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=250",
+    avatar: "/assets/malaysian_male_doctor.jpg",
     role: UserRole.DOCTOR,
     specialization: "Pediatrician",
     licenseNumber: "MMC-32109",
@@ -43,7 +43,7 @@ export const INITIAL_DOCTORS: DoctorProfile[] = [
     rating: 4.8,
     reviewCount: 52,
     verificationStatus: VerificationStatus.VERIFIED,
-    practiceAddress: "KPJ Damansara Specialist Hospital, 119 Jalan SS 21/56, Damansara Utama",
+    practiceAddress: "Damansara Specialist Medical Center, 119 Jalan SS 21/56, Damansara Utama",
     city: "Petaling Jaya",
     availability: {
       days: ["Tuesday", "Thursday", "Saturday"],
@@ -54,7 +54,7 @@ export const INITIAL_DOCTORS: DoctorProfile[] = [
   {
     id: "doc-3",
     name: "Dr. Ahmad Ridzuan Bin Mohd Rosli",
-    avatar: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=250",
+    avatar: "/assets/malaysian_male_doctor.jpg",
     role: UserRole.DOCTOR,
     specialization: "Neurologist",
     licenseNumber: "MMC-55412",
@@ -68,7 +68,7 @@ export const INITIAL_DOCTORS: DoctorProfile[] = [
     rating: 4.7,
     reviewCount: 24,
     verificationStatus: VerificationStatus.VERIFIED,
-    practiceAddress: "Gleneagles Penang, 2 Jalan Sultan Ahmad Shah, George Town",
+    practiceAddress: "Penang City Specialist Hospital, 2 Jalan Sultan Ahmad Shah, George Town",
     city: "Penang",
     availability: {
       days: ["Monday", "Tuesday", "Thursday"],
@@ -79,7 +79,7 @@ export const INITIAL_DOCTORS: DoctorProfile[] = [
   {
     id: "doc-4",
     name: "Dr. Leong Mei Ling",
-    avatar: "https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=250",
+    avatar: "/assets/malaysian_female_doctor.jpg",
     role: UserRole.DOCTOR,
     specialization: "Dermatologist",
     licenseNumber: "MMC-99213",
@@ -93,7 +93,7 @@ export const INITIAL_DOCTORS: DoctorProfile[] = [
     rating: 4.9,
     reviewCount: 45,
     verificationStatus: VerificationStatus.VERIFIED,
-    practiceAddress: "Sunway Medical Centre Johor, Iskandar Puteri",
+    practiceAddress: "Iskandar Specialist Medical Centre, Iskandar Puteri",
     city: "Johor Bahru",
     availability: {
       days: ["Wednesday", "Friday", "Saturday"],
@@ -107,7 +107,7 @@ export const INITIAL_NURSES: NurseProfile[] = [
   {
     id: "nur-1",
     name: "Sister Nurul Ain Binti Yusof",
-    avatar: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=250",
+    avatar: "/assets/malaysian_female_nurse.jpg",
     role: UserRole.NURSE,
     specialization: "ICU & Critical Care",
     licenseNumber: "LJM-RN-41223",
@@ -121,7 +121,7 @@ export const INITIAL_NURSES: NurseProfile[] = [
     rating: 4.9,
     reviewCount: 67,
     verificationStatus: VerificationStatus.VERIFIED,
-    practiceAddress: "Pantai Hospital Cheras, Jalan Cheras Makmur, Cheras",
+    practiceAddress: "Cheras Medical Center, Jalan Cheras Makmur, Cheras",
     city: "Kuala Lumpur",
     availability: {
       days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
@@ -133,13 +133,13 @@ export const INITIAL_NURSES: NurseProfile[] = [
   {
     id: "nur-2",
     name: "Karthik Loganathan",
-    avatar: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=250&idx=nurse2",
+    avatar: "/assets/malaysian_male_patient.jpg",
     role: UserRole.NURSE,
     specialization: "Geriatric & Eldercare",
     licenseNumber: "LJM-RN-11892",
     nursingCouncil: "Malaysian Nursing Board (LJM)",
     experienceYears: 8,
-    education: ["Diploma in Nursing (KPJ Healthcare University College)"],
+    education: ["Diploma in Nursing (National Healthcare University College)"],
     bio: "Dedicated eldercare nurse passionate about providing high-quality companion care, mobility assistance, medication management, and nutritional support for senior citizens.",
     languages: ["English", "Malay", "Tamil"],
     consultationModes: ["Home Visit" as any],
@@ -147,7 +147,7 @@ export const INITIAL_NURSES: NurseProfile[] = [
     rating: 4.8,
     reviewCount: 31,
     verificationStatus: VerificationStatus.VERIFIED,
-    practiceAddress: "KPJ Ampang Puteri Specialist Hospital, Jalan Memanda 9",
+    practiceAddress: "Ampang Specialist Hospital, Jalan Memanda 9",
     city: "Ampang",
     availability: {
       days: ["Monday", "Wednesday", "Friday", "Saturday"],
@@ -159,7 +159,7 @@ export const INITIAL_NURSES: NurseProfile[] = [
   {
     id: "nur-3",
     name: "Michelle Wong Siew Lan",
-    avatar: "https://images.unsplash.com/photo-1582966772680-860e372bb558?auto=format&fit=crop&q=80&w=250",
+    avatar: "/assets/malaysian_female_nurse.jpg",
     role: UserRole.NURSE,
     specialization: "Pediatric & Neonatal Care",
     licenseNumber: "LJM-RN-88314",
@@ -173,7 +173,7 @@ export const INITIAL_NURSES: NurseProfile[] = [
     rating: 4.9,
     reviewCount: 19,
     verificationStatus: VerificationStatus.VERIFIED,
-    practiceAddress: "Gleneagles Kuala Lumpur, 286 Jalan Ampang",
+    practiceAddress: "Kuala Lumpur Health Center, 286 Jalan Ampang",
     city: "Kuala Lumpur",
     availability: {
       days: ["Tuesday", "Thursday", "Saturday", "Sunday"],
@@ -248,7 +248,7 @@ export const INITIAL_REVIEWS: Review[] = [
     punctuality: 4,
     communication: 5,
     satisfaction: 5,
-    comment: "Very professional and empathetic. Highly recommend her for non-invasive heart screenings at Pantai Hospital.",
+    comment: "Very professional and empathetic. Highly recommend her for non-invasive heart screenings at Kuala Lumpur Specialist Hospital.",
     date: "2026-07-01",
     isVerifiedPatient: true
   },
@@ -271,7 +271,7 @@ export const INITIAL_REVIEWS: Review[] = [
 export const INITIAL_JOBS: JobPost[] = [
   {
     id: "job-1",
-    hospitalName: "KPJ Damansara Specialist Hospital",
+    hospitalName: "Damansara Specialist Medical Center",
     hospitalLogo: "🏥",
     title: "Critical Care Nurse (ICU) - Night Shift Focus",
     type: "Shift-based",
@@ -293,7 +293,7 @@ export const INITIAL_JOBS: JobPost[] = [
   },
   {
     id: "job-2",
-    hospitalName: "Pantai Hospital Kuala Lumpur",
+    hospitalName: "Kuala Lumpur Specialist Hospital",
     hospitalLogo: "🩺",
     title: "Junior Consultant - Paediatric Cardiology",
     type: "Full-time",
@@ -315,7 +315,7 @@ export const INITIAL_JOBS: JobPost[] = [
   },
   {
     id: "job-3",
-    hospitalName: "Sunway Home Healthcare",
+    hospitalName: "Metro Home Healthcare",
     hospitalLogo: "🏠",
     title: "Home Geriatric Care Nurse",
     type: "Contract",

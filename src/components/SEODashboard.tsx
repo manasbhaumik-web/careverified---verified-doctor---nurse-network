@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Globe, Code, Zap, FileSpreadsheet, Eye, Copy, CheckCircle, List, LayoutGrid, ShieldCheck, X } from 'lucide-react';
 import { DoctorProfile, NurseProfile } from '../types';
+import PageBanner from './PageBanner';
 
 interface SEODashboardProps {
   professionals: (DoctorProfile | NurseProfile)[];
@@ -90,64 +91,58 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border-2 border-slate-200/80 shadow-sm overflow-hidden" id="seo-dashboard-panel">
+    <div className="space-y-8 w-full max-w-[1920px] mx-auto" id="seo-dashboard-panel">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-blue-900 to-blue-800 p-6 text-white border-b-2 border-blue-700/20">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-white/10 rounded-xl">
-            <Globe className="h-6 w-6 text-blue-400" />
-          </div>
-          <div>
-            <h2 className="text-xl font-extrabold tracking-tight">Active SEO Strategy & Schema Engine</h2>
-            <p className="text-xs text-slate-300 font-semibold">Programmatic Landing Page Generators & YMYL E-E-A-T Compliant Meta Engines</p>
-          </div>
-        </div>
-      </div>
+      <PageBanner
+        eyebrow="SEO & Schema Engine"
+        title="Active SEO Strategy & Schema Engine"
+        description="Programmatic landing page generators and YMYL E-E-A-T compliant meta engines."
+      />
 
       {/* Tabs */}
-      <div className="flex border-b-2 border-slate-200 bg-slate-50/50 p-1.5 gap-1">
+      <div role="tablist" aria-label="SEO engine sections" className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-xl bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs">
         <button
           onClick={() => setActiveTab('schema')}
-          className={`flex-1 py-3 px-4 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+          className={`flex-1 py-2.5 px-4 text-xs font-extrabold rounded-lg transition-all flex items-center gap-2 cursor-pointer border ${
             activeTab === 'schema' 
-              ? 'bg-white text-blue-900 shadow-xs border-2 border-slate-200' 
-              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
+              ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' 
+              : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
           }`}
         >
-          <Code className="h-4 w-4" />
+          <Code className={`h-4 w-4 ${activeTab === 'schema' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           JSON-LD Structured Schema
         </button>
         <button
           onClick={() => setActiveTab('programmatic')}
-          className={`flex-1 py-3 px-4 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+          className={`flex-1 py-2.5 px-4 text-xs font-extrabold rounded-lg transition-all flex items-center gap-2 cursor-pointer border ${
             activeTab === 'programmatic' 
-              ? 'bg-white text-blue-900 shadow-xs border-2 border-slate-200' 
-              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
+              ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' 
+              : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
           }`}
         >
-          <Search className="h-4 w-4" />
+          <Search className={`h-4 w-4 ${activeTab === 'programmatic' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           Programmatic Landing Pages
         </button>
         <button
           onClick={() => setActiveTab('vitals')}
-          className={`flex-1 py-3 px-4 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+          className={`flex-1 py-2.5 px-4 text-xs font-extrabold rounded-lg transition-all flex items-center gap-2 cursor-pointer border ${
             activeTab === 'vitals' 
-              ? 'bg-white text-blue-900 shadow-xs border-2 border-slate-200' 
-              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
+              ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' 
+              : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
           }`}
         >
-          <Zap className="h-4 w-4" />
+          <Zap className={`h-4 w-4 ${activeTab === 'vitals' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           Core Web Vitals Scoring
         </button>
         <button
           onClick={() => setActiveTab('sitemap')}
-          className={`flex-1 py-3 px-4 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+          className={`flex-1 py-2.5 px-4 text-xs font-extrabold rounded-lg transition-all flex items-center gap-2 cursor-pointer border ${
             activeTab === 'sitemap' 
-              ? 'bg-white text-blue-900 shadow-xs border-2 border-slate-200' 
-              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
+              ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' 
+              : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
           }`}
         >
-          <FileSpreadsheet className="h-4 w-4" />
+          <FileSpreadsheet className={`h-4 w-4 ${activeTab === 'sitemap' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
           Sitemap Generator
         </button>
       </div>
@@ -245,7 +240,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
             </div>
 
             <div className="relative">
-              <pre className="bg-slate-900 text-slate-200 text-xs p-5 rounded-xl overflow-x-auto max-h-96 font-mono border-2 border-slate-800 leading-relaxed">
+              <pre className="bg-slate-100 text-slate-800 text-xs p-5 rounded-xl overflow-x-auto max-h-96 font-mono border-2 border-slate-300 leading-relaxed">
                 <code>{generateSchema()}</code>
               </pre>
               <button
@@ -432,7 +427,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
             </div>
 
             <div className="relative">
-              <pre className="bg-blue-950 text-blue-300 text-xs p-5 rounded-xl overflow-x-auto max-h-96 font-mono border-2 border-blue-900 leading-relaxed">
+              <pre className="bg-slate-100 text-slate-800 text-xs p-5 rounded-xl overflow-x-auto max-h-96 font-mono border-2 border-slate-300 leading-relaxed">
                 <code>{generateSitemapText()}</code>
               </pre>
             </div>
@@ -443,7 +438,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
       {/* Schema Structure Lightbox Modal */}
       {selectedSchemaProf && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-800/60 backdrop-blur-xs animate-fade-in"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-100/80 backdrop-blur-xs animate-fade-in"
           onClick={() => setSelectedSchemaProf(null)}
           id="schema-modal-backdrop"
         >
@@ -488,7 +483,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
 
               {/* JSON code block in modal */}
               <div className="relative">
-                <pre className="bg-blue-950 text-blue-100 text-[11px] p-4 rounded-xl overflow-x-auto max-h-72 font-mono border border-blue-900 leading-relaxed">
+                <pre className="bg-slate-100 text-slate-800 text-[11px] p-4 rounded-xl overflow-x-auto max-h-72 font-mono border border-slate-300 leading-relaxed">
                   <code>{generateSchema()}</code>
                 </pre>
                 <button

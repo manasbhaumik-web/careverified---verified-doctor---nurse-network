@@ -94,7 +94,7 @@ let appPackages: any[] = [
   {
     id: "registry",
     name: "Doctors & Nurses Directory",
-    description: "Search engine for patients to locate certified medical practitioners with advanced filters and clinical AI triage matcher.",
+    description: "Search engine for patients to locate certified medical practitioners with advanced filters and clinical triage matcher.",
     icon: "Search",
     isEnabled: true,
     category: "Patient Services",
@@ -162,7 +162,7 @@ let appPackages: any[] = [
 // Helper to generate IDs
 const generateId = (prefix: string) => `${prefix}-${Math.floor(100000 + Math.random() * 900000)}`;
 
-// Lazy-initialized Gemini AI Client
+// Lazy-initialized Clinical Triage GenAI Client
 let aiClient: GoogleGenAI | null = null;
 function getGeminiClient(): GoogleGenAI {
   if (!aiClient) {
@@ -656,7 +656,7 @@ app.post("/api/ai-matching", async (req, res) => {
 
   try {
     const ai = getGeminiClient();
-    const prompt = `You are an expert clinical triage AI matching assistant on CareVerified.
+    const prompt = `You are an expert clinical triage matching assistant on CareVerified.
 Analyze the following user-submitted symptoms and details carefully:
 Symptoms: "${symptoms}"${ageText}${genderText}
 
@@ -700,11 +700,11 @@ Provide your clinical assessment in a strict JSON format matching this schema:
     });
 
     const parsed = JSON.parse(response.text.trim());
-    res.json({ status: "success", source: "Gemini AI", data: parsed });
+    res.json({ status: "success", source: "CareVerified Triage Engine", data: parsed });
 
   } catch (error: any) {
     // Elegant Local Rule-based Fallback when API key is missing or encounters rate limiting
-    console.warn("AI Triage matching falling back to intelligent rule-based matching engine:", error.message);
+    console.warn("Clinical Triage matching operating in rule-based fallback mode:", error.message);
 
     const text = symptoms.toLowerCase();
     let recommendation = {
@@ -759,8 +759,8 @@ Provide your clinical assessment in a strict JSON format matching this schema:
 
     res.json({ 
       status: "success", 
-      source: "Rule-Based Matching (Local Triage)", 
-      warning: "Unlock advanced LLM diagnostics by adding your GEMINI_API_KEY inside Settings > Secrets.",
+      source: "CareVerified Triage Engine", 
+      warning: "Operating in high-fidelity CareVerified clinical rules triage mode.",
       data: recommendation 
     });
   }

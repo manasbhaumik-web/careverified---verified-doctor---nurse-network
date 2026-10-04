@@ -56,7 +56,7 @@ export default function SavedTab({
           animate={{ opacity: 1, scale: 1 }}
           className="bg-white border border-slate-200/60 rounded-[32px] py-20 px-8 text-center space-y-5 shadow-sm max-w-2xl mx-auto"
         >
-          <div className="h-16 w-16 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+          <div className="h-16 w-16 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center mx-auto shadow-sm">
             <Heart className="h-8 w-8 text-slate-400" />
           </div>
           <div className="space-y-2">
@@ -103,7 +103,7 @@ export default function SavedTab({
                         <img 
                           src={p.avatar} 
                           alt={p.name} 
-                          className={`h-14 w-14 rounded-2xl object-cover border-2 shadow-sm shrink-0 group-hover:scale-105 transition-transform duration-300 ${isDoc ? 'border-teal-100' : 'border-indigo-100'}`}
+                          className={`h-14 w-14 rounded-full object-cover border-2 shadow-sm shrink-0 group-hover:scale-105 transition-transform duration-300 ${isDoc ? 'border-teal-100' : 'border-indigo-100'}`}
                           referrerPolicy="no-referrer"
                         />
                         <span className="absolute -bottom-1 -right-1 bg-emerald-500 border-2 border-white rounded-full h-3.5 w-3.5 shadow-sm" />
@@ -129,7 +129,7 @@ export default function SavedTab({
                   </div>
 
                   {/* Specialty and clinical baseline */}
-                  <div className="space-y-2.5 text-xs text-slate-600 font-semibold bg-slate-50/80 group-hover:bg-teal-50/30 p-4 rounded-2xl border border-slate-200/80 transition-colors duration-300">
+                  <div className="space-y-2.5 text-xs text-slate-600 font-semibold bg-slate-50/80 group-hover:bg-teal-50/30 p-4 rounded-xl border border-slate-200/80 transition-colors duration-300">
                     <p className="flex items-center gap-2.5 text-slate-800 font-black">
                       <div className="bg-white p-1 rounded border border-slate-200 shadow-3xs"><Stethoscope className="h-3.5 w-3.5 text-teal-600" /></div>
                       <span>{p.specialization}</span>
@@ -163,7 +163,7 @@ export default function SavedTab({
                     </button>
                     <button
                       onClick={() => onSelectProfessional(p.id)}
-                      className="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-black py-3 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow-md active:scale-95"
+                      className="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black py-3 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow-md active:scale-95"
                     >
                       <CalendarRange className="h-3.5 w-3.5" />
                       <span>Book Slot</span>

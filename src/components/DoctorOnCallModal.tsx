@@ -145,8 +145,8 @@ export default function DoctorOnCallModal({
       // Auto-assign first available
       assignedDoctor = availableDoctors[0] || {
         id: 'doc-emergency',
-        name: 'Dr. Sarah Al-Jafri',
-        avatar: 'https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=250'
+        name: 'Dr. Sarah Binti Al-Jafri',
+        avatar: '/assets/malaysian_female_doctor.jpg'
       };
     } else {
       assignedDoctor = availableDoctors.find(d => d.id === selectedDoctorId);
@@ -203,11 +203,11 @@ export default function DoctorOnCallModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-800/60 backdrop-blur-xs animate-fade-in" id="doctor-on-call-lightbox">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-100/80 backdrop-blur-xs animate-fade-in" id="doctor-on-call-lightbox">
       <div className="bg-white rounded-3xl border-2 border-slate-200 w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-slide-down">
         
         {/* Header banner */}
-        <div className="bg-blue-900 text-white p-5 flex justify-between items-center shrink-0">
+        <div className="bg-blue-700 text-white p-5 flex justify-between items-center shrink-0">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 bg-rose-600 rounded-xl flex items-center justify-center text-white shadow-md animate-pulse">
               <Ambulance className="h-5 w-5" />
@@ -220,7 +220,7 @@ export default function DoctorOnCallModal({
               <p className="text-[10px] text-blue-200 font-bold uppercase tracking-wider mt-0.5">Physical Medical Dispatch Service & Eldercare Home Visits</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2.5 bg-blue-950/40 hover:bg-blue-950/60 rounded-xl transition-all border border-blue-800 cursor-pointer text-white">
+          <button onClick={onClose} className="p-2.5 bg-blue-800/40 hover:bg-blue-800/60 rounded-xl transition-all border border-blue-800 cursor-pointer text-white">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -586,7 +586,7 @@ export default function DoctorOnCallModal({
             <div className="space-y-6">
               
               {/* Tracker Card */}
-              <div className="bg-blue-900 text-white rounded-2xl p-5 shadow-lg relative overflow-hidden">
+              <div className="bg-blue-700 text-white rounded-2xl p-5 shadow-lg relative overflow-hidden">
                 {/* Backglow ambulance visual */}
                 <div className="absolute top-2 right-2 opacity-15">
                   <Ambulance className="h-20 w-20 animate-pulse text-white" />
@@ -621,7 +621,7 @@ export default function DoctorOnCallModal({
                     <span>Practitioner En-Route</span>
                     <span>Arrived</span>
                   </div>
-                  <div className="h-2 bg-blue-950/60 rounded-full overflow-hidden">
+                  <div className="h-2 bg-blue-800/60 rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-emerald-400 transition-all duration-1000 ease-out" 
                       style={{ width: `${progressPercent}%` }}
@@ -734,7 +734,7 @@ export default function DoctorOnCallModal({
           {step === 4 && (
             <button
               onClick={onClose}
-              className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black rounded-xl transition-all cursor-pointer"
+              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl transition-all cursor-pointer"
             >
               Minimize Tracker
             </button>

@@ -68,9 +68,9 @@ const INITIAL_RECORDS: MedicalRecord[] = [
     structuredData: {
       vaccineName: 'Comirnaty (Pfizer-BioNTech)',
       doses: [
-        { doseNumber: 1, date: '2021-06-15', batch: 'AA0129', center: 'Pantai Hospital Kuala Lumpur' },
-        { doseNumber: 2, date: '2021-07-06', batch: 'AA0135', center: 'Pantai Hospital Kuala Lumpur' },
-        { doseNumber: 3, date: '2022-01-20', batch: 'BA0294', center: 'BP Healthcare Bangsar' }
+        { doseNumber: 1, date: '2021-06-15', batch: 'AA0129', center: 'Kuala Lumpur Specialist Hospital' },
+        { doseNumber: 2, date: '2021-07-06', batch: 'AA0135', center: 'Kuala Lumpur Specialist Hospital' },
+        { doseNumber: 3, date: '2022-01-20', batch: 'BA0294', center: 'Metro Healthcare Bangsar' }
       ]
     }
   },
@@ -79,7 +79,7 @@ const INITIAL_RECORDS: MedicalRecord[] = [
     title: 'Chest Radiograph (X-Ray) Report',
     category: 'Imaging/Scan',
     date: '2026-05-14',
-    providerName: 'Pantai Hospital Medical Imaging Dept',
+    providerName: 'Kuala Lumpur Specialist Hospital Medical Imaging Dept',
     fileName: 'chest_xray_radiography_john_doe.png',
     fileSize: '4.8 MB',
     fileType: 'image/png',
@@ -496,11 +496,11 @@ export default function MedicalHistory() {
       {/* MODAL / DRAWER: UPLOAD SECURE DOCUMENT            */}
       {/* ================================================= */}
       {isUploadingOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
+        <div className="fixed inset-0 bg-slate-100/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-white rounded-3xl w-full max-w-lg border-2 border-slate-200/80 shadow-2xl overflow-hidden flex flex-col justify-between max-h-[90vh]">
             
             {/* Header */}
-            <div className="bg-slate-900 text-white p-5 flex justify-between items-center shrink-0">
+            <div className="bg-blue-700 text-white p-5 flex justify-between items-center shrink-0">
               <div className="space-y-1">
                 <h4 className="text-sm font-extrabold tracking-tight flex items-center gap-1.5">
                   <UploadCloud className="h-4.5 w-4.5 text-blue-400" />
@@ -547,7 +547,7 @@ export default function MedicalHistory() {
 
                   {attachedFile ? (
                     <>
-                      <div className="bg-emerald-100 text-emerald-800 p-2.5 rounded-full border border-emerald-200">
+                      <div className="bg-emerald-100 text-emerald-800 p-2.5 rounded-xs border border-emerald-200">
                         <FileCheck className="h-6 w-6" />
                       </div>
                       <div className="space-y-1 text-center">
@@ -625,7 +625,7 @@ export default function MedicalHistory() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Pantai Hospital Kuala Lumpur, BP Lab"
+                    placeholder="e.g. Kuala Lumpur Specialist Hospital, Metro Lab"
                     value={newProvider}
                     onChange={(e) => setNewProvider(e.target.value)}
                     className="w-full text-xs font-semibold py-2.5 px-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-150"
@@ -700,11 +700,11 @@ export default function MedicalHistory() {
       {/* MODAL: VIEW DETAILED STRUCTURED CLINICAL REPORT  */}
       {/* ================================================= */}
       {activeRecordDetail && (
-        <div className="fixed inset-0 bg-slate-800/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
+        <div className="fixed inset-0 bg-slate-100/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-white rounded-3xl w-full max-w-2xl border-2 border-slate-200/80 shadow-2xl overflow-hidden flex flex-col justify-between max-h-[90vh]">
             
             {/* Topbar */}
-            <div className="bg-blue-900 text-white p-5 flex justify-between items-center shrink-0">
+            <div className="bg-blue-700 text-white p-5 flex justify-between items-center shrink-0">
               <div className="space-y-1">
                 <span className="text-[9px] font-extrabold uppercase bg-blue-500/25 text-blue-300 border border-blue-500/30 px-2.5 py-0.5 rounded-full tracking-wider">
                   {activeRecordDetail.category}
@@ -778,7 +778,7 @@ export default function MedicalHistory() {
                 {/* CASE A: LAB RESULT RESULTS LIST */}
                 {activeRecordDetail.structuredData?.results && (
                   <div className="bg-white border-2 border-slate-200/60 rounded-2xl overflow-hidden shadow-xs">
-                    <div className="bg-blue-900 text-white px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-wider">
+                    <div className="bg-blue-700 text-white px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-wider">
                       {activeRecordDetail.structuredData.testName || 'Laboratory Analysis Breakdown'}
                     </div>
                     <div className="divide-y divide-slate-100">
@@ -823,7 +823,7 @@ export default function MedicalHistory() {
                       {activeRecordDetail.structuredData.doses.map((dose) => (
                         <div key={dose.doseNumber} className="bg-white border-2 border-slate-200/60 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                           <div className="flex items-center gap-3">
-                            <div className="h-9 w-9 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-extrabold border border-emerald-100 text-xs">
+                            <div className="h-9 w-9 rounded-xs bg-emerald-50 text-emerald-600 flex items-center justify-center font-extrabold border border-emerald-100 text-xs">
                               #{dose.doseNumber}
                             </div>
                             <div>
