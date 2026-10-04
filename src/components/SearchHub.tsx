@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import {
   Search, MapPin, BadgeCheck, Stethoscope, Clock, ShieldCheck,
-  HeartPulse, UserCheck, Star, LayoutGrid, List, Eye, X, Sparkles, Activity
+  HeartPulse, UserCheck, Star, LayoutGrid, List, Eye, X, Sparkles, Activity,
+  Calendar, Check, SlidersHorizontal, ArrowRight, CheckCircle2, Shield
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, UserRole, Review } from '../types';
 
@@ -22,49 +23,41 @@ export default function SearchHub({
   onSelectSpecialtyFilter,
   onClearSpecialtyFilter
 }: SearchHubProps) {
-  // Compute an honest rating from real reviews — never fall back to seed data
+  // Compute honest rating from real reviews
   const getRatingInfo = (professionalId: string) => {
     const profReviews = reviews.filter(r => r.professionalId === professionalId);
     if (profReviews.length === 0) return { display: 'New', count: 0 };
     const avg = (profReviews.reduce((sum, r) => sum + r.rating, 0) / profReviews.length).toFixed(1);
     return { display: avg, count: profReviews.length };
   };
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState<'all' | UserRole.DOCTOR | UserRole.NURSE>('all');
   const [selectedCity, setSelectedCity] = useState<string>('all');
   const [maxFee, setMaxFee] = useState<number>(500);
   const [showMap, setShowMap] = useState(false);
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedModalProf, setSelectedModalProf] = useState<(DoctorProfile | NurseProfile) | null>(null);
 
   // Filter logic
   const filteredList = professionals.filter(p => {
-    // 1. Search term
     const matchesSearch = searchTerm === '' ||
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.specialization.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.bio.toLowerCase().includes(searchTerm.toLowerCase());
 
-    // 2. Specialty Filter from Clinical Matcher or Pill Rail
     const matchesSpecialtyFilter = selectedSpecialtyFilter === '' ||
       p.specialization.toLowerCase().includes(selectedSpecialtyFilter.toLowerCase());
 
-    // 3. Role
     const matchesRole = selectedRole === 'all' || p.role === selectedRole;
-
-    // 4. City
     const matchesCity = selectedCity === 'all' || p.city === selectedCity;
-
-    // 5. Fee limit
     const matchesFee = p.fee <= maxFee;
 
     return matchesSearch && matchesSpecialtyFilter && matchesRole && matchesCity && matchesFee;
   });
 
-  // Unique specialties for the pill rail reference
   const specialties = Array.from(new Set(professionals.map(p => p.specialization)));
 
-  // Dynamic icon selector based on specialty names
   const getSpecialtyIcon = (specialty: string) => {
     const spec = specialty.toLowerCase();
     if (spec.includes('cardio')) return HeartPulse;
@@ -78,28 +71,90 @@ export default function SearchHub({
 
   return (
     <div className="space-y-6" id="search-hub-section">
-      {/* Quick Filters Panel */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-2xs space-y-5">
-        {/* Search Bar & City Selector */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="relative md:col-span-2">
-            <Search className="absolute left-4 top-3.5 h-4.5 w-4.5 text-slate-400" />
+      {/* Search Header Banner */}
+      <div className="bg-white border border-[#FECDD3] rounded-none p-6 shadow-3xs space-y-5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#FECDD3] pb-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="bg-[#FFF0F2] text-[#DC2626] border border-[#FECDD3] text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-none inline-flex items-center gap-1.5">
+                <ShieldCheck className="h-3.5 w-3.5 text-[#DC2626]" /> MMC &amp; LJM Council Verified
+              </span>
+              <span className="bg-emerald-50 text-emerald-800 border border-emerald-100 text-[10px] font-black uppercase px-2 py-0.5 rounded-none inline-flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                {filteredList.length} Active Practitioners
+              </span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              Find Certified Doctors and Nurses
+            </h2>
+            <p className="text-xs text-slate-600 font-medium max-w-2xl">
+              Search verified specialists, check active medical council licensing credentials, and book direct telehealth or in-clinic consultations.
+            </p>
+          </div>
+
+          {/* View Mode & Map Toggle Controls */}
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="flex bg-slate-100 p-1 rounded-none border border-slate-200">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`px-3 py-1.5 rounded-none text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'bg-[#DC2626] text-white shadow-3xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" />
+                <span>Grid</span>
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-1.5 rounded-none text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  viewMode === 'list'
+                    ? 'bg-[#DC2626] text-white shadow-3xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <List className="h-3.5 w-3.5" />
+                <span>List</span>
+              </button>
+            </div>
+
+            <button
+              onClick={() => setShowMap(!showMap)}
+              className={`px-3.5 py-2 rounded-none text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
+                showMap
+                  ? 'bg-[#0F172A] text-white border-[#0F172A]'
+                  : 'bg-white border-[#FECDD3] text-slate-700 hover:bg-[#FFF0F2]'
+              }`}
+            >
+              <MapPin className="h-3.5 w-3.5 text-[#DC2626]" />
+              <span>{showMap ? "Hide Map" : "Clinic Map"}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Primary Filter Bar: Input Search, City, Role, and Fee slider */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+          {/* Keyword Search Input */}
+          <div className="relative md:col-span-5">
+            <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Search by practitioner name, specialty, or treatment keywords..."
+              placeholder="Search by practitioner name, specialty, or treatment..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl py-3 pl-11 pr-4 outline-none focus:ring-1 focus:ring-[#DC2626] focus:border-[#DC2626] font-semibold text-slate-700 placeholder-slate-400 transition-all"
+              className="w-full text-xs bg-[#FFF0F2]/30 border border-[#FECDD3] rounded-none py-3 pl-10 pr-4 outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626] font-semibold text-slate-800 placeholder-slate-400 transition-all"
             />
           </div>
 
-          <div>
+          {/* City Filter Dropdown */}
+          <div className="md:col-span-3">
             <select
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
-              className="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 outline-none focus:ring-1 focus:ring-[#DC2626] focus:border-[#DC2626] font-bold text-slate-700 cursor-pointer transition-all"
+              className="w-full text-xs bg-slate-50 border border-[#FECDD3] rounded-none py-3 px-3.5 outline-none focus:border-[#DC2626] font-bold text-slate-700 cursor-pointer transition-all"
             >
-              <option value="all">📍 All Cities</option>
+              <option value="all">📍 All Cities (Malaysia)</option>
               <option value="Kuala Lumpur">Kuala Lumpur</option>
               <option value="Petaling Jaya">Petaling Jaya</option>
               <option value="Penang">Penang</option>
@@ -108,23 +163,26 @@ export default function SearchHub({
             </select>
           </div>
 
-          <div>
+          {/* Role Filter Selector */}
+          <div className="md:col-span-4">
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value as any)}
-              className="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 outline-none focus:ring-1 focus:ring-[#DC2626] focus:border-[#DC2626] font-bold text-slate-700 cursor-pointer transition-all"
+              className="w-full text-xs bg-slate-50 border border-[#FECDD3] rounded-none py-3 px-3.5 outline-none focus:border-[#DC2626] font-bold text-slate-700 cursor-pointer transition-all"
             >
-              <option value="all">👨‍⚕️ Doctors & Nurses</option>
-              <option value="doctor">Doctors (MD/MBBS)</option>
-              <option value="nurse">Nurses (RN/ICU/GNM)</option>
+              <option value="all">👨‍⚕️ All Medical Professionals</option>
+              <option value="doctor">Doctors Only (MD / MBBS)</option>
+              <option value="nurse">Nurses Only (RN / ICU)</option>
             </select>
           </div>
         </div>
 
-        {/* Advanced slider & state controls */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-t border-slate-100 pt-4 gap-4">
+        {/* Secondary Filter Row: Fee Slider & Active Triage Badges */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-2 gap-3 border-t border-[#FECDD3]/50 text-xs">
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <span className="text-xs font-bold text-slate-500 whitespace-nowrap">Budget Limit:</span>
+            <span className="font-extrabold text-slate-600 flex items-center gap-1">
+              <SlidersHorizontal className="h-3.5 w-3.5 text-[#DC2626]" /> Max Fee:
+            </span>
             <input
               type="range"
               min="30"
@@ -132,102 +190,65 @@ export default function SearchHub({
               step="10"
               value={maxFee}
               onChange={(e) => setMaxFee(Number(e.target.value))}
-              className="w-full sm:w-48 accent-[#DC2626] h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer"
+              className="w-full sm:w-40 accent-[#DC2626] h-1.5 bg-slate-100 rounded-none appearance-none cursor-pointer"
             />
-            <span className="text-xs font-black text-[#DC2626] shrink-0 bg-[#FFF0F2]/70 border border-[#FECDD3]/50 px-2.5 py-1 rounded-xl font-mono">RM {maxFee}</span>
+            <span className="font-mono font-black text-[#DC2626] bg-[#FFF0F2] border border-[#FECDD3] px-2.5 py-0.5 rounded-none text-xs">
+              RM {maxFee}
+            </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
-            {selectedSpecialtyFilter && (
-              <div className="bg-[#FFF0F2] border border-[#FECDD3] text-[#c8102e] text-[10px] font-black py-1 px-2.5 rounded-xs flex items-center gap-2 animate-fade-in">
-                <span>Triage: {selectedSpecialtyFilter}</span>
-                <button
-                  onClick={onClearSpecialtyFilter}
-                  className="hover:text-red-600 font-black text-xs cursor-pointer p-0.5 rounded-xs hover:bg-[#FFF0F2]/50"
-                  title="Clear Specialty"
-                >
-                  &times;
-                </button>
-              </div>
-            )}
-
-            {/* List/Grid View Mode Toggle */}
-            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-3xs shrink-0">
+          {selectedSpecialtyFilter && (
+            <div className="bg-[#FFF0F2] border border-[#FECDD3] text-[#DC2626] text-[11px] font-black py-1 px-3 rounded-none flex items-center gap-2">
+              <span>Filter: {selectedSpecialtyFilter}</span>
               <button
-                onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-lg transition-all flex items-center gap-1 text-xs font-bold cursor-pointer ${viewMode === 'list'
-                    ? 'bg-white text-[#DC2626] shadow-3xs'
-                    : 'text-slate-500 hover:text-slate-800'
-                  }`}
-                title="List View"
-                id="toggle-list-view"
+                onClick={onClearSpecialtyFilter}
+                className="hover:text-black font-black text-xs cursor-pointer px-1"
+                title="Clear Filter"
               >
-                <List className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">List</span>
-              </button>
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-lg transition-all flex items-center gap-1 text-xs font-bold cursor-pointer ${viewMode === 'grid'
-                    ? 'bg-white text-[#DC2626] shadow-3xs'
-                    : 'text-slate-500 hover:text-slate-800'
-                  }`}
-                title="Grid View"
-                id="toggle-grid-view"
-              >
-                <LayoutGrid className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Grid</span>
+                &times;
               </button>
             </div>
-
-            <button
-              onClick={() => setShowMap(!showMap)}
-              className="text-xs font-extrabold border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 py-1.5 px-3 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-3xs"
-            >
-              <MapPin className="h-3.5 w-3.5 text-[#DC2626]" />
-              <span>{showMap ? "Hide Map" : "Show Map"}</span>
-            </button>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Responsive Category Pill Rail */}
-      <div className="space-y-2 border-b border-slate-100 pb-2">
+      {/* Specialty Category Rail */}
+      <div className="space-y-2">
         <div className="flex items-center justify-between px-1">
           <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
-            <Stethoscope className="h-4 w-4 text-[#DC2626]" />
-            Specialty Directory Categories
+            <Stethoscope className="h-3.5 w-3.5 text-[#DC2626]" /> Specialty Categories
           </span>
-          <span className="text-[9px] font-semibold text-slate-400 hidden sm:inline-block">
-            Swipe left/right to browse &bull; {specialties.length + 1} categories
+          <span className="text-[9px] font-semibold text-slate-400">
+            {specialties.length} Categories Available
           </span>
         </div>
-        <div role="tablist" aria-label="Specialty directory categories" className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-xl bg-[#FFF0F2]/95 backdrop-blur-md p-1.5 shadow-xs">
-          {/* "All Specialties" Pill */}
+
+        <div className="flex flex-wrap gap-1.5 bg-[#FFF0F2]/70 border border-[#FECDD3] p-2 rounded-none">
           <button
             onClick={onClearSpecialtyFilter}
-            className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer border ${selectedSpecialtyFilter === ''
-                ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs'
-                : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
-              }`}
+            className={`px-3 py-1.5 text-xs font-bold transition-all cursor-pointer border ${
+              selectedSpecialtyFilter === ''
+                ? 'bg-[#DC2626] text-white border-[#B91C1C]'
+                : 'bg-white text-slate-700 border-[#FECDD3] hover:bg-[#FFF0F2]'
+            }`}
           >
-            <LayoutGrid className={`h-3.5 w-3.5 ${selectedSpecialtyFilter === '' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
-            <span>All Specialties</span>
+            All Specialties
           </button>
 
-          {/* Specialty Pills */}
           {specialties.map((spec) => {
-            const IconComponent = getSpecialtyIcon(spec);
+            const IconComp = getSpecialtyIcon(spec);
             const isSelected = selectedSpecialtyFilter.toLowerCase() === spec.toLowerCase();
             return (
               <button
                 key={spec}
                 onClick={() => onSelectSpecialtyFilter(spec)}
-                className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer border ${isSelected
-                    ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs'
-                    : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
-                  }`}
+                className={`px-3 py-1.5 text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                  isSelected
+                    ? 'bg-[#DC2626] text-white border-[#B91C1C]'
+                    : 'bg-white text-slate-700 border-[#FECDD3] hover:bg-[#FFF0F2]'
+                }`}
               >
-                <IconComponent className={`h-3.5 w-3.5 ${isSelected ? 'text-[#DC2626]' : 'text-slate-400'}`} />
+                <IconComp className={`h-3.5 w-3.5 ${isSelected ? 'text-white' : 'text-[#DC2626]'}`} />
                 <span>{spec}</span>
               </button>
             );
@@ -235,92 +256,111 @@ export default function SearchHub({
         </div>
       </div>
 
-      {/* Grid Content */}
+      {/* Main Results Directory Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Main List/Grid Column */}
         <div className={`${showMap ? "lg:col-span-8" : "lg:col-span-12"} space-y-4`}>
           {filteredList.length === 0 ? (
-            <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center space-y-3 shadow-3xs">
+            <div className="bg-white border border-[#FECDD3] rounded-none p-12 text-center space-y-3 shadow-3xs">
               <Stethoscope className="h-10 w-10 text-slate-300 mx-auto" />
-              <h4 className="text-sm font-bold text-slate-750">No medical professionals match your filters</h4>
-              <p className="text-xs text-slate-500">Try adjusting your budget, city selection, or query keywords.</p>
+              <h4 className="text-sm font-bold text-slate-800">No medical professionals match your search criteria</h4>
+              <p className="text-xs text-slate-500 font-medium">Try broadening your budget limit, city selection, or specialty keywords.</p>
+              <button
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedRole('all');
+                  setSelectedCity('all');
+                  setMaxFee(500);
+                  onClearSpecialtyFilter();
+                }}
+                className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold rounded-none cursor-pointer"
+              >
+                Reset All Filters
+              </button>
             </div>
-          ) : viewMode === 'list' ? (
-            /* Premium List View */
-            <div className="space-y-4">
+          ) : viewMode === 'grid' ? (
+            /* Grid View */
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {filteredList.map((prof) => {
                 const isDoc = prof.role === UserRole.DOCTOR;
+                const rating = getRatingInfo(prof.id);
+
                 return (
                   <div
                     key={prof.id}
-                    onClick={() => setSelectedModalProf(prof)}
-                    className="bg-white border border-slate-200 hover:border-[#FECDD3] rounded-3xl p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-5 cursor-pointer relative overflow-hidden group"
+                    onClick={() => onSelectProfessional(prof.id)}
+                    className="bg-white border border-[#FECDD3] rounded-none p-5 shadow-3xs hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col justify-between group relative overflow-hidden space-y-4"
                   >
-                    {/* Floating Accent Border on Hover */}
-                    <div className={`absolute left-0 top-0 bottom-0 w-1 transition-all group-hover:w-1.5 ${isDoc ? 'bg-[#DC2626]' : 'bg-[#DC2626]'
-                      }`}></div>
+                    {/* Top Accent Stripe */}
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-[#DC2626]"></div>
 
-                    <div className="flex items-center gap-4 flex-1 min-w-0">
-                      {/* Avatar */}
-                      <img
-                        src={prof.avatar}
-                        alt={prof.name}
-                        className="h-14 w-14 rounded-full object-cover border border-[#FECDD3] shadow-3xs shrink-0"
-                        referrerPolicy="no-referrer"
-                      />
+                    {/* Role & Verification Badge Header */}
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="bg-[#FFF0F2] text-[#DC2626] border border-[#FECDD3] text-[9px] font-black uppercase px-2.5 py-0.5 rounded-none">
+                        {isDoc ? "Doctor (MD/MBBS)" : "Registered Nurse (RN)"}
+                      </span>
+                      <span className="bg-emerald-50 text-emerald-800 border border-emerald-100 text-[9px] font-black px-2 py-0.5 rounded-none flex items-center gap-1">
+                        <BadgeCheck className="h-3 w-3 text-emerald-600" />
+                        Verified
+                      </span>
+                    </div>
+
+                    {/* Profile Avatar & Info */}
+                    <div className="flex gap-4 items-start">
+                      <div className="relative shrink-0">
+                        <img
+                          src={prof.avatar}
+                          alt={prof.name}
+                          className="h-16 w-16 rounded-full object-cover border-2 border-[#FECDD3] shadow-3xs"
+                          referrerPolicy="no-referrer"
+                        />
+                        <span className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white animate-pulse"></span>
+                      </div>
 
                       <div className="min-w-0 space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="text-sm font-black text-slate-850 group-hover:text-[#DC2626] transition-colors truncate">
-                            {prof.name}
-                          </h4>
-                          <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${isDoc
-                              ? "bg-[#FFF0F2] text-[#B91C1C] border-[#FECDD3]"
-                              : "bg-[#FFF0F2] text-[#B91C1C] border-[#FECDD3]"
-                            }`}>
-                            {isDoc ? "Doctor (MD/MBBS)" : "Registered Nurse (RN)"}
-                          </span>
-                          <span className="bg-emerald-50 text-emerald-800 text-[9px] font-black px-2 py-0.5 rounded-xs border border-emerald-100 flex items-center gap-0.5 shadow-3xs">
-                            <BadgeCheck className="h-3 w-3 text-emerald-600" />
-                            Verified ✅
-                          </span>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 font-semibold">
-                          <span className="flex items-center gap-1">
-                            <Stethoscope className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                            {prof.specialization}
-                          </span>
-                          <span className="text-slate-300">•</span>
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                            {prof.city}
-                          </span>
-                          <span className="text-slate-300">•</span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                            {prof.experienceYears} Years Exp
-                          </span>
-                        </div>
-
-                        <p className="text-[11px] text-slate-400 italic truncate max-w-xl">
-                          "{prof.bio}"
+                        <h3 className="text-base font-black text-slate-900 group-hover:text-[#DC2626] transition-colors truncate">
+                          {prof.name}
+                        </h3>
+                        <p className="text-xs font-bold text-slate-600 flex items-center gap-1">
+                          <Stethoscope className="h-3.5 w-3.5 text-[#DC2626] shrink-0" />
+                          <span className="truncate">{prof.specialization}</span>
+                        </p>
+                        <p className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                          <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                          <span>{prof.city}</span>
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 pt-3 md:pt-0 border-slate-100 shrink-0">
-                      <div className="flex items-center gap-1.5 text-xs font-black text-slate-700 bg-amber-50 border border-amber-200/60 px-2 py-0.5 rounded-lg">
+                    {/* Bio Snippet */}
+                    <p className="text-[11px] text-slate-600 leading-relaxed italic bg-[#FFF0F2]/30 border border-[#FECDD3]/50 p-2.5 rounded-none line-clamp-2">
+                      "{prof.bio}"
+                    </p>
+
+                    {/* Licensing & Experience Boxes */}
+                    <div className="grid grid-cols-2 gap-2 text-center text-xs">
+                      <div className="bg-slate-50 border border-slate-200 p-2 rounded-none">
+                        <span className="text-[8px] font-black uppercase text-slate-400 block">Council Code</span>
+                        <code className="font-mono text-[10px] font-bold text-slate-800">{prof.licenseNumber}</code>
+                      </div>
+                      <div className="bg-slate-50 border border-slate-200 p-2 rounded-none">
+                        <span className="text-[8px] font-black uppercase text-slate-400 block">Experience</span>
+                        <span className="text-[10px] font-black text-slate-800">{prof.experienceYears} Years</span>
+                      </div>
+                    </div>
+
+                    {/* Card Footer: Rating, Fee & Action */}
+                    <div className="border-t border-[#FECDD3] pt-3 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1 bg-amber-50 border border-amber-200 px-2 py-0.5 text-xs font-extrabold text-amber-800">
                         <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />
-                        <span>{getRatingInfo(prof.id).display}</span>
-                        <span className="text-slate-400 font-bold">({getRatingInfo(prof.id).count})</span>
+                        <span>{rating.display}</span>
+                        <span className="text-slate-400 text-[10px]">({rating.count})</span>
                       </div>
 
                       <div className="text-right">
-                        <span className="text-[9px] text-slate-400 block font-bold uppercase leading-none">Consultation Fee</span>
-                        <span className="text-sm font-extrabold text-[#B91C1C] font-mono">
+                        <span className="text-[9px] text-slate-400 uppercase font-extrabold block leading-none">Consultation</span>
+                        <span className="text-sm font-black font-mono text-[#DC2626]">
                           RM {prof.fee}
-                          <span className="text-[10px] font-semibold text-slate-500 font-sans">{isDoc ? "" : "/hr"}</span>
+                          <span className="text-[9px] font-sans font-semibold text-slate-500">{isDoc ? "" : "/hr"}</span>
                         </span>
                       </div>
 
@@ -329,11 +369,10 @@ export default function SearchHub({
                           e.stopPropagation();
                           setSelectedModalProf(prof);
                         }}
-                        className="text-xs font-extrabold bg-[#FFF0F2] hover:bg-[#FFF0F2] text-[#DC2626] py-2 px-3.5 rounded-xl border border-[#FECDD3] shadow-3xs transition-all flex items-center gap-1.5 cursor-pointer"
-                        id={`view-credentials-btn-${prof.id}`}
+                        className="p-2 bg-[#FFF0F2] hover:bg-[#DC2626] text-[#DC2626] hover:text-white border border-[#FECDD3] rounded-none transition-all cursor-pointer"
+                        title="View Full Credentials"
                       >
-                        <Eye className="h-3.5 w-3.5" />
-                        <span>View Credentials</span>
+                        <Eye className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
@@ -341,113 +380,70 @@ export default function SearchHub({
               })}
             </div>
           ) : (
-            /* Cleaner, More Professional Practitioner Grid Layouts */
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            /* List View */
+            <div className="space-y-3">
               {filteredList.map((prof) => {
                 const isDoc = prof.role === UserRole.DOCTOR;
+                const rating = getRatingInfo(prof.id);
+
                 return (
                   <div
                     key={prof.id}
                     onClick={() => onSelectProfessional(prof.id)}
-                    className={`bg-white border border-slate-200 rounded-[24px] p-5 shadow-3xs hover:shadow-md hover:border-[#FECDD3]/80 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between group relative overflow-hidden`}
+                    className="bg-white border border-[#FECDD3] p-4 rounded-none shadow-3xs hover:border-[#DC2626] transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
                   >
-                    {/* Visual top highlighting stripe per role */}
-                    <div className={`absolute left-0 right-0 top-0 h-1.5 ${isDoc ? 'bg-[#DC2626]/80' : 'bg-[#DC2626]/80'
-                      }`}></div>
-
-                    <div className="space-y-4">
-                      {/* Top Header: Role indicator and Verified Status */}
-                      <div className="flex justify-between items-center pt-1.5">
-                        <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${isDoc
-                            ? "bg-[#FFF0F2] text-[#B91C1C] border-[#FECDD3]"
-                            : "bg-[#FFF0F2] text-[#B91C1C] border-[#FECDD3]"
-                          }`}>
-                          {isDoc ? "Doctor" : "Registered Nurse"}
-                        </span>
-
-                        <span className="bg-emerald-50 text-emerald-800 text-[9px] font-black px-2 py-0.5 rounded-xs border border-emerald-150 flex items-center gap-0.5 shadow-3xs">
-                          <BadgeCheck className="h-3 w-3 text-emerald-500 fill-emerald-50" />
-                          Verified
-                        </span>
-                      </div>
-
-                      {/* Avatar, Name & Specialty info */}
-                      <div className="flex gap-4">
-                        <div className="relative shrink-0">
-                          <img
-                            src={prof.avatar}
-                            alt={prof.name}
-                            className="h-14 w-14 rounded-2xl object-cover border border-slate-100 shadow-3xs"
-                            referrerPolicy="no-referrer"
-                          />
-                          <span className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white ${isDoc ? 'bg-[#DC2626]' : 'bg-[#DC2626]'
-                            }`}></span>
-                        </div>
-
-                        <div className="space-y-1 min-w-0">
-                          <h4 className="text-sm font-black text-slate-850 group-hover:text-[#DC2626] transition-colors truncate leading-tight">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <img
+                        src={prof.avatar}
+                        alt={prof.name}
+                        className="h-14 w-14 rounded-full object-cover border border-[#FECDD3] shadow-3xs shrink-0"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="min-w-0 space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="text-sm font-black text-slate-900 group-hover:text-[#DC2626] transition-colors truncate">
                             {prof.name}
-                          </h4>
-
-                          <div className="flex items-center gap-1 text-[11px] text-slate-500 font-bold">
-                            <Stethoscope className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                            <span className="truncate">{prof.specialization}</span>
-                          </div>
-
-                          <div className="flex items-center gap-1 text-[11px] text-slate-400 font-bold">
-                            <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                            <span className="truncate">{prof.city}</span>
-                          </div>
+                          </h3>
+                          <span className="bg-[#FFF0F2] text-[#DC2626] border border-[#FECDD3] text-[9px] font-bold uppercase px-2 py-0.5 rounded-none">
+                            {isDoc ? "MD / MBBS" : "RN Nurse"}
+                          </span>
+                          <span className="bg-emerald-50 text-emerald-800 text-[9px] font-extrabold px-1.5 py-0.5 border border-emerald-100 flex items-center gap-0.5">
+                            <Check className="h-3 w-3 text-emerald-600" /> MMC Verified
+                          </span>
                         </div>
-                      </div>
-
-                      {/* Bio Quote box */}
-                      <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed italic bg-slate-50/50 border border-slate-150/40 p-3 rounded-xl">
-                        "{prof.bio}"
-                      </p>
-
-                      {/* Credential metrics compartment boxes */}
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="bg-slate-50/70 border border-slate-100 p-2 rounded-xl text-center">
-                          <span className="text-[8px] text-slate-400 font-bold uppercase block tracking-wider">Registry Code</span>
-                          <code className="text-[10px] font-mono font-black text-slate-800 bg-white px-1.5 py-0.5 rounded border border-slate-200/60 shadow-3xs inline-block mt-0.5">{prof.licenseNumber}</code>
-                        </div>
-                        <div className="bg-slate-50/70 border border-slate-100 p-2 rounded-xl text-center flex flex-col justify-center">
-                          <span className="text-[8px] text-slate-400 font-bold uppercase block tracking-wider">Experience</span>
-                          <span className="text-[11px] font-black text-slate-800 mt-0.5">{prof.experienceYears} Years</span>
-                        </div>
+                        <p className="text-xs text-slate-600 font-semibold flex items-center gap-2">
+                          <span className="flex items-center gap-1">
+                            <Stethoscope className="h-3.5 w-3.5 text-[#DC2626]" /> {prof.specialization}
+                          </span>
+                          <span className="text-slate-300">•</span>
+                          <span className="flex items-center gap-1">
+                            <MapPin className="h-3.5 w-3.5 text-slate-400" /> {prof.city}
+                          </span>
+                          <span className="text-slate-300">•</span>
+                          <span>{prof.experienceYears} Yrs Exp</span>
+                        </p>
                       </div>
                     </div>
 
-                    {/* Footer Details */}
-                    <div className="flex items-center justify-between border-t border-slate-100 pt-3 mt-4 text-xs gap-2">
-                      <div className="flex items-center gap-1 bg-amber-50 text-amber-800 border border-amber-250/50 px-2 py-0.5 rounded-lg text-[10px] font-extrabold shrink-0">
-                        <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
-                        <span>{getRatingInfo(prof.id).display}</span>
-                        <span className="text-amber-600/70">({getRatingInfo(prof.id).count})</span>
+                    <div className="flex items-center justify-between sm:justify-end gap-5 border-t sm:border-t-0 pt-3 sm:pt-0 border-[#FECDD3]">
+                      <div className="text-right">
+                        <span className="text-[9px] text-slate-400 font-bold uppercase block leading-none">Rate</span>
+                        <span className="text-sm font-black font-mono text-[#DC2626]">
+                          RM {prof.fee}
+                          <span className="text-[9px] font-sans text-slate-500 font-semibold">{isDoc ? "" : "/hr"}</span>
+                        </span>
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedModalProf(prof);
-                          }}
-                          className="text-[10px] font-extrabold text-[#DC2626] bg-[#FFF0F2]/70 hover:bg-[#FFF0F2] px-2.5 py-1.5 rounded-lg border border-[#FECDD3]/30 transition-all cursor-pointer flex items-center gap-1 shadow-3xs"
-                          title="View Credentials Card"
-                        >
-                          <Eye className="h-3 w-3" />
-                          <span>Credentials</span>
-                        </button>
-
-                        <div className="text-right">
-                          <span className="text-[9px] text-slate-400 block font-bold uppercase leading-none">Consultation Fee</span>
-                          <span className="text-xs font-black text-[#B91C1C] font-mono">
-                            RM {prof.fee}
-                            <span className="text-[9px] font-semibold text-slate-500 font-sans">{isDoc ? "" : "/hr"}</span>
-                          </span>
-                        </div>
-                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedModalProf(prof);
+                        }}
+                        className="px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold rounded-none transition-all flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                        <span>Credentials</span>
+                      </button>
                     </div>
                   </div>
                 );
@@ -456,27 +452,19 @@ export default function SearchHub({
           )}
         </div>
 
-        {/* Map Column (Toggleable) */}
+        {/* Clinic Location Map (Toggleable) */}
         {showMap && (
-          <div className="lg:col-span-4 bg-slate-50 border border-slate-200 rounded-3xl p-4 shadow-3xs flex flex-col h-[520px] justify-between relative overflow-hidden sticky top-20">
-            <div className="space-y-1 mb-4 z-10">
-              <h4 className="text-xs font-black text-slate-800 flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5 text-[#DC2626]" />
-                Clinic & Home Care Coordinates
+          <div className="lg:col-span-4 bg-white border border-[#FECDD3] rounded-none p-4 shadow-3xs flex flex-col h-[500px] justify-between sticky top-20">
+            <div className="space-y-1 mb-3">
+              <h4 className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                <MapPin className="h-4 w-4 text-[#DC2626]" /> Clinic Geolocations
               </h4>
-              <p className="text-[10px] text-slate-500 font-semibold">Active geolocations within KL, Selangor, Penang, and Johor</p>
+              <p className="text-[10px] text-slate-500 font-semibold">Interactive clinic coordinates across Malaysia</p>
             </div>
 
-            {/* Custom Interactive Mock Map Grid */}
-            <div className="flex-1 bg-slate-200/80 rounded-2xl border border-slate-300 relative overflow-hidden flex items-center justify-center">
-              <div className="absolute inset-0 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
-
-              {/* Map road lines mock */}
-              <div className="absolute top-1/3 left-0 right-0 h-1 bg-slate-300 transform -rotate-6 shadow-inner"></div>
-              <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-slate-300 transform rotate-12 shadow-inner"></div>
-              <div className="absolute top-2/3 left-0 right-0 h-1 bg-slate-300 shadow-inner"></div>
-
-              {/* Dynamic location pins from filtered results */}
+            <div className="flex-1 bg-slate-100 border border-slate-200 relative overflow-hidden flex items-center justify-center">
+              <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px]"></div>
+              
               {filteredList.slice(0, 5).map((prof, i) => {
                 const offsets = [
                   { top: "25%", left: "40%" },
@@ -494,167 +482,121 @@ export default function SearchHub({
                     onClick={() => onSelectProfessional(prof.id)}
                     className="absolute cursor-pointer group flex flex-col items-center justify-center z-20"
                   >
-                    <div className="bg-[#0F172A] text-white rounded-full p-1 border border-white shadow-lg animate-bounce hover:scale-110 transition-transform">
-                      {prof.role === UserRole.DOCTOR ? (
-                        <Stethoscope className="h-3 w-3 text-rose-300" />
-                      ) : (
-                        <HeartPulse className="h-3 w-3 text-slate-300" />
-                      )}
+                    <div className="bg-[#0F172A] text-white rounded-full p-1.5 border-2 border-white shadow-lg animate-bounce">
+                      <Stethoscope className="h-3.5 w-3.5 text-[#DC2626]" />
                     </div>
-                    {/* Tooltip */}
-                    <div className="absolute bottom-6 scale-0 group-hover:scale-100 transition-all bg-[#0F172A] text-white text-[9px] font-bold px-2 py-1 rounded shadow-md whitespace-nowrap">
+                    <div className="absolute bottom-7 scale-0 group-hover:scale-100 transition-all bg-[#0F172A] text-white text-[9px] font-bold px-2 py-1 rounded shadow-md whitespace-nowrap">
                       {prof.name}
                     </div>
                   </div>
                 );
               })}
 
-              <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur p-3 rounded-xl border border-slate-200 shadow-md">
-                <span className="text-[10px] font-extrabold text-slate-800 flex items-center gap-1 mb-1">
-                  <UserCheck className="h-3.5 w-3.5 text-[#DC2626]" />
-                  Showing {filteredList.length} verified listings
-                </span>
-                <p className="text-[9px] text-slate-500 font-semibold">Pins represent registered medical council practitioner clinic coordinates.</p>
+              <div className="absolute bottom-3 left-3 right-3 bg-white/95 p-2.5 border border-[#FECDD3] text-[10px] font-bold text-slate-700 shadow-sm">
+                📍 Showing {filteredList.length} verified practice locations.
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Verification Card Lightbox / Modal Popup */}
+      {/* Practitioner Credentials Modal */}
       {selectedModalProf && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-100/80 backdrop-blur-xs animate-fade-in"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
           onClick={() => setSelectedModalProf(null)}
-          id="credentials-modal-backdrop"
         >
-          {/* Card Wrapper with responsive scaling */}
           <div
-            className="relative max-w-md w-full scale-100 md:hover:scale-[1.01] transition-all duration-300 ease-out"
+            className="bg-white border-2 border-[#FECDD3] rounded-none max-w-lg w-full p-6 shadow-2xl space-y-5 relative"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* The precise, styled card matching user's image with a vibrant crimson border */}
-            <div
-              className="bg-white border-[3px] border-rose-400 rounded-[28px] p-6 shadow-[0_20px_50px_rgba(13,148,136,0.18)] flex flex-col justify-between relative overflow-hidden"
-              style={{ minHeight: '380px' }}
-              id="credentials-modal-card"
+            <button
+              onClick={() => setSelectedModalProf(null)}
+              className="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-800 cursor-pointer"
             >
-              {/* Floating Close Button in top corner */}
-              <button
-                onClick={() => setSelectedModalProf(null)}
-                className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer z-10"
-                title="Close"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              <X className="h-5 w-5" />
+            </button>
 
-              <div>
-                {/* Header layout: Avatar, Name & Specialization, Verified Badge */}
-                <div className="flex gap-4 pr-6">
-                  {/* Avatar with rounded corners */}
-                  <img
-                    src={selectedModalProf.avatar}
-                    alt={selectedModalProf.name}
-                    className="h-20 w-20 rounded-2xl object-cover border border-slate-150 shadow-sm shrink-0"
-                    referrerPolicy="no-referrer"
-                  />
-
-                  <div className="space-y-1">
-                    {/* Role badge */}
-                    <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${selectedModalProf.role === UserRole.DOCTOR
-                        ? "bg-[#FFF0F2] text-[#B91C1C] border-[#FECDD3]/60"
-                        : "bg-[#FFF0F2] text-[#B91C1C] border-[#FECDD3]"
-                      }`}>
-                      {selectedModalProf.role === UserRole.DOCTOR ? "DOCTOR (MD/MBBS)" : "REGISTERED NURSE (RN)"}
-                    </span>
-
-                    {/* Name */}
-                    <h3 className="text-lg font-black text-[#c8102e] leading-tight mt-1">
-                      {selectedModalProf.name}
-                    </h3>
-
-                    {/* Specialty */}
-                    <div className="flex items-center gap-1.5 text-xs text-slate-600 font-bold mt-1">
-                      <Stethoscope className="h-3.5 w-3.5 text-[#DC2626] shrink-0" />
-                      <span>{selectedModalProf.specialization}</span>
-                    </div>
-
-                    {/* City */}
-                    <div className="flex items-center gap-1.5 text-xs text-slate-400 font-bold mt-0.5">
-                      <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                      <span>{selectedModalProf.city}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Verified badge pill */}
-                <div className="mt-4 flex justify-between items-center bg-[#FFF0F2]/10 px-3.5 py-1.5 rounded-xl border border-[#FECDD3]">
-                  <div className="text-[10px] font-bold text-slate-500">Registry Verification Status</div>
-                  <div className="border border-emerald-500/80 text-emerald-600 bg-emerald-50/40 px-3 py-1 rounded-xs text-xs font-bold flex items-center gap-1 shadow-3xs">
-                    <span>Verified</span>
-                    <span className="text-emerald-500">☑</span>
-                  </div>
-                </div>
-
-                {/* Quote / Bio Block */}
-                <p className="text-[11px] text-slate-500 leading-relaxed italic border-l-2 border-slate-200 pl-3 mt-4">
-                  "{selectedModalProf.bio}"
+            {/* Modal Header */}
+            <div className="flex gap-4 items-start">
+              <img
+                src={selectedModalProf.avatar}
+                alt={selectedModalProf.name}
+                className="h-20 w-20 rounded-full object-cover border-2 border-[#FECDD3] shrink-0"
+                referrerPolicy="no-referrer"
+              />
+              <div className="space-y-1 pr-6">
+                <span className="bg-[#FFF0F2] text-[#DC2626] border border-[#FECDD3] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none inline-block">
+                  {selectedModalProf.role === UserRole.DOCTOR ? "Medical Specialist (MD)" : "Clinical Registered Nurse"}
+                </span>
+                <h3 className="text-lg font-black text-slate-900 leading-snug">
+                  {selectedModalProf.name}
+                </h3>
+                <p className="text-xs font-bold text-[#DC2626] flex items-center gap-1">
+                  <Stethoscope className="h-3.5 w-3.5" />
+                  <span>{selectedModalProf.specialization}</span>
                 </p>
-
-                {/* License credentials details */}
-                <div className="bg-slate-50/60 rounded-xl p-3.5 mt-4 space-y-2 border border-slate-150">
-                  <div className="flex justify-between items-center text-[10px]">
-                    <span className="text-slate-500 flex items-center gap-1.5 font-bold">
-                      <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                      {selectedModalProf.role === UserRole.DOCTOR ? "MMC Registration:" : "LJM Nurse Registry:"}
-                    </span>
-                    <code className="font-mono font-bold text-[11px] text-slate-800 bg-white border border-slate-200 px-2 py-0.5 rounded shadow-3xs">{selectedModalProf.licenseNumber}</code>
-                  </div>
-                  <div className="flex justify-between items-center text-[10px]">
-                    <span className="text-slate-500 flex items-center gap-1.5 font-bold">
-                      <Clock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                      Clinical Experience:
-                    </span>
-                    <span className="font-extrabold text-[11px] text-slate-800 bg-white border border-slate-200 px-2 py-0.5 rounded shadow-3xs">{selectedModalProf.experienceYears} Years</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer Section */}
-              <div className="flex items-center justify-between border-t border-slate-100 pt-4 mt-5">
-                <div className="flex items-center gap-1 font-extrabold text-slate-700 text-xs">
-                  <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
-                  <span>{getRatingInfo(selectedModalProf.id).display}</span>
-                  <span className="text-slate-400 font-semibold">({getRatingInfo(selectedModalProf.id).count})</span>
-                </div>
-
-                <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-extrabold uppercase tracking-wider leading-none">Consultation Fee</span>
-                  <span className="text-sm font-extrabold text-[#B91C1C] font-mono mt-1 block">
-                    RM {selectedModalProf.fee}
-                    <span className="text-[10px] font-semibold text-slate-500 font-sans">{selectedModalProf.role === UserRole.DOCTOR ? "" : "/hr"}</span>
-                  </span>
-                </div>
+                <p className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                  <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                  <span>{selectedModalProf.city}, Malaysia</span>
+                </p>
               </div>
             </div>
 
-            {/* Quick Actions Container Under Card */}
-            <div className="mt-4 flex gap-3 justify-end">
-              <button
-                onClick={() => setSelectedModalProf(null)}
-                className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-extrabold rounded-xl border border-slate-200 shadow-2xs transition-all cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  onSelectProfessional(selectedModalProf.id);
-                  setSelectedModalProf(null);
-                }}
-                className="px-5 py-2.5 bg-[#c8102e] hover:bg-[#a50f2a] text-white text-xs font-extrabold rounded-xl shadow-md shadow-rose-500/10 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <span>Full Profile & Appointments</span>
-              </button>
+            {/* Verification Status Banner */}
+            <div className="bg-[#FFF0F2] border border-[#FECDD3] p-3 rounded-none flex items-center justify-between text-xs font-bold">
+              <span className="text-slate-700 flex items-center gap-1.5">
+                <Shield className="h-4 w-4 text-[#DC2626]" /> Medical Council Verification:
+              </span>
+              <span className="bg-emerald-600 text-white px-2.5 py-0.5 text-[10px] font-black uppercase rounded-none">
+                VERIFIED ACTIVE
+              </span>
+            </div>
+
+            {/* Bio Block */}
+            <div className="text-xs text-slate-600 italic bg-slate-50 p-3 border-l-4 border-l-[#DC2626] rounded-none">
+              "{selectedModalProf.bio}"
+            </div>
+
+            {/* License details */}
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
+                <span className="text-[9px] font-black uppercase text-slate-400 block">Registration Code</span>
+                <code className="font-mono text-xs font-black text-slate-800">{selectedModalProf.licenseNumber}</code>
+              </div>
+              <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
+                <span className="text-[9px] font-black uppercase text-slate-400 block">Clinical Experience</span>
+                <span className="text-xs font-black text-slate-800">{selectedModalProf.experienceYears} Years</span>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="border-t border-[#FECDD3] pt-4 flex items-center justify-between gap-3">
+              <div className="text-left">
+                <span className="text-[9px] text-slate-400 font-bold uppercase block leading-none">Consultation Fee</span>
+                <span className="text-base font-black font-mono text-[#DC2626]">
+                  RM {selectedModalProf.fee}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setSelectedModalProf(null)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-none transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    onSelectProfessional(selectedModalProf.id);
+                    setSelectedModalProf(null);
+                  }}
+                  className="px-5 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black rounded-none transition-all cursor-pointer shadow-3xs flex items-center gap-1.5"
+                >
+                  <span>Book Consultation</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
