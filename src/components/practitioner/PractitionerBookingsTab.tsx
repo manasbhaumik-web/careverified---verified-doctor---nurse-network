@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import {
   FileSignature, X, ShieldCheck, Loader, Ambulance, MapPin, CheckCircle2, Calendar, Clock, Check
 } from 'lucide-react';
@@ -184,7 +184,7 @@ export default function PractitionerBookingsTab({
               return (
                 <div key={dispatch.id} className={`border p-4.5 rounded-none space-y-3.5 transition-all relative ${
                   isClaimedByMe
-                    ? 'border-indigo-200 bg-indigo-50/30'
+                    ? 'border-[#FECDD3] bg-[#FFF0F2]/50'
                     : 'border-[#FECDD3] bg-white hover:border-slate-350'
                 }`}>
                   <div className="flex justify-between items-start">
@@ -196,7 +196,7 @@ export default function PractitionerBookingsTab({
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-none ${
                       dispatch.dispatchStatus === 'Pending Dispatch'
                         ? 'bg-amber-100 text-amber-800'
-                        : 'bg-indigo-100 text-indigo-800'
+                        : 'bg-[#FFF0F2] text-[#DC2626] border border-[#FECDD3]'
                     }`}>
                       {dispatch.dispatchStatus}
                     </span>
@@ -228,17 +228,17 @@ export default function PractitionerBookingsTab({
                     {dispatch.dispatchStatus === 'En-Route' && isClaimedByMe && (
                       <button
                         onClick={() => onUpdateDispatchStatus(dispatch.id, 'Arrived')}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-black py-2 rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                        className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-black py-2 rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         <MapPin className="h-4 w-4" />
-                        <span>ðŸ“ MARK ARRIVED AT PATIENT</span>
+                        <span>MARK ARRIVED AT PATIENT</span>
                       </button>
                     )}
 
                     {dispatch.dispatchStatus === 'Arrived' && isClaimedByMe && (
                       <button
                         onClick={() => onUpdateDispatchStatus(dispatch.id, 'Completed')}
-                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black py-2 rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                        className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-black py-2 rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         <CheckCircle2 className="h-4 w-4" />
                         <span>✅ COMPLETE CRITICAL CARE DISPATCH</span>

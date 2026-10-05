@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { TrendingUp, Star } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking, OnCallDispatch, ConsultationMode } from '../../types';
 
@@ -86,7 +86,7 @@ export default function PractitionerAnalyticsTab({
               <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((inPersonEarned / totalEarnings) * 100) : 0}%</span>
             </div>
             <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
-              <div className="bg-indigo-600 h-full rounded-none transition-all duration-500" style={{ width: `${totalEarnings > 0 ? (inPersonEarned / totalEarnings) * 100 : 0}%` }}></div>
+              <div className="bg-[#DC2626] h-full rounded-none transition-all duration-500" style={{ width: `${totalEarnings > 0 ? (inPersonEarned / totalEarnings) * 100 : 0}%` }}></div>
             </div>
           </div>
 

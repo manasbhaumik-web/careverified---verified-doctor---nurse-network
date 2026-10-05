@@ -107,7 +107,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
       {/* Lightbox Header Bar */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white/70 backdrop-blur-sm z-10 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl border border-blue-100">
+          <div className="p-2.5 bg-[#FFF0F2] text-[#DC2626] rounded-xl border border-[#FECDD3]">
             <FileText className="h-5 w-5" />
           </div>
           <div>
@@ -180,9 +180,9 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
             />
           ) : isImageFile && record.id === 'rec-3' ? (
             /* Chest X-Ray SVG High Fidelity Radiograph Panel */
-            <div className="w-[450px] aspect-[3/4] bg-indigo-950 border-4 border-indigo-900 rounded-2xl p-5 flex flex-col justify-between font-mono text-white relative shadow-2xl overflow-hidden pointer-events-none">
+            <div className="w-[450px] aspect-[3/4] bg-[#0F172A] border-4 border-slate-800 rounded-2xl p-5 flex flex-col justify-between font-mono text-white relative shadow-2xl overflow-hidden pointer-events-none">
               {/* Backglow glow layer for clinical look */}
-              <div className="absolute inset-0 bg-radial-gradient from-indigo-900 to-indigo-950 pointer-events-none opacity-40"></div>
+              <div className="absolute inset-0 bg-radial-gradient from-slate-800 to-[#0F172A] pointer-events-none opacity-40"></div>
               
               {/* Radiograph Technical Header */}
               <div className="flex justify-between text-[8px] text-emerald-400 border-b border-slate-800/80 pb-2 z-10">
@@ -240,10 +240,10 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
                 </svg>
 
                 {/* Left/Right marker tags */}
-                <div className="absolute top-4 left-4 bg-blue-700 border border-slate-800 text-emerald-400 font-black px-2 py-0.5 rounded text-[10px]">
+                <div className="absolute top-4 left-4 bg-[#0F172A] border border-slate-800 text-emerald-400 font-black px-2 py-0.5 rounded text-[10px]">
                   R
                 </div>
-                <div className="absolute top-4 right-4 bg-blue-700 border border-slate-800 text-emerald-400 font-black px-2 py-0.5 rounded text-[10px]">
+                <div className="absolute top-4 right-4 bg-[#0F172A] border border-slate-800 text-emerald-400 font-black px-2 py-0.5 rounded text-[10px]">
                   L
                 </div>
 
@@ -266,7 +266,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
               <div className="border-b-2 border-slate-200 pb-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="text-xs font-black text-blue-700 tracking-wider uppercase">BP Clinical Laboratory</h4>
+                    <h4 className="text-xs font-black text-[#DC2626] tracking-wider uppercase">BP Clinical Laboratory</h4>
                     <p className="text-[8px] text-slate-500 font-semibold leading-relaxed mt-0.5">
                       Accredited Pathology Services Group &bull; ISO 15189 Certified<br/>
                       57 Jalan Maarof, Bangsar, 59100 Kuala Lumpur
@@ -294,7 +294,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
                   </div>
                   <div>
                     <span className="text-slate-400 font-bold block uppercase text-[7px] tracking-wider">Verified Hash proof</span>
-                    <span className="font-bold text-blue-600 font-mono truncate block max-w-[150px]">{record.hash?.substring(0, 24)}...</span>
+                    <span className="font-bold text-[#DC2626] font-mono truncate block max-w-[150px]">{record.hash?.substring(0, 24)}...</span>
                   </div>
                 </div>
               </div>
@@ -353,14 +353,14 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
                 <div>
                   <span className="font-bold block">LAB CHIEF SIGNATURE</span>
                   <div className="h-6 flex items-end">
-                    <span className="font-serif italic text-xs text-slate-700 font-bold tracking-widest">A.K. Saini</span>
+                    <span className="font-sans italic text-xs text-slate-700 font-bold tracking-widest">A.K. Saini</span>
                   </div>
                   <span className="text-[7px]">Dr. Amit K. Saini, FRCPath</span>
                 </div>
 
                 {/* Ledger Proof Badge */}
-                <div className="bg-blue-50 border border-blue-200 text-blue-700 p-2 rounded-xl flex items-center gap-1.5">
-                  <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0" />
+                <div className="bg-[#FFF0F2] border border-[#FECDD3] text-[#DC2626] p-2 rounded-xl flex items-center gap-1.5">
+                  <CheckCircle2 className="h-5 w-5 text-[#DC2626] shrink-0" />
                   <div>
                     <span className="font-black block uppercase tracking-wide text-[7px]">BLOCKCHAIN VERIFIED</span>
                     <span className="font-semibold block text-[6px] text-slate-400 font-mono">HASH CHECKED &bull; OK</span>
@@ -436,7 +436,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
                 </div>
 
                 {/* Scannable secure QR code block */}
-                <div className="h-10 w-10 bg-indigo-900 p-0.5 rounded-md flex items-center justify-center border border-amber-200 shrink-0">
+                <div className="h-10 w-10 bg-[#0F172A] p-0.5 rounded-md flex items-center justify-center border border-amber-200 shrink-0">
                   <svg className="w-full h-full text-white" viewBox="0 0 24 24" fill="currentColor">
                     <rect x="2" y="2" width="6" height="6" />
                     <rect x="4" y="4" width="2" height="2" fill="black" />
@@ -459,7 +459,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
               <div className="space-y-4">
                 <div className="flex justify-between items-center border-b-2 border-slate-100 pb-4">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
+                    <div className="p-2 bg-[#FFF0F2] text-[#DC2626] rounded-xl">
                       <FileText className="h-5 w-5" />
                     </div>
                     <div>
@@ -497,7 +497,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
               </div>
 
               <div className="border-t border-slate-100 pt-4 space-y-3">
-                <div className="flex items-center gap-3 bg-blue-50/50 border border-blue-100 rounded-xl p-3">
+                <div className="flex items-center gap-3 bg-[#FFF0F2] border border-[#FECDD3] rounded-xl p-3">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
                   <div className="min-w-0">
                     <span className="text-[8px] font-black text-emerald-800 uppercase tracking-wide block">GPG Hash Checked & Legitimate</span>
@@ -529,7 +529,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
         <div className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 p-1.5 rounded-2xl">
           <button 
             onClick={handleZoomOut}
-            className="p-2 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="p-2 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#DC2626]"
             title="Zoom Out (-)"
           >
             <ZoomOut className="h-4 w-4" />
@@ -541,7 +541,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
 
           <button 
             onClick={handleZoomIn}
-            className="p-2 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="p-2 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#DC2626]"
             title="Zoom In (+)"
           >
             <ZoomIn className="h-4 w-4" />
@@ -551,7 +551,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
 
           <button 
             onClick={handleRotateCcw}
-            className="p-2 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="p-2 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#DC2626]"
             title="Rotate Left"
           >
             <RotateCcw className="h-4 w-4" />
@@ -559,7 +559,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
 
           <button 
             onClick={handleRotateCw}
-            className="p-2 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="p-2 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#DC2626]"
             title="Rotate Right (R)"
           >
             <RotateCw className="h-4 w-4" />
@@ -569,7 +569,7 @@ export default function DocumentViewer({ record, onClose }: DocumentViewerProps)
 
           <button 
             onClick={handleReset}
-            className="p-2 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="p-2 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded-xl transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#DC2626]"
             title="Reset View"
           >
             <RefreshCw className="h-4 w-4" />

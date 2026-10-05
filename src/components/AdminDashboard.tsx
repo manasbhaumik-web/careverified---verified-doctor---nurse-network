@@ -328,7 +328,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
             <span className="font-mono tabular-nums text-2xl font-black block text-[#DC2626]">{professionals.length} Verified</span>
             <p className="text-[10px] text-slate-500 font-semibold leading-normal">Registered with medical & nursing councils.</p>
           </div>
-          <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl border border-blue-100 shrink-0">
+          <div className="p-2.5 bg-[#FFF0F2] text-[#DC2626] rounded-xl border border-[#FECDD3] shrink-0">
             <UserCheck className="h-5 w-5" />
           </div>
         </div>
@@ -360,7 +360,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
       <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-sm space-y-5">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-50 pb-4 gap-3">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-blue-600 text-white rounded-lg">
+            <div className="p-1.5 bg-[#DC2626] text-white rounded-lg">
               <ShieldCheck className="h-4.5 w-4.5" />
             </div>
             <div>
@@ -376,7 +376,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
               onClick={() => setViewMode('list')}
               className={`p-1.5 rounded-lg transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
                 viewMode === 'list'
-                  ? 'bg-white text-blue-800 shadow-xs'
+                  ? 'bg-white text-[#B91C1C] shadow-xs'
                   : 'text-slate-500 hover:text-slate-800'
               }`}
               title="List View"
@@ -390,7 +390,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
               onClick={() => setViewMode('grid')}
               className={`p-1.5 rounded-lg transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
                 viewMode === 'grid'
-                  ? 'bg-white text-blue-800 shadow-xs'
+                  ? 'bg-white text-[#B91C1C] shadow-xs'
                   : 'text-slate-500 hover:text-slate-800'
               }`}
               title="Grid View"
@@ -404,7 +404,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
 
         {loading ? (
           <div className="text-center py-10 space-y-2">
-            <Loader className="h-6 w-6 text-blue-600 animate-spin mx-auto" />
+            <Loader className="h-6 w-6 text-[#DC2626] animate-spin mx-auto" />
             <p className="text-xs text-slate-500">Fetching registration requests...</p>
           </div>
         ) : pendingRequests.length === 0 ? (
@@ -429,7 +429,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                   <div 
                     key={req.id} 
                     onClick={() => setSelectedModalRequest(req)}
-                    className={`border border-slate-200/80 rounded-xl p-4 shadow-2xs hover:shadow-sm transition-all flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 cursor-pointer hover:border-blue-300 ${
+                    className={`border border-slate-200/80 rounded-xl p-4 shadow-2xs hover:shadow-sm transition-all flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 cursor-pointer hover:border-rose-300 ${
                       isApprovedInLoop ? "bg-emerald-50/50 border-emerald-200" : "bg-white"
                     }`}
                   >
@@ -442,9 +442,9 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                       />
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <h4 className="font-serif text-sm font-semibold text-slate-800 truncate">{reqName}</h4>
+                          <h4 className="font-sans text-sm font-semibold text-slate-800 truncate">{reqName}</h4>
                           <span className={`text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
-                            reqRole === UserRole.DOCTOR ? "bg-blue-50 text-blue-800 border border-blue-100" : "bg-emerald-50 text-emerald-800 border border-emerald-100"
+                            reqRole === UserRole.DOCTOR ? "bg-[#FFF0F2] text-[#B91C1C] border border-[#FECDD3]" : "bg-emerald-50 text-emerald-800 border border-emerald-100"
                           }`}>
                             {reqRole === UserRole.DOCTOR ? "Doctor" : "Nurse"}
                           </span>
@@ -470,7 +470,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                       <button
                         type="button"
                         onClick={() => handleApprove(req.id)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-2 px-3 text-xs font-bold flex items-center gap-1 shadow-3xs transition-all cursor-pointer"
+                        className="bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl py-2 px-3 text-xs font-bold flex items-center gap-1 shadow-3xs transition-all cursor-pointer"
                       >
                         <Check className="h-3.5 w-3.5" />
                         <span>Approve</span>
@@ -508,7 +508,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                         <div className="flex items-center gap-2">
                           <h4 className="text-sm font-extrabold text-slate-800">{reqName}</h4>
                           <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded ${
-                            reqRole === UserRole.DOCTOR ? "bg-blue-50 text-blue-800 border border-blue-100" : "bg-emerald-50 text-emerald-800 border border-emerald-100"
+                            reqRole === UserRole.DOCTOR ? "bg-[#FFF0F2] text-[#B91C1C] border border-[#FECDD3]" : "bg-emerald-50 text-emerald-800 border border-emerald-100"
                           }`}>
                             {reqRole === UserRole.DOCTOR ? "Doctor" : "Registered Nurse"}
                           </span>
@@ -552,7 +552,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                   <div className="flex flex-row justify-end gap-2 shrink-0 border-t border-slate-100 pt-4 mt-2">
                     <button
                       onClick={() => handleApprove(req.id)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-2 px-5 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all"
+                      className="bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl py-2 px-5 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all"
                     >
                       <Check className="h-4 w-4" />
                       Approve & Publish
@@ -580,7 +580,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
           id="admin-credentials-backdrop"
         >
           <div 
-            className="relative bg-white border-[3px] border-blue-400 rounded-[28px] max-w-xl w-full p-6 shadow-2xl flex flex-col justify-between overflow-hidden scale-100 transition-all duration-300"
+            className="relative bg-white border-[3px] border-[#FECDD3] rounded-[28px] max-w-xl w-full p-6 shadow-2xl flex flex-col justify-between overflow-hidden scale-100 transition-all duration-300"
             onClick={(e) => e.stopPropagation()}
             id="admin-credentials-modal-card"
           >
@@ -604,16 +604,16 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 <div className="space-y-1">
                   <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded border ${
                     (selectedModalRequest.userType || selectedModalRequest.role) === UserRole.DOCTOR 
-                      ? "bg-blue-50 text-blue-850 border-blue-100" 
+                      ? "bg-[#FFF0F2] text-[#DC2626] border-[#FECDD3]" 
                       : "bg-emerald-50 text-emerald-850 border-emerald-100"
                   }`}>
                     {(selectedModalRequest.userType || selectedModalRequest.role) === UserRole.DOCTOR ? "Doctor Application" : "Nurse Application"}
                   </span>
-                  <h3 className="font-serif text-xl font-semibold text-slate-800 leading-tight">
+                  <h3 className="font-sans text-xl font-semibold text-slate-800 leading-tight">
                     {selectedModalRequest.userName || selectedModalRequest.name}
                   </h3>
                   <p className="text-xs text-slate-500 font-bold flex items-center gap-1.5">
-                    <Award className="h-3.5 w-3.5 text-blue-500" />
+                    <Award className="h-3.5 w-3.5 text-[#DC2626]" />
                     <span>{selectedModalRequest.specialization || "General Practitioner"} Specialist</span>
                   </p>
                 </div>
@@ -634,7 +634,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
               {/* Bio block */}
               <div className="space-y-1.5">
                 <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider">Statement of Clinical Philosophy</span>
-                <p className="text-xs text-slate-650 italic bg-slate-50/50 p-4 border-l-3 border-blue-400 rounded-r-xl leading-relaxed">
+                <p className="text-xs text-slate-650 italic bg-slate-50/50 p-4 border-l-3 border-[#FECDD3] rounded-r-xl leading-relaxed">
                   "{selectedModalRequest.bio || "Applicant is seeking medical or nurse credential verification."}"
                 </p>
               </div>
@@ -651,10 +651,10 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 </div>
                 <div className="border border-slate-200 rounded-xl p-3 bg-white flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <FileText className="h-4.5 w-4.5 text-blue-600" />
+                    <FileText className="h-4.5 w-4.5 text-[#DC2626]" />
                     <span className="font-bold text-slate-700">Certificate_Registry_Scan.pdf</span>
                   </div>
-                  <span className="text-[10px] bg-blue-50 border border-blue-150 text-blue-700 px-2 py-0.5 rounded font-bold uppercase">Ready</span>
+                  <span className="text-[10px] bg-[#FFF0F2] border border-[#FECDD3] text-[#DC2626] px-2 py-0.5 rounded font-bold uppercase">Ready</span>
                 </div>
               </div>
             </div>
@@ -682,7 +682,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                   handleApprove(selectedModalRequest.id);
                   setSelectedModalRequest(null);
                 }}
-                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold rounded-xl shadow-md shadow-blue-500/10 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-5 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-extrabold rounded-xl shadow-md shadow-rose-500/10 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <Check className="h-4 w-4" />
                 <span>Approve & Publish</span>
@@ -698,13 +698,13 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
         <div id="panel-packages" role="tabpanel" aria-labelledby="tab-packages" tabIndex={0} className="space-y-8 animate-fade-in text-slate-800">
           {/* Package Overview Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div className="bg-white border-2 border-slate-200/80 border-l-4 border-l-purple-600 rounded-xl p-5 shadow-xs flex items-start justify-between gap-4">
+            <div className="bg-white border-2 border-slate-200/80 border-l-4 border-l-[#DC2626] rounded-xl p-5 shadow-xs flex items-start justify-between gap-4">
               <div className="space-y-2">
                 <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider">Installed packages</span>
-                <span className="font-mono tabular-nums text-2xl font-black block text-purple-700">{packages.length} Active Modules</span>
+                <span className="font-mono tabular-nums text-2xl font-black block text-[#DC2626]">{packages.length} Active Modules</span>
                 <p className="text-[10px] text-slate-500 font-semibold leading-normal">Clinical packages compiled & mounted.</p>
               </div>
-              <div className="p-2.5 bg-purple-50 text-purple-600 rounded-xl border border-purple-100 shrink-0">
+              <div className="p-2.5 bg-[#FFF0F2] text-[#DC2626] rounded-xl border border-[#FECDD3] shrink-0">
                 <Puzzle className="h-5 w-5" />
               </div>
             </div>
@@ -720,15 +720,15 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
               </div>
             </div>
 
-            <div className="bg-white border-2 border-slate-200/80 border-l-4 border-l-blue-600 rounded-xl p-5 shadow-xs flex items-start justify-between gap-4">
+            <div className="bg-white border-2 border-slate-200/80 border-l-4 border-l-[#DC2626] rounded-xl p-5 shadow-xs flex items-start justify-between gap-4">
               <div className="space-y-2">
                 <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider">Marketplace Extensions</span>
-                <span className="font-mono tabular-nums text-2xl font-black text-blue-600 block">
+                <span className="font-mono tabular-nums text-2xl font-black text-[#DC2626] block">
                   {MARKETPLACE_ADDONS.filter(addon => !packages.some(p => p.id === addon.id)).length} Available
                 </span>
                 <p className="text-[10px] text-slate-500 font-semibold leading-normal">Ready to download from official cloud registry.</p>
               </div>
-              <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl border border-blue-100 shrink-0">
+              <div className="p-2.5 bg-[#FFF0F2] text-[#DC2626] rounded-xl border border-[#FECDD3] shrink-0">
                 <Download className="h-5 w-5" />
               </div>
             </div>
@@ -744,7 +744,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                   placeholder="Search installed packages..."
                   value={packageSearch}
                   onChange={(e) => setPackageSearch(e.target.value)}
-                  className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
                 />
               </div>
 
@@ -752,7 +752,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 <button
                   type="button"
                   onClick={() => setShowCustomForm(!showCustomForm)}
-                  className="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
                   <Plus className="h-4 w-4" />
                   <span>Compile Custom Package</span>
@@ -768,7 +768,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                   onClick={() => setPackageCategoryFilter(cat)}
                   className={`px-3 py-1.5 rounded-lg text-[10px] font-bold border transition-all cursor-pointer ${
                     packageCategoryFilter === cat
-                      ? 'bg-blue-600 border-blue-700 text-white shadow-xs'
+                      ? 'bg-[#DC2626] border-[#DC2626] text-white shadow-xs'
                       : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                   }`}
                 >
@@ -780,10 +780,10 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
 
           {/* Custom Package Form */}
           {showCustomForm && (
-            <form onSubmit={handleCreateCustomPackage} className="bg-blue-50/40 border-2 border-blue-400 p-6 rounded-xl shadow-md space-y-5 animate-fade-in">
-              <div className="flex items-center justify-between border-b border-blue-100 pb-3">
+            <form onSubmit={handleCreateCustomPackage} className="bg-[#FFF0F2]/40 border-2 border-[#FECDD3] p-6 rounded-xl shadow-md space-y-5 animate-fade-in">
+              <div className="flex items-center justify-between border-b border-[#FECDD3] pb-3">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="h-4.5 w-4.5 text-blue-600" />
+                  <Sparkles className="h-4.5 w-4.5 text-[#DC2626]" />
                   <h4 className="text-sm font-bold text-slate-900">Custom Package Compiler</h4>
                 </div>
                 <button
@@ -804,7 +804,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                     placeholder="e.g. diagnostics-charting"
                     value={newPkgId}
                     onChange={(e) => setNewPkgId(e.target.value)}
-                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-700 outline-none focus:border-blue-500"
+                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-700 outline-none focus:border-[#DC2626]"
                   />
                 </div>
 
@@ -816,7 +816,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                     placeholder="e.g. Real-Time Vitals Charting Engine"
                     value={newPkgName}
                     onChange={(e) => setNewPkgName(e.target.value)}
-                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-700 outline-none focus:border-blue-500"
+                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-700 outline-none focus:border-[#DC2626]"
                   />
                 </div>
               </div>
@@ -829,7 +829,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                   placeholder="Explain exactly what features this modular package mounts in the system, its integration, and patient impact..."
                   value={newPkgDesc}
                   onChange={(e) => setNewPkgDesc(e.target.value)}
-                  className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-medium text-slate-700 outline-none focus:border-blue-500"
+                  className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-medium text-slate-700 outline-none focus:border-[#DC2626]"
                 />
               </div>
 
@@ -839,7 +839,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                   <select
                     value={newPkgCategory}
                     onChange={(e) => setNewPkgCategory(e.target.value)}
-                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 cursor-pointer outline-none focus:border-blue-500"
+                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 cursor-pointer outline-none focus:border-[#DC2626]"
                   >
                     {['Patient Services', 'Clinical Operations', 'SEO & Growth', 'Communication', 'Credentialing', 'Custom Extension'].map(cat => (
                       <option key={cat} value={cat}>{cat}</option>
@@ -852,7 +852,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                   <select
                     value={newPkgIcon}
                     onChange={(e) => setNewPkgIcon(e.target.value)}
-                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 cursor-pointer outline-none focus:border-blue-500"
+                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 cursor-pointer outline-none focus:border-[#DC2626]"
                   >
                     {['Activity', 'CreditCard', 'TrendingUp', 'Heart', 'Search', 'Calendar', 'BookOpen', 'PlusCircle', 'MessageSquare', 'Globe'].map(ic => (
                       <option key={ic} value={ic}>{ic} Icon</option>
@@ -867,7 +867,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                     placeholder="e.g. 1.0.0"
                     value={newPkgVersion}
                     onChange={(e) => setNewPkgVersion(e.target.value)}
-                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-700 outline-none focus:border-blue-500"
+                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-700 outline-none focus:border-[#DC2626]"
                   />
                 </div>
 
@@ -878,12 +878,12 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                     placeholder="e.g. Clinical Ops Admin"
                     value={newPkgAuthor}
                     onChange={(e) => setNewPkgAuthor(e.target.value)}
-                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-700 outline-none focus:border-blue-500"
+                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-700 outline-none focus:border-[#DC2626]"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-blue-100">
+              <div className="flex justify-end gap-3 pt-3 border-t border-[#FECDD3]">
                 <button
                   type="button"
                   onClick={() => setShowCustomForm(false)}
@@ -894,7 +894,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 <button
                   type="submit"
                   disabled={isCompiling}
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold rounded-xl shadow-md flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-extrabold rounded-xl shadow-md flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
                 >
                   {isCompiling ? <Loader className="h-4 w-4 animate-spin" /> : <Settings className="h-4 w-4 animate-spin" />}
                   <span>Compile & Hot-Install Package</span>
@@ -906,7 +906,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
           {/* Installed Packages List */}
           <div className="space-y-4">
             <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
-              <Puzzle className="h-4 w-4 text-purple-600" />
+              <Puzzle className="h-4 w-4 text-[#DC2626]" />
               <span>Installed Packages ({packages.length})</span>
             </h3>
 
@@ -932,7 +932,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                           <div className="flex items-center gap-3">
                             <div className={`p-2.5 rounded-xl border shrink-0 ${
                               pkg.isEnabled
-                                ? 'bg-blue-50 border-blue-100 text-blue-600'
+                                ? 'bg-[#FFF0F2] border-[#FECDD3] text-[#DC2626]'
                                 : 'bg-slate-100 border-slate-200 text-slate-400'
                             }`}>
                               {renderIcon(pkg.icon)}
@@ -967,7 +967,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                             type="button"
                             onClick={() => handleTogglePackage(pkg.id)}
                             className={`relative inline-flex h-5.5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                              pkg.isEnabled ? 'bg-blue-600' : 'bg-slate-300'
+                              pkg.isEnabled ? 'bg-[#DC2626]' : 'bg-slate-300'
                             }`}
                           >
                             <span
@@ -1006,11 +1006,11 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
           <div className="bg-slate-100 text-slate-800 p-6 rounded-xl border border-slate-200 space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="space-y-1">
-                <span className="text-[10px] font-extrabold text-blue-600 uppercase tracking-wider block">Official Extensions Registry</span>
+                <span className="text-[10px] font-extrabold text-[#DC2626] uppercase tracking-wider block">Official Extensions Registry</span>
                 <h3 className="text-base font-extrabold text-slate-800 leading-tight">MediCert Cloud Marketplace</h3>
                 <p className="text-xs text-slate-500 font-semibold leading-relaxed">Expand clinical compliance and services with certified, HIPAA-compliant plug-ins.</p>
               </div>
-              <div className="bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-xl text-[10px] font-bold text-blue-700 flex items-center gap-1.5">
+              <div className="bg-[#FFF0F2] border border-[#FECDD3] px-3 py-1.5 rounded-xl text-[10px] font-bold text-[#DC2626] flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-xs animate-pulse"></span>
                 <span>Registry Server Active</span>
               </div>
@@ -1027,15 +1027,15 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 {MARKETPLACE_ADDONS
                   .filter(addon => !packages.some(p => p.id === addon.id))
                   .map((addon) => (
-                    <div key={addon.id} className="bg-white border border-slate-200 hover:border-blue-400 p-4.5 rounded-xl flex flex-col justify-between gap-4 transition-all text-slate-700 shadow-3xs">
+                    <div key={addon.id} className="bg-white border border-slate-200 hover:border-[#FECDD3] p-4.5 rounded-xl flex flex-col justify-between gap-4 transition-all text-slate-700 shadow-3xs">
                       <div className="space-y-2.5">
                         <div className="flex items-center justify-between gap-3">
                           <span className="bg-slate-50 text-slate-500 border border-slate-200 font-mono text-[8px] px-1.5 py-0.5 rounded">v{addon.version}</span>
-                          <span className="bg-blue-50 text-blue-700 border border-blue-100 text-[8px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wide">{addon.category}</span>
+                          <span className="bg-[#FFF0F2] text-[#DC2626] border border-[#FECDD3] text-[8px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wide">{addon.category}</span>
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg shrink-0">
+                          <div className="p-1.5 bg-[#FFF0F2] text-[#DC2626] rounded-lg shrink-0">
                             {renderIcon(addon.icon, "h-4 w-4")}
                           </div>
                           <h4 className="text-xs font-extrabold text-slate-800 truncate">{addon.name}</h4>
@@ -1049,7 +1049,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                       <button
                         type="button"
                         onClick={() => handleInstallPackage(addon)}
-                        className="w-full py-2 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white rounded-xl text-[10px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm shadow-blue-500/15"
+                        className="w-full py-2 bg-[#DC2626] hover:bg-[#DC2626] active:bg-[#0F172A] text-white rounded-xl text-[10px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm shadow-rose-500/15"
                       >
                         <Download className="h-3 w-3" />
                         <span>Hot-Install Package</span>

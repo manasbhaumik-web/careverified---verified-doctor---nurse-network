@@ -133,14 +133,14 @@ Notarized Secure Block under HIPAA Audit standards.`);
       <div className="bg-white rounded-3xl border-2 border-slate-200 w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[95vh] animate-slide-down">
         
         {/* Header */}
-        <div className="bg-blue-700 text-white p-5 flex justify-between items-center shrink-0">
+        <div className="bg-[#0F172A] text-white p-5 flex justify-between items-center shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="p-2 bg-white/10 rounded-xl">
-              <CreditCard className="h-5 w-5 text-blue-300" />
+              <CreditCard className="h-5 w-5 text-rose-300" />
             </div>
             <div>
               <h3 className="text-sm font-extrabold tracking-tight">CareVerified Payment Portal</h3>
-              <p className="text-[10px] text-blue-200 font-bold uppercase mt-0.5 tracking-wider">HIPAA Secure Clearing Ledger</p>
+              <p className="text-[10px] text-slate-300 font-bold uppercase mt-0.5 tracking-wider">HIPAA Secure Clearing Ledger</p>
             </div>
           </div>
           {!processing && !receipt && (
@@ -153,9 +153,9 @@ Notarized Secure Block under HIPAA Audit standards.`);
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-5 space-y-5">
           {/* Summary Banner */}
-          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center">
-            <span className="text-[10px] font-black uppercase text-blue-700 tracking-wider block">Total Payable Amount</span>
-            <span className="text-3xl font-black text-blue-900 mt-1 block">RM {amount.toFixed(2)}</span>
+          <div className="bg-[#FFF0F2] border border-[#FECDD3] rounded-2xl p-4 text-center">
+            <span className="text-[10px] font-black uppercase text-[#DC2626] tracking-wider block">Total Payable Amount</span>
+            <span className="text-3xl font-black text-[#0F172A] mt-1 block">RM {amount.toFixed(2)}</span>
             <span className="text-[11px] text-slate-500 font-semibold block mt-1.5 truncate" title={purpose}>{purpose}</span>
           </div>
 
@@ -167,7 +167,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
                   type="button"
                   onClick={() => setPaymentMethod('card')}
                   className={`py-2 px-1 text-center text-[11px] font-black rounded-lg transition-all cursor-pointer ${
-                    paymentMethod === 'card' ? 'bg-white text-blue-900 shadow-3xs border border-slate-200' : 'text-slate-500 hover:text-slate-800'
+                    paymentMethod === 'card' ? 'bg-white text-[#0F172A] shadow-3xs border border-slate-200' : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   Credit Card
@@ -176,7 +176,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
                   type="button"
                   onClick={() => setPaymentMethod('fpx')}
                   className={`py-2 px-1 text-center text-[11px] font-black rounded-lg transition-all cursor-pointer ${
-                    paymentMethod === 'fpx' ? 'bg-white text-blue-900 shadow-3xs border border-slate-200' : 'text-slate-500 hover:text-slate-800'
+                    paymentMethod === 'fpx' ? 'bg-white text-[#0F172A] shadow-3xs border border-slate-200' : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   FPX Banking
@@ -185,7 +185,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
                   type="button"
                   onClick={() => setPaymentMethod('ewallet')}
                   className={`py-2 px-1 text-center text-[11px] font-black rounded-lg transition-all cursor-pointer ${
-                    paymentMethod === 'ewallet' ? 'bg-white text-blue-900 shadow-3xs border border-slate-200' : 'text-slate-500 hover:text-slate-800'
+                    paymentMethod === 'ewallet' ? 'bg-white text-[#0F172A] shadow-3xs border border-slate-200' : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   E-Wallet
@@ -269,7 +269,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
                       <select
                         value={fpxBank}
                         onChange={(e) => setFpxBank(e.target.value)}
-                        className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-blue-500 font-extrabold text-slate-700 cursor-pointer"
+                        className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-[#DC2626] font-extrabold text-slate-700 cursor-pointer"
                       >
                         <option value="maybank2u">Maybank2u / Maybank</option>
                         <option value="cimb_clicks">CIMB Clicks</option>
@@ -295,7 +295,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
                           type="button"
                           onClick={() => setEwalletType('tng')}
                           className={`p-3 border-2 rounded-xl text-center cursor-pointer transition-all ${
-                            ewalletType === 'tng' ? 'border-blue-500 bg-blue-50 text-blue-900' : 'border-slate-200 bg-slate-50 hover:border-slate-300'
+                            ewalletType === 'tng' ? 'border-[#DC2626] bg-[#FFF0F2] text-[#0F172A]' : 'border-slate-200 bg-slate-50 hover:border-slate-300'
                           }`}
                         >
                           <span className="text-xs font-black block">Touch 'n Go eWallet</span>
@@ -304,7 +304,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
                           type="button"
                           onClick={() => setEwalletType('grabpay')}
                           className={`p-3 border-2 rounded-xl text-center cursor-pointer transition-all ${
-                            ewalletType === 'grabpay' ? 'border-blue-500 bg-blue-50 text-blue-900' : 'border-slate-200 bg-slate-50 hover:border-slate-300'
+                            ewalletType === 'grabpay' ? 'border-[#DC2626] bg-[#FFF0F2] text-[#0F172A]' : 'border-slate-200 bg-slate-50 hover:border-slate-300'
                           }`}
                         >
                           <span className="text-xs font-black block">GrabPay</span>
@@ -316,7 +316,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
 
                 <button
                   type="submit"
-                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md mt-6"
+                  className="w-full py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md mt-6"
                 >
                   <Lock className="h-4 w-4" />
                   <span>
@@ -328,7 +328,7 @@ Notarized Secure Block under HIPAA Audit standards.`);
 
               {/* Secure guarantee label */}
               <div className="pt-2 border-t border-slate-100 flex items-center gap-2 text-[9px] text-slate-400 font-bold justify-center">
-                <ShieldCheck className="h-3.5 w-3.5 text-blue-500" />
+                <ShieldCheck className="h-3.5 w-3.5 text-[#DC2626]" />
                 <span>Encrypted Bank Tokenization • Direct Medical Board Trust Notarized</span>
               </div>
             </>
@@ -338,13 +338,13 @@ Notarized Secure Block under HIPAA Audit standards.`);
           {processing && (
             <div className="text-center py-10 space-y-6">
               <div className="relative inline-block">
-                <div className="h-16 w-16 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
-                <Lock className="h-6 w-6 text-blue-600 absolute inset-0 m-auto" />
+                <div className="h-16 w-16 rounded-full border-4 border-[#FECDD3] border-t-[#DC2626] animate-spin"></div>
+                <Lock className="h-6 w-6 text-[#DC2626] absolute inset-0 m-auto" />
               </div>
               <div className="space-y-2">
                 <h4 className="text-xs font-extrabold text-slate-800">Processing Cryptographic Settlement</h4>
                 <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 inline-block max-w-xs">
-                  <span className="text-[10px] font-mono text-blue-700 font-extrabold animate-pulse block">
+                  <span className="text-[10px] font-mono text-[#DC2626] font-extrabold animate-pulse block">
                     {steps[statusStep]}
                   </span>
                 </div>
@@ -389,8 +389,8 @@ Notarized Secure Block under HIPAA Audit standards.`);
                   <span className="font-extrabold text-slate-800">{new Date(receipt.timestamp).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between pt-1 font-sans border-t border-slate-200">
-                  <span className="text-blue-900 font-black uppercase text-[11px]">Amount Paid:</span>
-                  <span className="font-black text-blue-900 text-xs">RM {receipt.amount.toFixed(2)}</span>
+                  <span className="text-[#0F172A] font-black uppercase text-[11px]">Amount Paid:</span>
+                  <span className="font-black text-[#0F172A] text-xs">RM {receipt.amount.toFixed(2)}</span>
                 </div>
 
                 <div className="pt-3 border-t border-dashed border-slate-200">

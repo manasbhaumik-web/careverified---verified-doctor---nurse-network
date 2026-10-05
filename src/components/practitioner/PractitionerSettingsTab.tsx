@@ -190,7 +190,7 @@ export default function PractitionerSettingsTab({
 
             <div className="flex flex-wrap gap-1.5 mb-2">
               {certifications.map(cert => (
-                <span key={cert} className="bg-[#FFF0F2] text-[#DC2626] border border-teal-150 font-extrabold text-[11px] px-3 py-1.5 rounded-none flex items-center gap-1.5 shadow-3xs">
+                <span key={cert} className="bg-[#FFF0F2] text-[#DC2626] border border-[#FECDD3] font-extrabold text-[11px] px-3 py-1.5 rounded-none flex items-center gap-1.5 shadow-3xs">
                   <span>{cert}</span>
                   <button
                     type="button"
@@ -198,7 +198,7 @@ export default function PractitionerSettingsTab({
                       setCertifications(certifications.filter(c => c !== cert));
                       showToast(`Removed certification: ${cert}`);
                     }}
-                    className="text-teal-400 hover:text-rose-600 font-black cursor-pointer p-0.5 rounded-none transition-colors"
+                    className="text-rose-500 hover:text-rose-600 font-black cursor-pointer p-0.5 rounded-none transition-colors"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -308,7 +308,7 @@ export default function PractitionerSettingsTab({
                       }}
                       className={`text-[11px] font-bold py-1.5 px-3 rounded-none border transition-all cursor-pointer ${
                         isActive
-                          ? 'bg-[#DC2626] text-white border-teal-600 shadow-3xs'
+                          ? 'bg-[#DC2626] text-white border-[#DC2626] shadow-3xs'
                           : 'bg-white text-slate-600 border-[#FECDD3] hover:bg-slate-50'
                       }`}
                     >
@@ -410,7 +410,7 @@ export default function PractitionerSettingsTab({
               />
               <div className="space-y-1 flex-1 min-w-0">
                 <div className="flex items-center gap-1 flex-wrap">
-                  <h4 className="font-serif text-sm font-semibold text-slate-850 truncate leading-snug">{matchedProfile.name}</h4>
+                  <h4 className="font-sans text-sm font-semibold text-slate-850 truncate leading-snug">{matchedProfile.name}</h4>
                   {isVerified && <Shield className="h-3.5 w-3.5 text-emerald-500 fill-emerald-500 shrink-0" />}
                 </div>
 

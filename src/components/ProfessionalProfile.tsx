@@ -163,7 +163,7 @@ export default function ProfessionalProfile({
   if (loading) {
     return (
       <div className="bg-white border border-slate-100 rounded-2xl p-10 text-center space-y-4 shadow-sm">
-        <RefreshCw className="h-8 w-8 text-blue-600 animate-spin mx-auto" />
+        <RefreshCw className="h-8 w-8 text-[#DC2626] animate-spin mx-auto" />
         <p className="text-xs text-slate-500 font-semibold">Retrieving verified credential profile records...</p>
       </div>
     );
@@ -174,7 +174,7 @@ export default function ProfessionalProfile({
       <div className="bg-white border border-slate-100 rounded-2xl p-10 text-center space-y-4 shadow-sm">
         <ShieldAlert className="h-10 w-10 text-red-500 mx-auto animate-pulse" />
         <h4 className="text-sm font-bold text-slate-800">Credential profile not found or suspended</h4>
-        <button onClick={onBack} className="text-xs font-semibold bg-blue-700 text-white rounded-lg py-2 px-4 hover:bg-blue-600">
+        <button onClick={onBack} className="text-xs font-semibold bg-[#0F172A] text-white rounded-lg py-2 px-4 hover:bg-[#DC2626]">
           Back to Directory
         </button>
       </div>
@@ -234,7 +234,7 @@ export default function ProfessionalProfile({
                 <img 
                   src={prof.avatar} 
                   alt={prof.name}
-                  className="h-24 w-24 rounded-2xl object-cover border-2 border-blue-100 shadow-md"
+                  className="h-24 w-24 rounded-2xl object-cover border-2 border-[#FECDD3] shadow-md"
                   referrerPolicy="no-referrer"
                 />
                 <div className="space-y-1.5">
@@ -247,7 +247,7 @@ export default function ProfessionalProfile({
                   </div>
 
                   <span className={`inline-block text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md ${
-                    isDoc ? "bg-blue-50 text-blue-800 border border-blue-100" : "bg-indigo-50 text-indigo-800 border border-indigo-100"
+                    isDoc ? "bg-[#FFF0F2] text-[#B91C1C] border border-[#FECDD3]" : "bg-[#FFF0F2] text-[#B91C1C] border border-[#FECDD3]"
                   }`}>
                     {isDoc ? "Doctor (MD/MBBS)" : "Registered Nurse (RN)"}
                   </span>
@@ -266,7 +266,7 @@ export default function ProfessionalProfile({
 
               <div className="text-left sm:text-right bg-slate-50 p-4 rounded-2xl border border-slate-100 min-w-[150px]">
                 <span className="text-[10px] text-slate-400 font-bold uppercase block tracking-wider">Consultation Rate</span>
-                <span className="text-xl font-extrabold text-blue-800 block">
+                <span className="text-xl font-extrabold text-[#B91C1C] block">
                   RM {prof.fee}
                   <span className="text-xs font-medium text-slate-500">{isDoc ? "" : "/hr"}</span>
                 </span>
@@ -289,7 +289,7 @@ export default function ProfessionalProfile({
             {/* Doctor Bio */}
             <div className="space-y-2">
               <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                <Activity className="h-4 w-4 text-blue-600" />
+                <Activity className="h-4 w-4 text-[#DC2626]" />
                 Clinical Overview & Biography
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed font-medium bg-slate-50/30 p-3 rounded-xl border border-slate-100/40 italic">
@@ -301,13 +301,13 @@ export default function ProfessionalProfile({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
                 <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                  <GraduationCap className="h-4 w-4 text-blue-600" />
+                  <GraduationCap className="h-4 w-4 text-[#DC2626]" />
                   Degrees & Certifications
                 </h4>
                 <ul className="space-y-2 text-xs">
                   {prof.education.map((edu: string, i: number) => (
                     <li key={i} className="flex gap-2 items-center bg-slate-50 p-2 rounded-lg border border-slate-100 font-semibold text-slate-700">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#DC2626] shrink-0"></span>
                       {edu}
                     </li>
                   ))}
@@ -316,22 +316,22 @@ export default function ProfessionalProfile({
 
               <div className="space-y-3">
                 <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                  <Languages className="h-4 w-4 text-indigo-600" />
+                  <Languages className="h-4 w-4 text-[#DC2626]" />
                   Languages & Accessibility
                 </h4>
                 <div className="flex flex-wrap gap-1.5">
                   {prof.languages.map((lang: string, i: number) => (
-                    <span key={i} className="bg-indigo-50 border border-indigo-100 text-indigo-800 text-[10px] font-bold py-1 px-2.5 rounded-lg">
+                    <span key={i} className="bg-[#FFF0F2] border border-[#FECDD3] text-[#B91C1C] text-[10px] font-bold py-1 px-2.5 rounded-lg">
                       {lang}
                     </span>
                   ))}
                 </div>
 
                 <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1 mt-4">
-                  <Award className="h-4 w-4 text-blue-600" />
+                  <Award className="h-4 w-4 text-[#DC2626]" />
                   Years in Active Practice
                 </h4>
-                <p className="text-xs font-extrabold text-blue-950 bg-blue-50 border border-blue-100/60 rounded-xl px-3 py-1.5 inline-block">
+                <p className="text-xs font-extrabold text-[#0F172A] bg-[#FFF0F2] border border-[#FECDD3]/60 rounded-xl px-3 py-1.5 inline-block">
                   {prof.experienceYears} Years Clinical Experience
                 </p>
               </div>
@@ -341,7 +341,7 @@ export default function ProfessionalProfile({
           {/* Practice Location with Interactive Coordinates Map */}
           <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm space-y-4">
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-              <MapPin className="h-4 w-4 text-blue-600 animate-bounce" />
+              <MapPin className="h-4 w-4 text-[#DC2626] animate-bounce" />
               Practice Locations & Clinic Coordinates
             </h3>
             <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs flex justify-between items-center">
@@ -372,17 +372,17 @@ export default function ProfessionalProfile({
               </div>
 
               <div className="text-center md:border-r border-slate-200/50">
-                <span className="text-lg font-extrabold text-blue-800 block">{hasReviews ? `⭐ ${scorePunctuality} / 5` : '—'}</span>
+                <span className="text-lg font-extrabold text-[#B91C1C] block">{hasReviews ? `⭐ ${scorePunctuality} / 5` : '—'}</span>
                 <span className="text-[10px] text-slate-500 font-bold uppercase block mt-1">Punctuality</span>
               </div>
 
               <div className="text-center md:border-r border-slate-200/50">
-                <span className="text-lg font-extrabold text-blue-800 block">{hasReviews ? `⭐ ${scoreCommunication} / 5` : '—'}</span>
+                <span className="text-lg font-extrabold text-[#B91C1C] block">{hasReviews ? `⭐ ${scoreCommunication} / 5` : '—'}</span>
                 <span className="text-[10px] text-slate-500 font-bold uppercase block mt-1">Communication</span>
               </div>
 
               <div className="text-center">
-                <span className="text-lg font-extrabold text-blue-800 block">{hasReviews ? `⭐ ${scoreSatisfaction} / 5` : '—'}</span>
+                <span className="text-lg font-extrabold text-[#B91C1C] block">{hasReviews ? `⭐ ${scoreSatisfaction} / 5` : '—'}</span>
                 <span className="text-[10px] text-slate-500 font-bold uppercase block mt-1">Satisfaction</span>
               </div>
             </div>
@@ -444,7 +444,7 @@ export default function ProfessionalProfile({
                         value={reviewName}
                         onChange={(e) => setReviewName(e.target.value)}
                         placeholder="Ahmad Fauzi Bin Ramli"
-                        className="w-full text-xs border border-slate-200/80 rounded-xl py-2 px-3 outline-none focus:ring-1 focus:ring-blue-500 font-semibold text-slate-700"
+                        className="w-full text-xs border border-slate-200/80 rounded-xl py-2 px-3 outline-none focus:ring-1 focus:ring-[#DC2626] font-semibold text-slate-700"
                         required
                       />
                     </div>
@@ -481,14 +481,14 @@ export default function ProfessionalProfile({
                         value={reviewComment}
                         onChange={(e) => setReviewComment(e.target.value)}
                         placeholder="Write your clinical experience details..."
-                        className="w-full text-xs border border-slate-200/80 rounded-xl p-3 outline-none focus:ring-1 focus:ring-blue-500 font-semibold text-slate-700 placeholder-slate-400"
+                        className="w-full text-xs border border-slate-200/80 rounded-xl p-3 outline-none focus:ring-1 focus:ring-[#DC2626] font-semibold text-slate-700 placeholder-slate-400"
                         required
                       />
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-2.5 text-xs font-bold shadow-sm transition-colors"
+                      className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl py-2.5 text-xs font-bold shadow-sm transition-colors"
                     >
                       Publish Patient Review
                     </button>
@@ -503,7 +503,7 @@ export default function ProfessionalProfile({
         <div className="lg:col-span-4">
           <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm sticky top-4 space-y-6">
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-              <Calendar className="h-4 w-4 text-blue-600" />
+              <Calendar className="h-4 w-4 text-[#DC2626]" />
               Book Professional Consultation
             </h3>
 
@@ -520,7 +520,7 @@ export default function ProfessionalProfile({
                 <div className="bg-slate-50 p-4 rounded-xl text-left border border-slate-100 text-[11px] space-y-2">
                   <div className="flex justify-between font-bold text-slate-700">
                     <span>Reference ID:</span>
-                    <code className="font-mono text-blue-800">{bookingSuccess.id}</code>
+                    <code className="font-mono text-[#B91C1C]">{bookingSuccess.id}</code>
                   </div>
                   <div className="flex justify-between font-semibold text-slate-600">
                     <span>Date:</span>
@@ -532,13 +532,13 @@ export default function ProfessionalProfile({
                   </div>
                   <div className="flex justify-between font-semibold text-slate-600">
                     <span>Mode:</span>
-                    <span className="font-bold text-indigo-700">{bookingSuccess.mode}</span>
+                    <span className="font-bold text-[#DC2626]">{bookingSuccess.mode}</span>
                   </div>
                 </div>
 
                 <button
                   onClick={() => setBookingSuccess(null)}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-2 text-xs font-bold shadow-sm transition-colors"
+                  className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl py-2 text-xs font-bold shadow-sm transition-colors"
                 >
                   Book Another Appointment
                 </button>
@@ -554,7 +554,7 @@ export default function ProfessionalProfile({
                         key={idx}
                         className={`border rounded-xl p-3 flex justify-between items-center cursor-pointer transition-all ${
                           bookingMode === m 
-                            ? "border-blue-500 bg-blue-50/20" 
+                            ? "border-[#DC2626] bg-[#FFF0F2]/20" 
                             : "border-slate-100 hover:border-slate-200"
                         }`}
                       >
@@ -565,7 +565,7 @@ export default function ProfessionalProfile({
                             value={m}
                             checked={bookingMode === m}
                             onChange={() => setBookingMode(m)}
-                            className="accent-blue-600"
+                            className="accent-[#DC2626]"
                           />
                           <span className="text-xs font-bold text-slate-800">{m}</span>
                         </div>
@@ -581,7 +581,7 @@ export default function ProfessionalProfile({
                     type="date"
                     value={bookingDate}
                     onChange={(e) => setBookingDate(e.target.value)}
-                    className="w-full text-xs border border-slate-200/80 rounded-xl py-2.5 px-3 bg-white outline-none focus:ring-1 focus:ring-blue-500 font-semibold text-slate-700"
+                    className="w-full text-xs border border-slate-200/80 rounded-xl py-2.5 px-3 bg-white outline-none focus:ring-1 focus:ring-[#DC2626] font-semibold text-slate-700"
                     min={new Date().toISOString().split('T')[0]}
                     required
                   />
@@ -598,7 +598,7 @@ export default function ProfessionalProfile({
                         onClick={() => setBookingSlot(slot)}
                         className={`py-2 text-[11px] font-bold rounded-lg border transition-all ${
                           bookingSlot === slot 
-                            ? "bg-blue-600 border-blue-600 text-white shadow-sm" 
+                            ? "bg-[#DC2626] border-[#DC2626] text-white shadow-sm" 
                             : "bg-white border-slate-100 text-slate-700 hover:border-slate-300"
                         }`}
                       >
@@ -616,14 +616,14 @@ export default function ProfessionalProfile({
                     value={symptoms}
                     onChange={(e) => setSymptoms(e.target.value)}
                     placeholder="Briefly state symptoms or clinical concerns..."
-                    className="w-full text-xs border border-slate-200/80 rounded-xl p-3 outline-none focus:ring-1 focus:ring-blue-500 font-semibold text-slate-700 placeholder-slate-400"
+                    className="w-full text-xs border border-slate-200/80 rounded-xl p-3 outline-none focus:ring-1 focus:ring-[#DC2626] font-semibold text-slate-700 placeholder-slate-400"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={bookingLoading || !bookingDate || !bookingSlot}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-xl py-3 text-xs font-bold shadow-sm transition-all"
+                  className="w-full bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-rose-400 text-white rounded-xl py-3 text-xs font-bold shadow-sm transition-all"
                 >
                   {bookingLoading ? "Securing booking slot..." : `Secure Slot • RM ${prof.fee}`}
                 </button>

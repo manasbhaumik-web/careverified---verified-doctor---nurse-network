@@ -207,7 +207,7 @@ export default function DoctorOnCallModal({
       <div className="bg-white rounded-3xl border-2 border-slate-200 w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-slide-down">
         
         {/* Header banner */}
-        <div className="bg-blue-700 text-white p-5 flex justify-between items-center shrink-0">
+        <div className="bg-[#0F172A] text-white p-5 flex justify-between items-center shrink-0">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 bg-rose-600 rounded-xl flex items-center justify-center text-white shadow-md animate-pulse">
               <Ambulance className="h-5 w-5" />
@@ -217,23 +217,23 @@ export default function DoctorOnCallModal({
                 Verified Doctor-on-Call Dispatch
                 <span className="text-[9px] px-1.5 py-0.5 bg-rose-500 text-white rounded-md font-bold uppercase tracking-widest">Immediate</span>
               </h3>
-              <p className="text-[10px] text-blue-200 font-bold uppercase tracking-wider mt-0.5">Physical Medical Dispatch Service & Eldercare Home Visits</p>
+              <p className="text-[10px] text-slate-300 font-bold uppercase tracking-wider mt-0.5">Physical Medical Dispatch Service & Eldercare Home Visits</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2.5 bg-blue-800/40 hover:bg-blue-800/60 rounded-xl transition-all border border-blue-800 cursor-pointer text-white">
+          <button onClick={onClose} className="p-2.5 bg-white/10 hover:bg-slate-800 rounded-xl transition-all border border-slate-700 cursor-pointer text-white">
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Form Wizard Navigation Bar */}
         <div className="bg-slate-50 border-b border-slate-200 px-6 py-3 flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-400 shrink-0">
-          <span className={step === 1 ? 'text-blue-600' : 'text-slate-400'}>1. Patient Details</span>
+          <span className={step === 1 ? 'text-[#DC2626]' : 'text-slate-400'}>1. Patient Details</span>
           <ChevronRight className="h-3 w-3" />
-          <span className={step === 2 ? 'text-blue-600' : 'text-slate-400'}>2. Match Doctor</span>
+          <span className={step === 2 ? 'text-[#DC2626]' : 'text-slate-400'}>2. Match Doctor</span>
           <ChevronRight className="h-3 w-3" />
-          <span className={step === 3 ? 'text-blue-600' : 'text-slate-400'}>3. Secure Deposit</span>
+          <span className={step === 3 ? 'text-[#DC2626]' : 'text-slate-400'}>3. Secure Deposit</span>
           <ChevronRight className="h-3 w-3" />
-          <span className={step === 4 ? 'text-blue-600' : 'text-slate-400'}>4. Live Dispatch Tracker</span>
+          <span className={step === 4 ? 'text-[#DC2626]' : 'text-slate-400'}>4. Live Dispatch Tracker</span>
         </div>
 
         {/* Content Panel */}
@@ -252,15 +252,15 @@ export default function DoctorOnCallModal({
                   }}
                   className={`p-4 border-2 rounded-2xl text-left transition-all relative overflow-hidden cursor-pointer ${
                     patientClass === 'elderly' 
-                      ? 'border-blue-500 bg-blue-50/50 shadow-sm' 
+                      ? 'border-[#DC2626] bg-[#FFF0F2] shadow-sm' 
                       : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
                   <div className="flex justify-between items-start">
-                    <span className="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                    <span className="p-2 bg-[#FFF0F2] text-[#DC2626] rounded-lg">
                       <Heart className="h-5 w-5" />
                     </span>
-                    {patientClass === 'elderly' && <CheckCircle2 className="h-5 w-5 text-blue-600" />}
+                    {patientClass === 'elderly' && <CheckCircle2 className="h-5 w-5 text-[#DC2626]" />}
                   </div>
                   <h4 className="font-extrabold text-slate-800 text-xs mt-3">Eldercare Home Visit</h4>
                   <p className="text-[10px] text-slate-500 font-medium leading-relaxed mt-1">
@@ -312,7 +312,7 @@ export default function DoctorOnCallModal({
                     type="text"
                     value={patientName}
                     onChange={(e) => setPatientName(e.target.value)}
-                    className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-blue-500 font-bold text-slate-700"
+                    className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-[#DC2626] font-bold text-slate-700"
                     required
                   />
                 </div>
@@ -324,7 +324,7 @@ export default function DoctorOnCallModal({
                       type="number"
                       value={patientAge}
                       onChange={(e) => setPatientAge(Number(e.target.value))}
-                      className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-blue-500 font-bold text-slate-700 text-center"
+                      className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-[#DC2626] font-bold text-slate-700 text-center"
                       required
                     />
                   </div>
@@ -333,7 +333,7 @@ export default function DoctorOnCallModal({
                     <select
                       value={patientGender}
                       onChange={(e: any) => setPatientGender(e.target.value)}
-                      className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl px-3 py-2.5 outline-none focus:border-blue-500 font-bold text-slate-700 cursor-pointer"
+                      className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl px-3 py-2.5 outline-none focus:border-[#DC2626] font-bold text-slate-700 cursor-pointer"
                     >
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
@@ -348,7 +348,7 @@ export default function DoctorOnCallModal({
                     type="text"
                     value={patientPhone}
                     onChange={(e) => setPatientPhone(e.target.value)}
-                    className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-blue-500 font-bold text-slate-700"
+                    className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-[#DC2626] font-bold text-slate-700"
                     placeholder="+60-12-345-6789"
                     required
                   />
@@ -361,14 +361,14 @@ export default function DoctorOnCallModal({
                       type="text"
                       value={dispatchAddress}
                       onChange={(e) => setDispatchAddress(e.target.value)}
-                      className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl pl-4 pr-10 py-2.5 outline-none focus:border-blue-500 font-bold text-slate-700 placeholder-slate-400 truncate"
+                      className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl pl-4 pr-10 py-2.5 outline-none focus:border-[#DC2626] font-bold text-slate-700 placeholder-slate-400 truncate"
                       placeholder="Street, Block, Condo, Postcode, City"
                       required
                     />
                     <button
                       type="button"
                       onClick={handleSimulateGPS}
-                      className="absolute right-2 top-1.5 p-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors cursor-pointer"
+                      className="absolute right-2 top-1.5 p-1.5 bg-[#FFF0F2] hover:bg-[#FECDD3] text-[#DC2626] rounded-lg transition-colors cursor-pointer"
                       title="Acquire current location via GPS"
                     >
                       {isLocating ? (
@@ -398,7 +398,7 @@ export default function DoctorOnCallModal({
                         onClick={() => toggleSymptom(symptom)}
                         className={`text-[10px] font-bold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
                           isChecked 
-                            ? 'bg-blue-600 text-white border-blue-600 shadow-3xs' 
+                            ? 'bg-[#DC2626] text-white border-[#DC2626] shadow-3xs' 
                             : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300'
                         }`}
                       >
@@ -420,7 +420,7 @@ export default function DoctorOnCallModal({
                   <button
                     type="button"
                     onClick={addCustomSymptom}
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-extrabold px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-3xs"
+                    className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-extrabold px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-3xs"
                   >
                     Add
                   </button>
@@ -430,7 +430,7 @@ export default function DoctorOnCallModal({
               {/* Action */}
               <button
                 type="submit"
-                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                className="w-full py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
               >
                 <span>Find Near-Home Medical Dispatchers</span>
                 <ArrowRight className="h-4 w-4" />
@@ -453,12 +453,12 @@ export default function DoctorOnCallModal({
                   onClick={() => handleSelectMatch('auto')}
                   className={`w-full text-left p-4 border-2 rounded-2xl transition-all relative overflow-hidden flex items-center justify-between cursor-pointer ${
                     selectedDoctorId === 'auto'
-                      ? 'border-blue-500 bg-blue-50/50 shadow-sm'
+                      ? 'border-[#DC2626] bg-[#FFF0F2] shadow-sm'
                       : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
                   <div className="flex gap-3 items-center">
-                    <div className="h-10 w-10 bg-blue-600 text-white rounded-xl flex items-center justify-center text-base shadow-sm shrink-0">
+                    <div className="h-10 w-10 bg-[#DC2626] text-white rounded-xl flex items-center justify-center text-base shadow-sm shrink-0">
                       ⚡
                     </div>
                     <div>
@@ -477,7 +477,7 @@ export default function DoctorOnCallModal({
                     onClick={() => handleSelectMatch(doc.id)}
                     className={`w-full text-left p-4 border-2 rounded-2xl transition-all relative overflow-hidden flex items-center justify-between cursor-pointer ${
                       selectedDoctorId === doc.id
-                        ? 'border-blue-500 bg-blue-50/50 shadow-sm'
+                        ? 'border-[#DC2626] bg-[#FFF0F2] shadow-sm'
                         : 'border-slate-200 bg-white hover:border-slate-300'
                     }`}
                   >
@@ -519,7 +519,7 @@ export default function DoctorOnCallModal({
                 <button
                   type="button"
                   onClick={() => setStep(3)}
-                  className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition-all cursor-pointer shadow-md text-center"
+                  className="flex-1 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl text-xs font-black transition-all cursor-pointer shadow-md text-center"
                 >
                   Proceed to Secure Checkout
                 </button>
@@ -530,7 +530,7 @@ export default function DoctorOnCallModal({
           {/* STEP 3: PAYMENT DEPOSIT DECK */}
           {step === 3 && (
             <div className="space-y-6 text-center py-4">
-              <div className="h-16 w-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto border border-blue-100">
+              <div className="h-16 w-16 bg-[#FFF0F2] text-[#DC2626] rounded-full flex items-center justify-center mx-auto border border-[#FECDD3]">
                 <Lock className="h-7 w-7" />
               </div>
               <div className="space-y-2 max-w-sm mx-auto">
@@ -555,7 +555,7 @@ export default function DoctorOnCallModal({
                     {selectedDoctorId === 'auto' ? 'Closest Auto-Match' : availableDoctors.find(d => d.id === selectedDoctorId)?.name}
                   </span>
                 </div>
-                <div className="border-t border-slate-200 pt-2.5 flex justify-between text-xs font-black text-blue-900 uppercase">
+                <div className="border-t border-slate-200 pt-2.5 flex justify-between text-xs font-black text-[#0F172A] uppercase">
                   <span>Total Payable Deposit:</span>
                   <span>RM {checkoutFee.toFixed(2)}</span>
                 </div>
@@ -572,7 +572,7 @@ export default function DoctorOnCallModal({
                 <button
                   type="button"
                   onClick={() => setShowCheckout(true)}
-                  className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition-all cursor-pointer shadow-md flex items-center justify-center gap-2"
+                  className="flex-1 py-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl text-xs font-black transition-all cursor-pointer shadow-md flex items-center justify-center gap-2"
                 >
                   <CreditCard className="h-4 w-4" />
                   <span>Launch Secure Payment</span>
@@ -586,7 +586,7 @@ export default function DoctorOnCallModal({
             <div className="space-y-6">
               
               {/* Tracker Card */}
-              <div className="bg-blue-700 text-white rounded-2xl p-5 shadow-lg relative overflow-hidden">
+              <div className="bg-[#0F172A] text-white rounded-2xl p-5 shadow-lg relative overflow-hidden">
                 {/* Backglow ambulance visual */}
                 <div className="absolute top-2 right-2 opacity-15">
                   <Ambulance className="h-20 w-20 animate-pulse text-white" />
@@ -598,13 +598,13 @@ export default function DoctorOnCallModal({
                       {activeDispatch.isEmergency ? 'Urgent Emergency Call' : 'Elder Care Home Checkup'}
                     </span>
                     <h4 className="text-base font-black mt-2">Active Dispatch: {activeDispatch.id}</h4>
-                    <p className="text-[10px] text-blue-200 font-semibold mt-1">Status: {activeDispatch.dispatchStatus}</p>
+                    <p className="text-[10px] text-slate-300 font-semibold mt-1">Status: {activeDispatch.dispatchStatus}</p>
                   </div>
                   <div className="text-right">
                     {activeDispatch.dispatchStatus !== 'Completed' && activeDispatch.dispatchStatus !== 'Arrived' ? (
                       <>
                         <span className="text-3xl font-black">{activeDispatch.etaMinutes}</span>
-                        <span className="text-[10px] text-blue-200 block font-bold uppercase tracking-wide">Mins ETA</span>
+                        <span className="text-[10px] text-slate-300 block font-bold uppercase tracking-wide">Mins ETA</span>
                       </>
                     ) : (
                       <span className="text-[10px] bg-emerald-500 text-white font-black px-2.5 py-1 rounded-lg uppercase tracking-wide">
@@ -616,12 +616,12 @@ export default function DoctorOnCallModal({
 
                 {/* Progress Bar representation */}
                 <div className="mt-5 space-y-1.5 z-10 relative">
-                  <div className="flex justify-between text-[9px] text-blue-300 font-bold uppercase">
+                  <div className="flex justify-between text-[9px] text-rose-300 font-bold uppercase">
                     <span>Base Station</span>
                     <span>Practitioner En-Route</span>
                     <span>Arrived</span>
                   </div>
-                  <div className="h-2 bg-blue-800/60 rounded-full overflow-hidden">
+                  <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-emerald-400 transition-all duration-1000 ease-out" 
                       style={{ width: `${progressPercent}%` }}
@@ -644,7 +644,7 @@ export default function DoctorOnCallModal({
                   <div>
                     <h5 className="text-[11px] text-slate-400 font-black uppercase tracking-wider">Dispatched Doctor</h5>
                     <p className="text-xs font-black text-slate-800 mt-0.5">{activeDispatch.doctorName}</p>
-                    <span className="text-[9px] text-blue-600 font-bold flex items-center gap-1 mt-0.5">
+                    <span className="text-[9px] text-[#DC2626] font-bold flex items-center gap-1 mt-0.5">
                       <ShieldCheck className="h-3.5 w-3.5" />
                       MMC Certified Surgeon/GP
                     </span>
@@ -667,7 +667,7 @@ export default function DoctorOnCallModal({
               {/* Simulated Map Visual */}
               <div className="bg-slate-100 border border-slate-200 rounded-2xl p-3 h-52 flex flex-col relative overflow-hidden">
                 <span className="absolute top-3 left-3 bg-white/85 backdrop-blur-xs px-2.5 py-1 rounded-lg text-[9px] text-slate-600 font-bold border border-slate-200 flex items-center gap-1 z-10">
-                  <Navigation className="h-3 w-3 text-blue-600 animate-spin" />
+                  <Navigation className="h-3 w-3 text-[#DC2626] animate-spin" />
                   Live GPS Ledger Stream
                 </span>
 
@@ -678,11 +678,11 @@ export default function DoctorOnCallModal({
                   <path d="M 50,0 L 50,180 M 150,0 L 150,180 M 270,0 L 270,180 M 350,0 L 350,180" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="3 3" />
 
                   {/* Route path from Doctor (Start: 40, 40) to Patient (End: 350, 140) */}
-                  <path d="M 40,40 L 150,40 L 150,90 L 270,90 L 270,140 L 350,140" stroke="#3b82f6" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="5 5" />
+                  <path d="M 40,40 L 150,40 L 150,90 L 270,90 L 270,140 L 350,140" stroke="#DC2626" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="5 5" />
 
                   {/* Base Station (Doctor Avatar placement start) */}
-                  <circle cx="40" cy="40" r="8" fill="#1d4ed8" />
-                  <text x="40" y="28" textAnchor="middle" fill="#1e3a8a" className="text-[8px] font-black font-sans">CLINIC</text>
+                  <circle cx="40" cy="40" r="8" fill="#DC2626" />
+                  <text x="40" y="28" textAnchor="middle" fill="#0F172A" className="text-[8px] font-black font-sans">CLINIC</text>
 
                   {/* Patient Pin placement (End) */}
                   <circle cx="350" cy="140" r="10" fill="#f43f5e" className="animate-pulse" />
@@ -692,15 +692,15 @@ export default function DoctorOnCallModal({
                   {/* Interactive vehicle marker moving along the path */}
                   {activeDispatch.dispatchStatus === 'Pending Dispatch' && (
                     <g transform="translate(40, 40)">
-                      <circle r="12" fill="#3b82f6" className="opacity-20 animate-ping" />
-                      <circle r="6" fill="#1d4ed8" />
+                      <circle r="12" fill="#DC2626" className="opacity-20 animate-ping" />
+                      <circle r="6" fill="#DC2626" />
                     </g>
                   )}
                   {activeDispatch.dispatchStatus === 'En-Route' && (
                     // Move translate along path based on progress
                     <g transform={`translate(${40 + (progressPercent / 100) * 310}, ${40 + (progressPercent / 100) * 100})`}>
-                      <circle r="14" fill="#3b82f6" className="opacity-25 animate-ping" />
-                      <path d="M-6,-4 L6,-4 L6,4 L-6,4 Z" fill="#1e3a8a" />
+                      <circle r="14" fill="#DC2626" className="opacity-25 animate-ping" />
+                      <path d="M-6,-4 L6,-4 L6,4 L-6,4 Z" fill="#0F172A" />
                       <circle cx="-3" cy="5" r="2.5" fill="#000" />
                       <circle cx="3" cy="5" r="2.5" fill="#000" />
                     </g>
@@ -728,13 +728,13 @@ export default function DoctorOnCallModal({
         {/* Footer actions */}
         <div className="bg-slate-50 border-t border-slate-200 p-4 flex justify-between items-center shrink-0">
           <div className="flex items-center gap-1 text-[9px] text-slate-400 font-bold">
-            <Lock className="h-3.5 w-3.5 text-blue-600" />
+            <Lock className="h-3.5 w-3.5 text-[#DC2626]" />
             <span>End-to-End Cryptographically Secured Channels</span>
           </div>
           {step === 4 && (
             <button
               onClick={onClose}
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black rounded-xl transition-all cursor-pointer"
+              className="px-5 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black rounded-xl transition-all cursor-pointer"
             >
               Minimize Tracker
             </button>
