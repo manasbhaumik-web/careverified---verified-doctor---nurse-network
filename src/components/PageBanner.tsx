@@ -31,7 +31,7 @@ export default function PageBanner({
       className={`bg-gradient-to-r from-[#FFF0F2] via-[#FFF5F6] to-[#FFE9EB] border-l-4 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 py-3.5 px-5 rounded-none shadow-3xs flex flex-wrap items-center justify-between gap-x-6 gap-y-2 ${className}`}
     >
       <div className="min-w-0 max-w-4xl">
-        <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#DC2626]">
+        <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-[#DC2626]">
           <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-[#DC2626] shrink-0" aria-hidden="true">
             <path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" />
           </svg>
@@ -52,7 +52,7 @@ export function BannerStat({ value, label }: { value: React.ReactNode; label: st
   return (
     <div className="flex items-baseline gap-2 bg-white px-3 py-1.5 border border-[#FECDD3] rounded-none shadow-3xs">
       <span className="font-display font-black text-lg leading-none tracking-tight text-[#DC2626] tabular-nums">{value}</span>
-      <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">{label}</span>
+      <span className="text-[11px] font-extrabold uppercase tracking-widest text-slate-600">{label}</span>
     </div>
   );
 }

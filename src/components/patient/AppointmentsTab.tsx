@@ -109,7 +109,7 @@ export default function AppointmentsTab({
                     {isVideo ? '📹 Secure Telehealth' : '🏥 In-Clinic Visit'}
                   </span>
 
-                  <span className="text-xs font-bold text-slate-400 font-mono uppercase bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-md">
+                  <span className="text-xs font-bold text-slate-600 font-mono uppercase bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-md">
                     REF: {b.id.substring(0, 8)}
                   </span>
                 </div>
@@ -144,14 +144,14 @@ export default function AppointmentsTab({
 
                     <div className="space-y-1">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] text-slate-400 font-black uppercase tracking-wider block">
+                        <span className="text-xs text-slate-600 font-black uppercase tracking-wider block">
                           {b.professionalRole === UserRole.DOCTOR ? 'Medical Specialist (MD)' : 'Clinical Specialist Nurse'}
                         </span>
                         <CheckCircle2 className="h-3 w-3 text-[#DC2626]" />
                       </div>
                       <h4 className="text-base font-black text-slate-900 group-hover:text-[#DC2626] transition-colors duration-200">{b.professionalName}</h4>
                       {matchedProf && (
-                        <p className="text-xs font-bold text-slate-400 font-mono bg-slate-50 px-1.5 py-0.5 rounded w-max">
+                        <p className="text-xs font-bold text-slate-600 font-mono bg-slate-50 px-1.5 py-0.5 rounded w-max">
                           MMC REG: {matchedProf.licenseNumber}
                         </p>
                       )}
@@ -165,8 +165,8 @@ export default function AppointmentsTab({
                         <Calendar className="h-4 w-4 text-[#DC2626]" />
                       </div>
                       <div>
-                        <span className="block text-[10px] text-slate-400 font-black uppercase tracking-widest">Date</span>
-                        <span className="text-slate-800 font-black text-[11px]">{b.date}</span>
+                        <span className="block text-[11px] text-slate-600 font-black uppercase tracking-widest">Date</span>
+                        <span className="text-slate-800 font-black text-xs">{b.date}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2.5">
@@ -174,17 +174,17 @@ export default function AppointmentsTab({
                         <Clock className="h-4 w-4 text-[#DC2626]" />
                       </div>
                       <div>
-                        <span className="block text-[10px] text-slate-400 font-black uppercase tracking-widest">Time Slot</span>
-                        <span className="text-slate-800 font-black text-[11px]">{b.timeSlot}</span>
+                        <span className="block text-[11px] text-slate-600 font-black uppercase tracking-widest">Time Slot</span>
+                        <span className="text-slate-800 font-black text-xs">{b.timeSlot}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Patient Symptom Brief */}
                   {b.symptoms && (
-                    <div className="text-[11px] text-slate-600 bg-white border border-slate-200 p-3.5 rounded-xl shadow-xs">
+                    <div className="text-xs text-slate-600 bg-white border border-slate-200 p-3.5 rounded-xl shadow-xs">
                       <strong className="text-slate-700 block text-[11px] font-black uppercase tracking-wider mb-1">Stated Symptoms & Concerns:</strong>
-                      <span className="italic font-medium text-slate-500">"{b.symptoms}"</span>
+                      <span className="italic font-medium text-slate-600">"{b.symptoms}"</span>
                     </div>
                   )}
 
@@ -204,7 +204,7 @@ export default function AppointmentsTab({
                 <div className="border-t border-slate-100 pt-5 flex items-center justify-between gap-3">
                   <button
                     onClick={() => onCancelBooking(b.id)}
-                    className="text-[11px] font-black text-slate-400 hover:text-rose-600 hover:bg-rose-50 px-4 py-2.5 rounded-xl transition-colors duration-200 cursor-pointer"
+                    className="text-xs font-black text-slate-600 hover:text-rose-600 hover:bg-rose-50 px-4 py-2.5 min-h-[44px] rounded-xl transition-colors duration-200 cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -212,9 +212,9 @@ export default function AppointmentsTab({
                   {isVideo ? (
                     <button
                       onClick={() => onStartVideoCall(b)}
-                      className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-black px-5 py-3 rounded-xl transition-all shadow-md shadow-rose-600/20 flex items-center gap-2 hover:scale-[1.02] active:scale-95 duration-200 cursor-pointer"
+                      className="bg-white hover:bg-[#FFE4E6] text-[#1E293B] border border-[#FECDD3] text-xs font-black px-5 py-3 min-h-[44px] rounded-xl transition-all flex items-center gap-2 active:scale-95 duration-200 cursor-pointer"
                     >
-                      <Video className="h-4 w-4 shrink-0" />
+                      <Video className="h-4 w-4 shrink-0 text-[#DC2626]" />
                       <span>Join Telehealth Room</span>
                     </button>
                   ) : (

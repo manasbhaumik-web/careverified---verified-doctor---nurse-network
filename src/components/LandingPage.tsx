@@ -341,7 +341,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
         {/* Clinical Background Image (Opacity strictly set to 80%) */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none z-0"
-          style={{ backgroundImage: `url(${heroBgImage})`, opacity: 0.8 }}
+          style={{ backgroundImage: `url(${heroBgImage})`, opacity: 0.5 }}
         />
         <Cross className="absolute -right-24 -bottom-36 h-[520px] w-[520px] text-[#DC2626] opacity-5 pointer-events-none z-0" />
 

@@ -433,16 +433,7 @@ export default function App() {
         <div className="w-full max-w-[1920px] mx-auto flex items-stretch justify-between">
           <div className="flex items-stretch gap-4 py-2">
 
-            {/* Left: Perspective Badge */}
-            <div className="flex items-center gap-2 self-center bg-[#DC2626] text-white px-3.5 py-2 rounded-xl text-xs font-extrabold tracking-wider uppercase border border-[#B91C1C] shadow-xs">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
-              <span>
-                {currentUser.role === 'patient' && 'Patient Hub'}
-                {currentUser.role === 'practitioner' && 'Practitioner Hub'}
-                {currentUser.role === 'admin' && 'Audit Board'}
-              </span>
-            </div>
-
+            {/* Role is already shown in the header pill, so no duplicate perspective badge here */}
             {/* Navigation Tabs */}
             <nav className="flex items-center gap-1.5 relative z-0">
               {navItems.map((item) => {

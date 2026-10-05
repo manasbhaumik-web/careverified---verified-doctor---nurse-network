@@ -532,133 +532,125 @@ export default function PatientDashboard({
   };
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto space-y-8" id="patient-dashboard-root">
-      
+    <div className="w-full max-w-[1920px] mx-auto space-y-5" id="patient-dashboard-root">
+
       {/* Standardized Compact Page Banner */}
       <PageBanner
         as="h1"
         eyebrow="MedCred Verified Health Console"
-        title={
-          <span>
-            {greetingText}, <span className="underline decoration-rose-400">{userName}</span>
-          </span>
-        }
+        title={`${greetingText}, ${userName}`}
         description="Centralized clinical telemetry, verified e-prescriptions, and 24/7 doctor-on-call emergency triage."
         actions={
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-white px-3 py-1.5 border border-[#FECDD3] rounded-none shadow-3xs text-xs">
-              <span className="font-mono text-base font-black text-[#DC2626]">{upcomingBookings.length}</span>
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase">Bookings</span>
-              <span className="text-slate-300 mx-1">|</span>
-              <span className="font-mono text-base font-black text-[#DC2626]">{prescriptionBookings.length}</span>
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase">Rx</span>
-              <span className="text-slate-300 mx-1">|</span>
-              <span className="font-mono text-base font-black text-[#DC2626]">{vitalsList.length}</span>
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase">Vitals</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center bg-white border border-[#FECDD3] rounded-none shadow-3xs divide-x divide-[#FECDD3]">
+              {[
+                { label: 'Bookings', value: upcomingBookings.length, tab: 'appointments' as const },
+                { label: 'Rx', value: prescriptionBookings.length, tab: 'prescriptions' as const },
+                { label: 'Vitals', value: vitalsList.length, tab: 'vitals' as const },
+              ].map(stat => (
+                <button
+                  key={stat.label}
+                  onClick={() => setActiveTab(stat.tab)}
+                  className="flex items-baseline gap-1.5 px-3 py-1.5 min-h-[36px] hover:bg-[#FFF0F2] transition-colors cursor-pointer"
+                  aria-label={`${stat.value} ${stat.label} — open ${stat.label}`}
+                >
+                  <span className="font-mono text-base font-black text-[#DC2626] tabular-nums">{stat.value}</span>
+                  <span className="text-[11px] font-extrabold text-slate-600 uppercase">{stat.label}</span>
+                </button>
+              ))}
             </div>
 
-            <button 
-              onClick={() => setShowOnCallModal(true)} 
-              className="px-4 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-black rounded-none border border-[#B91C1C] transition-all flex items-center gap-1.5 uppercase tracking-wider cursor-pointer shadow-3xs"
+            <button
+              onClick={() => setShowOnCallModal(true)}
+              className="px-5 py-2 min-h-[44px] bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-none border border-[#B91C1C] transition-all flex items-center gap-2.5 cursor-pointer shadow-xs text-left"
             >
-              <Ambulance className="h-4 w-4 text-white animate-bounce" />
-              <span>{activeDispatch ? 'Track Triage' : 'On-Call Doctor'}</span>
+              <Ambulance className="h-5 w-5 text-white shrink-0" />
+              <span className="leading-tight">
+                <span className="block text-xs font-black uppercase tracking-wider">{activeDispatch ? 'Track Triage' : 'On-Call Doctor'}</span>
+                <span className="block text-[11px] font-semibold text-rose-100">{activeDispatch ? 'Dispatch in progress' : 'Urgent care · under 3 min'}</span>
+              </span>
             </button>
           </div>
         }
       />
 
-      {/* Overview Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Next Best Action Card */}
-        {upcomingBookings.length > 0 ? (
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-[#FECDD3] rounded-none p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs hover:border-[#DC2626] transition-all"
-          >
-            <div className="flex items-center gap-4">
-              <div className="bg-[#FFF0F2] p-2.5 rounded-none text-[#DC2626] shrink-0 border border-[#FECDD3]">
-                <Bell className="h-5 w-5 animate-pulse" />
-              </div>
-              <div>
-                <h4 className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 mb-0.5">Next Best Action</h4>
-                <p className="text-sm font-bold text-[#1E293B]">Telehealth consultation with {upcomingBookings[0].professionalName}</p>
-              </div>
+      {/* Summary strip: next action + prescriptions in one panel */}
+      <motion.div
+        initial={{ opacity: 0, y: -6 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="grid grid-cols-1 md:grid-cols-2 bg-white border border-[#FECDD3] rounded-none shadow-xs md:divide-x divide-y md:divide-y-0 divide-[#FECDD3]"
+      >
+        {/* Next Best Action */}
+        <div className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="bg-[#FFF0F2] p-2.5 rounded-none text-[#DC2626] shrink-0 border border-[#FECDD3]">
+              {upcomingBookings.length > 0 ? <Bell className="h-5 w-5" /> : <Activity className="h-5 w-5" />}
             </div>
-            {upcomingBookings[0].mode === ConsultationMode.VIDEO ? (
-              <button 
-                onClick={() => setActiveTab('appointments')}
-                className="shrink-0 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-extrabold px-4 py-2.5 rounded-none border border-[#B91C1C] transition-all flex items-center gap-2 shadow-xs cursor-pointer"
+            <div className="min-w-0">
+              <h4 className="text-[11px] uppercase tracking-wider font-extrabold text-slate-600 mb-0.5">Next Best Action</h4>
+              <p className="text-sm font-bold text-[#1E293B]">
+                {upcomingBookings.length > 0
+                  ? `${upcomingBookings[0].mode === ConsultationMode.VIDEO ? 'Telehealth consultation' : 'Clinic visit'} with ${upcomingBookings[0].professionalName}`
+                  : "Log today's biometric vitals for your health profile."}
+              </p>
+            </div>
+          </div>
+          {upcomingBookings.length > 0 ? (
+            upcomingBookings[0].mode === ConsultationMode.VIDEO ? (
+              <button
+                onClick={() => handleStartVideoCall(upcomingBookings[0])}
+                className="shrink-0 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-extrabold px-4 py-2.5 min-h-[44px] rounded-none border border-[#B91C1C] transition-all flex items-center gap-2 shadow-xs cursor-pointer"
               >
                 <Video className="h-4 w-4" />
                 Join Call
               </button>
             ) : (
-              <button 
+              <button
                 onClick={() => setActiveTab('appointments')}
-                className="shrink-0 bg-white hover:bg-[#FFE4E6] text-[#1E293B] border border-[#FECDD3] text-[11px] font-extrabold px-4 py-2.5 rounded-none transition-all flex items-center gap-2 shadow-xs cursor-pointer"
+                className="shrink-0 bg-white hover:bg-[#FFE4E6] text-[#1E293B] border border-[#FECDD3] text-xs font-extrabold px-4 py-2.5 min-h-[44px] rounded-none transition-all flex items-center gap-2 cursor-pointer"
               >
                 View Details
                 <ArrowRight className="h-3.5 w-3.5 text-[#DC2626]" />
               </button>
-            )}
-          </motion.div>
-        ) : (
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-[#FECDD3] rounded-none p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs hover:border-[#DC2626] transition-all"
-          >
-            <div className="flex items-center gap-4">
-              <div className="bg-[#FFF0F2] p-2.5 rounded-none text-[#DC2626] shrink-0 border border-[#FECDD3]">
-                <Activity className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 mb-0.5">Next Best Action</h4>
-                <p className="text-sm font-bold text-[#1E293B]">Log today's biometric vitals for your health profile.</p>
-              </div>
-            </div>
-            <button 
+            )
+          ) : (
+            <button
               onClick={() => setActiveTab('vitals')}
-              className="shrink-0 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-extrabold px-4 py-2.5 rounded-none border border-[#B91C1C] transition-all flex items-center gap-2 shadow-xs cursor-pointer"
+              className="shrink-0 bg-white hover:bg-[#FFE4E6] text-[#1E293B] border border-[#FECDD3] text-xs font-extrabold px-4 py-2.5 min-h-[44px] rounded-none transition-all flex items-center gap-2 cursor-pointer"
             >
               Log Vitals
-              <ArrowRight className="h-3.5 w-3.5" />
+              <ArrowRight className="h-3.5 w-3.5 text-[#DC2626]" />
             </button>
-          </motion.div>
-        )}
+          )}
+        </div>
 
-        {/* Recent Activity Card */}
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white border border-[#FECDD3] rounded-none p-5 flex items-center justify-between shadow-xs hover:border-[#DC2626] transition-all"
-        >
-           <div className="flex items-center gap-4">
-              <div className="bg-[#FFF0F2] p-2.5 rounded-none text-[#DC2626] shrink-0 border border-[#FECDD3]">
-                <FileText className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 mb-0.5">Recent Activity</h4>
-                <p className="text-sm font-bold text-[#1E293B]"><span className="font-mono tabular-nums text-[#DC2626]">{prescriptionBookings.length}</span> Active E-Prescriptions</p>
-              </div>
+        {/* Active prescriptions */}
+        <div className="p-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="bg-[#FFF0F2] p-2.5 rounded-none text-[#DC2626] shrink-0 border border-[#FECDD3]">
+              <FileText className="h-5 w-5" />
             </div>
-            <button 
-              onClick={() => setActiveTab('prescriptions')}
-              className="shrink-0 text-[#DC2626] bg-white border border-[#FECDD3] hover:bg-[#FFE4E6] text-[11px] font-extrabold px-4 py-2.5 rounded-none transition-all flex items-center gap-2 cursor-pointer shadow-xs"
-            >
-              View
-            </button>
-        </motion.div>
-      </div>
+            <div className="min-w-0">
+              <h4 className="text-[11px] uppercase tracking-wider font-extrabold text-slate-600 mb-0.5">Active Prescriptions</h4>
+              <p className="text-sm font-bold text-[#1E293B]">
+                <span className="font-mono tabular-nums text-[#DC2626]">{prescriptionBookings.length}</span> verified e-prescription{prescriptionBookings.length === 1 ? '' : 's'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setActiveTab('prescriptions')}
+            className="shrink-0 text-[#1E293B] bg-white border border-[#FECDD3] hover:bg-[#FFE4E6] text-xs font-extrabold px-4 py-2.5 min-h-[44px] rounded-none transition-all flex items-center gap-2 cursor-pointer"
+          >
+            View prescriptions
+          </button>
+        </div>
+      </motion.div>
 
       {/* TAB NAVIGATION */}
       <div
         role="tablist"
         aria-label="Patient hub sections"
-        className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-xl sticky top-20 bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs"
+        className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-xl sticky top-20 bg-white/95 backdrop-blur-md z-30 p-1.5 shadow-xs"
       >
         {patientTabs.map(tab => (
           <button
