@@ -11,11 +11,13 @@ import {
 
 // Subcomponents import
 import SearchHub from './components/SearchHub';
+import DashboardHeader from './components/DashboardHeader';
 import AISymptomMatcher from './components/AISymptomMatcher';
 import ProfessionalProfile from './components/ProfessionalProfile';
 import VerificationTerminal from './components/VerificationTerminal';
 import JobMarket from './components/JobMarket';
 import SecureMessenger from './components/SecureMessenger';
+import MedicalLibrary from './components/MedicalLibrary';
 import SEODashboard from './components/SEODashboard';
 import AdminDashboard from './components/AdminDashboard';
 import PatientDashboard from './components/PatientDashboard';
@@ -269,7 +271,7 @@ export default function App() {
     <div className="min-h-screen bg-[#FFF8F9] text-slate-800 flex flex-col font-sans antialiased selection:bg-[#FFE4E6] selection:text-[#DC2626]">
 
       {/* CareVerified Elevated Primary Header */}
-      <header className="bg-white border-b border-[#FECDD3] sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-xs">
+      <header className="bg-[#DC2626] border-b border-[#B91C1C] sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-xs">
         <div className="max-w-[1920px] mx-auto flex items-center justify-between h-16">
 
           {/* Brand Logo */}
@@ -282,14 +284,14 @@ export default function App() {
               setSelectedProfId(null);
             }}
           >
-            <div className="w-10 h-10 rounded-lg bg-[#DC2626] text-white flex items-center justify-center shrink-0 shadow-xs group-hover:bg-[#B91C1C] transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-white text-[#DC2626] flex items-center justify-center shrink-0 shadow-xs group-hover:bg-[#FFE4E6] transition-colors">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
             </div>
             <div className="leading-none">
-              <span className="font-display font-bold text-[22px] text-[#1E293B] tracking-tight block">
-                MedCred<span className="text-[#DC2626]">.</span>
+              <span className="font-display font-bold text-[22px] text-white tracking-tight block">
+                MedCred<span className="text-[#FECDD3]">.</span>
               </span>
-              <span className="text-[10px] font-semibold text-[#334155] uppercase tracking-[0.14em] block mt-1">
+              <span className="text-[10px] font-semibold text-[#FFE4E6] uppercase tracking-[0.14em] block mt-1">
                 {currentUser.role === 'admin' ? 'Board Console' : currentUser.role === 'practitioner' ? 'Practitioner Hub' : 'Patient Portal'}
               </span>
             </div>
@@ -302,14 +304,14 @@ export default function App() {
               <span>MMC &amp; LJM Registry Aligned</span>
             </div>
 
-            <div className="flex items-center gap-3 border-l border-[#FECDD3] pl-5">
+            <div className="flex items-center gap-3 border-l border-white/30 pl-5">
               <button
-                className="relative h-11 w-11 flex items-center justify-center text-[#334155] bg-white border border-[#FECDD3] hover:bg-[#FFF0F2] rounded-lg transition-colors cursor-pointer"
+                className="relative h-11 w-11 flex items-center justify-center text-white bg-transparent border border-white/60 hover:bg-white/15 rounded-lg transition-colors cursor-pointer"
                 title="Notifications"
                 aria-label="Notifications"
               >
                 <Bell className="h-[18px] w-[18px]" />
-                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-[#DC2626] rounded-full ring-2 ring-white"></span>
+                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-[#FECDD3] rounded-full ring-2 ring-[#DC2626]"></span>
               </button>
 
               {/* Profile Badge embedded with Close Session Button (Transparent Background & No Border) */}
@@ -317,18 +319,18 @@ export default function App() {
                 <img
                   src={currentUser.avatarUrl || '/assets/malaysian_female_doctor.jpg'}
                   alt={currentUser.name}
-                  className="w-10 h-10 rounded-full object-cover border border-[#FECDD3]"
+                  className="w-10 h-10 rounded-full object-cover border-2 border-white"
                   referrerPolicy="no-referrer"
                 />
                 <div className="text-left hidden xl:block leading-tight">
-                  <p className="text-[13px] font-semibold text-[#1E293B] leading-none">{currentUser.name}</p>
-                  <p className="text-xs text-[#334155] mt-1">
+                  <p className="text-[13px] font-semibold text-white leading-none">{currentUser.name}</p>
+                  <p className="text-xs text-[#FFE4E6] mt-1">
                     {currentUser.role === 'admin' ? 'Board Admin' : currentUser.role === 'practitioner' ? 'Practitioner Account' : 'Patient Account'}
                   </p>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="h-9 w-9 text-[#334155] hover:text-[#DC2626] hover:bg-[#FFF0F2] bg-transparent border-0 rounded-full transition-colors cursor-pointer ml-1 flex items-center justify-center"
+                  className="h-9 w-9 text-white hover:bg-white/15 bg-transparent border-0 rounded-full transition-colors cursor-pointer ml-1 flex items-center justify-center"
                   title="Close Session"
                   aria-label="Close session"
                 >
@@ -342,7 +344,7 @@ export default function App() {
           <div className="flex lg:hidden items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="min-h-11 min-w-11 flex items-center justify-center rounded-lg border border-[#FECDD3] text-[#1E293B] hover:bg-[#FFF0F2] cursor-pointer"
+              className="min-h-11 min-w-11 flex items-center justify-center rounded-lg border border-white/60 text-white hover:bg-white/15 cursor-pointer"
               aria-label="Toggle navigation"
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -426,7 +428,7 @@ export default function App() {
       </header>
 
       {/* Elevated Navigation Bar */}
-      <div className="hidden lg:block bg-[#FFF0F2]/95 backdrop-blur-md border-b border-[#FECDD3] px-4 sm:px-6 lg:px-8 shrink-0 sticky top-16 z-30 shadow-xs">
+      <div className="hidden lg:block bg-[#FFE4E6]/95 backdrop-blur-md border-b border-[#FECDD3] px-4 sm:px-6 lg:px-8 shrink-0 sticky top-16 z-30 shadow-xs">
         <div className="w-full max-w-[1920px] mx-auto flex items-stretch justify-between">
           <div className="flex items-stretch gap-4 py-2">
 
@@ -506,61 +508,19 @@ export default function App() {
             {/* VIEW 1: REGISTRY & SYMPTOM MATCHER */}
             {activeView === 'registry' && !selectedProfId && (
               <div className="space-y-8">
-                {/* Hero Banner Intro */}
-                <PageBanner
-                  as="h1"
+                {/* Standard dashboard header with attached tabs */}
+                <DashboardHeader
                   eyebrow="Verified Medical Network"
                   title="Find Certified Doctors and Nurses"
-                  description="Direct directory of practitioners with active, verified MMC and LJM licensing registration codes."
+                  description="A directory of practitioners with active, verified MMC and LJM registration numbers."
+                  tabs={[
+                    { id: 'directory' as const, label: 'Medical Directory', icon: UserCheck },
+                    { id: 'triage' as const, label: 'AI Symptom Triage & Search', icon: Activity },
+                  ]}
+                  activeTab={registryTab}
+                  onTabChange={setRegistryTab}
+                  tabsLabel="Directory sections"
                 />
-
-                {/* Standardized Tab Button Group */}
-                <div className="flex flex-col sm:flex-row items-center justify-between bg-[#FFF0F2]/50 border border-[#FECDD3] p-2.5 rounded-none shadow-3xs gap-3">
-                  <div className="inline-flex bg-white p-1 border border-[#FECDD3] rounded-none gap-1 w-full sm:w-auto">
-                    <button
-                      onClick={() => setRegistryTab('directory')}
-                      className={`flex-1 sm:flex-initial px-5 py-2 text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer border rounded-none ${
-                        registryTab === 'directory'
-                          ? 'bg-[#DC2626] text-white border-[#B91C1C] shadow-3xs'
-                          : 'bg-white text-slate-700 border-transparent hover:text-[#DC2626] hover:bg-[#FFF0F2]'
-                      }`}
-                    >
-                      <UserCheck className={`h-4 w-4 ${registryTab === 'directory' ? 'text-white' : 'text-[#DC2626]'}`} />
-                      <span>Medical Directory List</span>
-                      {selectedSpecialtyFilter && (
-                        <span className={`text-[9px] px-2 py-0.5 font-black uppercase rounded-none border ${
-                          registryTab === 'directory'
-                            ? 'bg-white text-[#DC2626] border-white'
-                            : 'bg-[#FFF0F2] text-[#DC2626] border-[#FECDD3]'
-                        }`}>
-                          {selectedSpecialtyFilter}
-                        </span>
-                      )}
-                    </button>
-
-                    <button
-                      onClick={() => setRegistryTab('triage')}
-                      className={`flex-1 sm:flex-initial px-5 py-2 text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer border rounded-none ${
-                        registryTab === 'triage'
-                          ? 'bg-[#DC2626] text-white border-[#B91C1C] shadow-3xs'
-                          : 'bg-white text-slate-700 border-transparent hover:text-[#DC2626] hover:bg-[#FFF0F2]'
-                      }`}
-                    >
-                      <Activity className={`h-4 w-4 ${registryTab === 'triage' ? 'text-white' : 'text-[#DC2626]'}`} />
-                      <span>AI Symptom Triage &amp; Search</span>
-                    </button>
-                  </div>
-
-                  {selectedSpecialtyFilter && (
-                    <button
-                      onClick={() => setSelectedSpecialtyFilter('')}
-                      className="text-xs font-extrabold text-[#DC2626] bg-white border border-[#FECDD3] px-3 py-1.5 hover:bg-[#DC2626] hover:text-white transition-all cursor-pointer rounded-none flex items-center gap-1.5 shrink-0 shadow-3xs"
-                    >
-                      <span>Clear Filter ({selectedSpecialtyFilter})</span>
-                      <span>&times;</span>
-                    </button>
-                  )}
-                </div>
 
                 {/* TAB CONTENT 1: AI Symptom Triage Search Panel */}
                 {registryTab === 'triage' && (
@@ -655,87 +615,10 @@ export default function App() {
 
             {/* VIEW 8: HEALTH ARTICLES / EDUCATION */}
             {activeView === 'articles' && (
-              <div className="space-y-8">
-                <PageBanner
-                  eyebrow="Verified Medical Library"
-                  title="Clinical Library"
-                  description="Clinical papers and health guidance written by licensed practitioners."
-                />
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {articles.map((art) => (
-                    <div key={art.id} className="bg-white border-2 border-slate-200/80 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-[#FECDD3] hover:-translate-y-0.5 transition-all duration-300 ease-in-out space-y-4">
-                      <div className="flex justify-between items-center">
-                        <span className="bg-[#FFF0F2] text-[#DC2626] text-[10px] font-extrabold px-2.5 py-1 rounded-lg border border-[#FECDD3]">
-                          {art.category}
-                        </span>
-                        <span className="text-slate-400 text-xs font-semibold">{art.date}</span>
-                      </div>
-
-                      <h3 className="text-base font-extrabold text-slate-900 hover:text-[#DC2626] transition-colors">
-                        {art.title}
-                      </h3>
-
-                      <p className="text-xs text-slate-500 leading-relaxed font-semibold">
-                        {art.excerpt}
-                      </p>
-
-                      <div className="border-t-2 border-b-2 border-slate-100/80 py-4 text-xs text-slate-600 leading-relaxed font-normal whitespace-pre-line">
-                        {art.content}
-                      </div>
-
-                      {/* Author credentials card */}
-                      <div className="flex gap-3 items-center bg-slate-50 p-3.5 rounded-xl border-2 border-slate-200/60 hover:border-[#FECDD3] transition-all duration-200">
-                        <img
-                          src={art.authorAvatar}
-                          alt={art.authorName}
-                          className="h-10 w-10 rounded-full object-cover border-2 border-slate-200 shadow-xs shrink-0"
-                          referrerPolicy="no-referrer"
-                        />
-                        <div>
-                          <p className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
-                            {art.authorName}
-                            <span className="bg-emerald-50 text-emerald-800 text-[8px] font-bold px-1.5 py-0.5 rounded border border-emerald-150">Verified & Accredited</span>
-                          </p>
-                          <p className="text-[10px] text-slate-400 font-bold">{art.authorTitle}</p>
-                        </div>
-                      </div>
-
-                      {/* Citations Box */}
-                      {art.citations && (
-                        <div className="bg-slate-100 text-slate-800 rounded-xl p-4 space-y-2 text-xs border-2 border-slate-300">
-                          <span className="text-[9px] font-extrabold text-rose-500 uppercase tracking-wide block">
-                            Peer-Reviewed Medical Citations (E-E-A-T Compliant):
-                          </span>
-                          <ul className="list-decimal list-inside space-y-1 font-mono text-[10px] leading-normal">
-                            {art.citations.map((cit, idx) => (
-                              <li key={idx}>{cit}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {/* Accordion FAQ Box */}
-                      {art.faq && (
-                        <div className="space-y-3 pt-2">
-                          <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Clinical Patient FAQs</span>
-                          {art.faq.map((faqItem, idx) => (
-                            <details key={idx} className="group border-2 border-slate-200/60 rounded-xl p-3 bg-slate-50/50 cursor-pointer hover:border-slate-300 transition-all duration-200">
-                              <summary className="text-xs font-extrabold text-slate-800 flex justify-between items-center outline-none list-none">
-                                {faqItem.question}
-                                <span className="text-[#DC2626] group-open:rotate-180 transition-transform font-bold">+</span>
-                              </summary>
-                              <p className="text-xs text-slate-600 leading-relaxed font-normal mt-2 border-t-2 border-slate-100/80 pt-2">
-                                {faqItem.answer}
-                              </p>
-                            </details>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <MedicalLibrary
+                articles={articles}
+                onFindDoctor={() => { setActiveView('registry'); setSelectedProfId(null); }}
+              />
             )}
 
             {/* VIEW: DYNAMIC CUSTOM / MARKETPLACE MODULE VIEW */}

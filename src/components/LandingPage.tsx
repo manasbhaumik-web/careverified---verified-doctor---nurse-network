@@ -338,10 +338,10 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
 
       {/* ═══════════ HERO HEADER (LIGHT CRIMSON BACKGROUND - ZERO BLACK BACKGROUNDS) ═══════════ */}
       <header id="top" className="relative text-[#1E293B] border-b border-[#FECDD3] overflow-hidden min-h-[560px] bg-[#FFF0F2]">
-        {/* Clinical Background Image (Opacity strictly set to 80%) */}
+        {/* Clinical Background Image (Opacity set to 80%) */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none z-0"
-          style={{ backgroundImage: `url(${heroBgImage})`, opacity: 0.5 }}
+          style={{ backgroundImage: `url(${heroBgImage})`, opacity: 0.8 }}
         />
         <Cross className="absolute -right-24 -bottom-36 h-[520px] w-[520px] text-[#DC2626] opacity-5 pointer-events-none z-0" />
 
@@ -362,18 +362,20 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="font-display font-black text-3xl sm:text-4xl lg:text-5xl leading-[1.08] tracking-tight text-[#1E293B] drop-shadow-[0_1px_2px_rgba(255,255,255,0.95)] mb-4"
+              className="font-display font-black text-3xl sm:text-4xl lg:text-5xl leading-[1.08] tracking-tight text-black mb-4"
+              style={{ textShadow: '0 0 6px #fff, 0 0 12px #fff, 0 0 20px rgba(255,255,255,0.95), 0 1px 2px #fff' }}
             >
-              Next-generation online medical assistance &amp; doctor network.
+              Next-generation <span className="text-[#DC2626]">online medical assistance</span> &amp; <span className="text-black">doctor network.</span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.15 }}
-              className="text-base sm:text-lg text-[#334155] font-semibold max-w-xl leading-relaxed mb-7 drop-shadow-[0_1px_2px_rgba(255,255,255,0.95)]"
+              className="text-base sm:text-lg text-black font-semibold max-w-xl leading-relaxed mb-7 bg-white/20 backdrop-blur-sm border border-[#FECDD3] px-4 py-3"
+              style={{ textShadow: '0 0 6px #fff, 0 0 12px #fff, 0 0 20px rgba(255,255,255,0.95), 0 1px 2px #fff' }}
             >
-              MedCred provides real-time online medical assistance, 24/7 doctor tele-consultations, MMC credential auditing, and digital e-prescriptions built with verified clinical standards.
+              MedCred provides <span className="text-[#DC2626] font-bold">real-time online medical assistance</span>, <span className="text-black font-bold">24/7 doctor tele-consultations</span>, <span className="text-[#DC2626] font-bold">MMC credential auditing</span>, and <span className="text-black font-bold">digital e-prescriptions</span> built with verified clinical standards.
             </motion.p>
 
             <motion.div

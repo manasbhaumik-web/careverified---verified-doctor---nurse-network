@@ -4,7 +4,7 @@ import {
   CheckCircle2, Loader, Tag, Users, ShieldCheck, Heart, LayoutGrid, List, Eye, X, Clock 
 } from 'lucide-react';
 import { JobPost, UserRole } from '../types';
-import PageBanner, { BannerStat } from './PageBanner';
+import DashboardHeader from './DashboardHeader';
 
 interface JobMarketProps {
   jobs: JobPost[];
@@ -36,8 +36,14 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
   // Application tracker
   const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
 
+  const [activeTab, setActiveTab] = useState<'open' | 'applied'>('open');
+  const myApplications = jobs.filter(j => appliedJobs.includes(j.id) || j.appliedUserIds?.includes('doc-1'));
+  const baseJobs = activeTab === 'applied' ? myApplications : jobs;
+  const shiftBasedCount = jobs.filter(j => j.type === 'Shift-based').length;
+  const hospitalCount = new Set(jobs.map(j => j.hospitalName)).size;
+
   // Filter list
-  const filteredJobs = jobs.filter(job => {
+  const filteredJobs = baseJobs.filter(job => {
     const matchesSearch = searchTerm === '' || 
       job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.hospitalName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -114,29 +120,54 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
 
   return (
     <div className="space-y-8" id="job-market-section">
-      {/* Intro Header banner */}
-      <PageBanner
+      {/* Standard dashboard header with attached tabs */}
+      <DashboardHeader
         eyebrow="B2B Shift & Staff Recruitment"
         title="Hospital Staffing & Nurse Shift Marketplace"
-        description="Clinics can source credential-verified staff for temporary and full contract roles."
+        description="Clinics source credential-verified staff for temporary and full contract roles."
         actions={
-          <>
-            <BannerStat value={jobs.length} label="Open listings" />
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="min-h-11 px-5 border-[1.5px] border-cross text-cross hover:bg-cross hover:text-white rounded-md text-sm font-bold transition-colors cursor-pointer flex items-center gap-2"
-            >
-              <PlusCircle className="h-4 w-4" />
-              {showForm ? "View Active Shifts" : "Post Hospital Vacancy"}
-            </button>
-          </>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="min-h-[44px] px-5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold transition-colors cursor-pointer flex items-center gap-2"
+          >
+            <PlusCircle className="h-4 w-4" />
+            {showForm ? 'View Active Shifts' : 'Post Hospital Vacancy'}
+          </button>
         }
+        tabs={[
+          { id: 'open' as const, label: 'Open shifts', icon: Briefcase, count: jobs.length },
+          { id: 'applied' as const, label: 'My applications', icon: CheckCircle2, count: myApplications.length },
+        ]}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        tabsLabel="Shift sections"
       />
+
+      {/* Summary metrics */}
+      <section aria-label="Marketplace summary" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {[
+          { label: 'Open listings', value: jobs.length, caption: 'Across all contract types', icon: Briefcase, tone: 'crimson' },
+          { label: 'Shift-based roles', value: shiftBasedCount, caption: 'Temporary cover, nights & weekends', icon: Clock, tone: 'emerald' },
+          { label: 'Applications sent', value: myApplications.length, caption: 'Awaiting hospital response', icon: CheckCircle2, tone: 'crimson' },
+          { label: 'Verified hospitals', value: hospitalCount, caption: 'Credential-checked posters', icon: ShieldCheck, tone: 'emerald' },
+        ].map(card => (
+          <div key={card.label} className="bg-white border border-[#FECDD3] shadow-xs p-5 flex flex-col gap-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[13px] font-semibold text-[#334155]">{card.label}</span>
+              <span className={`h-8 w-8 flex items-center justify-center border ${card.tone === 'emerald' ? 'bg-[#ECFDF5] border-[#A7F3D0] text-[#059669]' : 'bg-[#FFF0F2] border-[#FECDD3] text-[#DC2626]'}`}>
+                <card.icon className="h-4 w-4" />
+              </span>
+            </div>
+            <span className="text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">{card.value}</span>
+            <span className="text-xs text-slate-600">{card.caption}</span>
+          </div>
+        ))}
+      </section>
 
       {/* JOB POSTING FORM */}
       {showForm && (
-        <form onSubmit={handleCreateJob} className="bg-white border-2 border-slate-200/80 rounded-xl p-6 shadow-sm space-y-6 animate-slide-down">
-          <h3 className="text-sm font-extrabold text-slate-900 border-b-2 border-slate-100 pb-3">Publish Shift Openings & Vacancies</h3>
+        <form onSubmit={handleCreateJob} className="bg-white border border-[#FECDD3] p-6 shadow-xs space-y-6 animate-slide-down">
+          <h3 className="text-base font-bold text-[#1E293B] border-b border-[#FECDD3] pb-3">Publish Shift Openings & Vacancies</h3>
           
           {formSuccess ? (
             <div className="bg-emerald-50 border-2 border-emerald-100 p-4 rounded-xl text-xs text-emerald-800 font-extrabold flex items-center gap-1.5">
@@ -153,7 +184,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                     placeholder="Kuala Lumpur Specialist Hospital"
                     value={hospitalName}
                     onChange={(e) => setHospitalName(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
+                    className="w-full text-xs border border-[#FECDD3] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
                     required
                   />
                 </div>
@@ -165,7 +196,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                     placeholder="ICU Nurse Night Duty Focus"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
+                    className="w-full text-xs border border-[#FECDD3] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
                     required
                   />
                 </div>
@@ -175,7 +206,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   <select
                     value={type}
                     onChange={(e) => setType(e.target.value as any)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-extrabold text-slate-700 cursor-pointer transition-all"
+                    className="w-full text-xs border border-[#FECDD3] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-extrabold text-slate-700 cursor-pointer transition-all"
                   >
                     <option value="Full-time">Full-time Vacancy</option>
                     <option value="Part-time">Part-time Role</option>
@@ -191,7 +222,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                     placeholder="e.g. RM 5,000 - RM 8,000 / month"
                     value={salaryRange}
                     onChange={(e) => setSalaryRange(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
+                    className="w-full text-xs border border-[#FECDD3] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
                     required
                   />
                 </div>
@@ -203,7 +234,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                     placeholder="ICU Department, Ground Floor"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
+                    className="w-full text-xs border border-[#FECDD3] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
                     required
                   />
                 </div>
@@ -213,7 +244,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   <select
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-extrabold text-slate-700 cursor-pointer transition-all"
+                    className="w-full text-xs border border-[#FECDD3] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-extrabold text-slate-700 cursor-pointer transition-all"
                   >
                     <option value="Kuala Lumpur">Kuala Lumpur</option>
                     <option value="Petaling Jaya">Petaling Jaya</option>
@@ -227,7 +258,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   <select
                     value={specialtyRequired}
                     onChange={(e) => setSpecialtyRequired(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-extrabold text-slate-700 cursor-pointer transition-all"
+                    className="w-full text-xs border border-[#FECDD3] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-extrabold text-slate-700 cursor-pointer transition-all"
                   >
                     <option value="ICU & Critical Care">ICU & Critical Care</option>
                     <option value="Geriatric & Eldercare">Geriatric & Eldercare</option>
@@ -245,7 +276,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   placeholder="Outline shift schedules, clinical assignments, equipment operation needed, and team scope..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full text-xs border-2 border-slate-200/80 rounded-xl p-3 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
+                  className="w-full text-xs border border-[#FECDD3] p-3 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
                   required
                 />
               </div>
@@ -257,7 +288,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   placeholder="e.g. Registered with state nursing council with active license"
                   value={requirementText}
                   onChange={(e) => setRequirementText(e.target.value)}
-                  className="w-full text-xs border-2 border-slate-200/80 rounded-xl p-3 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
+                  className="w-full text-xs border border-[#FECDD3] p-3 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
                   required
                 />
               </div>
@@ -285,274 +316,224 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
       )}
 
       {/* FILTER CONTROLS */}
-      <div className="bg-white border-2 border-slate-200/80 rounded-xl p-4 shadow-sm flex flex-col md:flex-row gap-3">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+      <section aria-label="Filters" className="bg-white border border-[#FECDD3] shadow-xs px-5 py-4 flex flex-wrap gap-3 items-center">
+        <label htmlFor="job-search" className="sr-only">Search shifts</label>
+        <div className="flex-[2_1_280px] flex items-center gap-2.5 border border-[#FECDD3] bg-[#FFF8F9] px-3.5 min-h-[46px] focus-within:border-[#DC2626]">
+          <Search className="h-4 w-4 text-slate-500 shrink-0" />
           <input
+            id="job-search"
             type="text"
-            placeholder="Search shift descriptions, requirements or hospital hubs..."
+            placeholder="Search by role, hospital or keyword"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl py-2.5 pl-10 pr-4 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold"
+            className="flex-1 min-w-0 bg-transparent text-sm text-[#1E293B] outline-none placeholder-slate-500"
           />
         </div>
 
-        <div>
-          <select
-            value={selectedType}
-            onChange={(e) => setSelectedType(e.target.value)}
-            className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl py-2.5 px-4 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-bold text-slate-700 cursor-pointer"
-          >
-            <option value="all">📁 All Job Formats</option>
-            <option value="Full-time">Full-time</option>
-            <option value="Part-time">Part-time</option>
-            <option value="Contract">Contract</option>
-            <option value="Shift-based">Shift-based</option>
-          </select>
-        </div>
+        <label htmlFor="job-type" className="sr-only">Contract type</label>
+        <select
+          id="job-type"
+          value={selectedType}
+          onChange={(e) => setSelectedType(e.target.value)}
+          className="flex-[1_1_180px] min-h-[46px] border border-[#FECDD3] bg-white px-3 text-sm font-semibold text-[#1E293B] outline-none focus:border-[#DC2626] cursor-pointer"
+        >
+          <option value="all">All contract types</option>
+          <option value="Full-time">Full-time</option>
+          <option value="Part-time">Part-time</option>
+          <option value="Contract">Contract</option>
+          <option value="Shift-based">Shift-based</option>
+        </select>
 
-        <div>
-          <select
-            value={selectedCity}
-            onChange={(e) => setSelectedCity(e.target.value)}
-            className="w-full text-xs bg-slate-50 border-2 border-slate-200/80 rounded-xl py-2.5 px-4 outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-bold text-slate-700 cursor-pointer"
-          >
-            <option value="all">📍 All Cities</option>
-            <option value="Kuala Lumpur">Kuala Lumpur</option>
-            <option value="Petaling Jaya">Petaling Jaya</option>
-            <option value="Penang">Penang</option>
-            <option value="Johor Bahru">Johor Bahru</option>
-          </select>
-        </div>
+        <label htmlFor="job-city" className="sr-only">City</label>
+        <select
+          id="job-city"
+          value={selectedCity}
+          onChange={(e) => setSelectedCity(e.target.value)}
+          className="flex-[1_1_180px] min-h-[46px] border border-[#FECDD3] bg-white px-3 text-sm font-semibold text-[#1E293B] outline-none focus:border-[#DC2626] cursor-pointer"
+        >
+          <option value="all">All cities</option>
+          <option value="Kuala Lumpur">Kuala Lumpur</option>
+          <option value="Petaling Jaya">Petaling Jaya</option>
+          <option value="Penang">Penang</option>
+          <option value="Johor Bahru">Johor Bahru</option>
+        </select>
 
-        {/* List/Grid View Mode Toggle */}
-        <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs shrink-0 items-center">
-          <button
-            type="button"
-            onClick={() => setViewMode('list')}
-            className={`p-1.5 rounded-lg transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
-              viewMode === 'list'
-                ? 'bg-white text-[#B91C1C] shadow-xs'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-            title="List View"
-            id="toggle-job-list-view"
-          >
-            <List className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">List</span>
-          </button>
+        <div className="flex border border-[#FECDD3]">
           <button
             type="button"
             onClick={() => setViewMode('grid')}
-            className={`p-1.5 rounded-lg transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
-              viewMode === 'grid'
-                ? 'bg-white text-[#B91C1C] shadow-xs'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-            title="Grid View"
+            aria-label="Grid view"
+            aria-pressed={viewMode === 'grid'}
             id="toggle-job-grid-view"
+            className={`h-11 w-11 flex items-center justify-center cursor-pointer ${viewMode === 'grid' ? 'bg-[#FFF0F2] text-[#B91C1C]' : 'bg-white text-slate-500 hover:bg-[#FFF0F2]'}`}
           >
-            <LayoutGrid className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">Grid</span>
+            <LayoutGrid className="h-[18px] w-[18px]" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('list')}
+            aria-label="List view"
+            aria-pressed={viewMode === 'list'}
+            id="toggle-job-list-view"
+            className={`h-11 w-11 flex items-center justify-center border-l border-[#FECDD3] cursor-pointer ${viewMode === 'list' ? 'bg-[#FFF0F2] text-[#B91C1C]' : 'bg-white text-slate-500 hover:bg-[#FFF0F2]'}`}
+          >
+            <List className="h-[18px] w-[18px]" />
           </button>
         </div>
+      </section>
+
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-base font-bold text-[#1E293B]">{activeTab === 'applied' ? 'Your applications' : 'Open shifts & vacancies'}</h2>
+        <span className="text-[13px] text-slate-600">Showing {filteredJobs.length} listing{filteredJobs.length === 1 ? '' : 's'}</span>
       </div>
 
       {/* ACTIVE SHIFTS CONTAINER */}
-      <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "flex flex-col gap-4"}>
+      <div
+        id={activeTab === 'applied' ? 'panel-applied' : 'panel-open'}
+        role="tabpanel"
+        aria-labelledby={activeTab === 'applied' ? 'tab-applied' : 'tab-open'}
+        className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5' : 'flex flex-col gap-4'}
+      >
         {filteredJobs.length === 0 ? (
-          <div className="col-span-full bg-white border-2 border-slate-200/80 rounded-xl p-12 text-center space-y-3">
-            <Briefcase className="h-12 w-12 text-slate-300 mx-auto animate-pulse" />
-            <h4 className="text-sm font-extrabold text-slate-800">No shift posts match active filters</h4>
-            <p className="text-xs text-slate-500 font-semibold">Modify filters to explore other contract categories.</p>
+          <div className="col-span-full bg-white border border-[#FECDD3] p-12 text-center space-y-3">
+            <Briefcase className="h-12 w-12 text-[#FECDD3] mx-auto" />
+            <h4 className="text-sm font-bold text-[#1E293B]">
+              {activeTab === 'applied' ? 'You have not applied to any shifts yet' : 'No shift posts match active filters'}
+            </h4>
+            <p className="text-[13px] text-slate-600">
+              {activeTab === 'applied' ? 'Apply to an open shift and it will appear here.' : 'Modify filters to explore other contract categories.'}
+            </p>
           </div>
         ) : (
           filteredJobs.map((job) => {
-            const hasApplied = appliedJobs.includes(job.id);
-            
+            const hasApplied = appliedJobs.includes(job.id) || job.appliedUserIds?.includes('doc-1');
+            const typePill = job.type === 'Shift-based'
+              ? 'bg-[#ECFDF5] border-[#A7F3D0] text-[#065F46]'
+              : 'bg-[#FFF0F2] border-[#FECDD3] text-[#B91C1C]';
+            const applyButton = (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); handleApply(job.id); }}
+                disabled={hasApplied}
+                className={`min-h-[44px] px-5 text-[13px] font-bold transition-colors flex items-center justify-center gap-1.5 ${
+                  hasApplied
+                    ? 'bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] cursor-not-allowed'
+                    : 'bg-[#DC2626] hover:bg-[#B91C1C] text-white cursor-pointer'
+                }`}
+              >
+                {hasApplied ? (<><CheckCircle2 className="h-4 w-4 text-[#059669]" />Applied</>) : 'Apply for shift'}
+              </button>
+            );
+
             if (viewMode === 'list') {
               return (
-                <div 
+                <article
                   key={job.id}
                   onClick={() => setSelectedModalJob(job)}
-                  className={`bg-white border-2 border-slate-200/80 hover:border-rose-300 rounded-xl p-4 shadow-xs hover:shadow-sm transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 cursor-pointer ${
-                    job.type === 'Shift-based' ? 'border-l-red-500' : 'border-l-[#DC2626]'
-                  }`}
+                  className="bg-white border border-[#FECDD3] hover:border-[#FDA4AF] shadow-xs p-4 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer"
                 >
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="h-10 w-10 bg-slate-50 border-2 border-slate-150 rounded-xl flex items-center justify-center text-base shadow-xs shrink-0">
-                      {job.hospitalLogo}
-                    </div>
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <div className="h-12 w-12 bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center text-lg shrink-0">{job.hospitalLogo}</div>
                     <div className="min-w-0">
-                      <h4 className="text-sm font-extrabold text-slate-800 truncate">{job.title}</h4>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{job.hospitalName}</p>
+                      <h3 className="text-[15px] font-bold text-[#1E293B] truncate">{job.title}</h3>
+                      <p className="text-[13px] text-[#334155] truncate">{job.hospitalName}</p>
                     </div>
                   </div>
-
-                  <div className="flex flex-wrap items-center gap-2 flex-1">
-                    <span className="bg-[#FFF0F2] border border-[#FECDD3] text-[#B91C1C] text-[9px] font-extrabold px-2.5 py-0.5 rounded-full shrink-0">
-                      {job.type}
-                    </span>
-                    <span className="bg-slate-50 border border-slate-200 text-slate-600 text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0">
-                      📍 {job.city}
-                    </span>
-                    <span className="bg-slate-50 border border-slate-200 text-slate-600 text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0">
-                      🏷️ {job.specialtyRequired}
-                    </span>
+                  <div className="flex flex-wrap items-center gap-2 flex-1 text-xs text-[#334155]">
+                    <span className={`border text-[11px] font-bold px-2.5 py-1 ${typePill}`}>{job.type}</span>
+                    <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5 text-slate-500" />{job.city}</span>
+                    <span className="inline-flex items-center gap-1"><Tag className="h-3.5 w-3.5 text-slate-500" />{job.specialtyRequired}</span>
                   </div>
-
-                  <div className="flex items-center justify-between md:justify-end gap-4 shrink-0 border-t md:border-t-0 pt-3 md:pt-0 border-slate-100">
-                    <div className="text-left md:text-right mr-2">
-                      <span className="text-[9px] text-slate-400 block font-bold leading-none uppercase">Offered Allowance</span>
-                      <span className="font-mono text-xs font-extrabold text-[#0F172A] leading-relaxed block">{job.salaryRange}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center justify-between md:justify-end gap-4 shrink-0">
+                    <span className="text-[15px] font-bold text-[#1E293B]">{job.salaryRange}</span>
+                    <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => setSelectedModalJob(job)}
-                        className="text-xs font-bold py-2 px-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+                        onClick={(e) => { e.stopPropagation(); setSelectedModalJob(job); }}
+                        className="min-h-[44px] px-4 bg-white border border-[#FECDD3] hover:bg-[#FFE4E6] text-[#1E293B] text-[13px] font-semibold flex items-center gap-1.5 cursor-pointer"
                       >
-                        <Eye className="h-3.5 w-3.5" />
-                        <span>Details</span>
+                        <Eye className="h-3.5 w-3.5" /> Details
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => handleApply(job.id)}
-                        disabled={hasApplied}
-                        className={`text-xs font-bold py-2 px-4 rounded-xl transition-all shadow-sm flex items-center gap-1 cursor-pointer ${
-                          hasApplied 
-                            ? "bg-emerald-50 border-2 border-emerald-100 text-emerald-800 cursor-not-allowed" 
-                            : "bg-[#DC2626] hover:bg-[#B91C1C] text-white hover:scale-[1.02]"
-                        }`}
-                      >
-                        {hasApplied ? (
-                          <>
-                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                            Applied
-                          </>
-                        ) : (
-                          "Apply"
-                        )}
-                      </button>
+                      {applyButton}
                     </div>
                   </div>
-                </div>
+                </article>
               );
             }
 
             return (
-              <div 
+              <article
                 key={job.id}
-                className={`bg-white border-2 border-slate-200/80 hover:border-rose-300 rounded-xl p-6 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between border-l-4 ${
-                  job.type === 'Shift-based' ? 'border-l-red-500' : 'border-l-[#DC2626]'
-                }`}
+                className="bg-white border border-[#FECDD3] hover:border-[#FDA4AF] shadow-xs hover:shadow-md p-5 transition-all flex flex-col gap-4"
               >
-                <div className="space-y-4">
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="flex gap-3 items-center">
-                      <div className="h-11 w-11 bg-slate-50 border-2 border-slate-150 rounded-xl flex items-center justify-center text-lg shadow-xs">
-                        {job.hospitalLogo}
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-extrabold text-slate-800">{job.title}</h4>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{job.hospitalName}</span>
-                      </div>
-                    </div>
-                    <span className="bg-[#FFF0F2] border border-[#FECDD3] text-[#B91C1C] text-[9px] font-extrabold px-2.5 py-0.5 rounded-full">
-                      {job.type}
-                    </span>
+                <div className="flex gap-3.5 items-start">
+                  <div className="h-12 w-12 bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center text-lg shrink-0">{job.hospitalLogo}</div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-base font-bold text-[#1E293B] leading-snug">{job.title}</h3>
+                    <p className="text-[13px] text-[#334155] mt-0.5">{job.hospitalName}</p>
                   </div>
-
-                  <p className="text-xs text-slate-600 leading-relaxed font-semibold">{job.description}</p>
-
-                  <div className="grid grid-cols-2 gap-3 text-[10px] font-bold text-slate-500">
-                    <div className="flex items-center gap-1.5 bg-slate-50/50 p-2 rounded-lg border-2 border-slate-200/40">
-                      <MapPin className="h-3.5 w-3.5 text-slate-400" />
-                      <span>{job.location}, {job.city}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-slate-50/50 p-2 rounded-lg border-2 border-slate-200/40">
-                      <Tag className="h-3.5 w-3.5 text-slate-400" />
-                      <span>{job.specialtyRequired}</span>
-                    </div>
-                  </div>
-
-                  {/* Requirements List */}
-                  <div className="bg-slate-50/30 border-2 border-slate-200/60 rounded-xl p-3.5 space-y-2">
-                    <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                      <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-                      Verification Licensing Mandate:
-                    </span>
-                    <ul className="text-[10px] text-slate-600 list-disc list-inside space-y-1">
-                      {job.requirements.slice(0, 3).map((req, idx) => (
-                        <li key={idx} className="font-semibold leading-relaxed">{req}</li>
-                      ))}
-                    </ul>
-                  </div>
+                  <span className={`border text-[11px] font-bold px-2.5 py-1 shrink-0 ${typePill}`}>{job.type}</span>
                 </div>
 
-                {/* Footer and apply action */}
-                <div className="flex justify-between items-center border-t-2 border-slate-100/80 pt-4 mt-5">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold">
-                    <Users className="h-4 w-4 text-slate-400" />
-                    <span><span className="font-mono tabular-nums">{job.applicantsCount}</span> Applicants</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <span className="text-[9px] text-slate-400 block font-bold leading-none uppercase">Offered Allowance</span>
-                      <span className="font-mono text-xs font-extrabold text-[#0F172A] leading-relaxed block">{job.salaryRange}</span>
-                    </div>
-
-                    <button
-                      onClick={() => handleApply(job.id)}
-                      disabled={hasApplied}
-                      className={`text-xs font-bold py-2 px-4 rounded-xl transition-all shadow-sm flex items-center gap-1 cursor-pointer ${
-                        hasApplied 
-                          ? "bg-emerald-50 border-2 border-emerald-100 text-emerald-800 cursor-not-allowed" 
-                          : "bg-[#DC2626] hover:bg-[#B91C1C] text-white hover:scale-[1.02]"
-                      }`}
-                    >
-                      {hasApplied ? (
-                        <>
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                          Applied
-                        </>
-                      ) : (
-                        "Apply"
-                      )}
-                    </button>
-                  </div>
+                <div className="flex flex-col gap-2 text-[13px] text-[#334155]">
+                  <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-slate-500 shrink-0" />{job.location}, {job.city}</div>
+                  <div className="flex items-center gap-2"><Tag className="h-4 w-4 text-slate-500 shrink-0" />{job.specialtyRequired}</div>
                 </div>
-              </div>
+
+                <p className="text-[13px] text-slate-600 leading-relaxed line-clamp-2">{job.description}</p>
+
+                <div className="border-t border-[#FFE4E6] pt-3.5 flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-[15px] font-bold text-[#1E293B]">{job.salaryRange}</span>
+                  <span className="text-xs text-slate-600 inline-flex items-center gap-1.5"><Users className="h-3.5 w-3.5" /><span className="tabular-nums">{job.applicantsCount}</span> applicants</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5 mt-auto">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedModalJob(job)}
+                    className="min-h-[44px] bg-white border border-[#FECDD3] hover:bg-[#FFE4E6] text-[#1E293B] text-[13px] font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Eye className="h-3.5 w-3.5" /> View details
+                  </button>
+                  {applyButton}
+                </div>
+              </article>
             );
           })
         )}
       </div>
+
+      {/* Trust note */}
+      <section className="bg-[#ECFDF5] border border-[#A7F3D0] px-5 py-4 flex flex-wrap items-center gap-3.5">
+        <ShieldCheck className="h-5 w-5 text-[#059669] shrink-0" />
+        <p className="flex-1 min-w-[260px] text-[13px] leading-relaxed text-[#065F46]">
+          <strong className="font-bold">Credential-verified only.</strong> Every applicant is checked against MMC and LJM registries before a hospital sees the application.
+        </p>
+      </section>
 
       {/* ========================================== */}
       {/* SHIFT DETAIL MODAL POPUP (LIGHTBOX)        */}
       {/* ========================================== */}
       {selectedModalJob && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-100/80 backdrop-blur-xs animate-fade-in"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-fade-in"
           onClick={() => setSelectedModalJob(null)}
         >
           <div 
-            className="bg-white border-2 border-slate-200 rounded-xl w-full max-w-xl shadow-2xl overflow-hidden animate-slide-down flex flex-col max-h-[90vh]"
+            className="bg-white border border-[#FECDD3] w-full max-w-xl shadow-2xl overflow-hidden animate-slide-down flex flex-col max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header banner */}
-            <div className="bg-[#0F172A] text-white p-5 flex justify-between items-center shrink-0">
+            <div className="bg-[#FFF0F2] text-[#1E293B] border-b border-[#FECDD3] p-5 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 bg-[#DC2626] border border-slate-700 rounded-xl flex items-center justify-center text-lg shadow-xs shrink-0">
                   {selectedModalJob.hospitalLogo}
                 </div>
                 <div>
-                  <h4 className="text-sm font-extrabold uppercase tracking-wide leading-tight">
+                  <h4 className="text-base font-bold leading-tight">
                     {selectedModalJob.title}
                   </h4>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                  <p className="text-xs text-[#334155] mt-0.5">
                     {selectedModalJob.hospitalName} &bull; Verified Employer
                   </p>
                 </div>
@@ -560,7 +541,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
               <button 
                 type="button"
                 onClick={() => setSelectedModalJob(null)}
-                className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                className="text-slate-600 hover:text-[#DC2626] transition-colors cursor-pointer"
               >
                 <X className="h-5.5 w-5.5" />
               </button>
