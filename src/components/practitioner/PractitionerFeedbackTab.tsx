@@ -37,38 +37,38 @@ export default function PractitionerFeedbackTab({
     <div id="panel-reviews" role="tabpanel" aria-labelledby="tab-reviews" tabIndex={0} className="space-y-6 animate-fade-in">
       {/* Reviews Metric Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white border border-[#FECDD3] p-5 rounded-none shadow-3xs space-y-1">
-          <span className="text-[10px] text-slate-400 font-bold uppercase block">Overall Clinical Rating</span>
+        <div className="bg-white border border-[#FECDD3] p-5 rounded-none shadow-xs space-y-1">
+          <span className="text-[13px] font-semibold text-[#334155] block">Overall Clinical Rating</span>
           <div className="flex items-center gap-2">
-            <span className="font-mono tabular-nums text-2xl font-bold text-slate-900">{avgOverall ?? "—"}</span>
+            <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">{avgOverall ?? "—"}</span>
             <div className="flex text-amber-400 shrink-0">
               <Star className="h-4.5 w-4.5 fill-current" />
             </div>
           </div>
-          <p className="text-[9px] text-slate-500 font-semibold">
+          <p className="text-xs text-slate-500 font-semibold">
             {hasReviews ? `Based on ${myReviews.length} verified review${myReviews.length === 1 ? '' : 's'}.` : 'Awaiting your first patient review.'}
           </p>
         </div>
 
-        <div className="bg-white border border-[#FECDD3] p-5 rounded-none shadow-3xs space-y-1">
-          <span className="text-[10px] text-slate-400 font-bold uppercase block">Bedside Manners</span>
-          <span className="font-mono tabular-nums text-xl font-bold text-[#DC2626]">{hasReviews ? `${avgComm} / 5.0` : '—'}</span>
+        <div className="bg-white border border-[#FECDD3] p-5 rounded-none shadow-xs space-y-1">
+          <span className="text-[13px] font-semibold text-[#334155] block">Bedside Manners</span>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">{hasReviews ? `${avgComm} / 5.0` : '—'}</span>
           <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
             <div className="bg-[#DC2626] h-full rounded-none" style={{ width: `${hasReviews ? (Number(avgComm)/5)*100 : 0}%` }}></div>
           </div>
         </div>
 
-        <div className="bg-white border border-[#FECDD3] p-5 rounded-none shadow-3xs space-y-1">
-          <span className="text-[10px] text-slate-400 font-bold uppercase block">Clinic Punctuality</span>
-          <span className="font-mono tabular-nums text-xl font-bold text-[#DC2626]">{hasReviews ? `${avgPunct} / 5.0` : '—'}</span>
+        <div className="bg-white border border-[#FECDD3] p-5 rounded-none shadow-xs space-y-1">
+          <span className="text-[13px] font-semibold text-[#334155] block">Clinic Punctuality</span>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">{hasReviews ? `${avgPunct} / 5.0` : '—'}</span>
           <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
             <div className="bg-[#DC2626] h-full rounded-none" style={{ width: `${hasReviews ? (Number(avgPunct)/5)*100 : 0}%` }}></div>
           </div>
         </div>
 
-        <div className="bg-white border border-[#FECDD3] p-5 rounded-none shadow-3xs space-y-1">
-          <span className="text-[10px] text-slate-400 font-bold uppercase block">Care Satisfaction</span>
-          <span className="font-mono tabular-nums text-xl font-bold text-[#DC2626]">{hasReviews ? `${avgSatis} / 5.0` : '—'}</span>
+        <div className="bg-white border border-[#FECDD3] p-5 rounded-none shadow-xs space-y-1">
+          <span className="text-[13px] font-semibold text-[#334155] block">Care Satisfaction</span>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">{hasReviews ? `${avgSatis} / 5.0` : '—'}</span>
           <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
             <div className="bg-[#DC2626] h-full rounded-none" style={{ width: `${hasReviews ? (Number(avgSatis)/5)*100 : 0}%` }}></div>
           </div>
@@ -76,9 +76,9 @@ export default function PractitionerFeedbackTab({
       </div>
 
       {/* List of Patient Feedback */}
-      <div className="bg-white border border-[#FECDD3] rounded-none p-6 shadow-3xs space-y-5">
+      <div className="bg-white border border-[#FECDD3] rounded-none p-6 shadow-xs space-y-5">
         <div className="border-b border-[#FECDD3] pb-3">
-          <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">Patient Care Logbook</h3>
+          <h3 className="text-base font-bold text-[#1E293B]">Patient Care Logbook</h3>
           <p className="text-[11px] text-slate-500 font-medium mt-0.5">Below are verified experiences left by patients post-treatment.</p>
         </div>
 
@@ -123,7 +123,7 @@ export default function PractitionerFeedbackTab({
                   </p>
 
                   {/* Individual Ratings Grid */}
-                  <div className="grid grid-cols-3 gap-2 text-[9px] font-bold text-slate-500 max-w-md bg-slate-50/30 p-2 rounded-none">
+                  <div className="grid grid-cols-3 gap-2 text-xs font-bold text-slate-500 max-w-md bg-slate-50/30 p-2 rounded-none">
                     <div>Communication: <span className="font-mono tabular-nums text-slate-800 font-extrabold">{rev.communication || rev.rating}/5</span></div>
                     <div>Punctuality: <span className="font-mono tabular-nums text-slate-800 font-extrabold">{rev.punctuality || rev.rating}/5</span></div>
                     <div>Care Satisfaction: <span className="font-mono tabular-nums text-slate-800 font-extrabold">{rev.satisfaction || rev.rating}/5</span></div>
@@ -175,7 +175,7 @@ export default function PractitionerFeedbackTab({
                           />
 
                           <div className="flex justify-between items-center gap-2">
-                            <p className="text-[9px] text-slate-400 font-medium max-w-[300px]">
+                            <p className="text-xs text-slate-400 font-medium max-w-[300px]">
                               Responses are published directly on your public specialty profile card.
                             </p>
                             <button

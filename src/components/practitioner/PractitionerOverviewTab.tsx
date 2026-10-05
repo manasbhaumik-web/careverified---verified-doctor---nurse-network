@@ -37,11 +37,11 @@ export default function PractitionerOverviewTab({
                 <span className="text-[10px] font-black uppercase tracking-widest text-[#DC2626] bg-[#FFE4E6] px-2 py-0.5 border border-[#FECDD3]">
                   Next Patient Queue
                 </span>
-                <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-emerald-500 rounded-full inline-block animate-pulse shrink-0 shadow-3xs" /> Live Telehealth Ready</span>
+                <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-emerald-500 rounded-full inline-block animate-pulse shrink-0 shadow-xs" /> Live Telehealth Ready</span>
               </div>
               {nextUpcomingBooking ? (
                 <div>
-                  <h3 className="text-lg font-black text-slate-900">{nextUpcomingBooking.patientName}</h3>
+                  <h3 className="text-lg font-bold text-[#1E293B]">{nextUpcomingBooking.patientName}</h3>
                   <p className="text-xs text-slate-600 font-mono font-bold mt-0.5 flex items-center gap-2 flex-wrap">
                     <span>{nextUpcomingBooking.date}</span>
                     <span>&bull;</span>
@@ -73,35 +73,35 @@ export default function PractitionerOverviewTab({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="bg-white border border-[#FECDD3] rounded-none p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Response SLA Speed</span>
+            <span className="text-[13px] font-semibold text-[#334155]">Response SLA Speed</span>
             <Clock className="h-4 w-4 text-[#DC2626]" />
           </div>
-          <span className="font-mono text-2xl font-black text-slate-900 block">&lt; 2.5 Mins</span>
-          <p className="text-[11px] text-emerald-700 font-semibold">Fastest 5% response time among {matchedProfile.specialization} specialists.</p>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums block">&lt; 2.5 Mins</span>
+          <p className="text-xs text-[#047857] font-semibold">Fastest 5% response time among {matchedProfile.specialization} specialists.</p>
         </div>
 
         <div className="bg-white border border-[#FECDD3] rounded-none p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">E-Prescription Compliance</span>
+            <span className="text-[13px] font-semibold text-[#334155]">E-Prescription Compliance</span>
             <FileText className="h-4 w-4 text-emerald-600" />
           </div>
-          <span className="font-mono text-2xl font-black text-slate-900 block">100% Certified</span>
-          <p className="text-[11px] text-slate-600 font-semibold">Digitally signed via MMC/LJM verified encryption keys.</p>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums block">100% Certified</span>
+          <p className="text-xs text-slate-600">Digitally signed via MMC/LJM verified encryption keys.</p>
         </div>
 
         <div className="bg-white border border-[#FECDD3] rounded-none p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Diagnostic Accuracy</span>
+            <span className="text-[13px] font-semibold text-[#334155]">Diagnostic Accuracy</span>
             <ShieldCheck className="h-4 w-4 text-[#DC2626]" />
           </div>
-          <span className="font-mono text-2xl font-black text-slate-900 block">99.4% Rated</span>
-          <p className="text-[11px] text-slate-600 font-semibold">Validated across patient follow-ups and peer clinical reviews.</p>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums block">99.4% Rated</span>
+          <p className="text-xs text-slate-600">Validated across patient follow-ups and peer clinical reviews.</p>
         </div>
       </div>
 
       {/* 3. CLINICAL WORKFLOW ACTIONS GRID */}
       <div className="bg-white border border-[#FECDD3] rounded-none p-6 shadow-xs space-y-4">
-        <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider border-b border-[#FECDD3] pb-3 flex items-center gap-2">
+        <h4 className="text-base font-bold text-[#1E293B] border-b border-[#FECDD3] pb-3 flex items-center gap-2">
           <Zap className="h-4 w-4 text-[#DC2626]" />
           Direct Clinical Operations Shortcuts
         </h4>
