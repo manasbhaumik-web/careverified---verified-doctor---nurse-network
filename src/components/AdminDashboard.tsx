@@ -283,42 +283,36 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
         <div id="panel-approvals" role="tabpanel" aria-labelledby="tab-approvals" tabIndex={0} className="space-y-6">
           {/* Overview stats cards with high visual distinction */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-white border border-[#FECDD3] border-l-4 border-l-[#DC2626] rounded-none p-5 shadow-xs flex items-start justify-between gap-4">
-          <div className="space-y-2">
-            <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider">Accredited Directory</span>
-            <span className="font-mono tabular-nums text-2xl font-black block text-[#DC2626]">{professionals.length} Verified</span>
-            <p className="text-[10px] text-slate-500 font-semibold leading-normal">Registered with medical & nursing councils.</p>
+        <div className="bg-white border border-[#FECDD3] shadow-xs p-5 flex flex-col gap-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[13px] font-semibold text-[#334155]">Accredited Directory</span>
+            <span className="h-8 w-8 flex items-center justify-center border bg-[#FFF0F2] border-[#FECDD3] text-[#DC2626]"><UserCheck className="h-4 w-4" /></span>
           </div>
-          <div className="p-2.5 bg-[#FFF0F2] text-[#DC2626] rounded-xl border border-[#FECDD3] shrink-0">
-            <UserCheck className="h-5 w-5" />
-          </div>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">{professionals.length} Verified</span>
+          <span className="text-xs text-slate-600">Registered with medical & nursing councils.</span>
         </div>
 
-        <div className="bg-white border-2 border-slate-200/80 border-l-4 border-l-amber-500 rounded-xl p-5 shadow-xs flex items-start justify-between gap-4">
-          <div className="space-y-2">
-            <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider">Pending Approvals</span>
-            <span className="font-mono tabular-nums text-2xl font-black text-amber-600 block">{pendingRequests.length} Pending</span>
-            <p className="text-[10px] text-slate-500 font-semibold leading-normal">Awaiting administrative credential review.</p>
+        <div className="bg-white border border-[#FECDD3] shadow-xs p-5 flex flex-col gap-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[13px] font-semibold text-[#334155]">Pending Approvals</span>
+            <span className="h-8 w-8 flex items-center justify-center border bg-amber-50 border-amber-200 text-amber-700"><ShieldAlert className="h-4 w-4 animate-pulse" /></span>
           </div>
-          <div className="p-2.5 bg-amber-50 text-amber-600 rounded-xl border border-amber-100 shrink-0">
-            <ShieldAlert className="h-5 w-5 animate-pulse" />
-          </div>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">{pendingRequests.length} Pending</span>
+          <span className="text-xs text-slate-600">Awaiting administrative credential review.</span>
         </div>
 
-        <div className="bg-white border-2 border-slate-200/80 border-l-4 border-l-emerald-500 rounded-xl p-5 shadow-xs flex items-start justify-between gap-4">
-          <div className="space-y-2">
-            <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider">Verified Status</span>
-            <span className="font-mono tabular-nums text-2xl font-black text-emerald-600 block">100% Verified</span>
-            <p className="text-[10px] text-slate-500 font-semibold leading-normal">Validated against active registries.</p>
+        <div className="bg-white border border-[#FECDD3] shadow-xs p-5 flex flex-col gap-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[13px] font-semibold text-[#334155]">Verified Status</span>
+            <span className="h-8 w-8 flex items-center justify-center border bg-[#ECFDF5] border-[#A7F3D0] text-[#059669]"><CheckCircle2 className="h-4 w-4" /></span>
           </div>
-          <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100 shrink-0">
-            <CheckCircle2 className="h-5 w-5" />
-          </div>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">100% Verified</span>
+          <span className="text-xs text-slate-600">Validated against active registries.</span>
         </div>
       </div>
 
       {/* Main moderator queue */}
-      <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-sm space-y-5">
+      <div className="bg-white border border-[#FECDD3] rounded-xl p-6 shadow-xs space-y-5">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-50 pb-4 gap-3">
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-[#DC2626] text-white rounded-lg">
@@ -659,44 +653,36 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
         <div id="panel-packages" role="tabpanel" aria-labelledby="tab-packages" tabIndex={0} className="space-y-8 animate-fade-in text-slate-800">
           {/* Package Overview Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div className="bg-white border-2 border-slate-200/80 border-l-4 border-l-[#DC2626] rounded-xl p-5 shadow-xs flex items-start justify-between gap-4">
-              <div className="space-y-2">
-                <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider">Installed packages</span>
-                <span className="font-mono tabular-nums text-2xl font-black block text-[#DC2626]">{packages.length} Active Modules</span>
-                <p className="text-[10px] text-slate-500 font-semibold leading-normal">Clinical packages compiled & mounted.</p>
+            <div className="bg-white border border-[#FECDD3] shadow-xs p-5 flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-semibold text-[#334155]">Installed packages</span>
+                <span className="h-8 w-8 flex items-center justify-center border bg-[#FFF0F2] border-[#FECDD3] text-[#DC2626]"><Puzzle className="h-4 w-4" /></span>
               </div>
-              <div className="p-2.5 bg-[#FFF0F2] text-[#DC2626] rounded-xl border border-[#FECDD3] shrink-0">
-                <Puzzle className="h-5 w-5" />
-              </div>
+              <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">{packages.length} Active Modules</span>
+              <span className="text-xs text-slate-600">Clinical packages compiled & mounted.</span>
             </div>
 
-            <div className="bg-white border-2 border-slate-200/80 border-l-4 border-l-emerald-600 rounded-xl p-5 shadow-xs flex items-start justify-between gap-4">
-              <div className="space-y-2">
-                <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider">Active Run-time</span>
-                <span className="font-mono tabular-nums text-2xl font-black text-emerald-600 block">{packages.filter(p => p.isEnabled).length} Enabled</span>
-                <p className="text-[10px] text-slate-500 font-semibold leading-normal">Active navigation endpoints in sidebar.</p>
+            <div className="bg-white border border-[#FECDD3] shadow-xs p-5 flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-semibold text-[#334155]">Active Run-time</span>
+                <span className="h-8 w-8 flex items-center justify-center border bg-[#ECFDF5] border-[#A7F3D0] text-[#059669]"><CheckCircle2 className="h-4 w-4" /></span>
               </div>
-              <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100 shrink-0">
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
+              <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">{packages.filter(p => p.isEnabled).length} Enabled</span>
+              <span className="text-xs text-slate-600">Active navigation endpoints in sidebar.</span>
             </div>
 
-            <div className="bg-white border-2 border-slate-200/80 border-l-4 border-l-[#DC2626] rounded-xl p-5 shadow-xs flex items-start justify-between gap-4">
-              <div className="space-y-2">
-                <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider">Marketplace Extensions</span>
-                <span className="font-mono tabular-nums text-2xl font-black text-[#DC2626] block">
-                  {MARKETPLACE_ADDONS.filter(addon => !packages.some(p => p.id === addon.id)).length} Available
-                </span>
-                <p className="text-[10px] text-slate-500 font-semibold leading-normal">Ready to download from official cloud registry.</p>
+            <div className="bg-white border border-[#FECDD3] shadow-xs p-5 flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-semibold text-[#334155]">Marketplace Extensions</span>
+                <span className="h-8 w-8 flex items-center justify-center border bg-[#FFF0F2] border-[#FECDD3] text-[#DC2626]"><Download className="h-4 w-4" /></span>
               </div>
-              <div className="p-2.5 bg-[#FFF0F2] text-[#DC2626] rounded-xl border border-[#FECDD3] shrink-0">
-                <Download className="h-5 w-5" />
-              </div>
+              <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">{MARKETPLACE_ADDONS.filter(addon => !packages.some(p => p.id === addon.id)).length} Available</span>
+              <span className="text-xs text-slate-600">Ready to download from official cloud registry.</span>
             </div>
           </div>
 
           {/* Search, Filter, and Custom Form Toggle Row */}
-          <div className="bg-white border border-slate-200/80 p-5 rounded-xl shadow-xs space-y-4">
+          <div className="bg-white border border-[#FECDD3] p-5 rounded-xl shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="flex-1 w-full max-w-md relative">
                 <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
