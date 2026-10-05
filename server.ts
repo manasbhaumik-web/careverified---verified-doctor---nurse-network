@@ -1,6 +1,5 @@
 import express from "express";
 import path from "path";
-import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 
@@ -891,6 +890,7 @@ app.get("/sitemap.xml", (req, res) => {
 // -------------------------------------------------------------
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -909,4 +909,9 @@ async function startServer() {
   });
 }
 
-startServer();
+// On Vercel the app is exported as a serverless function (api/index.mjs); static files are served by Vercel.
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export default app;

@@ -266,7 +266,7 @@ export default function App() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans antialiased selection:bg-[#FFE4E6] selection:text-[#DC2626]">
+    <div className="min-h-screen bg-[#FFF8F9] text-slate-800 flex flex-col font-sans antialiased selection:bg-[#FFE4E6] selection:text-[#DC2626]">
 
       {/* CareVerified Elevated Primary Header */}
       <header className="bg-white border-b border-[#FECDD3] sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-xs">
