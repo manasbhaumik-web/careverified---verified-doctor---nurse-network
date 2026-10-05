@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Shield, Lock, Check, RefreshCw, MessageSquare, Search, PhoneCall, Video, UserCheck } from 'lucide-react';
+import { Send, Shield, Lock, Check, RefreshCw, MessageSquare, Search, UserCheck } from 'lucide-react';
 import { ChatMessage } from '../types';
 
 export default function SecureMessenger() {
@@ -98,178 +98,213 @@ export default function SecureMessenger() {
 
   const currentThread = threads.find(t => t.id === activeThreadId) || threads[0];
 
+  const filteredThreads = threads.filter(
+    t => t.name.toLowerCase().includes(searchThread.toLowerCase()) || t.role.toLowerCase().includes(searchThread.toLowerCase())
+  );
+
   return (
-    <div className="bg-white border border-[#FECDD3] rounded-none shadow-3xs overflow-hidden grid grid-cols-1 lg:grid-cols-12 h-[560px]" id="secure-messenger-panel">
-      {/* Sidebar Thread Inbox */}
-      <div className="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-[#FECDD3] bg-slate-50 flex flex-col justify-between">
-        {/* Inbox Header */}
-        <div className="p-3.5 bg-[#0F172A] text-white border-b border-slate-700 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <MessageSquare className="h-4 w-4 text-[#DC2626]" />
-            <h3 className="text-xs font-black uppercase tracking-wider">Clinical Consult Mailbox</h3>
+    <div className="w-full space-y-5" id="secure-messenger-panel">
+      {/* Page header */}
+      <header className="bg-gradient-to-r from-[#FFF0F2] via-[#FFF5F6] to-[#FFE9EB] border border-[#FECDD3] shadow-xs px-5 sm:px-6 py-5 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <div className="h-11 w-11 bg-[#DC2626] text-white flex items-center justify-center shrink-0">
+            <MessageSquare className="h-5 w-5" />
           </div>
-          <span className="bg-[#DC2626] text-white text-[9px] font-black px-2 py-0.5 rounded-none">
-            HIPAA Safe
+          <div className="min-w-0">
+            <div className="text-[11px] font-bold uppercase tracking-widest text-[#047857]">Secure mailbox</div>
+            <h1 className="text-2xl font-bold tracking-tight text-[#1E293B] leading-tight">Clinical Consultation Mailbox</h1>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <span className="inline-flex items-center gap-1.5 min-h-[36px] px-3.5 bg-[#DC2626] text-white text-xs font-bold tracking-wide">
+            <Shield className="h-3.5 w-3.5" /> HIPAA safe
+          </span>
+          <span className="inline-flex items-center gap-1.5 min-h-[36px] px-3.5 bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] text-xs font-semibold">
+            <Lock className="h-3.5 w-3.5 text-[#059669]" /> 256-bit encrypted
+          </span>
+          <span className="inline-flex items-center min-h-[36px] px-3.5 bg-white border border-[#FECDD3] text-[#334155] text-xs font-semibold">
+            MMC reg validated
           </span>
         </div>
+      </header>
 
-        {/* Search Thread Filter */}
-        <div className="p-3 border-b border-[#FECDD3] bg-white">
-          <div className="relative">
-            <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search clinical conversations..."
-              value={searchThread}
-              onChange={(e) => setSearchThread(e.target.value)}
-              className="w-full text-xs bg-slate-50 border border-[#FECDD3] rounded-none py-2 pl-9 pr-3 outline-none focus:border-[#DC2626] font-semibold text-slate-700"
-            />
+      <div className="bg-white border border-[#FECDD3] shadow-xs overflow-hidden grid grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)] xl:grid-cols-[340px_minmax(0,1fr)_300px] lg:h-[calc(100vh-290px)] lg:min-h-[560px]">
+        {/* Conversation list */}
+        <aside aria-label="Conversations" className="border-b lg:border-b-0 lg:border-r border-[#FECDD3] bg-white flex flex-col min-h-0 max-h-[360px] lg:max-h-none">
+          <div className="p-4 border-b border-[#FECDD3]">
+            <label htmlFor="mailbox-search" className="sr-only">Search clinical conversations</label>
+            <div className="flex items-center gap-2.5 border border-[#FECDD3] bg-[#FFF8F9] px-3.5 min-h-[44px] focus-within:border-[#DC2626]">
+              <Search className="h-4 w-4 text-slate-500 shrink-0" />
+              <input
+                id="mailbox-search"
+                type="text"
+                placeholder="Search clinical conversations"
+                value={searchThread}
+                onChange={(e) => setSearchThread(e.target.value)}
+                className="flex-1 min-w-0 bg-transparent text-sm text-[#1E293B] outline-none placeholder-slate-500"
+              />
+            </div>
           </div>
-        </div>
-
-        {/* Thread List */}
-        <div className="flex-1 overflow-y-auto divide-y divide-[#FECDD3]/50">
-          {threads
-            .filter(t => t.name.toLowerCase().includes(searchThread.toLowerCase()) || t.role.toLowerCase().includes(searchThread.toLowerCase()))
-            .map(thread => {
+          <div className="flex items-center justify-between px-5 pt-3 pb-2">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-[#334155]">Conversations</span>
+            <span className="text-xs font-semibold text-slate-500">{filteredThreads.length}</span>
+          </div>
+          <ul className="flex-1 overflow-y-auto divide-y divide-[#FFE4E6]">
+            {filteredThreads.map(thread => {
               const isActive = thread.id === activeThreadId;
               return (
-                <div
-                  key={thread.id}
-                  onClick={() => setActiveThreadId(thread.id)}
-                  className={`p-3.5 transition-all cursor-pointer flex gap-3 items-center ${
-                    isActive
-                      ? 'bg-[#FFF0F2] border-l-4 border-l-[#DC2626]'
-                      : 'hover:bg-white bg-slate-50/50'
-                  }`}
-                >
-                  <div className="relative shrink-0">
-                    <img
-                      src={thread.avatar}
-                      alt={thread.name}
-                      className="h-10 w-10 rounded-full object-cover border border-[#FECDD3]"
-                    />
-                    {thread.status === 'Online' && (
-                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white"></span>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex justify-between items-center">
-                      <h4 className={`text-xs font-black truncate ${isActive ? 'text-[#DC2626]' : 'text-slate-800'}`}>
-                        {thread.name}
-                      </h4>
-                      {thread.unread > 0 && (
-                        <span className="bg-[#DC2626] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shrink-0">
-                          {thread.unread}
-                        </span>
+                <li key={thread.id}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveThreadId(thread.id)}
+                    aria-current={isActive ? 'true' : undefined}
+                    className={`w-full text-left px-5 py-4 flex gap-3.5 items-center transition-colors cursor-pointer ${
+                      isActive ? 'bg-[#FFF0F2] shadow-[inset_4px_0_0_#DC2626]' : 'hover:bg-[#FFF0F2]'
+                    }`}
+                  >
+                    <div className="relative shrink-0">
+                      <img src={thread.avatar} alt="" className="h-12 w-12 rounded-full object-cover border border-[#FECDD3]" />
+                      {thread.status === 'Online' && (
+                        <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white"></span>
                       )}
                     </div>
-                    <p className="text-[10px] text-slate-500 font-semibold truncate mt-0.5">{thread.role}</p>
-                    <p className="text-[10px] text-slate-400 italic truncate mt-0.5">{thread.lastMessage}</p>
-                  </div>
-                </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex justify-between items-center gap-2">
+                        <span className={`text-[15px] font-bold truncate ${isActive ? 'text-[#B91C1C]' : 'text-[#1E293B]'}`}>{thread.name}</span>
+                        {thread.unread > 0 && (
+                          <span className="bg-[#DC2626] text-white text-[11px] font-bold min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center shrink-0">
+                            {thread.unread}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[13px] text-[#334155] font-semibold truncate mt-0.5">{thread.role}</p>
+                      <p className="text-[13px] text-slate-500 truncate mt-0.5">{thread.lastMessage}</p>
+                    </div>
+                  </button>
+                </li>
               );
             })}
-        </div>
+            {filteredThreads.length === 0 && (
+              <li className="px-5 py-8 text-sm text-slate-600 text-center">No conversations match your search.</li>
+            )}
+          </ul>
+        </aside>
 
-        {/* Security Compliance Footer */}
-        <div className="p-3 bg-white border-t border-[#FECDD3] text-[9px] text-slate-500 font-bold flex items-center justify-between">
-          <span className="flex items-center gap-1 text-[#DC2626]">
-            <Lock className="h-3 w-3" /> 256-Bit Encrypted
-          </span>
-          <span>MMC Reg Validated</span>
-        </div>
-      </div>
-
-      {/* Main Consultation Conversation View */}
-      <div className="lg:col-span-8 flex flex-col justify-between h-[560px] bg-white">
-        {/* Active Conversation Header */}
-        <div className="p-3.5 bg-[#0F172A] text-white flex items-center justify-between border-b border-slate-700 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="relative shrink-0">
-              <img
-                src={currentThread.avatar}
-                alt={currentThread.name}
-                className="h-9 w-9 rounded-full object-cover border border-slate-600"
-              />
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white animate-pulse"></span>
+        {/* Active conversation */}
+        <section aria-label="Conversation" className="flex flex-col min-h-[480px] lg:min-h-0 min-w-0 bg-[#FFF8F9]">
+          <div className="px-6 py-4 bg-white border-b border-[#FECDD3] flex flex-wrap items-center justify-between gap-3 shrink-0">
+            <div className="flex items-center gap-3.5 min-w-0">
+              <div className="relative shrink-0">
+                <img src={currentThread.avatar} alt="" className="h-12 w-12 rounded-full object-cover border border-[#FECDD3]" />
+                {currentThread.status === 'Online' && (
+                  <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white"></span>
+                )}
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h2 className="text-[17px] font-bold text-[#1E293B]">{currentThread.name}</h2>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#065F46] bg-[#ECFDF5] border border-[#A7F3D0] px-2 py-0.5">
+                    <UserCheck className="h-3 w-3 text-[#059669]" /> Verified
+                  </span>
+                </div>
+                <p className="text-[13px] text-[#334155] mt-0.5">{currentThread.role} &bull; Active council session</p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-xs font-black text-white flex items-center gap-1.5">
-                {currentThread.name}
-                <UserCheck className="h-3.5 w-3.5 text-emerald-400" />
-              </h3>
-              <p className="text-[10px] text-rose-200 font-semibold">{currentThread.role} &bull; Active Council Session</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="hidden sm:flex items-center gap-1 bg-white/10 border border-white/20 px-2.5 py-1 text-[9px] font-bold text-slate-300">
-              <Lock className="h-3 w-3 text-rose-300" />
-              <span>END-TO-END ENCRYPTED</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Messages Body Scroll Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#FFF0F2]/20">
-          <div className="text-center py-1">
-            <span className="text-[9px] font-bold bg-[#FFF0F2] text-[#DC2626] border border-[#FECDD3] px-3 py-1 rounded-none uppercase tracking-wider inline-flex items-center gap-1.5">
-              <Shield className="h-3 w-3 text-[#DC2626]" />
-              Medical Council Identity Validated &bull; Encrypted Session
+            <span className="inline-flex items-center gap-2 min-h-[36px] px-3.5 bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] text-[11px] font-bold uppercase tracking-wider">
+              <Lock className="h-3.5 w-3.5 text-[#059669]" /> End-to-end encrypted
             </span>
           </div>
 
-          {messages.map((msg) => {
-            const isMe = msg.senderId === 'patient-1';
-            return (
-              <div
-                key={msg.id}
-                className={`flex flex-col max-w-[78%] ${isMe ? "ml-auto items-end" : "mr-auto items-start"}`}
-              >
-                <span className="text-[10px] text-slate-500 font-bold mb-0.5 px-1">{msg.senderName}</span>
-                <div className={`p-3 rounded-none text-xs font-semibold leading-relaxed shadow-3xs ${
-                  isMe
-                    ? "bg-[#DC2626] text-white border border-[#B91C1C]"
-                    : "bg-white border border-[#FECDD3] text-slate-800"
-                }`}>
-                  {msg.text}
-                </div>
-                <span className="font-mono tabular-nums text-[8px] text-slate-400 font-semibold mt-1 flex items-center gap-1 px-1">
-                  {msg.timestamp}
-                  {isMe && <Check className="h-3 w-3 text-[#DC2626]" />}
-                </span>
-              </div>
-            );
-          })}
-
-          {loading && (
-            <div className="flex items-center gap-2 text-[10px] text-[#DC2626] font-bold italic pl-1 bg-[#FFF0F2] p-2 border border-[#FECDD3] max-w-xs">
-              <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-              Specialist is processing diagnostic guidance...
+          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            <div className="text-center">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#FECDD3] text-[#B91C1C] text-[11px] font-bold uppercase tracking-wider">
+                <Shield className="h-3.5 w-3.5 text-[#DC2626]" />
+                Medical council identity validated &bull; encrypted session
+              </span>
             </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
 
-        {/* Message Input Bar */}
-        <form onSubmit={handleSendMessage} className="border-t border-[#FECDD3] p-3 bg-white flex gap-2 shrink-0">
-          <input
-            type="text"
-            placeholder="Type secure consultation message or diagnostic query..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="flex-1 text-xs border border-[#FECDD3] rounded-none px-4 py-2.5 outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626] font-semibold bg-slate-50 text-slate-800 placeholder-slate-400"
-          />
-          <button
-            type="submit"
-            disabled={!text.trim() || loading}
-            className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-slate-300 text-white rounded-none px-5 py-2.5 text-xs font-black shadow-3xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
-          >
-            <span>Send</span>
-            <Send className="h-3.5 w-3.5" />
-          </button>
-        </form>
+            {messages.length === 0 && !loading && (
+              <div className="flex flex-col items-center justify-center text-center gap-2 py-12">
+                <div className="h-14 w-14 rounded-full bg-[#FFE4E6] flex items-center justify-center">
+                  <MessageSquare className="h-6 w-6 text-[#DC2626]" />
+                </div>
+                <p className="text-[15px] font-semibold text-[#1E293B]">No messages in this conversation yet</p>
+                <p className="text-[13px] text-[#334155] max-w-sm">Send a secure message or diagnostic question to {currentThread.name}.</p>
+              </div>
+            )}
+
+            {messages.map((msg) => {
+              const isMe = msg.senderId === 'patient-1';
+              return (
+                <div key={msg.id} className={`flex flex-col max-w-[78%] ${isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
+                  <span className="text-xs text-[#334155] font-semibold mb-1 px-1">{msg.senderName}</span>
+                  <div className={`px-4 py-3 text-sm leading-relaxed shadow-3xs ${
+                    isMe ? 'bg-[#DC2626] text-white border border-[#B91C1C]' : 'bg-white border border-[#FECDD3] text-[#1E293B]'
+                  }`}>
+                    {msg.text}
+                  </div>
+                  <span className="tabular-nums text-[11px] text-slate-500 mt-1 flex items-center gap-1 px-1">
+                    {msg.timestamp}
+                    {isMe && <Check className="h-3 w-3 text-[#DC2626]" />}
+                  </span>
+                </div>
+              );
+            })}
+
+            {loading && (
+              <div className="flex items-center gap-2 text-xs text-[#B91C1C] font-semibold bg-[#FFF0F2] px-3 py-2 border border-[#FECDD3] max-w-xs">
+                <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                Specialist is processing diagnostic guidance...
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          <form onSubmit={handleSendMessage} className="border-t border-[#FECDD3] px-6 py-4 bg-white flex flex-wrap gap-3 shrink-0">
+            <label htmlFor="mailbox-message" className="sr-only">Secure consultation message</label>
+            <input
+              id="mailbox-message"
+              type="text"
+              placeholder="Type a secure consultation message or diagnostic question"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              className="flex-[1_1_280px] min-w-0 min-h-[48px] text-sm border border-[#FECDD3] px-4 outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626] bg-[#FFF8F9] text-[#1E293B] placeholder-slate-500"
+            />
+            <button
+              type="submit"
+              disabled={!text.trim() || loading}
+              className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-slate-300 disabled:cursor-not-allowed text-white min-h-[48px] px-7 text-sm font-bold transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>Send</span>
+              <Send className="h-4 w-4" />
+            </button>
+          </form>
+        </section>
+
+        {/* Practitioner details */}
+        <aside aria-label="Practitioner details" className="hidden xl:flex flex-col gap-5 border-l border-[#FECDD3] bg-white p-6">
+          <div className="flex flex-col items-center text-center gap-2.5">
+            <img src={currentThread.avatar} alt="" className="h-[72px] w-[72px] rounded-full object-cover border border-[#FECDD3]" />
+            <div>
+              <p className="text-base font-bold text-[#1E293B]">{currentThread.name}</p>
+              <p className="text-[13px] text-[#334155] mt-0.5">{currentThread.role}</p>
+            </div>
+          </div>
+          <dl className="flex flex-col gap-3 border-t border-[#FECDD3] pt-4">
+            <div className="flex justify-between gap-3">
+              <dt className="text-xs text-slate-600">Availability</dt>
+              <dd className={`text-[13px] font-semibold ${currentThread.status === 'Online' ? 'text-[#047857]' : 'text-slate-600'}`}>{currentThread.status}</dd>
+            </div>
+            <div className="flex justify-between gap-3">
+              <dt className="text-xs text-slate-600">Credentials</dt>
+              <dd className="text-[13px] font-semibold text-[#047857]">Council verified</dd>
+            </div>
+            <div className="flex justify-between gap-3">
+              <dt className="text-xs text-slate-600">Session</dt>
+              <dd className="text-[13px] font-semibold text-[#1E293B]">Encrypted</dd>
+            </div>
+          </dl>
+        </aside>
       </div>
     </div>
   );

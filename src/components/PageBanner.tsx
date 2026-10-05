@@ -28,19 +28,20 @@ export default function PageBanner({
   return (
     <div
       id={id}
-      className={`bg-gradient-to-r from-[#FFF0F2] via-[#FFF5F6] to-[#FFE9EB] border-l-4 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 py-3.5 px-5 rounded-none shadow-3xs flex flex-wrap items-center justify-between gap-x-6 gap-y-2 ${className}`}
+      className={`bg-gradient-to-r from-[#FFF0F2] via-[#FFF5F6] to-[#FFE9EB] border border-[#FECDD3] text-[#1E293B] py-5 px-5 sm:px-6 rounded-xl shadow-xs flex flex-wrap items-center justify-between gap-x-6 gap-y-2 ${className}`}
     >
       <div className="min-w-0 max-w-4xl">
-        <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-[#DC2626]">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-[#DC2626] shrink-0" aria-hidden="true">
-            <path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" />
+        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#047857]">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 shrink-0" aria-hidden="true">
+            <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" />
+            <path d="M9 12l2 2 4-4" />
           </svg>
           <span>{eyebrow}</span>
         </div>
-        <Heading className="font-display font-black text-base sm:text-lg leading-tight tracking-tight text-slate-900 mt-0.5">
+        <Heading className="font-display font-bold text-xl sm:text-2xl leading-tight tracking-tight text-[#1E293B] mt-1.5">
           {title}
         </Heading>
-        {description && <p className="text-xs text-slate-600 font-medium mt-0.5 leading-snug">{description}</p>}
+        {description && <p className="text-sm text-[#334155] mt-1 leading-relaxed">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-3 shrink-0">{actions}</div>}
     </div>
@@ -50,8 +51,8 @@ export default function PageBanner({
 /** Large number + small caps label, used in banner actions. */
 export function BannerStat({ value, label }: { value: React.ReactNode; label: string }) {
   return (
-    <div className="flex items-baseline gap-2 bg-white px-3 py-1.5 border border-[#FECDD3] rounded-none shadow-3xs">
-      <span className="font-display font-black text-lg leading-none tracking-tight text-[#DC2626] tabular-nums">{value}</span>
+    <div className="flex items-baseline gap-2 bg-white px-3 py-1.5 border border-[#FECDD3] rounded-lg shadow-3xs">
+      <span className="font-display font-bold text-lg leading-none tracking-tight text-[#DC2626] tabular-nums">{value}</span>
       <span className="text-[11px] font-extrabold uppercase tracking-widest text-slate-600">{label}</span>
     </div>
   );

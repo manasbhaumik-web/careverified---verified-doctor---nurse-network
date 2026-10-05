@@ -269,7 +269,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans antialiased selection:bg-[#FFE4E6] selection:text-[#DC2626]">
 
       {/* CareVerified Elevated Primary Header */}
-      <header className="bg-[#DC2626] border-b border-[#B91C1C] sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-md">
+      <header className="bg-white border-b border-[#FECDD3] sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-xs">
         <div className="max-w-[1920px] mx-auto flex items-center justify-between h-16">
 
           {/* Brand Logo */}
@@ -282,37 +282,34 @@ export default function App() {
               setSelectedProfId(null);
             }}
           >
-            <div className="w-10 h-10 rounded-none bg-white text-[#DC2626] border border-[#B91C1C] flex items-center justify-center shrink-0 shadow-xs group-hover:bg-[#FFF0F2] transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-[#DC2626] text-white flex items-center justify-center shrink-0 shadow-xs group-hover:bg-[#B91C1C] transition-colors">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
             </div>
             <div className="leading-none">
-              <span className="font-display font-black text-[22px] text-white tracking-tight flex items-center gap-2.5">
-                MedCred<span className="text-rose-200">.</span>
-                <span className="text-[10px] text-white bg-[#B91C1C] border border-white/40 px-2.5 py-0.5 rounded-none font-extrabold uppercase tracking-wider font-body">
-                  {currentUser.role === 'admin' ? 'Board Console' : currentUser.role === 'practitioner' ? 'Practitioner Hub' : 'Patient Portal'}
-                </span>
+              <span className="font-display font-bold text-[22px] text-[#1E293B] tracking-tight block">
+                MedCred<span className="text-[#DC2626]">.</span>
               </span>
-              <span className="text-[10px] font-bold text-rose-100 uppercase tracking-[0.18em] block mt-1.5">
-                Verified Medical Assistance Platform
+              <span className="text-[10px] font-semibold text-[#334155] uppercase tracking-[0.14em] block mt-1">
+                {currentUser.role === 'admin' ? 'Board Console' : currentUser.role === 'practitioner' ? 'Practitioner Hub' : 'Patient Portal'}
               </span>
             </div>
           </div>
 
           {/* Right-Side Desktop Actions & User Session Details */}
           <div className="hidden lg:flex items-center gap-5">
-            <div className="flex items-center gap-2 bg-[#B91C1C]/70 border border-white/50 px-3.5 py-1.5 rounded-full text-[11px] font-extrabold text-white shadow-xs">
-              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+            <div className="flex items-center gap-2 bg-[#ECFDF5] border border-[#A7F3D0] px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#065F46]">
+              <ShieldCheck className="h-3.5 w-3.5 text-[#059669]" aria-hidden="true" />
               <span>MMC &amp; LJM Registry Aligned</span>
             </div>
 
-            <div className="flex items-center gap-3 border-l border-white/30 pl-5">
+            <div className="flex items-center gap-3 border-l border-[#FECDD3] pl-5">
               <button
-                className="relative p-2 text-white hover:bg-white/15 rounded-xl transition-colors cursor-pointer"
+                className="relative h-11 w-11 flex items-center justify-center text-[#334155] bg-white border border-[#FECDD3] hover:bg-[#FFF0F2] rounded-lg transition-colors cursor-pointer"
                 title="Notifications"
                 aria-label="Notifications"
               >
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-[#DC2626]"></span>
+                <Bell className="h-[18px] w-[18px]" />
+                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-[#DC2626] rounded-full ring-2 ring-white"></span>
               </button>
 
               {/* Profile Badge embedded with Close Session Button (Transparent Background & No Border) */}
@@ -320,18 +317,18 @@ export default function App() {
                 <img
                   src={currentUser.avatarUrl || '/assets/malaysian_female_doctor.jpg'}
                   alt={currentUser.name}
-                  className="w-10 h-10 rounded-full object-cover border-2 border-white/80 shadow-xs"
+                  className="w-10 h-10 rounded-full object-cover border border-[#FECDD3]"
                   referrerPolicy="no-referrer"
                 />
                 <div className="text-left hidden xl:block leading-tight">
-                  <p className="text-xs font-extrabold text-white leading-none">{currentUser.name}</p>
-                  <p className="text-[10px] text-rose-100 font-bold mt-0.5">
+                  <p className="text-[13px] font-semibold text-[#1E293B] leading-none">{currentUser.name}</p>
+                  <p className="text-xs text-[#334155] mt-1">
                     {currentUser.role === 'admin' ? 'Board Admin' : currentUser.role === 'practitioner' ? 'Practitioner Account' : 'Patient Account'}
                   </p>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="p-1.5 text-white/90 hover:text-white hover:bg-white/20 bg-transparent border-0 rounded-full transition-colors cursor-pointer ml-1 flex items-center justify-center"
+                  className="h-9 w-9 text-[#334155] hover:text-[#DC2626] hover:bg-[#FFF0F2] bg-transparent border-0 rounded-full transition-colors cursor-pointer ml-1 flex items-center justify-center"
                   title="Close Session"
                   aria-label="Close session"
                 >
@@ -345,7 +342,7 @@ export default function App() {
           <div className="flex lg:hidden items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="min-h-11 min-w-11 flex items-center justify-center rounded-none border border-white text-white hover:bg-white/15 cursor-pointer"
+              className="min-h-11 min-w-11 flex items-center justify-center rounded-lg border border-[#FECDD3] text-[#1E293B] hover:bg-[#FFF0F2] cursor-pointer"
               aria-label="Toggle navigation"
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -361,7 +358,7 @@ export default function App() {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="lg:hidden bg-white text-[#1E293B] -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-[#B91C1C] overflow-hidden"
+              className="lg:hidden bg-white text-[#1E293B] -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-[#FECDD3] overflow-hidden"
             >
               <div className="py-3 space-y-1 text-sm font-bold text-[#1E293B]">
                 {navItems.map((item) => {
@@ -627,9 +624,7 @@ export default function App() {
 
             {/* VIEW 5: SECURE MESSENGER */}
             {activeView === 'messages' && (
-              <div className="max-w-2xl mx-auto">
-                <SecureMessenger />
-              </div>
+              <SecureMessenger />
             )}
 
             {/* VIEW 6: MEDICAL BOARD ADMIN */}

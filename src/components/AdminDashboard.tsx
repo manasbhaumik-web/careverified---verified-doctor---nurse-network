@@ -1,3 +1,4 @@
+import DashboardHeader from './DashboardHeader';
 import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, UserCheck, Check, X, ShieldAlert, Award, FileText, 
@@ -248,21 +249,12 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
 
   return (
     <div className="w-full max-w-[1920px] mx-auto space-y-6" id="national-registry-admin-panel">
-      {/* EXECUTIVE CRIMSON METRIC BANNER (CONCEPT 3) */}
-      <div className="bg-gradient-to-r from-[#FFF1F2] via-[#FFF5F5] to-[#FFE4E6] border-l-8 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 rounded-2xl p-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2 text-[#DC2626] text-xs font-black uppercase tracking-wider">
-            <ShieldAlert className="h-4 w-4 text-emerald-600" />
-            <span>National Medical Registry Audit Terminal</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
-            Registry Administrative Control Desk
-          </h1>
-          <p className="text-xs text-slate-600 font-medium max-w-xl">
-            Real-time MMC/LJM license verification, accreditation moderation queue, and modular extension management.
-          </p>
-        </div>
-
+      {/* Standard dashboard header with attached tabs */}
+      <DashboardHeader
+        eyebrow="National Medical Registry Audit Terminal"
+        title="Registry Administrative Control Desk"
+        description="Real-time MMC/LJM license verification, accreditation moderation queue, and modular extension management."
+        actions={
         <div className="grid grid-cols-3 gap-3 bg-white/90 backdrop-blur-xs p-3 border border-[#FECDD3] rounded-xl text-center min-w-[300px] shadow-xs">
           <div>
             <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{pendingRequests.length}</span>
@@ -277,46 +269,15 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
             <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Modules</span>
           </div>
         </div>
-      </div>
-      {/* Dynamic Module Tabs */}
-      <div role="tablist" aria-label="Admin panel sections" className="flex gap-3 border border-[#FECDD3] rounded-xl sticky top-20 bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs">
-        <button
-          type="button"
-          role="tab"
-          id="tab-approvals"
-          aria-controls="panel-approvals"
-          aria-selected={activeTab === 'approvals'}
-          tabIndex={activeTab === 'approvals' ? 0 : -1}
-          onClick={() => setActiveTab('approvals')}
-          onKeyDown={(e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); setActiveTab(activeTab === 'approvals' ? 'packages' : 'approvals'); } }}
-          className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
-            activeTab === 'approvals' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
-          }`}
-        >
-          <ShieldCheck className={`h-4 w-4 ${activeTab === 'approvals' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
-          <span>Practitioner Approvals</span>
-          {pendingRequests.length > 0 && (
-            <span className="font-mono tabular-nums text-[10px] px-2 py-0.5 rounded-full font-extrabold bg-[#DC2626] text-white leading-none">{pendingRequests.length}</span>
-          )}
-        </button>
-        <button
-          type="button"
-          role="tab"
-          id="tab-packages"
-          aria-controls="panel-packages"
-          aria-selected={activeTab === 'packages'}
-          tabIndex={activeTab === 'packages' ? 0 : -1}
-          onClick={() => setActiveTab('packages')}
-          onKeyDown={(e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); setActiveTab(activeTab === 'approvals' ? 'packages' : 'approvals'); } }}
-          className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
-            activeTab === 'packages' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
-          }`}
-        >
-          <Puzzle className={`h-4 w-4 ${activeTab === 'packages' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
-          <span>Package Manager</span>
-          <span className="font-mono tabular-nums text-[10px] px-2 py-0.5 rounded-full font-extrabold bg-[#FFE4E6] text-[#DC2626] border border-[#FECDD3] leading-none">{packages.length}</span>
-        </button>
-      </div>
+        }
+        tabs={[
+          { id: 'approvals' as const, label: 'Practitioner Approvals', icon: ShieldCheck, count: pendingRequests.length },
+          { id: 'packages' as const, label: 'Package Manager', icon: Puzzle, count: packages.length },
+        ]}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        tabsLabel="Admin panel sections"
+      />
 
       {activeTab === 'approvals' && (
         <div id="panel-approvals" role="tabpanel" aria-labelledby="tab-approvals" tabIndex={0} className="space-y-6">

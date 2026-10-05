@@ -13,6 +13,7 @@ import PractitionerBookingsTab from './practitioner/PractitionerBookingsTab';
 import PractitionerFeedbackTab from './practitioner/PractitionerFeedbackTab';
 import PractitionerAnalyticsTab from './practitioner/PractitionerAnalyticsTab';
 import PractitionerSettingsTab from './practitioner/PractitionerSettingsTab';
+import DashboardHeader from './DashboardHeader';
 import PageBanner from './PageBanner';
 
 interface VerificationTerminalProps {
@@ -355,14 +356,26 @@ export default function VerificationTerminal({
 
 
 
-          {/* ═══════════ MERGED EXECUTIVE CRIMSON HERO BANNER ═══════════ */}
-          <div className="bg-gradient-to-r from-[#FFF1F2] via-[#FFF5F5] to-[#FFE4E6] border-l-8 border-[#DC2626] border-y border-r border-[#FECDD3] text-slate-900 rounded-2xl p-5 sm:p-6 shadow-sm relative overflow-hidden space-y-4">
+          <DashboardHeader
+            tabs={[
+              { id: 'home' as const, label: 'Overview', icon: LayoutGrid },
+              { id: 'bookings' as const, label: 'Bookings', icon: Calendar, count: upcomingBookingsCount },
+              { id: 'accreditation' as const, label: 'Accreditation', icon: Award },
+              { id: 'reviews' as const, label: 'Feedback', icon: MessageSquare },
+              { id: 'analytics' as const, label: 'Analytics', icon: TrendingUp },
+              { id: 'settings' as const, label: 'Settings', icon: Edit },
+            ]}
+            activeTab={activeDashboardTab}
+            onTabChange={setActiveDashboardTab}
+            tabsLabel="Practitioner workspace sections"
+          >
+            <div className="space-y-4">
             {/* Integrated Top Bar: Dynamic Time-of-Day Greeting & Date Badge */}
             <div className="flex items-center justify-between gap-4 border-b border-[#FECDD3]/80 pb-3 flex-wrap">
               <div className="flex items-center gap-2 text-slate-600">
-                <span className="text-xs font-black tracking-wider uppercase font-mono text-[#DC2626]">Practitioner Terminal</span>
+                <span className="text-[11px] font-bold tracking-widest uppercase text-[#047857]">Practitioner Terminal</span>
                 <span className="text-slate-300">&bull;</span>
-                <span className="text-sm sm:text-base font-black text-slate-900 tracking-tight">
+                <span className="text-sm sm:text-base font-bold text-[#1E293B] tracking-tight">
                   {(() => {
                     const hour = new Date().getHours();
                     const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
@@ -399,7 +412,7 @@ export default function VerificationTerminal({
 
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2.5 flex-wrap">
-                    <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">{matchedProfile.name}</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-[#1E293B] tracking-tight">{matchedProfile.name}</h2>
                     <span className="bg-white text-[#DC2626] border border-[#FECDD3] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-2xs">
                       {isDoc ? "Physician Account" : "Nurse Account"}
                     </span>
@@ -439,15 +452,15 @@ export default function VerificationTerminal({
               <div className="flex items-center gap-4 flex-wrap lg:justify-end border-t lg:border-t-0 border-[#FECDD3]/80 pt-4 lg:pt-0">
                 <div className="grid grid-cols-3 gap-3 bg-white/90 p-3 border border-[#FECDD3] rounded-xl text-center min-w-[280px] shadow-xs">
                   <div>
-                    <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{patientsAttendedCount}</span>
+                    <span className="text-xl font-bold text-[#DC2626] block leading-tight tabular-nums">{patientsAttendedCount}</span>
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Patients</span>
                   </div>
                   <div className="border-x border-slate-200">
-                    <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{upcomingBookingsCount}</span>
+                    <span className="text-xl font-bold text-[#DC2626] block leading-tight tabular-nums">{upcomingBookingsCount}</span>
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Upcoming</span>
                   </div>
                   <div>
-                    <span className="font-mono text-xl font-black text-[#DC2626] block leading-tight">{avgOverall ?? '5.0'}</span>
+                    <span className="text-xl font-bold text-[#DC2626] block leading-tight tabular-nums">{avgOverall ?? '5.0'}</span>
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Rating</span>
                   </div>
                 </div>
@@ -475,7 +488,8 @@ export default function VerificationTerminal({
                 </div>
               </div>
             </div>
-          </div>
+            </div>
+          </DashboardHeader>
 
           <div className="w-full space-y-6">
             
@@ -496,115 +510,6 @@ export default function VerificationTerminal({
                 </span>
               </div>
 
-                                    {/* [ UNDERLINE TABBED NAVIGATION ] */}
-              <div
-                role="tablist"
-                aria-label="Practitioner workspace sections"
-                className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-xl sticky top-[72px] bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs"
-              >
-                <button
-                  role="tab"
-                  id="tab-home"
-                  aria-controls="panel-home"
-                  aria-selected={activeDashboardTab === 'home'}
-                  tabIndex={activeDashboardTab === 'home' ? 0 : -1}
-                  onClick={() => setActiveDashboardTab('home')}
-                  onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
-                    activeDashboardTab === 'home' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
-                  }`}
-                >
-                  <LayoutGrid className={`h-4 w-4 ${activeDashboardTab === 'home' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
-                  <span>Overview</span>
-                </button>
-
-                <button
-                  role="tab"
-                  id="tab-bookings"
-                  aria-controls="panel-bookings"
-                  aria-selected={activeDashboardTab === 'bookings'}
-                  tabIndex={activeDashboardTab === 'bookings' ? 0 : -1}
-                  onClick={() => setActiveDashboardTab('bookings')}
-                  onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
-                    activeDashboardTab === 'bookings' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
-                  }`}
-                >
-                  <Calendar className={`h-4 w-4 ${activeDashboardTab === 'bookings' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
-                  <span>Bookings</span>
-                  {upcomingBookingsCount > 0 && (
-                    <span className="font-mono tabular-nums text-[10px] px-2 py-0.5 rounded-full font-black bg-[#DC2626] text-white leading-none">
-                      {upcomingBookingsCount}
-                    </span>
-                  )}
-                </button>
-
-                <button
-                  role="tab"
-                  id="tab-accreditation"
-                  aria-controls="panel-accreditation"
-                  aria-selected={activeDashboardTab === 'accreditation'}
-                  tabIndex={activeDashboardTab === 'accreditation' ? 0 : -1}
-                  onClick={() => setActiveDashboardTab('accreditation')}
-                  onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
-                    activeDashboardTab === 'accreditation' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
-                  }`}
-                >
-                  <Award className={`h-4 w-4 ${activeDashboardTab === 'accreditation' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
-                  <span>Accreditation</span>
-                </button>
-
-                <button
-                  role="tab"
-                  id="tab-reviews"
-                  aria-controls="panel-reviews"
-                  aria-selected={activeDashboardTab === 'reviews'}
-                  tabIndex={activeDashboardTab === 'reviews' ? 0 : -1}
-                  onClick={() => setActiveDashboardTab('reviews')}
-                  onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
-                    activeDashboardTab === 'reviews' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
-                  }`}
-                >
-                  <MessageSquare className={`h-4 w-4 ${activeDashboardTab === 'reviews' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
-                  <span>Feedback</span>
-                </button>
-
-                <button
-                  role="tab"
-                  id="tab-analytics"
-                  aria-controls="panel-analytics"
-                  aria-selected={activeDashboardTab === 'analytics'}
-                  tabIndex={activeDashboardTab === 'analytics' ? 0 : -1}
-                  onClick={() => setActiveDashboardTab('analytics')}
-                  onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
-                    activeDashboardTab === 'analytics' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
-                  }`}
-                >
-                  <TrendingUp className={`h-4 w-4 ${activeDashboardTab === 'analytics' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
-                  <span>Analytics</span>
-                </button>
-
-                <button
-                  role="tab"
-                  id="tab-settings"
-                  aria-controls="panel-settings"
-                  aria-selected={activeDashboardTab === 'settings'}
-                  tabIndex={activeDashboardTab === 'settings' ? 0 : -1}
-                  onClick={() => setActiveDashboardTab('settings')}
-                  onKeyDown={handleTabKeyDown}
-                  className={`shrink-0 py-2.5 px-4 text-xs font-extrabold flex items-center gap-2 cursor-pointer rounded-lg border transition-all ${
-                    activeDashboardTab === 'settings' ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
-                  }`}
-                >
-                  <Edit className={`h-4 w-4 ${activeDashboardTab === 'settings' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
-                  <span>Settings</span>
-                </button>
-              </div>
-
-              {/* TAB CONTENT: OVERVIEW (default landing tab) */}
               {activeDashboardTab === 'home' && (
                 <PractitionerOverviewTab
                   matchedProfile={matchedProfile}

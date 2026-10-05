@@ -1,7 +1,7 @@
+import DashboardHeader from './DashboardHeader';
 import React, { useState } from 'react';
 import { Search, Globe, Code, Zap, FileSpreadsheet, Eye, Copy, CheckCircle, List, LayoutGrid, ShieldCheck, X } from 'lucide-react';
 import { DoctorProfile, NurseProfile } from '../types';
-import PageBanner from './PageBanner';
 
 interface SEODashboardProps {
   professionals: (DoctorProfile | NurseProfile)[];
@@ -92,60 +92,21 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
 
   return (
     <div className="space-y-8 w-full max-w-[1920px] mx-auto" id="seo-dashboard-panel">
-      {/* Header Banner */}
-      <PageBanner
+      {/* Standard dashboard header with attached tabs */}
+      <DashboardHeader
         eyebrow="SEO & Schema Engine"
         title="Active SEO Strategy & Schema Engine"
         description="Programmatic landing page generators and YMYL E-E-A-T compliant meta engines."
+        tabs={[
+          { id: 'schema' as const, label: 'JSON-LD Structured Schema', icon: Code },
+          { id: 'programmatic' as const, label: 'Programmatic Landing Pages', icon: Search },
+          { id: 'vitals' as const, label: 'Core Web Vitals Scoring', icon: Zap },
+          { id: 'sitemap' as const, label: 'Sitemap Generator', icon: FileSpreadsheet },
+        ]}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        tabsLabel="SEO engine sections"
       />
-
-      {/* Tabs */}
-      <div role="tablist" aria-label="SEO engine sections" className="flex flex-wrap gap-2 border border-[#FECDD3] rounded-xl bg-[#FFF0F2]/95 backdrop-blur-md z-30 p-1.5 shadow-xs">
-        <button
-          onClick={() => setActiveTab('schema')}
-          className={`flex-1 py-2.5 px-4 text-xs font-extrabold rounded-lg transition-all flex items-center gap-2 cursor-pointer border ${
-            activeTab === 'schema' 
-              ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' 
-              : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
-          }`}
-        >
-          <Code className={`h-4 w-4 ${activeTab === 'schema' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
-          JSON-LD Structured Schema
-        </button>
-        <button
-          onClick={() => setActiveTab('programmatic')}
-          className={`flex-1 py-2.5 px-4 text-xs font-extrabold rounded-lg transition-all flex items-center gap-2 cursor-pointer border ${
-            activeTab === 'programmatic' 
-              ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' 
-              : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
-          }`}
-        >
-          <Search className={`h-4 w-4 ${activeTab === 'programmatic' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
-          Programmatic Landing Pages
-        </button>
-        <button
-          onClick={() => setActiveTab('vitals')}
-          className={`flex-1 py-2.5 px-4 text-xs font-extrabold rounded-lg transition-all flex items-center gap-2 cursor-pointer border ${
-            activeTab === 'vitals' 
-              ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' 
-              : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
-          }`}
-        >
-          <Zap className={`h-4 w-4 ${activeTab === 'vitals' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
-          Core Web Vitals Scoring
-        </button>
-        <button
-          onClick={() => setActiveTab('sitemap')}
-          className={`flex-1 py-2.5 px-4 text-xs font-extrabold rounded-lg transition-all flex items-center gap-2 cursor-pointer border ${
-            activeTab === 'sitemap' 
-              ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs' 
-              : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
-          }`}
-        >
-          <FileSpreadsheet className={`h-4 w-4 ${activeTab === 'sitemap' ? 'text-[#DC2626]' : 'text-slate-400'}`} />
-          Sitemap Generator
-        </button>
-      </div>
 
       <div className="p-6">
         {/* TAB 1: SCHEMA GENERATOR */}
