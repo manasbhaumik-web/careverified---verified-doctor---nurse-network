@@ -370,26 +370,6 @@ export default function VerificationTerminal({
             tabsLabel="Practitioner workspace sections"
           >
             <div className="space-y-4">
-            {/* Integrated Top Bar: Dynamic Time-of-Day Greeting & Date Badge */}
-            <div className="flex items-center justify-between gap-4 border-b border-[#FECDD3]/80 pb-3 flex-wrap">
-              <div className="flex items-center gap-2 text-slate-600">
-                <span className="text-[11px] font-bold tracking-widest uppercase text-[#047857]">Practitioner Terminal</span>
-                <span className="text-slate-300">&bull;</span>
-                <span className="text-sm sm:text-base font-bold text-[#1E293B] tracking-tight">
-                  {(() => {
-                    const hour = new Date().getHours();
-                    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-                    return `${greeting}, ${matchedProfile.name}.`;
-                  })()}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono font-bold text-[#DC2626] bg-white border border-[#FECDD3] px-3 py-1 rounded-full tabular-nums shadow-xs">
-                  {new Date().toLocaleDateString('en-MY', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                </span>
-              </div>
-            </div>
-
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pt-1">
               {/* Left Practitioner Identity */}
               <div className="flex items-center gap-5">
@@ -482,7 +462,7 @@ export default function VerificationTerminal({
                     }}
                     className="bg-white hover:bg-[#FFF1F2] text-[#DC2626] border border-[#FECDD3] text-xs font-bold px-4 py-3 rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-xs"
                   >
-                    <Send className="h-3.5 w-3.5 text-white" />
+                    <Send className="h-3.5 w-3.5 text-[#DC2626]" />
                     <span>Share Link</span>
                   </button>
                 </div>
