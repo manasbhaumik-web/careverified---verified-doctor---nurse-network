@@ -58,6 +58,8 @@ export default function ProfessionalProfile({
   const [bookingMode, setBookingMode] = useState<ConsultationMode>(ConsultationMode.IN_PERSON);
   const [symptoms, setSymptoms] = useState('');
   const [shareRecord, setShareRecord] = useState(false);
+  const [canReview, setCanReview] = useState<boolean | null>(null);
+  const [credentials, setCredentials] = useState<{ name: string; issuer: string; expiry_date: string | null }[]>([]);
   const [bookingSuccess, setBookingSuccess] = useState<Booking | null>(null);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
@@ -90,6 +92,13 @@ export default function ProfessionalProfile({
   useEffect(() => {
     fetchProfile();
   }, [professionalId]);
+
+  useEffect(() => {
+    fetch(`/api/professionals/${professionalId}/credentials`).then(r => r.json()).then(d => d.status === 'success' && setCredentials(d.data)).catch(() => {});
+    if (currentUser?.role === 'patient') {
+      fetch(`/api/reviews/eligibility?professionalId=${professionalId}`).then(r => r.json()).then(d => setCanReview(d.status === 'success' ? d.data.eligible : false)).catch(() => setCanReview(false));
+    } else setCanReview(false);
+  }, [professionalId, reviewSuccess]);
 
   const handleBookAppointment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,7 +151,7 @@ export default function ProfessionalProfile({
 
   const handlePostReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!reviewName || !reviewComment) return;
+    if (!reviewComment) return;
 
     try {
       const response = await fetch('/api/reviews', {
@@ -309,6 +318,16 @@ export default function ProfessionalProfile({
               <p className="text-xs text-slate-600 leading-relaxed font-medium bg-slate-50/30 p-3 rounded-xl border border-slate-100/40 italic">
                 "{prof.bio}"
               </p>
+              {credentials.length > 0 && (
+                <div className="pt-3">
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Verified specialty certificates</p>
+                  <ul className="flex flex-wrap gap-2">
+                    {credentials.map((c, i) => (
+                      <li key={i} className="text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-900 px-2.5 py-1">{c.name} · {c.issuer}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
 
             {/* Education & Achievements */}
@@ -439,9 +458,13 @@ export default function ProfessionalProfile({
               )}
             </div>
 
-            {/* Post a Review Form */}
+            {/* Post a Review Form: only after a completed visit */}
+            {canReview === false && !reviewSuccess && (
+              <p className="border-t border-slate-100 pt-6 text-xs text-slate-500">Only patients with a completed visit can write a review, so every review comes from a real consultation.</p>
+            )}
+            {(canReview || reviewSuccess) && (
             <form onSubmit={handlePostReview} className="border-t border-slate-100 pt-6 space-y-4">
-              <h4 className="font-bold text-slate-800 text-sm">Have you consulted this specialist? Write a review</h4>
+              <h4 className="font-bold text-slate-800 text-sm">You have completed a visit with this specialist. Write a review</h4>
               
               {reviewSuccess ? (
                 <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-xs text-emerald-800 font-semibold flex items-center gap-1.5">
@@ -451,7 +474,7 @@ export default function ProfessionalProfile({
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-3">
-                    <div>
+                    <div className="hidden">
                       <label className="block text-xs font-semibold text-slate-600 mb-1">Your Full Name</label>
                       <input
                         type="text"
@@ -459,7 +482,6 @@ export default function ProfessionalProfile({
                         onChange={(e) => setReviewName(e.target.value)}
                         placeholder="Ahmad Fauzi Bin Ramli"
                         className="w-full text-xs border border-slate-200/80 rounded-xl py-2 px-3 outline-none focus:ring-1 focus:ring-[#DC2626] font-semibold text-slate-700"
-                        required
                       />
                     </div>
 
@@ -510,6 +532,7 @@ export default function ProfessionalProfile({
                 </div>
               )}
             </form>
+            )}
           </div>
         </div>
 

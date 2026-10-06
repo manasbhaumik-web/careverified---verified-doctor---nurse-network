@@ -11,6 +11,7 @@ import {
 } from "./server/auth";
 import { documentsRouter, setRequestOwnerLookup, setClinicalHooks } from "./server/documents";
 import { registerClinicalRoutes, createGrant, seedHealthItems } from "./server/clinical";
+import { registerQualityRoutes, accountForChatId, isBlocked } from "./server/quality";
 import { registerVerificationRoutes, notifyAdmins, notify } from "./server/verification";
 import { registerPaymentRoutes, registerPaymentWebhook, setPaymentHandlers, refundPayment, paymentMode } from "./server/payments";
 import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
@@ -245,7 +246,7 @@ const generateId = (prefix: string) => `${prefix}-${Math.floor(100000 + Math.ran
 // -------------------------------------------------------------
 // Auth & account
 // -------------------------------------------------------------
-const CONSENT_VERSION = "2026-10";
+const CONSENT_VERSION = "2026-11";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const str = (v: unknown, max = 200) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const fail = (res: express.Response, code: number, message: string) =>
@@ -602,7 +603,21 @@ const clinical = registerClinicalRoutes(app, {
   findProfessional,
   getBooking: id => bookings.find(b => b.id === id),
   allBookings: () => bookings,
+  completeBooking: id => {
+    const b = bookings.find(x => x.id === id);
+    if (b && b.status === "Upcoming" && b.paymentStatus === "Paid") { b.status = "Completed"; persistState(); }
+  },
 });
+
+// Rating = average of published reviews only (moderated-out reviews do not count)
+const recalcRating = (professionalId: string) => {
+  const live = reviews.filter(r => r.professionalId === professionalId && (r as any).status !== "hidden");
+  const prof: any = findProfessional(professionalId);
+  if (!prof) return;
+  prof.rating = live.length ? Number((live.reduce((sum, r) => sum + r.rating, 0) / live.length).toFixed(2)) : 0;
+  prof.reviewCount = live.length;
+};
+registerQualityRoutes(app, { reviews: () => reviews, findProfessional, allProfessionals, bookings: () => bookings, recalcRating, chats: () => chats });
 setClinicalHooks(clinical);
 registerPaymentRoutes(app);
 const UNPAID_HOLD_MS = 15 * 60_000;
@@ -801,11 +816,12 @@ app.post("/api/jobs/:id/apply", requireRole("practitioner"), (req, res) => {
 // -------------------------------------------------------------
 app.get("/api/reviews", (req, res) => {
   const { professionalId } = req.query;
-  let list = [...reviews];
+  let list = reviews.filter(r => (r as any).status !== "hidden");
   if (professionalId) {
     list = list.filter(r => r.professionalId === professionalId);
   }
-  res.json({ status: "success", data: list });
+  // Reporter details stay between the practitioner and the board
+  res.json({ status: "success", data: list.map(({ reportedAt, reportReason, moderatedBy, moderationReason, ...pub }: any) => pub) });
 });
 
 app.post("/api/reviews", requireRole("patient"), (req, res) => {
@@ -817,38 +833,38 @@ app.post("/api/reviews", requireRole("patient"), (req, res) => {
     return res.status(400).json({ status: "error", message: "Missing or invalid review fields." });
   }
   const user = req.user!;
-  // Only patients who actually booked this practitioner may review, once each.
-  if (!bookings.some(b => b.patientUserId === user.id && b.professionalId === professionalId)) {
-    return fail(res, 403, "You can only review practitioners you have booked.");
+  // Only a completed visit (signed notes) can be reviewed, once per visit.
+  const reviewedVisits = new Set(reviews.filter(r => (r as any).patientUserId === user.id).map(r => `${(r as any).visitKind}:${(r as any).visitId}`));
+  const visits: { kind: "booking" | "consult"; id: string }[] = [
+    ...bookings.filter(b => b.patientUserId === user.id && b.professionalId === professionalId && b.status === "Completed" && b.paymentStatus === "Paid").map(b => ({ kind: "booking" as const, id: b.id })),
+    ...(db.prepare("SELECT id FROM consults WHERE patient_user_id = ? AND professional_id = ? AND status = 'completed'").all(user.id, professionalId) as any[]).map(c => ({ kind: "consult" as const, id: c.id as string })),
+  ].filter(v => !reviewedVisits.has(`${v.kind}:${v.id}`));
+  if (visits.length === 0) {
+    return fail(res, 403, "You can review a practitioner after a completed visit with them.");
   }
-  if (reviews.some(r => r.professionalId === professionalId && (r as any).patientUserId === user.id)) {
-    return fail(res, 409, "You have already reviewed this practitioner.");
-  }
+  const visit = visits[0];
+  const comment = str(req.body.comment, 1000);
 
   const newReview = {
     id: generateId("rev"),
     professionalId,
     patientId: user.id,
     patientUserId: user.id,
+    visitKind: visit.kind,
+    visitId: visit.id,
     patientName: user.name,
     rating,
     punctuality: clamp(req.body.punctuality),
     communication: clamp(req.body.communication),
     satisfaction: clamp(req.body.satisfaction),
-    comment: str(req.body.comment, 1000),
+    comment,
     date: new Date().toISOString().split('T')[0],
-    isVerifiedPatient: true
+    isVerifiedPatient: true,
+    status: "published"
   };
 
-  reviews.push(newReview);
-
-  const targetReviews = reviews.filter(r => r.professionalId === professionalId);
-  const avg = Number((targetReviews.reduce((sum, r) => sum + r.rating, 0) / targetReviews.length).toFixed(2));
-  const prof: any = findProfessional(professionalId);
-  if (prof) {
-    prof.rating = avg;
-    prof.reviewCount = targetReviews.length;
-  }
+  reviews.push(newReview as any);
+  recalcRating(professionalId);
 
   res.status(201).json({ status: "success", message: "Review posted successfully.", data: newReview });
 });
@@ -881,6 +897,19 @@ app.post("/api/chats", requireRole("patient", "practitioner"), (req, res) => {
     return res.status(400).json({ status: "error", message: "Incomplete chat payload." });
   }
   const sender = req.user!;
+  const recipientAccount = accountForChatId(receiverId);
+  if (!recipientAccount) return fail(res, 404, "Recipient not found.");
+  if (isBlocked(recipientAccount, sender.id)) return fail(res, 403, "This message could not be delivered.");
+  // Messaging is for people in a care relationship (or replying to someone who wrote first), not cold contact.
+  const myChatId = chatIdOf(sender);
+  const related = sender.role === "patient"
+    ? bookings.some(b => b.patientUserId === sender.id && b.professionalId === receiverId && b.paymentStatus === "Paid") ||
+      !!db.prepare("SELECT 1 AS x FROM consults WHERE patient_user_id = ? AND professional_id = ?").get(sender.id, receiverId)
+    : bookings.some(b => b.professionalId === sender.profileId && b.patientUserId === receiverId && b.paymentStatus === "Paid") ||
+      !!db.prepare("SELECT 1 AS x FROM consults WHERE professional_id = ? AND patient_user_id = ?").get(sender.profileId ?? "", receiverId);
+  if (!related && !chats.some(m => m.senderId === receiverId && m.receiverId === myChatId)) {
+    return fail(res, 403, "You can message practitioners you have booked or consulted.");
+  }
   const msg = {
     id: generateId("msg"),
     senderId: chatIdOf(sender),

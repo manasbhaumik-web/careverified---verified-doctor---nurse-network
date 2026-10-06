@@ -5,7 +5,7 @@ import {
   Sparkles, Calendar, BookOpen, Globe, CheckCircle2, RefreshCw,
   Heart, MessageSquare, AlertTriangle, Menu, X, PlusCircle, UserCheck,
   Stethoscope, ChevronRight, ChevronLeft, Puzzle, Plus, Trash2,
-  Settings, Download, Activity, CreditCard, TrendingUp, Video, Radio
+  Settings, Download, Activity, CreditCard, TrendingUp, Video, Radio, LifeBuoy
 } from 'lucide-react';
 
 
@@ -22,6 +22,8 @@ import SEODashboard from './components/SEODashboard';
 import AdminDashboard from './components/AdminDashboard';
 import NotificationBell from './components/NotificationBell';
 import SOSButton from './components/SOSButton';
+import SupportDesk from './components/SupportDesk';
+import PractitionerQuality from './components/PractitionerQuality';
 import ConsultNow from './components/ConsultNow';
 import PractitionerOnCall from './components/PractitionerOnCall';
 import PatientDashboard from './components/PatientDashboard';
@@ -254,6 +256,7 @@ export default function App() {
       navItems.push({ id: 'patient_dashboard', name: 'Patient Hub', icon: Heart });
     }
     navItems.push({ id: 'consult', name: 'Consult Now', icon: Video });
+    navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
     if (isPackageEnabled('registry')) {
       navItems.push({ id: 'registry', name: 'Doctors & Nurses', icon: Search });
     }
@@ -268,6 +271,8 @@ export default function App() {
       navItems.push({ id: 'onboard', name: 'Practitioner Portal', icon: PlusCircle });
     }
     navItems.push({ id: 'oncall', name: 'On Call', icon: Radio });
+    navItems.push({ id: 'quality', name: 'Quality & CPD', icon: Award });
+    navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
     if (isPackageEnabled('recruitment')) {
       navItems.push({ id: 'recruitment', name: 'Clinical Shifts', icon: Calendar });
     }
@@ -288,7 +293,7 @@ export default function App() {
   }
 
   // Append any active extensions that aren't standard
-  const standardIds = ['patient_dashboard', 'registry', 'recruitment', 'articles', 'onboard', 'messages', 'seo', 'admin', 'consult', 'oncall'];
+  const standardIds = ['patient_dashboard', 'registry', 'recruitment', 'articles', 'onboard', 'messages', 'seo', 'admin', 'consult', 'oncall', 'quality', 'help'];
   const customPackages = packages.filter(p => !standardIds.includes(p.id) && p.isEnabled);
   customPackages.forEach(p => {
     let icon = Puzzle;
@@ -624,6 +629,12 @@ export default function App() {
             {/* VIEW 5: SECURE MESSENGER */}
             {activeView === 'consult' && currentUser.role === 'patient' && (
               <ConsultNow myUserId={currentUser.id} />
+            )}
+
+            {activeView === 'help' && currentUser.role !== 'admin' && <SupportDesk />}
+
+            {activeView === 'quality' && currentUser.role === 'practitioner' && (
+              <PractitionerQuality profileId={currentUser.profileId ?? null} />
             )}
 
             {activeView === 'oncall' && currentUser.role === 'practitioner' && (

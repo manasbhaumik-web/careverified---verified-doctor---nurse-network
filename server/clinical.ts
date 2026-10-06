@@ -134,6 +134,7 @@ interface Ctx {
   findProfessional: (id: string) => any | undefined;
   getBooking: (id: string) => any | undefined;
   allBookings: () => any[];
+  completeBooking: (id: string) => void;
 }
 
 export function registerClinicalRoutes(app: Application, ctx: Ctx) {
@@ -312,6 +313,8 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     if (e.signed_at) return fail(res, 409, "Already signed.");
     if (!e.assessment || !e.plan) return fail(res, 400, "Assessment and plan are required to sign.");
     db.prepare("UPDATE encounters SET signed_at = ? WHERE id = ?").run(iso(), e.id);
+    // A signed note completes the visit, which also unlocks the patient's review.
+    if (rel.kind === "booking") ctx.completeBooking(rel.refId);
     audit(req, "encounter.sign", { target: ["encounter", e.id] });
     notify(rel.patientUserId, "Consultation summary available", "Your doctor added a summary to your health record.");
     res.json({ status: "success" });

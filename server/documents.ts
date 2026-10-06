@@ -12,7 +12,7 @@ const root = path.join(process.env.DATA_DIR || path.join(process.cwd(), "data"),
 fs.mkdirSync(root, { recursive: true });
 
 const MAX_BYTES = 5 * 1024 * 1024;
-const KINDS = ["license", "degree", "identity", "lab_result", "other"];
+const KINDS = ["license", "degree", "identity", "lab_result", "cpd", "certificate", "other"];
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_BYTES, files: 1 } });
 
 function detectType(buf: Buffer): { mime: string; ext: string } | null {
