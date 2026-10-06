@@ -1016,8 +1016,7 @@ export default function VerificationTerminal({
           <div className="bg-[#FFF0F2] border border-[#FECDD3] p-4 rounded-xl text-xs text-[#B91C1C] leading-relaxed font-semibold flex gap-2">
             <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
             <div>
-              Our system runs cross-checks against state medical council database APIs automatically. 
-              The profile validation cycle completes within 24 hours of submission.
+              Our medical board reviews your documents and checks your licence against the council's register by hand. You will be notified in the app when a decision is made. Your profile is not public until you are approved.
             </div>
           </div>
 

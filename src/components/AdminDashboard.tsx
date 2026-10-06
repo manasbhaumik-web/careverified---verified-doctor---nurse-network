@@ -260,7 +260,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
       <DashboardHeader
         eyebrow="National Medical Registry Audit Terminal"
         title="Registry Administrative Control Desk"
-        description="Real-time MMC/LJM license verification, accreditation moderation queue, and modular extension management."
+        description="Practitioner licence review, trust and complaints, operations, quality and support, and modular extension management."
         actions={
         <div className="grid grid-cols-3 gap-3 bg-white/90 backdrop-blur-xs p-3 border border-[#FECDD3] rounded-xl text-center min-w-[300px] shadow-xs">
           <div>
@@ -316,8 +316,8 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
             <span className="text-[13px] font-semibold text-[#334155]">Verified Status</span>
             <span className="h-8 w-8 flex items-center justify-center border bg-[#ECFDF5] border-[#A7F3D0] text-[#059669]"><CheckCircle2 className="h-4 w-4" /></span>
           </div>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">100% Verified</span>
-          <span className="text-xs text-slate-600">Validated against active registries.</span>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">Board reviewed</span>
+          <span className="text-xs text-slate-600">Each licence is checked by a board reviewer.</span>
         </div>
       </div>
 
@@ -927,7 +927,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
               <div className="space-y-1">
                 <span className="text-[10px] font-extrabold text-[#DC2626] uppercase tracking-wider block">Official Extensions Registry</span>
                 <h3 className="text-base font-extrabold text-slate-800 leading-tight">MediCert Cloud Marketplace</h3>
-                <p className="text-xs text-slate-500 font-semibold leading-relaxed">Expand clinical compliance and services with certified, HIPAA-compliant plug-ins.</p>
+                <p className="text-xs text-slate-500 font-semibold leading-relaxed">Expand clinical compliance and services with plug-ins.</p>
               </div>
               <div className="bg-[#FFF0F2] border border-[#FECDD3] px-3 py-1.5 rounded-xl text-[10px] font-bold text-[#DC2626] flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-xs animate-pulse"></span>

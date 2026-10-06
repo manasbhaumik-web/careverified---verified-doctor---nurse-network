@@ -82,31 +82,31 @@ const PROFESSIONAL_ASSISTANCE_MODULES = [
     title: '24/7 On-Call Tele-Triage',
     tagline: 'Emergency & Urgent Consultations',
     icon: PhoneCall,
-    badge: 'Under 3-Min SLA',
-    summary: 'Direct WebRTC video & audio room pairing patients with verified on-call doctors for immediate emergency triage, symptom assessment, and hospital referral.',
+    badge: 'Chat or video',
+    summary: 'Chat or video with a verified doctor who is online. Not for emergencies: in an emergency call 999 first.',
     highlights: [
-      'Instant video room generation with end-to-end AES-256 encryption',
-      'Smart symptom specialty matching engine',
-      'Direct emergency room triage escalation protocol'
+      'Doctors are verified by our medical board before they can take consultations',
+      'Refunded automatically if no doctor joins',
+      'Red-flag symptoms show emergency numbers immediately'
     ],
-    metricValue: '< 3 Min',
-    metricLabel: 'Average Consultation Wait',
+    metricValue: 'Chat & video',
+    metricLabel: 'Subject to doctors being online',
     ctaText: 'Launch Telehealth Room'
   },
   {
     id: 'credential',
     title: 'Regulatory Credential Audit',
-    tagline: 'MMC & LJM Registry Sync',
+    tagline: 'Manual licence checks by our board',
     icon: ShieldCheck,
-    badge: 'Real-time API',
-    summary: 'Live cross-referencing with official medical council databases. Automatically validates Annual Practicing Certificates (APC) and issues verified digital practitioner badges.',
+    badge: 'Board reviewed',
+    summary: 'Every practitioner uploads their licence and certificates. A board reviewer checks the licence against the council register by hand and records how it was checked before approving.',
     highlights: [
-      'Automated daily MMC & LJM database synchronization',
-      'Tamper-proof digital badge verification URL',
-      'Instant disciplinary & licensing alert telemetry'
+      'Licence expiry tracked, with automatic suspension when it lapses',
+      'Re-verification every 12 months',
+      'Public licence lookup shows only currently verified practitioners'
     ],
-    metricValue: '100%',
-    metricLabel: 'Verified MMC License Audit',
+    metricValue: 'Every one',
+    metricLabel: 'Practitioner reviewed before going public',
     ctaText: 'Verify a Practitioner'
   },
   {
@@ -114,15 +114,15 @@ const PROFESSIONAL_ASSISTANCE_MODULES = [
     title: 'E-Prescriptions & Vitals Vault',
     tagline: 'Digital Pharmacy & Patient Record',
     icon: Pill,
-    badge: 'HIPAA Compliant',
-    summary: 'Doctor-signed digital prescriptions dispatched to accredited partner pharmacies, alongside patient biometric vitals tracking and exportable health history.',
+    badge: 'Doctor-signed',
+    summary: 'Doctor-signed digital prescriptions with a code and QR that pharmacies can check, alongside your own health record and readings.',
     highlights: [
-      'Pharmacist-verified digital signature authentication',
-      'Biometric vitals logging (blood pressure, HR, glucose)',
-      'Exportable PDF medical history records'
+      'Check any prescription by its code, no sign-in needed',
+      'Safety checks for allergies and interactions before issuing',
+      'You choose which doctors can see your record'
     ],
-    metricValue: '58,000+',
-    metricLabel: 'E-Prescriptions Issued',
+    metricValue: 'QR',
+    metricLabel: 'Every prescription can be verified',
     ctaText: 'View E-Prescriptions'
   },
   {
@@ -130,15 +130,15 @@ const PROFESSIONAL_ASSISTANCE_MODULES = [
     title: 'Hospital Locum Shift Network',
     tagline: 'Clinical Staffing Marketplace',
     icon: Hospital,
-    badge: 'Accredited Hospitals',
-    summary: 'Transparent clinical shift recruitment matching verified doctors and senior ICU nurses with accredited private and public hospital openings.',
+    badge: 'Verified practitioners',
+    summary: 'A board for clinical shift and locum postings that only verified practitioners can apply to.',
     highlights: [
-      'Verified hospital clinical shift postings',
-      'Transparent hourly pay rates & instant application',
-      'Automated credential check before shift assignment'
+      'Only verified practitioners can apply',
+      'Posts show pay range and requirements',
+      'Applicant details stay private'
     ],
-    metricValue: '150+',
-    metricLabel: 'Partner Hospital Facilities',
+    metricValue: 'Verified',
+    metricLabel: 'Applicants only',
     ctaText: 'Explore Shift Market'
   }
 ];
@@ -160,7 +160,7 @@ const PERSPECTIVES = [
     title: 'For Doctors & Nurses',
     tagline: 'Verified Clinical Practice',
     desc: 'Streamline credentialing through a step-by-step verification terminal. Apply for verified hospital shifts, manage patient consultations, and access peer-reviewed journals.',
-    features: ['Real-time MMC & LJM credential check', 'Clinical locum shift marketplace', 'HIPAA-compliant telehealth hub'],
+    features: ['Credential review by our medical board', 'Clinical locum shift board', 'Online consultations with payments and records'],
     badge: 'Practitioner Hub',
     ctaText: 'Access Practitioner Hub'
   },
@@ -170,35 +170,12 @@ const PERSPECTIVES = [
     title: 'For Medical Boards & Admins',
     tagline: 'Governance & Auditing',
     desc: 'Audit registration documents in real time. Manage platform expansion modules, monitor regulatory compliance, and oversee licensing telemetry across the network.',
-    features: ['Direct licensing document audit suite', 'Modular package and feature toggles', 'HIPAA telemetry & analytics dashboard'],
+    features: ['Licence document review queue', 'Complaints, incidents and peer review', 'Support desk and audit log'],
     badge: 'Board Admin',
     ctaText: 'Open Admin Audit Console'
   },
 ];
 
-const TESTIMONIALS = [
-  {
-    id: 1,
-    quote: "MedCred transformed how our hospital vets incoming practitioners. What used to take 3 weeks now takes 48 hours with full MMC cross-referencing.",
-    name: "Dato' Dr. Lim Wei Keat",
-    title: "Chief Medical Officer, Kuala Lumpur Specialist Hospital",
-    avatar: "/assets/malaysian_male_doctor.jpg"
-  },
-  {
-    id: 2,
-    quote: "As a patient, I finally feel confident knowing my doctor's license is verified in real-time. The booking and prescription system is seamless.",
-    name: "Nurul Aisyah Binti Hassan",
-    title: "Registered Patient, Kuala Lumpur",
-    avatar: "/assets/malaysian_female_nurse.jpg"
-  },
-  {
-    id: 3,
-    quote: "The clinical shift marketplace has been a game-changer for locum work. Transparent pay, verified hospitals, and instant applications.",
-    name: "Nurse Faridah Binti Yusof",
-    title: "ICU Senior Nurse, LJM Registered",
-    avatar: "/assets/malaysian_female_nurse.jpg"
-  },
-];
 
 
 // ═══════════════════════════════════════════════
@@ -341,17 +318,8 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
   };
 
   // Animated counters
-  const verifiedCount = useCounter(2400, 2200);
-  const hospitalCount = useCounter(150, 1800);
-  const consultationCount = useCounter(58000, 2500);
-  const uptimeCount = useCounter(99, 1400);
 
-  const stats = [
-    { ref: verifiedCount.ref, count: verifiedCount.count, suffix: '+', label: 'Verified Professionals' },
-    { ref: hospitalCount.ref, count: hospitalCount.count, suffix: '+', label: 'Partner Hospitals' },
-    { ref: consultationCount.ref, count: consultationCount.count, suffix: '+', label: 'Consultations Delivered' },
-    { ref: uptimeCount.ref, count: uptimeCount.count, suffix: '.9%', label: 'Network Uptime SLA' },
-  ];
+
 
   const activeModule = PROFESSIONAL_ASSISTANCE_MODULES.find(m => m.id === activeModuleId) || PROFESSIONAL_ASSISTANCE_MODULES[0];
 
@@ -423,7 +391,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-none bg-white border border-[#FECDD3] text-[11px] font-extrabold uppercase tracking-widest text-[#DC2626] mb-5 shadow-xs"
             >
               <Cross className="h-3 w-3 text-[#DC2626] animate-pulse" />
-              MMC &amp; LJM Integrated Medical Assistance Network
+              Online Medical Assistance Network
             </motion.div>
 
             <motion.h1
@@ -443,7 +411,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               className="text-base sm:text-lg text-black font-semibold max-w-xl leading-relaxed mb-7 bg-white/20 backdrop-blur-sm border border-[#FECDD3] px-4 py-3"
               style={{ textShadow: '0 0 6px #fff, 0 0 12px #fff, 0 0 20px rgba(255,255,255,0.95), 0 1px 2px #fff' }}
             >
-              MedCred provides <span className="text-[#DC2626] font-bold">real-time online medical assistance</span>, <span className="text-black font-bold">24/7 doctor tele-consultations</span>, <span className="text-[#DC2626] font-bold">MMC credential auditing</span>, and <span className="text-black font-bold">digital e-prescriptions</span> built with verified clinical standards.
+              MedCred provides <span className="text-[#DC2626] font-bold">real-time online medical assistance</span>, <span className="text-black font-bold">24/7 doctor tele-consultations</span>, <span className="text-[#DC2626] font-bold">board-verified practitioners</span>, and <span className="text-black font-bold">digital e-prescriptions</span> built with verified clinical standards.
             </motion.p>
 
             <motion.div
@@ -470,7 +438,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
 
             {/* Certification Badges */}
             <div className="flex flex-wrap items-center gap-2.5 text-[11px] font-bold text-[#1E293B]">
-              {['24/7 Telehealth Triage', 'MMC Registered Doctors', 'AES-256 Encrypted', 'SOC-2 Type II'].map((b) => (
+              {['Online consultations', 'Board-verified doctors', 'Signed e-prescriptions'].map((b) => (
                 <span key={b} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-white/95 border border-[#FECDD3] text-[#1E293B] font-bold shadow-xs">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
                   {b}
@@ -546,27 +514,6 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
           </motion.div>
         </div>
       </header>
-
-      {/* ═══════════ STATS BAR (THIN BORDER) ═══════════ */}
-      <section className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, i) => (
-            <div
-              key={stat.label}
-              ref={stat.ref}
-              className={`py-8 px-6 ${i < 3 ? 'lg:border-r border-slate-200' : ''} ${i % 2 === 0 ? 'border-r sm:border-r lg:border-r-0' : ''} border-slate-200 flex flex-col justify-center`}
-            >
-              <div className="flex items-center gap-2">
-                <Cross className="h-5 w-5 text-[#C8102E] shrink-0" />
-                <div className="font-display font-black text-3xl sm:text-4xl tracking-tight text-[#1A1A1A] tabular-nums">
-                  {stat.count.toLocaleString()}{stat.suffix}
-                </div>
-              </div>
-              <div className="mt-2 text-xs font-bold uppercase tracking-wider text-slate-500 pl-7">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* ═══════════ MAIN CONTENT ═══════════ */}
       <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-12 pt-20 space-y-24 pb-20">
@@ -874,49 +821,6 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
           </section>
         </AnimatedSection>
 
-        {/* ─── SECTION 4: COMMUNITY TESTIMONIAL CARDS (THIN BORDER) ─── */}
-        <section>
-          <AnimatedSection className="max-w-3xl mb-12">
-            <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-[#C8102E] bg-[#FFE9EB] px-3.5 py-1.5 rounded-none border border-[#FECDD3] mb-3">
-              <Cross className="h-3.5 w-3.5" /> Community Trust
-            </div>
-            <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight text-[#1A1A1A]">
-              What Doctors, Nurses &amp; Patients Say.
-            </h2>
-          </AnimatedSection>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {TESTIMONIALS.map((t, i) => (
-              <AnimatedSection key={t.id} delay={i * 0.1}>
-                <div className="bg-white rounded-none p-8 border border-slate-200 shadow-xs flex flex-col justify-between h-full relative overflow-hidden group">
-                  <Cross className="absolute right-4 bottom-4 h-32 w-32 text-[#C8102E] opacity-5 pointer-events-none" />
-                  <div>
-                    <div className="flex text-[#C8102E] gap-1 mb-4">
-                      {[...Array(5)].map((_, idx) => (
-                        <span key={idx}>★</span>
-                      ))}
-                    </div>
-                    <blockquote className="text-base text-slate-700 italic leading-relaxed mb-6">
-                      &ldquo;{t.quote}&rdquo;
-                    </blockquote>
-                  </div>
-                  <div className="flex items-center gap-3.5 pt-4 border-t border-slate-200">
-                    <img
-                      src={t.avatar}
-                      alt={t.name}
-                      className="w-11 h-11 rounded-none object-cover border border-[#FECDD3] shrink-0"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div>
-                      <h4 className="font-bold text-[#1A1A1A] text-sm">{t.name}</h4>
-                      <p className="text-xs text-slate-500 font-medium">{t.title}</p>
-                    </div>
-                  </div>
-                </div>
-              </AnimatedSection>
-            ))}
-          </div>
-        </section>
 
       </main>
 
@@ -1142,7 +1046,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
             <div>
               <h4 className="text-xs font-extrabold uppercase tracking-widest text-white mb-4">Regulatory Standards</h4>
               <ul className="space-y-3 text-sm text-slate-400">
-                {['HIPAA Security Compliance', 'Malaysian Medical Council (MMC)', 'Lembaga Jururawat Malaysia (LJM)', 'AES-256 Encryption Standard', 'SOC-2 Type II Certified'].map((item) => (
+                {['Licences checked by our medical board', 'Prescriptions signed and verifiable', 'Access to your records is logged', 'You choose who sees your health record'].map((item) => (
                   <li key={item} className="flex items-center gap-2">
                     <ShieldCheck className="h-4 w-4 text-[#C8102E] shrink-0" />
                     {item}

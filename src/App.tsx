@@ -351,7 +351,7 @@ export default function App() {
           <div className="hidden lg:flex items-center gap-5">
             <div className="flex items-center gap-2 bg-[#ECFDF5] border border-[#A7F3D0] px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#065F46]">
               <ShieldCheck className="h-3.5 w-3.5 text-[#059669]" aria-hidden="true" />
-              <span>MMC &amp; LJM Registry Aligned</span>
+              <span>Board-verified practitioners</span>
             </div>
 
             <div className="flex items-center gap-3 border-l border-white/30 pl-5">
@@ -532,7 +532,7 @@ export default function App() {
           {/* Right: Registry telemetry indicator */}
           <div className="flex items-center gap-2 self-center bg-white border border-[#FECDD3] px-3.5 py-1.5 rounded-full text-[11px] font-extrabold text-[#1E293B] shadow-xs">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-            <span>MMC &amp; LJM Sync Active</span>
+            <span>Board-verified practitioners</span>
           </div>
 
         </div>
@@ -724,8 +724,8 @@ export default function App() {
                               <p className="text-xs font-mono font-bold text-[#DC2626]">/src/modules/{activePkg.id}/index.tsx</p>
                             </div>
                             <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
-                              <span className="text-[10px] text-slate-400 font-extrabold uppercase">HIPAA / Security Shield</span>
-                              <p className="text-xs font-mono font-bold text-emerald-600">Sandbox Isolated & AES-256 Encrypted</p>
+                              <span className="text-[10px] text-slate-400 font-extrabold uppercase">Isolation</span>
+                              <p className="text-xs font-mono font-bold text-emerald-600">Runs inside the app</p>
                             </div>
                           </div>
 
@@ -776,7 +776,7 @@ export default function App() {
               </p>
               <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-bold bg-emerald-950/60 w-max px-2 py-1 rounded border border-emerald-800/40">
                 <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>
-                <span>Active Core Sync</span>
+                <span>Board-verified practitioners</span>
               </div>
             </div>
 
@@ -809,7 +809,7 @@ export default function App() {
               <ul className="space-y-2 text-[11px] font-semibold text-slate-400">
                 <li className="hover:text-slate-200 cursor-pointer transition-colors">Malaysian Medical Council (MMC)</li>
                 <li className="hover:text-slate-200 cursor-pointer transition-colors">Lembaga Jururawat Malaysia (LJM)</li>
-                <li className="hover:text-slate-200 cursor-pointer transition-colors">HIPAA Secured Encrypted Pipeline</li>
+                <li className="hover:text-slate-200 cursor-pointer transition-colors">Licences checked by the board</li>
                 <li className="hover:text-slate-200 cursor-pointer transition-colors">E-E-A-T Medical Content Standards</li>
                 <li className="hover:text-slate-200 cursor-pointer transition-colors">Kementerian Kesihatan Malaysia (KKM)</li>
               </ul>
@@ -838,7 +838,7 @@ export default function App() {
           {/* Copyright & Badges */}
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[11px]">
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-slate-400 font-bold justify-center">
-              <span className="hover:text-slate-200 cursor-pointer transition-colors">HIPAA Secured</span>
+              <span className="hover:text-slate-200 cursor-pointer transition-colors">Access to records is logged</span>
               <span>&bull;</span>
               <span className="hover:text-slate-200 cursor-pointer transition-colors">MMC Compliance</span>
               <span>&bull;</span>

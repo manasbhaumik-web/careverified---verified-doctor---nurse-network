@@ -19,3 +19,13 @@ The app is served at http://localhost:3000.
 - Data lives in `data/careverified.db` (SQLite) and private uploads in `data/uploads/`; both are git-ignored. Back them up.
 - Every sensitive action is written to an audit log (admin: `GET /api/admin/audit-log`).
 - `GET /api/me/export` and `POST /api/me/deletion-request` cover data export and deletion requests.
+
+## Demo data (development only)
+
+With the app running (`npm run dev`), create demo accounts and sample records in a second terminal:
+
+```
+npm run seed:demo
+```
+
+It prints the sign-in details, is safe to run repeatedly, uses test-mode payments only, and refuses to run against anything but a local server.
