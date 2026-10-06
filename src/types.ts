@@ -27,6 +27,11 @@ export interface DoctorProfile {
   specialization: string;
   licenseNumber: string;
   medicalCouncil: string;
+  licenseExpiry?: string;
+  verifiedAt?: string;
+  verifiedUntil?: string;
+  suspensionReason?: string;
+  lastWarning?: string;
   experienceYears: number;
   education: string[];
   bio: string;
@@ -53,6 +58,11 @@ export interface NurseProfile {
   specialization: string; // e.g. "ICU Care", "Geriatric Care", "Pediatrics"
   licenseNumber: string;
   nursingCouncil: string;
+  licenseExpiry?: string;
+  verifiedAt?: string;
+  verifiedUntil?: string;
+  suspensionReason?: string;
+  lastWarning?: string;
   experienceYears: number;
   education: string[];
   bio: string;

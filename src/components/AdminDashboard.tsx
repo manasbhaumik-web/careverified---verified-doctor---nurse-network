@@ -7,6 +7,7 @@ import {
   TrendingUp, Sparkles, RefreshCw, Heart, Search, Calendar, 
   BookOpen, PlusCircle, MessageSquare, Globe
 } from 'lucide-react';
+import AdminTrustPanel, { ReviewActions } from './AdminTrustPanel';
 import { DoctorProfile, NurseProfile, UserRole, AppPackage, VerificationStatus } from '../types';
 
 interface AdminDashboardProps {
@@ -59,7 +60,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
   const [selectedModalRequest, setSelectedModalRequest] = useState<any | null>(null);
 
   // --- Modular Packages Management State ---
-  const [activeTab, setActiveTab] = useState<'approvals' | 'packages'>('approvals');
+  const [activeTab, setActiveTab] = useState<'approvals' | 'trust' | 'packages'>('approvals');
   const [packageSearch, setPackageSearch] = useState('');
   const [packageCategoryFilter, setPackageCategoryFilter] = useState('All');
   
@@ -235,51 +236,20 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
     fetchPending();
   }, [votedId, professionals]);
 
-  const handleApprove = async (id: string) => {
-    try {
-      const response = await fetch(`/api/verification-requests/${id}/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Verified \u2705' }) // Verified ✅
-      });
-      const data = await response.json();
-      if (data.status === 'success') {
-        // Find approved practitioner profile to update local frontend state
-        const request = pendingRequests.find(r => r.id === id);
-        if (request) {
-          // Fetch the fully updated professional profile to append
-          const profResp = await fetch(`/api/professionals/${request.userId}`);
-          const profData = await profResp.json();
-          if (profData.status === 'success') {
-            onProfessionalApproved(profData.data);
-          }
-        }
-        setVotedId(id);
-        setTimeout(() => setVotedId(null), 1000);
-      }
-    } catch (error) {
-      console.error(error);
+  // After a decision: refresh the queue and the public directory
+  const handleDecisionDone = async () => {
+    const req = selectedModalRequest;
+    setSelectedModalRequest(null);
+    if (req) {
+      setVotedId(req.id);
+      setTimeout(() => setVotedId(null), 1000);
+      try {
+        const profResp = await fetch(`/api/professionals/${req.userId}`);
+        const profData = await profResp.json();
+        if (profData.status === 'success') onProfessionalApproved(profData.data);
+      } catch { /* profile is only visible once verified */ }
     }
-  };
-
-  const handleReject = async (id: string) => {
-    try {
-      const response = await fetch(`/api/verification-requests/${id}/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          status: 'Rejected',
-          rejectionReason: 'Credential authentication check failed on state registry records.'
-        })
-      });
-      const data = await response.json();
-      if (data.status === 'success') {
-        setVotedId(id);
-        setTimeout(() => setVotedId(null), 1000);
-      }
-    } catch (error) {
-      console.error(error);
-    }
+    fetchPending();
   };
 
   return (
@@ -307,6 +277,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
         }
         tabs={[
           { id: 'approvals' as const, label: 'Practitioner Approvals', icon: ShieldCheck, count: pendingRequests.length },
+          { id: 'trust' as const, label: 'Trust & Complaints', icon: ShieldAlert },
           { id: 'packages' as const, label: 'Package Manager', icon: Puzzle, count: packages.length },
         ]}
         activeTab={activeTab}
@@ -459,19 +430,11 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleApprove(req.id)}
+                        onClick={() => setSelectedModalRequest(req)}
                         className="bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl py-2 px-3 text-xs font-bold flex items-center gap-1 shadow-3xs transition-all cursor-pointer"
                       >
                         <Check className="h-3.5 w-3.5" />
-                        <span>Approve</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleReject(req.id)}
-                        className="border border-slate-200 text-slate-600 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-100 rounded-xl py-2 px-3 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                        <span>Reject</span>
+                        <span>Review</span>
                       </button>
                     </div>
                   </div>
@@ -528,31 +491,15 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                         "{reqBio}"
                       </p>
                     </div>
-
-                    {/* Attached Verification Proof Slip simulator */}
-                    <div className="bg-emerald-50/50 border border-emerald-100/40 p-3 rounded-xl flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <FileText className="h-4.5 w-4.5 text-emerald-600" />
-                        <span className="font-semibold text-emerald-900">Certificate_Registry_Scan.pdf</span>
-                      </div>
-                      <span className="bg-emerald-100 text-emerald-800 text-[9px] font-extrabold px-2 py-0.5 rounded">Attached</span>
-                    </div>
                   </div>
 
                   <div className="flex flex-row justify-end gap-2 shrink-0 border-t border-slate-100 pt-4 mt-2">
                     <button
-                      onClick={() => handleApprove(req.id)}
-                      className="bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl py-2 px-5 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all"
+                      onClick={() => setSelectedModalRequest(req)}
+                      className="bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl py-2 px-5 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
                     >
                       <Check className="h-4 w-4" />
-                      Approve & Publish
-                    </button>
-                    <button
-                      onClick={() => handleReject(req.id)}
-                      className="border border-slate-200 text-slate-600 hover:bg-red-50 hover:text-red-700 hover:border-red-100 rounded-xl py-2 px-5 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
-                    >
-                      <X className="h-4 w-4" />
-                      Reject Application
+                      Review application
                     </button>
                   </div>
                 </div>
@@ -636,38 +583,25 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
               </div>
             </div>
 
-            {/* Approve / Reject buttons */}
-            <div className="mt-8 flex gap-3 justify-end border-t border-slate-100 pt-4">
+            <p className="mt-4 text-xs text-slate-600">Licence expiry on file: <strong>{professionals.find(p => p.id === selectedModalRequest.userId)?.licenseExpiry || 'none'}</strong></p>
+            <ReviewActions request={selectedModalRequest} onDone={handleDecisionDone} />
+            <div className="mt-3 flex justify-end">
               <button
                 onClick={() => setSelectedModalRequest(null)}
-                className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-extrabold rounded-xl border-2 border-slate-200 transition-all cursor-pointer"
+                className="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-extrabold rounded-xl border-2 border-slate-200 transition-all cursor-pointer"
               >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  handleReject(selectedModalRequest.id);
-                  setSelectedModalRequest(null);
-                }}
-                className="px-5 py-2.5 bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
-              >
-                <X className="h-4 w-4 text-rose-600" />
-                <span>Reject</span>
-              </button>
-              <button
-                onClick={() => {
-                  handleApprove(selectedModalRequest.id);
-                  setSelectedModalRequest(null);
-                }}
-                className="px-5 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-extrabold rounded-xl shadow-md shadow-rose-500/10 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <Check className="h-4 w-4" />
-                <span>Approve & Publish</span>
+                Close
               </button>
             </div>
           </div>
         </div>
       )}
+        </div>
+      )}
+
+      {activeTab === 'trust' && (
+        <div id="panel-trust" role="tabpanel" tabIndex={0}>
+          <AdminTrustPanel onChanged={fetchPending} />
         </div>
       )}
 

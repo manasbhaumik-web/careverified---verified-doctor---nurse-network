@@ -1,3 +1,4 @@
+import VerificationStatusCard from './VerificationStatusCard';
 import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, UserCheck, Stethoscope, Award, FileText, Loader, 
@@ -87,6 +88,7 @@ export default function VerificationTerminal({
   const [role, setRole] = useState<UserRole>(UserRole.DOCTOR);
   const [specialization, setSpecialization] = useState('Cardiologist');
   const [licenseNumber, setLicenseNumber] = useState('');
+  const [licenseExpiry, setLicenseExpiry] = useState('');
   const [medicalCouncil, setMedicalCouncil] = useState('Malaysian Medical Council (MMC)');
   const [experienceYears, setExperienceYears] = useState('');
   const [education, setEducation] = useState('');
@@ -156,6 +158,7 @@ export default function VerificationTerminal({
           role,
           specialization,
           licenseNumber,
+          licenseExpiry,
           medicalCouncil,
           experienceYears: Number(experienceYears),
           education: [education],
@@ -443,14 +446,14 @@ export default function VerificationTerminal({
                     <span className="font-mono text-slate-700 text-[10px] bg-white px-1.5 py-0.5 border border-slate-200 rounded-md">
                       ID: {matchedProfile.id}
                     </span>
-                    <span className="text-slate-300">&bull;</span>
-                    <span className="text-emerald-700 font-extrabold flex items-center gap-1.5">
+                    {isVerified && <span className="text-slate-300">&bull;</span>}
+                    {isVerified && <span className="text-emerald-700 font-extrabold flex items-center gap-1.5">
                       <span className="relative flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </span>
-                      MMC/LJM Connected (Active)
-                    </span>
+                      Verified by the medical board
+                    </span>}
                   </div>
                 </div>
               </div>
@@ -516,6 +519,8 @@ export default function VerificationTerminal({
                   {new Date().toLocaleDateString('en-MY', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
               </div>
+
+              <VerificationStatusCard onChanged={onRefreshData} />
 
               {activeDashboardTab === 'home' && (
                 <PractitionerOverviewTab
@@ -921,6 +926,18 @@ export default function VerificationTerminal({
             </div>
 
             <div>
+              <label className="block text-xs font-bold text-slate-600 mb-1">Licence expiry date</label>
+              <input
+                type="date"
+                min={new Date(Date.now() + 86400_000).toISOString().slice(0, 10)}
+                value={licenseExpiry}
+                onChange={(e) => setLicenseExpiry(e.target.value)}
+                className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[#DC2626] font-semibold text-slate-705"
+                required
+              />
+            </div>
+
+            <div>
               <label className="block text-xs font-bold text-slate-600 mb-1">Primary Degree & Qualifications</label>
               <input
                 type="text"
@@ -980,7 +997,7 @@ export default function VerificationTerminal({
             </button>
             <button
               onClick={() => setStep(3)}
-              disabled={!licenseNumber || !education || !fee || !practiceAddress}
+              disabled={!licenseNumber || !licenseExpiry || !education || !fee || !practiceAddress}
               className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-slate-300 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-colors cursor-pointer"
             >
               Continue to Documentation

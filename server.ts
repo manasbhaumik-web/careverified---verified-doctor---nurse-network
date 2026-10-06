@@ -9,7 +9,8 @@ import {
   AuthUser, Role, attemptLogin, changePassword, createSession, createUser, destroySession, emailTaken,
   ensureAdmin, loadSession, passwordProblem, requireAuth, requireRole, verifyPassword,
 } from "./server/auth";
-import { documentsRouter } from "./server/documents";
+import { documentsRouter, setRequestOwnerLookup } from "./server/documents";
+import { registerVerificationRoutes, notifyAdmins } from "./server/verification";
 
 // Load environment variables
 dotenv.config();
@@ -457,6 +458,10 @@ app.post("/api/register", requireRole("practitioner"), (req, res) => {
   if (!name || !specialization || !licenseNumber || !medicalCouncil || !city) {
     return fail(res, 400, "Name, specialization, licence number, medical council and city are required.");
   }
+  const licenseExpiry = typeof req.body.licenseExpiry === "string" ? req.body.licenseExpiry : "";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(licenseExpiry) || licenseExpiry <= new Date().toISOString().slice(0, 10)) {
+    return fail(res, 400, "Enter your licence expiry date (it must be in the future).");
+  }
   if (allProfessionals().some(p => p.licenseNumber.toLowerCase() === licenseNumber.toLowerCase())) {
     return fail(res, 409, "This licence number is already registered.");
   }
@@ -475,6 +480,7 @@ app.post("/api/register", requireRole("practitioner"), (req, res) => {
       role: UserRole.DOCTOR as const,
       specialization,
       licenseNumber,
+      licenseExpiry,
       medicalCouncil,
       experienceYears: Number(experienceYears) || 1,
       education: educationList,
@@ -501,6 +507,7 @@ app.post("/api/register", requireRole("practitioner"), (req, res) => {
       role: UserRole.NURSE as const,
       specialization,
       licenseNumber,
+      licenseExpiry,
       nursingCouncil: medicalCouncil,
       experienceYears: Number(experienceYears) || 1,
       education: educationList,
@@ -539,6 +546,7 @@ app.post("/api/register", requireRole("practitioner"), (req, res) => {
   };
   verificationRequests.push(vReq);
   audit(req, "practitioner.submit", { target: ["verification", vReq.id], details: { profileId: newId } });
+  notifyAdmins("New verification request", `${name} (${role}) submitted credentials for review.`);
 
   res.status(201).json({
     status: "success",
@@ -575,38 +583,12 @@ app.post("/api/professionals/:id/edit", requireRole("practitioner", "admin"), (r
 // -------------------------------------------------------------
 // Admin verification pipeline
 // -------------------------------------------------------------
-app.get("/api/verification-requests", requireRole("admin"), (req, res) => {
-  res.json({ status: "success", data: verificationRequests });
-});
-
-app.post("/api/verification-requests/:id/verify", requireRole("admin"), (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-  const rejectionReason = str(req.body.rejectionReason, 500);
-
-  if (status !== VerificationStatus.VERIFIED && status !== VerificationStatus.REJECTED) {
-    return fail(res, 400, "Status must be Verified or Rejected.");
-  }
-  const request = verificationRequests.find(r => r.id === id);
-  if (!request) {
-    return res.status(404).json({ status: "error", message: "Verification request not found." });
-  }
-
-  request.status = status;
-  (request as any).reviewedBy = req.user!.id;
-  (request as any).reviewedAt = new Date().toISOString();
-  if (rejectionReason) {
-    request.rejectionReason = rejectionReason;
-  }
-
-  const profile: any = findProfessional(request.userId);
-  if (profile) profile.verificationStatus = status;
-
-  audit(req, "verification.decision", {
-    target: ["verification", id],
-    details: { status, profileId: request.userId, rejectionReason: rejectionReason || undefined },
-  });
-  res.json({ status: "success", message: `Verification request updated to ${status}` });
+setRequestOwnerLookup(id => (verificationRequests.find(r => r.id === id) as any)?.accountId ?? null);
+registerVerificationRoutes(app, {
+  allProfessionals,
+  requests: () => verificationRequests,
+  bookings: () => bookings,
+  persist: persistState,
 });
 
 // -------------------------------------------------------------

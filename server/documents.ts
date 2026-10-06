@@ -22,6 +22,10 @@ function detectType(buf: Buffer): { mime: string; ext: string } | null {
   return null;
 }
 
+// Set by server.ts: returns the account id that owns a verification request (or null if unknown).
+let requestOwner: (requestId: string) => string | null = () => null;
+export const setRequestOwnerLookup = (fn: typeof requestOwner) => { requestOwner = fn; };
+
 export const documentsRouter = Router();
 
 documentsRouter.post("/", requireAuth, (req, res) => {
@@ -39,6 +43,9 @@ documentsRouter.post("/", requireAuth, (req, res) => {
     if (!type) return res.status(400).json({ status: "error", message: "Only PDF, JPG or PNG files are accepted." });
 
     const requestId = req.body.verificationRequestId ? String(req.body.verificationRequestId) : null;
+    if (requestId && requestOwner(requestId) !== req.user!.id) {
+      return res.status(403).json({ status: "error", message: "That verification request is not yours." });
+    }
     const id = "doc-" + crypto.randomBytes(8).toString("hex");
     const storedName = `${crypto.randomBytes(16).toString("hex")}.${type.ext}`;
     fs.writeFileSync(path.join(root, storedName), file.buffer, { mode: 0o600 });

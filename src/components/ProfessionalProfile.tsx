@@ -1,3 +1,4 @@
+import ReportPractitioner from './ReportPractitioner';
 import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, BadgeCheck, Stethoscope, Award, GraduationCap, MapPin, 
@@ -219,6 +220,7 @@ export default function ProfessionalProfile({
           {isSaved ? 'Practitioner Saved' : 'Save Practitioner'}
         </button>
       </div>
+      {currentUser?.role === 'patient' && <ReportPractitioner professionalId={prof.id} />}
 
       {/* Main Profile Header */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

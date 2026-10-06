@@ -5,7 +5,7 @@ import {
   Sparkles, Calendar, BookOpen, Globe, CheckCircle2, RefreshCw,
   Heart, MessageSquare, AlertTriangle, Menu, X, PlusCircle, UserCheck,
   Stethoscope, ChevronRight, ChevronLeft, Puzzle, Plus, Trash2,
-  Settings, Download, Activity, CreditCard, TrendingUp, Bell
+  Settings, Download, Activity, CreditCard, TrendingUp
 } from 'lucide-react';
 
 
@@ -20,6 +20,7 @@ import SecureMessenger from './components/SecureMessenger';
 import MedicalLibrary from './components/MedicalLibrary';
 import SEODashboard from './components/SEODashboard';
 import AdminDashboard from './components/AdminDashboard';
+import NotificationBell from './components/NotificationBell';
 import PatientDashboard from './components/PatientDashboard';
 import LandingPage from './components/LandingPage';
 
@@ -331,14 +332,7 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-3 border-l border-white/30 pl-5">
-              <button
-                className="relative h-11 w-11 flex items-center justify-center text-white bg-transparent border border-white/60 hover:bg-white/15 rounded-lg transition-colors cursor-pointer"
-                title="Notifications"
-                aria-label="Notifications"
-              >
-                <Bell className="h-[18px] w-[18px]" />
-                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-[#FECDD3] rounded-full ring-2 ring-[#DC2626]"></span>
-              </button>
+              <NotificationBell />
 
               {/* Profile Badge embedded with Close Session Button (Transparent Background & No Border) */}
               <div className="flex items-center gap-2.5 bg-transparent border-0 p-1">
