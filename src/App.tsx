@@ -5,7 +5,7 @@ import {
   Sparkles, Calendar, BookOpen, Globe, CheckCircle2, RefreshCw,
   Heart, MessageSquare, AlertTriangle, Menu, X, PlusCircle, UserCheck,
   Stethoscope, ChevronRight, ChevronLeft, Puzzle, Plus, Trash2,
-  Settings, Download, Activity, CreditCard, TrendingUp
+  Settings, Download, Activity, CreditCard, TrendingUp, Video, Radio
 } from 'lucide-react';
 
 
@@ -21,6 +21,9 @@ import MedicalLibrary from './components/MedicalLibrary';
 import SEODashboard from './components/SEODashboard';
 import AdminDashboard from './components/AdminDashboard';
 import NotificationBell from './components/NotificationBell';
+import SOSButton from './components/SOSButton';
+import ConsultNow from './components/ConsultNow';
+import PractitionerOnCall from './components/PractitionerOnCall';
 import PatientDashboard from './components/PatientDashboard';
 import LandingPage from './components/LandingPage';
 
@@ -41,6 +44,13 @@ export default function App() {
   type SessionUser = { id: string; role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; avatarUrl?: string; profileId?: string | null };
   const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
   const [sessionChecked, setSessionChecked] = useState(false);
+  const [notice, setNotice] = useState<string | null>(() => {
+    // Stripe sends the patient back here with ?payment=success|cancelled
+    const q = new URLSearchParams(window.location.search).get('payment');
+    if (!q) return null;
+    window.history.replaceState({}, '', window.location.pathname);
+    return q === 'success' ? 'Payment received. It can take a few seconds to confirm.' : 'Payment was cancelled.';
+  });
 
   const routeForRole = (role: SessionUser['role']) => {
     setActiveView(role === 'patient' ? 'patient_dashboard' : role === 'practitioner' ? 'onboard' : 'admin');
@@ -243,6 +253,7 @@ export default function App() {
     if (isPackageEnabled('patient_dashboard')) {
       navItems.push({ id: 'patient_dashboard', name: 'Patient Hub', icon: Heart });
     }
+    navItems.push({ id: 'consult', name: 'Consult Now', icon: Video });
     if (isPackageEnabled('registry')) {
       navItems.push({ id: 'registry', name: 'Doctors & Nurses', icon: Search });
     }
@@ -256,6 +267,7 @@ export default function App() {
     if (isPackageEnabled('onboard')) {
       navItems.push({ id: 'onboard', name: 'Practitioner Portal', icon: PlusCircle });
     }
+    navItems.push({ id: 'oncall', name: 'On Call', icon: Radio });
     if (isPackageEnabled('recruitment')) {
       navItems.push({ id: 'recruitment', name: 'Clinical Shifts', icon: Calendar });
     }
@@ -276,7 +288,7 @@ export default function App() {
   }
 
   // Append any active extensions that aren't standard
-  const standardIds = ['patient_dashboard', 'registry', 'recruitment', 'articles', 'onboard', 'messages', 'seo', 'admin'];
+  const standardIds = ['patient_dashboard', 'registry', 'recruitment', 'articles', 'onboard', 'messages', 'seo', 'admin', 'consult', 'oncall'];
   const customPackages = packages.filter(p => !standardIds.includes(p.id) && p.isEnabled);
   customPackages.forEach(p => {
     let icon = Puzzle;
@@ -296,6 +308,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#FFF8F9] text-slate-800 flex flex-col font-sans antialiased selection:bg-[#FFE4E6] selection:text-[#DC2626]">
+      {notice && (
+        <div role="status" className="fixed top-3 left-1/2 -translate-x-1/2 z-[120] bg-slate-900 text-white text-sm font-semibold px-5 py-3 shadow-lg flex items-center gap-4">
+          {notice}
+          <button onClick={() => setNotice(null)} className="underline text-xs cursor-pointer">Dismiss</button>
+        </div>
+      )}
 
       {/* CareVerified Elevated Primary Header */}
       <header className="bg-[#DC2626] border-b border-[#B91C1C] sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-xs">
@@ -332,6 +350,7 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-3 border-l border-white/30 pl-5">
+              {currentUser.role === 'patient' && <SOSButton />}
               <NotificationBell />
 
               {/* Profile Badge embedded with Close Session Button (Transparent Background & No Border) */}
@@ -603,6 +622,14 @@ export default function App() {
             )}
 
             {/* VIEW 5: SECURE MESSENGER */}
+            {activeView === 'consult' && currentUser.role === 'patient' && (
+              <ConsultNow myUserId={currentUser.id} />
+            )}
+
+            {activeView === 'oncall' && currentUser.role === 'practitioner' && (
+              <PractitionerOnCall myUserId={currentUser.id} />
+            )}
+
             {activeView === 'messages' && (
               <SecureMessenger currentUserId={currentUser.profileId || currentUser.id} />
             )}
@@ -630,6 +657,7 @@ export default function App() {
                 professionals={professionals}
                 onSelectProfessional={(id) => setSelectedProfId(id)}
                 onNavigateToMessages={() => setActiveView('messages')}
+                onConsultNow={() => setActiveView('consult')}
               />
             )}
 
@@ -790,7 +818,7 @@ export default function App() {
                   }}
                   className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-extrabold rounded-lg border border-slate-700 transition-colors cursor-pointer"
                 >
-                  Switch Perspective
+                  Sign out
                 </button>
               </div>
             </div>

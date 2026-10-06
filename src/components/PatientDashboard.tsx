@@ -10,7 +10,6 @@ import {
 import { DoctorProfile, NurseProfile, Booking, UserRole, ConsultationMode, OnCallDispatch } from '../types';
 import MedicalHistory from './MedicalHistory';
 import DashboardHeader from './DashboardHeader';
-import DoctorOnCallModal from './DoctorOnCallModal';
 import AppointmentsTab from './patient/AppointmentsTab';
 import PrescriptionsTab from './patient/PrescriptionsTab';
 import VitalsTab from './patient/VitalsTab';
@@ -22,6 +21,7 @@ interface PatientDashboardProps {
   professionals: (DoctorProfile | NurseProfile)[];
   onSelectProfessional: (id: string) => void;
   onNavigateToMessages: () => void;
+  onConsultNow: () => void;
 }
 
 interface VitalsRecord {
@@ -41,7 +41,8 @@ export default function PatientDashboard({
   setBookings,
   professionals,
   onSelectProfessional,
-  onNavigateToMessages
+  onNavigateToMessages,
+  onConsultNow
 }: PatientDashboardProps) {
   const [activeTab, setActiveTab] = useState<'appointments' | 'prescriptions' | 'vitals' | 'saved' | 'records'>('appointments');
   
@@ -539,13 +540,13 @@ export default function PatientDashboard({
         description="Your appointments, prescriptions and vitals in one secure place."
         actions={
           <button
-            onClick={() => setShowOnCallModal(true)}
+            onClick={onConsultNow}
             className="px-5 py-2 min-h-[44px] bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-lg transition-all flex items-center gap-2.5 cursor-pointer shadow-xs text-left"
           >
             <Ambulance className="h-5 w-5 text-white shrink-0" />
             <span className="leading-tight">
-              <span className="block text-xs font-bold uppercase tracking-wider">{activeDispatch ? 'Track triage' : 'On-call doctor'}</span>
-              <span className="block text-[11px] font-medium text-rose-100">{activeDispatch ? 'Dispatch in progress' : 'Urgent care · under 3 min'}</span>
+              <span className="block text-xs font-bold uppercase tracking-wider">Consult a doctor now</span>
+              <span className="block text-[11px] font-medium text-rose-100">Chat or video with an online doctor</span>
             </span>
           </button>
         }
@@ -1658,23 +1659,6 @@ export default function PatientDashboard({
             </div>
           </div>
         </div>
-      )}
-
-      {showOnCallModal && (
-        <DoctorOnCallModal
-          professionals={professionals}
-          currentUser={(() => {
-            try {
-              const saved = localStorage.getItem('medi_user');
-              if (saved) return JSON.parse(saved);
-            } catch (e) {}
-            return { name: userName, email: '', role: 'patient' };
-          })()}
-          onClose={() => setShowOnCallModal(false)}
-          onDispatchCreated={handleDispatchCreated}
-          activeDispatch={activeDispatch}
-          onUpdateDispatchStatus={handleUpdateDispatchStatus}
-        />
       )}
 
     </div>

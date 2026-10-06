@@ -6,7 +6,7 @@ import {
   CheckCircle2, Download, Send, RefreshCw, Activity, Heart, CreditCard, Lock
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, ConsultationMode, UserRole, Booking, Review } from '../types';
-import PaymentCheckout from './PaymentCheckout';
+import PaymentDialog from './PaymentDialog';
 
 interface ProfessionalProfileProps {
   professionalId: string;
@@ -93,12 +93,16 @@ export default function ProfessionalProfile({
   const handleBookAppointment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!bookingDate || !bookingSlot) return;
-    setShowPayment(true);
+    holdSlotThenPay();
   };
 
-  const handlePaymentSuccess = async (receipt: any) => {
-    setShowPayment(false);
+  // Booking is created first (the slot is held for 15 minutes), then paid for.
+  const [pendingBooking, setPendingBooking] = useState<Booking | null>(null);
+  const [bookingError, setBookingError] = useState('');
+
+  const holdSlotThenPay = async () => {
     setBookingLoading(true);
+    setBookingError('');
     try {
       const response = await fetch('/api/bookings', {
         method: 'POST',
@@ -108,20 +112,30 @@ export default function ProfessionalProfile({
           date: bookingDate,
           timeSlot: bookingSlot,
           mode: bookingMode,
-          symptoms: symptoms ? `${symptoms} (Tx: ${receipt.paymentId})` : `Tx: ${receipt.paymentId}`
+          symptoms
         })
       });
-
       const data = await response.json();
       if (data.status === 'success') {
-        setBookingSuccess(data.data);
-        onNewBookingCreated(data.data);
+        setPendingBooking(data.data);
+        setShowPayment(true);
+      } else {
+        setBookingError(data.message || 'Could not book that slot.');
       }
     } catch (err) {
-      console.error(err);
+      setBookingError('Server connection error. Please try again.');
     } finally {
       setBookingLoading(false);
     }
+  };
+
+  const handlePaymentSuccess = async () => {
+    setShowPayment(false);
+    if (!pendingBooking) return;
+    const paid = { ...pendingBooking, paymentStatus: 'Paid' as const };
+    setBookingSuccess(paid);
+    onNewBookingCreated(paid);
+    setPendingBooking(null);
   };
 
   const handlePostReview = async (e: React.FormEvent) => {
@@ -618,6 +632,7 @@ export default function ProfessionalProfile({
                   />
                 </div>
 
+                {bookingError && <p className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 p-2.5">{bookingError}</p>}
                 <button
                   type="submit"
                   disabled={bookingLoading || !bookingDate || !bookingSlot}
@@ -631,13 +646,12 @@ export default function ProfessionalProfile({
         </div>
       </div>
 
-      {showPayment && (
-        <PaymentCheckout
-          amount={prof.fee}
-          purpose={`Appointment Booking with ${prof.name}`}
-          customerName={currentUser?.name || 'Patient'}
-          customerEmail={currentUser?.email || ''}
-          onPaymentSuccess={handlePaymentSuccess}
+      {showPayment && pendingBooking && (
+        <PaymentDialog
+          kind="booking"
+          refId={pendingBooking.id}
+          description={`Appointment with ${prof.name} on ${pendingBooking.date}, ${pendingBooking.timeSlot}`}
+          onPaid={handlePaymentSuccess}
           onCancel={() => setShowPayment(false)}
         />
       )}

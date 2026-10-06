@@ -135,6 +135,13 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
         </div>
       )}
 
+      {result?.emergency && (
+        <div role="alert" className="mt-5 bg-rose-50 border-2 border-rose-400 p-4 text-rose-900 space-y-1">
+          <p className="font-black">This may be an emergency: {result.emergency.reasons.join(', ')}.</p>
+          <p className="text-sm font-bold">Call {result.emergency.numbers.map((n: any) => n.number).join(' or ')} now instead of waiting for an appointment.</p>
+        </div>
+      )}
+
       {result && (
         <div className="mt-5 bg-white border-2 border-[#FECDD3] rounded-xl p-4 shadow-sm space-y-4 animate-fade-in">
           <div className="flex justify-between items-center border-b-2 border-slate-100/80 pb-3">
@@ -142,9 +149,8 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
               <span className="text-[10px] font-extrabold text-[#DC2626] uppercase tracking-wider">Matched Result</span>
               <h4 className="text-sm font-extrabold text-slate-800">{result.data.recommendedSpecialty}</h4>
             </div>
-            <div className="text-right">
-              <span className="text-[10px] text-slate-400 block font-bold">Confidence</span>
-              <span className="text-xs font-extrabold text-[#DC2626]">{Math.round(result.data.confidenceScore * 100)}%</span>
+            <div className="text-right max-w-[11rem]">
+              <span className="text-[10px] text-slate-500 block font-bold">Keyword-based suggestion, not a diagnosis</span>
             </div>
           </div>
 

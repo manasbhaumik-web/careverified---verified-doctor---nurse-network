@@ -8,6 +8,7 @@ import {
   BookOpen, PlusCircle, MessageSquare, Globe
 } from 'lucide-react';
 import AdminTrustPanel, { ReviewActions } from './AdminTrustPanel';
+import AdminOps from './AdminOps';
 import { DoctorProfile, NurseProfile, UserRole, AppPackage, VerificationStatus } from '../types';
 
 interface AdminDashboardProps {
@@ -60,7 +61,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
   const [selectedModalRequest, setSelectedModalRequest] = useState<any | null>(null);
 
   // --- Modular Packages Management State ---
-  const [activeTab, setActiveTab] = useState<'approvals' | 'trust' | 'packages'>('approvals');
+  const [activeTab, setActiveTab] = useState<'approvals' | 'trust' | 'ops' | 'packages'>('approvals');
   const [packageSearch, setPackageSearch] = useState('');
   const [packageCategoryFilter, setPackageCategoryFilter] = useState('All');
   
@@ -278,6 +279,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
         tabs={[
           { id: 'approvals' as const, label: 'Practitioner Approvals', icon: ShieldCheck, count: pendingRequests.length },
           { id: 'trust' as const, label: 'Trust & Complaints', icon: ShieldAlert },
+          { id: 'ops' as const, label: 'Operations & Payments', icon: Activity },
           { id: 'packages' as const, label: 'Package Manager', icon: Puzzle, count: packages.length },
         ]}
         activeTab={activeTab}
@@ -596,6 +598,12 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
           </div>
         </div>
       )}
+        </div>
+      )}
+
+      {activeTab === 'ops' && (
+        <div id="panel-ops" role="tabpanel" tabIndex={0}>
+          <AdminOps />
         </div>
       )}
 

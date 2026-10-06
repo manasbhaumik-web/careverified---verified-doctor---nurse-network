@@ -10,7 +10,9 @@ import {
   ensureAdmin, loadSession, passwordProblem, requireAuth, requireRole, verifyPassword,
 } from "./server/auth";
 import { documentsRouter, setRequestOwnerLookup } from "./server/documents";
-import { registerVerificationRoutes, notifyAdmins } from "./server/verification";
+import { registerVerificationRoutes, notifyAdmins, notify } from "./server/verification";
+import { registerPaymentRoutes, registerPaymentWebhook, setPaymentHandlers, refundPayment, paymentMode } from "./server/payments";
+import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
 
 // Load environment variables
 dotenv.config();
@@ -44,6 +46,7 @@ app.use(helmet({
     },
   } : false,
 }));
+registerPaymentWebhook(app); // needs the raw body, so it goes before the JSON parser
 app.use(express.json({ limit: "100kb" }));
 
 // Reject cross-site state-changing requests (defence in depth on top of SameSite=Lax cookies).
@@ -591,14 +594,64 @@ registerVerificationRoutes(app, {
   persist: persistState,
 });
 
+// ---- Payments and the 24/7 care engine ----
+const care = registerCareRoutes(app, { findProfessional, allProfessionals });
+registerPaymentRoutes(app);
+const UNPAID_HOLD_MS = 15 * 60_000;
+setPaymentHandlers({
+  resolve: (kind, refId) => {
+    if (kind === "consult") return care.resolveConsultPayable(refId);
+    if (kind !== "booking") return null;
+    const b = bookings.find(x => x.id === refId);
+    if (!b || b.status !== "Upcoming" || b.paymentStatus !== "Pending") return null;
+    if (b.holdExpiresAt && Date.parse(b.holdExpiresAt) < Date.now()) return null;
+    return { kind: "booking" as const, id: b.id, userId: b.patientUserId, professionalId: b.professionalId, amount: b.fee,
+      description: `Appointment with ${b.professionalName} on ${b.date}, ${b.timeSlot}` };
+  },
+  onPaid: (p) => {
+    if (p.kind === "consult") return care.onConsultPaid(p.ref_id);
+    const b = bookings.find(x => x.id === p.ref_id);
+    if (!b) return;
+    b.paymentStatus = "Paid";
+    b.paymentId = p.id;
+    delete b.holdExpiresAt;
+    const pro: any = findProfessional(b.professionalId);
+    const account = db.prepare("SELECT id FROM users WHERE profile_id = ?").get(b.professionalId) as any;
+    if (pro && account) notify(account.id, "New booking", `${b.patientName} booked ${b.date} at ${b.timeSlot}.`);
+    persistState();
+  },
+  onRefunded: (p) => {
+    if (p.kind === "consult") { care.onConsultRefunded(p.ref_id); return; }
+    const b = bookings.find(x => x.id === p.ref_id);
+    if (b) { b.paymentStatus = "Refunded"; b.status = "Cancelled"; persistState(); }
+  },
+});
+
 // -------------------------------------------------------------
 // Bookings & e-prescriptions
 // -------------------------------------------------------------
+// Release slots whose unpaid hold has lapsed
+setInterval(() => {
+  let changed = false;
+  for (const b of bookings) {
+    if (b.status === "Upcoming" && b.paymentStatus === "Pending" && b.holdExpiresAt && Date.parse(b.holdExpiresAt) < Date.now()) {
+      b.status = "Cancelled";
+      changed = true;
+    }
+  }
+  if (changed) persistState();
+}, 60_000).unref();
+
+// A booking occupies its slot unless cancelled or its unpaid hold has lapsed.
+const holdsSlot = (b: any) =>
+  b.status !== "Cancelled" && !(b.paymentStatus === "Pending" && b.holdExpiresAt && Date.parse(b.holdExpiresAt) < Date.now());
+
 app.get("/api/bookings", requireAuth, (req, res) => {
   const u = req.user!;
   let list: any[] = [];
   if (u.role === "admin") list = bookings;
-  else if (u.role === "practitioner") list = u.profileId ? bookings.filter(b => b.professionalId === u.profileId) : [];
+  // Practitioners only see bookings that have been paid for.
+  else if (u.role === "practitioner") list = u.profileId ? bookings.filter(b => b.professionalId === u.profileId && b.paymentStatus !== "Pending") : [];
   else list = bookings.filter(b => b.patientUserId === u.id);
   res.json({ status: "success", data: list });
 });
@@ -620,7 +673,7 @@ app.post("/api/bookings", requireRole("patient"), (req, res) => {
   }
   // Emergency on-call dispatches are not tied to a scheduled slot.
   if (timeSlot !== "Immediate Emergency Call" &&
-      bookings.some(b => b.professionalId === professionalId && b.date === date && b.timeSlot === timeSlot && b.status !== "Cancelled")) {
+      bookings.some(b => b.professionalId === professionalId && b.date === date && b.timeSlot === timeSlot && holdsSlot(b))) {
     return fail(res, 409, "That time slot has just been taken. Please choose another.");
   }
 
@@ -640,7 +693,8 @@ app.post("/api/bookings", requireRole("patient"), (req, res) => {
     timeSlot,
     mode: mode || ConsultationMode.IN_PERSON,
     fee: prof.fee, // always priced server-side
-    paymentStatus: "Paid" as const, // TODO(phase 3): real payment gateway; currently simulated
+    paymentStatus: "Pending" as const, // becomes "Paid" when the payment provider confirms
+    holdExpiresAt: new Date(Date.now() + UNPAID_HOLD_MS).toISOString(), // slot is held while the patient pays
     status: "Upcoming" as const,
     symptoms: str(symptoms, 1000),
     createdAt: new Date().toISOString()
@@ -649,6 +703,22 @@ app.post("/api/bookings", requireRole("patient"), (req, res) => {
   bookings.push(newBooking);
   audit(req, "booking.create", { target: ["booking", newBooking.id], details: { professionalId } });
   res.status(201).json({ status: "success", message: "Appointment booked successfully!", data: newBooking });
+});
+
+// Patient cancels: refunded in full when the appointment is at least a day away
+app.post("/api/bookings/:id/cancel", requireRole("patient"), async (req, res) => {
+  const b = bookings.find(x => x.id === req.params.id && x.patientUserId === req.user!.id);
+  if (!b) return res.status(404).json({ status: "error", message: "Booking not found." });
+  if (b.status !== "Upcoming") return fail(res, 409, "Only upcoming appointments can be cancelled.");
+  const tomorrow = new Date(Date.now() + 86400_000).toISOString().slice(0, 10);
+  const refundable = b.paymentStatus === "Paid" && b.date >= tomorrow;
+  b.status = "Cancelled";
+  let refunded = false;
+  if (refundable && b.paymentId) refunded = (await refundPayment(b.paymentId, "Cancelled by patient", null)).ok;
+  audit(req, "booking.cancel", { target: ["booking", b.id], details: { refunded } });
+  persistState();
+  res.json({ status: "success", data: b, refunded,
+    message: refunded ? "Cancelled and refunded in full." : b.paymentStatus === "Paid" ? "Cancelled. Appointments less than a day away are not refundable." : "Cancelled." });
 });
 
 app.post("/api/bookings/:id/prescribe", requireRole("practitioner"), (req, res) => {
@@ -665,6 +735,7 @@ app.post("/api/bookings/:id/prescribe", requireRole("practitioner"), (req, res) 
   if (!prof || prof.verificationStatus !== VerificationStatus.VERIFIED) {
     return fail(res, 403, "Only verified practitioners can issue prescriptions.");
   }
+  if (booking.paymentStatus !== "Paid") return fail(res, 409, "This booking has not been paid for.");
   if (!diagnosis || !medicines) {
     return fail(res, 400, "Diagnosis and medicines are required.");
   }
@@ -856,7 +927,7 @@ app.get("/api/articles", (req, res) => {
 app.post("/api/symptom-matching", (req, res) => {
   const { symptoms } = req.body;
 
-  if (!symptoms) {
+  if (!symptoms || typeof symptoms !== "string" || symptoms.length > 2000) {
     return res.status(400).json({ status: "error", message: "Please specify symptoms to match." });
   }
 
@@ -911,7 +982,13 @@ app.post("/api/symptom-matching", (req, res) => {
     };
   }
 
-  res.json({ status: "success", source: "CareVerified Triage Engine", data: recommendation });
+  const flags = redFlags(symptoms);
+  res.json({
+    status: "success",
+    source: "CareVerified Triage Engine",
+    data: recommendation,
+    emergency: flags.length ? { reasons: flags, numbers: emergencyNumbers() } : null,
+  });
 });
 
 // --- Packages Modular Architecture API ---
