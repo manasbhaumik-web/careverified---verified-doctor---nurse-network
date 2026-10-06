@@ -28,7 +28,7 @@ export default function DoctorOnCallModal({
   
   // Form fields
   const [patientClass, setPatientClass] = useState<'emergency' | 'elderly'>('elderly');
-  const [patientName, setPatientName] = useState(currentUser?.name || 'Ahmad Fauzi Bin Ramli');
+  const [patientName, setPatientName] = useState(currentUser?.name || 'Patient');
   const [patientAge, setPatientAge] = useState<number>(72); // elderly defaults to 72, emergency can change
   const [patientGender, setPatientGender] = useState<'Male' | 'Female' | 'Other'>('Male');
   const [patientPhone, setPatientPhone] = useState('+60-12-345-6789');

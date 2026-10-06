@@ -37,7 +37,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
   const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
 
   const [activeTab, setActiveTab] = useState<'open' | 'applied'>('open');
-  const myApplications = jobs.filter(j => appliedJobs.includes(j.id) || j.appliedUserIds?.includes('doc-1'));
+  const myApplications = jobs.filter(j => appliedJobs.includes(j.id) || (j.appliedUserIds?.length ?? 0) > 0);
   const baseJobs = activeTab === 'applied' ? myApplications : jobs;
   const shiftBasedCount = jobs.filter(j => j.type === 'Shift-based').length;
   const hospitalCount = new Set(jobs.map(j => j.hospitalName)).size;
@@ -101,16 +101,11 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
 
   const handleApply = async (jobId: string) => {
     try {
-      const simulatedUserId = "doc-1"; // Simulate applying as an active practitioner
-      const response = await fetch(`/api/jobs/${jobId}/apply`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: simulatedUserId })
-      });
+      const response = await fetch(`/api/jobs/${jobId}/apply`, { method: 'POST' });
 
       const data = await response.json();
       if (data.status === 'success') {
-        onApplyJob(jobId, simulatedUserId);
+        onApplyJob(jobId, data.data.appliedUserIds?.[0] ?? '');
         setAppliedJobs([...appliedJobs, jobId]);
       }
     } catch (error) {
@@ -406,7 +401,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
           </div>
         ) : (
           filteredJobs.map((job) => {
-            const hasApplied = appliedJobs.includes(job.id) || job.appliedUserIds?.includes('doc-1');
+            const hasApplied = appliedJobs.includes(job.id) || (job.appliedUserIds?.length ?? 0) > 0;
             const typePill = job.type === 'Shift-based'
               ? 'bg-[#ECFDF5] border-[#A7F3D0] text-[#065F46]'
               : 'bg-[#FFF0F2] border-[#FECDD3] text-[#B91C1C]';

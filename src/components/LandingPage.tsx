@@ -16,7 +16,7 @@ import heroBgImage from '../../assets/medical_hero_bg.jpg';
 // ─────────────────────────────────────────────
 interface LandingPageProps {
   professionals: (DoctorProfile | NurseProfile)[];
-  onLoginSuccess: (user: { role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; avatarUrl?: string }) => void;
+  onLoginSuccess: (user: { id: string; role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; avatarUrl?: string; profileId?: string | null }, patient?: unknown) => void;
 }
 
 // ─────────────────────────────────────────────
@@ -202,6 +202,81 @@ const TESTIMONIALS = [
 
 
 // ═══════════════════════════════════════════════
+// PRACTITIONER ACCOUNT SIGN-UP
+// ═══════════════════════════════════════════════
+function PractitionerSignUp({ onSuccess, onCancel }: {
+  onSuccess: (user: { id: string; role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; profileId?: string | null }) => void;
+  onCancel: () => void;
+}) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [consent, setConsent] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const field = 'w-full bg-[#FFF9F9] border border-[#FECDD3] rounded-none px-4 h-[50px] text-base font-medium text-[#1A1A1A] placeholder-slate-400 focus:outline-none focus:border-[#C8102E] focus:ring-1 focus:ring-[#C8102E] transition-all';
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const resp = await fetch('/api/auth/register-practitioner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, consent }),
+      });
+      const data = await resp.json();
+      if (data.status === 'success') onSuccess(data.data.user);
+      else setError(data.message || 'Could not create the account.');
+    } catch {
+      setError('Server connection error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <h3 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#1A1A1A]">Create a Practitioner Account</h3>
+      <p className="text-sm text-slate-600 mt-1">
+        After signing up you will submit your licence details and certificates. You appear in the public registry only once the medical board verifies you.
+      </p>
+      <form onSubmit={submit} className="space-y-5 mt-7">
+        {error && (
+          <div className="bg-[#FFE9EB] border border-[#FECDD3] text-[#C8102E] p-4 flex gap-3 text-xs font-bold">
+            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" /><span>{error}</span>
+          </div>
+        )}
+        <div className="space-y-2">
+          <label htmlFor="pr-name" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Full name (as on licence)</label>
+          <input id="pr-name" className={field} value={name} onChange={e => setName(e.target.value)} required maxLength={100} />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="pr-email" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Email address</label>
+          <input id="pr-email" type="email" className={field} value={email} onChange={e => setEmail(e.target.value)} required />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="pr-password" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Password</label>
+          <input id="pr-password" type="password" className={field} value={password} onChange={e => setPassword(e.target.value)} required minLength={8} autoComplete="new-password" />
+          <p className="text-[11px] text-slate-500">At least 8 characters, with letters and numbers.</p>
+        </div>
+        <label className="flex items-start gap-3 text-xs text-slate-700 cursor-pointer">
+          <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#C8102E]" required />
+          <span>I accept the Terms of Service and Privacy Policy, and agree that my credentials may be checked with the relevant medical council.</span>
+        </label>
+        <button type="submit" disabled={loading || !consent}
+          className="w-full h-[52px] text-base font-extrabold bg-[#C8102E] hover:bg-[#A50F2A] text-white shadow-md disabled:opacity-70 border border-[#A50F2A] cursor-pointer">
+          {loading ? 'Creating account…' : 'Create account'}
+        </button>
+        <button type="button" onClick={onCancel} className="w-full text-sm font-bold text-slate-600 hover:underline cursor-pointer">Back to sign in</button>
+      </form>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════
 // MAIN COMPONENT (THIN BORDERS - LIGHT NAVBAR & HERO - NO BLACK BORDERS)
 // ═══════════════════════════════════════════════
 export default function LandingPage({ professionals, onLoginSuccess }: LandingPageProps) {
@@ -239,37 +314,30 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
     setHasSearched(true);
   };
 
-  // Quick Bypass Logins
-  const handleSandboxLogin = (role: 'patient' | 'practitioner' | 'admin') => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      if (role === 'patient') {
-        onLoginSuccess({ role: 'patient', name: 'Ahmad Fauzi Bin Ramli', email: 'swarnabhaumik@gmail.com', avatarUrl: '/assets/malaysian_male_patient.jpg' });
-      } else if (role === 'practitioner') {
-        onLoginSuccess({ role: 'practitioner', name: 'Dr. Tan Seng Hock', email: 'tan@medicert.com', avatarUrl: '/assets/malaysian_male_doctor.jpg' });
-      } else if (role === 'admin') {
-        onLoginSuccess({ role: 'admin', name: 'Sharifah Noor Al-Hadi', email: 'admin@medicert.com', avatarUrl: '/assets/malaysian_female_doctor.jpg' });
-      }
-    }, 450);
-  };
-
-  // Standard Login Submission
-  const handleStandardSubmit = (e: React.FormEvent) => {
+  // Standard Login Submission (server-verified credentials and session)
+  const handleStandardSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (!email || !password) { setError('Please fill in all fields.'); return; }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      if (activeTab === 'patient') {
-        onLoginSuccess({ role: 'patient', name: 'Ahmad Fauzi Bin Ramli', email, avatarUrl: '/assets/malaysian_male_patient.jpg' });
-      } else if (activeTab === 'practitioner') {
-        onLoginSuccess({ role: 'practitioner', name: 'Dr. Tan Seng Hock', email, avatarUrl: '/assets/malaysian_male_doctor.jpg' });
+    try {
+      const resp = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, role: activeTab }),
+      });
+      const data = await resp.json();
+      if (data.status === 'success') {
+        setPassword('');
+        onLoginSuccess(data.data.user, data.data.patient);
       } else {
-        onLoginSuccess({ role: 'admin', name: 'Sharifah Noor Al-Hadi', email, avatarUrl: '/assets/malaysian_female_doctor.jpg' });
+        setError(data.message || 'Sign in failed.');
       }
-    }, 600);
+    } catch {
+      setError('Server connection error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Animated counters
@@ -684,7 +752,11 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                     <div className="pt-6 mt-6 border-t border-slate-200">
                       <button
                         type="button"
-                        onClick={() => handleSandboxLogin(card.roleKey)}
+                        onClick={() => {
+                          setActiveTab(card.roleKey);
+                          setIsRegistering(false);
+                          document.getElementById('login-section')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
                         className="w-full min-h-[46px] px-5 text-xs font-extrabold text-white bg-[#C8102E] hover:bg-[#A50F2A] border border-[#A50F2A] rounded-none shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
                       >
                         {card.ctaText}
@@ -924,10 +996,22 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                     exit={{ opacity: 0, y: -12 }}
                   >
                     <PatientRegistrationForm
-                      onRegisterSuccess={(user) => {
-                        onLoginSuccess(user);
+                      onRegisterSuccess={(user, patient) => {
+                        onLoginSuccess(user, patient);
                         setIsRegistering(false);
                       }}
+                      onCancel={() => setIsRegistering(false)}
+                    />
+                  </motion.div>
+                ) : isRegistering && activeTab === 'practitioner' ? (
+                  <motion.div
+                    key="register-practitioner"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                  >
+                    <PractitionerSignUp
+                      onSuccess={(user) => { onLoginSuccess(user); setIsRegistering(false); }}
                       onCancel={() => setIsRegistering(false)}
                     />
                   </motion.div>
@@ -963,8 +1047,8 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                           id="login-email"
                           type="email"
                           placeholder={
-                            activeTab === 'patient' ? 'patient@medcred.com' :
-                            activeTab === 'practitioner' ? 'doctor@medcred.com' : 'admin@medcred.com'
+                            activeTab === 'patient' ? 'you@example.com' :
+                            activeTab === 'practitioner' ? 'you@example.com' : 'you@example.com'
                           }
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
@@ -1007,7 +1091,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                       </button>
                     </form>
 
-                    {activeTab === 'patient' && (
+                    {(activeTab === 'patient' || activeTab === 'practitioner') && (
                       <p className="pt-6 text-center text-sm text-slate-600">
                         Need a new account?{' '}
                         <button
@@ -1015,7 +1099,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                           onClick={() => { setError(''); setIsRegistering(true); }}
                           className="text-[#C8102E] hover:underline font-extrabold cursor-pointer transition-colors"
                         >
-                          Register as a New Patient
+                          {activeTab === 'patient' ? 'Register as a New Patient' : 'Create a Practitioner Account'}
                         </button>
                       </p>
                     )}
@@ -1025,28 +1109,6 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
             </div>
           </div>
 
-          {/* Quick Access Demo Buttons */}
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-slate-600">
-              <Zap className="h-4 w-4 text-[#C8102E]" /> One-Click Demo Access:
-            </span>
-            {[
-              { role: 'patient' as const, icon: Heart, label: 'Demo Patient' },
-              { role: 'practitioner' as const, icon: PlusCircle, label: 'Demo Practitioner' },
-              { role: 'admin' as const, icon: Building, label: 'Demo Board Admin' },
-            ].map((d) => (
-              <button
-                key={d.role}
-                type="button"
-                onClick={() => handleSandboxLogin(d.role)}
-                disabled={loading}
-                className="inline-flex items-center gap-2 min-h-[42px] px-5 text-xs font-bold text-[#C8102E] bg-white border border-[#FECDD3] hover:bg-[#C8102E] hover:text-white rounded-none transition-all cursor-pointer disabled:opacity-60 shadow-xs"
-              >
-                <d.icon className="h-4 w-4" />
-                {d.label}
-              </button>
-            ))}
-          </div>
         </div>
       </section>
 

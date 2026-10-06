@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Send, Shield, Lock, Check, RefreshCw, MessageSquare, Search, UserCheck } from 'lucide-react';
 import { ChatMessage } from '../types';
 
-export default function SecureMessenger() {
+export default function SecureMessenger({ currentUserId }: { currentUserId: string }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -73,8 +73,6 @@ export default function SecureMessenger() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          senderId: 'patient-1',
-          senderName: 'Ahmad Fauzi Bin Ramli',
           receiverId: activeThreadId,
           receiverName: threads.find(t => t.id === activeThreadId)?.name || 'Clinical Specialist',
           text: outgoingText
@@ -234,7 +232,7 @@ export default function SecureMessenger() {
             )}
 
             {messages.map((msg) => {
-              const isMe = msg.senderId === 'patient-1';
+              const isMe = msg.senderId === currentUserId;
               return (
                 <div key={msg.id} className={`flex flex-col max-w-[78%] ${isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
                   <span className="text-xs text-[#334155] font-semibold mb-1 px-1">{msg.senderName}</span>

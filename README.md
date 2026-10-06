@@ -1,20 +1,21 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# CareVerified – Verified Doctor & Nurse Network
 
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/936d517d-7852-4e82-a49c-ac8c729e6b52
+A credential-verified registry connecting licensed doctors and nurses with patients and healthcare institutions.
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
+**Prerequisites:** Node.js
 
+1. Install dependencies: `npm install`
+2. Copy `.env.example` to `.env` and set `ADMIN_EMAIL` / `ADMIN_PASSWORD` (the first admin account is created on first start)
+3. Run the app: `npm run dev`
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+The app is served at http://localhost:3000.
+
+## Accounts & data
+
+- Sign-in uses server-side sessions (httpOnly cookie), scrypt password hashing and account lockout.
+- Roles: patient, practitioner, admin. Practitioners are listed publicly only after an admin verifies their uploaded credentials.
+- Data lives in `data/careverified.db` (SQLite) and private uploads in `data/uploads/`; both are git-ignored. Back them up.
+- Every sensitive action is written to an audit log (admin: `GET /api/admin/audit-log`).
+- `GET /api/me/export` and `POST /api/me/deletion-request` cover data export and deletion requests.

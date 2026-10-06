@@ -6,7 +6,7 @@ import {
 import { PatientProfile } from '../types';
 
 interface PatientRegistrationFormProps {
-  onRegisterSuccess: (user: { role: 'patient'; name: string; email: string; avatarUrl?: string }) => void;
+  onRegisterSuccess: (user: { id: string; role: 'patient'; name: string; email: string; avatarUrl?: string; profileId?: string | null }, patient?: unknown) => void;
   onCancel: () => void;
 }
 
@@ -49,8 +49,9 @@ export default function PatientRegistrationForm({
     return phone.trim() !== '' && age > 0;
   };
 
+  const [consent, setConsent] = useState(false);
   const isStep3Valid = () => {
-    return emergencyContactName.trim() !== '' && emergencyContactPhone.trim() !== '';
+    return emergencyContactName.trim() !== '' && emergencyContactPhone.trim() !== '' && consent;
   };
 
   const handleNextStep = () => {
@@ -98,21 +99,16 @@ export default function PatientRegistrationForm({
           chronicConditions: selectedConditions,
           allergies: allergiesText ? [allergiesText] : [],
           emergencyContactName,
-          emergencyContactPhone
+          emergencyContactPhone,
+          consent
         })
       });
 
       const data = await response.json();
       if (data.status === 'success') {
         setLoading(false);
-        // Save details inside local storage under 'medi_user' which PatientDashboard checks
-        localStorage.setItem('medi_user', JSON.stringify(data.data));
-        onRegisterSuccess({
-          role: 'patient',
-          name: data.data.name,
-          email: data.data.email,
-          avatarUrl: '/assets/malaysian_male_patient.jpg'
-        });
+        const me = await fetch('/api/auth/me').then(r => r.json());
+        onRegisterSuccess(me.data.user, data.data);
       } else {
         setError(data.message || 'Registration failed.');
         setLoading(false);
@@ -433,6 +429,17 @@ export default function PatientRegistrationForm({
                   />
                 </div>
               </div>
+              <label className="flex items-start gap-3 text-xs text-slate-300 cursor-pointer pt-2">
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 accent-[#DC2626]"
+                />
+                <span>
+                  I accept the Terms of Service and Privacy Policy, and consent to CareVerified storing and processing my health information so practitioners can treat me. I can export or request deletion of my data at any time.
+                </span>
+              </label>
             </div>
 
             {/* Stepped Navigation */}

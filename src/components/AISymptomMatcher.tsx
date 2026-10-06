@@ -22,7 +22,7 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
     setResult(null);
 
     try {
-      const response = await fetch('/api/ai-matching', {
+      const response = await fetch('/api/symptom-matching', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

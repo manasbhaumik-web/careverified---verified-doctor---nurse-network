@@ -36,36 +36,51 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
 
-  // User Session State
-  const [currentUser, setCurrentUser] = useState<{ role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; avatarUrl?: string } | null>(() => {
-    const cached = localStorage.getItem('medi_cert_logged_in_user');
-    if (cached) {
-      try {
-        return JSON.parse(cached);
-      } catch (err) {
-        console.error("Error parsing cached login session:", err);
-      }
-    }
-    return null;
-  });
+  // User Session State (server-side session cookie; nothing sensitive is kept in localStorage)
+  type SessionUser = { id: string; role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; avatarUrl?: string; profileId?: string | null };
+  const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
+  const [sessionChecked, setSessionChecked] = useState(false);
 
-  const handleLoginSuccess = (user: { role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; avatarUrl?: string }) => {
-    setCurrentUser(user);
-    localStorage.setItem('medi_cert_logged_in_user', JSON.stringify(user));
-    // Automatically redirect to the standard view for their role
-    if (user.role === 'patient') {
-      setActiveView('patient_dashboard');
-    } else if (user.role === 'practitioner') {
-      setActiveView('onboard');
-    } else if (user.role === 'admin') {
-      setActiveView('admin');
-    }
+  const routeForRole = (role: SessionUser['role']) => {
+    setActiveView(role === 'patient' ? 'patient_dashboard' : role === 'practitioner' ? 'onboard' : 'admin');
     setSelectedProfId(null);
   };
 
-  const handleLogout = () => {
+  // The patient dashboard reads the patient's profile from this key.
+  const rememberPatient = (patient?: unknown) => {
+    try {
+      if (patient) localStorage.setItem('medi_user', JSON.stringify(patient));
+      else localStorage.removeItem('medi_user');
+    } catch { /* storage unavailable */ }
+  };
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => {
+        if (d?.status === 'success') {
+          setCurrentUser(d.data.user);
+          rememberPatient(d.data.patient);
+          routeForRole(d.data.user.role);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setSessionChecked(true));
+  }, []);
+
+  const handleLoginSuccess = (user: SessionUser, patient?: unknown) => {
+    setCurrentUser(user);
+    rememberPatient(patient);
+    routeForRole(user.role);
+    loadData();
+  };
+
+  const handleLogout = async () => {
+    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch { /* ignore */ }
     setCurrentUser(null);
-    localStorage.removeItem('medi_cert_logged_in_user');
+    rememberPatient(undefined);
+    setBookings([]);
+    loadData();
   };
 
   // App Global State (synced from API)
@@ -81,6 +96,13 @@ export default function App() {
   const loadData = async () => {
     setLoading(true);
     try {
+      // 0. Refresh the signed-in account (e.g. after a profile is linked)
+      const meResp = await fetch('/api/auth/me');
+      if (meResp.ok) {
+        const meData = await meResp.json();
+        if (meData.status === 'success') setCurrentUser(meData.data.user);
+      }
+
       // 1. Fetch professionals
       const pResp = await fetch('/api/professionals');
       const pData = await pResp.json();
@@ -204,6 +226,10 @@ export default function App() {
       return [...prev, approvedProf];
     });
   };
+
+  if (!sessionChecked) {
+    return <div className="min-h-screen flex items-center justify-center text-sm font-semibold text-slate-500">Loading…</div>;
+  }
 
   // If not logged in, render landing page
   if (!currentUser) {
@@ -515,14 +541,14 @@ export default function App() {
                   description="A directory of practitioners with active, verified MMC and LJM registration numbers."
                   tabs={[
                     { id: 'directory' as const, label: 'Medical Directory', icon: UserCheck },
-                    { id: 'triage' as const, label: 'AI Symptom Triage & Search', icon: Activity },
+                    { id: 'triage' as const, label: 'Symptom Triage & Search', icon: Activity },
                   ]}
                   activeTab={registryTab}
                   onTabChange={setRegistryTab}
                   tabsLabel="Directory sections"
                 />
 
-                {/* TAB CONTENT 1: AI Symptom Triage Search Panel */}
+                {/* TAB CONTENT 1: Symptom Triage Search Panel */}
                 {registryTab === 'triage' && (
                   <div className="max-w-3xl mx-auto animate-fade-in">
                     <AISymptomMatcher
@@ -584,7 +610,7 @@ export default function App() {
 
             {/* VIEW 5: SECURE MESSENGER */}
             {activeView === 'messages' && (
-              <SecureMessenger />
+              <SecureMessenger currentUserId={currentUser.profileId || currentUser.id} />
             )}
 
             {/* VIEW 6: MEDICAL BOARD ADMIN */}

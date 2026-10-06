@@ -88,7 +88,7 @@ export default function PatientDashboard({
         if (u.name) return u.name;
       }
     } catch (e) {}
-    return 'Ahmad Fauzi Bin Ramli';
+    return 'Patient';
   });
   const [selectedModalProf, setSelectedModalProf] = useState<DoctorProfile | NurseProfile | null>(null);
   
@@ -132,10 +132,10 @@ export default function PatientDashboard({
         if (u.name) return u.name;
       }
     } catch (e) {}
-    return 'Ahmad Fauzi Bin Ramli';
+    return 'Patient';
   });
-  const [prescPatientEmail, setPrescPatientEmail] = useState<string>('swarnabhaumik@gmail.com');
-  const [prescPatientPhone, setPrescPatientPhone] = useState<string>('+60-12-345-6789');
+  const [prescPatientEmail, setPrescPatientEmail] = useState<string>('');
+  const [prescPatientPhone, setPrescPatientPhone] = useState<string>('');
   
   // Available doctors for selection
   const doctorsList = professionals.filter(p => p.role === UserRole.DOCTOR);
@@ -353,8 +353,8 @@ export default function PatientDashboard({
   }, []);
 
   // Filter Bookings for Current Patient
-  const patientEmail = 'swarnabhaumik@gmail.com';
-  const patientBookings = bookings.filter(b => b.patientEmail === patientEmail);
+  // The server only returns the signed-in patient's own bookings.
+  const patientBookings = bookings;
   const upcomingBookings = patientBookings.filter(b => b.status === 'Upcoming');
   const prescriptionBookings = patientBookings.filter(b => b.status === 'Completed' && b.prescription);
 
@@ -1668,7 +1668,7 @@ export default function PatientDashboard({
               const saved = localStorage.getItem('medi_user');
               if (saved) return JSON.parse(saved);
             } catch (e) {}
-            return { name: userName, email: 'swarnabhaumik@gmail.com', role: 'patient' };
+            return { name: userName, email: '', role: 'patient' };
           })()}
           onClose={() => setShowOnCallModal(false)}
           onDispatchCreated={handleDispatchCreated}

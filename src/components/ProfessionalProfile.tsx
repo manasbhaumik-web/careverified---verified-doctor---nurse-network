@@ -104,13 +104,9 @@ export default function ProfessionalProfile({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           professionalId: prof.id,
-          patientName: currentUser?.name || 'Ahmad Fauzi Bin Ramli',
-          patientEmail: currentUser?.email || 'swarnabhaumik@gmail.com',
-          patientPhone: '+60-12-345-6789',
           date: bookingDate,
           timeSlot: bookingSlot,
           mode: bookingMode,
-          fee: prof.fee,
           symptoms: symptoms ? `${symptoms} (Tx: ${receipt.paymentId})` : `Tx: ${receipt.paymentId}`
         })
       });
@@ -637,8 +633,8 @@ export default function ProfessionalProfile({
         <PaymentCheckout
           amount={prof.fee}
           purpose={`Appointment Booking with ${prof.name}`}
-          customerName={currentUser?.name || 'Ahmad Fauzi Bin Ramli'}
-          customerEmail={currentUser?.email || 'swarnabhaumik@gmail.com'}
+          customerName={currentUser?.name || 'Patient'}
+          customerEmail={currentUser?.email || ''}
           onPaymentSuccess={handlePaymentSuccess}
           onCancel={() => setShowPayment(false)}
         />

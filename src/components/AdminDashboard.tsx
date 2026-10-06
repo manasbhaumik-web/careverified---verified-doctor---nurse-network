@@ -16,6 +16,41 @@ interface AdminDashboardProps {
   onPackagesChanged: () => void;
 }
 
+// Documents the practitioner uploaded for a verification request (fetched through the audited, admin-only API)
+function RequestDocuments({ requestId }: { requestId: string }) {
+  const [docs, setDocs] = useState<any[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/documents?verificationRequestId=${encodeURIComponent(requestId)}`)
+      .then(r => r.json())
+      .then(d => { if (!cancelled) setDocs(d.status === 'success' ? d.data : []); })
+      .catch(() => { if (!cancelled) setDocs([]); });
+    return () => { cancelled = true; };
+  }, [requestId]);
+
+  if (docs === null) return <p className="text-xs text-slate-500">Loading documents…</p>;
+  if (docs.length === 0) {
+    return <p className="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3">No documents were uploaded. Do not approve without reviewing the practitioner's certificates.</p>;
+  }
+  return (
+    <>
+      {docs.map(d => (
+        <a key={d.id} href={`/api/documents/${d.id}/download`}
+          className="border border-slate-200 rounded-xl p-3 bg-white flex items-center justify-between text-xs hover:border-rose-300">
+          <span className="flex items-center gap-2 min-w-0">
+            <FileText className="h-4 w-4 text-[#DC2626] shrink-0" />
+            <span className="font-bold text-slate-700 truncate">{d.originalName}</span>
+          </span>
+          <span className="text-[10px] bg-slate-100 border border-slate-200 text-slate-600 px-2 py-0.5 rounded font-mono font-bold uppercase">
+            {d.kind} · {Math.max(1, Math.round(d.size / 1024))} KB
+          </span>
+        </a>
+      ))}
+    </>
+  );
+}
+
 export default function AdminDashboard({ onProfessionalApproved, professionals, packages, onPackagesChanged }: AdminDashboardProps) {
   const [pendingRequests, setPendingRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -597,20 +632,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
               {/* Credentials scans and PDF attachments */}
               <div className="space-y-2">
                 <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider">Proof of Registry & Certifications</span>
-                <div className="border border-slate-200 rounded-xl p-3 bg-white flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <FileSpreadsheet className="h-4.5 w-4.5 text-emerald-600" />
-                    <span className="font-bold text-slate-700">Official_Registry_Record.xml</span>
-                  </div>
-                  <span className="text-[10px] bg-slate-100 border border-slate-200 text-slate-600 px-2 py-0.5 rounded font-mono font-bold">128 KB</span>
-                </div>
-                <div className="border border-slate-200 rounded-xl p-3 bg-white flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4.5 w-4.5 text-[#DC2626]" />
-                    <span className="font-bold text-slate-700">Certificate_Registry_Scan.pdf</span>
-                  </div>
-                  <span className="text-[10px] bg-[#FFF0F2] border border-[#FECDD3] text-[#DC2626] px-2 py-0.5 rounded font-bold uppercase">Ready</span>
-                </div>
+                <RequestDocuments requestId={selectedModalRequest.id} />
               </div>
             </div>
 

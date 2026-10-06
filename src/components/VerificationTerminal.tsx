@@ -17,7 +17,7 @@ import DashboardHeader from './DashboardHeader';
 import PageBanner from './PageBanner';
 
 interface VerificationTerminalProps {
-  currentUser?: { role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; avatarUrl?: string } | null;
+  currentUser?: { role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; avatarUrl?: string; profileId?: string | null } | null;
   professionals?: (DoctorProfile | NurseProfile)[];
   reviews?: Review[];
   bookings?: Booking[];
@@ -95,6 +95,8 @@ export default function VerificationTerminal({
   const [city, setCity] = useState('Kuala Lumpur');
   const [practiceAddress, setPracticeAddress] = useState('');
   const [fileAttached, setFileAttached] = useState<string | null>(null);
+  const [fileObj, setFileObj] = useState<File | null>(null);
+  const [submitError, setSubmitError] = useState('');
 
   // Load and Sync Emergency Dispatches from localStorage
   useEffect(() => {
@@ -129,12 +131,20 @@ export default function VerificationTerminal({
 
   const handleFileUploadSimulate = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFileAttached(e.target.files[0].name);
+      const f = e.target.files[0];
+      if (f.size > 5 * 1024 * 1024) {
+        setSubmitError('File is larger than 5 MB.');
+        return;
+      }
+      setSubmitError('');
+      setFileObj(f);
+      setFileAttached(f.name);
     }
   };
 
   const handleOnboardingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError('');
     setLoading(true);
 
     try {
@@ -162,13 +172,30 @@ export default function VerificationTerminal({
       });
 
       const data = await response.json();
-      if (data.status === 'success') {
-        setSuccess(data.data);
-        setStep(4);
-        if (onRefreshData) onRefreshData();
+      if (data.status !== 'success') {
+        setSubmitError(data.message || 'Registration failed.');
+        return;
       }
+
+      // Upload the certificate against the new verification request
+      if (fileObj) {
+        const form = new FormData();
+        form.append('file', fileObj);
+        form.append('kind', 'degree');
+        form.append('verificationRequestId', data.data.verificationRequestId);
+        const up = await fetch('/api/documents', { method: 'POST', body: form });
+        const upData = await up.json();
+        if (upData.status !== 'success') {
+          setSubmitError(upData.message || 'Profile saved, but the certificate upload failed.');
+          return;
+        }
+      }
+      setSuccess(data.data);
+      setStep(4);
+      if (onRefreshData) onRefreshData();
     } catch (error) {
       console.error(error);
+      setSubmitError('Server connection error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -993,6 +1020,10 @@ export default function VerificationTerminal({
               The profile validation cycle completes within 24 hours of submission.
             </div>
           </div>
+
+          {submitError && (
+            <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-xl text-xs font-bold">{submitError}</div>
+          )}
 
           <div className="flex justify-between pt-4">
             <button

@@ -1,9 +1,0 @@
-<USER_REQUEST>
-Buil and Run the applicatiion .
-</USER_REQUEST>
-<ADDITIONAL_METADATA>
-The current local time is: 2026-07-11T20:16:12+08:00.
-</ADDITIONAL_METADATA>
-<USER_SETTINGS_CHANGE>
-The user changed setting `Model Selection` from None to Gemini 3.1 Pro (High). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
-</USER_SETTINGS_CHANGE>

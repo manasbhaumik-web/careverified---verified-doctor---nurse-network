@@ -1,7 +1,15 @@
 import express from "express";
 import path from "path";
-import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import { db, loadCollection, saveCollections } from "./server/db";
+import { audit } from "./server/audit";
+import {
+  AuthUser, Role, attemptLogin, changePassword, createSession, createUser, destroySession, emailTaken,
+  ensureAdmin, loadSession, passwordProblem, requireAuth, requireRole, verifyPassword,
+} from "./server/auth";
+import { documentsRouter } from "./server/documents";
 
 // Load environment variables
 dotenv.config();
@@ -18,7 +26,48 @@ import {
 import { UserRole, VerificationStatus, ConsultationMode } from "./src/types";
 
 const app = express();
-app.use(express.json());
+const isProd = process.env.NODE_ENV === "production";
+if (isProd) app.set("trust proxy", 1);
+
+app.use(helmet({
+  // CSP only in production: the Vite dev server injects inline scripts.
+  contentSecurityPolicy: isProd ? {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+      frameAncestors: ["'none'"],
+    },
+  } : false,
+}));
+app.use(express.json({ limit: "100kb" }));
+
+// Reject cross-site state-changing requests (defence in depth on top of SameSite=Lax cookies).
+app.use("/api", (req, res, next) => {
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
+  const origin = req.headers.origin;
+  if (origin) {
+    try {
+      if (new URL(origin).host !== req.headers.host) {
+        return res.status(403).json({ status: "error", message: "Cross-origin request blocked." });
+      }
+    } catch {
+      return res.status(403).json({ status: "error", message: "Bad origin." });
+    }
+  }
+  next();
+});
+
+app.use("/api/auth/login", rateLimit({ windowMs: 15 * 60_000, limit: 30, standardHeaders: true, legacyHeaders: false,
+  message: { status: "error", message: "Too many attempts. Please wait and try again." } }));
+app.use("/api/auth/register-practitioner", rateLimit({ windowMs: 60 * 60_000, limit: 20, standardHeaders: true, legacyHeaders: false }));
+app.use("/api/register-patient", rateLimit({ windowMs: 60 * 60_000, limit: 20, standardHeaders: true, legacyHeaders: false }));
+app.use("/api/", rateLimit({ windowMs: 60_000, limit: 300, standardHeaders: true, legacyHeaders: false }));
+
+app.use(loadSession);
 
 const PORT = 3000;
 
@@ -38,7 +87,7 @@ let bookings: any[] = [
     patientId: "pat-99912",
     patientName: "John Doe",
     patientPhone: "+60-12-345-6789",
-    patientEmail: "swarnabhaumik@gmail.com",
+    patientEmail: "patient@example.com",
     date: "2026-07-12",
     timeSlot: "10:00 AM",
     mode: ConsultationMode.VIDEO,
@@ -56,7 +105,7 @@ let bookings: any[] = [
     patientId: "pat-99912",
     patientName: "John Doe",
     patientPhone: "+60-12-345-6789",
-    patientEmail: "swarnabhaumik@gmail.com",
+    patientEmail: "patient@example.com",
     date: "2026-07-05",
     timeSlot: "11:00 AM",
     mode: ConsultationMode.IN_PERSON,
@@ -158,37 +207,208 @@ let appPackages: any[] = [
   }
 ];
 
+// Restore persisted state (falls back to seed data on first run) and make sure an admin exists.
+doctors = loadCollection("doctors", doctors);
+nurses = loadCollection("nurses", nurses);
+verificationRequests = loadCollection("verificationRequests", verificationRequests);
+reviews = loadCollection("reviews", reviews);
+jobs = loadCollection("jobs", jobs);
+bookings = loadCollection("bookings", bookings);
+chats = loadCollection("chats", chats);
+patients = loadCollection("patients", patients);
+appPackages = loadCollection("appPackages", appPackages);
+ensureAdmin();
+
+const persistState = () =>
+  saveCollections({ doctors, nurses, verificationRequests, reviews, jobs, bookings, chats, patients, appPackages });
+persistState();
+
+app.use("/api", (req, res, next) => {
+  if (!["GET", "HEAD", "OPTIONS"].includes(req.method)) {
+    res.on("finish", () => { if (res.statusCode < 400) persistState(); });
+  }
+  next();
+});
+
 // Helper to generate IDs
 const generateId = (prefix: string) => `${prefix}-${Math.floor(100000 + Math.random() * 900000)}`;
-
-// Lazy-initialized Clinical Triage GenAI Client
-let aiClient: GoogleGenAI | null = null;
-function getGeminiClient(): GoogleGenAI {
-  if (!aiClient) {
-    const key = process.env.GEMINI_API_KEY;
-    if (!key || key === "MY_GEMINI_API_KEY") {
-      throw new Error("GEMINI_API_KEY is not configured in environment variables.");
-    }
-    aiClient = new GoogleGenAI({
-      apiKey: key,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
-        }
-      }
-    });
-  }
-  return aiClient;
-}
 
 // -------------------------------------------------------------
 // API Endpoints
 // -------------------------------------------------------------
 
-// 1. Get Professionals (Doctors + Nurses combined or filtered)
+// -------------------------------------------------------------
+// Auth & account
+// -------------------------------------------------------------
+const CONSENT_VERSION = "2026-10";
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const str = (v: unknown, max = 200) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+const fail = (res: express.Response, code: number, message: string) =>
+  res.status(code).json({ status: "error", message });
+
+const publicUser = (u: AuthUser) => ({
+  id: u.id, role: u.role, name: u.name, email: u.email, avatarUrl: u.avatarUrl ?? undefined, profileId: u.profileId,
+});
+
+// Chat/booking identity: practitioners are addressed by their profile id, patients by their user id.
+const chatIdOf = (u: AuthUser) => (u.role === "practitioner" && u.profileId ? u.profileId : u.id);
+
+const allProfessionals = () => [...doctors, ...nurses];
+const findProfessional = (id: string) => allProfessionals().find(p => p.id === id);
+const isOwnerOrAdmin = (u: AuthUser | undefined, profileId: string) =>
+  !!u && (u.role === "admin" || (u.role === "practitioner" && u.profileId === profileId));
+
+app.post("/api/auth/login", (req, res) => {
+  const email = str(req.body.email, 254).toLowerCase();
+  const password = typeof req.body.password === "string" ? req.body.password : "";
+  const role = ["patient", "practitioner", "admin"].includes(req.body.role) ? (req.body.role as Role) : undefined;
+  if (!email || !password) return fail(res, 400, "Please fill in all fields.");
+
+  const result = attemptLogin(req, email, password, role);
+  if ("error" in result) return fail(res, 401, result.error);
+
+  createSession(req, res, result.id);
+  audit(req, "auth.login", { actor: result });
+  const patient = result.role === "patient" ? patients.find(p => p.userId === result.id) : undefined;
+  res.json({ status: "success", data: { user: publicUser(result), patient } });
+});
+
+app.post("/api/auth/logout", (req, res) => {
+  if (req.user) audit(req, "auth.logout");
+  destroySession(req, res);
+  res.json({ status: "success" });
+});
+
+app.get("/api/auth/me", (req, res) => {
+  if (!req.user) return fail(res, 401, "Not signed in.");
+  const patient = req.user.role === "patient" ? patients.find(p => p.userId === req.user!.id) : undefined;
+  res.json({ status: "success", data: { user: publicUser(req.user), patient } });
+});
+
+app.post("/api/auth/change-password", requireAuth, (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const row = db.prepare("SELECT password_hash FROM users WHERE id = ?").get(req.user!.id) as any;
+  if (typeof currentPassword !== "string" || !verifyPassword(currentPassword, row.password_hash)) {
+    return fail(res, 400, "Current password is incorrect.");
+  }
+  const problem = passwordProblem(newPassword);
+  if (problem) return fail(res, 400, problem);
+  changePassword(req.user!.id, newPassword);
+  createSession(req, res, req.user!.id);
+  audit(req, "auth.password.change");
+  res.json({ status: "success", message: "Password updated. Other sessions were signed out." });
+});
+
+// Practitioner account (profile + licence are submitted afterwards via /api/register and await admin verification)
+app.post("/api/auth/register-practitioner", (req, res) => {
+  const name = str(req.body.name, 100);
+  const email = str(req.body.email, 254).toLowerCase();
+  if (!name || !EMAIL_RE.test(email)) return fail(res, 400, "A valid name and email are required.");
+  const problem = passwordProblem(req.body.password);
+  if (problem) return fail(res, 400, problem);
+  if (req.body.consent !== true) return fail(res, 400, "You must accept the Terms and Privacy Policy.");
+  if (emailTaken(email)) return fail(res, 409, "An account with this email already exists.");
+
+  const user = createUser({ email, password: req.body.password, role: "practitioner", name, consentVersion: CONSENT_VERSION });
+  createSession(req, res, user.id);
+  audit(req, "auth.register", { actor: user, target: ["user", user.id] });
+  res.status(201).json({ status: "success", data: { user: publicUser(user) } });
+});
+
+// Patient registration
+app.post("/api/register-patient", (req, res) => {
+  const {
+    password, age, gender, chronicConditions, allergies, emergencyContactName, emergencyContactPhone,
+  } = req.body;
+  const name = str(req.body.name, 100);
+  const email = str(req.body.email, 254).toLowerCase();
+  const icNumber = str(req.body.icNumber, 30);
+  const phone = str(req.body.phone, 30);
+
+  if (!name || !icNumber || !EMAIL_RE.test(email)) {
+    return fail(res, 400, "Missing essential patient registration fields.");
+  }
+  const problem = passwordProblem(password);
+  if (problem) return fail(res, 400, problem);
+  if (req.body.consent !== true) return fail(res, 400, "You must consent to the processing of your health data to register.");
+  if (emailTaken(email)) return fail(res, 409, "A patient with this email already exists.");
+
+  const user = createUser({ email, password, role: "patient", name, consentVersion: CONSENT_VERSION });
+  const newPatient = {
+    id: generateId("pat"),
+    userId: user.id,
+    name,
+    email,
+    icNumber,
+    age: Number(age) || 30,
+    phone,
+    gender: gender || "Male",
+    chronicConditions: Array.isArray(chronicConditions) ? chronicConditions.map((c: unknown) => str(c, 100)) : [],
+    allergies: Array.isArray(allergies) ? allergies.map((a: unknown) => str(a, 200)) : [],
+    emergencyContactName: str(emergencyContactName, 100),
+    emergencyContactPhone: str(emergencyContactPhone, 30),
+    registeredAt: new Date().toISOString()
+  };
+  patients.push(newPatient);
+
+  createSession(req, res, user.id);
+  audit(req, "auth.register", { actor: user, target: ["user", user.id] });
+  res.status(201).json({
+    status: "success",
+    message: "Patient registered successfully.",
+    data: newPatient
+  });
+});
+
+// Data subject rights: export and deletion request
+app.get("/api/me/export", requireAuth, (req, res) => {
+  const u = req.user!;
+  const me = chatIdOf(u);
+  const data = {
+    exportedAt: new Date().toISOString(),
+    account: db.prepare(
+      "SELECT id,email,name,role,consent_version AS consentVersion,consent_at AS consentAt,created_at AS createdAt FROM users WHERE id = ?"
+    ).get(u.id),
+    patientProfile: patients.find(p => p.userId === u.id) ?? null,
+    professionalProfile: u.profileId ? findProfessional(u.profileId) ?? null : null,
+    bookings: bookings.filter(b => b.patientUserId === u.id || (u.profileId && b.professionalId === u.profileId)),
+    messages: chats.filter(m => m.senderId === me || m.receiverId === me),
+    documents: db.prepare("SELECT id,kind,original_name AS originalName,created_at AS createdAt FROM documents WHERE owner_id = ?").all(u.id),
+  };
+  audit(req, "account.export");
+  res.setHeader("Content-Disposition", 'attachment; filename="careverified-my-data.json"');
+  res.json(data);
+});
+
+app.post("/api/me/deletion-request", requireAuth, (req, res) => {
+  db.prepare("UPDATE users SET deletion_requested_at = ? WHERE id = ?").run(new Date().toISOString(), req.user!.id);
+  audit(req, "account.deletion.requested");
+  res.json({ status: "success", message: "Deletion request recorded. Our team will confirm within 30 days." });
+});
+
+// Admin: audit trail
+app.get("/api/admin/audit-log", requireRole("admin"), (req, res) => {
+  const limit = Math.min(Number(req.query.limit) || 100, 500);
+  const action = typeof req.query.action === "string" ? req.query.action : null;
+  const rows = action
+    ? db.prepare("SELECT * FROM audit_log WHERE action LIKE ? ORDER BY id DESC LIMIT ?").all(action + "%", limit)
+    : db.prepare("SELECT * FROM audit_log ORDER BY id DESC LIMIT ?").all(limit);
+  res.json({ status: "success", data: rows });
+});
+
+app.use("/api/documents", documentsRouter);
+
+// -------------------------------------------------------------
+// Professionals
+// -------------------------------------------------------------
+
+// Public directory shows verified practitioners only; owners see their own profile, admins see all.
+const visibleTo = (u: AuthUser | undefined) => (p: any) =>
+  p.verificationStatus === VerificationStatus.VERIFIED || isOwnerOrAdmin(u, p.id);
+
 app.get("/api/professionals", (req, res) => {
   const { role, city, specialty, search } = req.query;
-  let list: any[] = [...doctors, ...nurses];
+  let list: any[] = allProfessionals().filter(visibleTo(req.user));
 
   if (role) {
     list = list.filter(p => p.role === role);
@@ -201,8 +421,8 @@ app.get("/api/professionals", (req, res) => {
   }
   if (search) {
     const term = (search as string).toLowerCase();
-    list = list.filter(p => 
-      p.name.toLowerCase().includes(term) || 
+    list = list.filter(p =>
+      p.name.toLowerCase().includes(term) ||
       p.specialization.toLowerCase().includes(term) ||
       p.bio.toLowerCase().includes(term)
     );
@@ -211,89 +431,58 @@ app.get("/api/professionals", (req, res) => {
   res.json({ status: "success", data: list });
 });
 
-// Get a professional by ID or slug
 app.get("/api/professionals/:id", (req, res) => {
   const { id } = req.params;
-  const prof = [...doctors, ...nurses].find(p => p.id === id || p.seoSlug === id);
+  const prof = allProfessionals().find(p => (p.id === id || p.seoSlug === id) && visibleTo(req.user)(p));
   if (!prof) {
     return res.status(404).json({ status: "error", message: "Medical professional not found" });
   }
   res.json({ status: "success", data: prof });
 });
 
-// Register Patient Profile
-app.post("/api/register-patient", (req, res) => {
-  const { 
-    name, email, password, icNumber, age, phone, gender,
-    chronicConditions, allergies, emergencyContactName, emergencyContactPhone 
-  } = req.body;
+// Submit practitioner profile + licence details for verification (one profile per account)
+app.post("/api/register", requireRole("practitioner"), (req, res) => {
+  const user = req.user!;
+  if (user.profileId) return fail(res, 409, "A professional profile already exists for this account.");
 
-  if (!name || !email || !password || !icNumber) {
-    return res.status(400).json({ status: "error", message: "Missing essential patient registration fields." });
+  const role = req.body.role === UserRole.NURSE ? UserRole.NURSE : UserRole.DOCTOR;
+  const name = str(req.body.name, 100);
+  const specialization = str(req.body.specialization, 100);
+  const licenseNumber = str(req.body.licenseNumber, 50);
+  const medicalCouncil = str(req.body.medicalCouncil, 100);
+  const city = str(req.body.city, 80);
+  const practiceAddress = str(req.body.practiceAddress, 250);
+  const { experienceYears, education, bio, languages, consultationModes, fee, shiftTypes, avatar } = req.body;
+
+  if (!name || !specialization || !licenseNumber || !medicalCouncil || !city) {
+    return fail(res, 400, "Name, specialization, licence number, medical council and city are required.");
+  }
+  if (allProfessionals().some(p => p.licenseNumber.toLowerCase() === licenseNumber.toLowerCase())) {
+    return fail(res, 409, "This licence number is already registered.");
   }
 
-  // Check if email already registered
-  const exists = patients.some(p => p.email.toLowerCase() === email.toLowerCase());
-  if (exists) {
-    return res.status(400).json({ status: "error", message: "A patient with this email already exists." });
-  }
-
-  const newPatient = {
-    id: generateId("pat"),
-    name,
-    email,
-    icNumber,
-    age: Number(age) || 30,
-    phone,
-    gender: gender || "Male",
-    chronicConditions: Array.isArray(chronicConditions) ? chronicConditions : [],
-    allergies: Array.isArray(allergies) ? allergies : [],
-    emergencyContactName: emergencyContactName || "",
-    emergencyContactPhone: emergencyContactPhone || "",
-    registeredAt: new Date().toISOString()
-  };
-
-  patients.push(newPatient);
-
-  res.status(201).json({
-    status: "success",
-    message: "Patient registered successfully inside secure national register.",
-    data: newPatient
-  });
-});
-
-// 2. Multi-step Signup & Verification Request Submission
-app.post("/api/register", (req, res) => {
-  const { 
-    name, role, specialization, licenseNumber, medicalCouncil, 
-    experienceYears, education, bio, languages, consultationModes, 
-    fee, practiceAddress, city, shiftTypes, avatar 
-  } = req.body;
-
-  if (!name || !role || !licenseNumber || !medicalCouncil) {
-    return res.status(400).json({ status: "error", message: "Missing required registration parameters." });
-  }
-
+  const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   const newId = generateId(role === UserRole.DOCTOR ? "doc" : "nur");
-  const seoSlug = `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${specialization.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${city.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const seoSlug = `${slug(name)}-${slug(specialization)}-${slug(city)}`;
+  const educationList = (Array.isArray(education) ? education : [education]).map((e: unknown) => str(e, 200)).filter(Boolean);
+  const safeAvatar = typeof avatar === "string" && avatar.startsWith("/assets/") ? avatar : undefined;
 
-  // Create the professional profile with PENDING status
   if (role === UserRole.DOCTOR) {
-    const newDoc = {
+    doctors.push({
       id: newId,
       name,
-      avatar: avatar || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=250",
+      avatar: safeAvatar || "/assets/malaysian_female_doctor.jpg",
       role: UserRole.DOCTOR as const,
       specialization,
       licenseNumber,
       medicalCouncil,
       experienceYears: Number(experienceYears) || 1,
-      education: Array.isArray(education) ? education : [education],
-      bio: bio || "Licensed medical practitioner.",
-      languages: Array.isArray(languages) ? languages : ["English", "Hindi"],
+      education: educationList,
+      bio: str(bio, 1000) || "Licensed medical practitioner.",
+      languages: Array.isArray(languages) ? languages.map((l: unknown) => str(l, 40)) : ["English"],
       consultationModes: Array.isArray(consultationModes) ? consultationModes : ["In-person" as any],
-      fee: Number(fee) || 500,
-      rating: 5.0,
+      fee: Math.max(0, Number(fee) || 0),
+      rating: 0,
       reviewCount: 0,
       verificationStatus: VerificationStatus.PENDING,
       practiceAddress,
@@ -303,24 +492,23 @@ app.post("/api/register", (req, res) => {
         slots: ["10:00 AM", "12:00 PM", "02:00 PM", "04:00 PM"]
       },
       seoSlug
-    };
-    doctors.push(newDoc);
+    });
   } else {
-    const newNurse = {
+    nurses.push({
       id: newId,
       name,
-      avatar: avatar || "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=250",
+      avatar: safeAvatar || "/assets/malaysian_female_nurse.jpg",
       role: UserRole.NURSE as const,
       specialization,
       licenseNumber,
       nursingCouncil: medicalCouncil,
       experienceYears: Number(experienceYears) || 1,
-      education: Array.isArray(education) ? education : [education],
-      bio: bio || "Licensed care professional.",
-      languages: Array.isArray(languages) ? languages : ["English", "Hindi"],
+      education: educationList,
+      bio: str(bio, 1000) || "Licensed care professional.",
+      languages: Array.isArray(languages) ? languages.map((l: unknown) => str(l, 40)) : ["English"],
       consultationModes: Array.isArray(consultationModes) ? consultationModes : ["Home Visit" as any],
-      fee: Number(fee) || 200,
-      rating: 5.0,
+      fee: Math.max(0, Number(fee) || 0),
+      rating: 0,
       reviewCount: 0,
       verificationStatus: VerificationStatus.PENDING,
       practiceAddress,
@@ -331,160 +519,201 @@ app.post("/api/register", (req, res) => {
       },
       seoSlug,
       shiftTypes: Array.isArray(shiftTypes) ? shiftTypes : ["Day Shift"]
-    };
-    nurses.push(newNurse);
+    });
   }
 
-  // Generate a verification request in parallel
+  db.prepare("UPDATE users SET profile_id = ? WHERE id = ?").run(newId, user.id);
+
   const vReq = {
     id: generateId("ver"),
     userId: newId,
+    accountId: user.id,
     userName: name,
     userType: role as any,
     licenseNumber,
     medicalCouncil,
-    degreeName: Array.isArray(education) ? education[0] : education,
-    fileUrl: "uploaded_certificate_" + newId + ".pdf",
+    degreeName: educationList[0] || "",
+    fileUrl: "",
     submittedAt: new Date().toISOString(),
     status: VerificationStatus.PENDING
   };
   verificationRequests.push(vReq);
+  audit(req, "practitioner.submit", { target: ["verification", vReq.id], details: { profileId: newId } });
 
-  res.status(201).json({ 
-    status: "success", 
-    message: "Registration completed successfully. Profile is in pending verification state.", 
-    data: { id: newId, seoSlug, verificationRequestId: vReq.id } 
+  res.status(201).json({
+    status: "success",
+    message: "Registration submitted. Your profile is pending verification by the medical board.",
+    data: { id: newId, seoSlug, verificationRequestId: vReq.id }
   });
 });
 
-// 2.5. Edit Professional Details
-app.post("/api/professionals/:id/edit", (req, res) => {
+app.post("/api/professionals/:id/edit", requireRole("practitioner", "admin"), (req, res) => {
   const { id } = req.params;
   const { bio, fee, practiceAddress, city, availability } = req.body;
 
-  let prof: any = doctors.find(d => d.id === id);
-  if (!prof) {
-    prof = nurses.find(n => n.id === id);
-  }
-
+  const prof: any = findProfessional(id);
   if (!prof) {
     return res.status(404).json({ status: "error", message: "Practitioner profile not found." });
   }
+  if (!isOwnerOrAdmin(req.user, id)) {
+    audit(req, "access.denied", { target: ["professional", id] });
+    return fail(res, 403, "You can only edit your own profile.");
+  }
 
-  if (bio !== undefined) prof.bio = bio;
-  if (fee !== undefined) prof.fee = Number(fee) || prof.fee;
-  if (practiceAddress !== undefined) prof.practiceAddress = practiceAddress;
-  if (city !== undefined) prof.city = city;
-  if (availability !== undefined) prof.availability = availability;
+  if (bio !== undefined) prof.bio = str(bio, 1000);
+  if (fee !== undefined && Number(fee) >= 0) prof.fee = Number(fee);
+  if (practiceAddress !== undefined) prof.practiceAddress = str(practiceAddress, 250);
+  if (city !== undefined) prof.city = str(city, 80);
+  if (availability !== undefined && Array.isArray(availability?.days) && Array.isArray(availability?.slots)) {
+    prof.availability = { days: availability.days.map((d: unknown) => str(d, 20)), slots: availability.slots.map((s: unknown) => str(s, 30)) };
+  }
+  audit(req, "professional.edit", { target: ["professional", id] });
 
   res.json({ status: "success", message: "Profile updated successfully.", data: prof });
 });
 
-// 3. Admin Verification Pipeline
-app.get("/api/verification-requests", (req, res) => {
+// -------------------------------------------------------------
+// Admin verification pipeline
+// -------------------------------------------------------------
+app.get("/api/verification-requests", requireRole("admin"), (req, res) => {
   res.json({ status: "success", data: verificationRequests });
 });
 
-app.post("/api/verification-requests/:id/verify", (req, res) => {
+app.post("/api/verification-requests/:id/verify", requireRole("admin"), (req, res) => {
   const { id } = req.params;
-  const { status, rejectionReason } = req.body; // status: VerificationStatus.VERIFIED or VerificationStatus.REJECTED
+  const { status } = req.body;
+  const rejectionReason = str(req.body.rejectionReason, 500);
 
+  if (status !== VerificationStatus.VERIFIED && status !== VerificationStatus.REJECTED) {
+    return fail(res, 400, "Status must be Verified or Rejected.");
+  }
   const request = verificationRequests.find(r => r.id === id);
   if (!request) {
     return res.status(404).json({ status: "error", message: "Verification request not found." });
   }
 
   request.status = status;
+  (request as any).reviewedBy = req.user!.id;
+  (request as any).reviewedAt = new Date().toISOString();
   if (rejectionReason) {
     request.rejectionReason = rejectionReason;
   }
 
-  // Update associated doctor/nurse status
-  const docProfile = doctors.find(d => d.id === request.userId);
-  if (docProfile) {
-    docProfile.verificationStatus = status;
-  } else {
-    const nurseProfile = nurses.find(n => n.id === request.userId);
-    if (nurseProfile) {
-      nurseProfile.verificationStatus = status;
-    }
-  }
+  const profile: any = findProfessional(request.userId);
+  if (profile) profile.verificationStatus = status;
 
+  audit(req, "verification.decision", {
+    target: ["verification", id],
+    details: { status, profileId: request.userId, rejectionReason: rejectionReason || undefined },
+  });
   res.json({ status: "success", message: `Verification request updated to ${status}` });
 });
 
-// 4. Booking & Appointments Engine
-app.get("/api/bookings", (req, res) => {
-  res.json({ status: "success", data: bookings });
+// -------------------------------------------------------------
+// Bookings & e-prescriptions
+// -------------------------------------------------------------
+app.get("/api/bookings", requireAuth, (req, res) => {
+  const u = req.user!;
+  let list: any[] = [];
+  if (u.role === "admin") list = bookings;
+  else if (u.role === "practitioner") list = u.profileId ? bookings.filter(b => b.professionalId === u.profileId) : [];
+  else list = bookings.filter(b => b.patientUserId === u.id);
+  res.json({ status: "success", data: list });
 });
 
-app.post("/api/bookings", (req, res) => {
-  const { 
-    professionalId, patientName, patientPhone, patientEmail, 
-    date, timeSlot, mode, fee, symptoms 
-  } = req.body;
+app.post("/api/bookings", requireRole("patient"), (req, res) => {
+  const { professionalId, patientPhone, mode, symptoms } = req.body;
+  const date = str(req.body.date, 10);
+  const timeSlot = str(req.body.timeSlot, 30);
 
-  if (!professionalId || !patientName || !date || !timeSlot) {
-    return res.status(400).json({ status: "error", message: "Missing vital booking parameters." });
+  if (!professionalId || !date || !timeSlot) {
+    return fail(res, 400, "Missing vital booking parameters.");
   }
-
-  const prof = [...doctors, ...nurses].find(p => p.id === professionalId);
-  if (!prof) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date))) {
+    return fail(res, 400, "Invalid date.");
+  }
+  const prof: any = findProfessional(professionalId);
+  if (!prof || prof.verificationStatus !== VerificationStatus.VERIFIED) {
     return res.status(404).json({ status: "error", message: "Professional not found." });
   }
+  // Emergency on-call dispatches are not tied to a scheduled slot.
+  if (timeSlot !== "Immediate Emergency Call" &&
+      bookings.some(b => b.professionalId === professionalId && b.date === date && b.timeSlot === timeSlot && b.status !== "Cancelled")) {
+    return fail(res, 409, "That time slot has just been taken. Please choose another.");
+  }
 
+  const user = req.user!;
+  const patient = patients.find(p => p.userId === user.id);
   const newBooking = {
     id: generateId("bkg"),
     professionalId,
     professionalName: prof.name,
     professionalRole: prof.role,
-    patientId: generateId("pat"),
-    patientName,
-    patientPhone: patientPhone || "999-999-9999",
-    patientEmail: patientEmail || "patient@example.com",
+    patientId: patient?.id ?? user.id,
+    patientUserId: user.id,
+    patientName: user.name,
+    patientPhone: str(patientPhone, 30) || patient?.phone || "",
+    patientEmail: user.email,
     date,
     timeSlot,
     mode: mode || ConsultationMode.IN_PERSON,
-    fee: Number(fee) || prof.fee,
-    paymentStatus: "Paid" as const, // Automatically paid for simulation
+    fee: prof.fee, // always priced server-side
+    paymentStatus: "Paid" as const, // TODO(phase 3): real payment gateway; currently simulated
     status: "Upcoming" as const,
-    symptoms: symptoms || "",
+    symptoms: str(symptoms, 1000),
     createdAt: new Date().toISOString()
   };
 
   bookings.push(newBooking);
+  audit(req, "booking.create", { target: ["booking", newBooking.id], details: { professionalId } });
   res.status(201).json({ status: "success", message: "Appointment booked successfully!", data: newBooking });
 });
 
-// Issue E-Prescription (Doctor Action)
-app.post("/api/bookings/:id/prescribe", (req, res) => {
+app.post("/api/bookings/:id/prescribe", requireRole("practitioner"), (req, res) => {
   const { id } = req.params;
-  const { diagnosis, medicines, instructions, signature } = req.body;
+  const diagnosis = str(req.body.diagnosis, 500);
+  const medicines = str(req.body.medicines, 2000);
+  const instructions = str(req.body.instructions, 2000);
 
   const booking = bookings.find(b => b.id === id);
-  if (!booking) {
+  if (!booking || booking.professionalId !== req.user!.profileId) {
     return res.status(404).json({ status: "error", message: "Booking not found." });
+  }
+  const prof: any = findProfessional(booking.professionalId);
+  if (!prof || prof.verificationStatus !== VerificationStatus.VERIFIED) {
+    return fail(res, 403, "Only verified practitioners can issue prescriptions.");
+  }
+  if (!diagnosis || !medicines) {
+    return fail(res, 400, "Diagnosis and medicines are required.");
   }
 
   booking.status = "Completed";
   booking.prescription = {
-    diagnosis: diagnosis || "General Wellness Evaluation",
-    medicines: medicines || "Multivitamins 1 OD",
-    instructions: instructions || "Stay hydrated and get 8 hours of sleep.",
+    diagnosis,
+    medicines,
+    instructions,
     issuedAt: new Date().toISOString(),
-    digitalSignature: signature || `Digitally signed by ${booking.professionalName} (MMC Verified)`
+    digitalSignature: `Digitally signed by ${prof.name} (Licence ${prof.licenseNumber})`
   };
+  audit(req, "prescription.issue", { target: ["booking", id] });
 
   res.json({ status: "success", message: "E-prescription generated and signed successfully.", data: booking });
 });
 
-// 5. B2B Recruitment & Shift Board
+// -------------------------------------------------------------
+// Recruitment & shift board
+// -------------------------------------------------------------
 app.get("/api/jobs", (req, res) => {
-  res.json({ status: "success", data: jobs });
+  // Applicant identities stay private: callers only ever see their own application.
+  const me = req.user?.id;
+  res.json({ status: "success", data: jobs.map(j => ({ ...j, appliedUserIds: me && j.appliedUserIds.includes(me) ? [me] : [] })) });
 });
 
-app.post("/api/jobs", (req, res) => {
-  const { hospitalName, title, type, location, city, specialtyRequired, description, salaryRange, requirements } = req.body;
+app.post("/api/jobs", requireRole("practitioner", "admin"), (req, res) => {
+  const { type, requirements } = req.body;
+  const hospitalName = str(req.body.hospitalName, 120);
+  const title = str(req.body.title, 120);
+  const specialtyRequired = str(req.body.specialtyRequired, 100);
 
   if (!hospitalName || !title || !specialtyRequired) {
     return res.status(400).json({ status: "error", message: "Missing core job description fields." });
@@ -492,39 +721,40 @@ app.post("/api/jobs", (req, res) => {
 
   const newJob = {
     id: generateId("job"),
+    postedByUserId: req.user!.id,
     hospitalName,
     hospitalLogo: "🏥",
     title,
     type: type || "Full-time",
-    location: location || "Main Wing",
-    city: city || "New Delhi",
+    location: str(req.body.location, 120) || "Main Wing",
+    city: str(req.body.city, 80) || "Kuala Lumpur",
     specialtyRequired,
-    description: description || "Join our world-class care team.",
-    salaryRange: salaryRange || "Negotiable",
-    requirements: Array.isArray(requirements) ? requirements : ["Registered and licensed with local medical board"],
+    description: str(req.body.description, 2000) || "Join our care team.",
+    salaryRange: str(req.body.salaryRange, 60) || "Negotiable",
+    requirements: Array.isArray(requirements) ? requirements.map((r: unknown) => str(r, 200)) : ["Registered and licensed with local medical board"],
     applicantsCount: 0,
     status: "Active" as const,
     postedAt: new Date().toISOString(),
-    appliedUserIds: []
+    appliedUserIds: [] as string[]
   };
 
   jobs.push(newJob);
+  audit(req, "job.create", { target: ["job", newJob.id] });
   res.status(201).json({ status: "success", message: "Job listing published successfully.", data: newJob });
 });
 
-app.post("/api/jobs/:id/apply", (req, res) => {
+app.post("/api/jobs/:id/apply", requireRole("practitioner"), (req, res) => {
   const { id } = req.params;
-  const { userId } = req.body;
-
-  if (!userId) {
-    return res.status(400).json({ status: "error", message: "Applicant ID is required." });
-  }
+  const userId = req.user!.id;
 
   const job = jobs.find(j => j.id === id);
   if (!job) {
     return res.status(404).json({ status: "error", message: "Job post not found." });
   }
-
+  const prof: any = req.user!.profileId ? findProfessional(req.user!.profileId) : null;
+  if (!prof || prof.verificationStatus !== VerificationStatus.VERIFIED) {
+    return fail(res, 403, "Only verified practitioners can apply to positions.");
+  }
   if (job.appliedUserIds.includes(userId)) {
     return res.status(400).json({ status: "error", message: "You have already applied to this position." });
   }
@@ -532,10 +762,12 @@ app.post("/api/jobs/:id/apply", (req, res) => {
   job.appliedUserIds.push(userId);
   job.applicantsCount += 1;
 
-  res.json({ status: "success", message: "Application submitted successfully!", data: job });
+  res.json({ status: "success", message: "Application submitted successfully!", data: { ...job, appliedUserIds: [userId] } });
 });
 
-// 6. Review & Rating Submission
+// -------------------------------------------------------------
+// Reviews
+// -------------------------------------------------------------
 app.get("/api/reviews", (req, res) => {
   const { professionalId } = req.query;
   let list = [...reviews];
@@ -545,89 +777,85 @@ app.get("/api/reviews", (req, res) => {
   res.json({ status: "success", data: list });
 });
 
-app.post("/api/reviews", (req, res) => {
-  const { professionalId, patientName, rating, punctuality, communication, satisfaction, comment } = req.body;
+app.post("/api/reviews", requireRole("patient"), (req, res) => {
+  const { professionalId } = req.body;
+  const rating = Number(req.body.rating);
+  const clamp = (v: unknown) => { const n = Number(v); return n >= 1 && n <= 5 ? n : rating; };
 
-  if (!professionalId || !patientName || !rating) {
-    return res.status(400).json({ status: "error", message: "Missing review payload fields." });
+  if (!professionalId || !(rating >= 1 && rating <= 5)) {
+    return res.status(400).json({ status: "error", message: "Missing or invalid review fields." });
+  }
+  const user = req.user!;
+  // Only patients who actually booked this practitioner may review, once each.
+  if (!bookings.some(b => b.patientUserId === user.id && b.professionalId === professionalId)) {
+    return fail(res, 403, "You can only review practitioners you have booked.");
+  }
+  if (reviews.some(r => r.professionalId === professionalId && (r as any).patientUserId === user.id)) {
+    return fail(res, 409, "You have already reviewed this practitioner.");
   }
 
   const newReview = {
     id: generateId("rev"),
     professionalId,
-    patientId: generateId("pat"),
-    patientName,
-    rating: Number(rating),
-    punctuality: Number(punctuality) || Number(rating),
-    communication: Number(communication) || Number(rating),
-    satisfaction: Number(satisfaction) || Number(rating),
-    comment: comment || "",
+    patientId: user.id,
+    patientUserId: user.id,
+    patientName: user.name,
+    rating,
+    punctuality: clamp(req.body.punctuality),
+    communication: clamp(req.body.communication),
+    satisfaction: clamp(req.body.satisfaction),
+    comment: str(req.body.comment, 1000),
     date: new Date().toISOString().split('T')[0],
     isVerifiedPatient: true
   };
 
   reviews.push(newReview);
 
-  // Recalculate doctor/nurse rating average
-  const pId = professionalId;
-  const targetReviews = reviews.filter(r => r.professionalId === pId);
+  const targetReviews = reviews.filter(r => r.professionalId === professionalId);
   const avg = Number((targetReviews.reduce((sum, r) => sum + r.rating, 0) / targetReviews.length).toFixed(2));
-
-  const doc = doctors.find(d => d.id === pId);
-  if (doc) {
-    doc.rating = avg;
-    doc.reviewCount = targetReviews.length;
-  } else {
-    const nurse = nurses.find(n => n.id === pId);
-    if (nurse) {
-      nurse.rating = avg;
-      nurse.reviewCount = targetReviews.length;
-    }
+  const prof: any = findProfessional(professionalId);
+  if (prof) {
+    prof.rating = avg;
+    prof.reviewCount = targetReviews.length;
   }
 
   res.status(201).json({ status: "success", message: "Review posted successfully.", data: newReview });
 });
 
-// Reply to review
-app.post("/api/reviews/:id/reply", (req, res) => {
+app.post("/api/reviews/:id/reply", requireRole("practitioner"), (req, res) => {
   const { id } = req.params;
-  const { replyText } = req.body;
-
   const rev = reviews.find(r => r.id === id);
-  if (!rev) {
+  if (!rev || rev.professionalId !== req.user!.profileId) {
     return res.status(404).json({ status: "error", message: "Review not found." });
   }
-
-  rev.replyText = replyText;
+  rev.replyText = str(req.body.replyText, 1000);
   res.json({ status: "success", message: "Reply added to review.", data: rev });
 });
 
-// 7. Secure Messaging Chat Log
-app.get("/api/chats", (req, res) => {
-  const { userA, userB } = req.query;
-  let filtered = [...chats];
-  if (userA && userB) {
-    filtered = chats.filter(m => 
-      (m.senderId === userA && m.receiverId === userB) ||
-      (m.senderId === userB && m.receiverId === userA)
-    );
-  }
-  res.json({ status: "success", data: filtered });
+// -------------------------------------------------------------
+// Secure messaging (participants only)
+// -------------------------------------------------------------
+app.get("/api/chats", requireRole("patient", "practitioner"), (req, res) => {
+  const me = chatIdOf(req.user!);
+  let list = chats.filter(m => m.senderId === me || m.receiverId === me);
+  const withId = typeof req.query.with === "string" ? req.query.with : null;
+  if (withId) list = list.filter(m => m.senderId === withId || m.receiverId === withId);
+  res.json({ status: "success", data: list });
 });
 
-app.post("/api/chats", (req, res) => {
-  const { senderId, senderName, receiverId, receiverName, text } = req.body;
-
-  if (!senderId || !receiverId || !text) {
+app.post("/api/chats", requireRole("patient", "practitioner"), (req, res) => {
+  const receiverId = str(req.body.receiverId, 60);
+  const text = str(req.body.text, 2000);
+  if (!receiverId || !text) {
     return res.status(400).json({ status: "error", message: "Incomplete chat payload." });
   }
-
+  const sender = req.user!;
   const msg = {
     id: generateId("msg"),
-    senderId,
-    senderName,
+    senderId: chatIdOf(sender),
+    senderName: sender.name, // identity comes from the session, never the request
     receiverId,
-    receiverName,
+    receiverName: str(req.body.receiverName, 100),
     text,
     timestamp: new Date().toISOString(),
     isRead: false
@@ -642,127 +870,66 @@ app.get("/api/articles", (req, res) => {
   res.json({ status: "success", data: articles });
 });
 
-// 9. AI-Based Symptom-to-Specialist Intelligent Matching
-app.post("/api/ai-matching", async (req, res) => {
-  const { symptoms, patientAge, patientGender } = req.body;
+// 9. Symptom-to-Specialist Matching
+app.post("/api/symptom-matching", (req, res) => {
+  const { symptoms } = req.body;
 
   if (!symptoms) {
     return res.status(400).json({ status: "error", message: "Please specify symptoms to match." });
   }
 
-  const ageText = patientAge ? `, age ${patientAge}` : "";
-  const genderText = patientGender ? `, gender ${patientGender}` : "";
+  const text = symptoms.toLowerCase();
+  let recommendation = {
+    recommendedSpecialty: "General Physician",
+    confidenceScore: 0.85,
+    clinicalJustification: "Matched core symptomatic keywords indicating general systemic or standard infection-like symptoms.",
+    symptomSeverity: "Medium",
+    recommendedAction: "Schedule a teleconsultation or in-person evaluation with a GP for a comprehensive medical checkout."
+  };
 
-  try {
-    const ai = getGeminiClient();
-    const prompt = `You are an expert clinical triage matching assistant on CareVerified.
-Analyze the following user-submitted symptoms and details carefully:
-Symptoms: "${symptoms}"${ageText}${genderText}
-
-Recommend the absolute best medical specialist category from the following support list:
-- "Cardiologist" (for chest tightness, heart palpitations, blood pressure anomalies)
-- "Pediatrician" (for symptoms in infants and young kids)
-- "Neurologist" (for migraines, seizures, stroke signs, tremors, sensory loss)
-- "Dermatologist" (for rashes, acne, atypical moles, skin disorders)
-- "General Physician" (for basic fevers, common colds, gut upsets, or generic symptoms)
-- "ICU & Critical Care" (for high acuity, immediate ventilation or life-support care inquiries)
-
-Provide your clinical assessment in a strict JSON format matching this schema:
-{
-  "recommendedSpecialty": "Name of the specialty matching EXACTLY one of the categories above",
-  "confidenceScore": 0.0 to 1.0,
-  "clinicalJustification": "Explain concisely why this specialty is selected based on symptoms, citing potential pathophysiology triggers",
-  "symptomSeverity": "Low" | "Medium" | "High/Urgent",
-  "recommendedAction": "Immediate instructions for the patient (e.g., 'Schedule a consult within 48 hours', 'Go to the nearest emergency room immediately')"
-}`;
-
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            recommendedSpecialty: { type: Type.STRING },
-            confidenceScore: { type: Type.NUMBER },
-            clinicalJustification: { type: Type.STRING },
-            symptomSeverity: { 
-              type: Type.STRING,
-              enum: ["Low", "Medium", "High/Urgent"]
-            },
-            recommendedAction: { type: Type.STRING }
-          },
-          required: ["recommendedSpecialty", "confidenceScore", "clinicalJustification", "symptomSeverity", "recommendedAction"]
-        }
-      }
-    });
-
-    const parsed = JSON.parse(response.text.trim());
-    res.json({ status: "success", source: "CareVerified Triage Engine", data: parsed });
-
-  } catch (error: any) {
-    // Elegant Local Rule-based Fallback when API key is missing or encounters rate limiting
-    console.warn("Clinical Triage matching operating in rule-based fallback mode:", error.message);
-
-    const text = symptoms.toLowerCase();
-    let recommendation = {
-      recommendedSpecialty: "General Physician",
-      confidenceScore: 0.85,
-      clinicalJustification: "Matched core symptomatic keywords indicating general systemic or standard infection-like symptoms.",
-      symptomSeverity: "Medium",
-      recommendedAction: "Schedule a teleconsultation or in-person evaluation with a GP for a comprehensive medical checkout."
+  if (text.includes("chest") || text.includes("heart") || text.includes("palpitation") || text.includes("cardiac") || text.includes("pulse")) {
+    recommendation = {
+      recommendedSpecialty: "Cardiologist",
+      confidenceScore: 0.95,
+      clinicalJustification: "Symptom description contains references to chest discomfort, heavy pounding, or cardiac risk factors, necessitating ECG/lipid screenings.",
+      symptomSeverity: "High/Urgent",
+      recommendedAction: "Seek urgent cardiological evaluation. If you experience radiating arm pain or severe sweating, visit the nearest ER immediately."
     };
-
-    if (text.includes("chest") || text.includes("heart") || text.includes("palpitation") || text.includes("cardiac") || text.includes("pulse")) {
-      recommendation = {
-        recommendedSpecialty: "Cardiologist",
-        confidenceScore: 0.95,
-        clinicalJustification: "Symptom description contains references to chest discomfort, heavy pounding, or cardiac risk factors, necessitating ECG/lipid screenings.",
-        symptomSeverity: "High/Urgent",
-        recommendedAction: "Seek urgent cardiological evaluation. If you experience radiating arm pain or severe sweating, visit the nearest ER immediately."
-      };
-    } else if (text.includes("child") || text.includes("baby") || text.includes("infant") || text.includes("kid") || text.includes("pediatric")) {
-      recommendation = {
-        recommendedSpecialty: "Pediatrician",
-        confidenceScore: 0.92,
-        clinicalJustification: "Patient profile or symptom detail refers to pediatric/childhood development age bracket, requiring specialist pediatric dosage and monitoring.",
-        symptomSeverity: "Medium",
-        recommendedAction: "Book an appointment with a verified pediatrician for customized neonatal/growth-phase checkups."
-      };
-    } else if (text.includes("headache") || text.includes("migraine") || text.includes("seizure") || text.includes("numb") || text.includes("nerve") || text.includes("tremor")) {
-      recommendation = {
-        recommendedSpecialty: "Neurologist",
-        confidenceScore: 0.90,
-        clinicalJustification: "Symptomatology points to localized cranial or neurological pathways such as migraines, peripheral neuropathy, or potential autonomic disruptions.",
-        symptomSeverity: "Medium",
-        recommendedAction: "Consult a neurologist for detailed clinical reflex mappings or brain imaging if symptoms persist."
-      };
-    } else if (text.includes("rash") || text.includes("skin") || text.includes("acne") || text.includes("mole") || text.includes("spot") || text.includes("itch")) {
-      recommendation = {
-        recommendedSpecialty: "Dermatologist",
-        confidenceScore: 0.94,
-        clinicalJustification: "Primary physical manifestations are cutaneous (skin-based), suggesting allergy outbreaks, acne pathogenesis, or eczema.",
-        symptomSeverity: "Low",
-        recommendedAction: "Schedule a high-definition video teleconsultation or clinical in-person dermatology checkup."
-      };
-    } else if (text.includes("breathe") || text.includes("icu") || text.includes("critical") || text.includes("ventilator") || text.includes("oxygen")) {
-      recommendation = {
-        recommendedSpecialty: "ICU & Critical Care",
-        confidenceScore: 0.88,
-        clinicalJustification: "High-acuity respiratory distress or life-support status indicates an immediate need for clinical intensive care registered nurse support.",
-        symptomSeverity: "High/Urgent",
-        recommendedAction: "Procure ICU-trained private care staffing immediately or seek active emergency critical care stabilization."
-      };
-    }
-
-    res.json({ 
-      status: "success", 
-      source: "CareVerified Triage Engine", 
-      warning: "Operating in high-fidelity CareVerified clinical rules triage mode.",
-      data: recommendation 
-    });
+  } else if (text.includes("child") || text.includes("baby") || text.includes("infant") || text.includes("kid") || text.includes("pediatric")) {
+    recommendation = {
+      recommendedSpecialty: "Pediatrician",
+      confidenceScore: 0.92,
+      clinicalJustification: "Patient profile or symptom detail refers to pediatric/childhood development age bracket, requiring specialist pediatric dosage and monitoring.",
+      symptomSeverity: "Medium",
+      recommendedAction: "Book an appointment with a verified pediatrician for customized neonatal/growth-phase checkups."
+    };
+  } else if (text.includes("headache") || text.includes("migraine") || text.includes("seizure") || text.includes("numb") || text.includes("nerve") || text.includes("tremor")) {
+    recommendation = {
+      recommendedSpecialty: "Neurologist",
+      confidenceScore: 0.90,
+      clinicalJustification: "Symptomatology points to localized cranial or neurological pathways such as migraines, peripheral neuropathy, or potential autonomic disruptions.",
+      symptomSeverity: "Medium",
+      recommendedAction: "Consult a neurologist for detailed clinical reflex mappings or brain imaging if symptoms persist."
+    };
+  } else if (text.includes("rash") || text.includes("skin") || text.includes("acne") || text.includes("mole") || text.includes("spot") || text.includes("itch")) {
+    recommendation = {
+      recommendedSpecialty: "Dermatologist",
+      confidenceScore: 0.94,
+      clinicalJustification: "Primary physical manifestations are cutaneous (skin-based), suggesting allergy outbreaks, acne pathogenesis, or eczema.",
+      symptomSeverity: "Low",
+      recommendedAction: "Schedule a high-definition video teleconsultation or clinical in-person dermatology checkup."
+    };
+  } else if (text.includes("breathe") || text.includes("icu") || text.includes("critical") || text.includes("ventilator") || text.includes("oxygen")) {
+    recommendation = {
+      recommendedSpecialty: "ICU & Critical Care",
+      confidenceScore: 0.88,
+      clinicalJustification: "High-acuity respiratory distress or life-support status indicates an immediate need for clinical intensive care registered nurse support.",
+      symptomSeverity: "High/Urgent",
+      recommendedAction: "Procure ICU-trained private care staffing immediately or seek active emergency critical care stabilization."
+    };
   }
+
+  res.json({ status: "success", source: "CareVerified Triage Engine", data: recommendation });
 });
 
 // --- Packages Modular Architecture API ---
@@ -773,7 +940,7 @@ app.get("/api/packages", (req, res) => {
 });
 
 // Install or add a new package
-app.post("/api/packages", (req, res) => {
+app.post("/api/packages", requireRole("admin"), (req, res) => {
   const { id, name, description, icon, category, version, author, isRemovable } = req.body;
 
   if (!id || !name || !description) {
@@ -802,7 +969,7 @@ app.post("/api/packages", (req, res) => {
 });
 
 // Toggle enabled status of a package
-app.post("/api/packages/:id/toggle", (req, res) => {
+app.post("/api/packages/:id/toggle", requireRole("admin"), (req, res) => {
   const { id } = req.params;
   const pkg = appPackages.find(p => p.id === id);
   if (!pkg) {
@@ -814,7 +981,7 @@ app.post("/api/packages/:id/toggle", (req, res) => {
 });
 
 // Uninstall / Remove a package
-app.delete("/api/packages/:id", (req, res) => {
+app.delete("/api/packages/:id", requireRole("admin"), (req, res) => {
   const { id } = req.params;
   const idx = appPackages.findIndex(p => p.id === id);
   if (idx === -1) {
@@ -871,7 +1038,7 @@ app.get("/sitemap.xml", (req, res) => {
   });
 
   // Append individual doctor profile pages
-  [...doctors, ...nurses].forEach(prof => {
+  [...doctors, ...nurses].filter(p => p.verificationStatus === VerificationStatus.VERIFIED).forEach(prof => {
     xml += `
   <url>
     <loc>https://careverified.pro/doctors/${prof.seoSlug}</loc>
