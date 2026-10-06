@@ -1,4 +1,5 @@
 import VerificationStatusCard from './VerificationStatusCard';
+import ClinicalWorkspace from './ClinicalWorkspace';
 import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, UserCheck, Stethoscope, Award, FileText, Loader, 
@@ -262,36 +263,6 @@ export default function VerificationTerminal({
       console.error("Error replying to review:", err);
     } finally {
       setReplyingMap(prev => ({ ...prev, [reviewId]: false }));
-    }
-  };
-
-  const handleIssuePrescriptionSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedBookingForPrescribe) return;
-    setIssuingPrescription(true);
-    try {
-      const response = await fetch(`/api/bookings/${selectedBookingForPrescribe.id}/prescribe`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          diagnosis: prescribeDiagnosis,
-          medicines: prescribeMeds,
-          instructions: prescribeInstructions,
-          signature: `Digitally signed by ${matchedProfile?.name} (${matchedProfile?.role === UserRole.DOCTOR ? (matchedProfile as DoctorProfile).medicalCouncil : (matchedProfile as NurseProfile).nursingCouncil} License: ${matchedProfile?.licenseNumber})`
-        })
-      });
-      const data = await response.json();
-      if (data.status === 'success') {
-        setSelectedBookingForPrescribe(null);
-        setPrescribeDiagnosis('');
-        setPrescribeMeds('');
-        setPrescribeInstructions('');
-        if (onRefreshData) onRefreshData();
-      }
-    } catch (err) {
-      console.error("Error issuing e-prescription:", err);
-    } finally {
-      setIssuingPrescription(false);
     }
   };
 
@@ -608,7 +579,7 @@ export default function VerificationTerminal({
             matchedProfile={matchedProfile}
             myBookings={myBookings}
             dispatches={dispatches}
-            selectedBookingForPrescribe={selectedBookingForPrescribe}
+            selectedBookingForPrescribe={null}
             onStartPrescription={(booking) => {
               setSelectedBookingForPrescribe(booking);
               setPrescribeDiagnosis('');
@@ -622,10 +593,22 @@ export default function VerificationTerminal({
             setPrescribeMeds={setPrescribeMeds}
             prescribeInstructions={prescribeInstructions}
             setPrescribeInstructions={setPrescribeInstructions}
-            issuingPrescription={issuingPrescription}
-            onSubmitPrescription={handleIssuePrescriptionSubmit}
+            issuingPrescription={false}
+            onSubmitPrescription={() => {}}
             onUpdateDispatchStatus={handleUpdateDispatchStatus}
           />
+        )}
+
+        {selectedBookingForPrescribe && (
+          <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-start justify-center p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-label="Clinical workspace">
+            <div className="bg-white border border-[#FECDD3] shadow-2xl w-full max-w-3xl p-5 my-6">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-base font-black">Clinical workspace</h3>
+                <button onClick={() => setSelectedBookingForPrescribe(null)} className="text-xs font-bold border border-slate-200 px-3 py-1.5 cursor-pointer">Close</button>
+              </div>
+              <ClinicalWorkspace kind="booking" refId={selectedBookingForPrescribe.id} />
+            </div>
+          </div>
         )}
 
         {/* TAB CONTENT: PERFORMANCE & REVENUE */}

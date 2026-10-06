@@ -9,7 +9,8 @@ import {
   AuthUser, Role, attemptLogin, changePassword, createSession, createUser, destroySession, emailTaken,
   ensureAdmin, loadSession, passwordProblem, requireAuth, requireRole, verifyPassword,
 } from "./server/auth";
-import { documentsRouter, setRequestOwnerLookup } from "./server/documents";
+import { documentsRouter, setRequestOwnerLookup, setClinicalHooks } from "./server/documents";
+import { registerClinicalRoutes, createGrant, seedHealthItems } from "./server/clinical";
 import { registerVerificationRoutes, notifyAdmins, notify } from "./server/verification";
 import { registerPaymentRoutes, registerPaymentWebhook, setPaymentHandlers, refundPayment, paymentMode } from "./server/payments";
 import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
@@ -354,6 +355,7 @@ app.post("/api/register-patient", (req, res) => {
     registeredAt: new Date().toISOString()
   };
   patients.push(newPatient);
+  seedHealthItems(user.id, newPatient.chronicConditions, newPatient.allergies);
 
   createSession(req, res, user.id);
   audit(req, "auth.register", { actor: user, target: ["user", user.id] });
@@ -596,6 +598,12 @@ registerVerificationRoutes(app, {
 
 // ---- Payments and the 24/7 care engine ----
 const care = registerCareRoutes(app, { findProfessional, allProfessionals });
+const clinical = registerClinicalRoutes(app, {
+  findProfessional,
+  getBooking: id => bookings.find(b => b.id === id),
+  allBookings: () => bookings,
+});
+setClinicalHooks(clinical);
 registerPaymentRoutes(app);
 const UNPAID_HOLD_MS = 15 * 60_000;
 setPaymentHandlers({
@@ -701,6 +709,8 @@ app.post("/api/bookings", requireRole("patient"), (req, res) => {
   };
 
   bookings.push(newBooking);
+  // Opt-in consent: the patient chose to share their health record with this practitioner for the visit.
+  if (req.body.shareRecord === true) createGrant(user.id, professionalId, "booking", newBooking.id, 45);
   audit(req, "booking.create", { target: ["booking", newBooking.id], details: { professionalId } });
   res.status(201).json({ status: "success", message: "Appointment booked successfully!", data: newBooking });
 });
@@ -719,38 +729,6 @@ app.post("/api/bookings/:id/cancel", requireRole("patient"), async (req, res) =>
   persistState();
   res.json({ status: "success", data: b, refunded,
     message: refunded ? "Cancelled and refunded in full." : b.paymentStatus === "Paid" ? "Cancelled. Appointments less than a day away are not refundable." : "Cancelled." });
-});
-
-app.post("/api/bookings/:id/prescribe", requireRole("practitioner"), (req, res) => {
-  const { id } = req.params;
-  const diagnosis = str(req.body.diagnosis, 500);
-  const medicines = str(req.body.medicines, 2000);
-  const instructions = str(req.body.instructions, 2000);
-
-  const booking = bookings.find(b => b.id === id);
-  if (!booking || booking.professionalId !== req.user!.profileId) {
-    return res.status(404).json({ status: "error", message: "Booking not found." });
-  }
-  const prof: any = findProfessional(booking.professionalId);
-  if (!prof || prof.verificationStatus !== VerificationStatus.VERIFIED) {
-    return fail(res, 403, "Only verified practitioners can issue prescriptions.");
-  }
-  if (booking.paymentStatus !== "Paid") return fail(res, 409, "This booking has not been paid for.");
-  if (!diagnosis || !medicines) {
-    return fail(res, 400, "Diagnosis and medicines are required.");
-  }
-
-  booking.status = "Completed";
-  booking.prescription = {
-    diagnosis,
-    medicines,
-    instructions,
-    issuedAt: new Date().toISOString(),
-    digitalSignature: `Digitally signed by ${prof.name} (Licence ${prof.licenseNumber})`
-  };
-  audit(req, "prescription.issue", { target: ["booking", id] });
-
-  res.json({ status: "success", message: "E-prescription generated and signed successfully.", data: booking });
 });
 
 // -------------------------------------------------------------

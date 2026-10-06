@@ -1,19 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { 
-  Calendar, Heart, Activity, Sparkles, Plus, Trash2, Clock, FileText, 
-  Stethoscope, MapPin, Star, BadgeCheck, RefreshCw, PlusCircle, 
-  CheckCircle2, Printer, Video, BookOpen, HeartPulse, Info, 
-  TrendingUp, User, Phone, Mail, FileSignature, Eye, Check, X, FolderHeart, ShieldCheck, Ambulance,
-  Lock, UserCheck, ScanLine, Bell, ArrowRight
-} from 'lucide-react';
-import { DoctorProfile, NurseProfile, Booking, UserRole, ConsultationMode, OnCallDispatch } from '../types';
-import MedicalHistory from './MedicalHistory';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Calendar, Clock, FolderHeart, Heart, Pill, Stethoscope, Users, Video } from 'lucide-react';
+import { DoctorProfile, NurseProfile, Booking } from '../types';
 import DashboardHeader from './DashboardHeader';
-import AppointmentsTab from './patient/AppointmentsTab';
-import PrescriptionsTab from './patient/PrescriptionsTab';
-import VitalsTab from './patient/VitalsTab';
+import PatientRecords from './PatientRecords';
 import SavedTab from './patient/SavedTab';
+import PaymentDialog from './PaymentDialog';
 
 interface PatientDashboardProps {
   bookings: Booking[];
@@ -24,1643 +15,174 @@ interface PatientDashboardProps {
   onConsultNow: () => void;
 }
 
-interface VitalsRecord {
-  id: string;
-  date: string;
-  time: string;
-  systolic: number;
-  diastolic: number;
-  bloodSugar: number;
-  heartRate: number;
-  mood: string;
-  notes: string;
-}
+type Tab = 'appointments' | 'records' | 'saved';
+
+const readSaved = (): string[] => {
+  try { return JSON.parse(localStorage.getItem('saved_practitioners') || '[]'); } catch { return []; }
+};
 
 export default function PatientDashboard({
-  bookings,
-  setBookings,
-  professionals,
-  onSelectProfessional,
-  onNavigateToMessages,
-  onConsultNow
+  bookings, setBookings, professionals, onSelectProfessional, onNavigateToMessages, onConsultNow,
 }: PatientDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'appointments' | 'prescriptions' | 'vitals' | 'saved' | 'records'>('appointments');
-  
-  // Doctor on Call States
-  const [showOnCallModal, setShowOnCallModal] = useState<boolean>(false);
-  const [activeDispatch, setActiveDispatch] = useState<OnCallDispatch | null>(null);
-  const [dispatches, setDispatches] = useState<OnCallDispatch[]>(() => {
-    try {
-      const saved = localStorage.getItem('medi_dispatches');
-      if (saved) return JSON.parse(saved);
-    } catch (e) {}
-    return [];
-  });
+  const [activeTab, setActiveTab] = useState<Tab>('appointments');
+  const [savedIds, setSavedIds] = useState<string[]>(readSaved);
+  const [summary, setSummary] = useState<{ activeRx: number; bp: any | null } | null>(null);
+  const [paying, setPaying] = useState<Booking | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    localStorage.setItem('medi_dispatches', JSON.stringify(dispatches));
-    const active = dispatches.find(d => d.dispatchStatus !== 'Completed');
-    if (active) {
-      setActiveDispatch(active);
-    } else {
-      setActiveDispatch(null);
-    }
-  }, [dispatches]);
+  const userName = (() => {
+    try { const u = JSON.parse(localStorage.getItem('medi_user') || 'null'); if (u?.name) return u.name as string; } catch { /* ignore */ }
+    return 'there';
+  })();
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
-  const handleDispatchCreated = (dispatch: OnCallDispatch) => {
-    setDispatches([dispatch, ...dispatches]);
-    setActiveDispatch(dispatch);
-  };
-
-  const handleUpdateDispatchStatus = (dispatchId: string, status: OnCallDispatch['dispatchStatus'], eta: number) => {
-    setDispatches(prev => prev.map(d => {
-      if (d.id === dispatchId) {
-        return { ...d, dispatchStatus: status, etaMinutes: eta };
-      }
-      return d;
-    }));
-  };
-  
-  const [userName, setUserName] = useState<string>(() => {
-    try {
-      const saved = localStorage.getItem('medi_user');
-      if (saved) {
-        const u = JSON.parse(saved);
-        if (u.name) return u.name;
-      }
-    } catch (e) {}
-    return 'Patient';
-  });
-  const [selectedModalProf, setSelectedModalProf] = useState<DoctorProfile | NurseProfile | null>(null);
-  
-  // Local state for Saved Practitioners
-  const [savedIds, setSavedIds] = useState<string[]>([]);
-  
-  // Vitals State
-  const [vitalsList, setVitalsList] = useState<VitalsRecord[]>([]);
-  const [systolic, setSystolic] = useState<number>(120);
-  const [diastolic, setDiastolic] = useState<number>(80);
-  const [bloodSugar, setBloodSugar] = useState<number>(95);
-  const [heartRate, setHeartRate] = useState<number>(72);
-  const [mood, setMood] = useState<string>('Energetic');
-  const [vitalsNotes, setVitalsNotes] = useState<string>('');
-  const [vitalsSuccess, setVitalsSuccess] = useState<boolean>(false);
-
-  // Wellness Journal State
-  const [journalEntry, setJournalEntry] = useState<string>('');
-  const [journalFeedback, setJournalFeedback] = useState<string | null>(null);
-  const [journalFeedbackLoading, setJournalFeedbackLoading] = useState<boolean>(false);
-
-  // Prescription Modal State
-  const [selectedPrescriptionBooking, setSelectedPrescriptionBooking] = useState<Booking | null>(null);
-  const [isPrinting, setIsPrinting] = useState<boolean>(false);
-  const [printSuccess, setPrintSuccess] = useState<boolean>(false);
-
-  // Video Consultation Room State
-  const [activeVideoBooking, setActiveVideoBooking] = useState<Booking | null>(null);
-  const [videoConnected, setVideoConnected] = useState<boolean>(false);
-  const [videoTimer, setVideoTimer] = useState<number>(0);
-  const [videoMuted, setVideoMuted] = useState<boolean>(false);
-  const [cameraOff, setCameraOff] = useState<boolean>(false);
-
-  // E-Prescription Draft and Generation Modal State
-  const [showGenerateModal, setShowGenerateModal] = useState<boolean>(false);
-  const [prescPatientName, setPrescPatientName] = useState<string>(() => {
-    try {
-      const saved = localStorage.getItem('medi_user');
-      if (saved) {
-        const u = JSON.parse(saved);
-        if (u.name) return u.name;
-      }
-    } catch (e) {}
-    return 'Patient';
-  });
-  const [prescPatientEmail, setPrescPatientEmail] = useState<string>('');
-  const [prescPatientPhone, setPrescPatientPhone] = useState<string>('');
-  
-  // Available doctors for selection
-  const doctorsList = professionals.filter(p => p.role === UserRole.DOCTOR);
-  const [prescDoctorId, setPrescDoctorId] = useState<string>(doctorsList[0]?.id || 'doc-1');
-  const [prescDiagnosis, setPrescDiagnosis] = useState<string>('Acute Upper Respiratory Tract Infection (URTI)');
-  
-  // Custom medicine list builder
-  const [medsList, setMedsList] = useState<{name: string; dosage: string; frequency: string; duration: string;}[]>([
-    { name: 'Paracetamol', dosage: '500mg', frequency: 'Three times daily (TDS)', duration: '5 days' },
-    { name: 'Amoxicillin', dosage: '500mg', frequency: 'Three times daily (TDS)', duration: '7 days' }
-  ]);
-  const [newMedName, setNewMedName] = useState('');
-  const [newMedDosage, setNewMedDosage] = useState('');
-  const [newMedFrequency, setNewMedFrequency] = useState('Three times daily (TDS)');
-  const [newMedDuration, setNewMedDuration] = useState('5 days');
-  const [prescInstructions, setPrescInstructions] = useState<string>('To be taken after meals. Complete the course of antibiotics if prescribed. Drink plenty of warm water.');
-  
-  // Signature States
-  const [signingMethod, setSigningMethod] = useState<'draw' | 'type'>('draw');
-  const [typedSignature, setTypedSignature] = useState<string>('');
-  const [isSigned, setIsSigned] = useState<boolean>(false);
-
-  // Drawing signature states
-  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
-  const [isDrawing, setIsDrawing] = useState<boolean>(false);
-
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const rect = canvas.getBoundingClientRect();
-    ctx.beginPath();
-    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-    setIsDrawing(true);
-    setIsSigned(true);
-  };
-
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const rect = canvas.getBoundingClientRect();
-    ctx.lineWidth = 2.5;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#0F172A'; // dark slate
-    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-    ctx.stroke();
-  };
-
-  const stopDrawing = () => {
-    setIsDrawing(false);
-  };
-
-  const startDrawingTouch = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    ctx.beginPath();
-    ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
-    setIsDrawing(true);
-    setIsSigned(true);
-  };
-
-  const drawTouch = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    ctx.lineWidth = 2.5;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#0F172A';
-    ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
-    ctx.stroke();
-  };
-
-  const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    setIsSigned(false);
-  };
-
-  const handleAddMedicineItem = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMedName.trim() || !newMedDosage.trim()) return;
-    setMedsList(prev => [
-      ...prev,
-      {
-        name: newMedName.trim(),
-        dosage: newMedDosage.trim(),
-        frequency: newMedFrequency,
-        duration: newMedDuration
-      }
-    ]);
-    setNewMedName('');
-    setNewMedDosage('');
-  };
-
-  const handleRemoveMedicineItem = (index: number) => {
-    setMedsList(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleIssueEPrescriptionSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (medsList.length === 0) {
-      alert("Please add at least one medication to the prescription.");
-      return;
-    }
-    const selectedDoc = professionals.find(p => p.id === prescDoctorId) || professionals[0];
-    const compiledMedicines = medsList.map(m => `💊 Paed/Med: ${m.name} (${m.dosage})\n   Frequency: ${m.frequency}\n   Duration: ${m.duration}`).join('\n\n');
-    
-    const newPrescriptionBooking: Booking = {
-      id: `rx-${Math.floor(100000 + Math.random() * 900000)}`,
-      professionalId: selectedDoc.id,
-      professionalName: selectedDoc.name,
-      professionalRole: UserRole.DOCTOR,
-      patientId: 'pat-1',
-      patientName: prescPatientName,
-      patientPhone: prescPatientPhone,
-      patientEmail: prescPatientEmail,
-      date: new Date().toISOString().split('T')[0],
-      timeSlot: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      mode: ConsultationMode.VIDEO,
-      fee: selectedDoc.fee,
-      paymentStatus: 'Paid',
-      status: 'Completed',
-      symptoms: prescDiagnosis,
-      prescription: {
-        diagnosis: prescDiagnosis,
-        medicines: compiledMedicines,
-        instructions: prescInstructions,
-        issuedAt: new Date().toISOString(),
-        digitalSignature: signingMethod === 'type' 
-          ? `Digitally Certified Token: [${typedSignature || selectedDoc.name}] (MMC Ref: ${selectedDoc.licenseNumber || 'MMC-99213'})`
-          : `Hand-drawn Digital Signature [Verified MMC License: ${selectedDoc.licenseNumber || 'MMC-87429'}]`
-      }
-    };
-    
-    setBookings(prev => [newPrescriptionBooking, ...prev]);
-    
-    // Reset Form
-    setPrescDiagnosis('Acute Upper Respiratory Tract Infection (URTI)');
-    setMedsList([
-      { name: 'Paracetamol', dosage: '500mg', frequency: 'Three times daily (TDS)', duration: '5 days' }
-    ]);
-    setPrescInstructions('To be taken after meals. Complete the course of antibiotics if prescribed. Drink plenty of warm water.');
-    setTypedSignature('');
-    setIsSigned(false);
-    setShowGenerateModal(false);
-    
-    // Switch to Prescriptions tab to review
-    setActiveTab('prescriptions');
-  };
-
-  // Load Saved Practitioners & Seed Vitals from LocalStorage on mount
-  useEffect(() => {
-    // 1. Saved Practitioners
-    const saved = JSON.parse(localStorage.getItem('saved_practitioners') || '[]');
-    setSavedIds(saved);
-
-    // 2. Vitals seeding if empty
-    const savedVitals = localStorage.getItem('vitals_records');
-    if (savedVitals) {
-      setVitalsList(JSON.parse(savedVitals));
-    } else {
-      const seedVitals: VitalsRecord[] = [
-        {
-          id: 'v-1',
-          date: '2026-07-08',
-          time: '08:30 AM',
-          systolic: 118,
-          diastolic: 78,
-          bloodSugar: 92,
-          heartRate: 68,
-          mood: 'Restful',
-          notes: 'Fasting glucose levels are optimal. Cardiovascular response excellent.'
-        },
-        {
-          id: 'v-2',
-          date: '2026-07-06',
-          time: '07:00 PM',
-          systolic: 124,
-          diastolic: 82,
-          bloodSugar: 110,
-          heartRate: 75,
-          mood: 'Tired',
-          notes: 'Post-dinner measurements. Felt slight fatigue after work.'
-        },
-        {
-          id: 'v-3',
-          date: '2026-07-05',
-          time: '12:15 PM',
-          systolic: 120,
-          diastolic: 80,
-          bloodSugar: 98,
-          heartRate: 72,
-          mood: 'Calm',
-          notes: 'Pre-consultation baseline with Dr. Tan Seng Hock.'
-        }
-      ];
-      setVitalsList(seedVitals);
-      localStorage.setItem('vitals_records', JSON.stringify(seedVitals));
-    }
+  const loadSummary = useCallback(async () => {
+    const d = await fetch('/api/records/me').then(r => r.json()).catch(() => null);
+    if (d?.status !== 'success') return;
+    setSummary({
+      activeRx: d.data.prescriptions.filter((p: any) => p.status === 'active').length,
+      bp: d.data.vitals.find((v: any) => v.kind === 'bp') ?? null,
+    });
   }, []);
+  useEffect(() => { loadSummary(); }, [loadSummary, activeTab]);
 
-  // Filter Bookings for Current Patient
-  // The server only returns the signed-in patient's own bookings.
-  const patientBookings = bookings;
-  const upcomingBookings = patientBookings.filter(b => b.status === 'Upcoming');
-  const prescriptionBookings = patientBookings.filter(b => b.status === 'Completed' && b.prescription);
+  const upcoming = bookings.filter(b => b.status === 'Upcoming');
+  const past = bookings.filter(b => b.status !== 'Upcoming');
+  const careTeam = Array.from(new Set(bookings.filter(b => b.paymentStatus === 'Paid').map(b => b.professionalId)))
+    .map(id => professionals.find(p => p.id === id)).filter(Boolean) as (DoctorProfile | NurseProfile)[];
 
-  // Filter Saved Professionals
-  const savedProfessionals = professionals.filter(p => savedIds.includes(p.id));
-
-  // Handle Log Vitals
-  const handleAddVitals = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newRecord: VitalsRecord = {
-      id: `v-${Date.now()}`,
-      date: new Date().toISOString().split('T')[0],
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      systolic,
-      diastolic,
-      bloodSugar,
-      heartRate,
-      mood,
-      notes: vitalsNotes || 'Routine home self-measurement.'
-    };
-
-    const updatedList = [newRecord, ...vitalsList];
-    setVitalsList(updatedList);
-    localStorage.setItem('vitals_records', JSON.stringify(updatedList));
-
-    setVitalsNotes('');
-    setVitalsSuccess(true);
-    setTimeout(() => setVitalsSuccess(false), 3000);
+  const cancel = async (b: Booking) => {
+    if (!window.confirm('Cancel this appointment?')) return;
+    const d = await fetch(`/api/bookings/${b.id}/cancel`, { method: 'POST' }).then(r => r.json()).catch(() => null);
+    if (d?.status === 'success') {
+      setBookings(prev => prev.map(x => (x.id === b.id ? d.data : x)));
+      setMsg(d.message);
+    } else setMsg(d?.message || 'Could not cancel.');
   };
 
-  // Delete vital record
-  const handleDeleteVital = (id: string) => {
-    const updated = vitalsList.filter(v => v.id !== id);
-    setVitalsList(updated);
-    localStorage.setItem('vitals_records', JSON.stringify(updated));
+  const removeSaved = (id: string) => {
+    const next = savedIds.filter(x => x !== id);
+    setSavedIds(next);
+    try { localStorage.setItem('saved_practitioners', JSON.stringify(next)); } catch { /* ignore */ }
   };
 
-  // Handle removing a saved practitioner
-  const handleRemoveSaved = (id: string) => {
-    const updated = savedIds.filter(savedId => savedId !== id);
-    setSavedIds(updated);
-    localStorage.setItem('vitals_records', JSON.stringify(updated));
-    localStorage.setItem('saved_practitioners', JSON.stringify(updated));
-  };
-
-  // Calculate clinical feedback thresholds
-  const getBPFeedback = (sys: number, dia: number) => {
-    if (sys < 120 && dia < 80) return { label: 'Optimal Normal', color: 'text-emerald-600 bg-emerald-50 border-emerald-100', desc: 'Blood pressure is in the ideal healthy range.' };
-    if (sys >= 120 && sys <= 129 && dia < 80) return { label: 'Elevated BP', color: 'text-amber-600 bg-amber-50 border-amber-100', desc: 'Slightly elevated. Monitor sodium intake and stay hydrated.' };
-    if (sys >= 130 || dia >= 80) return { label: 'Stage 1 Hypertension', color: 'text-rose-600 bg-rose-50 border-rose-100', desc: 'Vitals indicate high blood pressure. Share these metrics with Dr. Ananya Sen.' };
-    return { label: 'Check Baseline', color: 'text-slate-600 bg-slate-50 border-slate-100', desc: 'Consult your health specialist.' };
-  };
-
-  const getSugarFeedback = (sugar: number) => {
-    if (sugar < 100) return { label: 'Normal Fasting', color: 'text-emerald-600 bg-emerald-50 border-emerald-100', desc: 'Glucose level is healthy.' };
-    if (sugar >= 100 && sugar <= 125) return { label: 'Pre-diabetes Range', color: 'text-amber-600 bg-amber-50 border-amber-100', desc: 'Borderline high fasting blood glucose. Limit processed carbs.' };
-    return { label: 'Hyperglycemia Risk', color: 'text-rose-600 bg-rose-50 border-rose-100', desc: 'Elevated glucose. Schedule a clinic review.' };
-  };
-
-  // Wellness Journal analysis engine (intelligent rule-based feedback aligned with CareVerified medical parameters)
-  const handleJournalAnalysis = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!journalEntry.trim()) return;
-
-    setJournalFeedbackLoading(true);
-    setJournalFeedback(null);
-
-    setTimeout(() => {
-      const text = journalEntry.toLowerCase();
-      let feedback = "";
-
-      if (text.includes("chest") || text.includes("pain") || text.includes("palpitation") || text.includes("breathe") || text.includes("shortness")) {
-        feedback = "⚠️ ALERT: Your entries contain references to cardiovascular discomfort or respiratory changes. Please note that Dr. Siti Aminah Binti Ahmad (Verified Cardiologist) recommends scheduled clinical screenings if these baseline values fluctuate. In case of sudden chest compression or severe acute dyspnea, seek immediate emergency care.";
-      } else if (text.includes("cough") || text.includes("fever") || text.includes("throat") || text.includes("cold")) {
-        feedback = "🩺 CLINICAL SUMMARY: Your respiratory symptoms align with seasonal triggers. Dr. Tan Seng Hock's prescription history recommends warm steam inhalations twice daily, staying fully hydrated, and monitoring temperature levels. Let us know if symptoms persist beyond 4 days.";
-      } else if (text.includes("stress") || text.includes("tired") || text.includes("sleep") || text.includes("anxious") || text.includes("headache")) {
-        feedback = "🌸 WELLNESS RECOMMENDATION: Elevated fatigue or sleep deficits can directly elevate your baseline blood pressure. We recommend incorporating a 5-minute deep-breathing cycle. You can schedule a video teleconsultation with our specialist team for a holistic wellness assessment.";
-      } else {
-        feedback = "✨ VITALITY SCORE: Thank you for logging your health journey. Your systemic levels seem balanced. Regular logging of daily vitals (BP and glucose) is key to preventative healthcare and supports your verified clinical team in prescribing precise treatments.";
-      }
-
-      setJournalFeedback(feedback);
-      setJournalFeedbackLoading(false);
-    }, 1200);
-  };
-
-  // Cancel Booking action
-  const handleCancelBooking = async (bookingId: string) => {
-    if (!confirm('Are you sure you want to cancel this verified booking? Your consultation fee will be processed for immediate refund.')) return;
-
-    try {
-      // Simulate backend update or do localized filtering
-      const updatedBookings = bookings.map(b => {
-        if (b.id === bookingId) {
-          return { ...b, status: 'Cancelled' as const };
-        }
-        return b;
-      });
-      setBookings(updatedBookings);
-    } catch (err) {
-      console.error("Error cancelling booking:", err);
-    }
-  };
-
-  // Simulated digital prescription printing
-  const handlePrintPrescription = () => {
-    setIsPrinting(true);
-    setPrintSuccess(false);
-    setTimeout(() => {
-      setIsPrinting(false);
-      setPrintSuccess(true);
-      setTimeout(() => setPrintSuccess(false), 3000);
-    }, 1800);
-  };
-
-  // Telehealth Video Call Session Controls
-  const handleStartVideoCall = (booking: Booking) => {
-    setActiveVideoBooking(booking);
-    setVideoConnected(false);
-    setVideoTimer(0);
-    // Connect after 2.5 seconds
-    setTimeout(() => {
-      setVideoConnected(true);
-    }, 2500);
-  };
-
-  // Video call timer tick
-  useEffect(() => {
-    let interval: any = null;
-    if (activeVideoBooking && videoConnected) {
-      interval = setInterval(() => {
-        setVideoTimer(prev => prev + 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [activeVideoBooking, videoConnected]);
-
-  const formatVideoTimer = (sec: number) => {
-    const mins = Math.floor(sec / 60);
-    const secs = sec % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const handleEndVideoCall = () => {
-    setActiveVideoBooking(null);
-    setVideoConnected(false);
-    setVideoTimer(0);
-  };
-
-  const latestVital = vitalsList[0];
-
-  // Overview helpers: BP trend series and care team
-  const bpSeries = vitalsList.slice(0, 7).reverse();
-  const bpX = (i: number) => (bpSeries.length > 1 ? 60 + (i * 540) / (bpSeries.length - 1) : 330);
-  const bpY = (v: number) => 155 - ((Math.min(160, Math.max(60, v)) - 70) / 90) * 135;
-  const careTeam = (() => {
-    const ids = Array.from(new Set([...patientBookings.map(b => b.professionalId), ...savedIds]));
-    return ids.map(id => professionals.find(p => p.id === id)).filter((p): p is (DoctorProfile | NurseProfile) => !!p).slice(0, 3);
-  })();
-
-  const greetingText = (() => {
-    const hr = new Date().getHours();
-    if (hr < 12) return 'Good morning';
-    if (hr < 17) return 'Good afternoon';
-    return 'Good evening';
-  })();
-
-  const patientTabs: { id: 'appointments' | 'prescriptions' | 'vitals' | 'records' | 'saved'; label: string; icon: React.ComponentType<any>; count?: number }[] = [
-    { id: 'appointments', label: 'Appointments', icon: Calendar, count: upcomingBookings.length },
-    { id: 'prescriptions', label: 'Prescriptions', icon: FileText, count: prescriptionBookings.length },
-    { id: 'vitals', label: 'Vitals & Logs', icon: Activity },
-    { id: 'records', label: 'Medical History', icon: FolderHeart },
-    { id: 'saved', label: 'Saved Docs', icon: Heart, count: savedProfessionals.length }
+  const tabs: { id: Tab; label: string; icon: React.ComponentType<any>; count?: number }[] = [
+    { id: 'appointments', label: 'Appointments', icon: Calendar, count: upcoming.length },
+    { id: 'records', label: 'Health Record', icon: FolderHeart },
+    { id: 'saved', label: 'Saved Doctors', icon: Heart, count: savedIds.length },
   ];
+
+  const card = 'bg-white border border-[#FECDD3] shadow-xs p-5';
   return (
     <div className="w-full max-w-[1920px] mx-auto space-y-5" id="patient-dashboard-root">
-
-      {/* Standard dashboard header with attached tabs */}
       <DashboardHeader
-        eyebrow="MedCred Verified Health Console"
-        title={`${greetingText}, ${userName}`}
-        description="Your appointments, prescriptions and vitals in one secure place."
+        eyebrow="Your health console"
+        title={`${greeting}, ${userName}`}
+        description="Your appointments, prescriptions and health record in one secure place."
         actions={
-          <button
-            onClick={onConsultNow}
-            className="px-5 py-2 min-h-[44px] bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-lg transition-all flex items-center gap-2.5 cursor-pointer shadow-xs text-left"
-          >
-            <Ambulance className="h-5 w-5 text-white shrink-0" />
+          <button onClick={onConsultNow} className="px-5 py-2 min-h-[44px] bg-[#DC2626] hover:bg-[#B91C1C] text-white flex items-center gap-2.5 cursor-pointer shadow-xs text-left">
+            <Video className="h-5 w-5 shrink-0" />
             <span className="leading-tight">
               <span className="block text-xs font-bold uppercase tracking-wider">Consult a doctor now</span>
               <span className="block text-[11px] font-medium text-rose-100">Chat or video with an online doctor</span>
             </span>
           </button>
         }
-        tabs={patientTabs}
+        tabs={tabs}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         tabsLabel="Patient hub sections"
       />
 
-      {/* Summary metrics */}
-      <motion.section
-        aria-label="Health summary"
-        initial={{ opacity: 0, y: -6 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
-      >
-        {[
-          {
-            key: 'visits',
-            label: 'Upcoming visits',
-            icon: Calendar,
-            tone: 'emerald' as const,
-            value: String(upcomingBookings.length),
-            unit: '',
-            caption: upcomingBookings.length > 0
-              ? `Next: ${upcomingBookings[0].professionalName}`
-              : 'No visits scheduled',
-            captionClass: 'text-slate-600',
-            onClick: () => setActiveTab('appointments'),
-          },
-          {
-            key: 'rx',
-            label: 'Active prescriptions',
-            icon: FileText,
-            tone: 'crimson' as const,
-            value: String(prescriptionBookings.length),
-            unit: '',
-            caption: 'Verified e-prescriptions',
-            captionClass: 'text-slate-600',
-            onClick: () => setActiveTab('prescriptions'),
-          },
-          {
-            key: 'bp',
-            label: 'Blood pressure',
-            icon: Activity,
-            tone: 'emerald' as const,
-            value: latestVital ? `${latestVital.systolic}/${latestVital.diastolic}` : '—',
-            unit: latestVital ? 'mmHg' : '',
-            caption: latestVital ? getBPFeedback(latestVital.systolic, latestVital.diastolic).label : 'No readings logged',
-            captionClass: latestVital ? (getBPFeedback(latestVital.systolic, latestVital.diastolic).color.split(' ')[0]) : 'text-slate-600',
-            onClick: () => setActiveTab('vitals'),
-          },
-          {
-            key: 'sugar',
-            label: 'Fasting glucose',
-            icon: HeartPulse,
-            tone: 'crimson' as const,
-            value: latestVital ? String(latestVital.bloodSugar) : '—',
-            unit: latestVital ? 'mg/dL' : '',
-            caption: latestVital ? getSugarFeedback(latestVital.bloodSugar).label : 'No readings logged',
-            captionClass: latestVital ? (getSugarFeedback(latestVital.bloodSugar).color.split(' ')[0]) : 'text-slate-600',
-            onClick: () => setActiveTab('vitals'),
-          },
-        ].map(card => (
-          <button
-            key={card.key}
-            onClick={card.onClick}
-            className="group text-left bg-white border border-[#FECDD3] rounded-xl shadow-xs p-5 flex flex-col gap-2.5 min-h-[44px] hover:shadow-md hover:border-[#FDA4AF] transition-all cursor-pointer"
-          >
-            <span className="flex items-center justify-between">
-              <span className="text-[13px] font-semibold text-[#334155]">{card.label}</span>
-              <span className={`h-8 w-8 rounded-lg flex items-center justify-center border ${card.tone === 'emerald' ? 'bg-[#ECFDF5] border-[#A7F3D0] text-[#059669]' : 'bg-[#FFF0F2] border-[#FECDD3] text-[#DC2626]'}`}>
-                <card.icon className="h-4 w-4" />
-              </span>
-            </span>
-            <span className="text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">
-              {card.value}
-              {card.unit && <span className="ml-1.5 text-sm font-medium text-slate-500">{card.unit}</span>}
-            </span>
-            <span className={`text-xs font-semibold truncate ${card.captionClass}`}>{card.caption}</span>
-          </button>
-        ))}
-      </motion.section>
-
-      {/* Next best action */}
-      <div className="bg-white border border-[#FECDD3] rounded-xl shadow-xs p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="bg-[#FFF0F2] h-10 w-10 rounded-lg text-[#DC2626] shrink-0 border border-[#FECDD3] flex items-center justify-center">
-            {upcomingBookings.length > 0 ? <Bell className="h-5 w-5" /> : <Activity className="h-5 w-5" />}
-          </div>
-          <div className="min-w-0">
-            <h4 className="text-[11px] uppercase tracking-wider font-bold text-slate-600 mb-0.5">Next best action</h4>
-            <p className="text-sm font-semibold text-[#1E293B]">
-              {upcomingBookings.length > 0
-                ? `${upcomingBookings[0].mode === ConsultationMode.VIDEO ? 'Telehealth consultation' : 'Clinic visit'} with ${upcomingBookings[0].professionalName}`
-                : "Log today's biometric vitals for your health profile."}
-            </p>
-          </div>
+      <section aria-label="Summary" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <button className={`${card} text-left cursor-pointer`} onClick={() => setActiveTab('appointments')}>
+          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Calendar className="h-4 w-4 text-[#DC2626]" /> Upcoming visits</p>
+          <p className="text-3xl font-bold tabular-nums mt-1">{upcoming.length}</p>
+          <p className="text-xs text-slate-600">{upcoming[0] ? `Next: ${upcoming[0].professionalName}, ${upcoming[0].date}` : 'No visits scheduled'}</p>
+        </button>
+        <button className={`${card} text-left cursor-pointer`} onClick={() => setActiveTab('records')}>
+          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Pill className="h-4 w-4 text-[#DC2626]" /> Active prescriptions</p>
+          <p className="text-3xl font-bold tabular-nums mt-1">{summary?.activeRx ?? '–'}</p>
+          <p className="text-xs text-slate-600">Signed e-prescriptions you can send to a pharmacy</p>
+        </button>
+        <button className={`${card} text-left cursor-pointer`} onClick={() => setActiveTab('records')}>
+          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Stethoscope className="h-4 w-4 text-[#DC2626]" /> Latest blood pressure</p>
+          <p className="text-3xl font-bold tabular-nums mt-1">{summary?.bp ? `${summary.bp.value1}/${summary.bp.value2}` : '–'}</p>
+          <p className={`text-xs ${summary?.bp?.flag?.level === 'urgent' ? 'text-rose-700 font-bold' : 'text-slate-600'}`}>{summary?.bp ? (summary.bp.flag?.text ?? 'mmHg') : 'No readings logged'}</p>
+        </button>
+        <div className={card}>
+          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Users className="h-4 w-4 text-[#DC2626]" /> Your care team</p>
+          <p className="text-3xl font-bold tabular-nums mt-1">{careTeam.length}</p>
+          <p className="text-xs text-slate-600">{careTeam.length ? careTeam.map(p => p.name).slice(0, 2).join(', ') : 'Book a visit to build your care team'}</p>
         </div>
-        {upcomingBookings.length > 0 && upcomingBookings[0].mode === ConsultationMode.VIDEO ? (
-          <button
-            onClick={() => handleStartVideoCall(upcomingBookings[0])}
-            className="shrink-0 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold px-4 py-2.5 min-h-[44px] rounded-lg transition-all flex items-center gap-2 shadow-xs cursor-pointer"
-          >
-            <Video className="h-4 w-4" />
-            Join call
-          </button>
-        ) : (
-          <button
-            onClick={() => setActiveTab(upcomingBookings.length > 0 ? 'appointments' : 'vitals')}
-            className="shrink-0 bg-white hover:bg-[#FFE4E6] text-[#1E293B] border border-[#FECDD3] text-xs font-bold px-4 py-2.5 min-h-[44px] rounded-lg transition-all flex items-center gap-2 cursor-pointer"
-          >
-            {upcomingBookings.length > 0 ? 'View details' : 'Log vitals'}
-            <ArrowRight className="h-3.5 w-3.5 text-[#DC2626]" />
-          </button>
-        )}
-      </div>
+      </section>
 
-      {/* MAIN VIEW CONTENT AREA */}
-      <div className="space-y-6">
+      {msg && <p role="status" className="text-sm font-semibold bg-slate-900 text-white px-4 py-2.5">{msg} <button className="underline ml-3 text-xs cursor-pointer" onClick={() => setMsg(null)}>Dismiss</button></p>}
 
-        {/* TAB 1: UPCOMING BOOKINGS + OVERVIEW */}
-        {activeTab === 'appointments' && (
-          <div className="flex flex-wrap gap-6 items-start">
-            <div id="panel-appointments" role="tabpanel" aria-labelledby="tab-appointments" tabIndex={0} className="flex-[999_1_620px] min-w-0 space-y-6">
-              <AppointmentsTab
-                upcomingBookings={upcomingBookings}
-                professionals={professionals}
-                onCancelBooking={handleCancelBooking}
-                onStartVideoCall={handleStartVideoCall}
-              />
-
-              <section className="bg-white border border-[#FECDD3] rounded-xl shadow-xs p-6" aria-labelledby="bp-trend-title">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <h2 id="bp-trend-title" className="text-base font-bold text-[#1E293B]">Blood pressure trend</h2>
-                    <p className="text-[13px] text-slate-600 mt-0.5">Last {bpSeries.length || 7} readings · mmHg</p>
-                  </div>
-                  <div className="flex gap-4 text-xs text-[#334155]">
-                    <span className="inline-flex items-center gap-1.5"><span className="h-[3px] w-3.5 rounded bg-[#DC2626]" />Systolic</span>
-                    <span className="inline-flex items-center gap-1.5"><span className="h-[3px] w-3.5 rounded bg-[#059669]" />Diastolic</span>
-                  </div>
-                </div>
-                {bpSeries.length >= 2 ? (
-                  <svg viewBox="0 0 640 220" className="w-full mt-4 block" role="img" aria-label="Blood pressure over recent readings">
-                    <g stroke="#FFE4E6" strokeWidth="1">
-                      {[160, 130, 100, 70].map(t => <line key={t} x1="40" x2="630" y1={bpY(t)} y2={bpY(t)} />)}
-                    </g>
-                    <g fontSize="11" fill="#64748B" textAnchor="end">
-                      {[160, 130, 100, 70].map(t => <text key={t} x="32" y={bpY(t) + 4}>{t}</text>)}
-                    </g>
-                    <polyline fill="none" stroke="#DC2626" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points={bpSeries.map((v, i) => `${bpX(i)},${bpY(v.systolic)}`).join(' ')} />
-                    <polyline fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points={bpSeries.map((v, i) => `${bpX(i)},${bpY(v.diastolic)}`).join(' ')} />
-                    {bpSeries.map((v, i) => (
-                      <g key={v.id}>
-                        <circle cx={bpX(i)} cy={bpY(v.systolic)} r="4" fill="#fff" stroke="#DC2626" strokeWidth="2" />
-                        <circle cx={bpX(i)} cy={bpY(v.diastolic)} r="4" fill="#fff" stroke="#059669" strokeWidth="2" />
-                        <text x={bpX(i)} y="206" fontSize="11" fill="#64748B" textAnchor="middle">{v.date.slice(5)}</text>
-                      </g>
-                    ))}
-                  </svg>
-                ) : (
-                  <div className="mt-4 rounded-lg border border-dashed border-[#FECDD3] bg-[#FFF8F9] p-8 text-center">
-                    <p className="text-sm text-[#334155]">Log at least two readings to see your trend.</p>
-                    <button onClick={() => setActiveTab('vitals')} className="mt-3 inline-flex items-center gap-2 min-h-[44px] px-4 rounded-lg border border-[#FECDD3] bg-white text-xs font-bold text-[#1E293B] hover:bg-[#FFE4E6] cursor-pointer">
-                      Log vitals <ArrowRight className="h-3.5 w-3.5 text-[#DC2626]" />
-                    </button>
-                  </div>
-                )}
-              </section>
-            </div>
-
-            <aside className="flex-[1_1_320px] min-w-0 space-y-6" aria-label="Care summary">
-              <section className="bg-white border border-[#FECDD3] rounded-xl shadow-xs p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-base font-bold text-[#1E293B]">Active prescriptions</h2>
-                  <button onClick={() => setActiveTab('prescriptions')} className="text-[13px] font-semibold text-[#047857] hover:text-[#065F46] min-h-[44px] cursor-pointer">View all</button>
-                </div>
-                {prescriptionBookings.length > 0 ? (
-                  <ul className="space-y-3">
-                    {prescriptionBookings.slice(0, 3).map(b => (
-                      <li key={b.id} className="flex items-center gap-3 p-3.5 border border-[#FECDD3] rounded-lg">
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold text-[#1E293B] truncate">{b.prescription?.diagnosis || 'E-prescription'}</p>
-                          <p className="text-xs text-slate-600 mt-0.5 line-clamp-2">{b.prescription?.medicines}</p>
-                          <p className="text-xs text-slate-500 mt-0.5 truncate">{b.professionalName} · {b.prescription?.issuedAt?.slice(0, 10)}</p>
-                        </div>
-                        <span className="text-[11px] font-semibold text-[#065F46] bg-[#ECFDF5] border border-[#A7F3D0] rounded-full px-2.5 py-1">Active</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-slate-600">No active prescriptions yet.</p>
-                )}
-              </section>
-
-              <section className="bg-white border border-[#FECDD3] rounded-xl shadow-xs p-6">
-                <h2 className="text-base font-bold text-[#1E293B] mb-4">Your care team</h2>
-                {careTeam.length > 0 ? (
-                  <ul className="space-y-3.5">
-                    {careTeam.map((pro, i) => (
-                      <li key={pro.id} className="flex items-center gap-3">
-                        <div className={`h-10 w-10 rounded-full flex items-center justify-center text-[13px] font-bold shrink-0 ${i % 2 === 0 ? 'bg-[#ECFDF5] text-[#065F46]' : 'bg-[#FFE4E6] text-[#991B1B]'}`}>
-                          {pro.name.replace('Dr. ', '').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold text-[#1E293B] truncate">{pro.name}</p>
-                          <p className="text-xs text-slate-600 truncate">{pro.specialization} · Verified</p>
-                        </div>
-                        <button
-                          onClick={onNavigateToMessages}
-                          aria-label={`Message ${pro.name}`}
-                          className="h-11 w-11 rounded-lg border border-[#FECDD3] flex items-center justify-center text-[#334155] hover:bg-[#FFE4E6] cursor-pointer shrink-0"
-                        >
-                          <Mail className="h-4 w-4" />
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-slate-600">Book a visit to build your care team.</p>
-                )}
-              </section>
-
-              <section className="bg-[#1E293B] rounded-xl p-6 text-white">
-                <div className="flex items-center gap-2.5">
-                  <ShieldCheck className="h-5 w-5 text-[#6EE7B7]" />
-                  <h2 className="text-base font-bold">Private &amp; secure</h2>
-                </div>
-                <p className="mt-2.5 text-[13px] leading-relaxed text-slate-300">
-                  Your records are encrypted and shared only with clinicians you choose. Every practitioner on MedCred is credential-verified.
-                </p>
-              </section>
-            </aside>
-          </div>
-        )}
-
-        {/* TAB 2: MY E-PRESCRIPTIONS */}
-        {activeTab === 'prescriptions' && (
-          <div id="panel-prescriptions" role="tabpanel" aria-labelledby="tab-prescriptions" tabIndex={0}>
-            <PrescriptionsTab
-              prescriptionBookings={prescriptionBookings}
-              onViewPrescription={setSelectedPrescriptionBooking}
-              onRequestRefill={() => setShowGenerateModal(true)}
-            />
-          </div>
-        )}
-
-        {/* TAB 3: HEALTH TRACKING & VITALS JOURNEY */}
-        {activeTab === 'vitals' && (
-          <div id="panel-vitals" role="tabpanel" aria-labelledby="tab-vitals" tabIndex={0}>
-            <VitalsTab
-              vitalsList={vitalsList}
-              systolic={systolic}
-              setSystolic={setSystolic}
-              diastolic={diastolic}
-              setDiastolic={setDiastolic}
-              bloodSugar={bloodSugar}
-              setBloodSugar={setBloodSugar}
-              heartRate={heartRate}
-              setHeartRate={setHeartRate}
-              mood={mood}
-              setMood={setMood}
-              vitalsNotes={vitalsNotes}
-              setVitalsNotes={setVitalsNotes}
-              vitalsSuccess={vitalsSuccess}
-              onSubmitVitals={handleAddVitals}
-              onDeleteVital={handleDeleteVital}
-              journalEntry={journalEntry}
-              setJournalEntry={setJournalEntry}
-              journalFeedback={journalFeedback}
-              journalFeedbackLoading={journalFeedbackLoading}
-              onSubmitJournal={handleJournalAnalysis}
-              getBPFeedback={getBPFeedback}
-              getSugarFeedback={getSugarFeedback}
-            />
-          </div>
-        )}
-
-        {/* TAB 4: SAVED PRACTITIONERS */}
-        {activeTab === 'saved' && (
-          <div id="panel-saved" role="tabpanel" aria-labelledby="tab-saved" tabIndex={0}>
-            <SavedTab
-              savedProfessionals={savedProfessionals}
-              onRemoveSaved={handleRemoveSaved}
-              onNavigateToMessages={onNavigateToMessages}
-              onSelectProfessional={onSelectProfessional}
-              onVerifyCredentials={setSelectedModalProf}
-            />
-          </div>
-        )}
-
-        {/* TAB 5: SECURED MEDICAL RECORDS / CLINICAL HISTORY */}
-        {activeTab === 'records' && (
-          <div id="panel-records" role="tabpanel" aria-labelledby="tab-records" tabIndex={0} className="space-y-6 animate-fade-in bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-            <div className="border-b border-slate-150 pb-3.5">
-              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                <FolderHeart className="h-4.5 w-4.5 text-[#DC2626]" />
-                Medical Record Ledger
-              </h3>
-              <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                Archived clinical notes, diagnostics reports, and historic treatment trails.
-              </p>
-            </div>
-            <MedicalHistory />
-          </div>
-        )}
-      </div>
-
-      {/* ========================================== */}
-      {/* MODAL: FULL E-PRESCRIPTION VIEW SLIP       */}
-      {/* ========================================== */}
-      {selectedPrescriptionBooking && (
-        <div className="fixed inset-0 bg-slate-100/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-white border-2 border-slate-200 rounded-3xl w-full max-w-xl shadow-xl overflow-hidden animate-slide-down flex flex-col max-h-[90vh]">
-            {/* Header */}
-            <div className="bg-[#0F172A] text-white p-5 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-rose-400" />
-                <h4 className="text-sm font-extrabold uppercase tracking-wide">Verified Digital Rx Slip</h4>
-              </div>
-              <button 
-                onClick={() => setSelectedPrescriptionBooking(null)}
-                className="text-slate-400 hover:text-white transition-colors cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Print feedback alerts */}
-            {printSuccess && (
-              <div className="bg-emerald-50 border-b border-emerald-100 p-3 text-xs text-emerald-800 font-bold flex items-center justify-center gap-1.5">
-                <Check className="h-4 w-4 text-emerald-600" />
-                Prescription downloaded successfully! PDF digital manifest ready.
-              </div>
+      {activeTab === 'appointments' && (
+        <div id="panel-appointments" role="tabpanel" aria-labelledby="tab-appointments" tabIndex={0} className="space-y-5">
+          <section className={card}>
+            <h2 className="text-base font-bold mb-3 flex items-center gap-2"><Clock className="h-4 w-4 text-[#DC2626]" /> Upcoming appointments</h2>
+            {upcoming.length === 0 ? (
+              <p className="text-sm text-slate-600">Nothing booked. Find a verified doctor under “Doctors &amp; Nurses”, or use “Consult a doctor now”.</p>
+            ) : (
+              <ul className="divide-y divide-slate-100">
+                {upcoming.map(b => (
+                  <li key={b.id} className="py-3 flex flex-wrap items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <button onClick={() => onSelectProfessional(b.professionalId)} className="text-sm font-bold hover:underline cursor-pointer text-left">{b.professionalName}</button>
+                      <p className="text-xs text-slate-600">{b.date} · {b.timeSlot} · {b.mode} · RM {b.fee.toFixed(2)}</p>
+                      {b.paymentStatus === 'Pending' && <p className="text-xs font-bold text-amber-700">Awaiting payment. The slot is held for a short time.</p>}
+                    </div>
+                    <div className="flex gap-2">
+                      {b.paymentStatus === 'Pending' && <button onClick={() => setPaying(b)} className="bg-[#DC2626] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Pay now</button>}
+                      <button onClick={onNavigateToMessages} className="border border-slate-200 text-xs font-bold px-3 py-2 cursor-pointer">Message</button>
+                      <button onClick={() => cancel(b)} className="border border-rose-200 text-rose-700 text-xs font-bold px-3 py-2 cursor-pointer">Cancel</button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             )}
+            <p className="text-[11px] text-slate-500 mt-3">Cancelling at least a day ahead is refunded in full. Scheduled video visits are arranged with your doctor by message; use “Consult a doctor now” for an instant video or chat.</p>
+          </section>
 
-            {/* Prescription Slip Body */}
-            <div className="p-8 overflow-y-auto space-y-8 flex-1 text-slate-800 bg-white relative" id="prescription-printable-area">
-              
-              {/* Official Watermark */}
-              <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] overflow-hidden z-0">
-                <ShieldCheck className="h-96 w-96 text-slate-900 rotate-[-20deg]" />
-              </div>
-
-              <div className="relative z-10">
-                {/* Rx Header */}
-                <div className="flex justify-between items-start border-b-2 border-slate-200 pb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-[#0F172A] text-rose-100 p-2.5 rounded-xl">
-                      <Stethoscope className="h-6 w-6" />
-                    </div>
-                    <div className="space-y-0.5">
-                      <h3 className="text-xl font-black text-rose-950 leading-none">MedCred</h3>
-                      <span className="text-[11px] font-extrabold text-[#DC2626] uppercase tracking-[0.2em] block">Verified Medical Network</span>
-                    </div>
-                  </div>
-                  <div className="text-right space-y-2">
-                    <div className="inline-flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-500 text-xs font-bold px-2 py-1 rounded-md">
-                      <Lock className="h-3 w-3" />
-                      SECURE DIGITAL RX
-                    </div>
-                    <p className="text-[11px] text-slate-400 font-mono font-bold tracking-wider">REF: {selectedPrescriptionBooking.id.toUpperCase()}</p>
-                    <p className="text-xs text-slate-400 font-medium">{new Date(selectedPrescriptionBooking.prescription?.issuedAt || Date.now()).toLocaleString()}</p>
-                  </div>
-                </div>
-
-                {/* Patient and Professional metadata */}
-                <div className="grid grid-cols-2 gap-0 border-b border-slate-200 my-6">
-                  <div className="space-y-1.5 border-r border-slate-200 pr-6 pb-6">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block">Patient Details</span>
-                    <p className="text-sm font-black text-slate-900">{selectedPrescriptionBooking.patientName}</p>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-slate-500 text-[11px] font-medium flex items-center gap-1.5"><Phone className="h-3 w-3"/> {selectedPrescriptionBooking.patientPhone}</span>
-                      <span className="text-slate-500 text-[11px] font-medium flex items-center gap-1.5"><Mail className="h-3 w-3"/> {selectedPrescriptionBooking.patientEmail}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-1.5 pl-6 pb-6">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block">Prescriber Details</span>
-                    <p className="text-sm font-black text-slate-900">{selectedPrescriptionBooking.professionalName}</p>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-slate-500 text-[11px] font-medium flex items-center gap-1.5"><UserCheck className="h-3 w-3"/> Verified {selectedPrescriptionBooking.professionalRole}</span>
-                      <span className="text-slate-500 text-[11px] font-mono font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded w-max">MMC ID: MMC-87429</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Diagnosis detail */}
-                <div className="space-y-2 mb-6">
-                  <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest block">Clinical Diagnosis</span>
-                  <p className="text-base font-black text-slate-900 bg-slate-50 border border-slate-200 p-4 rounded-xl">
-                    {selectedPrescriptionBooking.prescription?.diagnosis}
-                  </p>
-                </div>
-
-                {/* Rx Medicine grid */}
-                <div className="space-y-3 mb-6 relative">
-                  <div className="absolute top-0 right-4 text-8xl font-black text-slate-100 pointer-events-none opacity-50 select-none font-sans">Rx</div>
-                  <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest block flex items-center gap-1.5">
-                    <FileSignature className="h-3.5 w-3.5" />
-                    Prescribed Medications
-                  </span>
-                  <div className="border border-slate-200 rounded-xl p-5 bg-white whitespace-pre-line text-sm font-medium text-slate-800 leading-loose border-l-4 border-l-[#DC2626] relative z-10 shadow-sm">
-                    {selectedPrescriptionBooking.prescription?.medicines}
-                  </div>
-                </div>
-
-                {/* Instructions detail */}
-                {selectedPrescriptionBooking.prescription?.instructions && (
-                  <div className="space-y-2 mb-8">
-                    <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest block">Care Instructions</span>
-                    <p className="text-sm font-medium text-slate-600 leading-relaxed">
-                      {selectedPrescriptionBooking.prescription.instructions}
-                    </p>
-                  </div>
-                )}
-
-                {/* Signature stamp with digital certificate badge */}
-                <div className="border-t-2 border-slate-100 pt-6 flex flex-col sm:flex-row justify-between items-end gap-6">
-                  <div className="flex flex-col gap-2">
-                    {/* Mock QR Code area for verification */}
-                    <div className="w-16 h-16 bg-slate-100 rounded-lg border border-slate-200 p-1 flex items-center justify-center relative overflow-hidden group cursor-help">
-                      <div className="absolute inset-0 bg-slate-200/50 transition-all group-hover:bg-[#FFF0F2]"></div>
-                      <div className="w-full h-full border border-slate-300 border-dashed rounded relative flex items-center justify-center">
-                        <ScanLine className="h-6 w-6 text-slate-400" />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-emerald-700 font-extrabold bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100 text-[11px] uppercase tracking-wider">
-                      <BadgeCheck className="h-3.5 w-3.5 text-emerald-600" />
-                      <span>Valid Digital Signature</span>
-                    </div>
-                  </div>
-                  <div className="text-center sm:text-right flex flex-col items-end">
-                    <div className="w-40 border-b-2 border-slate-800 pb-2 mb-2">
-                      <span className="font-sans text-lg font-black text-slate-700 italic opacity-80">
-                        {selectedPrescriptionBooking.professionalName}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider block">Authorized Signature</p>
-                    <p className="font-mono text-[11px] font-bold text-slate-400 mt-1">
-                      {selectedPrescriptionBooking.prescription?.digitalSignature}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Actions Footer */}
-            <div className="bg-slate-50 border-t border-slate-100 p-4 flex gap-2.5">
-              <button
-                onClick={() => setSelectedPrescriptionBooking(null)}
-                className="flex-1 border-2 border-slate-200 text-slate-700 text-xs font-bold py-2.5 rounded-xl hover:bg-slate-100 transition-all cursor-pointer"
-              >
-                Close Window
-              </button>
-              <button
-                onClick={handlePrintPrescription}
-                disabled={isPrinting}
-                className="flex-1 bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-rose-400 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 hover:scale-[1.01] cursor-pointer"
-              >
-                {isPrinting ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                    Generating PDF Slip...
-                  </>
-                ) : (
-                  <>
-                    <Printer className="h-4 w-4" />
-                    Print & Download PDF
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
+          {past.length > 0 && (
+            <section className={card}>
+              <h2 className="text-base font-bold mb-3">Past appointments</h2>
+              <ul className="divide-y divide-slate-100 text-sm">
+                {past.map(b => (
+                  <li key={b.id} className="py-2 flex justify-between gap-3"><span>{b.professionalName} · {b.date}</span><span className="font-bold text-slate-600">{b.status}{b.paymentStatus === 'Refunded' ? ' (refunded)' : ''}</span></li>
+                ))}
+              </ul>
+            </section>
+          )}
         </div>
       )}
 
-      {/* ========================================== */}
-      {/* MODAL: SECURE E-PRESCRIPTION GENERATOR     */}
-      {/* ========================================== */}
-      {showGenerateModal && (
-        <div className="fixed inset-0 bg-slate-100/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-white border-2 border-slate-200 rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden animate-slide-down flex flex-col max-h-[92vh]">
-            
-            {/* Header banner */}
-            <div className="bg-[#0F172A] text-white p-5 flex justify-between items-center shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="bg-[#DC2626] p-2 rounded-xl text-white shadow-md">
-                  <FileSignature className="h-5 w-5" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-extrabold uppercase tracking-wide flex items-center gap-1.5">
-                    Write Prescription
-                  </h4>
-                  <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-                    Official digital prescription panel
-                  </p>
-                </div>
-              </div>
-              <button 
-                type="button"
-                onClick={() => setShowGenerateModal(false)}
-                className="text-slate-400 hover:text-white transition-colors cursor-pointer"
-              >
-                <X className="h-5.5 w-5.5" />
-              </button>
-            </div>
-
-            {/* Form Container */}
-            <form onSubmit={handleIssueEPrescriptionSubmit} className="flex-1 overflow-y-auto p-6 space-y-6 text-slate-800">
-              
-              <div className="bg-[#FFF0F2] border border-[#FECDD3] p-3.5 rounded-xl text-xs font-semibold text-[#0F172A] leading-relaxed">
-                ℹ️ Enter medication and dosage details below to issue an e-prescription.
-              </div>
-
-              {/* Bento Grid layout */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                {/* Left Column: Patient & Prescribing Practitioner Details */}
-                <div className="space-y-4">
-                  <span className="text-xs font-extrabold text-[#0F172A] uppercase tracking-wider block border-b border-slate-100 pb-1">
-                    1. Patient & Practitioner Details
-                  </span>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-600 mb-1">Patient Full Name</label>
-                    <input 
-                      type="text" 
-                      value={prescPatientName}
-                      onChange={(e) => setPrescPatientName(e.target.value)}
-                      className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 bg-slate-50 focus:border-[#DC2626] focus:bg-white outline-none"
-                      required
-                      placeholder="Enter patient's full name"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-600 mb-1">Patient Email</label>
-                      <input 
-                        type="email" 
-                        value={prescPatientEmail}
-                        onChange={(e) => setPrescPatientEmail(e.target.value)}
-                        className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 bg-slate-50 focus:border-[#DC2626] focus:bg-white outline-none"
-                        required
-                        placeholder="patient@email.com"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-600 mb-1">Patient Mobile Phone</label>
-                      <input 
-                        type="text" 
-                        value={prescPatientPhone}
-                        onChange={(e) => setPrescPatientPhone(e.target.value)}
-                        className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 bg-slate-50 focus:border-[#DC2626] focus:bg-white outline-none"
-                        required
-                        placeholder="+601xxxxxxxx"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-600 mb-1">Prescribing Doctor</label>
-                    <select 
-                      value={prescDoctorId}
-                      onChange={(e) => setPrescDoctorId(e.target.value)}
-                      className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2.5 px-3 bg-slate-50 focus:border-[#DC2626] focus:bg-white outline-none cursor-pointer"
-                    >
-                      {doctorsList.map((doc) => (
-                        <option key={doc.id} value={doc.id}>
-                          {doc.name} ({doc.specialization})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-600 mb-1">MMC Registration Number</label>
-                    <div className="w-full text-xs font-mono font-bold bg-slate-100 border-2 border-slate-200 rounded-xl py-2 px-3 text-slate-700">
-                      {professionals.find(p => p.id === prescDoctorId)?.licenseNumber || 'MMC-99213'} (Malaysian Medical Council Verified)
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Column: Diagnosis & Medicine Formulation */}
-                <div className="space-y-4">
-                  <span className="text-xs font-extrabold text-[#0F172A] uppercase tracking-wider block border-b border-slate-100 pb-1">
-                    2. Diagnosis & Medications
-                  </span>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-600 mb-1">Primary Clinical Diagnosis</label>
-                    <input 
-                      type="text" 
-                      value={prescDiagnosis}
-                      onChange={(e) => setPrescDiagnosis(e.target.value)}
-                      className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 bg-slate-50 focus:border-[#DC2626] focus:bg-white outline-none"
-                      required
-                      placeholder="e.g. Hypertension stage 1 / Acute bronchitis"
-                    />
-                  </div>
-
-                  {/* Added Medications Chip Area */}
-                  <div>
-                    <label className="block text-xs font-bold text-slate-600 mb-1">
-                      Medication List ({medsList.length})
-                    </label>
-                    {medsList.length === 0 ? (
-                      <p className="text-xs text-slate-400 font-semibold italic bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        No drugs or medicines added yet. Use formulation builder below.
-                      </p>
-                    ) : (
-                      <div className="flex flex-wrap gap-2 max-h-[140px] overflow-y-auto p-1 bg-slate-50 border border-slate-150 rounded-xl">
-                        {medsList.map((med, idx) => (
-                          <div 
-                            key={idx}
-                            className="bg-white border border-slate-200 text-xs font-extrabold text-slate-700 rounded-xl px-2.5 py-1.5 flex items-center gap-1.5 shadow-xs"
-                          >
-                            <span className="text-emerald-600">💊</span>
-                            <span>{med.name} ({med.dosage}) - {med.frequency} [{med.duration}]</span>
-                            <button 
-                              type="button"
-                              onClick={() => handleRemoveMedicineItem(idx)}
-                              className="text-slate-400 hover:text-red-600 font-extrabold ml-1 cursor-pointer"
-                              title="Delete Item"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Formulation Builder Box */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-3">
-                    <span className="text-[11px] font-extrabold text-slate-500 uppercase block">Add Medication</span>
-                    
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Medicine Name</label>
-                        <input 
-                          type="text"
-                          placeholder="e.g. Metformin"
-                          value={newMedName}
-                          onChange={(e) => setNewMedName(e.target.value)}
-                          className="w-full text-xs font-bold border border-slate-200 rounded-lg py-1 px-2 outline-none focus:border-[#DC2626]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Dosage / Strength</label>
-                        <input 
-                          type="text"
-                          placeholder="e.g. 500mg"
-                          value={newMedDosage}
-                          onChange={(e) => setNewMedDosage(e.target.value)}
-                          className="w-full text-xs font-bold border border-slate-200 rounded-lg py-1 px-2 outline-none focus:border-[#DC2626]"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Frequency</label>
-                        <select
-                          value={newMedFrequency}
-                          onChange={(e) => setNewMedFrequency(e.target.value)}
-                          className="w-full text-xs font-bold border border-slate-200 rounded-lg py-1 px-1.5 outline-none bg-white cursor-pointer"
-                        >
-                          <option value="Three times daily (TDS)">Three times daily (TDS)</option>
-                          <option value="Twice daily (BD)">Twice daily (BD)</option>
-                          <option value="Once daily (OD)">Once daily (OD)</option>
-                          <option value="Four times daily (QDS)">Four times daily (QDS)</option>
-                          <option value="Before bed (PRN)">Before bed (PRN)</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Duration</label>
-                        <select
-                          value={newMedDuration}
-                          onChange={(e) => setNewMedDuration(e.target.value)}
-                          className="w-full text-xs font-bold border border-slate-200 rounded-lg py-1 px-1.5 outline-none bg-white cursor-pointer"
-                        >
-                          <option value="3 days">3 days</option>
-                          <option value="5 days">5 days</option>
-                          <option value="7 days">7 days</option>
-                          <option value="10 days">10 days</option>
-                          <option value="14 days">14 days</option>
-                          <option value="1 month">1 month</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={handleAddMedicineItem}
-                      className="w-full bg-[#DC2626] hover:bg-[#DC2626] text-white text-xs font-extrabold py-1.5 rounded-lg transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer"
-                    >
-                      <Plus className="h-3 w-3" />
-                      Add Medication
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Special instructions */}
-              <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1">Special Instructions</label>
-                <textarea 
-                  value={prescInstructions}
-                  onChange={(e) => setPrescInstructions(e.target.value)}
-                  placeholder="e.g. Take plenty of fluids. Do not drink dairy within 2 hours of antibiotics."
-                  rows={2}
-                  className="w-full text-xs font-semibold border-2 border-slate-200 rounded-xl p-3 bg-slate-50 focus:border-[#DC2626] focus:bg-white outline-none"
-                  required
-                />
-              </div>
-
-              {/* Secure Digital Signature Area */}
-              <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-4">
-                <div className="flex justify-between items-center flex-wrap gap-2">
-                  <div>
-                    <span className="text-xs font-extrabold text-[#0F172A] uppercase tracking-wide block">
-                      3. Digital Signature
-                    </span>
-                    <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-                      Sign below using touch/mouse or type your name
-                    </p>
-                  </div>
-
-                  <div className="flex bg-slate-200 p-1 rounded-xl gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setSigningMethod('draw')}
-                      className={`text-xs font-extrabold px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                        signingMethod === 'draw' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-                      }`}
-                    >
-                      Draw Signature
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSigningMethod('type')}
-                      className={`text-xs font-extrabold px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                        signingMethod === 'type' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-                      }`}
-                    >
-                      Type Digital Name
-                    </button>
-                  </div>
-                </div>
-
-                {signingMethod === 'draw' ? (
-                  <div className="space-y-2">
-                    <div className="bg-white border border-slate-200 rounded-xl p-2 relative">
-                      <canvas
-                        ref={canvasRef}
-                        onMouseDown={startDrawing}
-                        onMouseMove={draw}
-                        onMouseUp={stopDrawing}
-                        onMouseLeave={stopDrawing}
-                        onTouchStart={startDrawingTouch}
-                        onTouchMove={drawTouch}
-                        onTouchEnd={stopDrawing}
-                        width={600}
-                        height={100}
-                        className="w-full h-[100px] block cursor-crosshair bg-slate-50 rounded-lg touch-none border border-slate-100"
-                        title="Draw signature with mouse or touch screen"
-                      />
-                      <span className="absolute bottom-3 left-3 text-[11px] font-bold text-slate-300 pointer-events-none uppercase tracking-wider">
-                        Sign within this box
-                      </span>
-                      {isSigned && (
-                        <span className="absolute top-3 right-3 text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 flex items-center gap-0.5">
-                          <Check className="h-3 w-3" /> Signed
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <p className="text-xs text-slate-400 font-semibold">Use your cursor or touch screen to draw your signature.</p>
-                      <button
-                        type="button"
-                        onClick={clearCanvas}
-                        className="text-xs font-extrabold text-red-600 hover:text-red-800 cursor-pointer bg-red-50 hover:bg-red-100 px-3 py-1 rounded-lg border border-red-200/50"
-                      >
-                        Clear Signature Pad
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-500 mb-1">Doctor Name</label>
-                      <input 
-                        type="text"
-                        placeholder="e.g. Dr. Ananya Sen"
-                        value={typedSignature}
-                        onChange={(e) => setTypedSignature(e.target.value)}
-                        className="w-full text-xs font-bold border-2 border-slate-200 rounded-xl py-2 px-3 focus:border-[#DC2626] outline-none"
-                      />
-                    </div>
-                    <div className="bg-slate-100 border border-slate-200 p-4 rounded-xl text-center">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Signature Preview</span>
-                      <p className="font-sans italic text-xl text-[#0F172A] tracking-wide select-none">
-                        {typedSignature || (professionals.find(p => p.id === prescDoctorId)?.name || 'Dr. Ananya Sen')}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-            </form>
-
-            {/* Actions Footer */}
-            <div className="bg-slate-50 border-t border-slate-200 p-4 flex justify-between items-center shrink-0">
-              <span className="text-[11px] text-slate-400 font-mono font-bold leading-relaxed max-w-[250px]">
-                🔒 Securely processed under Malaysian cyberlaws.
-              </span>
-              <div className="flex gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setShowGenerateModal(false)}
-                  className="border-2 border-slate-200 text-slate-700 text-xs font-bold py-2.5 px-5 rounded-xl hover:bg-slate-100 transition-all cursor-pointer"
-                >
-                  Cancel Draft
-                </button>
-                <button
-                  type="button"
-                  onClick={handleIssueEPrescriptionSubmit}
-                  className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold py-2.5 px-6 rounded-xl transition-all shadow-md flex items-center gap-1.5 hover:scale-[1.01] cursor-pointer"
-                >
-                  <FileSignature className="h-4 w-4" />
-                  Issue Prescription
-                </button>
-              </div>
-            </div>
-
-          </div>
+      {activeTab === 'records' && (
+        <div id="panel-records" role="tabpanel" aria-labelledby="tab-records" tabIndex={0}>
+          <PatientRecords />
         </div>
       )}
 
-      {/* ========================================== */}
-      {/* MODAL: LIVE TELEHEALTH CONSULTATION ROOM   */}
-      {/* ========================================== */}
-      {activeVideoBooking && (
-        <div className="fixed inset-0 bg-[#0F172A]/95 flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-[#0F172A] rounded-3xl w-full max-w-2xl border border-[#DC2626] shadow-2xl overflow-hidden aspect-video flex flex-col justify-between relative text-white">
-            
-            {/* Top Bar overlay */}
-            <div className="p-4 bg-gradient-to-b from-slate-900/80 to-transparent flex justify-between items-center z-10 absolute top-0 left-0 right-0">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping"></span>
-                <span className="bg-rose-500 text-white font-extrabold text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-md">
-                  LIVE SECURED TELEHEALTH
-                </span>
-                {videoConnected && (
-                  <span className="font-mono text-xs font-bold text-slate-300 ml-2">
-                    {formatVideoTimer(videoTimer)}
-                  </span>
-                )}
-              </div>
-              <div className="bg-[#0F172A]/60 backdrop-blur-xs px-3 py-1.5 rounded-lg border border-white/10 text-xs font-semibold text-slate-300">
-                Patient: {userName} &bull; PDPA Compliant
-              </div>
-            </div>
-
-            {/* Video Feed Workspace */}
-            <div className="flex-1 flex items-center justify-center relative bg-[#0F172A]">
-              
-              {!videoConnected ? (
-                <div className="text-center space-y-4 p-8">
-                  <RefreshCw className="h-10 w-10 text-[#DC2626] animate-spin mx-auto" />
-                  <div className="space-y-1">
-                    <h4 className="text-sm font-extrabold text-slate-200">Establishing Secured Telehealth Room</h4>
-                    <p className="text-xs text-slate-500 font-semibold max-w-sm mx-auto">
-                      Connecting line with verified clinical provider **{activeVideoBooking.professionalName}**... Checking E-E-A-T council licenses...
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="absolute inset-0 w-full h-full">
-                  {/* Remote Video Stream (Simulated Practitioner) */}
-                  <div className="w-full h-full bg-[#DC2626] relative overflow-hidden flex items-center justify-center">
-                    <img 
-                      src={professionals.find(p => p.id === activeVideoBooking.professionalId)?.avatar || "/assets/malaysian_female_doctor.jpg"}
-                      alt={activeVideoBooking.professionalName}
-                      className="w-full h-full object-cover brightness-95 opacity-90"
-                    />
-                    
-                    {/* Practitioner Name tag */}
-                    <div className="absolute bottom-4 left-4 bg-[#0F172A]/70 border border-white/10 px-3 py-1.5 rounded-xl backdrop-blur-xs text-xs font-bold">
-                      {activeVideoBooking.professionalName} (Consultant)
-                    </div>
-                  </div>
-
-                  {/* Local Video Stream Pip (Self-view) */}
-                  <div className="absolute bottom-4 right-4 w-32 sm:w-40 aspect-video bg-[#0F172A] border-2 border-[#DC2626] rounded-xl overflow-hidden shadow-md">
-                    {!cameraOff ? (
-                      <div className="w-full h-full relative bg-[#DC2626] flex items-center justify-center">
-                        <div className="absolute inset-0 bg-gradient-to-br from-slate-600 to-[#DC2626] flex items-center justify-center">
-                          <User className="h-10 w-10 text-white/50" />
-                        </div>
-                        <div className="absolute bottom-1 right-1 bg-slate-800 px-1 text-[10px] rounded text-white font-mono">
-                          You (Self)
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="w-full h-full bg-[#0F172A] flex items-center justify-center text-slate-500">
-                        <X className="h-5 w-5" />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Bottom Call Controls Overlay */}
-            <div className="p-4 bg-gradient-to-t from-slate-900/90 to-transparent z-10">
-              <div className="flex justify-center items-center gap-3">
-                <button
-                  onClick={() => setVideoMuted(!videoMuted)}
-                  className={`p-3.5 rounded-full border transition-all hover:scale-105 cursor-pointer ${
-                    videoMuted 
-                      ? 'bg-rose-600 border-rose-500 text-white' 
-                      : 'bg-white/10 border-white/15 text-slate-200 hover:bg-white/20'
-                  }`}
-                  title={videoMuted ? "Unmute Mic" : "Mute Mic"}
-                >
-                  <Phone className="h-5 w-5" />
-                </button>
-                
-                <button
-                  onClick={handleEndVideoCall}
-                  className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold py-3.5 px-6 rounded-full transition-all shadow-md hover:scale-105 cursor-pointer"
-                >
-                  End Secure Consultation
-                </button>
-
-                <button
-                  onClick={() => {
-                    setPrescPatientName(activeVideoBooking.patientName);
-                    setPrescPatientEmail(activeVideoBooking.patientEmail);
-                    setPrescPatientPhone(activeVideoBooking.patientPhone);
-                    const docProfile = professionals.find(p => p.name === activeVideoBooking.professionalName);
-                    if (docProfile) {
-                      setPrescDoctorId(docProfile.id);
-                    }
-                    setShowGenerateModal(true);
-                  }}
-                  className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold py-3.5 px-6 rounded-full transition-all shadow-md hover:scale-105 cursor-pointer flex items-center gap-1.5"
-                  title="Draft digital prescription for active patient"
-                >
-                  <FileSignature className="h-4 w-4" />
-                  Draft E-Prescription
-                </button>
-
-                <button
-                  onClick={() => setCameraOff(!cameraOff)}
-                  className={`p-3.5 rounded-full border transition-all hover:scale-105 cursor-pointer ${
-                    cameraOff 
-                      ? 'bg-rose-600 border-rose-500 text-white' 
-                      : 'bg-white/10 border-white/15 text-slate-200 hover:bg-white/20'
-                  }`}
-                  title={cameraOff ? "Turn Camera On" : "Turn Camera Off"}
-                >
-                  <Video className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-
-          </div>
+      {activeTab === 'saved' && (
+        <div id="panel-saved" role="tabpanel" aria-labelledby="tab-saved" tabIndex={0}>
+          <SavedTab
+            savedProfessionals={professionals.filter(p => savedIds.includes(p.id))}
+            onRemoveSaved={removeSaved}
+            onNavigateToMessages={onNavigateToMessages}
+            onSelectProfessional={onSelectProfessional}
+            onVerifyCredentials={p => onSelectProfessional(p.id)}
+          />
         </div>
       )}
 
-      {/* Verification Card Lightbox / Modal Popup */}
-      {selectedModalProf && (
-        <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-100/80 backdrop-blur-xs animate-fade-in"
-          onClick={() => setSelectedModalProf(null)}
-          id="credentials-modal-backdrop"
-        >
-          {/* Card Wrapper with responsive scaling */}
-          <div 
-            className="relative max-w-md w-full scale-100 md:hover:scale-[1.01] transition-all duration-300 ease-out"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* The precise, styled card matching user's image with a vibrant crimson border */}
-            <div 
-              className="bg-white border-[3px] border-rose-300 rounded-[28px] p-6 shadow-[0_20px_50px_rgba(13,148,136,0.15)] flex flex-col justify-between relative overflow-hidden"
-              style={{ minHeight: '380px' }}
-              id="credentials-modal-card"
-            >
-              {/* Floating Close Button in top corner */}
-              <button
-                onClick={() => setSelectedModalProf(null)}
-                className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer z-10"
-                title="Close"
-              >
-                <X className="h-4 w-4" />
-              </button>
-
-              <div>
-                {/* Header layout: Avatar, Name & Specialization, Verified Badge */}
-                <div className="flex gap-4 pr-6">
-                  {/* Avatar with rounded corners */}
-                  <img 
-                    src={selectedModalProf.avatar} 
-                    alt={selectedModalProf.name}
-                    className="h-20 w-20 rounded-2xl object-cover border border-slate-150 shadow-sm shrink-0"
-                    referrerPolicy="no-referrer"
-                  />
-                  
-                  <div className="space-y-1">
-                    {/* Role badge */}
-                    <span className={`text-[11px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${
-                      selectedModalProf.role === UserRole.DOCTOR 
-                        ? "bg-[#FFF0F2] text-[#B91C1C] border-[#FECDD3]/60" 
-                        : "bg-slate-100 text-slate-800 border-slate-200"
-                    }`}>
-                      {selectedModalProf.role === UserRole.DOCTOR ? "DOCTOR (MD/MBBS)" : "REGISTERED NURSE (RN)"}
-                    </span>
-                    
-                    {/* Name */}
-                    <h3 className="text-lg font-extrabold text-[#c8102e] leading-tight mt-1">
-                      {selectedModalProf.name}
-                    </h3>
-                    
-                    {/* Specialty */}
-                    <div className="flex items-center gap-1.5 text-xs text-slate-600 font-bold mt-1">
-                      <Stethoscope className="h-3.5 w-3.5 text-[#DC2626] shrink-0" />
-                      <span>{selectedModalProf.specialization}</span>
-                    </div>
-
-                    {/* City */}
-                    <div className="flex items-center gap-1.5 text-xs text-slate-400 font-bold mt-0.5">
-                      <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                      <span>{selectedModalProf.city}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Verified badge pill */}
-                <div className="mt-4 flex justify-between items-center bg-[#FFF0F2]/10 px-3.5 py-1.5 rounded-xl border border-[#FECDD3]">
-                  <div className="text-xs font-bold text-slate-500">Registry Verification Status</div>
-                  <div className="border border-emerald-500/80 text-emerald-600 bg-emerald-50/40 px-3 py-1 rounded-xs text-xs font-bold flex items-center gap-1 shadow-3xs">
-                    <span>Verified</span>
-                    <span className="text-emerald-500">☑</span>
-                  </div>
-                </div>
-
-                {/* Quote / Bio Block */}
-                <p className="text-[11px] text-slate-500 leading-relaxed italic border-l-2 border-slate-200 pl-3 mt-4">
-                  "{selectedModalProf.bio}"
-                </p>
-
-                {/* License credentials details */}
-                <div className="bg-slate-50/60 rounded-xl p-3.5 mt-4 space-y-2 border border-slate-150">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500 flex items-center gap-1.5 font-bold">
-                      <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                      {selectedModalProf.role === UserRole.DOCTOR ? "MMC Registration:" : "LJM Nurse Registry:"}
-                    </span>
-                    <code className="font-mono font-bold text-[11px] text-slate-800 bg-white border border-slate-200 px-2 py-0.5 rounded shadow-3xs">{selectedModalProf.licenseNumber}</code>
-                  </div>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500 flex items-center gap-1.5 font-bold">
-                      <Clock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                      Clinical Experience:
-                    </span>
-                    <span className="font-extrabold text-[11px] text-slate-800 bg-white border border-slate-200 px-2 py-0.5 rounded shadow-3xs">{selectedModalProf.experienceYears} Years</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer Section */}
-              <div className="flex items-center justify-between border-t border-slate-100 pt-4 mt-5">
-                <div className="flex items-center gap-1 font-extrabold text-slate-700 text-xs">
-                  <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
-                  <span>{selectedModalProf.rating}</span>
-                  <span className="text-slate-400 font-semibold">({selectedModalProf.reviewCount})</span>
-                </div>
-                
-                <div className="text-right">
-                  <span className="text-[11px] text-slate-400 block font-extrabold uppercase tracking-wider leading-none">Consultation Fee</span>
-                  <span className="text-sm font-extrabold text-[#B91C1C] font-mono mt-1 block">
-                    RM {selectedModalProf.fee}
-                    <span className="text-xs font-semibold text-slate-500 font-sans">{selectedModalProf.role === UserRole.DOCTOR ? "" : "/hr"}</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Actions Container Under Card */}
-            <div className="mt-4 flex gap-3 justify-end">
-              <button
-                onClick={() => setSelectedModalProf(null)}
-                className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-extrabold rounded-xl border-2 border-slate-200 shadow-2xs transition-all cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  onSelectProfessional(selectedModalProf.id);
-                  setSelectedModalProf(null);
-                }}
-                className="px-5 py-2.5 bg-[#c8102e] hover:bg-[#a50f2a] text-white text-xs font-extrabold rounded-xl shadow-md shadow-rose-500/10 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <span>Full Profile & Appointments</span>
-              </button>
-            </div>
-          </div>
-        </div>
+      {paying && (
+        <PaymentDialog kind="booking" refId={paying.id} description={`Appointment with ${paying.professionalName} on ${paying.date}, ${paying.timeSlot}`}
+          onCancel={() => setPaying(null)}
+          onPaid={() => { setBookings(prev => prev.map(x => (x.id === paying.id ? { ...x, paymentStatus: 'Paid' as const } : x))); setPaying(null); }} />
       )}
-
     </div>
   );
 }

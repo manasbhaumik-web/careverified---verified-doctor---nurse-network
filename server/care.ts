@@ -6,6 +6,7 @@ import { requireAuth, requireRole } from "./auth";
 import { notify, notifyAdmins } from "./verification";
 import { refundPayment, paymentsEnabled } from "./payments";
 import { VerificationStatus } from "../src/types";
+import { createGrant } from "./clinical";
 
 /**
  * The 24/7 care engine: practitioner presence + on-call roster, the instant-consult queue,
@@ -75,6 +76,8 @@ CREATE TABLE IF NOT EXISTS emergency_events (
   handled_at TEXT
 );
 `);
+
+try { db.exec("ALTER TABLE consults ADD COLUMN share_record INTEGER NOT NULL DEFAULT 0"); } catch { /* column already exists */ }
 
 const PRESENCE_TTL_MS = 90_000;
 const ESCALATE_AFTER_MS = 3 * 60_000;
@@ -210,8 +213,8 @@ export function registerCareRoutes(app: Application, ctx: Ctx) {
     }
     const flags = redFlags(symptoms);
     const id = newId("con");
-    db.prepare("INSERT INTO consults (id, patient_user_id, status, mode, symptoms, red_flags, fee_sen, created_at) VALUES (?,?,?,?,?,?,?,?)")
-      .run(id, req.user!.id, "awaiting_payment", mode, symptoms, flags.length ? JSON.stringify(flags) : null, consultFeeSen(), iso());
+    db.prepare("INSERT INTO consults (id, patient_user_id, status, mode, symptoms, red_flags, fee_sen, created_at, share_record) VALUES (?,?,?,?,?,?,?,?,?)")
+      .run(id, req.user!.id, "awaiting_payment", mode, symptoms, flags.length ? JSON.stringify(flags) : null, consultFeeSen(), iso(), req.body.shareRecord === true ? 1 : 0);
     audit(req, "consult.create", { target: ["consult", id], details: { mode, redFlags: flags } });
     res.status(201).json({ status: "success", data: { id, redFlags: flags, fee: consultFeeSen() / 100 } });
   });
@@ -257,6 +260,8 @@ export function registerCareRoutes(app: Application, ctx: Ctx) {
     if (!won) return fail(res, 409, "Another doctor has already taken this consultation.");
     db.prepare("UPDATE payments SET professional_id = ? WHERE kind='consult' AND ref_id = ?").run(pid, req.params.id);
     const c = loadConsult(req.params.id);
+    // The patient opted in when they requested the consult: share their record with this doctor for 30 days.
+    if (c.share_record === 1) createGrant(c.patient_user_id, pid!, "consult", c.id, 30);
     notify(c.patient_user_id, "A doctor is ready", `${ctx.findProfessional(pid!).name} has joined your consultation.`);
     audit(req, "consult.accept", { target: ["consult", c.id] });
     res.json({ status: "success", data: consultView(c, req.user!) });

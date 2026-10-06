@@ -16,6 +16,7 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
   const [mine, setMine] = useState<any[]>([]);
   const [mode, setMode] = useState<'chat' | 'video'>('chat');
   const [symptoms, setSymptoms] = useState('');
+  const [shareRecord, setShareRecord] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [redFlags, setRedFlags] = useState<string[]>([]);
@@ -48,7 +49,7 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
     e.preventDefault();
     setError(''); setBusy(true);
     try {
-      const d = await jpost('/api/consults', { mode, symptoms });
+      const d = await jpost('/api/consults', { mode, symptoms, shareRecord });
       if (d.status === 'success') {
         setRedFlags(d.data.redFlags ?? []);
         setSymptoms('');
@@ -127,6 +128,10 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
               className="w-full border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-[#DC2626]"
               placeholder="Describe your symptoms and how long you have had them" />
           </div>
+          <label className="flex items-start gap-2 text-xs text-slate-700 cursor-pointer">
+            <input type="checkbox" className="mt-0.5" checked={shareRecord} onChange={e => setShareRecord(e.target.checked)} />
+            <span>Share my health record (allergies, conditions, medicines, readings) with the doctor who takes my consultation. Helps them prescribe safely. I can stop sharing at any time.</span>
+          </label>
           {error && <p className="text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 p-3">{error}</p>}
           <button disabled={busy || status?.onlineDoctors === 0} className="w-full bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-slate-300 text-white text-sm font-extrabold py-3 cursor-pointer">
             {busy ? 'Starting…' : status?.onlineDoctors === 0 ? 'No doctors online right now' : 'Continue to payment'}

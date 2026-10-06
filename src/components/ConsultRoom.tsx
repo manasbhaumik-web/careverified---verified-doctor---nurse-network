@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { PhoneOff, Send, Video, VideoOff, Mic, MicOff } from 'lucide-react';
+import { PhoneOff, Send, Video, VideoOff, Mic, MicOff, Stethoscope } from 'lucide-react';
+import ClinicalWorkspace from './ClinicalWorkspace';
 
 interface Props {
   consultId: string;
@@ -20,6 +21,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded }: 
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
   const [error, setError] = useState('');
+  const [showClinical, setShowClinical] = useState(true);
   const lastMsg = useRef(0);
   const lastSignal = useRef(0);
   const pc = useRef<RTCPeerConnection | null>(null);
@@ -216,6 +218,14 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded }: 
           </form>
         </div>
       </div>
+      {isDoctor && (
+        <div className="border-t border-slate-100 p-4">
+          <button onClick={() => setShowClinical(v => !v)} aria-expanded={showClinical} className="text-xs font-extrabold flex items-center gap-1.5 mb-3 cursor-pointer">
+            <Stethoscope className="h-4 w-4" /> Clinical tools {showClinical ? '(hide)' : '(show)'}
+          </button>
+          {showClinical && <ClinicalWorkspace kind="consult" refId={consultId} />}
+        </div>
+      )}
     </section>
   );
 }

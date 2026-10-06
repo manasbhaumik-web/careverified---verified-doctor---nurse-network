@@ -11,6 +11,9 @@ export default function AdminOps() {
   const [emergencies, setEmergencies] = useState<any[]>([]);
   const [payments, setPayments] = useState<any | null>(null);
   const [msg, setMsg] = useState('');
+  const [pharmacies, setPharmacies] = useState<any[]>([]);
+  const [newPharm, setNewPharm] = useState({ name: '', address: '', phone: '' });
+  const [issued, setIssued] = useState<{ id: string; pin: string } | null>(null);
 
   const load = async () => {
     const [c, e, p] = await Promise.all([
@@ -21,6 +24,8 @@ export default function AdminOps() {
     if (c.status === 'success') setCoverage(c.data);
     if (e.status === 'success') setEmergencies(e.data);
     if (p.status === 'success') setPayments(p.data);
+    const ph = await fetch('/api/admin/pharmacies').then(r => r.json());
+    if (ph.status === 'success') setPharmacies(ph.data);
   };
   useEffect(() => { load().catch(() => setMsg('Could not load data.')); const t = setInterval(() => load().catch(() => {}), 15000); return () => clearInterval(t); }, []);
 
@@ -32,6 +37,13 @@ export default function AdminOps() {
     setMsg(d.status === 'success' ? 'Refunded.' : d.message || 'Refund failed.');
     load();
   };
+
+  const addPharmacy = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const d = await post('/api/admin/pharmacies', newPharm);
+    if (d.status === 'success') { setIssued(d.data); setNewPharm({ name: '', address: '', phone: '' }); load(); } else setMsg(d.message || 'Could not add the pharmacy.');
+  };
+  const togglePharmacy = async (id: string, active: boolean) => { await post(`/api/admin/pharmacies/${id}/active`, { active }); load(); };
 
   const gaps = coverage ? coverage.grid.flat().filter((n: number) => n === 0).length : 0;
   const openSos = emergencies.filter(e => e.status === 'open');
@@ -109,6 +121,26 @@ export default function AdminOps() {
             </table>
           </div>
         )}
+      </section>
+
+      <section className="bg-white border border-[#FECDD3] p-5 space-y-3">
+        <h3 className="text-sm font-extrabold">Partner pharmacies</h3>
+        <p className="text-xs text-slate-600">Patients can send prescriptions to these pharmacies. Each pharmacy signs in at /pharmacy with its ID and PIN to look up and dispense.</p>
+        <form onSubmit={addPharmacy} className="flex flex-wrap gap-2 items-end">
+          <input className="border border-slate-200 px-3 py-2 text-xs flex-1 min-w-[10rem]" placeholder="Name" value={newPharm.name} onChange={e => setNewPharm({ ...newPharm, name: e.target.value })} required />
+          <input className="border border-slate-200 px-3 py-2 text-xs flex-1 min-w-[12rem]" placeholder="Address" value={newPharm.address} onChange={e => setNewPharm({ ...newPharm, address: e.target.value })} required />
+          <input className="border border-slate-200 px-3 py-2 text-xs w-36" placeholder="Phone" value={newPharm.phone} onChange={e => setNewPharm({ ...newPharm, phone: e.target.value })} />
+          <button className="bg-[#DC2626] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Add pharmacy</button>
+        </form>
+        {issued && <p role="status" className="text-xs bg-amber-50 border border-amber-300 p-3 font-semibold">Give the pharmacy these sign-in details now; the PIN is not shown again. ID: <span className="font-mono font-bold">{issued.id}</span> · PIN: <span className="font-mono font-bold">{issued.pin}</span> <button className="underline ml-2 cursor-pointer" onClick={() => setIssued(null)}>Done</button></p>}
+        <ul className="text-xs divide-y divide-slate-100">
+          {pharmacies.map(p => (
+            <li key={p.id} className="py-2 flex flex-wrap justify-between gap-2">
+              <span><b>{p.name}</b> · {p.address} · <span className="font-mono">{p.id}</span></span>
+              <button onClick={() => togglePharmacy(p.id, !p.active)} className="font-bold cursor-pointer">{p.active ? 'Deactivate' : 'Activate'}</button>
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   );

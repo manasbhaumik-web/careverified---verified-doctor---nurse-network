@@ -57,6 +57,7 @@ export default function ProfessionalProfile({
   const [bookingSlot, setBookingSlot] = useState('');
   const [bookingMode, setBookingMode] = useState<ConsultationMode>(ConsultationMode.IN_PERSON);
   const [symptoms, setSymptoms] = useState('');
+  const [shareRecord, setShareRecord] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState<Booking | null>(null);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
@@ -112,7 +113,8 @@ export default function ProfessionalProfile({
           date: bookingDate,
           timeSlot: bookingSlot,
           mode: bookingMode,
-          symptoms
+          symptoms,
+          shareRecord
         })
       });
       const data = await response.json();
@@ -631,6 +633,11 @@ export default function ProfessionalProfile({
                     className="w-full text-xs border border-slate-200/80 rounded-xl p-3 outline-none focus:ring-1 focus:ring-[#DC2626] font-semibold text-slate-700 placeholder-slate-400"
                   />
                 </div>
+
+                <label className="flex items-start gap-2 text-xs text-slate-700 cursor-pointer">
+                  <input type="checkbox" className="mt-0.5" checked={shareRecord} onChange={(e) => setShareRecord(e.target.checked)} />
+                  <span>Share my health record (allergies, conditions, medicines, readings) with this practitioner for this visit. I can stop sharing at any time.</span>
+                </label>
 
                 {bookingError && <p className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 p-2.5">{bookingError}</p>}
                 <button

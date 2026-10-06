@@ -12,7 +12,7 @@ const root = path.join(process.env.DATA_DIR || path.join(process.cwd(), "data"),
 fs.mkdirSync(root, { recursive: true });
 
 const MAX_BYTES = 5 * 1024 * 1024;
-const KINDS = ["license", "degree", "identity", "other"];
+const KINDS = ["license", "degree", "identity", "lab_result", "other"];
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_BYTES, files: 1 } });
 
 function detectType(buf: Buffer): { mime: string; ext: string } | null {
@@ -25,6 +25,15 @@ function detectType(buf: Buffer): { mime: string; ext: string } | null {
 // Set by server.ts: returns the account id that owns a verification request (or null if unknown).
 let requestOwner: (requestId: string) => string | null = () => null;
 export const setRequestOwnerLookup = (fn: typeof requestOwner) => { requestOwner = fn; };
+
+// Clinical hooks (set by server.ts): lab orders and who may open a patient's lab results.
+interface ClinicalHooks {
+  labOrderOwner: (orderId: string) => string | null;
+  onLabResult: (orderId: string, documentId: string) => void;
+  canViewLabDocument: (user: { role: string; profileId: string | null }, doc: { owner_id: string; kind: string }) => boolean;
+}
+let clinical: ClinicalHooks | null = null;
+export const setClinicalHooks = (h: ClinicalHooks) => { clinical = h; };
 
 export const documentsRouter = Router();
 
@@ -46,6 +55,10 @@ documentsRouter.post("/", requireAuth, (req, res) => {
     if (requestId && requestOwner(requestId) !== req.user!.id) {
       return res.status(403).json({ status: "error", message: "That verification request is not yours." });
     }
+    const labOrderId = req.body.labOrderId ? String(req.body.labOrderId) : null;
+    if (kind === "lab_result" && (!labOrderId || clinical?.labOrderOwner(labOrderId) !== req.user!.id)) {
+      return res.status(403).json({ status: "error", message: "That lab order is not yours." });
+    }
     const id = "doc-" + crypto.randomBytes(8).toString("hex");
     const storedName = `${crypto.randomBytes(16).toString("hex")}.${type.ext}`;
     fs.writeFileSync(path.join(root, storedName), file.buffer, { mode: 0o600 });
@@ -55,6 +68,7 @@ documentsRouter.post("/", requireAuth, (req, res) => {
       id, req.user!.id, kind, path.basename(file.originalname).slice(0, 120), type.mime, file.size, storedName,
       crypto.createHash("sha256").update(file.buffer).digest("hex"), requestId, new Date().toISOString()
     );
+    if (kind === "lab_result" && labOrderId) clinical?.onLabResult(labOrderId, id);
     audit(req, "document.upload", { target: ["document", id], details: { kind, size: file.size } });
     res.status(201).json({ status: "success", data: { id, kind, originalName: file.originalname, mime: type.mime, size: file.size } });
   });
@@ -82,7 +96,8 @@ documentsRouter.get("/", requireAuth, (req, res) => {
 documentsRouter.get("/:id/download", requireAuth, (req, res) => {
   const row = db.prepare("SELECT * FROM documents WHERE id = ?").get(req.params.id) as any;
   const user = req.user!;
-  if (!row || (row.owner_id !== user.id && user.role !== "admin")) {
+  const allowed = !!row && (row.owner_id === user.id || user.role === "admin" || !!clinical?.canViewLabDocument(user, row));
+  if (!row || !allowed) {
     return res.status(404).json({ status: "error", message: "Document not found." });
   }
   if (row.owner_id !== user.id) audit(req, "document.view", { target: ["document", row.id], details: { ownerId: row.owner_id } });
