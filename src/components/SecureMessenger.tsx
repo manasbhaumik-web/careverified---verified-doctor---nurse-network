@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Send, MessageSquare, Search, Ban } from 'lucide-react';
 import { ChatMessage } from '../types';
+import DashboardHeader from './DashboardHeader';
 
 interface Thread { id: string; name: string; role: string; blocked: boolean }
 
@@ -57,11 +58,12 @@ export default function SecureMessenger({ currentUserId }: { currentUserId: stri
   const shown = threads.filter(t => t.name.toLowerCase().includes(search.toLowerCase()));
   return (
     <div className="w-full space-y-5" id="secure-messenger-panel">
-      <header className="bg-white border border-[color:var(--t-200)] shadow-xs px-5 py-5">
-        <div className="text-[11px] font-bold uppercase tracking-widest text-[color:var(--t-700)]">Messages</div>
-        <h1 className="text-2xl font-bold tracking-tight text-[color:var(--ink)]">Your care team</h1>
-        <p className="text-sm text-slate-600 mt-1">Messages are private to you and the other person. Do not use messages for emergencies: call 999. Replies can take time.</p>
-      </header>
+      <DashboardHeader
+        icon={MessageSquare}
+        eyebrow="Messages"
+        title="Your care team"
+        description="Messages are private to you and the other person. Do not use messages for emergencies: call 999. Replies can take time."
+      />
 
       <div className="bg-white border border-[color:var(--t-200)] shadow-xs grid grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)] lg:h-[calc(100vh-300px)] lg:min-h-[480px]">
         <aside aria-label="Conversations" className="border-b lg:border-b-0 lg:border-r border-[color:var(--t-200)] flex flex-col min-h-0 max-h-[320px] lg:max-h-none">

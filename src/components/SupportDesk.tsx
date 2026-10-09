@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { AlertTriangle, LifeBuoy } from 'lucide-react';
+import DashboardHeader from './DashboardHeader';
 
 const jpost = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -46,12 +47,19 @@ export default function SupportDesk() {
   const chosen = cats.find(c => c.name === form.category);
 
   return (
-    <div className="max-w-4xl space-y-5">
-      <header className="bg-white border border-[color:var(--t-200)] p-5">
-        <h1 className="text-xl font-black flex items-center gap-2"><LifeBuoy className="h-5 w-5 text-[color:var(--t-600)]" /> Help &amp; support</h1>
-        <p className="text-sm text-slate-600 mt-1">Tell us what went wrong. Safety concerns are answered first.</p>
-      </header>
-      <p className="text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-900 p-3 flex gap-2"><AlertTriangle className="h-4 w-4 shrink-0" />If you or someone else is in danger, call 999. Do not wait for a support reply.</p>
+    <div className="w-full space-y-5">
+      <DashboardHeader
+        icon={LifeBuoy}
+        eyebrow="Support"
+        title="Help & support"
+        description="Tell us what went wrong. Safety concerns are answered first."
+        actions={
+          <p className="text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-900 p-3 flex gap-2 items-center max-w-sm"><AlertTriangle className="h-4 w-4 shrink-0" />If you or someone else is in danger, call 999. Do not wait for a support reply.</p>
+        }
+      />
+
+      <div className="grid gap-5 xl:grid-cols-[400px_minmax(0,1fr)] items-start">
+      <div className="space-y-5 min-w-0">
 
       <form onSubmit={create} className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
         <h2 className="text-sm font-extrabold">Open a ticket</h2>
@@ -67,7 +75,19 @@ export default function SupportDesk() {
         <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Send</button>
       </form>
 
-      <div className="grid md:grid-cols-[280px_1fr] gap-5">
+      {cats.length > 0 && (
+        <section className="bg-white border border-slate-200 p-5">
+          <h2 className="text-sm font-extrabold mb-2">How fast we reply</h2>
+          <ul className="divide-y divide-slate-100 text-xs">
+            {cats.map(c => (
+              <li key={c.name} className="py-1.5 flex justify-between gap-3"><span>{c.name}</span><span className="font-bold tabular-nums">within {c.respondWithinHours} h</span></li>
+            ))}
+          </ul>
+        </section>
+      )}
+      </div>
+
+      <div className="grid md:grid-cols-[280px_minmax(0,1fr)] gap-5 min-w-0">
         <section className="bg-white border border-slate-200 p-4">
           <h2 className="text-sm font-extrabold mb-2">Your tickets</h2>
           {tickets.length === 0 ? <p className="text-xs text-slate-500">None yet.</p> : (
@@ -99,6 +119,7 @@ export default function SupportDesk() {
             </div>
           )}
         </section>
+      </div>
       </div>
     </div>
   );

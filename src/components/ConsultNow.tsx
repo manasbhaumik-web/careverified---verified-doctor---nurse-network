@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { AlertTriangle, MessageSquare, Video, Clock } from 'lucide-react';
+import { AlertTriangle, MessageSquare, Video, Clock, CreditCard, UserCheck, Lock } from 'lucide-react';
 import PaymentDialog from './PaymentDialog';
 import ConsultRoom from './ConsultRoom';
+import DashboardHeader, { BannerKpis } from './DashboardHeader';
 
 const jpost = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -77,81 +78,124 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
     return <ConsultRoom consultId={open.id} myUserId={myUserId} isDoctor={false} onEnded={load} />;
   }
 
-  return (
-    <div className="max-w-3xl space-y-5">
-      <header className="bg-white border border-[color:var(--t-200)] p-5">
-        <h2 className="text-lg font-black text-slate-900">Consult a doctor now</h2>
-        <p className="text-sm text-slate-600 mt-1">Talk to a verified doctor online within minutes.</p>
-        <p className="text-xs mt-2 font-bold flex items-center gap-1.5">
-          <span className={`inline-block h-2 w-2 rounded-full ${status?.onlineDoctors ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-          {status ? `${status.onlineDoctors} doctor${status.onlineDoctors === 1 ? '' : 's'} online now · RM ${status.consultFee.toFixed(2)} per consultation` : 'Checking availability…'}
-        </p>
-      </header>
+  const past = mine.filter(c => !['awaiting_payment', 'queued', 'active'].includes(c.status));
+  const emergencyNumbers = emergency.map(n => n.number).join(' or ') || '999';
+  const steps = [
+    { icon: MessageSquare, title: 'Describe the problem', text: 'Choose chat or video and tell us your symptoms.' },
+    { icon: CreditCard, title: 'Pay the consultation fee', text: 'Pay securely before the doctor is notified.' },
+    { icon: UserCheck, title: 'A verified doctor joins', text: 'If nobody joins within 10 minutes you are refunded automatically.' },
+  ];
 
-      <p className="bg-white border border-rose-200 text-rose-900 text-xs font-semibold p-3">
-        Online consultations are not for emergencies. In an emergency call {emergency.map(n => n.number).join(' or ') || '999'} first.
+  return (
+    <div className="w-full space-y-5">
+      {/* Header with live availability */}
+      <DashboardHeader
+        icon={Video}
+        eyebrow="Instant care"
+        title="Consult a doctor now"
+        description="Talk to a verified doctor online within minutes."
+        actions={
+          <BannerKpis items={[
+            { value: status ? status.onlineDoctors : '—', label: 'Doctors online' },
+            { value: status ? `RM ${status.consultFee.toFixed(0)}` : '—', label: 'Per consult' },
+            { value: '10 min', label: 'Refund if unmatched' },
+          ]} />
+        }
+      />
+
+      <p className="bg-rose-50 border border-rose-200 text-rose-900 text-xs font-semibold p-3 flex items-center gap-2" role="note">
+        <AlertTriangle className="h-4 w-4 shrink-0" />
+        Online consultations are not for emergencies. In an emergency call {emergencyNumbers} first.
       </p>
 
       {redFlags.length > 0 && <EmergencyBox reasons={redFlags} />}
 
-      {open?.status === 'queued' && (
-        <div className="bg-white border border-amber-200 p-5 space-y-3">
-          <p className="font-extrabold flex items-center gap-2"><Clock className="h-4 w-4 text-amber-600" /> Waiting for a doctor to join…</p>
-          <p className="text-xs text-slate-600">Paid. Stay on this page. If nobody joins within 10 minutes you are refunded automatically.</p>
-          <button onClick={() => cancel(open.id)} className="text-xs font-bold border border-slate-200 px-4 py-2 cursor-pointer">Cancel and refund</button>
-        </div>
-      )}
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_380px] items-start">
+        <div className="space-y-5 min-w-0">
+          {open?.status === 'queued' && (
+            <div className="bg-white border border-amber-200 p-5 space-y-3">
+              <p className="font-extrabold flex items-center gap-2"><Clock className="h-4 w-4 text-amber-600" /> Waiting for a doctor to join…</p>
+              <p className="text-xs text-slate-600">Paid. Stay on this page. If nobody joins within 10 minutes you are refunded automatically.</p>
+              <button onClick={() => cancel(open.id)} className="text-xs font-bold border border-slate-200 px-4 py-2 cursor-pointer">Cancel and refund</button>
+            </div>
+          )}
 
-      {open?.status === 'awaiting_payment' && (
-        <div className="bg-white border border-amber-200 p-5 space-y-3">
-          <p className="font-extrabold">Your consultation request is waiting for payment.</p>
-          <div className="flex gap-3">
-            <button onClick={() => setPaying(open.id)} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Pay RM {open.fee.toFixed(2)}</button>
-            <button onClick={() => cancel(open.id)} className="text-xs font-bold border border-slate-200 px-4 py-2 cursor-pointer">Cancel</button>
-          </div>
-        </div>
-      )}
+          {open?.status === 'awaiting_payment' && (
+            <div className="bg-white border border-amber-200 p-5 space-y-3">
+              <p className="font-extrabold">Your consultation request is waiting for payment.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setPaying(open.id)} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Pay RM {open.fee.toFixed(2)}</button>
+                <button onClick={() => cancel(open.id)} className="text-xs font-bold border border-slate-200 px-4 py-2 cursor-pointer">Cancel</button>
+              </div>
+            </div>
+          )}
 
-      {!open && (
-        <form onSubmit={submit} className="bg-white border border-[color:var(--t-200)] p-5 space-y-4">
-          <div role="radiogroup" aria-label="Consultation type" className="grid grid-cols-2 gap-3">
-            {([['chat', 'Chat', MessageSquare], ['video', 'Video', Video]] as const).map(([id, label, Icon]) => (
-              <button type="button" key={id} role="radio" aria-checked={mode === id} onClick={() => setMode(id)}
-                className={`flex items-center justify-center gap-2 py-3 border text-sm font-extrabold cursor-pointer ${mode === id ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)] text-[color:var(--t-700)]' : 'border-slate-200 text-slate-600'}`}>
-                <Icon className="h-4 w-4" /> {label}
+          {!open && (
+            <form onSubmit={submit} className="bg-white border border-[color:var(--t-200)] p-5 sm:p-6 space-y-5">
+              <div>
+                <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block mb-2">How would you like to talk?</span>
+                <div role="radiogroup" aria-label="Consultation type" className="grid sm:grid-cols-2 gap-3">
+                  {([['chat', 'Chat', 'Type messages with the doctor', MessageSquare], ['video', 'Video', 'Face-to-face video call', Video]] as const).map(([id, label, hint, Icon]) => (
+                    <button type="button" key={id} role="radio" aria-checked={mode === id} onClick={() => setMode(id)}
+                      className={`flex items-center gap-3 px-4 py-3.5 border text-left cursor-pointer ${mode === id ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)] text-[color:var(--t-700)]' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+                      <Icon className="h-5 w-5 shrink-0" />
+                      <span><span className="block text-sm font-extrabold">{label}</span><span className="block text-xs font-normal opacity-80">{hint}</span></span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label htmlFor="cn-symptoms" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block mb-1">What is the problem?</label>
+                <textarea id="cn-symptoms" value={symptoms} onChange={e => setSymptoms(e.target.value)} rows={6} minLength={10} maxLength={1000} required
+                  className="w-full border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--t-600)]"
+                  placeholder="Describe your symptoms and how long you have had them" />
+                <p className="text-[11px] text-slate-500 mt-1 text-right tabular-nums">{symptoms.length} / 1000</p>
+              </div>
+              <label className="flex items-start gap-2 text-xs text-slate-700 cursor-pointer bg-slate-50 border border-slate-100 p-3">
+                <input type="checkbox" className="mt-0.5" checked={shareRecord} onChange={e => setShareRecord(e.target.checked)} />
+                <span>Share my health record (allergies, conditions, medicines, readings) with the doctor who takes my consultation. Helps them prescribe safely. I can stop sharing at any time.</span>
+              </label>
+              {error && <p className="text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 p-3">{error}</p>}
+              <button disabled={busy || status?.onlineDoctors === 0} className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-sm font-extrabold py-3 cursor-pointer">
+                {busy ? 'Starting…' : status?.onlineDoctors === 0 ? 'No doctors online right now' : 'Continue to payment'}
               </button>
-            ))}
-          </div>
-          <div>
-            <label htmlFor="cn-symptoms" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block mb-1">What is the problem?</label>
-            <textarea id="cn-symptoms" value={symptoms} onChange={e => setSymptoms(e.target.value)} rows={4} minLength={10} maxLength={1000} required
-              className="w-full border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--t-600)]"
-              placeholder="Describe your symptoms and how long you have had them" />
-          </div>
-          <label className="flex items-start gap-2 text-xs text-slate-700 cursor-pointer">
-            <input type="checkbox" className="mt-0.5" checked={shareRecord} onChange={e => setShareRecord(e.target.checked)} />
-            <span>Share my health record (allergies, conditions, medicines, readings) with the doctor who takes my consultation. Helps them prescribe safely. I can stop sharing at any time.</span>
-          </label>
-          {error && <p className="text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 p-3">{error}</p>}
-          <button disabled={busy || status?.onlineDoctors === 0} className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-sm font-extrabold py-3 cursor-pointer">
-            {busy ? 'Starting…' : status?.onlineDoctors === 0 ? 'No doctors online right now' : 'Continue to payment'}
-          </button>
-        </form>
-      )}
+            </form>
+          )}
+        </div>
 
-      {mine.some(c => !['awaiting_payment', 'queued', 'active'].includes(c.status)) && (
-        <section className="bg-white border border-slate-200 p-5">
-          <h3 className="text-sm font-extrabold mb-3">Past consultations</h3>
-          <ul className="divide-y divide-slate-100 text-xs">
-            {mine.filter(c => !['awaiting_payment', 'queued', 'active'].includes(c.status)).map(c => (
-              <li key={c.id} className="py-2 flex justify-between gap-3">
-                <span>{new Date(c.createdAt).toLocaleString()} · {c.mode}{c.professional ? ` · ${c.professional.name}` : ''}</span>
-                <span className="font-bold">{STATUS_TEXT[c.status] ?? c.status}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+        <aside className="space-y-5 min-w-0" aria-label="About online consultations">
+          <section className="bg-white border border-slate-200 p-5">
+            <h3 className="text-sm font-extrabold mb-3">How it works</h3>
+            <ol className="space-y-3">
+              {steps.map((st, i) => (
+                <li key={st.title} className="flex gap-3">
+                  <span className="h-8 w-8 shrink-0 flex items-center justify-center bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)]"><st.icon className="h-4 w-4" /></span>
+                  <span className="text-xs"><b className="block text-sm">{i + 1}. {st.title}</b><span className="text-slate-600">{st.text}</span></span>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          <section className="bg-white border border-slate-200 p-5">
+            <h3 className="text-sm font-extrabold mb-1 flex items-center gap-2"><Lock className="h-4 w-4 text-[color:var(--t-600)]" /> Your privacy</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">Only the doctor who takes your consultation can see what you share, and only if you tick the box. You can stop sharing from your Health Record at any time.</p>
+          </section>
+
+          <section className="bg-white border border-slate-200 p-5">
+            <h3 className="text-sm font-extrabold mb-2">Past consultations</h3>
+            {past.length === 0 ? <p className="text-xs text-slate-500">None yet.</p> : (
+              <ul className="divide-y divide-slate-100 text-xs">
+                {past.map(c => (
+                  <li key={c.id} className="py-2 flex justify-between gap-3">
+                    <span>{new Date(c.createdAt).toLocaleString()} · {c.mode}{c.professional ? ` · ${c.professional.name}` : ''}</span>
+                    <span className="font-bold text-right">{STATUS_TEXT[c.status] ?? c.status}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </aside>
+      </div>
 
       {paying && (
         <PaymentDialog kind="consult" refId={paying} description="Instant online consultation"

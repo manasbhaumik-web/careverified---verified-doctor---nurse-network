@@ -11,6 +11,7 @@ import {
 } from "./server/auth";
 import { documentsRouter, setRequestOwnerLookup, setClinicalHooks } from "./server/documents";
 import { registerClinicalRoutes, createGrant, seedHealthItems } from "./server/clinical";
+import { registerLiteratureRoutes, approvedLiteratureArticles } from "./server/literature";
 import { registerQualityRoutes, accountForChatId, isBlocked } from "./server/quality";
 import { registerVerificationRoutes, notifyAdmins, notify } from "./server/verification";
 import { registerPaymentRoutes, registerPaymentWebhook, setPaymentHandlers, refundPayment, paymentMode } from "./server/payments";
@@ -617,6 +618,7 @@ const recalcRating = (professionalId: string) => {
   prof.rating = live.length ? Number((live.reduce((sum, r) => sum + r.rating, 0) / live.length).toFixed(2)) : 0;
   prof.reviewCount = live.length;
 };
+registerLiteratureRoutes(app);
 registerQualityRoutes(app, { reviews: () => reviews, findProfessional, allProfessionals, bookings: () => bookings, recalcRating, chats: () => chats });
 setClinicalHooks(clinical);
 registerPaymentRoutes(app);
@@ -927,7 +929,7 @@ app.post("/api/chats", requireRole("patient", "practitioner"), (req, res) => {
 
 // 8. Health Blog Articles
 app.get("/api/articles", (req, res) => {
-  res.json({ status: "success", data: articles });
+  res.json({ status: "success", data: [...articles, ...approvedLiteratureArticles()] });
 });
 
 // 9. Symptom-to-Specialist Matching

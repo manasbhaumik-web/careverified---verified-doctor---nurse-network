@@ -1,14 +1,66 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowRight, BadgeCheck, BookOpen, Check, Search, ShieldCheck, X } from 'lucide-react';
-import { Article } from '../types';
+import { ArrowRight, BadgeCheck, BookOpen, Check, ExternalLink, Search, ShieldCheck, X } from 'lucide-react';
+import { Article, DoctorProfile, NurseProfile } from '../types';
 import DashboardHeader from './DashboardHeader';
 
 interface MedicalLibraryProps {
   articles: Article[];
-  onFindDoctor: () => void;
+  professionals?: (DoctorProfile | NurseProfile)[];
+  /** Opens the directory, optionally filtered to a specialty. */
+  onFindDoctor: (specialty?: string) => void;
 }
 
 const ALL = 'All articles';
+
+type SourceFilter = 'all' | 'practitioner' | 'research';
+type SortKey = 'newest' | 'oldest' | 'evidence';
+
+/** Topic keywords mapped to the directory's specialty names. A match is only used if such a practitioner exists. */
+const SPECIALTY_KEYWORDS: [RegExp, string][] = [
+  [/heart|cardi|hypertens|blood pressure|atrial|coronary/i, 'Cardiolog'],
+  [/skin|derma|eczema|psoria|acne/i, 'Dermatolog'],
+  [/stroke|migraine|epilep|neuro|parkinson|dementia|alzheimer/i, 'Neurolog'],
+  [/child|paediatr|pediatr|infant|neonat/i, 'Pediatric'],
+  [/elder|geriatr|older adult|ageing|aging/i, 'Geriatric'],
+  [/sepsis|critical|intensive|icu|ventilat/i, 'ICU'],
+  [/./, 'General'],
+];
+
+const specialtyFor = (a: Article, pros: (DoctorProfile | NurseProfile)[] = []): string | null => {
+  const text = `${a.category} ${a.title}`;
+  for (const [re, term] of SPECIALTY_KEYWORDS) {
+    if (!re.test(text)) continue;
+    const hit = pros.find(p => p.specialization.toLowerCase().includes(term.toLowerCase()));
+    if (hit) return hit.specialization;
+  }
+  return null;
+};
+
+const LEVEL_RANK = { high: 3, moderate: 2, info: 1 } as const;
+const evidenceRank = (a: Article) => (a.evidence ? LEVEL_RANK[a.evidence.level] : 0);
+const dateValue = (a: Article) => { const t = Date.parse(a.date); return Number.isNaN(t) ? 0 : t; };
+
+function EvidenceBadge({ article }: { article: Article }) {
+  if (!article.evidence) {
+    return <span className="text-[11px] font-bold text-slate-700 bg-slate-50 border border-slate-200 px-2.5 py-0.5">Practitioner article</span>;
+  }
+  const tone = article.evidence.level === 'high'
+    ? 'text-[color:var(--e-800)] bg-[color:var(--e-50)] border-[color:var(--e-200)]'
+    : article.evidence.level === 'moderate'
+      ? 'text-[color:var(--t-700)] bg-[color:var(--t-50)] border-[color:var(--t-200)]'
+      : 'text-slate-700 bg-slate-50 border-slate-200';
+  return <span className={`text-[11px] font-bold border px-2.5 py-0.5 ${tone}`} title="Strength of evidence, from the paper's publication type">{article.evidence.label}</span>;
+}
+
+function Takeaway({ text, className = '' }: { text?: string | null; className?: string }) {
+  if (!text) return null;
+  return (
+    <div className={`bg-[color:var(--t-50)] border-l-4 border-[color:var(--t-600)] px-3 py-2 ${className}`}>
+      <p className="text-[10px] font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">Key takeaway</p>
+      <p className="text-[13px] text-[color:var(--ink)] leading-snug mt-0.5">{text}</p>
+    </div>
+  );
+}
 
 const initialsOf = (name: string) =>
   name.replace('Dr. ', '').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
@@ -39,9 +91,12 @@ function AuthorBadge({ article, large = false }: { article: Article; large?: boo
   );
 }
 
-export default function MedicalLibrary({ articles, onFindDoctor }: MedicalLibraryProps) {
+export default function MedicalLibrary({ articles, professionals = [], onFindDoctor }: MedicalLibraryProps) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>(ALL);
+  const [source, setSource] = useState<SourceFilter>('all');
+  const [evidence, setEvidence] = useState<string>('all');
+  const [sort, setSort] = useState<SortKey>('newest');
   const [openArticle, setOpenArticle] = useState<Article | null>(null);
 
   const categories = useMemo(() => {
@@ -49,6 +104,9 @@ export default function MedicalLibrary({ articles, onFindDoctor }: MedicalLibrar
     articles.forEach(a => counts.set(a.category, (counts.get(a.category) || 0) + 1));
     return Array.from(counts.entries());
   }, [articles]);
+
+  const evidenceLabels = useMemo(() => Array.from(new Set(articles.map(a => a.evidence?.label).filter(Boolean) as string[])), [articles]);
+  const hasResearch = evidenceLabels.length > 0;
 
   const filtered = articles.filter(a => {
     const q = query.trim().toLowerCase();
@@ -58,7 +116,12 @@ export default function MedicalLibrary({ articles, onFindDoctor }: MedicalLibrar
       a.excerpt.toLowerCase().includes(q) ||
       a.authorName.toLowerCase().includes(q) ||
       a.category.toLowerCase().includes(q);
-    return matchesQuery && (category === ALL || a.category === category);
+    const matchesSource = source === 'all' || (source === 'research' ? !!a.source : !a.source);
+    const matchesEvidence = evidence === 'all' || a.evidence?.label === evidence;
+    return matchesQuery && matchesSource && matchesEvidence && (category === ALL || a.category === category);
+  }).sort((a, b) => {
+    if (sort === 'evidence') return evidenceRank(b) - evidenceRank(a) || dateValue(b) - dateValue(a);
+    return sort === 'oldest' ? dateValue(a) - dateValue(b) : dateValue(b) - dateValue(a);
   });
 
   const featured = filtered[0];
@@ -67,13 +130,14 @@ export default function MedicalLibrary({ articles, onFindDoctor }: MedicalLibrar
   return (
     <div className="w-full space-y-6" id="medical-library-section">
       <DashboardHeader
+        icon={BookOpen}
         eyebrow="Verified Medical Library"
-        title="Clinical Articles by Verified Practitioners"
-        description="Every article is written or reviewed by a credential-checked doctor or nurse, with citations you can follow."
+        title="Clinical Articles & Published Research"
+        description="Articles by credential-checked practitioners, plus peer-reviewed papers from PubMed that our medical board has approved. Every item lists its sources."
         actions={
           <>
             <span className="inline-flex items-center gap-1.5 min-h-[36px] px-3.5 bg-[color:var(--e-50)] border border-[color:var(--e-200)] text-[color:var(--e-800)] text-xs font-semibold">
-              <Check className="h-3.5 w-3.5 text-[color:var(--e-600)]" /> Practitioner-reviewed
+              <Check className="h-3.5 w-3.5 text-[color:var(--e-600)]" /> Board-approved
             </span>
             <span className="inline-flex items-center min-h-[36px] px-3.5 bg-white border border-[color:var(--t-200)] text-[color:var(--ink-2)] text-xs font-semibold">
               Cited sources
@@ -96,6 +160,32 @@ export default function MedicalLibrary({ articles, onFindDoctor }: MedicalLibrar
             className="flex-1 min-w-0 bg-transparent text-sm text-[color:var(--ink)] outline-none placeholder-slate-500"
           />
         </div>
+        {hasResearch && (
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pb-1">
+            <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Source">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 mr-1">Source</span>
+              {([['all', 'All'], ['practitioner', 'Practitioner articles'], ['research', 'Research papers']] as const).map(([id, label]) => (
+                <button key={id} type="button" aria-pressed={source === id} onClick={() => { setSource(id); if (id === 'practitioner') setEvidence('all'); }}
+                  className={`min-h-[34px] px-3 text-xs font-semibold border cursor-pointer ${source === id ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-100)]'}`}>{label}</button>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Type of evidence">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 mr-1">Evidence</span>
+              {['all', ...evidenceLabels].map(l => (
+                <button key={l} type="button" aria-pressed={evidence === l} onClick={() => { setEvidence(l); if (l !== 'all') setSource('research'); }}
+                  className={`min-h-[34px] px-3 text-xs font-semibold border cursor-pointer ${evidence === l ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-100)]'}`}>{l === 'all' ? 'Any' : l}</button>
+              ))}
+            </div>
+            <label className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 ml-auto">
+              Sort
+              <select value={sort} onChange={e => setSort(e.target.value as SortKey)} className="border border-[color:var(--t-200)] bg-white px-2 min-h-[34px] text-xs font-semibold normal-case tracking-normal text-[color:var(--ink)]">
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="evidence">Strongest evidence</option>
+              </select>
+            </label>
+          </div>
+        )}
         <div className="flex flex-wrap gap-2" role="group" aria-label="Categories">
           {[ALL, ...categories.map(([c]) => c)].map(c => (
             <button
@@ -136,10 +226,12 @@ export default function MedicalLibrary({ articles, onFindDoctor }: MedicalLibrar
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-white bg-[color:var(--t-600)] px-2.5 py-1">Featured</span>
                     <span className="text-[11px] font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-0.5">{featured.category}</span>
+                    <EvidenceBadge article={featured} />
                     <span className="text-xs text-slate-600">{featured.date}</span>
                   </div>
                   <h2 className="text-2xl font-bold tracking-tight text-[color:var(--ink)] leading-snug">{featured.title}</h2>
-                  <p className="text-sm text-[color:var(--ink-2)] leading-relaxed">{featured.excerpt}</p>
+                  <Takeaway text={featured.takeaway} />
+                  <p className="text-sm text-[color:var(--ink-2)] leading-relaxed line-clamp-4">{featured.excerpt}</p>
                   <div className="mt-auto pt-4 border-t border-[color:var(--t-100)] flex flex-wrap items-center justify-between gap-3">
                     <AuthorBadge article={featured} large />
                     <button
@@ -165,8 +257,10 @@ export default function MedicalLibrary({ articles, onFindDoctor }: MedicalLibrar
                       <span className="text-[11px] font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-0.5">{art.category}</span>
                       <span className="text-xs text-slate-600">{art.date}</span>
                     </div>
+                    <div><EvidenceBadge article={art} /></div>
                     <h3 className="text-[17px] font-bold text-[color:var(--ink)] leading-snug">{art.title}</h3>
-                    <p className="text-[13px] text-[color:var(--ink-2)] leading-relaxed line-clamp-3">{art.excerpt}</p>
+                    <Takeaway text={art.takeaway} />
+                    <p className={`text-[13px] text-[color:var(--ink-2)] leading-relaxed ${art.takeaway ? 'line-clamp-2' : 'line-clamp-3'}`}>{art.excerpt}</p>
                     <div className="mt-auto pt-3.5 border-t border-[color:var(--t-100)] flex flex-wrap items-center justify-between gap-2">
                       <AuthorBadge article={art} />
                       {art.citations?.length > 0 && <span className="text-xs text-slate-600">{art.citations.length} citation{art.citations.length === 1 ? '' : 's'}</span>}
@@ -211,7 +305,7 @@ export default function MedicalLibrary({ articles, onFindDoctor }: MedicalLibrar
               <h2 className="text-base font-bold text-[color:var(--e-800)]">How articles are verified</h2>
             </div>
             <p className="mt-2.5 text-[13px] leading-relaxed text-[color:var(--e-800)]">
-              Authors are checked against MMC and LJM registries. Each article lists its sources so you can confirm the evidence yourself.
+              Practitioner articles are written by authors checked against MMC and LJM registries. Research papers come from PubMed, are limited to reviews, trials and guidelines, are screened for retraction, and only appear after our medical board approves them. Each item links to its source so you can confirm the evidence yourself.
             </p>
           </section>
 
@@ -220,7 +314,7 @@ export default function MedicalLibrary({ articles, onFindDoctor }: MedicalLibrar
             <p className="text-[13px] leading-relaxed text-[color:var(--ink-2)]">Articles are for education. For personal medical advice, book a consultation.</p>
             <button
               type="button"
-              onClick={onFindDoctor}
+              onClick={() => onFindDoctor()}
               className="w-full min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-[13px] font-bold transition-colors cursor-pointer"
             >
               Find a doctor
@@ -246,6 +340,7 @@ export default function MedicalLibrary({ articles, onFindDoctor }: MedicalLibrar
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1.5">
                   <span className="text-[11px] font-bold text-[color:var(--t-700)] bg-white border border-[color:var(--t-200)] px-2.5 py-0.5">{openArticle.category}</span>
+                  <EvidenceBadge article={openArticle} />
                   <span className="text-xs text-slate-600">{openArticle.date}</span>
                 </div>
                 <h2 className="text-xl font-bold text-[color:var(--ink)] leading-snug">{openArticle.title}</h2>
@@ -264,15 +359,24 @@ export default function MedicalLibrary({ articles, onFindDoctor }: MedicalLibrar
               <div className="flex items-center gap-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3.5">
                 <AuthorBadge article={openArticle} large />
                 <span className="ml-auto hidden sm:inline-flex items-center gap-1 text-[11px] font-bold text-[color:var(--e-800)] bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-2 py-1">
-                  <BadgeCheck className="h-3.5 w-3.5 text-[color:var(--e-600)]" /> Verified & accredited
+                  <BadgeCheck className="h-3.5 w-3.5 text-[color:var(--e-600)]" /> {openArticle.source ? 'PubMed paper · board-approved' : 'Verified & accredited'}
                 </span>
               </div>
 
+              <Takeaway text={openArticle.takeaway} />
               <div className="text-sm leading-relaxed text-[color:var(--ink-2)] whitespace-pre-line">{openArticle.content}</div>
+
+              {openArticle.source && (
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+                  <a href={openArticle.source.url} target="_blank" rel="noopener noreferrer" className="font-bold text-[color:var(--t-700)] inline-flex items-center gap-1 hover:underline">Read the full paper on PubMed <ExternalLink className="h-3 w-3" /></a>
+                  {openArticle.source.doi && <a href={`https://doi.org/${openArticle.source.doi}`} target="_blank" rel="noopener noreferrer" className="font-bold text-[color:var(--t-700)] inline-flex items-center gap-1 hover:underline">Publisher (DOI) <ExternalLink className="h-3 w-3" /></a>}
+                  {openArticle.source.retractionCheckedAt && <span className="text-slate-500">Checked for retraction {new Date(openArticle.source.retractionCheckedAt).toLocaleDateString()}</span>}
+                </div>
+              )}
 
               {openArticle.citations?.length > 0 && (
                 <section className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-4 space-y-2">
-                  <h3 className="text-sm font-bold text-[color:var(--ink)]">Peer-reviewed citations</h3>
+                  <h3 className="text-sm font-bold text-[color:var(--ink)]">{openArticle.source ? 'Source' : 'Peer-reviewed citations'}</h3>
                   <ol className="list-decimal list-inside space-y-1 text-[13px] text-[color:var(--ink-2)] leading-relaxed">
                     {openArticle.citations.map((cit, idx) => <li key={idx}>{cit}</li>)}
                   </ol>
@@ -305,10 +409,10 @@ export default function MedicalLibrary({ articles, onFindDoctor }: MedicalLibrar
               </button>
               <button
                 type="button"
-                onClick={() => { setOpenArticle(null); onFindDoctor(); }}
+                onClick={() => { const sp = specialtyFor(openArticle, professionals); setOpenArticle(null); onFindDoctor(sp ?? undefined); }}
                 className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-[13px] font-bold cursor-pointer"
               >
-                Find a doctor
+                {(() => { const sp = specialtyFor(openArticle, professionals); return sp ? `Find a ${sp}` : 'Find a doctor'; })()}
               </button>
             </div>
           </div>

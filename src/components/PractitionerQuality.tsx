@@ -36,7 +36,7 @@ export default function PractitionerQuality({ profileId }: { profileId: string |
 
   const tabs = [['reviews', 'Ratings & reviews', Star], ['cpd', 'CPD & certificates', GraduationCap], ['peer', 'Peer review', ClipboardCheck], ['incidents', 'Report an incident', ShieldAlert]] as const;
   return (
-    <div className="space-y-4 max-w-5xl">
+    <div className="space-y-4 w-full">
       <div role="tablist" className="flex flex-wrap gap-1 border-b border-slate-200">
         {tabs.map(([id, text, Icon]) => (
           <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setMsg(null); }}
@@ -46,13 +46,16 @@ export default function PractitionerQuality({ profileId }: { profileId: string |
       {msg && <p role="status" className={`text-xs font-bold p-2.5 border ${msg.ok ? 'text-emerald-800 bg-emerald-50 border-emerald-200' : 'text-rose-700 bg-rose-50 border-rose-200'}`}>{msg.text}</p>}
 
       {tab === 'reviews' && (
-        <section className="space-y-3">
-          <div className="grid grid-cols-2 gap-3 max-w-md">
+        <section className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)] items-start">
+          <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
             <div className="bg-white border border-slate-200 p-4"><p className={lab}>Average rating</p><p className="text-3xl font-black tabular-nums">{cred?.reviews.average ?? '—'}</p></div>
             <div className="bg-white border border-slate-200 p-4"><p className={lab}>Published reviews</p><p className="text-3xl font-black tabular-nums">{cred?.reviews.count ?? 0}</p></div>
           </div>
           <p className="text-xs text-slate-600">Only patients with a completed visit can review you. If a review breaks the rules (personal details, abuse, not about care), report it and the board will decide.</p>
-          {myReviews.length === 0 ? <p className="text-sm text-slate-500 bg-white border border-slate-200 p-4">No reviews yet.</p> : myReviews.map(r => (
+          </div>
+          <div className="grid gap-3 lg:grid-cols-2 items-start">
+          {myReviews.length === 0 ? <p className="text-sm text-slate-500 bg-white border border-slate-200 p-4 lg:col-span-2">No reviews yet.</p> : myReviews.map(r => (
             <article key={r.id} className="bg-white border border-slate-200 p-4 text-sm space-y-1">
               <p className="font-bold">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)} <span className="text-xs text-slate-500 font-normal">{r.date}</span></p>
               {r.comment && <p>{r.comment}</p>}
@@ -63,6 +66,7 @@ export default function PractitionerQuality({ profileId }: { profileId: string |
               }} className="text-xs font-bold text-slate-600 flex items-center gap-1 cursor-pointer"><Flag className="h-3 w-3" /> Report this review</button>
             </article>
           ))}
+          </div>
         </section>
       )}
 
@@ -100,7 +104,8 @@ function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say:
   };
 
   return (
-    <div className="space-y-6">
+    <div className="grid gap-5 xl:grid-cols-2 items-start">
+      <div className="space-y-5 min-w-0">
       <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-2">
         <h3 className="text-sm font-extrabold">CPD points for {cred.year}</h3>
         <div className="h-3 bg-slate-100" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}><div className="h-3 bg-[color:var(--t-600)]" style={{ width: `${pct}%` }} /></div>
@@ -118,6 +123,8 @@ function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say:
         <label className="sm:col-span-2 text-xs font-bold border border-dashed border-slate-300 px-3 py-2 cursor-pointer">{cpdFile ? cpdFile.name : 'Attach evidence (certificate of attendance), PDF/JPG/PNG'}<input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={e => setCpdFile(e.target.files?.[0] ?? null)} /></label>
         <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer w-fit">Submit</button>
       </form>
+      </div>
+      <div className="space-y-5 min-w-0">
 
       <section className="bg-white border border-slate-200 p-5">
         <h3 className="text-sm font-extrabold mb-2">Your CPD entries</h3>
@@ -143,6 +150,7 @@ function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say:
           <li key={c.id} className="py-2 flex justify-between gap-3"><span><b>{c.name}</b> · {c.issuer}{c.expiry_date ? ` · expires ${c.expiry_date}` : ''}{c.review_note ? <span className="block text-rose-700">{c.review_note}</span> : null}</span><span className="font-bold">{c.status === 'approved' ? 'Shown on your profile' : c.status}</span></li>
         ))}</ul>
       </form>
+      </div>
     </div>
   );
 }
@@ -166,8 +174,8 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
   };
   const c = open?.content;
   return (
-    <div className="space-y-5">
-      <section className="bg-white border border-slate-200 p-5 space-y-2">
+    <div className="grid gap-5 xl:grid-cols-2 items-start">
+      <section className="bg-white border border-slate-200 p-5 space-y-2 min-w-0">
         <h3 className="text-sm font-extrabold">Cases for you to review</h3>
         <p className="text-[11px] text-slate-500">Colleagues' work, with the patient and the author hidden. Treat what you read as confidential.</p>
         {tasks.length === 0 ? <p className="text-xs text-slate-500">Nothing assigned.</p> : (
@@ -179,7 +187,7 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
       </section>
 
       {open && (
-        <section className="bg-white border-2 border-[color:var(--t-200)] p-5 space-y-3">
+        <section className="bg-white border-2 border-[color:var(--t-200)] p-5 space-y-3 xl:col-span-2">
           <h3 className="text-sm font-extrabold">{c?.kind ?? 'Case'}</h3>
           {c && <div className="text-sm space-y-1.5 bg-slate-50 border border-slate-200 p-3">
             {'subjective' in c ? (['subjective', 'objective', 'assessment', 'plan'] as const).map(k => <p key={k}><span className="text-[10px] font-extrabold uppercase text-slate-500 mr-2">{k}</span>{c[k]}</p>) : (
@@ -199,7 +207,7 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
         </section>
       )}
 
-      <section className="bg-white border border-slate-200 p-5 space-y-2">
+      <section className="bg-white border border-slate-200 p-5 space-y-2 min-w-0">
         <h3 className="text-sm font-extrabold">Feedback on your own work</h3>
         {about.length === 0 ? <p className="text-xs text-slate-500">No peer feedback yet.</p> : about.map(a => (
           <article key={a.id} className="border border-slate-100 p-3 text-sm"><p className="font-bold">{a.subject_type === 'prescription' ? 'Prescription' : 'Consultation note'} · score {a.score}/5 · {a.outcome.replace(/_/g, ' ')} <span className="text-xs text-slate-400 font-normal">{day(a.completed_at)}</span></p>{a.comments && <p className="text-xs mt-1">{a.comments}</p>}</article>
@@ -221,7 +229,7 @@ function IncidentSection({ say }: { say: (ok: boolean, t: string) => void }) {
     if (d.status === 'success') { setForm({ ...form, description: '' }); load(); }
   };
   return (
-    <div className="space-y-5">
+    <div className="grid gap-5 xl:grid-cols-2 items-start">
       <form onSubmit={submit} className="bg-white border border-slate-200 p-5 space-y-3">
         <h3 className="text-sm font-extrabold">Report a patient-safety incident or near miss</h3>
         <p className="text-[11px] text-slate-500">Reporting is how we learn. Do not include patient names; describe what happened. For anyone in immediate danger call 999 first.</p>
@@ -233,8 +241,8 @@ function IncidentSection({ say }: { say: (ok: boolean, t: string) => void }) {
         <textarea className={field} rows={4} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="What happened? (at least 20 characters)" required minLength={20} maxLength={4000} aria-label="Description" />
         <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Submit report</button>
       </form>
-      {mine.length > 0 && <section className="bg-white border border-slate-200 p-5"><h3 className="text-sm font-extrabold mb-2">Your reports</h3>
-        <ul className="divide-y divide-slate-100 text-sm">{mine.map(i => <li key={i.id} className="py-2"><b>{i.kind.replace(/_/g, ' ')}</b> · {i.severity} · <span className="font-bold">{i.status}</span> <span className="text-xs text-slate-400">{day(i.createdAt)}</span>{i.resolution && <p className="text-xs text-slate-600">Outcome: {i.resolution}</p>}</li>)}</ul></section>}
+      <section className="bg-white border border-slate-200 p-5 min-w-0"><h3 className="text-sm font-extrabold mb-2">Your reports</h3>
+        {mine.length === 0 ? <p className="text-xs text-slate-500">No reports yet.</p> : <ul className="divide-y divide-slate-100 text-sm">{mine.map(i => <li key={i.id} className="py-2"><b>{i.kind.replace(/_/g, ' ')}</b> · {i.severity} · <span className="font-bold">{i.status}</span> <span className="text-xs text-slate-400">{day(i.createdAt)}</span>{i.resolution && <p className="text-xs text-slate-600">Outcome: {i.resolution}</p>}</li>)}</ul>}</section>
     </div>
   );
 }
