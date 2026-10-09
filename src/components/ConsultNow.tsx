@@ -79,7 +79,7 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
 
   return (
     <div className="max-w-3xl space-y-5">
-      <header className="bg-white border border-[#FECDD3] p-5">
+      <header className="bg-white border border-[color:var(--t-200)] p-5">
         <h2 className="text-lg font-black text-slate-900">Consult a doctor now</h2>
         <p className="text-sm text-slate-600 mt-1">Talk to a verified doctor online within minutes.</p>
         <p className="text-xs mt-2 font-bold flex items-center gap-1.5">
@@ -106,18 +106,18 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
         <div className="bg-white border border-amber-200 p-5 space-y-3">
           <p className="font-extrabold">Your consultation request is waiting for payment.</p>
           <div className="flex gap-3">
-            <button onClick={() => setPaying(open.id)} className="bg-[#DC2626] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Pay RM {open.fee.toFixed(2)}</button>
+            <button onClick={() => setPaying(open.id)} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Pay RM {open.fee.toFixed(2)}</button>
             <button onClick={() => cancel(open.id)} className="text-xs font-bold border border-slate-200 px-4 py-2 cursor-pointer">Cancel</button>
           </div>
         </div>
       )}
 
       {!open && (
-        <form onSubmit={submit} className="bg-white border border-[#FECDD3] p-5 space-y-4">
+        <form onSubmit={submit} className="bg-white border border-[color:var(--t-200)] p-5 space-y-4">
           <div role="radiogroup" aria-label="Consultation type" className="grid grid-cols-2 gap-3">
             {([['chat', 'Chat', MessageSquare], ['video', 'Video', Video]] as const).map(([id, label, Icon]) => (
               <button type="button" key={id} role="radio" aria-checked={mode === id} onClick={() => setMode(id)}
-                className={`flex items-center justify-center gap-2 py-3 border text-sm font-extrabold cursor-pointer ${mode === id ? 'border-[#DC2626] bg-[#FFF0F2] text-[#B91C1C]' : 'border-slate-200 text-slate-600'}`}>
+                className={`flex items-center justify-center gap-2 py-3 border text-sm font-extrabold cursor-pointer ${mode === id ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)] text-[color:var(--t-700)]' : 'border-slate-200 text-slate-600'}`}>
                 <Icon className="h-4 w-4" /> {label}
               </button>
             ))}
@@ -125,7 +125,7 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
           <div>
             <label htmlFor="cn-symptoms" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block mb-1">What is the problem?</label>
             <textarea id="cn-symptoms" value={symptoms} onChange={e => setSymptoms(e.target.value)} rows={4} minLength={10} maxLength={1000} required
-              className="w-full border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-[#DC2626]"
+              className="w-full border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--t-600)]"
               placeholder="Describe your symptoms and how long you have had them" />
           </div>
           <label className="flex items-start gap-2 text-xs text-slate-700 cursor-pointer">
@@ -133,7 +133,7 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
             <span>Share my health record (allergies, conditions, medicines, readings) with the doctor who takes my consultation. Helps them prescribe safely. I can stop sharing at any time.</span>
           </label>
           {error && <p className="text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 p-3">{error}</p>}
-          <button disabled={busy || status?.onlineDoctors === 0} className="w-full bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-slate-300 text-white text-sm font-extrabold py-3 cursor-pointer">
+          <button disabled={busy || status?.onlineDoctors === 0} className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-sm font-extrabold py-3 cursor-pointer">
             {busy ? 'Starting…' : status?.onlineDoctors === 0 ? 'No doctors online right now' : 'Continue to payment'}
           </button>
         </form>

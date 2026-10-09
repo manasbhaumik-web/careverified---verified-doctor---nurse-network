@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ThemeSwitcher from './ThemeSwitcher';
 import { motion, AnimatePresence, useInView } from 'motion/react';
 import {
   ShieldCheck, Search, CheckCircle2, RefreshCw, Heart,
@@ -192,7 +193,7 @@ function PractitionerSignUp({ onSuccess, onCancel }: {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const field = 'w-full bg-[#FFF9F9] border border-[#FECDD3] rounded-none px-4 h-[50px] text-base font-medium text-[#1A1A1A] placeholder-slate-400 focus:outline-none focus:border-[#C8102E] focus:ring-1 focus:ring-[#C8102E] transition-all';
+  const field = 'w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none px-4 h-[50px] text-base font-medium text-[color:var(--ink)] placeholder-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all';
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -216,13 +217,13 @@ function PractitionerSignUp({ onSuccess, onCancel }: {
 
   return (
     <div>
-      <h3 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#1A1A1A]">Create a Practitioner Account</h3>
+      <h3 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[color:var(--ink)]">Create a Practitioner Account</h3>
       <p className="text-sm text-slate-600 mt-1">
         After signing up you will submit your licence details and certificates. You appear in the public registry only once the medical board verifies you.
       </p>
       <form onSubmit={submit} className="space-y-5 mt-7">
         {error && (
-          <div className="bg-[#FFE9EB] border border-[#FECDD3] text-[#C8102E] p-4 flex gap-3 text-xs font-bold">
+          <div className="bg-[color:var(--t-100)] border border-[color:var(--t-200)] text-[color:var(--t-600)] p-4 flex gap-3 text-xs font-bold">
             <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" /><span>{error}</span>
           </div>
         )}
@@ -240,11 +241,11 @@ function PractitionerSignUp({ onSuccess, onCancel }: {
           <p className="text-[11px] text-slate-500">At least 8 characters, with letters and numbers.</p>
         </div>
         <label className="flex items-start gap-3 text-xs text-slate-700 cursor-pointer">
-          <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#C8102E]" required />
+          <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[color:var(--t-600)]" required />
           <span>I accept the Terms of Service and Privacy Policy, and agree that my credentials may be checked with the relevant medical council.</span>
         </label>
         <button type="submit" disabled={loading || !consent}
-          className="w-full h-[52px] text-base font-extrabold bg-[#C8102E] hover:bg-[#A50F2A] text-white shadow-md disabled:opacity-70 border border-[#A50F2A] cursor-pointer">
+          className="w-full h-[52px] text-base font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-800)] text-white shadow-md disabled:opacity-70 border border-[color:var(--t-800)] cursor-pointer">
           {loading ? 'Creating account…' : 'Create account'}
         </button>
         <button type="button" onClick={onCancel} className="w-full text-sm font-bold text-slate-600 hover:underline cursor-pointer">Back to sign in</button>
@@ -326,28 +327,28 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
   const inputClass = 'w-full bg-white/10 border border-white/30 rounded-none px-4 h-[50px] text-base font-medium text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-all';
 
   return (
-    <div className="min-h-screen bg-[#FDFBFB] text-[#1E293B] font-body flex flex-col antialiased selection:bg-[#FFE4E6] selection:text-[#DC2626]">
+    <div className="min-h-screen bg-[color:var(--t-bg)] text-[color:var(--ink)] font-body flex flex-col antialiased selection:bg-[color:var(--t-100)] selection:text-[color:var(--t-600)]">
 
       {/* ═══════════ TOP BANNER ═══════════ */}
-      <div className="bg-[#FFE4E6] text-[#DC2626] text-xs font-semibold py-2 px-4 text-center border-b border-[#FECDD3] flex items-center justify-center gap-2">
-        <span className="inline-flex items-center gap-1.5 bg-[#DC2626] text-white px-2.5 py-0.5 rounded-none text-[10px] uppercase tracking-wider font-bold">
+      <div className="bg-[color:var(--t-100)] text-[color:var(--t-600)] text-xs font-semibold py-2 px-4 text-center border-b border-[color:var(--t-200)] flex items-center justify-center gap-2">
+        <span className="inline-flex items-center gap-1.5 bg-[color:var(--t-600)] text-white px-2.5 py-0.5 rounded-none text-[10px] uppercase tracking-wider font-bold">
           <Cross className="h-2.5 w-2.5" /> CareVerified Standard
         </span>
         <span>Online Medical Assistance Platform — Verification &amp; Telehealth Network</span>
       </div>
 
       {/* ═══════════ NAVBAR (LIGHT TONE PRIMARY BACKGROUND) ═══════════ */}
-      <nav className="sticky top-0 z-50 bg-[#FFF1F2]/95 backdrop-blur-md border-b border-[#FECDD3]">
+      <nav className="sticky top-0 z-50 bg-[color:var(--t-50)]/95 backdrop-blur-md border-b border-[color:var(--t-200)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-3.5 flex flex-wrap justify-between items-center gap-4">
           <a href="#top" className="flex items-center gap-3.5 group">
-            <span className="w-10 h-10 rounded-none bg-[#DC2626] flex items-center justify-center text-white border border-[#B91C1C] group-hover:bg-[#B91C1C] transition-colors">
+            <span className="w-10 h-10 rounded-none bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-700)] group-hover:bg-[color:var(--t-700)] transition-colors">
               <Cross className="h-5 w-5" />
             </span>
             <span className="flex flex-col leading-none">
-              <span className="font-display font-black text-2xl tracking-tight text-[#1E293B]">
-                MedCred<span className="text-[#DC2626]">.</span>
+              <span className="font-display font-black text-2xl tracking-tight text-[color:var(--ink)]">
+                MedCred<span className="text-[color:var(--t-600)]">.</span>
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#DC2626] mt-1">
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[color:var(--t-600)] mt-1">
                 Medical Assistance Platform
               </span>
             </span>
@@ -356,30 +357,31 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
           <div className="flex flex-wrap items-center gap-3">
             <a
               href="#verify-section"
-              className="hidden sm:inline-flex items-center gap-2 min-h-[42px] px-5 text-sm font-bold text-[#DC2626] bg-white border border-[#FECDD3] rounded-none hover:bg-[#FFE4E6] transition-all cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-2 min-h-[42px] px-5 text-sm font-bold text-[color:var(--t-600)] bg-white border border-[color:var(--t-200)] rounded-none hover:bg-[color:var(--t-100)] transition-all cursor-pointer"
             >
               <Search className="h-4 w-4" />
               Verify a License
             </a>
             <a
               href="#login-section"
-              className="inline-flex items-center gap-2 min-h-[42px] px-6 text-sm font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] border border-[#B91C1C] rounded-none shadow-xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 min-h-[42px] px-6 text-sm font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none shadow-xs transition-all cursor-pointer"
             >
               Access Portal
               <ArrowRight className="h-4 w-4" />
             </a>
+            <ThemeSwitcher />
           </div>
         </div>
       </nav>
 
       {/* ═══════════ HERO HEADER (LIGHT CRIMSON BACKGROUND - ZERO BLACK BACKGROUNDS) ═══════════ */}
-      <header id="top" className="relative text-[#1E293B] border-b border-[#FECDD3] overflow-hidden min-h-[560px] bg-[#FFF0F2]">
+      <header id="top" className="relative text-[color:var(--ink)] border-b border-[color:var(--t-200)] overflow-hidden min-h-[560px] bg-[color:var(--t-50)]">
         {/* Clinical Background Image (Opacity set to 80%) */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none z-0"
-          style={{ backgroundImage: `url(${heroBgImage})`, opacity: 0.8 }}
+          style={{ backgroundImage: `url(${heroBgImage})`, opacity: 0.8, filter: "hue-rotate(var(--t-hue)) brightness(var(--t-bright))" }}
         />
-        <Cross className="absolute -right-24 -bottom-36 h-[520px] w-[520px] text-[#DC2626] opacity-5 pointer-events-none z-0" />
+        <Cross className="absolute -right-24 -bottom-36 h-[520px] w-[520px] text-[color:var(--t-600)] opacity-5 pointer-events-none z-0" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-12 pb-14 lg:pt-16 lg:pb-18 flex flex-wrap items-center justify-between gap-10 z-10">
           {/* Left Column — Clean Light Crimson Layout */}
@@ -388,9 +390,9 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-none bg-white border border-[#FECDD3] text-[11px] font-extrabold uppercase tracking-widest text-[#DC2626] mb-5 shadow-xs"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-none bg-white border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-600)] mb-5 shadow-xs"
             >
-              <Cross className="h-3 w-3 text-[#DC2626] animate-pulse" />
+              <Cross className="h-3 w-3 text-[color:var(--t-600)] animate-pulse" />
               Online Medical Assistance Network
             </motion.div>
 
@@ -401,17 +403,17 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               className="font-display font-black text-3xl sm:text-4xl lg:text-5xl leading-[1.08] tracking-tight text-black mb-4"
               style={{ textShadow: '0 0 6px #fff, 0 0 12px #fff, 0 0 20px rgba(255,255,255,0.95), 0 1px 2px #fff' }}
             >
-              Next-generation <span className="text-[#DC2626]">online medical assistance</span> &amp; <span className="text-black">doctor network.</span>
+              Next-generation <span className="text-[color:var(--t-600)]">online medical assistance</span> &amp; <span className="text-black">doctor network.</span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.15 }}
-              className="text-base sm:text-lg text-black font-semibold max-w-xl leading-relaxed mb-7 bg-white/20 backdrop-blur-sm border border-[#FECDD3] px-4 py-3"
+              className="text-base sm:text-lg text-black font-semibold max-w-xl leading-relaxed mb-7 bg-white/20 backdrop-blur-sm border border-[color:var(--t-200)] px-4 py-3"
               style={{ textShadow: '0 0 6px #fff, 0 0 12px #fff, 0 0 20px rgba(255,255,255,0.95), 0 1px 2px #fff' }}
             >
-              MedCred provides <span className="text-[#DC2626] font-bold">real-time online medical assistance</span>, <span className="text-black font-bold">24/7 doctor tele-consultations</span>, <span className="text-[#DC2626] font-bold">board-verified practitioners</span>, and <span className="text-black font-bold">digital e-prescriptions</span> built with verified clinical standards.
+              MedCred provides <span className="text-[color:var(--t-600)] font-bold">real-time online medical assistance</span>, <span className="text-black font-bold">24/7 doctor tele-consultations</span>, <span className="text-[color:var(--t-600)] font-bold">board-verified practitioners</span>, and <span className="text-black font-bold">digital e-prescriptions</span> built with verified clinical standards.
             </motion.p>
 
             <motion.div
@@ -422,24 +424,24 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
             >
               <a
                 href="#login-section"
-                className="group inline-flex items-center gap-2.5 min-h-[48px] px-7 text-sm font-extrabold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-none shadow-md transition-all cursor-pointer border border-[#B91C1C]"
+                className="group inline-flex items-center gap-2.5 min-h-[48px] px-7 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] rounded-none shadow-md transition-all cursor-pointer border border-[color:var(--t-700)]"
               >
                 Access Portal Free
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </a>
               <a
                 href="#verify-section"
-                className="inline-flex items-center gap-2 min-h-[48px] px-7 text-sm font-bold text-[#1E293B] bg-white border border-[#FECDD3] hover:bg-[#FFE4E6] rounded-none transition-all cursor-pointer shadow-xs"
+                className="inline-flex items-center gap-2 min-h-[48px] px-7 text-sm font-bold text-[color:var(--ink)] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] rounded-none transition-all cursor-pointer shadow-xs"
               >
-                <Search className="h-4 w-4 text-[#DC2626]" />
+                <Search className="h-4 w-4 text-[color:var(--t-600)]" />
                 Verify a Doctor
               </a>
             </motion.div>
 
             {/* Certification Badges */}
-            <div className="flex flex-wrap items-center gap-2.5 text-[11px] font-bold text-[#1E293B]">
+            <div className="flex flex-wrap items-center gap-2.5 text-[11px] font-bold text-[color:var(--ink)]">
               {['Online consultations', 'Board-verified doctors', 'Signed e-prescriptions'].map((b) => (
-                <span key={b} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-white/95 border border-[#FECDD3] text-[#1E293B] font-bold shadow-xs">
+                <span key={b} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-white/95 border border-[color:var(--t-200)] text-[color:var(--ink)] font-bold shadow-xs">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
                   {b}
                 </span>
@@ -454,15 +456,15 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
             transition={{ duration: 0.6, delay: 0.15 }}
             className="flex-[1_1_340px] min-w-0 max-w-[420px]"
           >
-            <div className="bg-white text-[#1A1A1A] rounded-none p-6 shadow-xl border border-[#FECDD3] relative">
+            <div className="bg-white text-[color:var(--ink)] rounded-none p-6 shadow-xl border border-[color:var(--t-200)] relative">
               <div className="flex justify-between items-start gap-3 mb-4">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-none bg-[#FFE9EB] border border-[#FECDD3] flex items-center justify-center text-[#C8102E]">
+                  <div className="w-9 h-9 rounded-none bg-[color:var(--t-100)] border border-[color:var(--t-200)] flex items-center justify-center text-[color:var(--t-600)]">
                     <Cross className="h-4 w-4" />
                   </div>
                   <div>
                     <span className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-slate-500 block">Medical Assistance Badge</span>
-                    <span className="text-xs font-bold text-[#1A1A1A]">Verified Practitioner</span>
+                    <span className="text-xs font-bold text-[color:var(--ink)]">Verified Practitioner</span>
                   </div>
                 </div>
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-none bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-bold">
@@ -476,20 +478,20 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                 <img
                   src="/assets/malaysian_male_doctor.jpg"
                   alt="Dr. Tan Seng Hock"
-                  className="w-14 h-14 rounded-full object-cover border border-[#FECDD3] shadow-xs"
+                  className="w-14 h-14 rounded-full object-cover border border-[color:var(--t-200)] shadow-xs"
                 />
                 <div>
-                  <h3 className="font-display font-extrabold text-xl tracking-tight text-[#1A1A1A]">Dr. Tan Seng Hock</h3>
-                  <p className="text-xs font-semibold text-[#C8102E] mt-0.5">Senior Specialist · MMC Registered</p>
+                  <h3 className="font-display font-extrabold text-xl tracking-tight text-[color:var(--ink)]">Dr. Tan Seng Hock</h3>
+                  <p className="text-xs font-semibold text-[color:var(--t-600)] mt-0.5">Senior Specialist · MMC Registered</p>
                   <p className="text-[11px] text-slate-500 mt-0.5">Kuala Lumpur Specialist Hospital</p>
                 </div>
               </div>
 
               {/* Data Rows */}
-              <div className="space-y-2 bg-[#FFF9F9] rounded-none p-3.5 border border-[#FECDD3] text-xs">
+              <div className="space-y-2 bg-[color:var(--t-bg)] rounded-none p-3.5 border border-[color:var(--t-200)] text-xs">
                 <div className="flex justify-between items-center py-1 border-b border-rose-100">
                   <span className="text-slate-500 font-medium">MMC License Number</span>
-                  <span className="font-mono font-bold text-[#C8102E] bg-[#FFE9EB] px-2 py-0.5 border border-[#FECDD3] rounded-none text-[11px]">MMC-32109</span>
+                  <span className="font-mono font-bold text-[color:var(--t-600)] bg-[color:var(--t-100)] px-2 py-0.5 border border-[color:var(--t-200)] rounded-none text-[11px]">MMC-32109</span>
                 </div>
                 <div className="flex justify-between items-center py-1 border-b border-rose-100">
                   <span className="text-slate-500 font-medium">Registry Status</span>
@@ -506,7 +508,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               {/* Card Footer */}
               <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
                 <span className="flex items-center gap-1 text-slate-600 font-medium">
-                  <ShieldCheck className="h-3.5 w-3.5 text-[#C8102E]" /> CareVerified Standard
+                  <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> CareVerified Standard
                 </span>
                 <span className="font-mono text-[10px] text-slate-400">ID: 8F2A-9912</span>
               </div>
@@ -521,10 +523,10 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
         {/* ─── INTERACTIVE CONTENT LAYOUT: PROFESSIONAL MEDICAL ASSISTANCE SUITE (THIN BORDERS) ─── */}
         <section>
           <AnimatedSection className="max-w-3xl mb-12">
-            <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-[#C8102E] bg-[#FFE9EB] px-3.5 py-1.5 rounded-none border border-[#FECDD3] mb-3">
+            <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-600)] bg-[color:var(--t-100)] px-3.5 py-1.5 rounded-none border border-[color:var(--t-200)] mb-3">
               <Cross className="h-3.5 w-3.5" /> Professional Assistance Suite
             </div>
-            <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight text-[#1A1A1A] leading-[1.05]">
+            <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight text-[color:var(--ink)] leading-[1.05]">
               Executive Medical Assistance &amp; Triage Workflows.
             </h2>
             <p className="text-lg text-slate-600 mt-3 leading-relaxed">
@@ -553,13 +555,13 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                           onClick={() => setActiveModuleId(m.id)}
                           className={`w-full p-4 text-left transition-all cursor-pointer flex items-center justify-between border ${
                             isActive
-                              ? 'bg-white border-[#C8102E] text-[#1A1A1A] shadow-xs'
+                              ? 'bg-white border-[color:var(--t-600)] text-[color:var(--ink)] shadow-xs'
                               : 'bg-transparent border-transparent text-slate-600 hover:bg-white hover:border-slate-200'
                           }`}
                         >
                           <div className="flex items-center gap-3 min-w-0">
                             <span className={`w-9 h-9 rounded-none flex items-center justify-center shrink-0 border ${
-                              isActive ? 'bg-[#C8102E] border-[#A50F2A] text-white' : 'bg-slate-100 border-slate-200 text-slate-700'
+                              isActive ? 'bg-[color:var(--t-600)] border-[color:var(--t-800)] text-white' : 'bg-slate-100 border-slate-200 text-slate-700'
                             }`}>
                               <IconComp className="h-4 w-4" />
                             </span>
@@ -568,7 +570,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                               <span className="block text-[11px] text-slate-500 truncate">{m.tagline}</span>
                             </div>
                           </div>
-                          <ChevronRight className={`h-4 w-4 shrink-0 transition-transform ${isActive ? 'translate-x-1 text-[#C8102E]' : 'text-slate-400'}`} />
+                          <ChevronRight className={`h-4 w-4 shrink-0 transition-transform ${isActive ? 'translate-x-1 text-[color:var(--t-600)]' : 'text-slate-400'}`} />
                         </button>
                       );
                     })}
@@ -576,7 +578,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                 </div>
 
                 <div className="mt-8 pt-6 border-t border-slate-200 text-xs text-slate-500 font-medium flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-[#C8102E]" />
+                  <Shield className="h-4 w-4 text-[color:var(--t-600)]" />
                   <span>Regulatory Compliant Protocol</span>
                 </div>
               </div>
@@ -585,7 +587,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               <div className="p-8 sm:p-10 flex flex-col justify-between">
                 <div>
                   <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                    <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#FFE9EB] border border-[#FECDD3] text-[#C8102E] text-xs font-extrabold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-2 px-3 py-1 bg-[color:var(--t-100)] border border-[color:var(--t-200)] text-[color:var(--t-600)] text-xs font-extrabold uppercase tracking-wider">
                       <Cross className="h-3 w-3" /> {activeModule.badge}
                     </span>
                     <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-widest">
@@ -593,10 +595,10 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                     </span>
                   </div>
 
-                  <h3 className="font-display font-black text-3xl tracking-tight text-[#1A1A1A] mb-2">
+                  <h3 className="font-display font-black text-3xl tracking-tight text-[color:var(--ink)] mb-2">
                     {activeModule.title}
                   </h3>
-                  <p className="text-sm font-bold uppercase tracking-wider text-[#C8102E] mb-4">
+                  <p className="text-sm font-bold uppercase tracking-wider text-[color:var(--t-600)] mb-4">
                     {activeModule.tagline}
                   </p>
                   <p className="text-slate-600 text-base leading-relaxed mb-8">
@@ -609,7 +611,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                     <div className="space-y-3">
                       {activeModule.highlights.map((h) => (
                         <div key={h} className="flex items-start gap-3 bg-slate-50/80 p-3.5 border border-slate-200 text-xs font-bold text-slate-800">
-                          <CheckCircle2 className="h-4 w-4 text-[#C8102E] shrink-0 mt-0.5" />
+                          <CheckCircle2 className="h-4 w-4 text-[color:var(--t-600)] shrink-0 mt-0.5" />
                           <span>{h}</span>
                         </div>
                       ))}
@@ -620,7 +622,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                 {/* Bottom Stage Footer */}
                 <div className="pt-6 border-t border-slate-200 flex flex-wrap items-center justify-between gap-6">
                   <div>
-                    <span className="block font-display font-black text-3xl text-[#C8102E] leading-none">
+                    <span className="block font-display font-black text-3xl text-[color:var(--t-600)] leading-none">
                       {activeModule.metricValue}
                     </span>
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-1 block">
@@ -630,7 +632,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
 
                   <a
                     href="#login-section"
-                    className="inline-flex items-center gap-2.5 min-h-[48px] px-7 text-sm font-extrabold text-white bg-[#C8102E] hover:bg-[#A50F2A] rounded-none shadow-xs transition-colors cursor-pointer border border-[#A50F2A]"
+                    className="inline-flex items-center gap-2.5 min-h-[48px] px-7 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-800)] rounded-none shadow-xs transition-colors cursor-pointer border border-[color:var(--t-800)]"
                   >
                     {activeModule.ctaText}
                     <ArrowRight className="h-4 w-4" />
@@ -645,10 +647,10 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
         {/* ─── SECTION 2: USER ECOSYSTEM (REDESIGNED ROLE PORTALS) ─── */}
         <section>
           <AnimatedSection className="max-w-3xl mb-12">
-            <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-[#C8102E] bg-[#FFE9EB] px-3.5 py-1.5 rounded-none border border-[#FECDD3] mb-3">
+            <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-600)] bg-[color:var(--t-100)] px-3.5 py-1.5 rounded-none border border-[color:var(--t-200)] mb-3">
               <Cross className="h-3.5 w-3.5" /> User Ecosystem
             </div>
-            <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight text-[#1A1A1A] leading-[1.05]">
+            <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight text-[color:var(--ink)] leading-[1.05]">
               Tailored Portals for Every Healthcare Role.
             </h2>
             <p className="text-lg text-slate-600 mt-3 leading-relaxed">
@@ -661,22 +663,22 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               const IconComp = card.icon;
               return (
                 <AnimatedSection key={card.title} delay={i * 0.12}>
-                  <article className="bg-white rounded-none p-8 border border-slate-200 hover:border-[#C8102E] shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between h-full relative overflow-hidden group">
+                  <article className="bg-white rounded-none p-8 border border-slate-200 hover:border-[color:var(--t-600)] shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between h-full relative overflow-hidden group">
                     <div>
                       {/* Card Header: Icon & Badge */}
                       <div className="flex justify-between items-center gap-3 mb-6">
-                        <span className="w-12 h-12 rounded-none bg-[#FFE9EB] border border-[#FECDD3] text-[#C8102E] flex items-center justify-center group-hover:bg-[#C8102E] group-hover:text-white transition-colors">
+                        <span className="w-12 h-12 rounded-none bg-[color:var(--t-100)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center group-hover:bg-[color:var(--t-600)] group-hover:text-white transition-colors">
                           <IconComp className="h-6 w-6" />
                         </span>
-                        <span className="text-xs font-extrabold uppercase tracking-wider text-[#C8102E] bg-[#FFE9EB] px-3 py-1 rounded-none border border-[#FECDD3]">
+                        <span className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--t-600)] bg-[color:var(--t-100)] px-3 py-1 rounded-none border border-[color:var(--t-200)]">
                           {card.badge}
                         </span>
                       </div>
 
-                      <h3 className="font-display font-extrabold text-2xl tracking-tight text-[#1A1A1A] mb-1">
+                      <h3 className="font-display font-extrabold text-2xl tracking-tight text-[color:var(--ink)] mb-1">
                         {card.title}
                       </h3>
-                      <p className="text-xs font-bold text-[#C8102E] uppercase tracking-wider mb-4">
+                      <p className="text-xs font-bold text-[color:var(--t-600)] uppercase tracking-wider mb-4">
                         {card.tagline}
                       </p>
                       <p className="text-slate-600 text-sm leading-relaxed mb-6">
@@ -687,8 +689,8 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                       <div className="pt-5 border-t border-slate-200 space-y-2.5">
                         <h4 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-3">Key Capabilities</h4>
                         {card.features.map((f) => (
-                          <div key={f} className="flex items-center gap-2.5 bg-[#FFF9F9] border border-[#FECDD3] p-2.5 text-xs font-bold text-slate-800">
-                            <CheckCircle2 className="h-4 w-4 text-[#C8102E] shrink-0" />
+                          <div key={f} className="flex items-center gap-2.5 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-2.5 text-xs font-bold text-slate-800">
+                            <CheckCircle2 className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
                             <span>{f}</span>
                           </div>
                         ))}
@@ -704,7 +706,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                           setIsRegistering(false);
                           document.getElementById('login-section')?.scrollIntoView({ behavior: 'smooth' });
                         }}
-                        className="w-full min-h-[46px] px-5 text-xs font-extrabold text-white bg-[#C8102E] hover:bg-[#A50F2A] border border-[#A50F2A] rounded-none shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
+                        className="w-full min-h-[46px] px-5 text-xs font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-800)] border border-[color:var(--t-800)] rounded-none shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
                       >
                         {card.ctaText}
                         <ArrowRight className="h-4 w-4" />
@@ -720,17 +722,17 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
         {/* ─── SECTION 3: PUBLIC LICENSE LOOKUP (LIGHT CRIMSON DESIGN) ─── */}
         <AnimatedSection>
           <section id="verify-section" className="scroll-mt-28">
-            <div className="bg-[#FFF0F2] text-[#1E293B] rounded-none p-8 sm:p-14 border border-[#FECDD3] shadow-sm relative overflow-hidden">
-              <Cross className="absolute -right-20 -bottom-24 h-[440px] w-[440px] text-[#DC2626] opacity-5 pointer-events-none" />
+            <div className="bg-[color:var(--t-50)] text-[color:var(--ink)] rounded-none p-8 sm:p-14 border border-[color:var(--t-200)] shadow-sm relative overflow-hidden">
+              <Cross className="absolute -right-20 -bottom-24 h-[440px] w-[440px] text-[color:var(--t-600)] opacity-5 pointer-events-none" />
 
               <div className="relative z-10 max-w-4xl">
-                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-none bg-[#DC2626] text-white text-xs font-bold uppercase tracking-wider mb-4 border border-[#B91C1C]">
+                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-none bg-[color:var(--t-600)] text-white text-xs font-bold uppercase tracking-wider mb-4 border border-[color:var(--t-700)]">
                   <ShieldCheck className="h-3.5 w-3.5" /> Instant Doctor Lookup
                 </span>
-                <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight leading-tight text-[#1E293B] mb-4">
+                <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight leading-tight text-[color:var(--ink)] mb-4">
                   Confirm Active Medical Licensing.
                 </h2>
-                <p className="text-[#334155] text-base sm:text-lg mb-8 leading-relaxed max-w-2xl font-medium">
+                <p className="text-[color:var(--ink-2)] text-base sm:text-lg mb-8 leading-relaxed max-w-2xl font-medium">
                   Search by practitioner name, license code (e.g., MMC-32109), or specialty to verify live practicing status instantly.
                 </p>
 
@@ -743,12 +745,12 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                       placeholder="Search doctor name, license number (e.g. MMC-32109), or specialty..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full h-14 pl-12 pr-4 bg-white border border-[#FECDD3] rounded-none text-[#1E293B] placeholder-slate-400 font-medium focus:outline-none focus:border-[#DC2626] transition-all text-base shadow-xs"
+                      className="w-full h-14 pl-12 pr-4 bg-white border border-[color:var(--t-200)] rounded-none text-[color:var(--ink)] placeholder-slate-400 font-medium focus:outline-none focus:border-[color:var(--t-600)] transition-all text-base shadow-xs"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="h-14 px-8 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-extrabold text-base rounded-none transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0 border border-[#B91C1C] shadow-sm"
+                    className="h-14 px-8 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white font-extrabold text-base rounded-none transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0 border border-[color:var(--t-700)] shadow-sm"
                   >
                     <Search className="h-5 w-5" />
                     Verify Now
@@ -769,7 +771,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                         <button
                           type="button"
                           onClick={() => { setSearchQuery(''); setHasSearched(false); setLookupResult(null); }}
-                          className="text-[#ff8a98] hover:underline cursor-pointer"
+                          className="text-[color:var(--t-400)] hover:underline cursor-pointer"
                         >
                           Clear Search
                         </button>
@@ -792,7 +794,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                                 <div className="min-w-0">
                                   <h4 className="font-bold text-white text-base truncate">{p.name}</h4>
                                   <p className="text-xs text-slate-300 font-medium truncate">{p.specialization}</p>
-                                  <p className="text-xs font-mono font-bold text-[#ff8a98] mt-0.5">License: {p.licenseNumber}</p>
+                                  <p className="text-xs font-mono font-bold text-[color:var(--t-400)] mt-0.5">License: {p.licenseNumber}</p>
                                 </div>
                               </div>
                               <div className="text-right shrink-0">
@@ -825,16 +827,16 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
       </main>
 
       {/* ═══════════ LOGIN PORTAL (REDESIGNED LIGHT THEME & THIN BORDERS) ═══════════ */}
-      <section id="login-section" className="relative bg-gradient-to-br from-[#FFF0F2] via-[#FFE9EB] to-[#FFF5F6] text-[#1A1A1A] border-t border-[#FECDD3] overflow-hidden scroll-mt-20">
-        <Cross className="absolute -right-24 -bottom-28 h-[520px] w-[520px] text-[#C8102E] opacity-5 pointer-events-none" />
+      <section id="login-section" className="relative bg-gradient-to-br from-[color:var(--t-50)] via-[color:var(--t-100)] to-[color:var(--t-50)] text-[color:var(--ink)] border-t border-[color:var(--t-200)] overflow-hidden scroll-mt-20">
+        <Cross className="absolute -right-24 -bottom-28 h-[520px] w-[520px] text-[color:var(--t-600)] opacity-5 pointer-events-none" />
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-12 py-20">
           {/* Heading */}
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="inline-flex items-center justify-center w-14 h-14 rounded-none bg-[#C8102E] text-white shadow-md mb-5 border border-[#A50F2A]">
+            <span className="inline-flex items-center justify-center w-14 h-14 rounded-none bg-[color:var(--t-600)] text-white shadow-md mb-5 border border-[color:var(--t-800)]">
               <Cross className="h-7 w-7" />
             </span>
-            <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight text-[#1A1A1A] mb-3">
+            <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight text-[color:var(--ink)] mb-3">
               Access the MedCred Portal
             </h2>
             <p className="text-base sm:text-lg text-slate-600">
@@ -843,11 +845,11 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
           </div>
 
           {/* Split card: role picker + form */}
-          <div className="grid md:grid-cols-[280px_1fr] bg-white text-[#1A1A1A] rounded-none border border-[#FECDD3] shadow-xl">
+          <div className="grid md:grid-cols-[280px_1fr] bg-white text-[color:var(--ink)] rounded-none border border-[color:var(--t-200)] shadow-xl">
             {/* Role picker side */}
-            <div className="p-6 bg-[#FFF5F6] md:border-r border-b md:border-b-0 border-[#FECDD3] flex flex-col justify-between">
+            <div className="p-6 bg-[color:var(--t-50)] md:border-r border-b md:border-b-0 border-[color:var(--t-200)] flex flex-col justify-between">
               <div>
-                <div className="text-xs font-extrabold uppercase tracking-widest text-[#C8102E] mb-4">
+                <div className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-600)] mb-4">
                   Select User Role
                 </div>
                 <div className="grid grid-cols-3 md:grid-cols-1 gap-2.5">
@@ -865,8 +867,8 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                         aria-pressed={active}
                         className={`rounded-none p-4 transition-all cursor-pointer flex flex-col md:flex-row md:items-start items-center text-center md:text-left gap-3 border ${
                           active
-                            ? 'bg-[#C8102E] border-[#A50F2A] text-white shadow-xs'
-                            : 'bg-white border-[#FECDD3] text-[#1A1A1A] hover:bg-[#FFE9EB]'
+                            ? 'bg-[color:var(--t-600)] border-[color:var(--t-800)] text-white shadow-xs'
+                            : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-100)]'
                         }`}
                       >
                         <tab.icon className="h-5 w-5 shrink-0 md:mt-0.5" />
@@ -882,9 +884,9 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                 </div>
               </div>
 
-              <div className="hidden md:block pt-6 border-t border-[#FECDD3] mt-6">
+              <div className="hidden md:block pt-6 border-t border-[color:var(--t-200)] mt-6">
                 <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
-                  <Lock className="h-3.5 w-3.5 text-[#C8102E]" /> 256-Bit Encrypted Session
+                  <Lock className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> 256-Bit Encrypted Session
                 </span>
               </div>
             </div>
@@ -926,7 +928,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
                   >
-                    <h3 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#1A1A1A]">
+                    <h3 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[color:var(--ink)]">
                       Sign in as {activeTab === 'patient' ? 'a Patient' : activeTab === 'practitioner' ? 'a Practitioner' : 'a Board Admin'}
                     </h3>
                     <p className="text-sm text-slate-600 mt-1">Enter your credentials to access the verified network.</p>
@@ -936,9 +938,9 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                         <motion.div
                           initial={{ opacity: 0, y: -8 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="bg-[#FFE9EB] border border-[#FECDD3] text-[#C8102E] p-4 rounded-none flex gap-3 text-xs font-bold"
+                          className="bg-[color:var(--t-100)] border border-[color:var(--t-200)] text-[color:var(--t-600)] p-4 rounded-none flex gap-3 text-xs font-bold"
                         >
-                          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-[#C8102E]" />
+                          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" />
                           <span>{error}</span>
                         </motion.div>
                       )}
@@ -956,7 +958,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                           }
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="w-full bg-[#FFF9F9] border border-[#FECDD3] rounded-none px-4 h-[50px] text-base font-medium text-[#1A1A1A] placeholder-slate-400 focus:outline-none focus:border-[#C8102E] focus:ring-1 focus:ring-[#C8102E] transition-all"
+                          className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none px-4 h-[50px] text-base font-medium text-[color:var(--ink)] placeholder-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all"
                           required
                         />
                       </div>
@@ -971,7 +973,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                           placeholder="••••••••"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className="w-full bg-[#FFF9F9] border border-[#FECDD3] rounded-none px-4 h-[50px] text-base font-medium text-[#1A1A1A] placeholder-slate-400 focus:outline-none focus:border-[#C8102E] focus:ring-1 focus:ring-[#C8102E] transition-all"
+                          className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none px-4 h-[50px] text-base font-medium text-[color:var(--ink)] placeholder-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all"
                           required
                         />
                       </div>
@@ -979,7 +981,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                       <button
                         type="submit"
                         disabled={loading}
-                        className="w-full h-[52px] rounded-none text-base font-extrabold transition-all cursor-pointer flex justify-center items-center gap-2.5 bg-[#C8102E] hover:bg-[#A50F2A] text-white shadow-md disabled:opacity-70 border border-[#A50F2A]"
+                        className="w-full h-[52px] rounded-none text-base font-extrabold transition-all cursor-pointer flex justify-center items-center gap-2.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-800)] text-white shadow-md disabled:opacity-70 border border-[color:var(--t-800)]"
                       >
                         {loading ? (
                           <>
@@ -1001,7 +1003,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                         <button
                           type="button"
                           onClick={() => { setError(''); setIsRegistering(true); }}
-                          className="text-[#C8102E] hover:underline font-extrabold cursor-pointer transition-colors"
+                          className="text-[color:var(--t-600)] hover:underline font-extrabold cursor-pointer transition-colors"
                         >
                           {activeTab === 'patient' ? 'Register as a New Patient' : 'Create a Practitioner Account'}
                         </button>
@@ -1017,12 +1019,12 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
       </section>
 
       {/* ═══════════ FOOTER (THIN BORDERS) ═══════════ */}
-      <footer className="bg-[#1A1A1A] text-slate-300 border-t border-slate-800 shrink-0">
+      <footer className="bg-[color:var(--dark)] text-slate-300 border-t border-slate-800 shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-16 pb-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 pb-12 border-b border-slate-800">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <span className="w-9 h-9 rounded-none bg-[#C8102E] flex items-center justify-center text-white border border-[#A50F2A]">
+                <span className="w-9 h-9 rounded-none bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-800)]">
                   <Cross className="h-5 w-5" />
                 </span>
                 <span className="font-display font-black text-2xl text-white">MedCred</span>
@@ -1048,7 +1050,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               <ul className="space-y-3 text-sm text-slate-400">
                 {['Licences checked by our medical board', 'Prescriptions signed and verifiable', 'Access to your records is logged', 'You choose who sees your health record'].map((item) => (
                   <li key={item} className="flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-[#C8102E] shrink-0" />
+                    <ShieldCheck className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -1072,9 +1074,9 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               &copy; {new Date().getFullYear()} MedCred Network. Operating in alignment with Medical Act 1971 credential guidelines. CareVerified Crimson System.
             </p>
             <div className="flex items-center gap-4 text-xs font-bold text-slate-300">
-              <span className="flex items-center gap-1.5"><Globe className="h-3.5 w-3.5 text-[#C8102E]" /> English</span>
+              <span className="flex items-center gap-1.5"><Globe className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> English</span>
               <span className="text-slate-700">|</span>
-              <span className="flex items-center gap-1.5"><Globe className="h-3.5 w-3.5 text-[#C8102E]" /> Bahasa Melayu</span>
+              <span className="flex items-center gap-1.5"><Globe className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> Bahasa Melayu</span>
             </div>
           </div>
         </div>

@@ -64,7 +64,7 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
 
   const tone = verified ? 'border-emerald-200 bg-emerald-50' : suspended || rejected ? 'border-rose-200 bg-rose-50' : 'border-amber-200 bg-amber-50';
   const Icon = verified ? CheckCircle2 : suspended || rejected ? ShieldOff : infoRequested ? AlertCircle : Clock;
-  const field = 'w-full border border-slate-200 bg-white rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#DC2626]';
+  const field = 'w-full border border-slate-200 bg-white rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[color:var(--t-600)]';
 
   return (
     <section className={`border rounded-xl p-5 space-y-3 ${tone}`} aria-label="Verification status">
@@ -112,7 +112,7 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
             </label>
           </div>
           <button disabled={busy || (canRenew && (!expiry || !file))} onClick={canRenew ? renew : resubmit}
-            className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-slate-300 text-white text-xs font-extrabold px-5 py-2.5 rounded-xl cursor-pointer">
+            className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-extrabold px-5 py-2.5 rounded-xl cursor-pointer">
             {busy ? 'Submitting…' : canRenew ? 'Submit renewal for review' : 'Send reply to the board'}
           </button>
         </div>

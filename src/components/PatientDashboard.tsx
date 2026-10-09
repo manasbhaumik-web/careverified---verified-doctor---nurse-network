@@ -73,7 +73,7 @@ export default function PatientDashboard({
     { id: 'saved', label: 'Saved Doctors', icon: Heart, count: savedIds.length },
   ];
 
-  const card = 'bg-white border border-[#FECDD3] shadow-xs p-5';
+  const card = 'bg-white border border-[color:var(--t-200)] shadow-xs p-5';
   return (
     <div className="w-full max-w-[1920px] mx-auto space-y-5" id="patient-dashboard-root">
       <DashboardHeader
@@ -81,11 +81,11 @@ export default function PatientDashboard({
         title={`${greeting}, ${userName}`}
         description="Your appointments, prescriptions and health record in one secure place."
         actions={
-          <button onClick={onConsultNow} className="px-5 py-2 min-h-[44px] bg-[#DC2626] hover:bg-[#B91C1C] text-white flex items-center gap-2.5 cursor-pointer shadow-xs text-left">
-            <Video className="h-5 w-5 shrink-0" />
+          <button onClick={onConsultNow} className="group pl-3 pr-5 py-2.5 min-h-[52px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white flex items-center gap-3 cursor-pointer shadow-sm hover:shadow-md transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[color:var(--t-600)]">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center bg-white/15"><Video className="h-5 w-5" /></span>
             <span className="leading-tight">
-              <span className="block text-xs font-bold uppercase tracking-wider">Consult a doctor now</span>
-              <span className="block text-[11px] font-medium text-rose-100">Chat or video with an online doctor</span>
+              <span className="block text-sm font-semibold tracking-wide">Consult a doctor now</span>
+              <span className="block text-xs font-normal text-white/80">Chat or video with an online doctor</span>
             </span>
           </button>
         }
@@ -97,22 +97,22 @@ export default function PatientDashboard({
 
       <section aria-label="Summary" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <button className={`${card} text-left cursor-pointer`} onClick={() => setActiveTab('appointments')}>
-          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Calendar className="h-4 w-4 text-[#DC2626]" /> Upcoming visits</p>
+          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Calendar className="h-4 w-4 text-[color:var(--t-600)]" /> Upcoming visits</p>
           <p className="text-3xl font-bold tabular-nums mt-1">{upcoming.length}</p>
           <p className="text-xs text-slate-600">{upcoming[0] ? `Next: ${upcoming[0].professionalName}, ${upcoming[0].date}` : 'No visits scheduled'}</p>
         </button>
         <button className={`${card} text-left cursor-pointer`} onClick={() => setActiveTab('records')}>
-          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Pill className="h-4 w-4 text-[#DC2626]" /> Active prescriptions</p>
+          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Pill className="h-4 w-4 text-[color:var(--t-600)]" /> Active prescriptions</p>
           <p className="text-3xl font-bold tabular-nums mt-1">{summary?.activeRx ?? '–'}</p>
           <p className="text-xs text-slate-600">Signed e-prescriptions you can send to a pharmacy</p>
         </button>
         <button className={`${card} text-left cursor-pointer`} onClick={() => setActiveTab('records')}>
-          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Stethoscope className="h-4 w-4 text-[#DC2626]" /> Latest blood pressure</p>
+          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Stethoscope className="h-4 w-4 text-[color:var(--t-600)]" /> Latest blood pressure</p>
           <p className="text-3xl font-bold tabular-nums mt-1">{summary?.bp ? `${summary.bp.value1}/${summary.bp.value2}` : '–'}</p>
           <p className={`text-xs ${summary?.bp?.flag?.level === 'urgent' ? 'text-rose-700 font-bold' : 'text-slate-600'}`}>{summary?.bp ? (summary.bp.flag?.text ?? 'mmHg') : 'No readings logged'}</p>
         </button>
         <div className={card}>
-          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Users className="h-4 w-4 text-[#DC2626]" /> Your care team</p>
+          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Users className="h-4 w-4 text-[color:var(--t-600)]" /> Your care team</p>
           <p className="text-3xl font-bold tabular-nums mt-1">{careTeam.length}</p>
           <p className="text-xs text-slate-600">{careTeam.length ? careTeam.map(p => p.name).slice(0, 2).join(', ') : 'Book a visit to build your care team'}</p>
         </div>
@@ -123,7 +123,7 @@ export default function PatientDashboard({
       {activeTab === 'appointments' && (
         <div id="panel-appointments" role="tabpanel" aria-labelledby="tab-appointments" tabIndex={0} className="space-y-5">
           <section className={card}>
-            <h2 className="text-base font-bold mb-3 flex items-center gap-2"><Clock className="h-4 w-4 text-[#DC2626]" /> Upcoming appointments</h2>
+            <h2 className="text-base font-bold mb-3 flex items-center gap-2"><Clock className="h-4 w-4 text-[color:var(--t-600)]" /> Upcoming appointments</h2>
             {upcoming.length === 0 ? (
               <p className="text-sm text-slate-600">Nothing booked. Find a verified doctor under “Doctors &amp; Nurses”, or use “Consult a doctor now”.</p>
             ) : (
@@ -136,7 +136,7 @@ export default function PatientDashboard({
                       {b.paymentStatus === 'Pending' && <p className="text-xs font-bold text-amber-700">Awaiting payment. The slot is held for a short time.</p>}
                     </div>
                     <div className="flex gap-2">
-                      {b.paymentStatus === 'Pending' && <button onClick={() => setPaying(b)} className="bg-[#DC2626] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Pay now</button>}
+                      {b.paymentStatus === 'Pending' && <button onClick={() => setPaying(b)} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Pay now</button>}
                       <button onClick={onNavigateToMessages} className="border border-slate-200 text-xs font-bold px-3 py-2 cursor-pointer">Message</button>
                       <button onClick={() => cancel(b)} className="border border-rose-200 text-rose-700 text-xs font-bold px-3 py-2 cursor-pointer">Cancel</button>
                     </div>

@@ -10,9 +10,9 @@
    * ------------------------------------------------------------- */
 
   /* Layer 1: Primitives */
-  --color-cross: #dc2626;
-  --color-cross-dark: #b91c1c;
-  --color-cross-tint: #ffe4e6;
+  --color-cross: var(--t-600);
+  --color-cross-dark: var(--t-700);
+  --color-cross-tint: var(--t-100);
   --color-emerald-primary: #059669;
   --color-emerald-bright: #10b981;
   --color-emerald-mint: #ecfdf5;
@@ -21,12 +21,12 @@
   --color-ink-body: #334155;
 
   /* Layer 2: Semantic System Tokens */
-  --sys-bg-hero: #fff0f2;
-  --sys-border-hairline: #fecdd3;
+  --sys-bg-hero: var(--t-50);
+  --sys-border-hairline: var(--t-200);
   --sys-text-primary: #1e293b;
   --sys-text-body: #334155;
-  --sys-brand-red: #dc2626;
-  --sys-brand-red-dark: #b91c1c;
+  --sys-brand-red: var(--t-600);
+  --sys-brand-red-dark: var(--t-700);
   --sys-brand-emerald: #059669;
   --sys-bg-mint: #ecfdf5;
   --sys-border-emerald: #a7f3d0;
@@ -43,19 +43,19 @@
   --font-weight-black: 700;
 
   /* Unified App-Wide Color System: CareVerified Crimson + Modern Slate Theme */
-  --color-rose-50: #fff1f2;
-  --color-rose-100: #ffe4e6;
-  --color-rose-200: #fecdd3;
-  --color-rose-300: #fda4af;
-  --color-rose-400: #ff8a98;
-  --color-rose-500: #e0243f;
-  --color-rose-600: #dc2626;
-  --color-rose-700: #b91c1c;
-  --color-rose-800: #86102a;
-  --color-rose-900: #6b0f24;
+  --color-rose-50: var(--t-50);
+  --color-rose-100: var(--t-100);
+  --color-rose-200: var(--t-200);
+  --color-rose-300: var(--t-300);
+  --color-rose-400: var(--t-400);
+  --color-rose-500: var(--t-500);
+  --color-rose-600: var(--t-600);
+  --color-rose-700: var(--t-700);
+  --color-rose-800: var(--t-800);
+  --color-rose-900: var(--t-900);
 
   /* Neutral Modern Slate Ink scale */
-  --color-slate-50: #fdfbfb;
+  --color-slate-50: #F8FAFC;
   --color-slate-100: #f1f5f9;
   --color-slate-200: #e2e8f0;
   --color-slate-300: #cbd5e1;
@@ -77,7 +77,7 @@
 }
 
 html, body {
-  background-color: #FFF8F9;
+  background-color: var(--t-bg);
   color: #1E293B;
   font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   margin: 0;
@@ -145,29 +145,29 @@ main {
 footer,
 footer.app-dark-footer,
 .app-dark-footer {
-  background-color: #0F172A !important;
-  color: #CBD5E1 !important;
-  border-top: 1px solid #1E293B !important;
+  background-color: var(--t-900) !important;
+  color: var(--t-100) !important;
+  border-top: 1px solid var(--t-800) !important;
 }
 
 footer *,
 .app-dark-footer * {
-  border-color: #1E293B !important;
+  border-color: var(--t-800) !important;
 }
 
 footer p,
 .app-dark-footer p {
-  color: #94A3B8 !important;
+  color: var(--t-200) !important;
 }
 
 footer h4,
 .app-dark-footer h4 {
-  color: #94A3B8 !important;
+  color: var(--t-200) !important;
 }
 
 footer a,
 .app-dark-footer a {
-  color: #CBD5E1 !important;
+  color: var(--t-100) !important;
 }
 
 footer a:hover,
@@ -177,12 +177,109 @@ footer a:hover,
 
 footer button.bg-slate-800,
 .app-dark-footer button.bg-slate-800 {
-  background-color: #1E293B !important;
+  background-color: var(--t-800) !important;
   color: #FFFFFF !important;
-  border-color: #334155 !important;
+  border-color: var(--t-700) !important;
 }
 
 footer button.bg-slate-800:hover,
 .app-dark-footer button.bg-slate-800:hover {
-  background-color: #334155 !important;
+  background-color: var(--t-700) !important;
 }
+/* -------------------------------------------------------------
+ * APPLICATION THEMES - switched via <html data-theme="...">
+ * Default: sky. See components/ThemeSwitcher.tsx
+ * ------------------------------------------------------------- */
+:root,
+:root[data-theme="sky"] {
+  --ink: #1E293B; --ink-2: #334155; --t-bright: 1; --page: #F8FAFC;
+  --e-50: #ECFDF5; --e-200: #A7F3D0; --e-600: #059669; --e-700: #047857; --e-800: #065F46;
+  --dark: #0F172A;
+  --t-50: #F0F9FF; --t-100: #E0F2FE; --t-200: #BAE6FD; --t-300: #7DD3FC; --t-400: #38BDF8;
+  --t-500: #0EA5E9; --t-600: #0284C7; --t-700: #0369A1; --t-800: #075985; --t-900: #0C4A6E;
+  --t-bg: #F5FAFF; --t-hue: 205deg;
+}
+
+:root[data-theme="crimson"] {
+  --t-50: #FFF0F2; --t-100: #FFE4E6; --t-200: #FECDD3; --t-300: #FDA4AF; --t-400: #FF8A98;
+  --t-500: #E0243F; --t-600: #DC2626; --t-700: #B91C1C; --t-800: #86102A; --t-900: #6B0F24;
+  --t-bg: #FFF8F9; --t-hue: 0deg;
+}
+
+:root[data-theme="green"] {
+  --t-50: #F0FDF4; --t-100: #DCFCE7; --t-200: #BBF7D0; --t-300: #86EFAC; --t-400: #4ADE80;
+  --t-500: #22C55E; --t-600: #16A34A; --t-700: #15803D; --t-800: #166534; --t-900: #14532D;
+  --t-bg: #F7FEF9; --t-hue: 130deg;
+}
+
+/* -------------------------------------------------------------
+ * DARK NAVY THEME
+ * Inverts the slate neutral scale (so existing bg-slate-* / text-slate-*
+ * utilities flip automatically) and re-tints surfaces and status colours.
+ * ------------------------------------------------------------- */
+:root[data-theme="navy"] {
+  color-scheme: dark;
+  --t-50: #0F1D3A; --t-100: #14264B; --t-200: #24407A; --t-300: #3B63B0; --t-400: #60A5FA;
+  --t-500: #4F8EF7; --t-600: #3B82F6; --t-700: #2563EB; --t-800: #93C5FD; --t-900: #060E21;
+  --t-bg: #0A1128; --t-hue: 205deg; --t-bright: 0.5;
+  --ink: #E6EDF8; --ink-2: #BCC8DC;
+  --e-50: #0B2B26; --e-200: #14574A; --e-600: #34D399; --e-700: #6EE7B7; --e-800: #6EE7B7;
+  --dark: #060E21;
+  --page: #0A1128; --surface: #101C38; --surface-2: #0F1D3A;
+
+  --color-slate-50: #0F1D3A; --color-slate-100: #14264B; --color-slate-200: #22345A;
+  --color-slate-300: #33486F; --color-slate-400: #7A8CAB; --color-slate-500: #94A3BF;
+  --color-slate-600: #B4C0D6; --color-slate-700: #CBD5E6; --color-slate-800: #E2E8F4;
+  --color-slate-900: #F1F5FB; --color-slate-950: #FFFFFF;
+
+  --color-emerald-50: #0B2B26; --color-emerald-100: #0F3A32; --color-emerald-200: #14574A;
+  --color-emerald-700: #34D399; --color-emerald-800: #6EE7B7;
+  --color-amber-50: #33270B; --color-amber-100: #3F2F0B; --color-amber-200: #6B4E10;
+  --color-amber-700: #FBBF24; --color-amber-800: #FCD34D;
+  --color-red-50: #3A1216; --color-red-100: #4A171C; --color-red-200: #7A2A31;
+  --color-red-700: #FCA5A5; --color-red-800: #FECACA;
+}
+
+:root[data-theme="navy"] html, :root[data-theme="navy"] body { background-color: var(--t-bg); }
+
+/* Surfaces that are literally white in light themes */
+:root[data-theme="navy"] .bg-white,
+:root[data-theme="navy"] .bg-white\/95,
+:root[data-theme="navy"] .bg-white\/90,
+:root[data-theme="navy"] .bg-white\/80,
+:root[data-theme="navy"] .bg-white\/70,
+:root[data-theme="navy"] .bg-white\/60 { background-color: var(--surface); }
+
+/* Elements that are dark in every theme: keep them dark navy, with light text */
+:root[data-theme="navy"] .bg-slate-900 { background-color: var(--dark); }
+
+:root[data-theme="navy"] .bg-slate-800 { background-color: #0B1A33; }
+
+/* Coloured app header stays deep navy rather than bright accent blue */
+:root[data-theme="navy"] header.sticky { background-color: #0B1B3D !important; border-color: #1E3A6B !important; }
+
+/* Footer */
+:root[data-theme="navy"] footer,
+:root[data-theme="navy"] footer.app-dark-footer,
+:root[data-theme="navy"] .app-dark-footer { background-color: #060E21 !important; border-top-color: #14264B !important; }
+:root[data-theme="navy"] footer *, :root[data-theme="navy"] .app-dark-footer * { border-color: #14264B !important; }
+:root[data-theme="navy"] footer a, :root[data-theme="navy"] .app-dark-footer a { color: #BCC8DC !important; }
+:root[data-theme="navy"] footer a:hover, :root[data-theme="navy"] .app-dark-footer a:hover { color: #FFFFFF !important; }
+
+/* Form controls */
+:root[data-theme="navy"] input, :root[data-theme="navy"] textarea, :root[data-theme="navy"] select {
+  background-color: var(--surface-2); color: var(--ink); border-color: #22345A;
+}
+:root[data-theme="navy"] ::placeholder { color: #7A8CAB; }
+
+/* Light-tinted text that sits on the app header must stay light in the navy theme */
+:root[data-theme="navy"] header.sticky [class*="text-[color:var(--t-1"],
+:root[data-theme="navy"] header.sticky [class*="text-[color:var(--t-2"] { color: #BFD7FF; }
+
+/* Hero headline is black-with-white-glow over a photo in light themes; invert for navy */
+:root[data-theme="navy"] header#top h1.text-black,
+:root[data-theme="navy"] header#top h1 .text-black { color: #FFFFFF; text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
+:root[data-theme="navy"] header#top h1 { text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
+:root[data-theme="navy"] header#top p.text-black { color: #E6EDF8; background-color: rgba(6, 14, 33, 0.62); text-shadow: none !important; }
+:root[data-theme="navy"] header#top p.text-black .text-black { color: #FFFFFF; }
+:root[data-theme="navy"] header#top p.text-black [class*="text-[color:var(--t-600)]"] { color: #7DB4FF; }

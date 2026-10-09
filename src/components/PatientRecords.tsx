@@ -5,7 +5,7 @@ import { Activity, AlertTriangle, ClipboardList, FileText, FlaskConical, Pill, S
 const jpost = (url: string, body?: unknown, method = 'POST') =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '');
-const field = 'border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-[#DC2626]';
+const field = 'border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--t-600)]';
 
 const VITAL_LABEL: Record<string, string> = { bp: 'Blood pressure', glucose: 'Blood sugar', heart_rate: 'Heart rate', spo2: 'Oxygen (SpO₂)', temperature: 'Temperature', weight: 'Weight' };
 
@@ -56,7 +56,7 @@ export default function PatientRecords() {
       <div role="tablist" className="flex flex-wrap gap-1 border-b border-slate-200">
         {tabs.map(([id, text, Icon]) => (
           <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setMsg(null); }}
-            className={`px-3 py-2.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer ${tab === id ? 'border-b-2 border-[#DC2626] text-[#B91C1C]' : 'text-slate-500'}`}>
+            className={`px-3 py-2.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer ${tab === id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-500'}`}>
             <Icon className="h-3.5 w-3.5" /> {text}
           </button>
         ))}
@@ -80,7 +80,7 @@ export default function PatientRecords() {
               )}
             </section>
           ))}
-          <form className="bg-white border border-[#FECDD3] p-4 flex flex-wrap gap-2 items-end" onSubmit={async e => {
+          <form className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap gap-2 items-end" onSubmit={async e => {
             e.preventDefault();
             const d = await act(() => jpost('/api/records/items', item), 'Added.');
             if (d.status === 'success') setItem({ ...item, name: '', detail: '' });
@@ -88,7 +88,7 @@ export default function PatientRecords() {
             <label className="text-xs font-bold">Type<select className={`${field} block mt-1`} value={item.type} onChange={e => setItem({ ...item, type: e.target.value })}><option value="allergy">Allergy</option><option value="condition">Condition</option><option value="medication">Medicine</option></select></label>
             <label className="text-xs font-bold flex-1 min-w-[10rem]">Name<input className={`${field} block w-full mt-1`} value={item.name} onChange={e => setItem({ ...item, name: e.target.value })} required maxLength={120} placeholder="e.g. Penicillin" /></label>
             <label className="text-xs font-bold flex-1 min-w-[10rem]">Details (optional)<input className={`${field} block w-full mt-1`} value={item.detail} onChange={e => setItem({ ...item, detail: e.target.value })} maxLength={300} placeholder="e.g. rash" /></label>
-            <button className="bg-[#DC2626] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Add</button>
+            <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Add</button>
           </form>
           <p className="text-[11px] text-slate-500">Accurate allergies and medicines help doctors prescribe safely. Only practitioners you choose can see this.</p>
         </div>
@@ -96,7 +96,7 @@ export default function PatientRecords() {
 
       {tab === 'vitals' && (
         <div className="space-y-4">
-          <form className="bg-white border border-[#FECDD3] p-4 flex flex-wrap gap-2 items-end" onSubmit={async e => {
+          <form className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap gap-2 items-end" onSubmit={async e => {
             e.preventDefault();
             setVitalFlag(null);
             const d = await act(() => jpost('/api/records/vitals', { kind: vital.kind, value1: Number(vital.value1), value2: vital.kind === 'bp' ? Number(vital.value2) : undefined }), 'Reading saved.');
@@ -105,7 +105,7 @@ export default function PatientRecords() {
             <label className="text-xs font-bold">Reading<select className={`${field} block mt-1`} value={vital.kind} onChange={e => setVital({ kind: e.target.value, value1: '', value2: '' })}>{Object.entries(VITAL_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
             <label className="text-xs font-bold">{vital.kind === 'bp' ? 'Systolic' : 'Value'}<input type="number" step="any" className={`${field} block w-28 mt-1`} value={vital.value1} onChange={e => setVital({ ...vital, value1: e.target.value })} required /></label>
             {vital.kind === 'bp' && <label className="text-xs font-bold">Diastolic<input type="number" className={`${field} block w-28 mt-1`} value={vital.value2} onChange={e => setVital({ ...vital, value2: e.target.value })} required /></label>}
-            <button className="bg-[#DC2626] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Save reading</button>
+            <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Save reading</button>
           </form>
           {vitalFlag && <p role="alert" className="bg-rose-50 border-2 border-rose-300 text-rose-900 text-sm font-bold p-3 flex gap-2"><AlertTriangle className="h-5 w-5 shrink-0" />{vitalFlag}</p>}
           <section className="bg-white border border-slate-200 p-4">
@@ -219,10 +219,10 @@ export default function PatientRecords() {
             ))}
           </section>
           {data.sharableWith.length > 0 && (
-            <form className="bg-white border border-[#FECDD3] p-4 flex flex-wrap gap-2 items-end" onSubmit={e => { e.preventDefault(); if (shareWith) act(() => jpost('/api/records/grants', { professionalId: shareWith, days: 30 }), 'Shared for 30 days.'); }}>
+            <form className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap gap-2 items-end" onSubmit={e => { e.preventDefault(); if (shareWith) act(() => jpost('/api/records/grants', { professionalId: shareWith, days: 30 }), 'Shared for 30 days.'); }}>
               <label className="text-xs font-bold flex-1 min-w-[12rem]">Share with a doctor you have seen
                 <select className={`${field} block w-full mt-1`} value={shareWith} onChange={e => setShareWith(e.target.value)}><option value="">Choose…</option>{data.sharableWith.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
-              <button className="bg-[#DC2626] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Share for 30 days</button>
+              <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Share for 30 days</button>
             </form>
           )}
         </div>

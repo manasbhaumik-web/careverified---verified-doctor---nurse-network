@@ -13,7 +13,7 @@ const SEV: Record<string, string> = {
   moderate: 'bg-slate-100 border-slate-300 text-slate-800',
 };
 const blankItem = () => ({ name: '', strength: '', form: 'tablet', dose: '', frequency: '', durationDays: 5, quantity: 10, instructions: '' });
-const field = 'w-full border border-slate-200 bg-white px-2.5 py-1.5 text-xs focus:outline-none focus:border-[#DC2626]';
+const field = 'w-full border border-slate-200 bg-white px-2.5 py-1.5 text-xs focus:outline-none focus:border-[color:var(--t-600)]';
 const label = 'text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
 
 /** The doctor's clinical tools for one booking or consultation: record, notes, prescriptions, certificates, referrals, labs. */
@@ -123,7 +123,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
       <div role="tablist" className="flex flex-wrap gap-1 border-b border-slate-200">
         {tabs.map(([id, text, Icon]) => (
           <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setError(''); setOk(''); }}
-            className={`px-3 py-2 text-xs font-bold flex items-center gap-1.5 cursor-pointer ${tab === id ? 'border-b-2 border-[#DC2626] text-[#B91C1C]' : 'text-slate-500'}`}>
+            className={`px-3 py-2 text-xs font-bold flex items-center gap-1.5 cursor-pointer ${tab === id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-500'}`}>
             <Icon className="h-3.5 w-3.5" /> {text}
           </button>
         ))}
@@ -154,7 +154,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
           {signed ? <p className="text-xs font-bold text-slate-600">Signed {new Date(ctx.encounter.signedAt).toLocaleString()}. This note is locked.</p> : (
             <div className="flex gap-2">
               <button onClick={() => saveNote(false)} className="border border-slate-300 text-xs font-bold px-4 py-2 cursor-pointer">Save draft</button>
-              <button onClick={() => saveNote(true)} className="bg-[#DC2626] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Sign note</button>
+              <button onClick={() => saveNote(true)} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Sign note</button>
             </div>
           )}
         </div>
@@ -210,7 +210,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
             </div>
           )}
 
-          <button onClick={issue} disabled={busy || !diagnosis || (warnings === null) || !canIssue} className="bg-[#DC2626] disabled:bg-slate-300 text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">
+          <button onClick={issue} disabled={busy || !diagnosis || (warnings === null) || !canIssue} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">
             {warnings === null ? 'Run the safety check first' : 'Sign and issue prescription'}
           </button>
 
@@ -236,7 +236,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
             <div><label className={label}>To</label><input type="date" className={field} value={mc.toDate} onChange={e => setMc({ ...mc, toDate: e.target.value })} /></div>
           </div>
           <div><label className={label}>Remarks (optional)</label><input className={field} value={mc.remarks} onChange={e => setMc({ ...mc, remarks: e.target.value })} maxLength={200} /></div>
-          <button onClick={() => submit('/api/certificates', mc, () => setMc({ ...mc, remarks: '' }))} className="bg-[#DC2626] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Sign and issue certificate</button>
+          <button onClick={() => submit('/api/certificates', mc, () => setMc({ ...mc, remarks: '' }))} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Sign and issue certificate</button>
           {ctx.certificates.length > 0 && <ul className="text-xs space-y-1 pt-2 border-t border-slate-200">{ctx.certificates.map((c: any) => <li key={c.id}>{c.fromDate} to {c.toDate} · code <span className="font-mono font-bold">{c.code}</span></li>)}</ul>}
         </div>
       )}
@@ -248,14 +248,14 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
             <input className={field} placeholder="Specialty (e.g. Cardiologist)" value={ref.toSpecialty} onChange={e => setRef({ ...ref, toSpecialty: e.target.value })} maxLength={100} />
             <textarea className={field} rows={3} placeholder="Reason for referral" value={ref.reason} onChange={e => setRef({ ...ref, reason: e.target.value })} maxLength={1000} />
             <select className={field} value={ref.urgency} onChange={e => setRef({ ...ref, urgency: e.target.value })}><option value="routine">Routine</option><option value="soon">Soon</option><option value="urgent">Urgent</option></select>
-            <button onClick={() => submit('/api/referrals', ref, () => setRef({ toSpecialty: '', reason: '', urgency: 'routine' }))} className="bg-[#DC2626] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Issue referral</button>
+            <button onClick={() => submit('/api/referrals', ref, () => setRef({ toSpecialty: '', reason: '', urgency: 'routine' }))} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Issue referral</button>
             {ctx.referrals.length > 0 && <ul className="text-xs space-y-1 pt-2 border-t border-slate-200">{ctx.referrals.map((r: any) => <li key={r.id}>{r.toSpecialty} · {r.urgency}</li>)}</ul>}
           </div>
           <div className="space-y-2 max-w-md">
             <h4 className={label}>Lab tests</h4>
             <input className={field} placeholder="Tests (e.g. FBC, HbA1c)" value={lab.tests} onChange={e => setLab({ ...lab, tests: e.target.value })} maxLength={500} />
             <input className={field} placeholder="Notes for the patient or lab" value={lab.notes} onChange={e => setLab({ ...lab, notes: e.target.value })} maxLength={300} />
-            <button onClick={() => submit('/api/lab-orders', lab, () => setLab({ tests: '', notes: '' }))} className="bg-[#DC2626] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Request tests</button>
+            <button onClick={() => submit('/api/lab-orders', lab, () => setLab({ tests: '', notes: '' }))} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Request tests</button>
             {ctx.labOrders.length > 0 && <ul className="text-xs space-y-1 pt-2 border-t border-slate-200">{ctx.labOrders.map((o: any) => (
               <li key={o.id}>{o.tests} · {o.status}{o.resultDocumentId && ctx.recordShared ? <> · <a className="underline font-bold" href={`/api/documents/${o.resultDocumentId}/download`}>download result</a></> : ''}</li>
             ))}</ul>}

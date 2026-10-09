@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '');
-const box = 'min-h-screen bg-[#FFF8F9] flex items-start justify-center p-4 pt-12';
-const card = 'bg-white border border-[#FECDD3] shadow-sm w-full max-w-lg p-6 space-y-4';
+const box = 'min-h-screen bg-[color:var(--t-bg)] flex items-start justify-center p-4 pt-12';
+const card = 'bg-white border border-[color:var(--t-200)] shadow-sm w-full max-w-lg p-6 space-y-4';
 
 /** Public pages: /rx/<code> and /cert/<code> (anyone), and /pharmacy (partner pharmacies with their PIN). */
 export default function VerifyDocument({ path }: { path: string }) {
@@ -67,7 +67,7 @@ function PharmacyConsole() {
   const [code, setCode] = useState('');
   const [rx, setRx] = useState<any | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
-  const input = 'border border-slate-200 px-3 py-2 text-sm w-full focus:outline-none focus:border-[#DC2626]';
+  const input = 'border border-slate-200 px-3 py-2 text-sm w-full focus:outline-none focus:border-[color:var(--t-600)]';
   const post = (url: string, body: object) => fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json());
 
   const lookup = async (e: React.FormEvent) => {
@@ -87,7 +87,7 @@ function PharmacyConsole() {
         <label className="text-xs font-bold block">Pharmacy ID<input className={input} value={auth.pharmacyId} onChange={e => setAuth({ ...auth, pharmacyId: e.target.value })} required autoComplete="off" /></label>
         <label className="text-xs font-bold block">PIN<input className={input} type="password" value={auth.pin} onChange={e => setAuth({ ...auth, pin: e.target.value })} required autoComplete="off" /></label>
         <label className="text-xs font-bold block">Prescription code<input className={`${input} font-mono uppercase`} value={code} onChange={e => setCode(e.target.value)} required maxLength={20} /></label>
-        <button className="bg-[#DC2626] text-white text-sm font-extrabold px-5 py-2.5 cursor-pointer">Look up</button>
+        <button className="bg-[color:var(--t-600)] text-white text-sm font-extrabold px-5 py-2.5 cursor-pointer">Look up</button>
       </form>
       {msg && <p role="status" className={`text-sm font-bold ${msg.ok ? 'text-emerald-700' : 'text-rose-700'}`}>{msg.text}</p>}
       {rx && (

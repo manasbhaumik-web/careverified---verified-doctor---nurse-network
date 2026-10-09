@@ -80,19 +80,19 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <section className={`border p-5 flex flex-wrap items-center justify-between gap-4 ${me?.online ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-[#FECDD3]'}`}>
+      <section className={`border p-5 flex flex-wrap items-center justify-between gap-4 ${me?.online ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-[color:var(--t-200)]'}`}>
         <div>
           <h2 className="text-lg font-black flex items-center gap-2"><Radio className={`h-5 w-5 ${me?.online ? 'text-emerald-600' : 'text-slate-400'}`} /> {me?.online ? 'You are on call' : 'You are offline'}</h2>
           <p className="text-xs text-slate-600 mt-1">While online, patients waiting for an instant consultation appear below. Keep this page open.</p>
         </div>
-        <button onClick={() => setOnline(!me?.online)} className={`px-6 py-3 text-sm font-extrabold cursor-pointer ${me?.online ? 'bg-white border border-slate-300 text-slate-800' : 'bg-[#DC2626] text-white'}`}>
+        <button onClick={() => setOnline(!me?.online)} className={`px-6 py-3 text-sm font-extrabold cursor-pointer ${me?.online ? 'bg-white border border-slate-300 text-slate-800' : 'bg-[color:var(--t-600)] text-white'}`}>
           {me?.online ? 'Go offline' : 'Go online'}
         </button>
       </section>
       {msg && <p className="text-xs font-bold text-slate-700 bg-slate-50 border border-slate-200 p-3">{msg}</p>}
 
       {me?.online && (
-        <section className="bg-white border border-[#FECDD3] p-5 space-y-3">
+        <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
           <h3 className="text-sm font-extrabold">Waiting patients ({offers.length})</h3>
           {offers.length === 0 ? <p className="text-xs text-slate-500">Nobody is waiting right now.</p> : offers.map(o => (
             <div key={o.id} className="border border-slate-200 p-4 space-y-2">
@@ -102,7 +102,7 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
               <p className="text-sm">{o.symptoms}</p>
               <p className="text-[11px] text-slate-500">{o.patientFirstName} · {o.mode} · waiting since {new Date(o.queuedAt).toLocaleTimeString()} · RM {o.fee.toFixed(2)}</p>
               <div className="flex gap-2">
-                <button onClick={() => accept(o.id)} className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-extrabold px-5 py-2 cursor-pointer">Accept</button>
+                <button onClick={() => accept(o.id)} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-5 py-2 cursor-pointer">Accept</button>
                 <button onClick={() => decline(o.id)} className="border border-slate-200 text-xs font-bold px-4 py-2 cursor-pointer">Not for me</button>
               </div>
             </div>
@@ -113,7 +113,7 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
       <section className="bg-white border border-slate-200 p-5 space-y-3">
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-sm font-extrabold">On-call roster</h3>
-          <button onClick={saveRoster} disabled={!rosterDirty} className="bg-[#DC2626] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Save roster</button>
+          <button onClick={saveRoster} disabled={!rosterDirty} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Save roster</button>
         </div>
         <p className="text-xs text-slate-600">Tick the hours you commit to be available. The board uses this to make sure every hour of the day is covered.</p>
         <div className="overflow-x-auto">
@@ -128,7 +128,7 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
                     return (
                       <td key={h}>
                         <button onClick={() => toggleCell(day, h)} aria-pressed={on} aria-label={`${d} ${h}:00`}
-                          className={`w-6 h-6 cursor-pointer ${on ? 'bg-[#DC2626]' : 'bg-slate-100 hover:bg-slate-200'}`} />
+                          className={`w-6 h-6 cursor-pointer ${on ? 'bg-[color:var(--t-600)]' : 'bg-slate-100 hover:bg-slate-200'}`} />
                       </td>
                     );
                   })}

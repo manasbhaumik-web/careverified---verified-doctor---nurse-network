@@ -24,8 +24,8 @@ interface DashboardHeaderProps<T extends string> {
 }
 
 /**
- * Standard dashboard header shared by every role's dashboard: pink hero with the
- * page title and actions, and the section tabs attached to its bottom edge.
+ * Standard dashboard header shared by every role's dashboard: white card with a brand accent rule,
+ * the page title and actions, and an underline tab strip along the bottom.
  */
 export default function DashboardHeader<T extends string>({
   eyebrow,
@@ -56,28 +56,33 @@ export default function DashboardHeader<T extends string>({
   return (
     <header
       id={id}
-      className="bg-gradient-to-r from-[#FFF0F2] via-[#FFF5F6] to-[#FFE9EB] border border-[#FECDD3] rounded-xl shadow-xs pt-5 px-5 sm:px-6"
+      className="relative bg-white border border-[color:var(--t-200)] border-t-[3px] border-t-[color:var(--t-600)] shadow-xs overflow-hidden"
     >
+      {/* soft brand wash on the right edge */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-[color:var(--t-50)] to-transparent" />
+
       {title && (
-        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4 pb-5">
+        <div className="relative flex flex-wrap items-center justify-between gap-x-8 gap-y-5 px-5 sm:px-7 py-6">
           <div className="min-w-0 max-w-3xl">
             {eyebrow && (
-              <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#047857]">
-                <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--t-700)]">
+                <span className="flex h-5 w-5 items-center justify-center bg-[color:var(--t-100)] text-[color:var(--t-700)]">
+                  <ShieldCheck className="h-3 w-3" aria-hidden="true" />
+                </span>
                 <span>{eyebrow}</span>
               </div>
             )}
-            <h1 className="mt-1.5 text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] leading-tight">{title}</h1>
-            {description && <p className="mt-1 text-sm text-[#334155] leading-relaxed">{description}</p>}
+            <h1 className="mt-2.5 text-2xl sm:text-[28px] font-semibold tracking-tight text-[color:var(--ink)] leading-tight">{title}</h1>
+            {description && <p className="mt-1.5 text-sm text-[color:var(--ink-2)] leading-relaxed">{description}</p>}
           </div>
           {actions && <div className="flex flex-wrap items-center gap-3 shrink-0">{actions}</div>}
         </div>
       )}
 
-      {children && <div className="pb-5">{children}</div>}
+      {children && <div className="relative px-5 sm:px-7 pb-5">{children}</div>}
 
       {tabs && tabs.length > 0 && (
-        <div role="tablist" aria-label={tabsLabel} className="flex gap-1 overflow-x-auto -mb-px">
+        <div role="tablist" aria-label={tabsLabel} className="relative flex gap-1 overflow-x-auto px-3 sm:px-5 border-t border-[color:var(--t-200)] bg-white">
           {tabs.map(tab => {
             const selected = activeTab === tab.id;
             return (
@@ -91,16 +96,16 @@ export default function DashboardHeader<T extends string>({
                 tabIndex={selected ? 0 : -1}
                 onClick={() => onTabChange?.(tab.id)}
                 onKeyDown={handleKeyDown}
-                className={`shrink-0 min-h-[48px] px-4 text-[13px] flex items-center gap-2 cursor-pointer rounded-t-lg border border-b-0 transition-colors ${
+                className={`shrink-0 min-h-[48px] px-4 text-[13px] flex items-center gap-2 cursor-pointer border-b-2 -mb-px transition-colors ${
                   selected
-                    ? 'font-bold text-[#1E293B] bg-white border-[#FECDD3]'
-                    : 'font-medium text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
+                    ? 'font-semibold text-[color:var(--t-700)] border-[color:var(--t-600)]'
+                    : 'font-medium text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
                 }`}
               >
-                <tab.icon className={`h-4 w-4 ${selected ? 'text-[#DC2626]' : 'text-slate-500'}`} />
+                <tab.icon className={`h-4 w-4 ${selected ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
                 <span className="whitespace-nowrap">{tab.label}</span>
                 {tab.count !== undefined && tab.count > 0 && (
-                  <span className="tabular-nums text-[11px] px-2 py-0.5 rounded-full font-bold bg-[#DC2626] text-white leading-none">
+                  <span className="tabular-nums text-[11px] min-w-[20px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
                     {tab.count}
                   </span>
                 )}

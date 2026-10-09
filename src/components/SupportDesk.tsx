@@ -3,7 +3,7 @@ import { AlertTriangle, LifeBuoy } from 'lucide-react';
 
 const jpost = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
-const field = 'border border-slate-200 bg-white px-3 py-2 text-sm w-full focus:outline-none focus:border-[#DC2626]';
+const field = 'border border-slate-200 bg-white px-3 py-2 text-sm w-full focus:outline-none focus:border-[color:var(--t-600)]';
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString() : '');
 
 /** Help & support for patients and practitioners: open a ticket, follow replies. Safety concerns are answered first. */
@@ -47,13 +47,13 @@ export default function SupportDesk() {
 
   return (
     <div className="max-w-4xl space-y-5">
-      <header className="bg-white border border-[#FECDD3] p-5">
-        <h1 className="text-xl font-black flex items-center gap-2"><LifeBuoy className="h-5 w-5 text-[#DC2626]" /> Help &amp; support</h1>
+      <header className="bg-white border border-[color:var(--t-200)] p-5">
+        <h1 className="text-xl font-black flex items-center gap-2"><LifeBuoy className="h-5 w-5 text-[color:var(--t-600)]" /> Help &amp; support</h1>
         <p className="text-sm text-slate-600 mt-1">Tell us what went wrong. Safety concerns are answered first.</p>
       </header>
       <p className="text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-900 p-3 flex gap-2"><AlertTriangle className="h-4 w-4 shrink-0" />If you or someone else is in danger, call 999. Do not wait for a support reply.</p>
 
-      <form onSubmit={create} className="bg-white border border-[#FECDD3] p-5 space-y-3">
+      <form onSubmit={create} className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
         <h2 className="text-sm font-extrabold">Open a ticket</h2>
         <select className={field} value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} required aria-label="Category">
           <option value="">Choose a category…</option>
@@ -64,7 +64,7 @@ export default function SupportDesk() {
         <input className={field} placeholder="Subject" value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} required minLength={3} maxLength={120} />
         <textarea className={field} rows={4} placeholder="Describe the problem" value={form.body} onChange={e => setForm({ ...form, body: e.target.value })} required minLength={10} maxLength={3000} />
         {msg && <p role="status" className={`text-xs font-bold ${msg.ok ? 'text-emerald-700' : 'text-rose-700'}`}>{msg.text}</p>}
-        <button className="bg-[#DC2626] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Send</button>
+        <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Send</button>
       </form>
 
       <div className="grid md:grid-cols-[280px_1fr] gap-5">
@@ -87,14 +87,14 @@ export default function SupportDesk() {
                 {open.status !== 'resolved' && <button onClick={resolve} className="text-xs font-bold border border-slate-200 px-3 py-1.5 h-fit cursor-pointer">Mark resolved</button>}</div>
               <ul className="space-y-2 max-h-80 overflow-y-auto">
                 {open.messages.map((m: any) => (
-                  <li key={m.id} className={`text-sm p-3 border ${m.fromStaff ? 'bg-[#FFF0F2] border-[#FECDD3]' : 'bg-slate-50 border-slate-200'}`}>
+                  <li key={m.id} className={`text-sm p-3 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}>
                     <p className="text-[10px] font-extrabold uppercase text-slate-500 mb-1">{m.fromStaff ? 'CareVerified support' : 'You'} · {when(m.ts)}</p>{m.body}
                   </li>
                 ))}
               </ul>
               <div className="flex gap-2">
                 <input className={field} value={reply} onChange={e => setReply(e.target.value)} placeholder={open.status === 'resolved' ? 'Reply to reopen this ticket' : 'Write a reply'} maxLength={3000} aria-label="Reply" />
-                <button onClick={send} disabled={!reply.trim()} className="bg-[#DC2626] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 cursor-pointer">Send</button>
+                <button onClick={send} disabled={!reply.trim()} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 cursor-pointer">Send</button>
               </div>
             </div>
           )}

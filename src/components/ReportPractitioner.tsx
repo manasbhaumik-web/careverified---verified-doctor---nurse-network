@@ -31,7 +31,7 @@ export default function ReportPractitioner({ professionalId }: { professionalId:
     } finally { setBusy(false); }
   };
 
-  const field = 'w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#DC2626]';
+  const field = 'w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[color:var(--t-600)]';
   return (
     <div>
       <button onClick={() => setOpen(o => !o)}
@@ -48,7 +48,7 @@ export default function ReportPractitioner({ professionalId }: { professionalId:
           <textarea className={field} rows={4} value={description} onChange={e => setDescription(e.target.value)}
             placeholder="What happened? (at least 20 characters)" minLength={20} maxLength={2000} required />
           {msg && <p className={`text-xs font-bold ${msg.ok ? 'text-emerald-700' : 'text-rose-700'}`}>{msg.text}</p>}
-          <button disabled={busy} className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:opacity-60 text-white text-xs font-extrabold px-4 py-2 rounded-xl cursor-pointer">
+          <button disabled={busy} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:opacity-60 text-white text-xs font-extrabold px-4 py-2 rounded-xl cursor-pointer">
             {busy ? 'Sending…' : 'Submit report'}
           </button>
         </form>

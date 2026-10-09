@@ -90,10 +90,10 @@ export default function PractitionerSettingsTab({
     <div id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" tabIndex={0} className="flex flex-col xl:flex-row gap-6 animate-fade-in items-start w-full">
 
       {/* LEFT PANE: Configuration Form */}
-      <div className="flex-1 bg-white border border-[#FECDD3] rounded-none p-6 sm:p-8 shadow-xs w-full">
-        <div className="border-b border-[#FECDD3] pb-3.5 mb-6">
+      <div className="flex-1 bg-white border border-[color:var(--t-200)] rounded-none p-6 sm:p-8 shadow-xs w-full">
+        <div className="border-b border-[color:var(--t-200)] pb-3.5 mb-6">
           <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-            <Edit className="h-4.5 w-4.5 text-[#DC2626]" />
+            <Edit className="h-4.5 w-4.5 text-[color:var(--t-600)]" />
             Registry Listing Configuration
           </h3>
           <p className="text-[11px] text-slate-500 font-medium">Update the public information patients find when searching the registry.</p>
@@ -177,20 +177,20 @@ export default function PractitionerSettingsTab({
               rows={5}
               value={editBio}
               onChange={(e) => setEditBio(e.target.value)}
-              className="w-full text-xs border border-[#FECDD3] rounded-none p-3.5 outline-none focus:ring-1 focus:ring-[#DC2626] font-semibold text-slate-700 leading-relaxed bg-white"
+              className="w-full text-xs border border-[color:var(--t-200)] rounded-none p-3.5 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 leading-relaxed bg-white"
               placeholder="Explain your approach to care, clinical experience, and focus areas..."
               required
             />
           </div>
 
           {/* Medical Certifications Tag Manager */}
-          <div className="space-y-2 pt-2 border-t border-[#FECDD3]">
+          <div className="space-y-2 pt-2 border-t border-[color:var(--t-200)]">
             <label className="block text-xs font-black text-slate-700">Active Medical Certifications</label>
             <p className="text-[10px] text-slate-500 font-semibold">Verify specialized training tags displayed on your public patient card.</p>
 
             <div className="flex flex-wrap gap-1.5 mb-2">
               {certifications.map(cert => (
-                <span key={cert} className="bg-[#FFF0F2] text-[#DC2626] border border-[#FECDD3] font-extrabold text-[11px] px-3 py-1.5 rounded-none flex items-center gap-1.5 shadow-3xs">
+                <span key={cert} className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] font-extrabold text-[11px] px-3 py-1.5 rounded-none flex items-center gap-1.5 shadow-3xs">
                   <span>{cert}</span>
                   <button
                     type="button"
@@ -215,7 +215,7 @@ export default function PractitionerSettingsTab({
                 placeholder="e.g. Advanced Pediatric Life Support"
                 value={newCert}
                 onChange={(e) => setNewCert(e.target.value)}
-                className="text-xs border border-[#FECDD3] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[#DC2626] font-semibold text-slate-700 flex-1 bg-white"
+                className="text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 flex-1 bg-white"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -226,7 +226,7 @@ export default function PractitionerSettingsTab({
               <button
                 type="button"
                 onClick={addCertification}
-                className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-extrabold px-4 py-2 rounded-none transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap"
+                className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-[11px] font-extrabold px-4 py-2 rounded-none transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add Tag
@@ -235,7 +235,7 @@ export default function PractitionerSettingsTab({
           </div>
 
           {/* Professional Fee, City & Clinical Center */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-[#FECDD3]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-[color:var(--t-200)]">
             <div>
               <label className="block text-xs font-black text-slate-700 mb-1.5">
                 {isDoc ? "Standard Co-Pay Fee (RM)" : "Hourly Clinical Service Fee (RM)"}
@@ -246,7 +246,7 @@ export default function PractitionerSettingsTab({
                   type="number"
                   value={editFee}
                   onChange={(e) => setEditFee(Number(e.target.value))}
-                  className="w-full text-xs border border-[#FECDD3] rounded-none py-2.5 pl-9 pr-3 outline-none focus:ring-1 focus:ring-[#DC2626] font-bold text-slate-700 bg-white"
+                  className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2.5 pl-9 pr-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-700 bg-white"
                   placeholder="e.g. 150"
                   required
                 />
@@ -258,7 +258,7 @@ export default function PractitionerSettingsTab({
               <select
                 value={editCity}
                 onChange={(e) => setEditCity(e.target.value)}
-                className="w-full text-xs border border-[#FECDD3] rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[#DC2626] font-bold text-slate-700 bg-white"
+                className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-700 bg-white"
               >
                 <option value="Kuala Lumpur">Kuala Lumpur</option>
                 <option value="Petaling Jaya">Petaling Jaya</option>
@@ -274,17 +274,17 @@ export default function PractitionerSettingsTab({
               type="text"
               value={editAddress}
               onChange={(e) => setEditAddress(e.target.value)}
-              className="w-full text-xs border border-[#FECDD3] rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[#DC2626] font-semibold text-slate-700 bg-white"
+              className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 bg-white"
               placeholder="e.g. Metropolitan Specialist Center, 8 Bukit Pantai"
               required
             />
           </div>
 
           {/* Dynamic Availability Matrix Config */}
-          <div className="border-t border-[#FECDD3] pt-5 space-y-4">
+          <div className="border-t border-[color:var(--t-200)] pt-5 space-y-4">
             <div>
               <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                <Calendar className="h-4 w-4 text-[#DC2626]" />
+                <Calendar className="h-4 w-4 text-[color:var(--t-600)]" />
                 Availability & Timeslot Configuration
               </h4>
               <p className="text-[10px] text-slate-500 font-semibold mb-3">Define the days and times patients are allowed to book consultations with you.</p>
@@ -308,8 +308,8 @@ export default function PractitionerSettingsTab({
                       }}
                       className={`text-[11px] font-bold py-1.5 px-3 rounded-none border transition-all cursor-pointer ${
                         isActive
-                          ? 'bg-[#DC2626] text-white border-[#DC2626] shadow-3xs'
-                          : 'bg-white text-slate-600 border-[#FECDD3] hover:bg-slate-50'
+                          ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-600)] shadow-3xs'
+                          : 'bg-white text-slate-600 border-[color:var(--t-200)] hover:bg-slate-50'
                       }`}
                     >
                       {day.substring(0, 3)}
@@ -327,24 +327,24 @@ export default function PractitionerSettingsTab({
                   placeholder="e.g. 10:00 AM"
                   value={newTimeSlot}
                   onChange={(e) => setNewTimeSlot(e.target.value)}
-                  className="text-xs border border-[#FECDD3] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[#DC2626] font-bold text-slate-700 flex-1 bg-white"
+                  className="text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-700 flex-1 bg-white"
                 />
                 <button
                   type="button"
                   onClick={addTimeSlot}
-                  className="bg-[#DC2626] hover:bg-[#B91C1C] border border-[#B91C1C] text-white text-[11px] font-bold px-4 py-2 rounded-none transition-all cursor-pointer flex items-center gap-1 shrink-0"
+                  className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-[11px] font-bold px-4 py-2 rounded-none transition-all cursor-pointer flex items-center gap-1 shrink-0"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Add Slot
                 </button>
               </div>
 
-              <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto p-1.5 bg-slate-50 border border-[#FECDD3] rounded-none">
+              <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto p-1.5 bg-slate-50 border border-[color:var(--t-200)] rounded-none">
                 {editSlots.length === 0 ? (
                   <span className="text-[10px] text-slate-400 font-semibold p-2">No custom scheduling slots configured. Click 'Add Slot' above.</span>
                 ) : (
                   editSlots.map(slot => (
-                    <span key={slot} className="bg-white border border-[#FECDD3] rounded-none px-2.5 py-1 text-xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-3xs font-mono">
+                    <span key={slot} className="bg-white border border-[color:var(--t-200)] rounded-none px-2.5 py-1 text-xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-3xs font-mono">
                       <span>{slot}</span>
                       <button
                         type="button"
@@ -374,7 +374,7 @@ export default function PractitionerSettingsTab({
             <button
               type="submit"
               disabled={savingSettings}
-              className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-slate-300 text-white text-xs font-black py-2.5 px-6 rounded-none transition-all flex items-center gap-2 shadow-xs cursor-pointer"
+              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-black py-2.5 px-6 rounded-none transition-all flex items-center gap-2 shadow-xs cursor-pointer"
             >
               {savingSettings ? (
                 <>
@@ -394,18 +394,18 @@ export default function PractitionerSettingsTab({
 
       {/* RIGHT PANE: Patient-Facing Live Preview Card */}
       <div className="w-full xl:w-[380px] shrink-0 space-y-4 lg:sticky lg:top-24">
-        <div className="bg-white border-2 border-dashed border-[#FECDD3] rounded-none p-5 shadow-xs relative overflow-hidden space-y-4">
-          <div className="bg-[#FFF0F2] text-[#DC2626] border border-[#FECDD3] text-[9px] font-black uppercase py-1 px-3 rounded-full flex items-center gap-1.5 w-max">
+        <div className="bg-white border-2 border-dashed border-[color:var(--t-200)] rounded-none p-5 shadow-xs relative overflow-hidden space-y-4">
+          <div className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] text-[9px] font-black uppercase py-1 px-3 rounded-full flex items-center gap-1.5 w-max">
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
             Live Patient Search Card Preview
           </div>
 
-          <div className="border border-[#FECDD3] rounded-none p-4 shadow-3xs space-y-4 bg-white relative">
+          <div className="border border-[color:var(--t-200)] rounded-none p-4 shadow-3xs space-y-4 bg-white relative">
             <div className="flex gap-3 items-start">
               <img
                 src={matchedProfile.avatar}
                 alt={matchedProfile.name}
-                className="h-14 w-14 rounded-full object-cover border-2 border-[#FECDD3] shadow-3xs shrink-0"
+                className="h-14 w-14 rounded-full object-cover border-2 border-[color:var(--t-200)] shadow-3xs shrink-0"
                 referrerPolicy="no-referrer"
               />
               <div className="space-y-1 flex-1 min-w-0">
@@ -414,7 +414,7 @@ export default function PractitionerSettingsTab({
                   {isVerified && <Shield className="h-3.5 w-3.5 text-emerald-500 fill-emerald-500 shrink-0" />}
                 </div>
 
-                <p className="text-[10px] text-[#DC2626] font-extrabold uppercase tracking-wide">
+                <p className="text-[10px] text-[color:var(--t-600)] font-extrabold uppercase tracking-wide">
                   {matchedProfile.specialization}
                 </p>
 
@@ -426,7 +426,7 @@ export default function PractitionerSettingsTab({
               </div>
             </div>
 
-            <p className="text-[11px] text-slate-500 font-medium leading-relaxed italic bg-slate-50 p-2.5 rounded-none border border-[#FECDD3] line-clamp-3">
+            <p className="text-[11px] text-slate-500 font-medium leading-relaxed italic bg-slate-50 p-2.5 rounded-none border border-[color:var(--t-200)] line-clamp-3">
               {editBio || "No clinical biography provided. Please write a description to engage patients..."}
             </p>
 
@@ -444,7 +444,7 @@ export default function PractitionerSettingsTab({
               </div>
             )}
 
-            <div className="pt-3 border-t border-[#FECDD3] flex flex-col gap-1.5 text-[11px] text-slate-600 font-semibold">
+            <div className="pt-3 border-t border-[color:var(--t-200)] flex flex-col gap-1.5 text-[11px] text-slate-600 font-semibold">
               <div className="flex items-center gap-1.5">
                 <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                 <span className="truncate">{editAddress || "Metropolitan Specialist Center"}, {editCity}</span>
@@ -460,7 +460,7 @@ export default function PractitionerSettingsTab({
 
             <button
               type="button"
-              className="w-full py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-black rounded-none transition-all shadow-3xs cursor-not-allowed mt-2"
+              className="w-full py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-[11px] font-black rounded-none transition-all shadow-3xs cursor-not-allowed mt-2"
               disabled
             >
               Book Appointment (Preview)
