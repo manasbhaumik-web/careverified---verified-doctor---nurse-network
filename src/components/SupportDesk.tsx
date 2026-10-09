@@ -23,6 +23,17 @@ export default function SupportDesk() {
   }, []);
   useEffect(() => { load().catch(() => {}); }, [load]);
 
+  // Other pages (e.g. the Medical Library's "Report a problem") can hand over a draft subject.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('support_prefill');
+      if (!raw) return;
+      sessionStorage.removeItem('support_prefill');
+      const p = JSON.parse(raw);
+      setForm(f => ({ ...f, category: String(p.category || ''), subject: String(p.subject || '').slice(0, 120) }));
+    } catch { /* ignore */ }
+  }, []);
+
   const openTicket = async (id: string) => {
     const d = await fetch(`/api/support/tickets/${id}`).then(r => r.json());
     if (d.status === 'success') setOpen(d.data);

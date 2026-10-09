@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowRight, BadgeCheck, BookOpen, Check, ExternalLink, Search, ShieldCheck, X } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Bookmark, BookOpen, Check, ExternalLink, Flag, Printer, Search, ShieldCheck, X } from 'lucide-react';
 import { Article, DoctorProfile, NurseProfile } from '../types';
-import DashboardHeader from './DashboardHeader';
+import DashboardHeader, { BannerKpis } from './DashboardHeader';
 
 interface MedicalLibraryProps {
   articles: Article[];
   professionals?: (DoctorProfile | NurseProfile)[];
+  /** Sends the reader to Help with a draft ticket about this article. */
+  onReportProblem?: (article: Article) => void;
   /** Opens the directory, optionally filtered to a specialty. */
   onFindDoctor: (specialty?: string) => void;
 }
@@ -39,6 +41,39 @@ const specialtyFor = (a: Article, pros: (DoctorProfile | NurseProfile)[] = []): 
 const LEVEL_RANK = { high: 3, moderate: 2, info: 1 } as const;
 const evidenceRank = (a: Article) => (a.evidence ? LEVEL_RANK[a.evidence.level] : 0);
 const dateValue = (a: Article) => { const t = Date.parse(a.date); return Number.isNaN(t) ? 0 : t; };
+
+const readingMinutes = (a: Article) => Math.max(1, Math.round(`${a.excerpt} ${a.content}`.split(/\s+/).length / 200));
+
+/** Everyday words people search with, mapped to the terms articles use. */
+const SYNONYMS: Record<string, string[]> = {
+  sugar: ['diabetes', 'glycaemic', 'glucose'],
+  'high blood pressure': ['hypertension'],
+  bp: ['hypertension', 'blood pressure'],
+  'heart attack': ['myocardial', 'cardiac', 'coronary'],
+  flu: ['influenza'],
+  cholesterol: ['lipid', 'statin'],
+  kidney: ['renal', 'nephro'],
+  stomach: ['gastric', 'gastro'],
+  'skin rash': ['dermat', 'eczema'],
+  stroke: ['cerebrovascular'],
+  cancer: ['oncolog', 'tumour', 'tumor', 'carcinoma'],
+  asthma: ['bronch', 'respiratory'],
+  depression: ['depressive', 'mental health'],
+  pregnancy: ['pregnan', 'obstetric', 'maternal'],
+};
+const expandQuery = (q: string): string[] => {
+  const base = q.trim().toLowerCase();
+  if (!base) return [];
+  const out = new Set([base]);
+  for (const [word, alts] of Object.entries(SYNONYMS)) {
+    if (base.includes(word) || alts.some(a => base.includes(a))) { out.add(word); alts.forEach(a => out.add(a)); }
+  }
+  return [...out];
+};
+
+const readSaved = (): string[] => {
+  try { return JSON.parse(localStorage.getItem('saved_articles') || '[]'); } catch { return []; }
+};
 
 function EvidenceBadge({ article }: { article: Article }) {
   if (!article.evidence) {
@@ -91,13 +126,21 @@ function AuthorBadge({ article, large = false }: { article: Article; large?: boo
   );
 }
 
-export default function MedicalLibrary({ articles, professionals = [], onFindDoctor }: MedicalLibraryProps) {
+export default function MedicalLibrary({ articles, professionals = [], onFindDoctor, onReportProblem }: MedicalLibraryProps) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>(ALL);
   const [source, setSource] = useState<SourceFilter>('all');
   const [evidence, setEvidence] = useState<string>('all');
   const [sort, setSort] = useState<SortKey>('newest');
   const [openArticle, setOpenArticle] = useState<Article | null>(null);
+  const [savedIds, setSavedIds] = useState<string[]>(readSaved);
+  const [onlySaved, setOnlySaved] = useState(false);
+
+  const toggleSaved = (id: string) => {
+    const next = savedIds.includes(id) ? savedIds.filter(x => x !== id) : [...savedIds, id];
+    setSavedIds(next);
+    try { localStorage.setItem('saved_articles', JSON.stringify(next)); } catch { /* ignore */ }
+  };
 
   const categories = useMemo(() => {
     const counts = new Map<string, number>();
@@ -109,20 +152,20 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
   const hasResearch = evidenceLabels.length > 0;
 
   const filtered = articles.filter(a => {
-    const q = query.trim().toLowerCase();
-    const matchesQuery =
-      q === '' ||
-      a.title.toLowerCase().includes(q) ||
-      a.excerpt.toLowerCase().includes(q) ||
-      a.authorName.toLowerCase().includes(q) ||
-      a.category.toLowerCase().includes(q);
+    const terms = expandQuery(query);
+    const hay = `${a.title} ${a.excerpt} ${a.takeaway ?? ''} ${a.authorName} ${a.category}`.toLowerCase();
+    const matchesQuery = terms.length === 0 || terms.some(t => hay.includes(t));
     const matchesSource = source === 'all' || (source === 'research' ? !!a.source : !a.source);
     const matchesEvidence = evidence === 'all' || a.evidence?.label === evidence;
-    return matchesQuery && matchesSource && matchesEvidence && (category === ALL || a.category === category);
+    return matchesQuery && matchesSource && matchesEvidence && (!onlySaved || savedIds.includes(a.id)) && (category === ALL || a.category === category);
   }).sort((a, b) => {
     if (sort === 'evidence') return evidenceRank(b) - evidenceRank(a) || dateValue(b) - dateValue(a);
     return sort === 'oldest' ? dateValue(a) - dateValue(b) : dateValue(b) - dateValue(a);
   });
+
+  const related = openArticle
+    ? articles.filter(a => a.id !== openArticle.id && a.category === openArticle.category).slice(0, 3)
+    : [];
 
   const featured = filtered[0];
   const rest = filtered.slice(1);
@@ -135,30 +178,33 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
         title="Clinical Articles & Published Research"
         description="Articles by credential-checked practitioners, plus peer-reviewed papers from PubMed that our medical board has approved. Every item lists its sources."
         actions={
-          <>
-            <span className="inline-flex items-center gap-1.5 min-h-[36px] px-3.5 bg-[color:var(--e-50)] border border-[color:var(--e-200)] text-[color:var(--e-800)] text-xs font-semibold">
-              <Check className="h-3.5 w-3.5 text-[color:var(--e-600)]" /> Board-approved
-            </span>
-            <span className="inline-flex items-center min-h-[36px] px-3.5 bg-white border border-[color:var(--t-200)] text-[color:var(--ink-2)] text-xs font-semibold">
-              Cited sources
-            </span>
-          </>
+          <BannerKpis items={[
+            { value: articles.length, label: 'Articles' },
+            { value: articles.filter(a => a.source).length, label: 'Research papers' },
+            { value: categories.length, label: 'Topics' },
+          ]} />
         }
       />
 
       {/* Search + categories */}
       <section aria-label="Find articles" className="bg-white border border-[color:var(--t-200)] shadow-xs px-5 py-4 space-y-3.5">
         <label htmlFor="library-search" className="sr-only">Search articles</label>
-        <div className="flex items-center gap-2.5 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 min-h-[48px] focus-within:border-[color:var(--t-600)]">
+        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex-1 min-w-[240px] flex items-center gap-2.5 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 min-h-[48px] focus-within:border-[color:var(--t-600)]">
           <Search className="h-4 w-4 text-slate-500 shrink-0" />
           <input
             id="library-search"
             type="text"
-            placeholder="Search by condition, topic or author"
+            placeholder="Search by condition, topic or author (try “sugar” or “high blood pressure”)"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="flex-1 min-w-0 bg-transparent text-sm text-[color:var(--ink)] outline-none placeholder-slate-500"
           />
+        </div>
+        <button type="button" aria-pressed={onlySaved} onClick={() => setOnlySaved(v => !v)}
+          className={`min-h-[48px] px-4 text-[13px] font-semibold border inline-flex items-center gap-2 cursor-pointer ${onlySaved ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-100)]'}`}>
+          <Bookmark className="h-4 w-4" /> Saved ({savedIds.length})
+        </button>
         </div>
         {hasResearch && (
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pb-1">
@@ -210,8 +256,8 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
           {!featured ? (
             <div className="bg-white border border-[color:var(--t-200)] p-12 text-center space-y-3">
               <BookOpen className="h-12 w-12 text-[color:var(--t-200)] mx-auto" />
-              <h3 className="text-sm font-bold text-[color:var(--ink)]">No articles match your search</h3>
-              <p className="text-[13px] text-slate-600">Try a different keyword or category.</p>
+              <h3 className="text-sm font-bold text-[color:var(--ink)]">{onlySaved ? 'No saved articles match' : 'No articles match your search'}</h3>
+              <p className="text-[13px] text-slate-600">{onlySaved ? 'Open an article and tap Save to keep it here.' : 'Try a different keyword or category.'}</p>
             </div>
           ) : (
             <>
@@ -227,7 +273,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
                     <span className="text-[11px] font-bold uppercase tracking-wider text-white bg-[color:var(--t-600)] px-2.5 py-1">Featured</span>
                     <span className="text-[11px] font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-0.5">{featured.category}</span>
                     <EvidenceBadge article={featured} />
-                    <span className="text-xs text-slate-600">{featured.date}</span>
+                    <span className="text-xs text-slate-600">{featured.date} · {readingMinutes(featured)} min read</span>
                   </div>
                   <h2 className="text-2xl font-bold tracking-tight text-[color:var(--ink)] leading-snug">{featured.title}</h2>
                   <Takeaway text={featured.takeaway} />
@@ -263,7 +309,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
                     <p className={`text-[13px] text-[color:var(--ink-2)] leading-relaxed ${art.takeaway ? 'line-clamp-2' : 'line-clamp-3'}`}>{art.excerpt}</p>
                     <div className="mt-auto pt-3.5 border-t border-[color:var(--t-100)] flex flex-wrap items-center justify-between gap-2">
                       <AuthorBadge article={art} />
-                      {art.citations?.length > 0 && <span className="text-xs text-slate-600">{art.citations.length} citation{art.citations.length === 1 ? '' : 's'}</span>}
+                      <span className="text-xs text-slate-600">{readingMinutes(art)} min read{art.citations?.length > 0 ? ` · ${art.citations.length} citation${art.citations.length === 1 ? '' : 's'}` : ''}</span>
                     </div>
                     <button
                       type="button"
@@ -333,7 +379,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
             role="dialog"
             aria-modal="true"
             aria-label={openArticle.title}
-            className="bg-white border border-[color:var(--t-200)] w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl"
+            className="print-article bg-white border border-[color:var(--t-200)] w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] p-5 flex items-start justify-between gap-4 shrink-0">
@@ -366,6 +412,9 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
               <Takeaway text={openArticle.takeaway} />
               <div className="text-sm leading-relaxed text-[color:var(--ink-2)] whitespace-pre-line">{openArticle.content}</div>
 
+              {openArticle.source?.approvedAt && (
+                <p className="text-xs text-slate-600 flex items-center gap-1.5"><BadgeCheck className="h-3.5 w-3.5 text-[color:var(--e-600)]" /> Approved for this library by the medical board on {new Date(openArticle.source.approvedAt).toLocaleDateString()}.</p>
+              )}
               {openArticle.source && (
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
                   <a href={openArticle.source.url} target="_blank" rel="noopener noreferrer" className="font-bold text-[color:var(--t-700)] inline-flex items-center gap-1 hover:underline">Read the full paper on PubMed <ExternalLink className="h-3 w-3" /></a>
@@ -399,7 +448,36 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
               )}
             </div>
 
-            <div className="border-t border-[color:var(--t-200)] p-4 flex flex-wrap gap-2.5 justify-end shrink-0 bg-white">
+            {related.length > 0 && (
+              <div className="no-print border-t border-[color:var(--t-200)] px-6 py-4 shrink-0 bg-[color:var(--t-bg)]">
+                <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2">Related articles</h3>
+                <ul className="grid gap-2 sm:grid-cols-3">
+                  {related.map(r => (
+                    <li key={r.id}>
+                      <button type="button" onClick={() => setOpenArticle(r)} className="w-full text-left bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-2.5 cursor-pointer">
+                        <span className="block text-[11px] text-slate-500">{r.category}</span>
+                        <span className="text-[13px] font-semibold leading-snug line-clamp-2">{r.title}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="no-print border-t border-[color:var(--t-200)] p-4 flex flex-wrap gap-2.5 items-center shrink-0 bg-white">
+              <button type="button" onClick={() => toggleSaved(openArticle.id)} aria-pressed={savedIds.includes(openArticle.id)}
+                className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-[13px] font-semibold inline-flex items-center gap-2 cursor-pointer">
+                <Bookmark className={`h-4 w-4 ${savedIds.includes(openArticle.id) ? 'fill-current text-[color:var(--t-600)]' : ''}`} /> {savedIds.includes(openArticle.id) ? 'Saved' : 'Save'}
+              </button>
+              <button type="button" onClick={() => window.print()} className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-[13px] font-semibold inline-flex items-center gap-2 cursor-pointer">
+                <Printer className="h-4 w-4" /> Print
+              </button>
+              {onReportProblem && (
+                <button type="button" onClick={() => { const a = openArticle; setOpenArticle(null); onReportProblem(a); }} className="min-h-[44px] px-4 text-[13px] font-semibold text-slate-600 hover:text-rose-700 inline-flex items-center gap-2 cursor-pointer">
+                  <Flag className="h-4 w-4" /> Report a problem
+                </button>
+              )}
+              <span className="flex-1" />
               <button
                 type="button"
                 onClick={() => setOpenArticle(null)}

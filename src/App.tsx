@@ -684,6 +684,10 @@ export default function App() {
               <MedicalLibrary
                 articles={articles}
                 professionals={professionals}
+                onReportProblem={(a) => {
+                  try { sessionStorage.setItem('support_prefill', JSON.stringify({ category: 'Feedback', subject: `Problem with article: ${a.title}`.slice(0, 120) })); } catch { /* ignore */ }
+                  setActiveView('help');
+                }}
                 onFindDoctor={(specialty) => { setSelectedSpecialtyFilter(specialty ?? ''); setRegistryTab('directory'); setActiveView('registry'); setSelectedProfId(null); }}
               />
             )}
