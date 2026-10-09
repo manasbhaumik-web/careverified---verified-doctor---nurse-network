@@ -31,42 +31,42 @@ export default function PractitionerAnalyticsTab({
   return (
     <div id="panel-analytics" role="tabpanel" aria-labelledby="tab-analytics" tabIndex={0} className="space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-[#FECDD3] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-[13px] font-semibold text-[#334155] block">Generated Income</span>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">RM {totalEarnings.toLocaleString()}</span>
+        <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
+          <span className="text-[13px] font-semibold text-[color:var(--ink-2)] block">Generated Income</span>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">RM {totalEarnings.toLocaleString()}</span>
           <p className="text-xs text-emerald-600 font-bold flex items-center gap-0.5">
             <TrendingUp className="h-3 w-3" />
             <span>100% practitioner distribution</span>
           </p>
         </div>
 
-        <div className="bg-white border border-[#FECDD3] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-[13px] font-semibold text-[#334155] block">Patients Attended</span>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">{totalAttendedCount} Patients</span>
+        <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
+          <span className="text-[13px] font-semibold text-[color:var(--ink-2)] block">Patients Attended</span>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{totalAttendedCount} Patients</span>
           <p className="text-xs text-slate-500 font-semibold">{completedBookings.length} consults &bull; {completedDispatches.length} dispatches</p>
         </div>
 
-        <div className="bg-white border border-[#FECDD3] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-[13px] font-semibold text-[#334155] block">Practice Rating</span>
+        <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
+          <span className="text-[13px] font-semibold text-[color:var(--ink-2)] block">Practice Rating</span>
           <div className="flex items-center gap-1.5">
-            <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1E293B] tabular-nums">{avgOverall ?? "—"}</span>
+            <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{avgOverall ?? "—"}</span>
             <Star className="h-4.5 w-4.5 text-amber-500 fill-amber-500" />
           </div>
           <p className="text-xs text-slate-500 font-semibold">Based on {reviewCount} clinical ratings</p>
         </div>
 
-        <div className="bg-white border border-[#FECDD3] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-[13px] font-semibold text-[#334155] block">Clinical Accuracy</span>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#047857] tabular-nums">99.8%</span>
+        <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
+          <span className="text-[13px] font-semibold text-[color:var(--ink-2)] block">Clinical Accuracy</span>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--e-700)] tabular-nums">99.8%</span>
           <p className="text-xs text-slate-500 font-semibold">Government standard audit cleared</p>
         </div>
       </div>
 
       {/* Earnings Visualizer Chart */}
-      <div className="bg-white border border-[#FECDD3] rounded-none p-6 shadow-xs space-y-5">
+      <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-xs space-y-5">
         <div>
-          <h4 className="text-base font-bold text-[#1E293B]">Revenue Stream Distribution</h4>
-          <p className="text-[13px] text-[#334155]">Visualizing contribution proportions across clinical channels</p>
+          <h4 className="text-base font-bold text-[color:var(--ink)]">Revenue Stream Distribution</h4>
+          <p className="text-[13px] text-[color:var(--ink-2)]">Visualizing contribution proportions across clinical channels</p>
         </div>
 
         <div className="space-y-3 max-w-xl text-xs font-bold text-slate-700">
@@ -76,7 +76,7 @@ export default function PractitionerAnalyticsTab({
               <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((videoEarned / totalEarnings) * 100) : 0}%</span>
             </div>
             <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
-              <div className="bg-[#DC2626] h-full rounded-none transition-all duration-500" style={{ width: `${totalEarnings > 0 ? (videoEarned / totalEarnings) * 100 : 0}%` }}></div>
+              <div className="bg-[color:var(--t-600)] h-full rounded-none transition-all duration-500" style={{ width: `${totalEarnings > 0 ? (videoEarned / totalEarnings) * 100 : 0}%` }}></div>
             </div>
           </div>
 
@@ -86,7 +86,7 @@ export default function PractitionerAnalyticsTab({
               <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((inPersonEarned / totalEarnings) * 100) : 0}%</span>
             </div>
             <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
-              <div className="bg-[#DC2626] h-full rounded-none transition-all duration-500" style={{ width: `${totalEarnings > 0 ? (inPersonEarned / totalEarnings) * 100 : 0}%` }}></div>
+              <div className="bg-[color:var(--t-600)] h-full rounded-none transition-all duration-500" style={{ width: `${totalEarnings > 0 ? (inPersonEarned / totalEarnings) * 100 : 0}%` }}></div>
             </div>
           </div>
 
@@ -103,16 +103,16 @@ export default function PractitionerAnalyticsTab({
       </div>
 
       {/* Patient History Logs */}
-      <div className="bg-white border border-[#FECDD3] rounded-none p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-xs space-y-4">
         <div>
-          <h4 className="text-base font-bold text-[#1E293B]">Clinical Attended Ledger</h4>
-          <p className="text-[13px] text-[#334155]">Chronological history log of all patients evaluated and treatments finalized</p>
+          <h4 className="text-base font-bold text-[color:var(--ink)]">Clinical Attended Ledger</h4>
+          <p className="text-[13px] text-[color:var(--ink-2)]">Chronological history log of all patients evaluated and treatments finalized</p>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-semibold text-slate-600">
             <thead>
-              <tr className="border-b border-[#FECDD3] text-slate-400 font-bold uppercase text-xs tracking-wider">
+              <tr className="border-b border-[color:var(--t-200)] text-slate-400 font-bold uppercase text-xs tracking-wider">
                 <th className="pb-2.5">Patient Name</th>
                 <th className="pb-2.5">Channel Mode</th>
                 <th className="pb-2.5">Final Diagnosis</th>

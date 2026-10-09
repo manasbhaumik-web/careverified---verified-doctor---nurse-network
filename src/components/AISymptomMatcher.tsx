@@ -56,9 +56,9 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
   };
 
   return (
-    <div className="bg-gradient-to-br from-[#FFF0F2]/50 via-white to-[#FFF0F2]/30 border-2 border-[#FECDD3]/80 rounded-2xl p-6 shadow-xs hover:shadow-md transition-all duration-300" id="ai-symptom-matcher">
+    <div className="bg-gradient-to-br from-[color:var(--t-50)]/50 via-white to-[color:var(--t-50)]/30 border-2 border-[color:var(--t-200)]/80 rounded-2xl p-6 shadow-xs hover:shadow-md transition-all duration-300" id="ai-symptom-matcher">
       <div className="flex items-center gap-3 mb-5">
-        <div className="p-2 bg-[#DC2626] text-white rounded-xl shadow-sm">
+        <div className="p-2 bg-[color:var(--t-600)] text-white rounded-xl shadow-sm">
           <Activity className="h-5 w-5" />
         </div>
         <div>
@@ -77,7 +77,7 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
             onChange={(e) => setSymptoms(e.target.value)}
             placeholder="Type symptoms... (e.g. A persistent dry cough and light fever of 101F since last night)"
             rows={2}
-            className="w-full text-xs border-2 border-slate-200/80 rounded-xl p-3 bg-white shadow-inner outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold placeholder-slate-400 transition-all"
+            className="w-full text-xs border-2 border-slate-200/80 rounded-xl p-3 bg-white shadow-inner outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold placeholder-slate-400 transition-all"
             required
           />
         </div>
@@ -90,7 +90,7 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
               value={age}
               onChange={(e) => setAge(e.target.value)}
               placeholder="Age"
-              className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3 bg-white outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold transition-all"
+              className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3 bg-white outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold transition-all"
               min={0}
               max={120}
             />
@@ -100,7 +100,7 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
             <select
               value={gender}
               onChange={(e) => setGender(e.target.value)}
-              className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3 bg-white outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-extrabold text-slate-700 cursor-pointer transition-all"
+              className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3 bg-white outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-extrabold text-slate-700 cursor-pointer transition-all"
             >
               <option value="any">Any Gender</option>
               <option value="Male">Male</option>
@@ -112,7 +112,7 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
         <button
           type="submit"
           disabled={loading || !symptoms.trim()}
-          className="w-full bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-rose-400 text-white rounded-xl py-3 text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+          className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-rose-400 text-white rounded-xl py-3 text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
         >
           {loading ? (
             <>
@@ -143,10 +143,10 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
       )}
 
       {result && (
-        <div className="mt-5 bg-white border-2 border-[#FECDD3] rounded-xl p-4 shadow-sm space-y-4 animate-fade-in">
+        <div className="mt-5 bg-white border-2 border-[color:var(--t-200)] rounded-xl p-4 shadow-sm space-y-4 animate-fade-in">
           <div className="flex justify-between items-center border-b-2 border-slate-100/80 pb-3">
             <div>
-              <span className="text-[10px] font-extrabold text-[#DC2626] uppercase tracking-wider">Matched Result</span>
+              <span className="text-[10px] font-extrabold text-[color:var(--t-600)] uppercase tracking-wider">Matched Result</span>
               <h4 className="text-sm font-extrabold text-slate-800">{result.data.recommendedSpecialty}</h4>
             </div>
             <div className="text-right max-w-[11rem]">
@@ -185,7 +185,7 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
             </span>
             <button
               onClick={handleApplyFilter}
-              className="bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-lg px-4 py-2 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all hover:scale-[1.02]"
+              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white rounded-lg px-4 py-2 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all hover:scale-[1.02]"
             >
               Filter Doctors & Nurses
               <ChevronRight className="h-3 w-3" />

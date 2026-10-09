@@ -5,7 +5,7 @@ const jreq = (url: string, method = 'POST', body?: unknown) =>
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString() : '—');
 const lab = 'text-[10px] font-extrabold uppercase tracking-wider text-slate-500';
 const btn = 'text-xs font-bold cursor-pointer';
-const field = 'border border-slate-200 px-3 py-2 text-xs w-full focus:outline-none focus:border-[#DC2626]';
+const field = 'border border-slate-200 px-3 py-2 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
 
 type Sub = 'support' | 'reviews' | 'incidents' | 'peer' | 'credentials';
 
@@ -19,7 +19,7 @@ export default function AdminQuality() {
       <div role="tablist" className="flex flex-wrap gap-1 border-b border-slate-200">
         {subs.map(([id, text]) => (
           <button key={id} role="tab" aria-selected={sub === id} onClick={() => { setSub(id); setMsg(''); }}
-            className={`px-3 py-2.5 text-xs font-bold cursor-pointer ${sub === id ? 'border-b-2 border-[#DC2626] text-[#B91C1C]' : 'text-slate-500'}`}>{text}</button>
+            className={`px-3 py-2.5 text-xs font-bold cursor-pointer ${sub === id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-500'}`}>{text}</button>
         ))}
       </div>
       {msg && <p role="status" className="text-xs font-bold bg-slate-50 border border-slate-200 p-2.5">{msg}</p>}
@@ -47,7 +47,7 @@ function Support({ say }: { say: (t: string) => void }) {
         {[['Open tickets', data.stats.open], ['Overdue', data.stats.overdue], ['Median first reply', data.stats.medianFirstResponseMinutes == null ? '—' : `${data.stats.medianFirstResponseMinutes} min`], ['Replied within target', data.stats.targetMetPct == null ? '—' : `${data.stats.targetMetPct}%`]].map(([l, v]) => (
           <div key={l as string} className={`bg-white border p-3 ${l === 'Overdue' && (v as number) > 0 ? 'border-rose-300' : 'border-slate-200'}`}><p className={lab}>{l}</p><p className="text-xl font-black tabular-nums">{v}</p></div>
         ))}</div>}
-      <div className="flex gap-2 text-xs font-bold">{(['active', 'resolved'] as const).map(v => <button key={v} onClick={() => setView(v)} className={`px-3 py-1.5 cursor-pointer ${view === v ? 'bg-[#DC2626] text-white' : 'bg-slate-100'}`}>{v}</button>)}</div>
+      <div className="flex gap-2 text-xs font-bold">{(['active', 'resolved'] as const).map(v => <button key={v} onClick={() => setView(v)} className={`px-3 py-1.5 cursor-pointer ${view === v ? 'bg-[color:var(--t-600)] text-white' : 'bg-slate-100'}`}>{v}</button>)}</div>
       <div className="grid lg:grid-cols-[1fr_1fr] gap-4">
         <ul className="bg-white border border-slate-200 divide-y divide-slate-100 text-sm max-h-[480px] overflow-y-auto">
           {(data?.tickets ?? []).length === 0 && <li className="p-4 text-xs text-slate-500">No tickets.</li>}
@@ -63,8 +63,8 @@ function Support({ say }: { say: (t: string) => void }) {
               <div className="flex justify-between gap-2"><div><h3 className="text-sm font-extrabold">{open.subject}</h3><p className="text-[11px] text-slate-500">{open.requester} · {open.category}{open.target ? ` · about: ${open.target}` : ''}</p></div>
                 <select aria-label="Priority" className="border border-slate-200 text-xs px-2 h-fit" value={open.priority} onChange={async e => { await jreq(`/api/admin/support/tickets/${open.id}/priority`, 'POST', { priority: e.target.value }); openT(open.id); load(); }}>
                   {['urgent', 'high', 'normal', 'low'].map(p => <option key={p}>{p}</option>)}</select></div>
-              <ul className="space-y-2 max-h-64 overflow-y-auto">{open.messages.map((m: any) => <li key={m.id} className={`text-sm p-2.5 border ${m.fromStaff ? 'bg-[#FFF0F2] border-[#FECDD3]' : 'bg-slate-50 border-slate-200'}`}><p className="text-[10px] font-extrabold uppercase text-slate-500">{m.fromStaff ? 'Staff' : 'User'} · {when(m.ts)}</p>{m.body}</li>)}</ul>
-              <div className="flex gap-2"><input className={field} value={reply} onChange={e => setReply(e.target.value)} placeholder="Reply" aria-label="Reply" /><button onClick={send} disabled={!reply.trim()} className="bg-[#DC2626] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 cursor-pointer">Send</button></div>
+              <ul className="space-y-2 max-h-64 overflow-y-auto">{open.messages.map((m: any) => <li key={m.id} className={`text-sm p-2.5 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}><p className="text-[10px] font-extrabold uppercase text-slate-500">{m.fromStaff ? 'Staff' : 'User'} · {when(m.ts)}</p>{m.body}</li>)}</ul>
+              <div className="flex gap-2"><input className={field} value={reply} onChange={e => setReply(e.target.value)} placeholder="Reply" aria-label="Reply" /><button onClick={send} disabled={!reply.trim()} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 cursor-pointer">Send</button></div>
               {open.status !== 'resolved' && <button onClick={async () => { await jreq(`/api/support/tickets/${open.id}/resolve`); openT(open.id); load(); }} className={`${btn} text-emerald-700`}>Mark resolved</button>}
             </>
           )}
@@ -85,7 +85,7 @@ function Reviews({ say }: { say: (t: string) => void }) {
   };
   return (
     <div className="space-y-3">
-      <div className="flex gap-2 text-xs font-bold">{(['reported', 'all'] as const).map(v => <button key={v} onClick={() => setFilter(v)} className={`px-3 py-1.5 cursor-pointer ${filter === v ? 'bg-[#DC2626] text-white' : 'bg-slate-100'}`}>{v === 'reported' ? 'Reported by practitioners' : 'All reviews'}</button>)}</div>
+      <div className="flex gap-2 text-xs font-bold">{(['reported', 'all'] as const).map(v => <button key={v} onClick={() => setFilter(v)} className={`px-3 py-1.5 cursor-pointer ${filter === v ? 'bg-[color:var(--t-600)] text-white' : 'bg-slate-100'}`}>{v === 'reported' ? 'Reported by practitioners' : 'All reviews'}</button>)}</div>
       {list.length === 0 && <p className="text-xs text-slate-500 bg-white border border-slate-200 p-4">Nothing to moderate.</p>}
       {list.map(r => (
         <article key={r.id} className="bg-white border border-slate-200 p-4 text-sm space-y-1">
@@ -143,14 +143,14 @@ function Peer({ say }: { say: (t: string) => void }) {
   };
   return (
     <div className="space-y-4">
-      <section className="bg-white border border-[#FECDD3] p-4 space-y-2">
+      <section className="bg-white border border-[color:var(--t-200)] p-4 space-y-2">
         <h3 className="text-sm font-extrabold">Random case audit</h3>
         <p className="text-xs text-slate-600">Picks signed work at random from recent days and assigns each case to the verified doctor with the fewest open reviews (never the author). Reviewers see cases without patient or author names.</p>
         <div className="flex flex-wrap items-end gap-2 text-xs">
           <label>Type<select className={`${field} mt-1`} value={sample.subjectType} onChange={e => setSample({ ...sample, subjectType: e.target.value })}><option value="prescription">Prescriptions</option><option value="encounter">Consultation notes</option></select></label>
           <label>Last days<input type="number" min={1} max={90} className={`${field} mt-1 w-24`} value={sample.days} onChange={e => setSample({ ...sample, days: Number(e.target.value) })} /></label>
           <label>How many<input type="number" min={1} max={50} className={`${field} mt-1 w-24`} value={sample.count} onChange={e => setSample({ ...sample, count: Number(e.target.value) })} /></label>
-          <button onClick={run} className="bg-[#DC2626] text-white font-extrabold px-4 py-2.5 cursor-pointer">Draw sample</button>
+          <button onClick={run} className="bg-[color:var(--t-600)] text-white font-extrabold px-4 py-2.5 cursor-pointer">Draw sample</button>
         </div>
       </section>
       <section className="bg-white border border-slate-200 p-4">

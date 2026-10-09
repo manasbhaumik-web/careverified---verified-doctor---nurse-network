@@ -33,7 +33,7 @@ export default function SOSButton() {
 
   return (
     <>
-      <button onClick={show} className="inline-flex items-center gap-1.5 h-11 px-3 bg-white text-[#B91C1C] text-xs font-black border border-white hover:bg-rose-50 cursor-pointer" aria-label="Emergency help">
+      <button onClick={show} className="inline-flex items-center gap-1.5 h-11 px-3 bg-white text-[color:var(--t-700)] text-xs font-black border border-white hover:bg-rose-50 cursor-pointer" aria-label="Emergency help">
         <Siren className="h-4 w-4" /> SOS
       </button>
       {open && (

@@ -126,7 +126,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                     onClick={() => setViewMode('list')}
                     className={`p-1.5 rounded-lg transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
                       viewMode === 'list'
-                        ? 'bg-white text-[#DC2626] shadow-xs'
+                        ? 'bg-white text-[color:var(--t-600)] shadow-xs'
                         : 'text-slate-500 hover:text-slate-800'
                     }`}
                     title="List View"
@@ -139,7 +139,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                     onClick={() => setViewMode('grid')}
                     className={`p-1.5 rounded-lg transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
                       viewMode === 'grid'
-                        ? 'bg-white text-[#DC2626] shadow-xs'
+                        ? 'bg-white text-[color:var(--t-600)] shadow-xs'
                         : 'text-slate-500 hover:text-slate-800'
                     }`}
                     title="Grid View"
@@ -163,7 +163,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                         onClick={() => setSelectedProfId(p.id)}
                         className={`p-3 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between gap-3 ${
                           isSelected
-                            ? "bg-[#FFF0F2] border-[#DC2626] shadow-xs"
+                            ? "bg-[color:var(--t-50)] border-[color:var(--t-600)] shadow-xs"
                             : "bg-white border-slate-200 hover:border-slate-300"
                         }`}
                       >
@@ -188,7 +188,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                             setSelectedSchemaProf(p);
                             setSelectedProfId(p.id);
                           }}
-                          className="p-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-[#DC2626] rounded-lg border border-slate-200 shadow-3xs transition-all cursor-pointer shrink-0"
+                          className="p-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-[color:var(--t-600)] rounded-lg border border-slate-200 shadow-3xs transition-all cursor-pointer shrink-0"
                           title="View JSON-LD Schema details"
                         >
                           <Eye className="h-3.5 w-3.5" />
@@ -206,7 +206,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
               </pre>
               <button
                 onClick={copyToClipboard}
-                className="absolute top-4 right-4 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-lg px-3.5 py-2 text-xs font-bold flex items-center gap-1.5 transition-all hover:scale-[1.02] shadow-md cursor-pointer"
+                className="absolute top-4 right-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white rounded-lg px-3.5 py-2 text-xs font-bold flex items-center gap-1.5 transition-all hover:scale-[1.02] shadow-md cursor-pointer"
               >
                 {copied ? <CheckCircle className="h-3.5 w-3.5 text-white" /> : <Copy className="h-3.5 w-3.5 text-white" />}
                 {copied ? 'Copied!' : 'Copy Code'}
@@ -235,9 +235,9 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
         {/* TAB 2: PROGRAMMATIC SEO */}
         {activeTab === 'programmatic' && (
           <div className="space-y-6">
-            <div className="bg-[#FFF0F2]/60 border-2 border-[#FECDD3] p-5 rounded-xl">
-              <h3 className="text-sm font-extrabold text-[#0F172A] mb-1">Programmatic SEO Landing Page Architecture</h3>
-              <p className="text-xs text-[#DC2626] leading-relaxed font-semibold">
+            <div className="bg-[color:var(--t-50)]/60 border-2 border-[color:var(--t-200)] p-5 rounded-xl">
+              <h3 className="text-sm font-extrabold text-[color:var(--ink)] mb-1">Programmatic SEO Landing Page Architecture</h3>
+              <p className="text-xs text-[color:var(--t-600)] leading-relaxed font-semibold">
                 Rather than manually creating pages, our system programmatically generates high-converting localized landers.
                 This allows us to dominate high-intent keywords such as <strong>"Best Cardiologist in Kuala Lumpur"</strong> or <strong>"ICU Nurse in Petaling Jaya"</strong>.
               </p>
@@ -254,7 +254,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                     type="text"
                     value={titleTemplate}
                     onChange={(e) => setTitleTemplate(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3 bg-white outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold"
+                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3 bg-white outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold"
                   />
                 </div>
 
@@ -264,7 +264,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                     rows={3}
                     value={descTemplate}
                     onChange={(e) => setDescriptionTemplate(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3 bg-white outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] font-semibold"
+                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3 bg-white outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold"
                   />
                 </div>
               </div>
@@ -275,7 +275,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                 
                 <div className="bg-white border-2 border-slate-200 p-4 rounded-xl shadow-xs space-y-2">
                   <div className="text-xs text-slate-400 font-mono">https://careverified.pro/best-cardiologist-in-kuala-lumpur</div>
-                  <h5 className="text-base text-[#B91C1C] hover:underline cursor-pointer font-extrabold leading-snug">
+                  <h5 className="text-base text-[color:var(--t-700)] hover:underline cursor-pointer font-extrabold leading-snug">
                     {titleTemplate.replace('[Specialty]', 'Cardiologist').replace('[City]', 'Kuala Lumpur')}
                   </h5>
                   <p className="text-xs text-slate-600 leading-relaxed font-medium">
@@ -285,7 +285,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
 
                 <div className="bg-white border-2 border-slate-200 p-4 rounded-xl shadow-xs space-y-2">
                   <div className="text-xs text-slate-400 font-mono">https://careverified.pro/find-icu-nurse-petaling-jaya</div>
-                  <h5 className="text-base text-[#B91C1C] hover:underline cursor-pointer font-extrabold leading-snug">
+                  <h5 className="text-base text-[color:var(--t-700)] hover:underline cursor-pointer font-extrabold leading-snug">
                     {titleTemplate.replace('[Specialty]', 'ICU Critical Care Nurse').replace('[City]', 'Petaling Jaya')}
                   </h5>
                   <p className="text-xs text-slate-600 leading-relaxed font-medium">
@@ -300,15 +300,15 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-slate-50 p-4 rounded-xl border-2 border-slate-200/60 text-center">
                   <div className="text-xs font-bold text-slate-700">Specialty Landing</div>
-                  <code className="text-[10px] text-[#DC2626] font-mono font-bold mt-1.5 block">/best-[specialty]-in-[city]</code>
+                  <code className="text-[10px] text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/best-[specialty]-in-[city]</code>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-xl border-2 border-slate-200/60 text-center">
                   <div className="text-xs font-bold text-slate-700">Direct Doctor Link</div>
-                  <code className="text-[10px] text-[#DC2626] font-mono font-bold mt-1.5 block">/doctors/[doctor-name-slug]</code>
+                  <code className="text-[10px] text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/doctors/[doctor-name-slug]</code>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-xl border-2 border-slate-200/60 text-center">
                   <div className="text-xs font-bold text-slate-700">Sitemap Feed</div>
-                  <code className="text-[10px] text-[#DC2626] font-mono font-bold mt-1.5 block">/sitemap.xml</code>
+                  <code className="text-[10px] text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/sitemap.xml</code>
                 </div>
               </div>
             </div>
@@ -380,7 +380,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
               <a 
                 href="/sitemap.xml" 
                 target="_blank" 
-                className="text-xs font-bold bg-[#DC2626] text-white rounded-lg py-2.5 px-4 hover:bg-[#DC2626] flex items-center gap-1.5 transition-all hover:scale-[1.02] shadow-sm cursor-pointer shrink-0"
+                className="text-xs font-bold bg-[color:var(--t-600)] text-white rounded-lg py-2.5 px-4 hover:bg-[color:var(--t-600)] flex items-center gap-1.5 transition-all hover:scale-[1.02] shadow-sm cursor-pointer shrink-0"
               >
                 <Eye className="h-4 w-4" />
                 Open Sitemap XML
@@ -404,7 +404,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
           id="schema-modal-backdrop"
         >
           <div 
-            className="relative bg-white border-[3px] border-[#DC2626] rounded-[28px] max-w-xl w-full p-6 shadow-2xl flex flex-col justify-between overflow-hidden scale-100 transition-all duration-300"
+            className="relative bg-white border-[3px] border-[color:var(--t-600)] rounded-[28px] max-w-xl w-full p-6 shadow-2xl flex flex-col justify-between overflow-hidden scale-100 transition-all duration-300"
             onClick={(e) => e.stopPropagation()}
             id="schema-modal-card"
           >
@@ -419,7 +419,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
 
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-[#FFF0F2] text-[#DC2626] rounded-xl border border-[#FECDD3]">
+                <div className="p-2 bg-[color:var(--t-50)] text-[color:var(--t-600)] rounded-xl border border-[color:var(--t-200)]">
                   <Code className="h-5 w-5" />
                 </div>
                 <div>
@@ -453,7 +453,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }}
-                  className="absolute top-3 right-3 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-lg px-2.5 py-1.5 text-[10px] font-bold flex items-center gap-1 shadow-md transition-all cursor-pointer"
+                  className="absolute top-3 right-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white rounded-lg px-2.5 py-1.5 text-[10px] font-bold flex items-center gap-1 shadow-md transition-all cursor-pointer"
                 >
                   {copied ? <CheckCircle className="h-3 w-3 text-white" /> : <Copy className="h-3 w-3 text-white" />}
                   {copied ? 'Copied!' : 'Copy Schema'}

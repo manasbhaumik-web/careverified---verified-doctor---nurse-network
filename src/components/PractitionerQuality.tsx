@@ -3,7 +3,7 @@ import { Award, ClipboardCheck, Flag, GraduationCap, ShieldAlert, Star } from 'l
 
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
-const field = 'border border-slate-200 bg-white px-3 py-2 text-sm w-full focus:outline-none focus:border-[#DC2626]';
+const field = 'border border-slate-200 bg-white px-3 py-2 text-sm w-full focus:outline-none focus:border-[color:var(--t-600)]';
 const lab = 'text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
 const day = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '—');
 
@@ -40,7 +40,7 @@ export default function PractitionerQuality({ profileId }: { profileId: string |
       <div role="tablist" className="flex flex-wrap gap-1 border-b border-slate-200">
         {tabs.map(([id, text, Icon]) => (
           <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setMsg(null); }}
-            className={`px-3 py-2.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer ${tab === id ? 'border-b-2 border-[#DC2626] text-[#B91C1C]' : 'text-slate-500'}`}><Icon className="h-3.5 w-3.5" /> {text}</button>
+            className={`px-3 py-2.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer ${tab === id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-500'}`}><Icon className="h-3.5 w-3.5" /> {text}</button>
         ))}
       </div>
       {msg && <p role="status" className={`text-xs font-bold p-2.5 border ${msg.ok ? 'text-emerald-800 bg-emerald-50 border-emerald-200' : 'text-rose-700 bg-rose-50 border-rose-200'}`}>{msg.text}</p>}
@@ -101,9 +101,9 @@ function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say:
 
   return (
     <div className="space-y-6">
-      <section className="bg-white border border-[#FECDD3] p-5 space-y-2">
+      <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-2">
         <h3 className="text-sm font-extrabold">CPD points for {cred.year}</h3>
-        <div className="h-3 bg-slate-100" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}><div className="h-3 bg-[#DC2626]" style={{ width: `${pct}%` }} /></div>
+        <div className="h-3 bg-slate-100" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}><div className="h-3 bg-[color:var(--t-600)]" style={{ width: `${pct}%` }} /></div>
         <p className="text-sm"><b className="tabular-nums">{cred.pointsApproved}</b> of {cred.target} verified points{cred.pointsPending ? ` · ${cred.pointsPending} awaiting verification` : ''}</p>
         <p className="text-[11px] text-slate-500">The annual target is set by the platform and may differ from your council's rule. Check your council's requirement.</p>
       </section>
@@ -116,7 +116,7 @@ function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say:
         <div><label className={lab}>Date</label><input type="date" max={today} className={field} value={cpd.activityDate} onChange={e => setCpd({ ...cpd, activityDate: e.target.value })} required /></div>
         <div><label className={lab}>Provider (optional)</label><input className={field} value={cpd.provider} onChange={e => setCpd({ ...cpd, provider: e.target.value })} maxLength={120} /></div>
         <label className="sm:col-span-2 text-xs font-bold border border-dashed border-slate-300 px-3 py-2 cursor-pointer">{cpdFile ? cpdFile.name : 'Attach evidence (certificate of attendance), PDF/JPG/PNG'}<input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={e => setCpdFile(e.target.files?.[0] ?? null)} /></label>
-        <button className="bg-[#DC2626] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer w-fit">Submit</button>
+        <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer w-fit">Submit</button>
       </form>
 
       <section className="bg-white border border-slate-200 p-5">
@@ -132,13 +132,13 @@ function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say:
       </section>
 
       <form onSubmit={addCert} className="bg-white border border-slate-200 p-5 grid sm:grid-cols-2 gap-3">
-        <h3 className="text-sm font-extrabold sm:col-span-2 flex items-center gap-2"><Award className="h-4 w-4 text-[#DC2626]" /> Specialty certificates</h3>
+        <h3 className="text-sm font-extrabold sm:col-span-2 flex items-center gap-2"><Award className="h-4 w-4 text-[color:var(--t-600)]" /> Specialty certificates</h3>
         <div><label className={lab}>Certificate</label><input className={field} value={cert.name} onChange={e => setCert({ ...cert, name: e.target.value })} required placeholder="e.g. MRCP (UK)" maxLength={150} /></div>
         <div><label className={lab}>Issued by</label><input className={field} value={cert.issuer} onChange={e => setCert({ ...cert, issuer: e.target.value })} required maxLength={150} /></div>
         <div><label className={lab}>Issued</label><input type="date" className={field} value={cert.issuedDate} onChange={e => setCert({ ...cert, issuedDate: e.target.value })} required /></div>
         <div><label className={lab}>Expires (if it does)</label><input type="date" className={field} value={cert.expiryDate} onChange={e => setCert({ ...cert, expiryDate: e.target.value })} /></div>
         <label className="sm:col-span-2 text-xs font-bold border border-dashed border-slate-300 px-3 py-2 cursor-pointer">{certFile ? certFile.name : 'Attach a copy of the certificate (required)'}<input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={e => setCertFile(e.target.files?.[0] ?? null)} /></label>
-        <button className="bg-[#DC2626] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer w-fit">Submit for verification</button>
+        <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer w-fit">Submit for verification</button>
         <ul className="sm:col-span-2 text-xs divide-y divide-slate-100">{cred.certs.map((c: any) => (
           <li key={c.id} className="py-2 flex justify-between gap-3"><span><b>{c.name}</b> · {c.issuer}{c.expiry_date ? ` · expires ${c.expiry_date}` : ''}{c.review_note ? <span className="block text-rose-700">{c.review_note}</span> : null}</span><span className="font-bold">{c.status === 'approved' ? 'Shown on your profile' : c.status}</span></li>
         ))}</ul>
@@ -173,13 +173,13 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
         {tasks.length === 0 ? <p className="text-xs text-slate-500">Nothing assigned.</p> : (
           <ul className="divide-y divide-slate-100 text-sm">{tasks.map(t => (
             <li key={t.id} className="py-2 flex justify-between gap-3"><span>{t.subject_type === 'prescription' ? 'Prescription' : 'Consultation note'} · assigned {day(t.assigned_at)}</span>
-              {t.status === 'pending' ? <button onClick={() => openCase(t.id)} className="text-xs font-bold text-[#B91C1C] cursor-pointer">Review</button> : <span className="text-xs font-bold text-slate-500">done</span>}</li>
+              {t.status === 'pending' ? <button onClick={() => openCase(t.id)} className="text-xs font-bold text-[color:var(--t-700)] cursor-pointer">Review</button> : <span className="text-xs font-bold text-slate-500">done</span>}</li>
           ))}</ul>
         )}
       </section>
 
       {open && (
-        <section className="bg-white border-2 border-[#FECDD3] p-5 space-y-3">
+        <section className="bg-white border-2 border-[color:var(--t-200)] p-5 space-y-3">
           <h3 className="text-sm font-extrabold">{c?.kind ?? 'Case'}</h3>
           {c && <div className="text-sm space-y-1.5 bg-slate-50 border border-slate-200 p-3">
             {'subjective' in c ? (['subjective', 'objective', 'assessment', 'plan'] as const).map(k => <p key={k}><span className="text-[10px] font-extrabold uppercase text-slate-500 mr-2">{k}</span>{c[k]}</p>) : (
@@ -195,7 +195,7 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
             <div><label className={lab}>Quality score (1 low, 5 high)</label><select className={field} value={form.score} onChange={e => setForm({ ...form, score: Number(e.target.value) })}>{[1, 2, 3, 4, 5].map(n => <option key={n}>{n}</option>)}</select></div>
           </div>
           <div><label className={lab}>Comments {form.outcome !== 'no_concerns' ? '(required)' : '(optional)'}</label><textarea className={field} rows={3} value={form.comments} onChange={e => setForm({ ...form, comments: e.target.value })} maxLength={3000} /></div>
-          <div className="flex gap-2"><button onClick={submit} className="bg-[#DC2626] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Submit review</button><button onClick={() => setOpen(null)} className="border border-slate-200 text-xs font-bold px-4 py-2.5 cursor-pointer">Cancel</button></div>
+          <div className="flex gap-2"><button onClick={submit} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Submit review</button><button onClick={() => setOpen(null)} className="border border-slate-200 text-xs font-bold px-4 py-2.5 cursor-pointer">Cancel</button></div>
         </section>
       )}
 
@@ -231,7 +231,7 @@ function IncidentSection({ say }: { say: (ok: boolean, t: string) => void }) {
           <div><label className={lab}>Severity</label><select className={field} value={form.severity} onChange={e => setForm({ ...form, severity: e.target.value })}><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="critical">Critical</option></select></div>
         </div>
         <textarea className={field} rows={4} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="What happened? (at least 20 characters)" required minLength={20} maxLength={4000} aria-label="Description" />
-        <button className="bg-[#DC2626] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Submit report</button>
+        <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Submit report</button>
       </form>
       {mine.length > 0 && <section className="bg-white border border-slate-200 p-5"><h3 className="text-sm font-extrabold mb-2">Your reports</h3>
         <ul className="divide-y divide-slate-100 text-sm">{mine.map(i => <li key={i.id} className="py-2"><b>{i.kind.replace(/_/g, ' ')}</b> · {i.severity} · <span className="font-bold">{i.status}</span> <span className="text-xs text-slate-400">{day(i.createdAt)}</span>{i.resolution && <p className="text-xs text-slate-600">Outcome: {i.resolution}</p>}</li>)}</ul></section>}

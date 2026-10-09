@@ -166,7 +166,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded }: 
 
   const other = isDoctor ? `${consult.patientName ?? 'Patient'}` : consult.professional?.name ?? 'Doctor';
   return (
-    <section className="bg-white border border-[#FECDD3] shadow-xs" aria-label="Consultation room">
+    <section className="bg-white border border-[color:var(--t-200)] shadow-xs" aria-label="Consultation room">
       <header className="flex items-center justify-between gap-3 px-5 py-3 border-b border-slate-100">
         <div>
           <p className="text-sm font-extrabold text-slate-900">Consultation with {other}</p>
@@ -185,7 +185,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded }: 
             {videoState !== 'connected' && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-white text-xs font-semibold text-center p-4">
                 {videoState === 'idle' && (isDoctor
-                  ? <button onClick={startVideo} className="bg-[#DC2626] px-5 py-2.5 font-extrabold cursor-pointer">Start video call</button>
+                  ? <button onClick={startVideo} className="bg-[color:var(--t-600)] px-5 py-2.5 font-extrabold cursor-pointer">Start video call</button>
                   : <span>Waiting for the doctor to start the video call. You can chat in the meantime.</span>)}
                 {videoState === 'connecting' && <span>Connecting video…</span>}
                 {videoState === 'failed' && <span>Video could not connect. Use the chat, or ask the doctor to restart the call.</span>}
@@ -201,10 +201,10 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded }: 
         )}
 
         <div className="flex flex-col h-[420px]">
-          <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-[#FFF9F9]">
+          <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-[color:var(--t-bg)]">
             <p className="text-[11px] text-slate-500 bg-white border border-slate-100 p-2">Reason for consultation: {consult.symptoms}</p>
             {messages.map(m => (
-              <div key={m.id} className={`max-w-[85%] text-sm px-3 py-2 ${m.senderUserId === myUserId ? 'ml-auto bg-[#DC2626] text-white' : 'bg-white border border-slate-200 text-slate-800'}`}>
+              <div key={m.id} className={`max-w-[85%] text-sm px-3 py-2 ${m.senderUserId === myUserId ? 'ml-auto bg-[color:var(--t-600)] text-white' : 'bg-white border border-slate-200 text-slate-800'}`}>
                 {m.text}
               </div>
             ))}
@@ -213,8 +213,8 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded }: 
           {error && <p className="text-xs font-bold text-rose-700 px-4 py-2 bg-rose-50">{error}</p>}
           <form onSubmit={send} className="flex gap-2 p-3 border-t border-slate-100">
             <input value={text} onChange={e => setText(e.target.value)} maxLength={2000} placeholder="Type a message…"
-              className="flex-1 border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-[#DC2626]" aria-label="Message" />
-            <button className="bg-[#DC2626] text-white px-4 cursor-pointer" aria-label="Send"><Send className="h-4 w-4" /></button>
+              className="flex-1 border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--t-600)]" aria-label="Message" />
+            <button className="bg-[color:var(--t-600)] text-white px-4 cursor-pointer" aria-label="Send"><Send className="h-4 w-4" /></button>
           </form>
         </div>
       </div>

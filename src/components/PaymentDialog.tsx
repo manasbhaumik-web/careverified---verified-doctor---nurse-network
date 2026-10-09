@@ -56,10 +56,10 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50" role="dialog" aria-modal="true" aria-label="Payment">
-      <div className="bg-white w-full max-w-md border border-[#FECDD3] shadow-2xl p-6 space-y-5">
+      <div className="bg-white w-full max-w-md border border-[color:var(--t-200)] shadow-2xl p-6 space-y-5">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="text-base font-black text-slate-900 flex items-center gap-2"><Lock className="h-4 w-4 text-[#DC2626]" /> Secure payment</h3>
+            <h3 className="text-base font-black text-slate-900 flex items-center gap-2"><Lock className="h-4 w-4 text-[color:var(--t-600)]" /> Secure payment</h3>
             <p className="text-xs text-slate-600 mt-1">{description}</p>
           </div>
           {state !== 'paid' && (
@@ -84,7 +84,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
             </div>
             <p className="text-3xl font-black text-slate-900 tabular-nums">RM {amount.toFixed(2)}</p>
             {error && <p className="text-xs font-bold text-rose-700">{error}</p>}
-            <button onClick={confirmTest} className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-extrabold py-3 cursor-pointer">
+            <button onClick={confirmTest} className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-extrabold py-3 cursor-pointer">
               Confirm test payment
             </button>
           </div>
@@ -101,7 +101,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                 {invoice.testMode && (<><dt className="text-slate-500">Mode</dt><dd className="font-bold text-amber-700">Test payment</dd></>)}
               </dl>
             )}
-            <button onClick={() => onPaid(paymentId)} className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-extrabold py-3 cursor-pointer">Continue</button>
+            <button onClick={() => onPaid(paymentId)} className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-extrabold py-3 cursor-pointer">Continue</button>
           </div>
         )}
       </div>

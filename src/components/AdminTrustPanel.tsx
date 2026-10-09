@@ -33,7 +33,7 @@ export function ReviewActions({ request, onDone }: { request: any; onDone: () =>
     }
   };
 
-  const field = 'w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#DC2626]';
+  const field = 'w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[color:var(--t-600)]';
   return (
     <div className="mt-6 border-t border-slate-100 pt-4 space-y-3">
       {history.length > 0 && (
@@ -70,7 +70,7 @@ export function ReviewActions({ request, onDone }: { request: any; onDone: () =>
           Request more info
         </button>
         <button disabled={busy} onClick={() => decide('approve')}
-          className="px-5 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-extrabold rounded-xl flex items-center gap-1.5 cursor-pointer disabled:opacity-60">
+          className="px-5 py-2.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold rounded-xl flex items-center gap-1.5 cursor-pointer disabled:opacity-60">
           <Check className="h-4 w-4" /> Approve & Publish
         </button>
       </div>
@@ -132,12 +132,12 @@ export default function AdminTrustPanel({ onChanged }: { onChanged: () => void }
     <div className="space-y-6 text-slate-800">
       {error && <p className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-3">{error}</p>}
 
-      <section className="bg-white border border-[#FECDD3] rounded-xl p-5 shadow-xs space-y-3">
+      <section className="bg-white border border-[color:var(--t-200)] rounded-xl p-5 shadow-xs space-y-3">
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-sm font-bold flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-amber-600" /> Licence & re-verification watchlist</h3>
           <div className="flex gap-1 bg-slate-100 p-1 rounded-lg text-xs font-bold">
             {(['attention', 'all'] as const).map(f => (
-              <button key={f} onClick={() => setFilter(f)} className={`px-3 py-1 rounded-md cursor-pointer ${filter === f ? 'bg-white text-[#B91C1C] shadow-xs' : 'text-slate-500'}`}>
+              <button key={f} onClick={() => setFilter(f)} className={`px-3 py-1 rounded-md cursor-pointer ${filter === f ? 'bg-white text-[color:var(--t-700)] shadow-xs' : 'text-slate-500'}`}>
                 {f === 'attention' ? 'Needs attention' : 'Everyone'}
               </button>
             ))}
@@ -174,8 +174,8 @@ export default function AdminTrustPanel({ onChanged }: { onChanged: () => void }
         )}
       </section>
 
-      <section className="bg-white border border-[#FECDD3] rounded-xl p-5 shadow-xs space-y-3">
-        <h3 className="text-sm font-bold flex items-center gap-2"><MessageSquareWarning className="h-4 w-4 text-[#DC2626]" /> Patient complaints ({openComplaints.length} open)</h3>
+      <section className="bg-white border border-[color:var(--t-200)] rounded-xl p-5 shadow-xs space-y-3">
+        <h3 className="text-sm font-bold flex items-center gap-2"><MessageSquareWarning className="h-4 w-4 text-[color:var(--t-600)]" /> Patient complaints ({openComplaints.length} open)</h3>
         {complaints.length === 0 ? <p className="text-xs text-slate-500">No complaints have been filed.</p> : (
           <ul className="space-y-3">
             {complaints.map(c => (

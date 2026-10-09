@@ -52,7 +52,7 @@ export default function AdminOps() {
     <div className="space-y-6 text-slate-800">
       {msg && <p className="text-xs font-bold bg-slate-50 border border-slate-200 p-3">{msg}</p>}
 
-      <section className={`border p-5 space-y-3 ${openSos.length ? 'bg-rose-50 border-rose-300' : 'bg-white border-[#FECDD3]'}`}>
+      <section className={`border p-5 space-y-3 ${openSos.length ? 'bg-rose-50 border-rose-300' : 'bg-white border-[color:var(--t-200)]'}`}>
         <h3 className="text-sm font-extrabold flex items-center gap-2"><Siren className="h-4 w-4 text-rose-600" /> SOS alerts ({openSos.length} open)</h3>
         {emergencies.length === 0 ? <p className="text-xs text-slate-500">No SOS alerts.</p> : (
           <ul className="space-y-2 text-xs">
@@ -70,7 +70,7 @@ export default function AdminOps() {
         )}
       </section>
 
-      <section className="bg-white border border-[#FECDD3] p-5 space-y-3">
+      <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-sm font-extrabold">24/7 roster coverage</h3>
           {coverage && <p className="text-xs font-bold">{coverage.onlineNow} doctor(s) online now · {coverage.queued} waiting · {coverage.active} in consultation · <span className={gaps ? 'text-rose-700' : 'text-emerald-700'}>{gaps} uncovered hour(s) per week</span></p>}
@@ -96,7 +96,7 @@ export default function AdminOps() {
         )}
       </section>
 
-      <section className="bg-white border border-[#FECDD3] p-5 space-y-3">
+      <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-sm font-extrabold">Payments</h3>
           {payments && <p className="text-xs font-bold">Mode: {payments.mode ?? 'not configured'} · Gross RM {payments.totals.gross.toFixed(2)} · Platform fee RM {payments.totals.platformFee.toFixed(2)}</p>}
@@ -123,14 +123,14 @@ export default function AdminOps() {
         )}
       </section>
 
-      <section className="bg-white border border-[#FECDD3] p-5 space-y-3">
+      <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
         <h3 className="text-sm font-extrabold">Partner pharmacies</h3>
         <p className="text-xs text-slate-600">Patients can send prescriptions to these pharmacies. Each pharmacy signs in at /pharmacy with its ID and PIN to look up and dispense.</p>
         <form onSubmit={addPharmacy} className="flex flex-wrap gap-2 items-end">
           <input className="border border-slate-200 px-3 py-2 text-xs flex-1 min-w-[10rem]" placeholder="Name" value={newPharm.name} onChange={e => setNewPharm({ ...newPharm, name: e.target.value })} required />
           <input className="border border-slate-200 px-3 py-2 text-xs flex-1 min-w-[12rem]" placeholder="Address" value={newPharm.address} onChange={e => setNewPharm({ ...newPharm, address: e.target.value })} required />
           <input className="border border-slate-200 px-3 py-2 text-xs w-36" placeholder="Phone" value={newPharm.phone} onChange={e => setNewPharm({ ...newPharm, phone: e.target.value })} />
-          <button className="bg-[#DC2626] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Add pharmacy</button>
+          <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Add pharmacy</button>
         </form>
         {issued && <p role="status" className="text-xs bg-amber-50 border border-amber-300 p-3 font-semibold">Give the pharmacy these sign-in details now; the PIN is not shown again. ID: <span className="font-mono font-bold">{issued.id}</span> · PIN: <span className="font-mono font-bold">{issued.pin}</span> <button className="underline ml-2 cursor-pointer" onClick={() => setIssued(null)}>Done</button></p>}
         <ul className="text-xs divide-y divide-slate-100">

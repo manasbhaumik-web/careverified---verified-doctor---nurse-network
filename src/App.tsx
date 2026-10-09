@@ -21,6 +21,7 @@ import MedicalLibrary from './components/MedicalLibrary';
 import SEODashboard from './components/SEODashboard';
 import AdminDashboard from './components/AdminDashboard';
 import NotificationBell from './components/NotificationBell';
+import ThemeSwitcher from './components/ThemeSwitcher';
 import SOSButton from './components/SOSButton';
 import SupportDesk from './components/SupportDesk';
 import PractitionerQuality from './components/PractitionerQuality';
@@ -312,7 +313,7 @@ export default function App() {
   });
 
   return (
-    <div className="min-h-screen bg-[#FFF8F9] text-slate-800 flex flex-col font-sans antialiased selection:bg-[#FFE4E6] selection:text-[#DC2626]">
+    <div className="min-h-screen bg-[color:var(--t-bg)] text-slate-800 flex flex-col font-sans antialiased selection:bg-[color:var(--t-100)] selection:text-[color:var(--t-600)]">
       {notice && (
         <div role="status" className="fixed top-3 left-1/2 -translate-x-1/2 z-[120] bg-slate-900 text-white text-sm font-semibold px-5 py-3 shadow-lg flex items-center gap-4">
           {notice}
@@ -321,7 +322,7 @@ export default function App() {
       )}
 
       {/* CareVerified Elevated Primary Header */}
-      <header className="bg-[#DC2626] border-b border-[#B91C1C] sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-xs">
+      <header className="bg-[color:var(--t-600)] border-b border-[color:var(--t-700)] sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-xs">
         <div className="max-w-[1920px] mx-auto flex items-center justify-between h-16">
 
           {/* Brand Logo */}
@@ -334,14 +335,14 @@ export default function App() {
               setSelectedProfId(null);
             }}
           >
-            <div className="w-10 h-10 rounded-lg bg-white text-[#DC2626] flex items-center justify-center shrink-0 shadow-xs group-hover:bg-[#FFE4E6] transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-white text-[color:var(--t-600)] flex items-center justify-center shrink-0 shadow-xs group-hover:bg-[color:var(--t-100)] transition-colors">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
             </div>
             <div className="leading-none">
               <span className="font-display font-bold text-[22px] text-white tracking-tight block">
-                MedCred<span className="text-[#FECDD3]">.</span>
+                MedCred<span className="text-[color:var(--t-200)]">.</span>
               </span>
-              <span className="text-[10px] font-semibold text-[#FFE4E6] uppercase tracking-[0.14em] block mt-1">
+              <span className="text-[10px] font-semibold text-[color:var(--t-100)] uppercase tracking-[0.14em] block mt-1">
                 {currentUser.role === 'admin' ? 'Board Console' : currentUser.role === 'practitioner' ? 'Practitioner Hub' : 'Patient Portal'}
               </span>
             </div>
@@ -349,11 +350,12 @@ export default function App() {
 
           {/* Right-Side Desktop Actions & User Session Details */}
           <div className="hidden lg:flex items-center gap-5">
-            <div className="flex items-center gap-2 bg-[#ECFDF5] border border-[#A7F3D0] px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#065F46]">
-              <ShieldCheck className="h-3.5 w-3.5 text-[#059669]" aria-hidden="true" />
+            <div className="flex items-center gap-2 bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-3.5 py-1.5 rounded-full text-xs font-semibold text-[color:var(--e-800)]">
+              <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--e-600)]" aria-hidden="true" />
               <span>Board-verified practitioners</span>
             </div>
 
+            <ThemeSwitcher tone="onColor" />
             <div className="flex items-center gap-3 border-l border-white/30 pl-5">
               {currentUser.role === 'patient' && <SOSButton />}
               <NotificationBell />
@@ -368,7 +370,7 @@ export default function App() {
                 />
                 <div className="text-left hidden xl:block leading-tight">
                   <p className="text-[13px] font-semibold text-white leading-none">{currentUser.name}</p>
-                  <p className="text-xs text-[#FFE4E6] mt-1">
+                  <p className="text-xs text-[color:var(--t-100)] mt-1">
                     {currentUser.role === 'admin' ? 'Board Admin' : currentUser.role === 'practitioner' ? 'Practitioner Account' : 'Patient Account'}
                   </p>
                 </div>
@@ -404,9 +406,9 @@ export default function App() {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="lg:hidden bg-white text-[#1E293B] -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-[#FECDD3] overflow-hidden"
+              className="lg:hidden bg-white text-[color:var(--ink)] -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-[color:var(--t-200)] overflow-hidden"
             >
-              <div className="py-3 space-y-1 text-sm font-bold text-[#1E293B]">
+              <div className="py-3 space-y-1 text-sm font-bold text-[color:var(--ink)]">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeView === item.id;
@@ -415,27 +417,27 @@ export default function App() {
                       key={item.id}
                       onClick={() => { setActiveView(item.id); setSelectedProfId(null); setMobileMenuOpen(false); }}
                       className={`w-full text-left min-h-11 py-2.5 px-3.5 rounded-none flex items-center justify-between transition-colors cursor-pointer ${isActive
-                        ? 'bg-[#DC2626] text-white font-extrabold'
-                        : 'hover:bg-[#FFF0F2] text-[#1E293B]'
+                        ? 'bg-[color:var(--t-600)] text-white font-extrabold'
+                        : 'hover:bg-[color:var(--t-50)] text-[color:var(--ink)]'
                         }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Icon className={`h-5 w-5 shrink-0 ${isActive ? 'text-white' : 'text-[#DC2626]'}`} />
+                        <Icon className={`h-5 w-5 shrink-0 ${isActive ? 'text-white' : 'text-[color:var(--t-600)]'}`} />
                         <span>{item.name}</span>
                       </div>
 
                       {item.id === 'messages' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[#DC2626]' : 'bg-[#FFE4E6] text-[#DC2626]'}`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-100)] text-[color:var(--t-600)]'}`}>
                           2 new
                         </span>
                       )}
                       {item.id === 'recruitment' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[#DC2626]' : 'bg-[#FFF0F2] text-[#DC2626] border border-[#FECDD3]'}`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           9 Open
                         </span>
                       )}
                       {item.id === 'onboard' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[#DC2626]' : 'bg-[#FFF0F2] text-[#DC2626] border border-[#FECDD3]'}`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           MMC
                         </span>
                       )}
@@ -443,22 +445,26 @@ export default function App() {
                   );
                 })}
 
-                <div className="pt-3 mt-3 border-t border-[#FECDD3] flex items-center justify-between gap-3 px-1">
+                <div className="flex items-center justify-between px-1 pt-3 mt-3 border-t border-[color:var(--t-200)]">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--ink-2)]">Settings</span>
+                  <ThemeSwitcher />
+                </div>
+                <div className="pt-3 mt-3 border-t border-[color:var(--t-200)] flex items-center justify-between gap-3 px-1">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <img
                       src={currentUser.avatarUrl || '/assets/malaysian_female_doctor.jpg'}
                       alt={currentUser.name}
-                      className="w-9 h-9 rounded-full object-cover border border-[#FECDD3] shrink-0"
+                      className="w-9 h-9 rounded-full object-cover border border-[color:var(--t-200)] shrink-0"
                       referrerPolicy="no-referrer"
                     />
                     <div className="min-w-0">
-                      <p className="text-xs font-extrabold text-[#1E293B] leading-none truncate">{currentUser.name}</p>
-                      <p className="text-[11px] text-[#334155] font-semibold capitalize mt-1">{currentUser.role} Account</p>
+                      <p className="text-xs font-extrabold text-[color:var(--ink)] leading-none truncate">{currentUser.name}</p>
+                      <p className="text-[11px] text-[color:var(--ink-2)] font-semibold capitalize mt-1">{currentUser.role} Account</p>
                     </div>
                   </div>
                   <button
                     onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
-                    className="p-2 bg-transparent text-[#DC2626] hover:bg-[#FFF0F2] rounded-full border-0 transition-colors cursor-pointer shrink-0"
+                    className="p-2 bg-transparent text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] rounded-full border-0 transition-colors cursor-pointer shrink-0"
                     title="Close Session"
                     aria-label="Close session"
                   >
@@ -472,7 +478,7 @@ export default function App() {
       </header>
 
       {/* Elevated Navigation Bar */}
-      <div className="hidden lg:block bg-[#FFE4E6]/95 backdrop-blur-md border-b border-[#FECDD3] px-4 sm:px-6 lg:px-8 shrink-0 sticky top-16 z-30 shadow-xs">
+      <div className="hidden lg:block bg-[color:var(--t-100)]/95 backdrop-blur-md border-b border-[color:var(--t-200)] px-4 sm:px-6 lg:px-8 shrink-0 sticky top-16 z-30 shadow-xs">
         <div className="w-full max-w-[1920px] mx-auto flex items-stretch justify-between">
           <div className="flex items-stretch gap-4 py-2">
 
@@ -488,30 +494,30 @@ export default function App() {
                     onClick={() => { setActiveView(item.id); setSelectedProfId(null); }}
                     className={`relative flex items-center gap-2 px-4 py-2 text-xs font-extrabold transition-all duration-200 cursor-pointer select-none rounded-lg border ${
                       isActive
-                        ? 'text-[#DC2626] bg-white border-[#FECDD3] shadow-xs'
-                        : 'text-[#334155] border-transparent hover:text-[#DC2626] hover:bg-white/60'
+                        ? 'text-[color:var(--t-600)] bg-white border-[color:var(--t-200)] shadow-xs'
+                        : 'text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-600)] hover:bg-white/60'
                     }`}
                   >
-                    <Icon className={`h-4 w-4 ${isActive ? 'text-[#DC2626]' : 'text-slate-400'}`} />
+                    <Icon className={`h-4 w-4 ${isActive ? 'text-[color:var(--t-600)]' : 'text-slate-400'}`} />
                     <span>{item.name}</span>
 
                     {item.id === 'messages' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[#DC2626] text-white' : 'bg-[#FFE4E6] text-[#DC2626] border border-[#FECDD3]'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-600)] text-white' : 'bg-[color:var(--t-100)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                         2 new
                       </span>
                     )}
                     {item.id === 'recruitment' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[#DC2626] text-white' : 'bg-white text-[#1E293B] border border-[#FECDD3]'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-600)] text-white' : 'bg-white text-[color:var(--ink)] border border-[color:var(--t-200)]'}`}>
                         9 Open
                       </span>
                     )}
                     {item.id === 'onboard' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[#DC2626] text-white' : 'bg-white text-[#1E293B] border border-[#FECDD3]'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-600)] text-white' : 'bg-white text-[color:var(--ink)] border border-[color:var(--t-200)]'}`}>
                         MMC
                       </span>
                     )}
                     {item.id === 'seo' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[#DC2626] text-white' : 'bg-white text-[#1E293B] border border-[#FECDD3]'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-600)] text-white' : 'bg-white text-[color:var(--ink)] border border-[color:var(--t-200)]'}`}>
                         98%
                       </span>
                     )}
@@ -519,7 +525,7 @@ export default function App() {
                     {isActive && (
                       <motion.div
                         layoutId="activeNavUnderline"
-                        className="absolute left-0 right-0 -bottom-[9px] h-[3px] bg-[#DC2626]"
+                        className="absolute left-0 right-0 -bottom-[9px] h-[3px] bg-[color:var(--t-600)]"
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
@@ -530,7 +536,7 @@ export default function App() {
           </div>
 
           {/* Right: Registry telemetry indicator */}
-          <div className="flex items-center gap-2 self-center bg-white border border-[#FECDD3] px-3.5 py-1.5 rounded-full text-[11px] font-extrabold text-[#1E293B] shadow-xs">
+          <div className="flex items-center gap-2 self-center bg-white border border-[color:var(--t-200)] px-3.5 py-1.5 rounded-full text-[11px] font-extrabold text-[color:var(--ink)] shadow-xs">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
             <span>Board-verified practitioners</span>
           </div>
@@ -542,7 +548,7 @@ export default function App() {
       <main className="flex-grow py-8 px-4 sm:px-6 lg:px-8 w-full max-w-[1920px] mx-auto">
         {loading ? (
           <div className="text-center py-20 space-y-4">
-            <RefreshCw className="h-10 w-10 text-[#DC2626] animate-spin mx-auto" />
+            <RefreshCw className="h-10 w-10 text-[color:var(--t-600)] animate-spin mx-auto" />
             <h3 className="text-sm font-bold text-slate-800">Loading MedCred...</h3>
             <p className="text-xs text-slate-500 font-semibold">Connecting to medical registry...</p>
           </div>
@@ -694,7 +700,7 @@ export default function App() {
                         description={`Compiled & hot-loaded by ${activePkg.author}`}
                         actions={
                           <>
-                            <span className="bg-[#FFF0F2] text-[#DC2626] text-[10px] font-extrabold px-2 py-0.5 rounded-lg border border-[#FECDD3]">v{activePkg.version}</span>
+                            <span className="bg-[color:var(--t-50)] text-[color:var(--t-600)] text-[10px] font-extrabold px-2 py-0.5 rounded-lg border border-[color:var(--t-200)]">v{activePkg.version}</span>
                             <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-3 py-1.5 rounded-xs border border-emerald-200 uppercase tracking-wider inline-flex items-center gap-1.5">
                               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-xs animate-pulse"></span>
                               <span>Active Runtime Package</span>
@@ -713,7 +719,7 @@ export default function App() {
                       {/* Interactive sandbox demonstration for custom module */}
                       <div className="border border-slate-200/60 rounded-2xl p-6 bg-slate-50/50 space-y-5">
                         <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                          <Settings className="h-4.5 w-4.5 text-[#DC2626] animate-spin" />
+                          <Settings className="h-4.5 w-4.5 text-[color:var(--t-600)] animate-spin" />
                           <h4 className="text-xs font-black uppercase text-slate-800 tracking-wider">Interactive Package Terminal & Diagnostics</h4>
                         </div>
 
@@ -721,7 +727,7 @@ export default function App() {
                           <div className="space-y-4">
                             <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
                               <span className="text-[10px] text-slate-400 font-extrabold uppercase">Mountpoint Hook</span>
-                              <p className="text-xs font-mono font-bold text-[#DC2626]">/src/modules/{activePkg.id}/index.tsx</p>
+                              <p className="text-xs font-mono font-bold text-[color:var(--t-600)]">/src/modules/{activePkg.id}/index.tsx</p>
                             </div>
                             <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
                               <span className="text-[10px] text-slate-400 font-extrabold uppercase">Isolation</span>
@@ -742,7 +748,7 @@ export default function App() {
                           <button
                             type="button"
                             onClick={() => alert(`Dynamic simulation for "${activePkg.name}" triggered successfully!`)}
-                            className="px-4 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold rounded-xl transition-all shadow-sm shadow-rose-500/10 cursor-pointer"
+                            className="px-4 py-2.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold rounded-xl transition-all shadow-sm shadow-rose-500/10 cursor-pointer"
                           >
                             Execute Package Dynamic Simulation
                           </button>
@@ -759,7 +765,7 @@ export default function App() {
       </main>
 
       {/* Footer Sitemap */}
-      <footer className="app-dark-footer bg-[#0F172A] text-slate-300 border-t border-slate-800 pt-10 pb-6 text-xs mt-12 shrink-0">
+      <footer className="app-dark-footer bg-[color:var(--dark)] text-slate-300 border-t border-slate-800 pt-10 pb-6 text-xs mt-12 shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
           {/* Detailed Sitemap Grid */}
@@ -767,7 +773,7 @@ export default function App() {
             {/* Column 1: Brand & Description */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Stethoscope className="h-5 w-5 text-[#DC2626] animate-pulse" />
+                <Stethoscope className="h-5 w-5 text-[color:var(--t-600)] animate-pulse" />
                 <span className="font-extrabold text-sm tracking-tight text-white">MedCred</span>
                 <span className="text-[9px] bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Registry</span>
               </div>
@@ -791,10 +797,10 @@ export default function App() {
                     <li key={item.id}>
                       <button
                         onClick={() => { setActiveView(item.id); setSelectedProfId(null); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                        className={`flex items-center gap-2 text-[11px] transition-colors hover:text-white cursor-pointer ${isActive ? 'text-[#DC2626] font-extrabold' : 'text-slate-300'
+                        className={`flex items-center gap-2 text-[11px] transition-colors hover:text-white cursor-pointer ${isActive ? 'text-[color:var(--t-600)] font-extrabold' : 'text-slate-300'
                           }`}
                       >
-                        <Icon className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-[#DC2626]' : 'text-slate-400'}`} />
+                        <Icon className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-[color:var(--t-600)]' : 'text-slate-400'}`} />
                         <span>{item.name}</span>
                       </button>
                     </li>

@@ -40,15 +40,15 @@ export default function NotificationBell() {
       >
         <Bell className="h-[18px] w-[18px]" />
         {unread > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-white text-[#B91C1C] text-[10px] font-black flex items-center justify-center">{unread}</span>
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-white text-[color:var(--t-700)] text-[10px] font-black flex items-center justify-center">{unread}</span>
         )}
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-white text-slate-800 border border-[#FECDD3] shadow-lg z-50">
+        <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-white text-slate-800 border border-[color:var(--t-200)] shadow-lg z-50">
           {items.length === 0 ? (
             <p className="p-4 text-xs text-slate-500">No notifications yet.</p>
           ) : items.map(i => (
-            <div key={i.id} className={`p-3 border-b border-slate-100 text-xs ${i.isRead ? '' : 'bg-[#FFF5F6]'}`}>
+            <div key={i.id} className={`p-3 border-b border-slate-100 text-xs ${i.isRead ? '' : 'bg-[color:var(--t-50)]'}`}>
               <p className="font-extrabold">{i.title}</p>
               <p className="text-slate-600 mt-0.5">{i.body}</p>
               <p className="text-[10px] text-slate-400 mt-1">{new Date(i.ts).toLocaleString()}</p>
