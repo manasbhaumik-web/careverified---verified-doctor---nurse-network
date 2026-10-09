@@ -1,11 +1,13 @@
-import React, { useMemo, useState } from 'react';
-import { ArrowRight, BadgeCheck, Bookmark, BookOpen, Check, ExternalLink, Flag, Printer, Search, ShieldCheck, X } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ArrowRight, BadgeCheck, Bookmark, BookOpen, Check, ExternalLink, Flag, Printer, Search, Send, ShieldCheck, X } from 'lucide-react';
 import { Article, DoctorProfile, NurseProfile } from '../types';
 import DashboardHeader, { BannerKpis } from './DashboardHeader';
 
 interface MedicalLibraryProps {
   articles: Article[];
   professionals?: (DoctorProfile | NurseProfile)[];
+  /** True for signed-in practitioners: shows "Recommend to a patient". */
+  canRecommend?: boolean;
   /** Sends the reader to Help with a draft ticket about this article. */
   onReportProblem?: (article: Article) => void;
   /** Opens the directory, optionally filtered to a specialty. */
@@ -87,12 +89,24 @@ function EvidenceBadge({ article }: { article: Article }) {
   return <span className={`text-[11px] font-bold border px-2.5 py-0.5 ${tone}`} title="Strength of evidence, from the paper's publication type">{article.evidence.label}</span>;
 }
 
-function Takeaway({ text, className = '' }: { text?: string | null; className?: string }) {
+function Takeaway({ text, ms, className = '' }: { text?: string | null; ms?: string | null; className?: string }) {
+  const [lang, setLang] = useState<'en' | 'ms'>('en');
   if (!text) return null;
+  const shown = lang === 'ms' && ms ? ms : text;
   return (
     <div className={`bg-[color:var(--t-50)] border-l-4 border-[color:var(--t-600)] px-3 py-2 ${className}`}>
-      <p className="text-[10px] font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">Key takeaway</p>
-      <p className="text-[13px] text-[color:var(--ink)] leading-snug mt-0.5">{text}</p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[10px] font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">{lang === 'ms' ? 'Intipati utama' : 'Key takeaway'}</p>
+        {ms && (
+          <span role="group" aria-label="Language" className="inline-flex text-[10px] font-bold">
+            {([['en', 'EN'], ['ms', 'BM']] as const).map(([id, label]) => (
+              <button key={id} type="button" aria-pressed={lang === id} onClick={() => setLang(id)}
+                className={`px-1.5 py-0.5 border border-[color:var(--t-200)] cursor-pointer ${lang === id ? 'bg-[color:var(--t-600)] text-white' : 'bg-white text-[color:var(--ink)]'}`}>{label}</button>
+            ))}
+          </span>
+        )}
+      </div>
+      <p lang={lang === 'ms' ? 'ms' : 'en'} className="text-[13px] text-[color:var(--ink)] leading-snug mt-0.5">{shown}</p>
     </div>
   );
 }
@@ -126,7 +140,8 @@ function AuthorBadge({ article, large = false }: { article: Article; large?: boo
   );
 }
 
-export default function MedicalLibrary({ articles, professionals = [], onFindDoctor, onReportProblem }: MedicalLibraryProps) {
+export default function MedicalLibrary({ articles, professionals = [], onFindDoctor, onReportProblem, canRecommend = false }: MedicalLibraryProps) {
+  const isPractitioner = canRecommend;
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>(ALL);
   const [source, setSource] = useState<SourceFilter>('all');
@@ -135,6 +150,38 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
   const [openArticle, setOpenArticle] = useState<Article | null>(null);
   const [savedIds, setSavedIds] = useState<string[]>(readSaved);
   const [onlySaved, setOnlySaved] = useState(false);
+  const [factSheets, setFactSheets] = useState<{ topic: string; title: string; summary: string; url: string }[]>([]);
+  useEffect(() => {
+    fetch('/api/fact-sheets').then(r => r.json()).then(d => d.status === 'success' && setFactSheets(d.data)).catch(() => {});
+  }, []);
+
+  // Practitioners can recommend the open article to a patient they have treated.
+  const [recOpen, setRecOpen] = useState(false);
+  const [patients, setPatients] = useState<{ id: string; name: string }[]>([]);
+  const [recPatient, setRecPatient] = useState('');
+  const [recNote, setRecNote] = useState('');
+  const [recMsg, setRecMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  useEffect(() => {
+    if (!recOpen || patients.length) return;
+    fetch('/api/practitioner/my-patients').then(r => r.json()).then(d => d.status === 'success' && setPatients(d.data)).catch(() => {});
+  }, [recOpen, patients.length]);
+  useEffect(() => { setRecOpen(false); setRecMsg(null); setRecNote(''); }, [openArticle?.id]);
+  const sendRecommendation = async () => {
+    if (!openArticle || !recPatient) return;
+    const d = await fetch(`/api/articles/${encodeURIComponent(openArticle.id)}/recommend`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ patientUserId: recPatient, note: recNote }),
+    }).then(r => r.json()).catch(() => null);
+    setRecMsg({ ok: d?.status === 'success', text: d?.status === 'success' ? 'Sent. The patient will see it on their dashboard.' : d?.message || 'Could not send.' });
+    if (d?.status === 'success') { setRecNote(''); setRecPatient(''); }
+  };
+
+  // Open an article handed over by another page (e.g. the patient dashboard's recommended reading).
+  useEffect(() => {
+    let id: string | null = null;
+    try { id = sessionStorage.getItem('open_article'); if (id) sessionStorage.removeItem('open_article'); } catch { /* ignore */ }
+    const hit = id ? articles.find(a => a.id === id) : null;
+    if (hit) setOpenArticle(hit);
+  }, [articles]);
 
   const toggleSaved = (id: string) => {
     const next = savedIds.includes(id) ? savedIds.filter(x => x !== id) : [...savedIds, id];
@@ -166,6 +213,12 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
   const related = openArticle
     ? articles.filter(a => a.id !== openArticle.id && a.category === openArticle.category).slice(0, 3)
     : [];
+
+  // Topic page: shown when a category is chosen.
+  const hubSheet = category === ALL ? null : factSheets.find(f => { const c = category.toLowerCase(); return c.includes(f.topic) || f.topic.includes(c); }) ?? null;
+  const hubSpecialty = category === ALL ? null : specialtyFor({ category, title: '' } as Article, professionals);
+  const hubSpecialists = hubSpecialty ? professionals.filter(p => p.specialization === hubSpecialty).slice(0, 3) : [];
+  const hubArticles = category === ALL ? [] : articles.filter(a => a.category === category);
 
   const featured = filtered[0];
   const rest = filtered.slice(1);
@@ -253,6 +306,33 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
 
       <div className="flex flex-wrap gap-6 items-start">
         <div className="flex-[999_1_640px] min-w-0 space-y-6">
+          {category !== ALL && (
+            <section aria-label={`${category} topic page`} className="bg-white border border-[color:var(--t-200)] border-t-[3px] border-t-[color:var(--t-600)] p-5 space-y-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">Topic</p>
+                  <h2 className="text-xl font-bold text-[color:var(--ink)] leading-tight">{category}</h2>
+                  <p className="text-xs text-slate-600 mt-1">{hubArticles.length} article{hubArticles.length === 1 ? '' : 's'} in this topic{hubArticles.some(a => a.source) ? `, ${hubArticles.filter(a => a.source).length} research paper${hubArticles.filter(a => a.source).length === 1 ? '' : 's'}` : ''}</p>
+                </div>
+                <button type="button" onClick={() => setCategory(ALL)} className="text-xs font-bold text-[color:var(--t-700)] cursor-pointer">← All topics</button>
+              </div>
+              {hubSheet && (
+                <div className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-4 space-y-2">
+                  <h3 className="text-sm font-bold">About this condition</h3>
+                  <p className="text-[13px] leading-relaxed text-[color:var(--ink-2)]">{hubSheet.summary}</p>
+                  <a href={hubSheet.url} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-[color:var(--t-700)] inline-flex items-center gap-1 hover:underline">
+                    Read more on MedlinePlus (U.S. National Library of Medicine) <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              )}
+              {hubSpecialty && (
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="text-xs text-slate-600">Specialists: {hubSpecialists.length ? hubSpecialists.map(p => p.name).join(', ') : hubSpecialty}</span>
+                  <button type="button" onClick={() => onFindDoctor(hubSpecialty)} className="min-h-[36px] px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer">Find a {hubSpecialty}</button>
+                </div>
+              )}
+            </section>
+          )}
           {!featured ? (
             <div className="bg-white border border-[color:var(--t-200)] p-12 text-center space-y-3">
               <BookOpen className="h-12 w-12 text-[color:var(--t-200)] mx-auto" />
@@ -276,7 +356,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
                     <span className="text-xs text-slate-600">{featured.date} · {readingMinutes(featured)} min read</span>
                   </div>
                   <h2 className="text-2xl font-bold tracking-tight text-[color:var(--ink)] leading-snug">{featured.title}</h2>
-                  <Takeaway text={featured.takeaway} />
+                  <Takeaway text={featured.takeaway} ms={featured.takeawayMs} />
                   <p className="text-sm text-[color:var(--ink-2)] leading-relaxed line-clamp-4">{featured.excerpt}</p>
                   <div className="mt-auto pt-4 border-t border-[color:var(--t-100)] flex flex-wrap items-center justify-between gap-3">
                     <AuthorBadge article={featured} large />
@@ -305,7 +385,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
                     </div>
                     <div><EvidenceBadge article={art} /></div>
                     <h3 className="text-[17px] font-bold text-[color:var(--ink)] leading-snug">{art.title}</h3>
-                    <Takeaway text={art.takeaway} />
+                    <Takeaway text={art.takeaway} ms={art.takeawayMs} />
                     <p className={`text-[13px] text-[color:var(--ink-2)] leading-relaxed ${art.takeaway ? 'line-clamp-2' : 'line-clamp-3'}`}>{art.excerpt}</p>
                     <div className="mt-auto pt-3.5 border-t border-[color:var(--t-100)] flex flex-wrap items-center justify-between gap-2">
                       <AuthorBadge article={art} />
@@ -409,7 +489,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
                 </span>
               </div>
 
-              <Takeaway text={openArticle.takeaway} />
+              <Takeaway text={openArticle.takeaway} ms={openArticle.takeawayMs} />
               <div className="text-sm leading-relaxed text-[color:var(--ink-2)] whitespace-pre-line">{openArticle.content}</div>
 
               {openArticle.source?.approvedAt && (
@@ -448,6 +528,25 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
               )}
             </div>
 
+            {isPractitioner && recOpen && (
+              <div className="no-print border-t border-[color:var(--t-200)] px-6 py-4 shrink-0 bg-white space-y-2">
+                <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-600">Recommend to a patient</h3>
+                {patients.length === 0 ? (
+                  <p className="text-xs text-slate-500">You have no patients yet. You can recommend articles to people you have treated.</p>
+                ) : (
+                  <div className="grid gap-2 sm:grid-cols-[220px_1fr_auto] items-start">
+                    <select value={recPatient} onChange={e => setRecPatient(e.target.value)} aria-label="Patient" className="border border-slate-200 bg-white px-3 py-2 text-sm">
+                      <option value="">Choose a patient…</option>
+                      {patients.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                    </select>
+                    <input value={recNote} onChange={e => setRecNote(e.target.value)} maxLength={300} placeholder="Optional note, e.g. “Read this before our follow-up”" aria-label="Note" className="border border-slate-200 px-3 py-2 text-sm" />
+                    <button type="button" onClick={sendRecommendation} disabled={!recPatient} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 py-2.5 cursor-pointer">Send</button>
+                  </div>
+                )}
+                {recMsg && <p role="status" className={`text-xs font-bold ${recMsg.ok ? 'text-emerald-700' : 'text-rose-700'}`}>{recMsg.text}</p>}
+              </div>
+            )}
+
             {related.length > 0 && (
               <div className="no-print border-t border-[color:var(--t-200)] px-6 py-4 shrink-0 bg-[color:var(--t-bg)]">
                 <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2">Related articles</h3>
@@ -472,6 +571,11 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
               <button type="button" onClick={() => window.print()} className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-[13px] font-semibold inline-flex items-center gap-2 cursor-pointer">
                 <Printer className="h-4 w-4" /> Print
               </button>
+              {isPractitioner && (
+                <button type="button" onClick={() => setRecOpen(v => !v)} aria-expanded={recOpen} className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-[13px] font-semibold inline-flex items-center gap-2 cursor-pointer">
+                  <Send className="h-4 w-4" /> Recommend to a patient
+                </button>
+              )}
               {onReportProblem && (
                 <button type="button" onClick={() => { const a = openArticle; setOpenArticle(null); onReportProblem(a); }} className="min-h-[44px] px-4 text-[13px] font-semibold text-slate-600 hover:text-rose-700 inline-flex items-center gap-2 cursor-pointer">
                   <Flag className="h-4 w-4" /> Report a problem

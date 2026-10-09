@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Calendar, Clock, FolderHeart, Heart, Video } from 'lucide-react';
+import { BookOpen, Calendar, Clock, FolderHeart, Heart, Video } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking } from '../types';
 import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
 import PatientRecords from './PatientRecords';
@@ -13,6 +13,8 @@ interface PatientDashboardProps {
   onSelectProfessional: (id: string) => void;
   onNavigateToMessages: () => void;
   onConsultNow: () => void;
+  /** Opens the Medical Library on a specific article. */
+  onOpenArticle: (articleId: string) => void;
 }
 
 type Tab = 'appointments' | 'records' | 'saved';
@@ -22,12 +24,16 @@ const readSaved = (): string[] => {
 };
 
 export default function PatientDashboard({
-  bookings, setBookings, professionals, onSelectProfessional, onNavigateToMessages, onConsultNow,
+  bookings, setBookings, professionals, onSelectProfessional, onNavigateToMessages, onConsultNow, onOpenArticle,
 }: PatientDashboardProps) {
   const [activeTab, setActiveTab] = useState<Tab>('appointments');
   const [savedIds, setSavedIds] = useState<string[]>(readSaved);
   const [summary, setSummary] = useState<{ activeRx: number; bp: any | null } | null>(null);
   const [paying, setPaying] = useState<Booking | null>(null);
+  const [reading, setReading] = useState<{ id: string; articleId: string; title: string; doctor: string; note: string | null; seen: boolean }[]>([]);
+  useEffect(() => {
+    fetch('/api/me/recommended-reading').then(r => r.json()).then(d => d.status === 'success' && setReading(d.data)).catch(() => {});
+  }, []);
   const [msg, setMsg] = useState<string | null>(null);
 
   const userName = (() => {
@@ -135,6 +141,24 @@ export default function PatientDashboard({
 
       {activeTab === 'appointments' && (
         <div id="panel-appointments" role="tabpanel" aria-labelledby="tab-appointments" tabIndex={0} className="space-y-5">
+          {reading.length > 0 && (
+            <section className={card} aria-label="Recommended reading">
+              <h2 className="text-base font-bold mb-3 flex items-center gap-2"><BookOpen className="h-4 w-4 text-[color:var(--t-600)]" /> Recommended by your doctors</h2>
+              <ul className="divide-y divide-slate-100">
+                {reading.slice(0, 5).map(r => (
+                  <li key={r.id} className="py-3 flex flex-wrap items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold">{r.title} {!r.seen && <span className="ml-1 text-[10px] font-extrabold uppercase bg-[color:var(--t-600)] text-white px-1.5 py-0.5 align-middle">New</span>}</p>
+                      <p className="text-xs text-slate-600">From {r.doctor}{r.note ? `: “${r.note}”` : ''}</p>
+                    </div>
+                    <button onClick={() => { fetch(`/api/me/recommended-reading/${r.id}/seen`, { method: 'POST' }).catch(() => {}); onOpenArticle(r.articleId); }}
+                      className="border border-slate-200 text-xs font-bold px-4 py-2 cursor-pointer">Read</button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           <section className={card}>
             <h2 className="text-base font-bold mb-3 flex items-center gap-2"><Clock className="h-4 w-4 text-[color:var(--t-600)]" /> Upcoming appointments</h2>
             {upcoming.length === 0 ? (
