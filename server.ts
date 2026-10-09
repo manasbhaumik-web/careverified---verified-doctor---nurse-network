@@ -618,7 +618,11 @@ const recalcRating = (professionalId: string) => {
   prof.rating = live.length ? Number((live.reduce((sum, r) => sum + r.rating, 0) / live.length).toFixed(2)) : 0;
   prof.reviewCount = live.length;
 };
-registerLiteratureRoutes(app);
+registerLiteratureRoutes(app, {
+  allBookings: () => bookings,
+  isVerifiedPractitioner: id => findProfessional(id)?.verificationStatus === VerificationStatus.VERIFIED,
+  libraryArticleIds: () => new Map<string, string>([...articles.map(a => [a.id, a.title] as [string, string]), ...approvedLiteratureArticles().map(a => [a.id, a.title] as [string, string])]),
+});
 registerQualityRoutes(app, { reviews: () => reviews, findProfessional, allProfessionals, bookings: () => bookings, recalcRating, chats: () => chats });
 setClinicalHooks(clinical);
 registerPaymentRoutes(app);

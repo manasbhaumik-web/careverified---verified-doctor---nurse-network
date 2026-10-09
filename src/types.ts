@@ -181,6 +181,8 @@ export interface Article {
   faq: { question: string; answer: string; }[];
   /** Plain-language summary written or approved by the board (research papers). */
   takeaway?: string | null;
+  /** Malay version of the key takeaway, written by the board. */
+  takeawayMs?: string | null;
   /** Strength of evidence for research papers. */
   evidence?: { label: string; level: 'high' | 'moderate' | 'info' };
   /** Present for papers imported from PubMed after admin approval. */

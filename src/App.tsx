@@ -676,6 +676,7 @@ export default function App() {
                 onSelectProfessional={(id) => setSelectedProfId(id)}
                 onNavigateToMessages={() => setActiveView('messages')}
                 onConsultNow={() => setActiveView('consult')}
+                onOpenArticle={(id) => { try { sessionStorage.setItem('open_article', id); } catch { /* ignore */ } setActiveView('articles'); }}
               />
             )}
 
@@ -684,6 +685,7 @@ export default function App() {
               <MedicalLibrary
                 articles={articles}
                 professionals={professionals}
+                canRecommend={currentUser.role === 'practitioner'}
                 onReportProblem={(a) => {
                   try { sessionStorage.setItem('support_prefill', JSON.stringify({ category: 'Feedback', subject: `Problem with article: ${a.title}`.slice(0, 120) })); } catch { /* ignore */ }
                   setActiveView('help');
