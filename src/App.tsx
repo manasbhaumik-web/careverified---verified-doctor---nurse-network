@@ -560,6 +560,7 @@ export default function App() {
               <div className="space-y-8">
                 {/* Standard dashboard header with attached tabs */}
                 <DashboardHeader
+                  icon={UserCheck}
                   eyebrow="Verified Medical Network"
                   title="Find Certified Doctors and Nurses"
                   description="A directory of practitioners with active, verified MMC and LJM registration numbers."
@@ -682,7 +683,8 @@ export default function App() {
             {activeView === 'articles' && (
               <MedicalLibrary
                 articles={articles}
-                onFindDoctor={() => { setActiveView('registry'); setSelectedProfId(null); }}
+                professionals={professionals}
+                onFindDoctor={(specialty) => { setSelectedSpecialtyFilter(specialty ?? ''); setRegistryTab('directory'); setActiveView('registry'); setSelectedProfId(null); }}
               />
             )}
 

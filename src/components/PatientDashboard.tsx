@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Calendar, Clock, FolderHeart, Heart, Pill, Stethoscope, Users, Video } from 'lucide-react';
+import { Calendar, Clock, FolderHeart, Heart, Video } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking } from '../types';
-import DashboardHeader from './DashboardHeader';
+import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
 import PatientRecords from './PatientRecords';
 import SavedTab from './patient/SavedTab';
 import PaymentDialog from './PaymentDialog';
@@ -33,6 +33,10 @@ export default function PatientDashboard({
   const userName = (() => {
     try { const u = JSON.parse(localStorage.getItem('medi_user') || 'null'); if (u?.name) return u.name as string; } catch { /* ignore */ }
     return 'there';
+  })();
+  const userAvatar = (() => {
+    try { const u = JSON.parse(localStorage.getItem('medi_user') || 'null'); if (u?.avatarUrl) return u.avatarUrl as string; } catch { /* ignore */ }
+    return null;
   })();
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
@@ -77,46 +81,55 @@ export default function PatientDashboard({
   return (
     <div className="w-full max-w-[1920px] mx-auto space-y-5" id="patient-dashboard-root">
       <DashboardHeader
-        eyebrow="Your health console"
-        title={`${greeting}, ${userName}`}
-        description="Your appointments, prescriptions and health record in one secure place."
-        actions={
-          <button onClick={onConsultNow} className="group pl-3 pr-5 py-2.5 min-h-[52px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white flex items-center gap-3 cursor-pointer shadow-sm hover:shadow-md transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[color:var(--t-600)]">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center bg-white/15"><Video className="h-5 w-5" /></span>
-            <span className="leading-tight">
-              <span className="block text-sm font-semibold tracking-wide">Consult a doctor now</span>
-              <span className="block text-xs font-normal text-white/80">Chat or video with an online doctor</span>
-            </span>
-          </button>
-        }
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         tabsLabel="Patient hub sections"
-      />
-
-      <section aria-label="Summary" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <button className={`${card} text-left cursor-pointer`} onClick={() => setActiveTab('appointments')}>
-          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Calendar className="h-4 w-4 text-[color:var(--t-600)]" /> Upcoming visits</p>
-          <p className="text-3xl font-bold tabular-nums mt-1">{upcoming.length}</p>
-          <p className="text-xs text-slate-600">{upcoming[0] ? `Next: ${upcoming[0].professionalName}, ${upcoming[0].date}` : 'No visits scheduled'}</p>
-        </button>
-        <button className={`${card} text-left cursor-pointer`} onClick={() => setActiveTab('records')}>
-          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Pill className="h-4 w-4 text-[color:var(--t-600)]" /> Active prescriptions</p>
-          <p className="text-3xl font-bold tabular-nums mt-1">{summary?.activeRx ?? '–'}</p>
-          <p className="text-xs text-slate-600">Signed e-prescriptions you can send to a pharmacy</p>
-        </button>
-        <button className={`${card} text-left cursor-pointer`} onClick={() => setActiveTab('records')}>
-          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Stethoscope className="h-4 w-4 text-[color:var(--t-600)]" /> Latest blood pressure</p>
-          <p className="text-3xl font-bold tabular-nums mt-1">{summary?.bp ? `${summary.bp.value1}/${summary.bp.value2}` : '–'}</p>
-          <p className={`text-xs ${summary?.bp?.flag?.level === 'urgent' ? 'text-rose-700 font-bold' : 'text-slate-600'}`}>{summary?.bp ? (summary.bp.flag?.text ?? 'mmHg') : 'No readings logged'}</p>
-        </button>
-        <div className={card}>
-          <p className="text-[13px] font-semibold text-slate-600 flex items-center gap-2"><Users className="h-4 w-4 text-[color:var(--t-600)]" /> Your care team</p>
-          <p className="text-3xl font-bold tabular-nums mt-1">{careTeam.length}</p>
-          <p className="text-xs text-slate-600">{careTeam.length ? careTeam.map(p => p.name).slice(0, 2).join(', ') : 'Book a visit to build your care team'}</p>
-        </div>
-      </section>
+      >
+        <BannerRow
+          identity={
+            <BannerIdentity
+              name={userName}
+              avatarUrl={userAvatar}
+              badges={<BannerBadge>Patient Account</BannerBadge>}
+              meta={
+                <>
+                  <span className="font-extrabold text-slate-900">{greeting}</span>
+                  <span className="text-slate-300">&bull;</span>
+                  <span>{upcoming[0] ? `Next visit: ${upcoming[0].professionalName}, ${upcoming[0].date}` : 'No visits scheduled'}</span>
+                  {summary?.bp && (
+                    <>
+                      <span className="text-slate-300">&bull;</span>
+                      <span className={summary.bp.flag?.level === 'urgent' ? 'text-rose-700 font-bold' : ''}>
+                        BP {summary.bp.value1}/{summary.bp.value2} mmHg
+                      </span>
+                    </>
+                  )}
+                </>
+              }
+            />
+          }
+          aside={
+            <>
+              <BannerKpis items={[
+                { value: upcoming.length, label: 'Upcoming' },
+                { value: summary?.activeRx ?? '–', label: 'Prescriptions' },
+                { value: careTeam.length, label: 'Care team' },
+              ]} />
+              <div className="flex items-center gap-2">
+                <button type="button" onClick={onConsultNow} className={bannerPrimaryBtn}>
+                  <Video className="h-4 w-4" />
+                  <span>Consult a doctor now</span>
+                </button>
+                <button type="button" onClick={() => setActiveTab('records')} className={bannerSecondaryBtn}>
+                  <FolderHeart className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                  <span>Health Record</span>
+                </button>
+              </div>
+            </>
+          }
+        />
+      </DashboardHeader>
 
       {msg && <p role="status" className="text-sm font-semibold bg-slate-900 text-white px-4 py-2.5">{msg} <button className="underline ml-3 text-xs cursor-pointer" onClick={() => setMsg(null)}>Dismiss</button></p>}
 

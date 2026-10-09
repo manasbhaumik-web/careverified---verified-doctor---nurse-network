@@ -179,6 +179,12 @@ export interface Article {
   date: string;
   citations: string[];
   faq: { question: string; answer: string; }[];
+  /** Plain-language summary written or approved by the board (research papers). */
+  takeaway?: string | null;
+  /** Strength of evidence for research papers. */
+  evidence?: { label: string; level: 'high' | 'moderate' | 'info' };
+  /** Present for papers imported from PubMed after admin approval. */
+  source?: { type: 'pubmed'; pmid: string; doi: string | null; journal: string; url: string; pubTypes: string[]; approvedAt: string | null; retractionCheckedAt: string | null };
 }
 
 // SEO Schemas Structure

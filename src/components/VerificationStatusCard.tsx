@@ -66,33 +66,44 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
   const Icon = verified ? CheckCircle2 : suspended || rejected ? ShieldOff : infoRequested ? AlertCircle : Clock;
   const field = 'w-full border border-slate-200 bg-white rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[color:var(--t-600)]';
 
+  const events: any[] = (info.events || []).slice(0, 3);
+
   return (
-    <section className={`border rounded-xl p-5 space-y-3 ${tone}`} aria-label="Verification status">
-      <div className="flex items-start gap-3">
-        <Icon className="h-5 w-5 shrink-0 mt-0.5" />
-        <div className="min-w-0 text-sm">
-          <p className="font-extrabold">
-            {verified ? 'Verified: your profile is public'
-              : suspended ? 'Suspended: your profile is hidden'
-              : rejected ? 'Application rejected'
-              : infoRequested ? 'The board needs more information'
-              : 'Pending: under review by the medical board'}
-          </p>
-          <p className="text-xs text-slate-600 mt-0.5">
-            Licence expires {fmt(info.licenseExpiry)}{verified ? ` · re-verification due ${fmt(info.verifiedUntil)}` : ''}
-            {dueSoon ? ' · renewal needed soon' : ''}
-          </p>
-          {suspended && info.suspensionReason && <p className="text-xs font-semibold text-rose-800 mt-1">Reason: {info.suspensionReason}</p>}
+    <section className={`border rounded-xl px-4 py-3 space-y-2 ${tone}`} aria-label="Verification status">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1 basis-72">
+          <Icon className="h-5 w-5 shrink-0" />
+          <div className="min-w-0 text-sm">
+            <p className="font-extrabold leading-tight">
+              {verified ? 'Verified: your profile is public'
+                : suspended ? 'Suspended: your profile is hidden'
+                : rejected ? 'Application rejected'
+                : infoRequested ? 'The board needs more information'
+                : 'Pending: under review by the medical board'}
+            </p>
+            <p className="text-xs text-slate-600">
+              Licence expires {fmt(info.licenseExpiry)}{verified ? ` · re-verification due ${fmt(info.verifiedUntil)}` : ''}
+              {dueSoon ? ' · renewal needed soon' : ''}
+            </p>
+            {suspended && info.suspensionReason && <p className="text-xs font-semibold text-rose-800 mt-0.5">Reason: {info.suspensionReason}</p>}
+          </div>
         </div>
+
+        {events.length > 0 && (
+          <ul className="flex flex-wrap gap-1.5 text-[11px]">
+            {events.map((e: any, i: number) => (
+              <li key={i} title={e.note || undefined} className="bg-white/70 border border-white rounded-lg px-2 py-1">
+                <span className="font-bold capitalize">{e.action.replace(/_/g, ' ')}</span> · {fmt(e.ts)}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
-      {info.events?.length > 0 && (
-        <ul className="text-xs space-y-1.5">
-          {info.events.slice(0, 4).map((e: any, i: number) => (
-            <li key={i} className="bg-white/70 border border-white rounded-lg p-2">
-              <span className="font-bold">{e.action.replace(/_/g, ' ')}</span> · {fmt(e.ts)}
-              {e.note && <span className="block text-slate-700">{e.note}</span>}
-            </li>
+      {events.some((e: any) => e.note) && (
+        <ul className="text-xs space-y-1">
+          {events.filter((e: any) => e.note).map((e: any, i: number) => (
+            <li key={i} className="text-slate-700"><span className="font-bold capitalize">{e.action.replace(/_/g, ' ')}:</span> {e.note}</li>
           ))}
         </ul>
       )}

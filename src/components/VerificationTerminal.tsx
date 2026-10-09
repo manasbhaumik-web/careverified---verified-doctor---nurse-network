@@ -15,7 +15,7 @@ import PractitionerBookingsTab from './practitioner/PractitionerBookingsTab';
 import PractitionerFeedbackTab from './practitioner/PractitionerFeedbackTab';
 import PractitionerAnalyticsTab from './practitioner/PractitionerAnalyticsTab';
 import PractitionerSettingsTab from './practitioner/PractitionerSettingsTab';
-import DashboardHeader from './DashboardHeader';
+import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
 import PageBanner from './PageBanner';
 
 interface VerificationTerminalProps {
@@ -370,106 +370,77 @@ export default function VerificationTerminal({
             onTabChange={setActiveDashboardTab}
             tabsLabel="Practitioner workspace sections"
           >
-            <div className="space-y-4">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pt-1">
-              {/* Left Practitioner Identity */}
-              <div className="flex items-center gap-5">
-                <div className="relative shrink-0">
-                  <img 
-                    src={matchedProfile.avatar} 
-                    alt={matchedProfile.name}
-                    className="h-20 w-20 rounded-full object-cover border-4 border-white shadow-md"
-                    referrerPolicy="no-referrer"
-                  />
-                  {isVerified && (
-                    <span 
+            <BannerRow
+              identity={
+                <BannerIdentity
+                  name={matchedProfile.name}
+                  avatarUrl={matchedProfile.avatar}
+                  avatarBadge={isVerified && (
+                    <span
                       className="absolute -bottom-1 -right-1 bg-white text-[color:var(--t-600)] p-1.5 rounded-full shadow-md flex items-center justify-center border border-[color:var(--t-200)]"
                       title="Verified Licensed Practitioner"
                     >
                       <Shield className="h-3.5 w-3.5 fill-current text-[color:var(--t-600)]" />
                     </span>
                   )}
-                </div>
-
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2.5 flex-wrap">
-                    <h2 className="text-xl sm:text-2xl font-bold text-[color:var(--ink)] tracking-tight">{matchedProfile.name}</h2>
-                    <span className="bg-white text-[color:var(--t-600)] border border-[color:var(--t-200)] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-2xs">
-                      {isDoc ? "Physician Account" : "Nurse Account"}
-                    </span>
-                    {isVerified && (
-                      <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
-                        <Check className="h-3 w-3 text-emerald-600 stroke-[3]" /> Verified Active
+                  badges={
+                    <>
+                      <BannerBadge>{isDoc ? "Physician Account" : "Nurse Account"}</BannerBadge>
+                      {isVerified && <BannerBadge tone="success"><Check className="h-3 w-3 text-emerald-600 stroke-[3]" /> Verified Active</BannerBadge>}
+                    </>
+                  }
+                  meta={
+                    <>
+                      <span className="font-extrabold text-slate-900">{matchedProfile.specialization}</span>
+                      <span className="text-slate-300">&bull;</span>
+                      <span className="font-mono text-slate-700">{matchedProfile.experienceYears} Years Exp.</span>
+                      <span className="text-slate-300">&bull;</span>
+                      <span className="font-mono font-bold text-slate-900 bg-white px-2 py-0.5 border border-[color:var(--t-200)] text-[10px] rounded-md shadow-2xs">
+                        {matchedProfile.licenseNumber}
                       </span>
-                    )}
-                  </div>
-
-                  {/* Integrated Essential Practice Metadata Strip */}
-                  <div className="flex items-center gap-2.5 text-xs text-slate-700 font-semibold flex-wrap">
-                    <span className="font-extrabold text-slate-900">{matchedProfile.specialization}</span>
-                    <span className="text-slate-300">&bull;</span>
-                    <span className="font-mono text-slate-700">{matchedProfile.experienceYears} Years Exp.</span>
-                    <span className="text-slate-300">&bull;</span>
-                    <span className="font-mono font-bold text-slate-900 bg-white px-2 py-0.5 border border-[color:var(--t-200)] text-[10px] rounded-md shadow-2xs">
-                      {matchedProfile.licenseNumber}
-                    </span>
-                    <span className="text-slate-300">&bull;</span>
-                    <span className="font-mono text-slate-700 text-[10px] bg-white px-1.5 py-0.5 border border-slate-200 rounded-md">
-                      ID: {matchedProfile.id}
-                    </span>
-                    {isVerified && <span className="text-slate-300">&bull;</span>}
-                    {isVerified && <span className="text-emerald-700 font-extrabold flex items-center gap-1.5">
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      <span className="text-slate-300">&bull;</span>
+                      <span className="font-mono text-slate-700 text-[10px] bg-white px-1.5 py-0.5 border border-slate-200 rounded-md">
+                        ID: {matchedProfile.id}
                       </span>
-                      Verified by the medical board
-                    </span>}
+                      {isVerified && <span className="text-slate-300">&bull;</span>}
+                      {isVerified && <span className="text-emerald-700 font-extrabold flex items-center gap-1.5">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        Verified by the medical board
+                      </span>}
+                    </>
+                  }
+                />
+              }
+              aside={
+                <>
+                  <BannerKpis items={[
+                    { value: patientsAttendedCount, label: 'Patients' },
+                    { value: upcomingBookingsCount, label: 'Upcoming' },
+                    { value: avgOverall ?? '5.0', label: 'Rating' },
+                  ]} />
+                  <div className="flex items-center gap-2">
+                    <button type="button" onClick={() => setShowPublicProfilePreview(true)} className={bannerPrimaryBtn}>
+                      <Eye className="h-4 w-4" />
+                      <span>View Public Profile</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`https://medicert.com/practitioner/${matchedProfile.id}`);
+                        showToast("Profile link copied to clipboard!");
+                      }}
+                      className={bannerSecondaryBtn}
+                    >
+                      <Send className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                      <span>Share Link</span>
+                    </button>
                   </div>
-                </div>
-              </div>
-
-              {/* Right High-Contrast KPI Executive Strip */}
-              <div className="flex items-center gap-4 flex-wrap lg:justify-end border-t lg:border-t-0 border-[color:var(--t-200)]/80 pt-4 lg:pt-0">
-                <div className="grid grid-cols-3 gap-3 bg-white/90 p-3 border border-[color:var(--t-200)] rounded-xl text-center min-w-[280px] shadow-xs">
-                  <div>
-                    <span className="text-xl font-bold text-[color:var(--t-600)] block leading-tight tabular-nums">{patientsAttendedCount}</span>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Patients</span>
-                  </div>
-                  <div className="border-x border-slate-200">
-                    <span className="text-xl font-bold text-[color:var(--t-600)] block leading-tight tabular-nums">{upcomingBookingsCount}</span>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Upcoming</span>
-                  </div>
-                  <div>
-                    <span className="text-xl font-bold text-[color:var(--t-600)] block leading-tight tabular-nums">{avgOverall ?? '5.0'}</span>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Rating</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowPublicProfilePreview(true)}
-                    className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-4 py-3 rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-2 border border-[color:var(--t-700)]"
-                  >
-                    <Eye className="h-4 w-4" />
-                    <span>View Public Profile</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText(`https://medicert.com/practitioner/${matchedProfile.id}`);
-                      showToast("Profile link copied to clipboard!");
-                    }}
-                    className="bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] text-xs font-bold px-4 py-3 rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-xs"
-                  >
-                    <Send className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                    <span>Share Link</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-            </div>
+                </>
+              }
+            />
           </DashboardHeader>
 
           <div className="w-full space-y-6">
