@@ -303,3 +303,11 @@ footer button.bg-slate-800:hover,
   border-color: var(--t-600);
   box-shadow: 0 0 0 1px var(--t-600);
 }
+
+/* Printing an open Medical Library article: hide everything except the reader */
+@media print {
+  body * { visibility: hidden; }
+  .print-article, .print-article * { visibility: visible; }
+  .print-article { position: absolute; inset: 0; max-height: none !important; width: 100% !important; max-width: none !important; box-shadow: none !important; border: 0 !important; }
+  .print-article .no-print { display: none !important; }
+}

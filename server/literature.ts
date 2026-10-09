@@ -202,22 +202,36 @@ export function registerLiteratureRoutes(app: Application) {
 
   /** Re-check every published paper against PubMed and pull any that have since been retracted. */
   app.post("/api/admin/literature/recheck", admin, async (req, res) => {
-    const approved = rows("SELECT * FROM literature WHERE status = 'approved'");
     try {
-      let withdrawn = 0;
-      for (let i = 0; i < approved.length; i += 50) {
-        const batch = approved.slice(i, i + 50);
-        const papers = await fetchPapers(batch.map(b => b.pmid));
-        for (const b of batch) {
-          const p = papers.find(x => x.pmid === b.pmid);
-          if (p?.retracted) { db.prepare("UPDATE literature SET status = 'withdrawn', admin_note = 'Retracted at source', retraction_checked_at = ? WHERE id = ?").run(iso(), b.id); withdrawn++; }
-          else if (p) db.prepare("UPDATE literature SET retraction_checked_at = ? WHERE id = ?").run(iso(), b.id);
-        }
-      }
-      audit(req, "literature.recheck", { details: { checked: approved.length, withdrawn } });
-      res.json({ status: "success", data: { checked: approved.length, withdrawn } });
+      const out = await recheckPublished();
+      audit(req, "literature.recheck", { details: out });
+      res.json({ status: "success", data: out });
     } catch (e: any) {
       fail(res, 502, `Could not reach PubMed: ${e?.message || "unknown error"}.`);
     }
   });
+
+  // Daily automatic retraction check so a retracted paper does not stay public until someone remembers to look.
+  const timer = setInterval(() => {
+    recheckPublished()
+      .then(out => { if (out.checked) audit(null, "literature.recheck.scheduled", { details: out }); })
+      .catch(() => { /* PubMed unreachable; the next run retries */ });
+  }, 24 * 60 * 60 * 1000);
+  timer.unref();
+}
+
+/** Checks all published papers against PubMed; retracted ones are withdrawn from the library. */
+export async function recheckPublished(): Promise<{ checked: number; withdrawn: number }> {
+  const approved = rows("SELECT * FROM literature WHERE status = 'approved'");
+  let withdrawn = 0;
+  for (let i = 0; i < approved.length; i += 50) {
+    const batch = approved.slice(i, i + 50);
+    const papers = await fetchPapers(batch.map(b => b.pmid));
+    for (const b of batch) {
+      const p = papers.find(x => x.pmid === b.pmid);
+      if (p?.retracted) { db.prepare("UPDATE literature SET status = 'withdrawn', admin_note = 'Retracted at source', retraction_checked_at = ? WHERE id = ?").run(iso(), b.id); withdrawn++; }
+      else if (p) db.prepare("UPDATE literature SET retraction_checked_at = ? WHERE id = ?").run(iso(), b.id);
+    }
+  }
+  return { checked: approved.length, withdrawn };
 }
