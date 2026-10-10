@@ -400,7 +400,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                       isApprovedInLoop ? "bg-emerald-50/50 border-emerald-200" : "bg-white"
                     }`}
                   >
-                    <div className="flex gap-4 items-center flex-1">
+                    <div className="flex gap-4 items-center flex-1 min-w-0 w-full lg:w-auto">
                       <img 
                         src={reqAvatar} 
                         alt={reqName}
@@ -408,9 +408,9 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                         referrerPolicy="no-referrer"
                       />
                       <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-sans text-sm font-semibold text-slate-800 truncate">{reqName}</h4>
-                          <span className={`text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
+                        <div className="flex items-center gap-2 min-w-0">
+                          <h4 className="font-sans text-sm font-semibold text-slate-800 truncate min-w-0">{reqName}</h4>
+                          <span className={`shrink-0 text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
                             reqRole === UserRole.DOCTOR ? "bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]" : "bg-emerald-50 text-emerald-800 border border-emerald-100"
                           }`}>
                             {reqRole === UserRole.DOCTOR ? "Doctor" : "Nurse"}

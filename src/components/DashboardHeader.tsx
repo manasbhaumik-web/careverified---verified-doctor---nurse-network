@@ -118,9 +118,9 @@ export default function DashboardHeader<T extends string>({
  * ---------------------------------------------------------------------------------------------- */
 
 export const bannerPrimaryBtn =
-  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-4 h-11 rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-2 border border-[color:var(--t-700)]';
+  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-4 h-11 rounded-xl shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
 export const bannerSecondaryBtn =
-  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] text-xs font-bold px-4 h-11 rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-xs';
+  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] text-xs font-bold px-4 h-11 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none shadow-xs';
 
 /** Two-column row: identity on the left, KPIs and actions on the right. */
 export function BannerRow({ identity, aside }: { identity: React.ReactNode; aside?: React.ReactNode }) {
@@ -152,13 +152,13 @@ interface BannerIdentityProps {
 export function BannerIdentity({ name, avatarUrl, icon: Icon, as: Heading = 'h2', description, avatarBadge, badges, meta }: BannerIdentityProps) {
   const initials = typeof name === 'string' ? name.replace(/^Dr\.?\s+/i, '').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() : '';
   return (
-    <div className="flex items-center gap-5 min-w-0">
+    <div className="flex items-center gap-3 sm:gap-5 min-w-0">
       <div className="relative shrink-0">
         {avatarUrl ? (
-          <img src={avatarUrl} alt={typeof name === 'string' ? name : ''} className="h-20 w-20 rounded-full object-cover border-4 border-white shadow-md" referrerPolicy="no-referrer" />
+          <img src={avatarUrl} alt={typeof name === 'string' ? name : ''} className="h-14 w-14 sm:h-20 sm:w-20 rounded-full object-cover border-2 sm:border-4 border-white shadow-md" referrerPolicy="no-referrer" />
         ) : (
-          <div aria-hidden="true" className="h-20 w-20 rounded-full border-4 border-white shadow-md bg-[color:var(--t-100)] text-[color:var(--t-700)] flex items-center justify-center text-2xl font-bold">
-            {Icon ? <Icon className="h-8 w-8" /> : initials || '?'}
+          <div aria-hidden="true" className="h-14 w-14 sm:h-20 sm:w-20 rounded-full border-2 sm:border-4 border-white shadow-md bg-[color:var(--t-100)] text-[color:var(--t-700)] flex items-center justify-center text-lg sm:text-2xl font-bold">
+            {Icon ? <Icon className="h-6 w-6 sm:h-8 sm:w-8" /> : initials || '?'}
           </div>
         )}
         {avatarBadge}
@@ -187,13 +187,26 @@ export function BannerBadge({ tone = 'brand', children }: { tone?: 'brand' | 'su
 /** KPI strip: one compact row, same height as the banner buttons (h-11). */
 export function BannerKpis({ items }: { items: { value: React.ReactNode; label: string }[] }) {
   return (
-    <div className="flex items-stretch h-11 bg-white/90 border border-[color:var(--t-200)] rounded-xl shadow-xs">
+    <div className="flex items-stretch w-full sm:w-auto sm:h-11 bg-white/90 border border-[color:var(--t-200)] rounded-xl shadow-xs">
       {items.map((k, i) => (
-        <div key={k.label} className={`flex items-center gap-2 px-4 ${i > 0 ? 'border-l border-slate-200' : ''}`}>
+        <div key={k.label} className={`flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-0 min-w-0 ${i > 0 ? 'border-l border-slate-200' : ''}`}>
           <span className="text-base font-bold text-[color:var(--t-600)] leading-none tabular-nums">{k.value}</span>
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-none whitespace-nowrap">{k.label}</span>
+          <span className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-tight text-center">{k.label}</span>
         </div>
       ))}
     </div>
+  );
+}
+
+/** Labelled dropdown used in filter rows (library, pharmacies). Two per row on phones. */
+export function FilterSelect({ label, value, onChange, children }: { label: string; value: string; onChange: (v: string) => void; children: React.ReactNode }) {
+  return (
+    <label className="flex flex-col gap-1 min-w-0 basis-[calc(50%-8px)] sm:basis-auto sm:w-[190px]">
+      <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-600">{label}</span>
+      <select value={value} onChange={e => onChange(e.target.value)}
+        className="w-full border border-[color:var(--t-200)] bg-white px-2 sm:px-3 min-h-[40px] text-[13px] font-semibold text-[color:var(--ink)] cursor-pointer focus:outline-none focus:border-[color:var(--t-600)]">
+        {children}
+      </select>
+    </label>
   );
 }

@@ -61,6 +61,17 @@ CREATE TABLE IF NOT EXISTS pharmacies (
   active INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL
 );
 `);
+for (const col of ["city TEXT", "hours TEXT", "services TEXT"]) {
+  try { db.exec(`ALTER TABLE pharmacies ADD COLUMN ${col}`); } catch { /* column already exists */ }
+}
+
+/** Services a pharmacy can list. Anything else is dropped. */
+export const PHARMACY_SERVICES = ["24 hours", "Home delivery", "Drive-through", "Vaccinations", "Online ordering"] as const;
+const cleanServices = (v: unknown): string[] => (Array.isArray(v) ? [...new Set(v.filter((x): x is string => typeof x === "string" && (PHARMACY_SERVICES as readonly string[]).includes(x)))] : []);
+const pharmacyView = (p: any) => ({
+  id: p.id, name: p.name, address: p.address, city: p.city ?? null, phone: p.phone ?? null, hours: p.hours ?? null,
+  services: (() => { try { return cleanServices(JSON.parse(p.services ?? "[]")); } catch { return []; } })(),
+});
 
 const iso = () => new Date().toISOString();
 const newId = (p: string) => `${p}-${crypto.randomBytes(7).toString("hex")}`;
@@ -425,7 +436,7 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
 
   // Patient: send a prescription to a partner pharmacy
   app.get("/api/pharmacies", requireAuth, (_req, res) => {
-    res.json({ status: "success", data: rows("SELECT id, name, address, phone FROM pharmacies WHERE active = 1 ORDER BY name") });
+    res.json({ status: "success", data: rows("SELECT id, name, address, city, phone, hours, services FROM pharmacies WHERE active = 1 ORDER BY name").map(pharmacyView) });
   });
   app.post("/api/prescriptions/:id/send", requireRole("patient"), (req, res) => {
     const r = row("SELECT * FROM prescriptions WHERE id = ? AND patient_user_id = ?", req.params.id, req.user!.id);
@@ -491,16 +502,35 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
 
   // Admin: pharmacy directory
   app.get("/api/admin/pharmacies", requireRole("admin"), (_req, res) => {
-    res.json({ status: "success", data: rows("SELECT id, name, address, phone, active, created_at FROM pharmacies ORDER BY created_at DESC") });
+    res.json({ status: "success", data: rows("SELECT id, name, address, city, phone, hours, services, active, created_at FROM pharmacies ORDER BY created_at DESC").map(p => ({ ...pharmacyView(p), active: p.active, created_at: p.created_at })) });
   });
   app.post("/api/admin/pharmacies", requireRole("admin"), (req, res) => {
     const name = str(req.body.name, 120), address = str(req.body.address, 250);
     if (!name || !address) return fail(res, 400, "Name and address are required.");
     const id = newId("ph");
     const pin = String(crypto.randomInt(100000, 999999));
-    db.prepare("INSERT INTO pharmacies (id,name,address,phone,pin_hash,created_at) VALUES (?,?,?,?,?,?)").run(id, name, address, str(req.body.phone, 30) || null, hashPassword(pin), iso());
+    db.prepare("INSERT INTO pharmacies (id,name,address,city,phone,hours,services,pin_hash,created_at) VALUES (?,?,?,?,?,?,?,?,?)")
+      .run(id, name, address, str(req.body.city, 60) || null, str(req.body.phone, 30) || null, str(req.body.hours, 120) || null, JSON.stringify(cleanServices(req.body.services)), hashPassword(pin), iso());
     audit(req, "pharmacy.create", { target: ["pharmacy", id] });
     res.status(201).json({ status: "success", data: { id, pin }, message: "Give the pharmacy its ID and PIN. The PIN is shown only once." });
+  });
+  app.patch("/api/admin/pharmacies/:id", requireRole("admin"), (req, res) => {
+    const p = row("SELECT * FROM pharmacies WHERE id = ?", req.params.id);
+    if (!p) return fail(res, 404, "Pharmacy not found.");
+    const b = req.body ?? {};
+    const name = "name" in b ? str(b.name, 120) : p.name;
+    const address = "address" in b ? str(b.address, 250) : p.address;
+    if (!name || !address) return fail(res, 400, "Name and address cannot be empty.");
+    db.prepare("UPDATE pharmacies SET name = ?, address = ?, city = ?, phone = ?, hours = ?, services = ? WHERE id = ?").run(
+      name, address,
+      "city" in b ? str(b.city, 60) || null : p.city,
+      "phone" in b ? str(b.phone, 30) || null : p.phone,
+      "hours" in b ? str(b.hours, 120) || null : p.hours,
+      "services" in b ? JSON.stringify(cleanServices(b.services)) : p.services,
+      p.id,
+    );
+    audit(req, "pharmacy.update", { target: ["pharmacy", p.id] });
+    res.json({ status: "success", data: pharmacyView(row("SELECT * FROM pharmacies WHERE id = ?", p.id)) });
   });
   app.post("/api/admin/pharmacies/:id/active", requireRole("admin"), (req, res) => {
     const r = db.prepare("UPDATE pharmacies SET active = ? WHERE id = ?").run(req.body.active === false ? 0 : 1, req.params.id);

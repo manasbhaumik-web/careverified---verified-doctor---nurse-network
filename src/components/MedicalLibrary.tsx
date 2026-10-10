@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, BadgeCheck, Bookmark, BookOpen, Check, ExternalLink, Flag, Printer, Search, Send, ShieldCheck, X } from 'lucide-react';
 import { Article, DoctorProfile, NurseProfile } from '../types';
-import DashboardHeader, { BannerKpis } from './DashboardHeader';
+import DashboardHeader, { BannerKpis, FilterSelect } from './DashboardHeader';
 
 interface MedicalLibraryProps {
   articles: Article[];
@@ -240,67 +240,58 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
       />
 
       {/* Search + categories */}
-      <section aria-label="Find articles" className="bg-white border border-[color:var(--t-200)] shadow-xs px-5 py-4 space-y-3.5">
-        <label htmlFor="library-search" className="sr-only">Search articles</label>
+      <section aria-label="Find articles" className="bg-white border border-[color:var(--t-200)] shadow-xs px-5 py-4 space-y-3">
+        {/* Row 1: search + saved */}
         <div className="flex flex-wrap items-center gap-3">
-        <div className="flex-1 min-w-[240px] flex items-center gap-2.5 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 min-h-[48px] focus-within:border-[color:var(--t-600)]">
-          <Search className="h-4 w-4 text-slate-500 shrink-0" />
-          <input
-            id="library-search"
-            type="text"
-            placeholder="Search by condition, topic or author (try “sugar” or “high blood pressure”)"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="flex-1 min-w-0 bg-transparent text-sm text-[color:var(--ink)] outline-none placeholder-slate-500"
-          />
+          <label htmlFor="library-search" className="sr-only">Search articles</label>
+          <div className="flex-1 min-w-[220px] flex items-center gap-2.5 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 min-h-[44px] focus-within:border-[color:var(--t-600)]">
+            <Search className="h-4 w-4 text-slate-500 shrink-0" />
+            <input
+              id="library-search"
+              type="text"
+              placeholder="Search topics, e.g. “sugar”"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="flex-1 min-w-0 bg-transparent text-sm text-[color:var(--ink)] outline-none placeholder-slate-500"
+            />
+          </div>
+          <button type="button" aria-pressed={onlySaved} onClick={() => setOnlySaved(v => !v)}
+            className={`min-h-[44px] px-4 text-[13px] font-semibold border inline-flex items-center gap-2 cursor-pointer ${onlySaved ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-100)]'}`}>
+            <Bookmark className="h-4 w-4" /> Saved ({savedIds.length})
+          </button>
         </div>
-        <button type="button" aria-pressed={onlySaved} onClick={() => setOnlySaved(v => !v)}
-          className={`min-h-[48px] px-4 text-[13px] font-semibold border inline-flex items-center gap-2 cursor-pointer ${onlySaved ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-100)]'}`}>
-          <Bookmark className="h-4 w-4" /> Saved ({savedIds.length})
-        </button>
-        </div>
-        {hasResearch && (
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pb-1">
-            <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Source">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 mr-1">Source</span>
-              {([['all', 'All'], ['practitioner', 'Practitioner articles'], ['research', 'Research papers']] as const).map(([id, label]) => (
-                <button key={id} type="button" aria-pressed={source === id} onClick={() => { setSource(id); if (id === 'practitioner') setEvidence('all'); }}
-                  className={`min-h-[34px] px-3 text-xs font-semibold border cursor-pointer ${source === id ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-100)]'}`}>{label}</button>
-              ))}
-            </div>
-            <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Type of evidence">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 mr-1">Evidence</span>
-              {['all', ...evidenceLabels].map(l => (
-                <button key={l} type="button" aria-pressed={evidence === l} onClick={() => { setEvidence(l); if (l !== 'all') setSource('research'); }}
-                  className={`min-h-[34px] px-3 text-xs font-semibold border cursor-pointer ${evidence === l ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-100)]'}`}>{l === 'all' ? 'Any' : l}</button>
-              ))}
-            </div>
-            <label className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 ml-auto">
-              Sort
-              <select value={sort} onChange={e => setSort(e.target.value as SortKey)} className="border border-[color:var(--t-200)] bg-white px-2 min-h-[34px] text-xs font-semibold normal-case tracking-normal text-[color:var(--ink)]">
+
+        {/* Row 2: filters as dropdowns */}
+        <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
+          <FilterSelect label="Topic" value={category} onChange={setCategory}>
+            <option value={ALL}>All topics ({articles.length})</option>
+            {categories.map(([c, n]) => <option key={c} value={c}>{c} ({n})</option>)}
+          </FilterSelect>
+          {hasResearch && (
+            <>
+              <FilterSelect label="Source" value={source} onChange={(v) => { setSource(v as SourceFilter); if (v === 'practitioner') setEvidence('all'); }}>
+                <option value="all">All sources</option>
+                <option value="practitioner">Practitioner articles</option>
+                <option value="research">Research papers</option>
+              </FilterSelect>
+              <FilterSelect label="Evidence" value={evidence} onChange={(v) => { setEvidence(v); if (v !== 'all') setSource('research'); }}>
+                <option value="all">Any evidence</option>
+                {evidenceLabels.map(l => <option key={l} value={l}>{l}</option>)}
+              </FilterSelect>
+              <FilterSelect label="Sort by" value={sort} onChange={(v) => setSort(v as SortKey)}>
                 <option value="newest">Newest first</option>
                 <option value="oldest">Oldest first</option>
                 <option value="evidence">Strongest evidence</option>
-              </select>
-            </label>
-          </div>
-        )}
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Categories">
-          {[ALL, ...categories.map(([c]) => c)].map(c => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setCategory(c)}
-              aria-pressed={category === c}
-              className={`min-h-[40px] px-4 text-[13px] font-semibold border transition-colors cursor-pointer ${
-                category === c
-                  ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white'
-                  : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-100)]'
-              }`}
-            >
-              {c}
+              </FilterSelect>
+            </>
+          )}
+          {(category !== ALL || source !== 'all' || evidence !== 'all' || onlySaved || query) && (
+            <button type="button" onClick={() => { setCategory(ALL); setSource('all'); setEvidence('all'); setOnlySaved(false); setQuery(''); }}
+              className="min-h-[40px] px-3 text-[13px] font-bold text-[color:var(--t-700)] hover:underline cursor-pointer">
+              Clear filters
             </button>
-          ))}
+          )}
+          <span className="ml-auto self-center text-[13px] text-slate-600 tabular-nums" aria-live="polite">{filtered.length} result{filtered.length === 1 ? '' : 's'}</span>
         </div>
       </section>
 
@@ -343,19 +334,19 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
             <>
               {/* Featured article */}
               <article className="bg-white border border-[color:var(--t-200)] shadow-xs hover:shadow-md hover:border-[color:var(--t-300)] transition-all flex flex-wrap">
-                <div className="flex-[1_1_240px] min-h-[200px] bg-[color:var(--t-50)] border-b md:border-b-0 md:border-r border-[color:var(--t-200)] flex items-center justify-center">
+                <div className="flex-[1_1_240px] min-w-0 min-h-[200px] bg-[color:var(--t-50)] border-b md:border-b-0 md:border-r border-[color:var(--t-200)] flex items-center justify-center">
                   <div className="h-[72px] w-[72px] bg-[color:var(--t-600)] text-white flex items-center justify-center">
                     <BookOpen className="h-8 w-8" />
                   </div>
                 </div>
-                <div className="flex-[2_1_380px] p-6 flex flex-col gap-3">
+                <div className="flex-[2_1_380px] min-w-0 p-6 flex flex-col gap-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-white bg-[color:var(--t-600)] px-2.5 py-1">Featured</span>
                     <span className="text-[11px] font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-0.5">{featured.category}</span>
                     <EvidenceBadge article={featured} />
                     <span className="text-xs text-slate-600">{featured.date} · {readingMinutes(featured)} min read</span>
                   </div>
-                  <h2 className="text-2xl font-bold tracking-tight text-[color:var(--ink)] leading-snug">{featured.title}</h2>
+                  <h2 className="text-2xl font-bold tracking-tight text-[color:var(--ink)] leading-snug [overflow-wrap:anywhere]">{featured.title}</h2>
                   <Takeaway text={featured.takeaway} ms={featured.takeawayMs} />
                   <p className="text-sm text-[color:var(--ink-2)] leading-relaxed line-clamp-4">{featured.excerpt}</p>
                   <div className="mt-auto pt-4 border-t border-[color:var(--t-100)] flex flex-wrap items-center justify-between gap-3">
@@ -384,7 +375,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
                       <span className="text-xs text-slate-600">{art.date}</span>
                     </div>
                     <div><EvidenceBadge article={art} /></div>
-                    <h3 className="text-[17px] font-bold text-[color:var(--ink)] leading-snug">{art.title}</h3>
+                    <h3 className="text-[17px] font-bold text-[color:var(--ink)] leading-snug [overflow-wrap:anywhere]">{art.title}</h3>
                     <Takeaway text={art.takeaway} ms={art.takeawayMs} />
                     <p className={`text-[13px] text-[color:var(--ink-2)] leading-relaxed ${art.takeaway ? 'line-clamp-2' : 'line-clamp-3'}`}>{art.excerpt}</p>
                     <div className="mt-auto pt-3.5 border-t border-[color:var(--t-100)] flex flex-wrap items-center justify-between gap-2">
@@ -469,7 +460,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
                   <EvidenceBadge article={openArticle} />
                   <span className="text-xs text-slate-600">{openArticle.date}</span>
                 </div>
-                <h2 className="text-xl font-bold text-[color:var(--ink)] leading-snug">{openArticle.title}</h2>
+                <h2 className="text-xl font-bold text-[color:var(--ink)] leading-snug [overflow-wrap:anywhere]">{openArticle.title}</h2>
               </div>
               <button
                 type="button"
@@ -555,7 +546,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
                     <li key={r.id}>
                       <button type="button" onClick={() => setOpenArticle(r)} className="w-full text-left bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-2.5 cursor-pointer">
                         <span className="block text-[11px] text-slate-500">{r.category}</span>
-                        <span className="text-[13px] font-semibold leading-snug line-clamp-2">{r.title}</span>
+                        <span className="text-[13px] font-semibold leading-snug line-clamp-2 [overflow-wrap:anywhere]">{r.title}</span>
                       </button>
                     </li>
                   ))}

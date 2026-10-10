@@ -421,7 +421,7 @@ export default function VerificationTerminal({
                     { value: upcomingBookingsCount, label: 'Upcoming' },
                     { value: avgOverall ?? '5.0', label: 'Rating' },
                   ]} />
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                     <button type="button" onClick={() => setShowPublicProfilePreview(true)} className={bannerPrimaryBtn}>
                       <Eye className="h-4 w-4" />
                       <span>View Public Profile</span>

@@ -205,8 +205,8 @@ export default function AdminLiterature() {
                   <span key={t} className="bg-slate-50 border border-slate-200 px-2 py-0.5">{t}</span>
                 ))}
               </div>
-              <h3 className="text-sm font-extrabold leading-snug">{p.title}</h3>
-              <p className="text-xs text-slate-600">{p.authors} · <i>{p.journal}</i> · {p.pubDate} · PMID {p.pmid}{p.doi ? ` · doi:${p.doi}` : ''}</p>
+              <h3 className="text-sm font-extrabold leading-snug [overflow-wrap:anywhere]">{p.title}</h3>
+              <p className="text-xs text-slate-600 [overflow-wrap:anywhere]">{p.authors} · <i>{p.journal}</i> · {p.pubDate} · PMID {p.pmid}{p.doi ? ` · doi:${p.doi}` : ''}</p>
               <p className={`text-xs text-slate-700 leading-relaxed whitespace-pre-line ${openId === p.id ? '' : 'line-clamp-4'}`}>{p.abstract}</p>
               <div className="flex flex-wrap items-center gap-3 text-xs">
                 <button onClick={() => setOpenId(openId === p.id ? null : p.id)} className="font-bold text-[color:var(--t-700)] cursor-pointer">{openId === p.id ? 'Show less' : 'Read full abstract'}</button>

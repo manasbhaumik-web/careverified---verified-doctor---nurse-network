@@ -122,7 +122,7 @@ export default function PatientDashboard({
                 { value: summary?.activeRx ?? '–', label: 'Prescriptions' },
                 { value: careTeam.length, label: 'Care team' },
               ]} />
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                 <button type="button" onClick={onConsultNow} className={bannerPrimaryBtn}>
                   <Video className="h-4 w-4" />
                   <span>Consult a doctor now</span>
