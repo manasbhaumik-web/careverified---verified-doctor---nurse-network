@@ -15,7 +15,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
   const [selectedSchemaProf, setSelectedSchemaProf] = useState<any | null>(null);
 
   // Programmatic templates
-  const [titleTemplate, setTitleTemplate] = useState('Best [Specialty] in [City] | CareVerified ✅');
+  const [titleTemplate, setTitleTemplate] = useState('Best [Specialty] in [City] | MedCred ✅');
   const [descTemplate, setDescriptionTemplate] = useState('Find & book pre-verified, licensed [Specialty] specialists in [City] with transparent credentials, patient reviews, and verified medical council registries.');
 
   const selectedProf = professionals.find(p => p.id === selectedProfId) || professionals[0];

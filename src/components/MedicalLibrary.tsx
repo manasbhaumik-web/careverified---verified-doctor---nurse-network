@@ -450,7 +450,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
             role="dialog"
             aria-modal="true"
             aria-label={openArticle.title}
-            className="print-article bg-white border border-[color:var(--t-200)] w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl"
+            className="print-article bg-white border border-[color:var(--t-200)] w-full max-w-3xl max-h-[90dvh] flex flex-col shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] p-5 flex items-start justify-between gap-4 shrink-0">

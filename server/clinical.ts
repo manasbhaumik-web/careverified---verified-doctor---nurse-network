@@ -65,10 +65,32 @@ for (const col of ["city TEXT", "hours TEXT", "services TEXT"]) {
   try { db.exec(`ALTER TABLE pharmacies ADD COLUMN ${col}`); } catch { /* column already exists */ }
 }
 
+// Board verification of a pharmacy before it can have workspace logins.
+for (const col of ["licence_no TEXT", "pharmacist_name TEXT", "pharmacist_reg TEXT", "verified_at TEXT", "verified_by TEXT"]) {
+  try { db.exec(`ALTER TABLE pharmacies ADD COLUMN ${col}`); } catch { /* column already exists */ }
+}
+
+// Pharmacy workspace: when a prescription was sent and how the pharmacy has handled it, plus the activity log and private notes.
+for (const col of ["sent_at TEXT", "fill_status TEXT", "fill_reason TEXT", "fill_updated_at TEXT", "first_response_at TEXT", "share_safety INTEGER NOT NULL DEFAULT 0"]) {
+  try { db.exec(`ALTER TABLE prescriptions ADD COLUMN ${col}`); } catch { /* column already exists */ }
+}
+db.exec("UPDATE prescriptions SET sent_at = issued_at WHERE pharmacy_id IS NOT NULL AND sent_at IS NULL");
+db.exec(`
+CREATE TABLE IF NOT EXISTS pharmacy_events (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, pharmacy_id TEXT NOT NULL, prescription_id TEXT, ts TEXT NOT NULL,
+  actor_user_id TEXT, type TEXT NOT NULL, detail TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_pharmacy_events ON pharmacy_events(pharmacy_id, ts);
+CREATE TABLE IF NOT EXISTS pharmacy_notes (
+  pharmacy_id TEXT NOT NULL, prescription_id TEXT NOT NULL, note TEXT NOT NULL, updated_at TEXT NOT NULL,
+  PRIMARY KEY (pharmacy_id, prescription_id)
+);
+`);
+
 /** Services a pharmacy can list. Anything else is dropped. */
 export const PHARMACY_SERVICES = ["24 hours", "Home delivery", "Drive-through", "Vaccinations", "Online ordering"] as const;
-const cleanServices = (v: unknown): string[] => (Array.isArray(v) ? [...new Set(v.filter((x): x is string => typeof x === "string" && (PHARMACY_SERVICES as readonly string[]).includes(x)))] : []);
-const pharmacyView = (p: any) => ({
+export const cleanServices = (v: unknown): string[] => (Array.isArray(v) ? [...new Set(v.filter((x): x is string => typeof x === "string" && (PHARMACY_SERVICES as readonly string[]).includes(x)))] : []);
+export const pharmacyView = (p: any) => ({
   id: p.id, name: p.name, address: p.address, city: p.city ?? null, phone: p.phone ?? null, hours: p.hours ?? null,
   services: (() => { try { return cleanServices(JSON.parse(p.services ?? "[]")); } catch { return []; } })(),
 });
@@ -81,6 +103,27 @@ const dateOnly = (v: unknown) => (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/
 const rows = (sql: string, ...p: any[]) => db.prepare(sql).all(...p) as any[];
 const row = (sql: string, ...p: any[]) => db.prepare(sql).get(...p) as any;
 
+export const rxEffectiveStatus = (r: any) => (r.status === "active" && Date.parse(r.valid_until) < Date.now() ? "expired" : r.status);
+
+/** Activity log entry for a pharmacy (new prescription, status change, dispense, profile edit...). */
+export function pharmacyEvent(pharmacyId: string, prescriptionId: string | null, type: string, actorUserId: string | null, detail?: unknown) {
+  db.prepare("INSERT INTO pharmacy_events (pharmacy_id, prescription_id, ts, actor_user_id, type, detail) VALUES (?,?,?,?,?,?)")
+    .run(pharmacyId, prescriptionId, iso(), actorUserId, type, detail === undefined ? null : JSON.stringify(detail));
+}
+/** In-app notification to every active login of a pharmacy. */
+export function notifyPharmacy(pharmacyId: string, title: string, body: string) {
+  const users = rows("SELECT id, email FROM users WHERE role = 'pharmacy' AND profile_id = ? AND status = 'active'", pharmacyId);
+  for (const u of users) notify(u.id, title, body);
+  // Optional outbound alert for email/SMS/chat: point PHARMACY_ALERT_WEBHOOK_URL at a gateway. No patient details are sent.
+  const hook = process.env.PHARMACY_ALERT_WEBHOOK_URL;
+  if (hook && users.length) {
+    fetch(hook, {
+      method: "POST", headers: { "Content-Type": "application/json" }, signal: AbortSignal.timeout(5000),
+      body: JSON.stringify({ type: "pharmacy.alert", pharmacyId, title, body, recipients: users.map(u => u.email) }),
+    }).catch(() => { /* alerts are best effort; the in-app notification is already stored */ });
+  }
+}
+
 // ---------- tamper-evident signatures ----------
 function signingKey(): string {
   if (process.env.RECORD_SIGNING_SECRET) return process.env.RECORD_SIGNING_SECRET;
@@ -92,13 +135,13 @@ function signingKey(): string {
   }
   return r.value;
 }
-const sign = (payload: unknown) => crypto.createHmac("sha256", signingKey()).update(JSON.stringify(payload)).digest("hex");
-const same = (a: string, b: string) => a.length === b.length && crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+export const sign = (payload: unknown) => crypto.createHmac("sha256", signingKey()).update(JSON.stringify(payload)).digest("hex");
+export const same = (a: string, b: string) => a.length === b.length && crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
 // 10 chars from an unambiguous alphabet (no 0/O/1/I): about 50 bits, enough to be unguessable
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const newCode = () => Array.from(crypto.randomBytes(10), b => ALPHABET[b % ALPHABET.length]).join("");
 
-const rxPayload = (r: any) => ({ id: r.id, code: r.code, patient: r.patient_user_id, professional: r.professional_id, issuedAt: r.issued_at, validUntil: r.valid_until, diagnosis: r.diagnosis, items: JSON.parse(r.items) });
+export const rxPayload = (r: any) => ({ id: r.id, code: r.code, patient: r.patient_user_id, professional: r.professional_id, issuedAt: r.issued_at, validUntil: r.valid_until, diagnosis: r.diagnosis, items: JSON.parse(r.items) });
 const certPayload = (c: any) => ({ id: c.id, code: c.code, patient: c.patient_user_id, professional: c.professional_id, from: c.from_date, to: c.to_date, issuedAt: c.issued_at });
 
 // ---------- consent ----------
@@ -420,16 +463,22 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     if (!reason) return fail(res, 400, "A reason is required.");
     db.prepare("UPDATE prescriptions SET status='cancelled', cancelled_reason=? WHERE id=?").run(reason, r.id);
     notify(r.patient_user_id, "A prescription was cancelled", reason);
+    if (r.pharmacy_id) {
+      pharmacyEvent(r.pharmacy_id, r.id, "cancelled", req.user!.id, { reason });
+      notifyPharmacy(r.pharmacy_id, "Prescription cancelled by the doctor", `Prescription ${r.code} was cancelled. Do not dispense it.`);
+    }
     audit(req, "prescription.cancel", { target: ["prescription", r.id] });
     res.json({ status: "success" });
   });
 
-  const effectiveStatus = (r: any) => (r.status === "active" && Date.parse(r.valid_until) < Date.now() ? "expired" : r.status);
+  const effectiveStatus = rxEffectiveStatus;
   function rxView(r: any) {
     const prof = ctx.findProfessional(r.professional_id);
     return {
       id: r.id, code: r.code, diagnosis: r.diagnosis, items: JSON.parse(r.items), notes: r.notes, issuedAt: r.issued_at, validUntil: r.valid_until,
       status: effectiveStatus(r), pharmacyId: r.pharmacy_id, dispensedAt: r.dispensed_at,
+      pharmacyName: r.pharmacy_id ? (row("SELECT name FROM pharmacies WHERE id = ?", r.pharmacy_id)?.name as string | undefined) ?? null : null,
+      sentAt: r.sent_at ?? null, fillStatus: r.fill_status ?? null, fillReason: r.fill_reason ?? null, fillUpdatedAt: r.fill_updated_at ?? null, sharedSafety: !!r.share_safety,
       doctor: prof ? { name: prof.name, licenseNumber: prof.licenseNumber } : null,
     };
   }
@@ -444,9 +493,18 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     if (effectiveStatus(r) !== "active") return fail(res, 409, "This prescription can no longer be sent.");
     const ph = row("SELECT id, name FROM pharmacies WHERE id = ? AND active = 1", str(req.body.pharmacyId, 60));
     if (!ph) return fail(res, 404, "Pharmacy not found.");
-    db.prepare("UPDATE prescriptions SET pharmacy_id = ? WHERE id = ?").run(ph.id, r.id);
+    const share = req.body.shareSafety === true ? 1 : 0;
+    if (r.pharmacy_id === ph.id) {
+      db.prepare("UPDATE prescriptions SET share_safety = ? WHERE id = ?").run(share, r.id);
+      return res.json({ status: "success", message: `Already sent to ${ph.name}. Show the pharmacy the code ${r.code}.` });
+    }
+    const now = iso();
+    db.prepare("UPDATE prescriptions SET pharmacy_id = ?, sent_at = ?, fill_status = NULL, fill_reason = NULL, fill_updated_at = NULL, first_response_at = NULL, share_safety = ? WHERE id = ?").run(ph.id, now, share, r.id);
+    if (r.pharmacy_id) pharmacyEvent(r.pharmacy_id, r.id, "redirected", req.user!.id, { code: r.code });
+    pharmacyEvent(ph.id, r.id, "sent", req.user!.id, { code: r.code });
+    notifyPharmacy(ph.id, "New prescription received", `A patient sent prescription ${r.code}. Open your inbox to respond.`);
     audit(req, "prescription.send", { target: ["prescription", r.id], details: { pharmacyId: ph.id } });
-    res.json({ status: "success", message: `Prescription assigned to ${ph.name}. Show the pharmacy the code ${r.code}.` });
+    res.json({ status: "success", message: `Prescription sent to ${ph.name}. They can see it in their inbox, or show them the code ${r.code}.` });
   });
 
   // Public check: is this prescription genuine and still valid? (no patient details)
@@ -479,6 +537,7 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     const r = row("SELECT * FROM prescriptions WHERE code = ?", str(req.body.code, 20).toUpperCase());
     if (!r || !same(sign(rxPayload(r)), r.signature)) return fail(res, 404, "No valid prescription with that code.");
     audit(null, "pharmacy.lookup", { actor: null, target: ["prescription", r.id], details: { pharmacyId: ph.id } });
+    pharmacyEvent(ph.id, r.id, "lookup", null, { via: "counter" });
     const prof = ctx.findProfessional(r.professional_id);
     res.json({ status: "success", data: {
       id: r.id, status: effectiveStatus(r), issuedAt: r.issued_at, validUntil: r.valid_until, patientName: userName(r.patient_user_id),
@@ -495,6 +554,8 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     if (effectiveStatus(r) !== "active") return fail(res, 409, `This prescription is ${effectiveStatus(r)}.`);
     const changed = db.prepare("UPDATE prescriptions SET status='dispensed', dispensed_at=?, dispensed_by=? WHERE id=? AND status='active'").run(iso(), ph.id, r.id).changes;
     if (!changed) return fail(res, 409, "Already dispensed.");
+    db.prepare("UPDATE prescriptions SET pharmacy_id = COALESCE(pharmacy_id, ?), first_response_at = CASE WHEN pharmacy_id IS NULL OR pharmacy_id = ? THEN COALESCE(first_response_at, ?) ELSE first_response_at END WHERE id = ?").run(ph.id, ph.id, iso(), r.id);
+    pharmacyEvent(ph.id, r.id, "dispensed", null, { via: "counter" });
     notify(r.patient_user_id, "Prescription dispensed", `${ph.name} dispensed your prescription.`);
     audit(null, "pharmacy.dispense", { actor: null, target: ["prescription", r.id], details: { pharmacyId: ph.id } });
     res.json({ status: "success" });

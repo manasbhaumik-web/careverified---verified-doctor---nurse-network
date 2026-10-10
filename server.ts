@@ -11,6 +11,7 @@ import {
 } from "./server/auth";
 import { documentsRouter, setRequestOwnerLookup, setClinicalHooks } from "./server/documents";
 import { registerClinicalRoutes, createGrant, seedHealthItems } from "./server/clinical";
+import { registerPharmacyWorkspace } from "./server/pharmacy";
 import { registerLiteratureRoutes, approvedLiteratureArticles } from "./server/literature";
 import { registerQualityRoutes, accountForChatId, isBlocked } from "./server/quality";
 import { registerVerificationRoutes, notifyAdmins, notify } from "./server/verification";
@@ -268,11 +269,11 @@ const isOwnerOrAdmin = (u: AuthUser | undefined, profileId: string) =>
 app.post("/api/auth/login", (req, res) => {
   const email = str(req.body.email, 254).toLowerCase();
   const password = typeof req.body.password === "string" ? req.body.password : "";
-  const role = ["patient", "practitioner", "admin"].includes(req.body.role) ? (req.body.role as Role) : undefined;
+  const role = ["patient", "practitioner", "admin", "pharmacy"].includes(req.body.role) ? (req.body.role as Role) : undefined;
   if (!email || !password) return fail(res, 400, "Please fill in all fields.");
 
-  const result = attemptLogin(req, email, password, role);
-  if ("error" in result) return fail(res, 401, result.error);
+  const result = attemptLogin(req, email, password, role, str(req.body.code, 12));
+  if ("error" in result) return res.status(401).json({ status: "error", message: result.error, needsCode: result.needsCode === true });
 
   createSession(req, res, result.id);
   audit(req, "auth.login", { actor: result });
@@ -624,6 +625,7 @@ registerLiteratureRoutes(app, {
   libraryArticleIds: () => new Map<string, string>([...articles.map(a => [a.id, a.title] as [string, string]), ...approvedLiteratureArticles().map(a => [a.id, a.title] as [string, string])]),
 });
 registerQualityRoutes(app, { reviews: () => reviews, findProfessional, allProfessionals, bookings: () => bookings, recalcRating, chats: () => chats });
+registerPharmacyWorkspace(app, { findProfessional });
 setClinicalHooks(clinical);
 registerPaymentRoutes(app);
 const UNPAID_HOLD_MS = 15 * 60_000;
@@ -998,7 +1000,7 @@ app.post("/api/symptom-matching", (req, res) => {
   const flags = redFlags(symptoms);
   res.json({
     status: "success",
-    source: "CareVerified Triage Engine",
+    source: "MedCred Triage Engine",
     data: recommendation,
     emergency: flags.length ? { reasons: flags, numbers: emergencyNumbers() } : null,
   });
@@ -1144,7 +1146,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`CareVerified Full-Stack server is actively listening on http://0.0.0.0:${PORT}`);
+    console.log(`MedCred Full-Stack server is actively listening on http://0.0.0.0:${PORT}`);
   });
 }
 

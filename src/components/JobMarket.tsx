@@ -515,7 +515,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
           onClick={() => setSelectedModalJob(null)}
         >
           <div 
-            className="bg-white border border-[color:var(--t-200)] w-full max-w-xl shadow-2xl overflow-hidden animate-slide-down flex flex-col max-h-[90vh]"
+            className="bg-white border border-[color:var(--t-200)] w-full max-w-xl shadow-2xl overflow-hidden animate-slide-down flex flex-col max-h-[90dvh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header banner */}

@@ -42,7 +42,7 @@
   --font-weight-extrabold: 700;
   --font-weight-black: 700;
 
-  /* Unified App-Wide Color System: CareVerified Crimson + Modern Slate Theme */
+  /* Unified App-Wide Color System: MedCred Crimson + Modern Slate Theme */
   --color-rose-50: var(--t-50);
   --color-rose-100: var(--t-100);
   --color-rose-200: var(--t-200);
@@ -84,6 +84,27 @@ html, body {
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Viewport robustness: no sideways page scroll, notch-safe edges, no iOS focus-zoom, calm motion on request */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  overflow-x: clip;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+@media (max-width: 639px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+  select,
+  textarea { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .font-mono {
@@ -278,8 +299,11 @@ footer button.bg-slate-800:hover,
 
 /* Hero headline is black-with-white-glow over a photo in light themes; invert for navy */
 :root[data-theme="navy"] header#top h1.text-black,
+:root[data-theme="navy"] header#top h2.text-black,
 :root[data-theme="navy"] header#top h1 .text-black { color: #FFFFFF; text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
+:root[data-theme="navy"] header#top h2 .text-black { color: #FFFFFF; text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
 :root[data-theme="navy"] header#top h1 { text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
+:root[data-theme="navy"] header#top h2 { text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
 :root[data-theme="navy"] header#top p.text-black { color: #E6EDF8; background-color: rgba(6, 14, 33, 0.62); text-shadow: none !important; }
 :root[data-theme="navy"] header#top p.text-black .text-black { color: #FFFFFF; }
 :root[data-theme="navy"] header#top p.text-black [class*="text-[color:var(--t-600)]"] { color: #7DB4FF; }
@@ -297,6 +321,8 @@ footer button.bg-slate-800:hover,
   transition: border-color .15s, box-shadow .15s;
 }
 .form-input.pl-10 { padding-left: 2.5rem; }
+/* Multi-line variant: .form-input is a fixed-height single-line field */
+.form-input.form-textarea { height: auto; min-height: 48px; padding: 0.625rem 1rem; line-height: 1.45; resize: vertical; }
 .form-input::placeholder { color: #94a3b8; }
 .form-input:focus, .form-select:focus {
   outline: none;

@@ -19,6 +19,13 @@ export default function AdminOps() {
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState(blankPharm);
   const [issued, setIssued] = useState<{ id: string; pin: string } | null>(null);
+  const [summary, setSummary] = useState<Record<string, any>>({});
+  const [loginFor, setLoginFor] = useState<string | null>(null);
+  const [loginDraft, setLoginDraft] = useState({ name: '', email: '' });
+  const [loginIssued, setLoginIssued] = useState<{ pharmacy: string; email: string; password: string } | null>(null);
+  const [verifyFor, setVerifyFor] = useState<string | null>(null);
+  const blankVerify = { licenceNumber: '', pharmacistName: '', pharmacistRegNo: '', confirmed: false };
+  const [verifyDraft, setVerifyDraft] = useState(blankVerify);
 
   const load = async () => {
     const [c, e, p] = await Promise.all([
@@ -31,6 +38,8 @@ export default function AdminOps() {
     if (p.status === 'success') setPayments(p.data);
     const ph = await fetch('/api/admin/pharmacies').then(r => r.json());
     if (ph.status === 'success') setPharmacies(ph.data);
+    const sm = await fetch('/api/admin/pharmacies/summary').then(r => r.json()).catch(() => null);
+    if (sm?.status === 'success') setSummary(sm.data);
   };
   useEffect(() => { load().catch(() => setMsg('Could not load data.')); const t = setInterval(() => load().catch(() => {}), 15000); return () => clearInterval(t); }, []);
 
@@ -55,6 +64,22 @@ export default function AdminOps() {
     if (d.status === 'success') { setEditing(null); load(); } else setMsg(d.message || 'Could not save.');
   };
   const togglePharmacy = async (id: string, active: boolean) => { await post(`/api/admin/pharmacies/${id}/active`, { active }); load(); };
+  const createLogin = async (p: any) => {
+    const d = await post(`/api/admin/pharmacies/${p.id}/account`, loginDraft);
+    if (d.status === 'success') { setLoginIssued({ pharmacy: p.name, ...d.data }); setLoginFor(null); setLoginDraft({ name: '', email: '' }); load(); }
+    else setMsg(d.message || 'Could not create the login.');
+  };
+  const resetLogin = async (p: any) => {
+    if (!window.confirm(`Reset the password for ${p.name}? They will be signed out.`)) return;
+    const d = await post(`/api/admin/pharmacies/${p.id}/account/reset`);
+    if (d.status === 'success') setLoginIssued({ pharmacy: p.name, ...d.data }); else setMsg(d.message || 'Could not reset the password.');
+    load();
+  };
+  const verifyPharmacy = async (p: any) => {
+    const d = await post(`/api/admin/pharmacies/${p.id}/verification`, verifyDraft);
+    if (d.status === 'success') { setVerifyFor(null); setVerifyDraft(blankVerify); load(); } else setMsg(d.message || 'Could not record the verification.');
+  };
+  const minutes = (m: number | null | undefined) => (m == null ? '—' : m < 60 ? `${m} min` : m < 1440 ? `${(m / 60).toFixed(1)} h` : `${(m / 1440).toFixed(1)} d`);
 
   const gaps = coverage ? coverage.grid.flat().filter((n: number) => n === 0).length : 0;
   const openSos = emergencies.filter(e => e.status === 'open');
@@ -136,7 +161,7 @@ export default function AdminOps() {
 
       <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
         <h3 className="text-sm font-extrabold">Partner pharmacies</h3>
-        <p className="text-xs text-slate-600">Patients can send prescriptions to these pharmacies. Each pharmacy signs in at /pharmacy with its ID and PIN to look up and dispense.</p>
+        <p className="text-xs text-slate-600">Patients can send prescriptions to these pharmacies. Verify each pharmacy's licence and pharmacist against the official registers, then give it a workspace login (email and password) for its own inbox, status updates, activity and reports. The owner login adds its own staff. The ID and PIN still work at /pharmacy for quick counter lookups.</p>
         <form onSubmit={addPharmacy} className="space-y-2">
           <div className="flex flex-wrap gap-2 items-end">
             <input className="border border-slate-200 px-3 py-2 text-xs flex-1 min-w-[10rem]" placeholder="Name" value={newPharm.name} onChange={e => setNewPharm({ ...newPharm, name: e.target.value })} required />
@@ -155,6 +180,7 @@ export default function AdminOps() {
           </fieldset>
         </form>
         {issued && <p role="status" className="text-xs bg-amber-50 border border-amber-300 p-3 font-semibold">Give the pharmacy these sign-in details now; the PIN is not shown again. ID: <span className="font-mono font-bold">{issued.id}</span> · PIN: <span className="font-mono font-bold">{issued.pin}</span> <button className="underline ml-2 cursor-pointer" onClick={() => setIssued(null)}>Done</button></p>}
+        {loginIssued && <p role="status" className="text-xs bg-amber-50 border border-amber-300 p-3 font-semibold [overflow-wrap:anywhere]">Workspace login for {loginIssued.pharmacy}. Share it now; the password is not shown again. Email: <span className="font-mono font-bold">{loginIssued.email}</span> · Temporary password: <span className="font-mono font-bold">{loginIssued.password}</span> <button className="underline ml-2 cursor-pointer" onClick={() => setLoginIssued(null)}>Done</button></p>}
         <ul className="text-xs divide-y divide-slate-100">
           {pharmacies.map(p => (
             <li key={p.id} className="py-2 space-y-2">
@@ -165,6 +191,60 @@ export default function AdminOps() {
                   <button onClick={() => togglePharmacy(p.id, !p.active)} className="font-bold cursor-pointer">{p.active ? 'Deactivate' : 'Activate'}</button>
                 </span>
               </div>
+              {summary[p.id] && (
+                <div className="text-slate-600 space-y-2">
+                  {summary[p.id].verification ? (
+                    <p className="[overflow-wrap:anywhere]">Verified by the board · licence <b>{summary[p.id].verification.licenceNumber}</b> · pharmacist <b>{summary[p.id].verification.pharmacistName}</b> ({summary[p.id].verification.pharmacistRegNo}) · {new Date(summary[p.id].verification.verifiedAt).toLocaleDateString()}</p>
+                  ) : verifyFor === p.id ? (
+                    <form onSubmit={e => { e.preventDefault(); verifyPharmacy(p); }} className="bg-slate-50 border border-slate-200 p-3 space-y-2">
+                      <div className="flex flex-wrap gap-2">
+                        <input aria-label="Pharmacy licence number" placeholder="Pharmacy licence number" required className="border border-slate-200 bg-white px-3 py-2 text-xs flex-1 min-w-[10rem]" value={verifyDraft.licenceNumber} onChange={e => setVerifyDraft({ ...verifyDraft, licenceNumber: e.target.value })} />
+                        <input aria-label="Pharmacist name" placeholder="Pharmacist name" required className="border border-slate-200 bg-white px-3 py-2 text-xs flex-1 min-w-[10rem]" value={verifyDraft.pharmacistName} onChange={e => setVerifyDraft({ ...verifyDraft, pharmacistName: e.target.value })} />
+                        <input aria-label="Pharmacist registration number" placeholder="Pharmacist registration no." required className="border border-slate-200 bg-white px-3 py-2 text-xs flex-1 min-w-[10rem]" value={verifyDraft.pharmacistRegNo} onChange={e => setVerifyDraft({ ...verifyDraft, pharmacistRegNo: e.target.value })} />
+                      </div>
+                      <label className="text-xs inline-flex items-start gap-2 cursor-pointer"><input type="checkbox" className="mt-0.5" checked={verifyDraft.confirmed} onChange={e => setVerifyDraft({ ...verifyDraft, confirmed: e.target.checked })} /> I checked these details against the official pharmacy and pharmacist registers.</label>
+                      <div className="flex gap-3 items-center">
+                        <button disabled={!verifyDraft.confirmed} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Record verification</button>
+                        <button type="button" onClick={() => setVerifyFor(null)} className="font-bold cursor-pointer">Cancel</button>
+                      </div>
+                    </form>
+                  ) : (
+                    <p>Not verified yet. <button onClick={() => { setVerifyFor(p.id); setVerifyDraft(blankVerify); }} className="font-bold underline cursor-pointer">Verify pharmacy</button></p>
+                  )}
+                </div>
+              )}
+              {(() => {
+                const s = summary[p.id];
+                if (!s) return null;
+                return (
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-600">
+                    {s.account ? (
+                      <>
+                        <span className="[overflow-wrap:anywhere]">Login: <b>{s.account.email}</b>{s.account.mustChangePassword ? <span className="text-amber-700"> (temporary password not yet changed)</span> : null}</span>
+                        <span>Staff logins: <b>{s.staffCount}</b> · Two-factor: <b>{s.account.twoFactor ? 'on' : 'off'}</b></span>
+                        <span>New: <b>{s.inbox}</b> · In progress: <b>{s.inProgress}</b> · Dispensed: <b>{s.dispensed}</b></span>
+                        <span>Avg response (30d): <b>{minutes(s.avgResponseMinutes)}</b></span>
+                        <span>Last activity: <b>{s.lastActivity ? new Date(s.lastActivity).toLocaleString() : 'none yet'}</b></span>
+                        <button onClick={() => resetLogin(p)} className="font-bold underline cursor-pointer">Reset password and two-factor</button>
+                      </>
+                    ) : loginFor === p.id ? (
+                      <form onSubmit={e => { e.preventDefault(); createLogin(p); }} className="flex flex-wrap gap-2 items-center w-full">
+                        <input aria-label="Contact name" placeholder="Contact name" className="border border-slate-200 px-3 py-2 text-xs flex-1 min-w-[9rem]" value={loginDraft.name} onChange={e => setLoginDraft({ ...loginDraft, name: e.target.value })} />
+                        <input aria-label="Login email" type="email" required placeholder="Login email" className="border border-slate-200 px-3 py-2 text-xs flex-1 min-w-[12rem]" value={loginDraft.email} onChange={e => setLoginDraft({ ...loginDraft, email: e.target.value })} />
+                        <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Create login</button>
+                        <button type="button" onClick={() => setLoginFor(null)} className="font-bold cursor-pointer">Cancel</button>
+                      </form>
+                    ) : (
+                      <>
+                        <span>No workspace login yet.</span>
+                        {s.verification
+                          ? <button onClick={() => { setLoginFor(p.id); setLoginDraft({ name: p.name, email: '' }); }} className="font-bold underline cursor-pointer">Create login</button>
+                          : <span className="text-amber-700">Verify the pharmacy first.</span>}
+                      </>
+                    )}
+                  </div>
+                );
+              })()}
               {editing === p.id && (
                 <div className="bg-slate-50 border border-slate-200 p-3 space-y-2">
                   <div className="flex flex-wrap gap-2">

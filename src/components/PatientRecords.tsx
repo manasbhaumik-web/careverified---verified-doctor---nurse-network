@@ -7,6 +7,7 @@ const jpost = (url: string, body?: unknown, method = 'POST') =>
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '');
 const field = 'border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--t-600)]';
 
+const FILL_LABEL: Record<string, string> = { received: 'Received by the pharmacy', preparing: 'Being prepared', ready: 'Ready for pickup', cannot_fill: 'The pharmacy could not fill it' };
 const VITAL_LABEL: Record<string, string> = { bp: 'Blood pressure', glucose: 'Blood sugar', heart_rate: 'Heart rate', spo2: 'Oxygen (SpO₂)', temperature: 'Temperature', weight: 'Weight' };
 
 function Qr({ text }: { text: string }) {
@@ -132,6 +133,14 @@ export default function PatientRecords() {
                 <p className="text-xs text-slate-500">{p.doctor?.name} (licence {p.doctor?.licenseNumber}) · issued {fmt(p.issuedAt)} · valid until {fmt(p.validUntil)}</p>
                 <ul className="text-sm list-disc ml-5">{p.items.map((i: any, k: number) => <li key={k}><b>{i.name}</b> {i.strength} {i.form} · {i.dose}, {i.frequency} for {i.durationDays} days · qty {i.quantity}{i.instructions ? ` · ${i.instructions}` : ''}</li>)}</ul>
                 <p className="text-xs"><span className={`font-bold px-2 py-0.5 border ${p.status === 'active' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-slate-100 border-slate-200 text-slate-600'}`}>{p.status}</span> · code <span className="font-mono font-bold">{p.code}</span></p>
+                {p.pharmacyName && (
+                  <p className="text-xs text-slate-700 [overflow-wrap:anywhere]">
+                    Sent to <b>{p.pharmacyName}</b>{p.sharedSafety ? ' (allergies and medicines shared)' : ''}
+                    {p.status === 'dispensed' ? <> · <span className="font-bold text-emerald-700">dispensed {fmt(p.dispensedAt)}</span></>
+                      : p.fillStatus ? <> · <span className={`font-bold ${p.fillStatus === 'cannot_fill' ? 'text-rose-700' : 'text-emerald-700'}`}>{FILL_LABEL[p.fillStatus] ?? p.fillStatus}</span>{p.fillStatus === 'cannot_fill' && p.fillReason ? `: ${p.fillReason}` : ''}</>
+                      : p.status === 'active' ? <> · waiting for the pharmacy to respond</> : null}
+                  </p>
+                )}
                 {p.status === 'active' && pharmacies.length > 0 && (
                   <div className="flex gap-2 pt-1">
                     <select aria-label="Choose a pharmacy" className={`${field} text-xs py-1.5`} defaultValue={p.pharmacyId ?? ''} id={`ph-${p.id}`}>
@@ -140,9 +149,15 @@ export default function PatientRecords() {
                     </select>
                     <button className="text-xs font-bold border border-slate-300 px-3 cursor-pointer" onClick={() => {
                       const id = (document.getElementById(`ph-${p.id}`) as HTMLSelectElement).value;
-                      if (id) act(() => jpost(`/api/prescriptions/${p.id}/send`, { pharmacyId: id }), 'Sent.');
+                      if (id) act(() => jpost(`/api/prescriptions/${p.id}/send`, { pharmacyId: id, shareSafety: (document.getElementById(`share-${p.id}`) as HTMLInputElement | null)?.checked === true }), 'Sent.');
                     }}>Send</button>
                   </div>
+                )}
+                {p.status === 'active' && pharmacies.length > 0 && (
+                  <label className="text-xs text-slate-700 flex items-start gap-2 cursor-pointer">
+                    <input type="checkbox" id={`share-${p.id}`} defaultChecked={!!p.sharedSafety} className="mt-0.5 h-4 w-4 accent-[color:var(--t-600)]" />
+                    <span>Share my allergies and current medicines with the pharmacy so the pharmacist can check safety <b>(recommended)</b>.</span>
+                  </label>
                 )}
                 {p.status === 'active' && <button className="text-xs font-bold underline cursor-pointer" onClick={() => window.print()}>Print</button>}
               </div>

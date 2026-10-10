@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '');
-const box = 'min-h-screen bg-[color:var(--t-bg)] flex items-start justify-center p-4 pt-12';
+const box = 'min-h-dvh bg-[color:var(--t-bg)] flex items-start justify-center p-4 pt-12';
 const card = 'bg-white border border-[color:var(--t-200)] shadow-sm w-full max-w-lg p-6 space-y-4';
 
 /** Public pages: /rx/<code> and /cert/<code> (anyone), and /pharmacy (partner pharmacies with their PIN). */
@@ -23,7 +23,7 @@ function Result({ ok, title, children }: { ok: boolean; title: string; children?
     <div className={box}><div className={card} role="status">
       <p className={`flex items-center gap-2 text-lg font-black ${ok ? 'text-emerald-700' : 'text-rose-700'}`}>{ok ? <CheckCircle2 className="h-6 w-6" /> : <XCircle className="h-6 w-6" />}{title}</p>
       {children}
-      <p className="text-[11px] text-slate-500">Checked live against CareVerified records.</p>
+      <p className="text-[11px] text-slate-500">Checked live against MedCred records.</p>
     </div></div>
   );
 }

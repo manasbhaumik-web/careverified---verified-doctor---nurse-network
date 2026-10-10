@@ -1,4 +1,4 @@
-# CareVerified – Verified Doctor & Nurse Network
+# MedCred – Verified Doctor & Nurse Network
 
 A credential-verified registry connecting licensed doctors and nurses with patients and healthcare institutions.
 
@@ -17,6 +17,7 @@ The app is served at http://localhost:3000.
 - Sign-in uses server-side sessions (httpOnly cookie), scrypt password hashing and account lockout.
 - Roles: patient, practitioner, admin. Practitioners are listed publicly only after an admin verifies their uploaded credentials.
 - Data lives in `data/careverified.db` (SQLite) and private uploads in `data/uploads/`; both are git-ignored. Back them up.
+- The first start after the pharmacy-workspace update rebuilds the `users` table once (SQLite cannot widen a CHECK constraint) and saves a copy first as `data/careverified.before-pharmacy-role-<timestamp>.db`. Delete that backup once you have confirmed everything works.
 - Every sensitive action is written to an audit log (admin: `GET /api/admin/audit-log`).
 - `GET /api/me/export` and `POST /api/me/deletion-request` cover data export and deletion requests.
 
