@@ -5,7 +5,7 @@ import {
   Sparkles, Calendar, BookOpen, Globe, CheckCircle2, RefreshCw,
   Heart, MessageSquare, AlertTriangle, Menu, X, PlusCircle, UserCheck,
   Stethoscope, ChevronRight, ChevronLeft, Puzzle, Plus, Trash2,
-  Settings, Download, Activity, CreditCard, TrendingUp, Video, Radio, LifeBuoy
+  Settings, Download, Activity, CreditCard, TrendingUp, Video, Radio, LifeBuoy, Pill
 } from 'lucide-react';
 
 
@@ -28,6 +28,7 @@ import PractitionerQuality from './components/PractitionerQuality';
 import ConsultNow from './components/ConsultNow';
 import PractitionerOnCall from './components/PractitionerOnCall';
 import PatientDashboard from './components/PatientDashboard';
+import PharmacyFinder from './components/PharmacyFinder';
 import LandingPage from './components/LandingPage';
 
 // Types import
@@ -257,6 +258,7 @@ export default function App() {
       navItems.push({ id: 'patient_dashboard', name: 'Patient Hub', icon: Heart });
     }
     navItems.push({ id: 'consult', name: 'Consult Now', icon: Video });
+    navItems.push({ id: 'pharmacies', name: 'Pharmacies', icon: Pill });
     navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
     if (isPackageEnabled('registry')) {
       navItems.push({ id: 'registry', name: 'Doctors & Nurses', icon: Search });
@@ -634,6 +636,8 @@ export default function App() {
             )}
 
             {/* VIEW 5: SECURE MESSENGER */}
+            {activeView === 'pharmacies' && currentUser.role === 'patient' && <PharmacyFinder />}
+
             {activeView === 'consult' && currentUser.role === 'patient' && (
               <ConsultNow myUserId={currentUser.id} />
             )}

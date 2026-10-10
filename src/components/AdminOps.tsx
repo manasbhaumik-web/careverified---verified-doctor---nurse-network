@@ -6,13 +6,18 @@ const post = (url: string, body?: unknown) =>
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 /** Admin operations: 24/7 roster coverage, SOS alerts, payments and refunds. */
+const SERVICES = ['24 hours', 'Home delivery', 'Drive-through', 'Vaccinations', 'Online ordering'];
+
 export default function AdminOps() {
   const [coverage, setCoverage] = useState<any | null>(null);
   const [emergencies, setEmergencies] = useState<any[]>([]);
   const [payments, setPayments] = useState<any | null>(null);
   const [msg, setMsg] = useState('');
   const [pharmacies, setPharmacies] = useState<any[]>([]);
-  const [newPharm, setNewPharm] = useState({ name: '', address: '', phone: '' });
+  const blankPharm = { name: '', address: '', city: '', phone: '', hours: '', services: [] as string[] };
+  const [newPharm, setNewPharm] = useState(blankPharm);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [draft, setDraft] = useState(blankPharm);
   const [issued, setIssued] = useState<{ id: string; pin: string } | null>(null);
 
   const load = async () => {
@@ -41,7 +46,13 @@ export default function AdminOps() {
   const addPharmacy = async (e: React.FormEvent) => {
     e.preventDefault();
     const d = await post('/api/admin/pharmacies', newPharm);
-    if (d.status === 'success') { setIssued(d.data); setNewPharm({ name: '', address: '', phone: '' }); load(); } else setMsg(d.message || 'Could not add the pharmacy.');
+    if (d.status === 'success') { setIssued(d.data); setNewPharm(blankPharm); load(); } else setMsg(d.message || 'Could not add the pharmacy.');
+  };
+  const toggleService = (list: string[], s: string) => (list.includes(s) ? list.filter(x => x !== s) : [...list, s]);
+  const startEdit = (p: any) => { setEditing(p.id); setDraft({ name: p.name, address: p.address, city: p.city ?? '', phone: p.phone ?? '', hours: p.hours ?? '', services: p.services ?? [] }); };
+  const saveEdit = async (id: string) => {
+    const d = await fetch(`/api/admin/pharmacies/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(draft) }).then(r => r.json());
+    if (d.status === 'success') { setEditing(null); load(); } else setMsg(d.message || 'Could not save.');
   };
   const togglePharmacy = async (id: string, active: boolean) => { await post(`/api/admin/pharmacies/${id}/active`, { active }); load(); };
 
@@ -126,18 +137,51 @@ export default function AdminOps() {
       <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
         <h3 className="text-sm font-extrabold">Partner pharmacies</h3>
         <p className="text-xs text-slate-600">Patients can send prescriptions to these pharmacies. Each pharmacy signs in at /pharmacy with its ID and PIN to look up and dispense.</p>
-        <form onSubmit={addPharmacy} className="flex flex-wrap gap-2 items-end">
-          <input className="border border-slate-200 px-3 py-2 text-xs flex-1 min-w-[10rem]" placeholder="Name" value={newPharm.name} onChange={e => setNewPharm({ ...newPharm, name: e.target.value })} required />
-          <input className="border border-slate-200 px-3 py-2 text-xs flex-1 min-w-[12rem]" placeholder="Address" value={newPharm.address} onChange={e => setNewPharm({ ...newPharm, address: e.target.value })} required />
-          <input className="border border-slate-200 px-3 py-2 text-xs w-36" placeholder="Phone" value={newPharm.phone} onChange={e => setNewPharm({ ...newPharm, phone: e.target.value })} />
-          <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Add pharmacy</button>
+        <form onSubmit={addPharmacy} className="space-y-2">
+          <div className="flex flex-wrap gap-2 items-end">
+            <input className="border border-slate-200 px-3 py-2 text-xs flex-1 min-w-[10rem]" placeholder="Name" value={newPharm.name} onChange={e => setNewPharm({ ...newPharm, name: e.target.value })} required />
+            <input className="border border-slate-200 px-3 py-2 text-xs flex-1 min-w-[12rem]" placeholder="Address" value={newPharm.address} onChange={e => setNewPharm({ ...newPharm, address: e.target.value })} required />
+            <input className="border border-slate-200 px-3 py-2 text-xs w-36" placeholder="City" value={newPharm.city} onChange={e => setNewPharm({ ...newPharm, city: e.target.value })} maxLength={60} />
+            <input className="border border-slate-200 px-3 py-2 text-xs w-36" placeholder="Phone" value={newPharm.phone} onChange={e => setNewPharm({ ...newPharm, phone: e.target.value })} />
+            <input className="border border-slate-200 px-3 py-2 text-xs flex-1 min-w-[12rem]" placeholder="Opening hours, e.g. Mon–Sat 9am–10pm" value={newPharm.hours} onChange={e => setNewPharm({ ...newPharm, hours: e.target.value })} maxLength={120} />
+          </div>
+          <fieldset className="flex flex-wrap gap-x-4 gap-y-1 items-center">
+            <legend className="sr-only">Services</legend>
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Services</span>
+            {SERVICES.map(s => (
+              <label key={s} className="text-xs inline-flex items-center gap-1.5 cursor-pointer"><input type="checkbox" checked={newPharm.services.includes(s)} onChange={() => setNewPharm({ ...newPharm, services: toggleService(newPharm.services, s) })} /> {s}</label>
+            ))}
+            <button className="ml-auto bg-[color:var(--t-600)] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Add pharmacy</button>
+          </fieldset>
         </form>
         {issued && <p role="status" className="text-xs bg-amber-50 border border-amber-300 p-3 font-semibold">Give the pharmacy these sign-in details now; the PIN is not shown again. ID: <span className="font-mono font-bold">{issued.id}</span> · PIN: <span className="font-mono font-bold">{issued.pin}</span> <button className="underline ml-2 cursor-pointer" onClick={() => setIssued(null)}>Done</button></p>}
         <ul className="text-xs divide-y divide-slate-100">
           {pharmacies.map(p => (
-            <li key={p.id} className="py-2 flex flex-wrap justify-between gap-2">
-              <span><b>{p.name}</b> · {p.address} · <span className="font-mono">{p.id}</span></span>
-              <button onClick={() => togglePharmacy(p.id, !p.active)} className="font-bold cursor-pointer">{p.active ? 'Deactivate' : 'Activate'}</button>
+            <li key={p.id} className="py-2 space-y-2">
+              <div className="flex flex-wrap justify-between gap-2">
+                <span className="min-w-0 [overflow-wrap:anywhere]"><b>{p.name}</b> · {p.address}{p.city && !p.address.toLowerCase().includes(p.city.toLowerCase()) ? `, ${p.city}` : ''} · <span className="font-mono">{p.id}</span>{p.hours ? <span className="text-slate-500"> · {p.hours}</span> : null}{p.services?.length ? <span className="text-slate-500"> · {p.services.join(', ')}</span> : null}</span>
+                <span className="flex gap-3">
+                  <button onClick={() => (editing === p.id ? setEditing(null) : startEdit(p))} className="font-bold cursor-pointer">{editing === p.id ? 'Cancel' : 'Edit'}</button>
+                  <button onClick={() => togglePharmacy(p.id, !p.active)} className="font-bold cursor-pointer">{p.active ? 'Deactivate' : 'Activate'}</button>
+                </span>
+              </div>
+              {editing === p.id && (
+                <div className="bg-slate-50 border border-slate-200 p-3 space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    <input aria-label="Name" className="border border-slate-200 bg-white px-3 py-2 text-xs flex-1 min-w-[10rem]" value={draft.name} onChange={e => setDraft({ ...draft, name: e.target.value })} />
+                    <input aria-label="Address" className="border border-slate-200 bg-white px-3 py-2 text-xs flex-1 min-w-[12rem]" value={draft.address} onChange={e => setDraft({ ...draft, address: e.target.value })} />
+                    <input aria-label="City" placeholder="City" className="border border-slate-200 bg-white px-3 py-2 text-xs w-36" value={draft.city} onChange={e => setDraft({ ...draft, city: e.target.value })} />
+                    <input aria-label="Phone" placeholder="Phone" className="border border-slate-200 bg-white px-3 py-2 text-xs w-36" value={draft.phone} onChange={e => setDraft({ ...draft, phone: e.target.value })} />
+                    <input aria-label="Opening hours" placeholder="Opening hours" className="border border-slate-200 bg-white px-3 py-2 text-xs flex-1 min-w-[12rem]" value={draft.hours} onChange={e => setDraft({ ...draft, hours: e.target.value })} />
+                  </div>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 items-center">
+                    {SERVICES.map(s => (
+                      <label key={s} className="text-xs inline-flex items-center gap-1.5 cursor-pointer"><input type="checkbox" checked={draft.services.includes(s)} onChange={() => setDraft({ ...draft, services: toggleService(draft.services, s) })} /> {s}</label>
+                    ))}
+                    <button onClick={() => saveEdit(p.id)} className="ml-auto bg-[color:var(--t-600)] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Save</button>
+                  </div>
+                </div>
+              )}
             </li>
           ))}
         </ul>

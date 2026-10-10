@@ -121,8 +121,17 @@ async function main() {
   let pharmacyLine = "Demo Pharmacy already exists (its PIN was shown the first time).";
   const pharmacies = must("pharmacies", await admin.call("GET", "/api/admin/pharmacies")).data as any[];
   if (!pharmacies.some(p => p.name === "Demo Pharmacy")) {
-    const ph = must("pharmacy", await admin.call("POST", "/api/admin/pharmacies", { name: "Demo Pharmacy", address: "2 Jalan Demo, Kuala Lumpur" })).data;
+    const ph = must("pharmacy", await admin.call("POST", "/api/admin/pharmacies", { name: "Demo Pharmacy", address: "2 Jalan Demo, Kuala Lumpur", city: "Kuala Lumpur", phone: "03-5550 0100", hours: "Mon–Sat 9am–10pm", services: ["Home delivery", "Vaccinations"] })).data;
     pharmacyLine = `Pharmacy console (${BASE}/pharmacy):  ID ${ph.id}   PIN ${ph.pin}`;
+  } else {
+    // Fill in the directory details on a pharmacy created before they existed.
+    const demo = pharmacies.find(p => p.name === "Demo Pharmacy");
+    if (demo && !demo.city) must("pharmacy details", await admin.call("PATCH", `/api/admin/pharmacies/${demo.id}`, { city: "Kuala Lumpur", phone: "03-5550 0100", hours: "Mon–Sat 9am–10pm", services: ["Home delivery", "Vaccinations"] }));
+  }
+  // A second pharmacy so the patient's Pharmacies page has something to filter.
+  if (!pharmacies.some(p => p.name === "Demo 24h Pharmacy")) {
+    const ph2 = must("pharmacy 2", await admin.call("POST", "/api/admin/pharmacies", { name: "Demo 24h Pharmacy", address: "15 Jalan Contoh, George Town", city: "Penang", phone: "04-5550 0200", hours: "Open 24 hours", services: ["24 hours", "Drive-through", "Online ordering"] })).data;
+    pharmacyLine += `\n                                          Second pharmacy:  ID ${ph2.id}   PIN ${ph2.pin}`;
   }
 
   console.log(`
