@@ -119,7 +119,7 @@ export default function SupportDesk() {
               <ul className="space-y-2 max-h-80 overflow-y-auto">
                 {open.messages.map((m: any) => (
                   <li key={m.id} className={`text-sm p-3 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}>
-                    <p className="text-[10px] font-extrabold uppercase text-slate-500 mb-1">{m.fromStaff ? 'CareVerified support' : 'You'} · {when(m.ts)}</p>{m.body}
+                    <p className="text-[10px] font-extrabold uppercase text-slate-500 mb-1">{m.fromStaff ? 'MedCred support' : 'You'} · {when(m.ts)}</p>{m.body}
                   </li>
                 ))}
               </ul>

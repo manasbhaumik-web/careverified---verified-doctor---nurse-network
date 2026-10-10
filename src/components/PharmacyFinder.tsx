@@ -3,7 +3,8 @@ import { Clock, MapPin, Phone, Pill, Search, Send } from 'lucide-react';
 import DashboardHeader, { BannerKpis, FilterSelect } from './DashboardHeader';
 
 interface Pharmacy { id: string; name: string; address: string; city: string | null; phone: string | null; hours: string | null; services: string[] }
-interface Rx { id: string; code: string; status: string; validUntil: string; pharmacyId: string | null; items: { name: string; strength?: string }[] }
+interface Rx { id: string; code: string; status: string; validUntil: string; pharmacyId: string | null; fillStatus?: string | null; fillReason?: string | null; items: { name: string; strength?: string }[] }
+const FILL_LABEL: Record<string, string> = { received: 'received', preparing: 'being prepared', ready: 'ready for pickup', cannot_fill: 'could not be filled' };
 
 const ALL = 'all';
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '');
@@ -21,6 +22,7 @@ export default function PharmacyFinder() {
   const [chosen, setChosen] = useState('');
   const [msg, setMsg] = useState<{ id: string; ok: boolean; text: string } | null>(null);
   const [sending, setSending] = useState(false);
+  const [share, setShare] = useState(false);
 
   const loadRx = useCallback(async () => {
     const d = await fetch('/api/records/me').then(r => r.json()).catch(() => null);
@@ -47,10 +49,10 @@ export default function PharmacyFinder() {
   const send = async (p: Pharmacy) => {
     if (!chosen) return;
     setSending(true); setMsg(null);
-    const d = await jpost(`/api/prescriptions/${chosen}/send`, { pharmacyId: p.id }).catch(() => null);
+    const d = await jpost(`/api/prescriptions/${chosen}/send`, { pharmacyId: p.id, shareSafety: share }).catch(() => null);
     setMsg({ id: p.id, ok: d?.status === 'success', text: d?.message || 'Could not send the prescription. Try again.' });
     setSending(false);
-    if (d?.status === 'success') { setOpenId(null); setChosen(''); loadRx(); }
+    if (d?.status === 'success') { setOpenId(null); setChosen(''); setShare(false); loadRx(); }
   };
 
   return (
@@ -123,7 +125,7 @@ export default function PharmacyFinder() {
 
                 {sentHere.length > 0 && (
                   <p className="text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 p-2.5">
-                    Your prescription {sentHere.map(r => r.code).join(', ')} {sentHere.length === 1 ? 'was' : 'were'} sent here. Show the pharmacy the code.
+                    Your prescription {sentHere.map(r => `${r.code}${r.fillStatus ? ` (${FILL_LABEL[r.fillStatus] ?? r.fillStatus}${r.fillStatus === 'cannot_fill' && r.fillReason ? `: ${r.fillReason}` : ''})` : ''}`).join(', ')} {sentHere.length === 1 ? 'was' : 'were'} sent here. The pharmacy can see it in their inbox, or you can show them the code.
                   </p>
                 )}
                 {msg?.id === p.id && (
@@ -140,6 +142,10 @@ export default function PharmacyFinder() {
                           <option key={r.id} value={r.id}>{r.code} · {r.items[0]?.name ?? 'Prescription'}{r.items.length > 1 ? ` +${r.items.length - 1}` : ''} · valid until {fmt(r.validUntil)}</option>
                         ))}
                       </select>
+                      <label className="flex items-start gap-2 text-xs text-slate-700 cursor-pointer">
+                        <input type="checkbox" checked={share} onChange={e => setShare(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[color:var(--t-600)]" />
+                        <span>Share my allergies and current medicines with this pharmacy so the pharmacist can check the medicine is safe for me <b>(recommended)</b>. You choose this each time.</span>
+                      </label>
                       <div className="flex gap-2">
                         <button type="button" onClick={() => send(p)} disabled={!chosen || sending} className="flex-1 min-h-[40px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-extrabold cursor-pointer">{sending ? 'Sending…' : 'Send'}</button>
                         <button type="button" onClick={() => { setOpenId(null); setChosen(''); }} className="min-h-[40px] px-4 border border-slate-200 text-xs font-bold cursor-pointer">Cancel</button>

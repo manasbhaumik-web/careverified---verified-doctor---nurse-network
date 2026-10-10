@@ -60,7 +60,7 @@ export default function DashboardHeader<T extends string>({
   return (
     <header
       id={id}
-      className="relative bg-white border border-[color:var(--t-200)] border-t-[3px] border-t-[color:var(--t-600)] shadow-xs overflow-hidden"
+      className="relative bg-white border border-[color:var(--t-200)] shadow-xs overflow-hidden"
     >
       {/* soft brand wash on the right edge */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-[color:var(--t-50)] to-transparent" />
@@ -77,7 +77,7 @@ export default function DashboardHeader<T extends string>({
       {children && <div className="relative px-5 sm:px-7 pb-5">{children}</div>}
 
       {tabs && tabs.length > 0 && (
-        <div role="tablist" aria-label={tabsLabel} className="relative flex gap-1 overflow-x-auto px-3 sm:px-5 border-t border-[color:var(--t-200)] bg-white">
+        <div role="tablist" aria-label={tabsLabel} className="relative flex gap-1 overflow-x-auto overflow-y-hidden px-3 sm:px-5 border-t border-[color:var(--t-200)] bg-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map(tab => {
             const selected = activeTab === tab.id;
             return (
@@ -91,7 +91,7 @@ export default function DashboardHeader<T extends string>({
                 tabIndex={selected ? 0 : -1}
                 onClick={() => onTabChange?.(tab.id)}
                 onKeyDown={handleKeyDown}
-                className={`shrink-0 min-h-[48px] px-4 text-[13px] flex items-center gap-2 cursor-pointer border-b-2 -mb-px transition-colors ${
+                className={`shrink-0 min-h-[48px] px-4 text-[13px] flex items-center gap-2 cursor-pointer border-b-2 transition-colors ${
                   selected
                     ? 'font-semibold text-[color:var(--t-700)] border-[color:var(--t-600)]'
                     : 'font-medium text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'

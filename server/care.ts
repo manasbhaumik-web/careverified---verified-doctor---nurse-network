@@ -345,7 +345,7 @@ export function registerCareRoutes(app: Application, ctx: Ctx) {
   app.get("/api/emergency/info", (_req, res) => {
     res.json({ status: "success", data: {
       numbers: emergencyNumbers(),
-      disclaimer: "CareVerified is not an emergency service and cannot send an ambulance. In an emergency call the number below first.",
+      disclaimer: "MedCred is not an emergency service and cannot send an ambulance. In an emergency call the number below first.",
     } });
   });
 

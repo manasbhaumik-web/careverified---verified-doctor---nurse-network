@@ -16,6 +16,7 @@ const ACCOUNTS = {
   patient: { email: "demo.patient@careverified.test", name: "Demo Patient" },
   doctor: { email: "demo.doctor@careverified.test", name: "Dr Demo Physician" },
 };
+const PHARMACY_EMAIL = "demo.pharmacy@careverified.test";
 
 const host = new URL(BASE).hostname;
 if (process.env.NODE_ENV === "production" || !["localhost", "127.0.0.1", "[::1]"].includes(host)) {
@@ -134,6 +135,46 @@ async function main() {
     pharmacyLine += `\n                                          Second pharmacy:  ID ${ph2.id}   PIN ${ph2.pin}`;
   }
 
+  // ---- pharmacy workspace login (email + password) and a few prescriptions in its inbox
+  const demoPharmacy = (must("pharmacies", await admin.call("GET", "/api/admin/pharmacies")).data as any[]).find(p => p.name === "Demo Pharmacy");
+  const phc = new Client();
+  let workspaceLine = "Pharmacy workspace login is not set up (Demo Pharmacy was not found).";
+  if (demoPharmacy) {
+    const summary = must("pharmacy summary", await admin.call("GET", "/api/admin/pharmacies/summary")).data[demoPharmacy.id];
+    if (!summary?.verification) {
+      must("pharmacy verification", await admin.call("POST", `/api/admin/pharmacies/${demoPharmacy.id}/verification`, { licenceNumber: "DEMO-PH-0001", pharmacistName: "Demo Pharmacist", pharmacistRegNo: "DEMO-RPh-0001", confirmed: true }));
+    }
+    const signIn = (password: string) => phc.call("POST", "/api/auth/login", { email: PHARMACY_EMAIL, password, role: "pharmacy" });
+    const adopt = async (temp: string) => {
+      must("pharmacy sign-in (temporary password)", await signIn(temp));
+      must("pharmacy password", await phc.call("POST", "/api/auth/change-password", { currentPassword: temp, newPassword: DEMO_PASSWORD }));
+    };
+    if (!summary?.account) {
+      const created = must("pharmacy login", await admin.call("POST", `/api/admin/pharmacies/${demoPharmacy.id}/account`, { email: PHARMACY_EMAIL, name: "Demo Pharmacy Team" })).data;
+      await adopt(created.password);
+    } else if ((await signIn(DEMO_PASSWORD)).status !== 200) {
+      const reset = must("pharmacy password reset", await admin.call("POST", `/api/admin/pharmacies/${demoPharmacy.id}/account/reset`)).data;
+      await adopt(reset.password);
+    }
+    workspaceLine = `Pharmacy workspace (Pharmacy tab):  ${PHARMACY_EMAIL}  /  ${DEMO_PASSWORD}   ->  ${demoPharmacy.name}`;
+
+    // Sample inbox: one new, one being prepared, one that could not be filled. Created once.
+    const inbox = must("pharmacy inbox", await phc.call("GET", "/api/pharmacy/prescriptions")).data.items as any[];
+    const visit = (must("bookings", await pat.call("GET", "/api/bookings")).data as any[])[0];
+    if (inbox.length < 3 && visit) {
+      const issue = async (drug: any, diagnosis: string) => {
+        const rx = must("prescription", await doc.call("POST", "/api/prescriptions", { kind: "booking", refId: visit.id, diagnosis, items: [drug] })).data;
+        must("send to pharmacy", await pat.call("POST", `/api/prescriptions/${rx.id}/send`, { pharmacyId: demoPharmacy.id, shareSafety: true }));
+        return rx;
+      };
+      await issue({ name: "cetirizine", strength: "10 mg", form: "tablet", dose: "1 tablet", frequency: "once daily", durationDays: 7, quantity: 7, instructions: "At night" }, "Seasonal allergic rhinitis");
+      const second = await issue({ name: "paracetamol", strength: "500 mg", form: "tablet", dose: "1 tablet", frequency: "every 6 hours if needed", durationDays: 3, quantity: 12, instructions: "After food" }, "Viral upper respiratory infection");
+      must("status preparing", await phc.call("POST", `/api/pharmacy/prescriptions/${second.id}/status`, { status: "preparing" }));
+      const third = await issue({ name: "cetirizine", strength: "10 mg", form: "tablet", dose: "1 tablet", frequency: "once daily", durationDays: 14, quantity: 14, instructions: "In the morning" }, "Allergic rhinitis, follow-up");
+      must("status cannot fill", await phc.call("POST", `/api/pharmacy/prescriptions/${third.id}/status`, { status: "cannot_fill", reason: "Out of stock until Tuesday" }));
+    }
+  }
+
   console.log(`
 Demo data is ready at ${BASE}
 
@@ -142,13 +183,16 @@ Demo data is ready at ${BASE}
   Patient       Patient            ${ACCOUNTS.patient.email.padEnd(33)}  ${DEMO_PASSWORD}
   Doctor        Practitioner       ${ACCOUNTS.doctor.email.padEnd(33)}  ${DEMO_PASSWORD}
   Admin         Board Admin        ${adminEmail.padEnd(33)}  (ADMIN_PASSWORD in .env)
+  Pharmacy      Pharmacy           ${PHARMACY_EMAIL.padEnd(33)}  ${DEMO_PASSWORD}
 
 ${pharmacyLine}
+${workspaceLine}
 
 What is set up
   - The doctor is verified, with a weekday 08:00-20:00 on-call roster.
   - The patient has a Penicillin allergy, Hypertension, a Warfarin entry and a blood pressure reading.
   - One paid and completed visit with a signed note and a prescription (see Health Record).
+  - Demo Pharmacy has its own workspace login with a sample inbox (new, being prepared, could not fill).
   - All payments are test mode: no real money moves.
 
 To try "Consult a doctor now": sign in as the doctor, open On Call and click "Go online"

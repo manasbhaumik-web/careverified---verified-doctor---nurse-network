@@ -2,8 +2,9 @@ import crypto from "crypto";
 import type { NextFunction, Request, Response } from "express";
 import { db } from "./db";
 import { audit } from "./audit";
+import { verifyTotp } from "./totp";
 
-export type Role = "patient" | "practitioner" | "admin";
+export type Role = "patient" | "practitioner" | "admin" | "pharmacy";
 export interface AuthUser {
   id: string;
   email: string;
@@ -120,7 +121,7 @@ export function requireRole(...roles: Role[]) {
 }
 
 // ---------- login with lockout ----------
-export function attemptLogin(req: Request, email: string, password: string, role?: Role): AuthUser | { error: string } {
+export function attemptLogin(req: Request, email: string, password: string, role?: Role, code?: string): AuthUser | { error: string; needsCode?: boolean } {
   const generic = { error: "Invalid email or password." };
   const row = db.prepare("SELECT * FROM users WHERE email = ?").get(email) as any;
   if (!row) {
@@ -133,7 +134,9 @@ export function attemptLogin(req: Request, email: string, password: string, role
     return { error: "Too many failed attempts. Try again in a few minutes." };
   }
   const ok = verifyPassword(password, row.password_hash);
-  if (!ok || row.status !== "active" || (role && role !== row.role)) {
+  // A pharmacy login only works while the pharmacy is active and has been verified by the board.
+  const pharmacyOff = row.role === "pharmacy" && !db.prepare("SELECT 1 AS x FROM pharmacies WHERE id = ? AND active = 1 AND verified_at IS NOT NULL").get(row.profile_id);
+  if (!ok || row.status !== "active" || pharmacyOff || (role && role !== row.role)) {
     if (!ok) {
       const failed = row.failed_logins + 1;
       const lock = failed >= MAX_FAILED ? new Date(Date.now() + LOCK_MINUTES * 60_000).toISOString() : null;
@@ -141,6 +144,17 @@ export function attemptLogin(req: Request, email: string, password: string, role
     }
     audit(req, "auth.login.failed", { actor: { id: row.id, role: row.role }, details: { reason: ok ? "role_or_status" : "bad_password" } });
     return generic;
+  }
+  // Second factor: asked only once the password is right; a wrong code counts towards the same lockout.
+  if (row.totp_enabled) {
+    if (!code) return { error: "Enter the 6-digit code from your authenticator app.", needsCode: true };
+    if (!verifyTotp(row.totp_secret, code)) {
+      const failed = row.failed_logins + 1;
+      const lock = failed >= MAX_FAILED ? new Date(Date.now() + LOCK_MINUTES * 60_000).toISOString() : null;
+      db.prepare("UPDATE users SET failed_logins = ?, locked_until = ? WHERE id = ?").run(lock ? 0 : failed, lock, row.id);
+      audit(req, "auth.login.failed", { actor: { id: row.id, role: row.role }, details: { reason: "bad_totp" } });
+      return { error: "That code is not correct.", needsCode: true };
+    }
   }
   db.prepare("UPDATE users SET failed_logins = 0, locked_until = NULL WHERE id = ?").run(row.id);
   return { id: row.id, email: row.email, name: row.name, role: row.role, avatarUrl: row.avatar_url, profileId: row.profile_id };
@@ -179,6 +193,6 @@ export function ensureAdmin() {
 }
 
 export function changePassword(userId: string, newPassword: string) {
-  db.prepare("UPDATE users SET password_hash = ? WHERE id = ?").run(hashPassword(newPassword), userId);
+  db.prepare("UPDATE users SET password_hash = ?, must_change_password = 0 WHERE id = ?").run(hashPassword(newPassword), userId);
   db.prepare("DELETE FROM sessions WHERE user_id = ?").run(userId);
 }

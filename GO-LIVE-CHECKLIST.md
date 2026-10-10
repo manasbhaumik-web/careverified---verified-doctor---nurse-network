@@ -1,4 +1,4 @@
-# CareVerified go-live checklist
+# MedCred go-live checklist
 
 Status of the platform today: all five build phases are done and tested against a local SQLite database with test-mode payments.
 **It is not ready for real patients until every item in section A is closed.** Sections B and C can follow in order.
@@ -36,7 +36,7 @@ The interface still carries claims the platform cannot back up. Regulators and u
 - [x] Replace the **animated statistics** on the landing page ("2,400+ verified professionals", "150+ partner hospitals", "58,000+ consultations", "99.9% uptime") with real numbers from the database, or delete them (`LandingPage.tsx` `useCounter(...)`).
 - [ ] Remove **"Malaysian Medical Council (MMC)" / "LJM" regulatory-standards badges** unless there is a formal relationship with those bodies.
 - [ ] Review the **"24/7"** wording against reality: coverage is only as good as the on-call roster (Admin → Operations → 24/7 roster coverage shows uncovered hours).
-- [ ] Rename the product consistently. Code and UI mix **CareVerified**, **MedCred** and **MediCert** (`@medicert.com`, "MediCert Core Dev", page title). Pick one and search for the others.
+- [x] Product renamed to **MedCred** in the UI and docs. Still to decide: `MediCert` (`@medicert.com`, "MediCert Core Dev" author names) and internal identifiers such as `careverified.db`, `@careverified.test` and `careverified.pro`.
 - [ ] Review the Admin "Package Manager" text and any "marketplace extension" wording that implies features that do not exist.
 
 **Verify:** search the repo for `HIPAA`, `SOC-2`, `AES-256`, `MedCred`, `MediCert`; open every public page and read it as a regulator would.
@@ -122,6 +122,7 @@ Today everything is in-app only. A doctor who is not looking at the page will mi
 - [ ] Review error pages and API errors for information leaks; add a global error handler that logs but returns a generic message. (S)
 - [ ] Review CORS/CSRF stance: same-origin only with `SameSite=Lax` and an Origin check on writes (already in place); confirm if you add a mobile app or other domains.
 - [ ] Secure the pharmacy console `/pharmacy`: PIN length (now 6 digits), per-pharmacy lockout, and PIN rotation. (S)
+- [ ] **Pharmacy workspace logins** (role `pharmacy`, one email + password per pharmacy, issued by the board with a temporary password). Before launch: add two-factor sign-in, decide whether pharmacies need several staff accounts, verify the pharmacy and pharmacist licence before issuing a login, and set a retention period for `pharmacy_events` (the activity log). (M)
 
 ### A11. Operational readiness  (Owner: you; Effort: M)
 

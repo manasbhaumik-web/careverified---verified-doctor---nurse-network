@@ -6,7 +6,7 @@ import {
   AlertTriangle, ArrowRight, Lock, AlertCircle, PlusCircle,
   Building, ChevronRight, Zap, Globe, Award, FileText,
   Sparkles, Calendar, Users, Stethoscope, Activity, Check, UserCheck,
-  Clock, PhoneCall, FileSpreadsheet, Pill, Hospital, ExternalLink, Shield
+  Clock, PhoneCall, FileSpreadsheet, Pill, Hospital, ExternalLink, Shield, ChevronLeft
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, UserRole } from '../types';
 import PatientRegistrationForm from './PatientRegistrationForm';
@@ -17,11 +17,11 @@ import heroBgImage from '../../assets/medical_hero_bg.jpg';
 // ─────────────────────────────────────────────
 interface LandingPageProps {
   professionals: (DoctorProfile | NurseProfile)[];
-  onLoginSuccess: (user: { id: string; role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; avatarUrl?: string; profileId?: string | null }, patient?: unknown) => void;
+  onLoginSuccess: (user: { id: string; role: 'patient' | 'practitioner' | 'admin' | 'pharmacy'; name: string; email: string; avatarUrl?: string; profileId?: string | null }, patient?: unknown) => void;
 }
 
 // ─────────────────────────────────────────────
-// CareVerified Medical Cross mark (solid iconic emblem)
+// MedCred Medical Cross mark (solid iconic emblem)
 // ─────────────────────────────────────────────
 function Cross({ className = '' }: { className?: string }) {
   return (
@@ -113,7 +113,7 @@ const PROFESSIONAL_ASSISTANCE_MODULES = [
   {
     id: 'prescriptions',
     title: 'E-Prescriptions & Vitals Vault',
-    tagline: 'Digital Pharmacy & Patient Record',
+    tagline: 'Digital Pharmacy & Health Record',
     icon: Pill,
     badge: 'Doctor-signed',
     summary: 'Doctor-signed digital prescriptions with a code and QR that pharmacies can check, alongside your own health record and readings.',
@@ -144,36 +144,166 @@ const PROFESSIONAL_ASSISTANCE_MODULES = [
   }
 ];
 
+type PortalRole = 'patient' | 'practitioner' | 'admin' | 'pharmacy';
+type Icon = React.ComponentType<{ className?: string }>;
+
 const PERSPECTIVES = [
   {
     roleKey: 'patient' as const,
     icon: Heart,
-    title: 'For Patients & Families',
-    tagline: 'Empowered Health Decisions',
-    desc: 'Access verified doctors and nurses instantly. View real-time active e-prescriptions, log health vitals, book tele-consultations, and share medical history securely.',
-    features: ['Smart symptom specialty matching', 'Instant digital e-prescriptions directory', 'End-to-end encrypted medical messaging'],
-    badge: 'Patient Portal',
-    ctaText: 'Launch Patient Portal'
+    title: 'For Members & Families',
+    tagline: 'Care you can trust',
+    desc: 'Talk to verified doctors, and keep your prescriptions and health record in one private place.',
+    features: ['Matched to the right specialty', 'Digital e-prescriptions', 'Private, encrypted messaging'],
+    badge: 'Member Portal',
+    ctaText: 'Open Member Portal'
   },
   {
     roleKey: 'practitioner' as const,
     icon: UserCheck,
     title: 'For Doctors & Nurses',
-    tagline: 'Verified Clinical Practice',
-    desc: 'Streamline credentialing through a step-by-step verification terminal. Apply for verified hospital shifts, manage patient consultations, and access peer-reviewed journals.',
-    features: ['Credential review by our medical board', 'Clinical locum shift board', 'Online consultations with payments and records'],
+    tagline: 'Verified clinical practice',
+    desc: 'Get verified, take online consultations, issue e-prescriptions and apply for locum shifts.',
+    features: ['Credential review by our medical board', 'Clinical locum shift board', 'Consultations with payments and records'],
     badge: 'Practitioner Hub',
-    ctaText: 'Access Practitioner Hub'
+    ctaText: 'Open Practitioner Hub'
   },
   {
     roleKey: 'admin' as const,
     icon: Building,
-    title: 'For Medical Boards & Admins',
-    tagline: 'Governance & Auditing',
-    desc: 'Audit registration documents in real time. Manage platform expansion modules, monitor regulatory compliance, and oversee licensing telemetry across the network.',
+    title: 'For Boards & Admins',
+    tagline: 'Governance & auditing',
+    desc: 'Review licences, monitor compliance and keep a full audit trail across the network.',
     features: ['Licence document review queue', 'Complaints, incidents and peer review', 'Support desk and audit log'],
     badge: 'Board Admin',
-    ctaText: 'Open Admin Audit Console'
+    ctaText: 'Open Admin Console'
+  },
+];
+
+// ─────────────────────────────────────────────
+// HERO SLIDES: one per audience. Slide 1 is the original hero.
+// ─────────────────────────────────────────────
+const hl = (t: string) => <span className="text-[color:var(--t-600)]">{t}</span>;
+
+interface HeroCardData {
+  label: string;
+  title: string;
+  status: string;
+  person: { img?: string; icon?: Icon; name: string; line1: string; line2: string };
+  rows: { k: string; v: string; kind?: 'mono' | 'ok' }[];
+  footId: string;
+}
+
+interface HeroSlide {
+  id: string;
+  pill: string;
+  headline: React.ReactNode;
+  body: React.ReactNode;
+  cta: { label: string; role?: PortalRole; register?: boolean; href?: string };
+  chips: string[];
+  card: HeroCardData;
+}
+
+const HERO_SLIDES: HeroSlide[] = [
+  {
+    id: 'network',
+    pill: 'Online Medical Assistance Network',
+    headline: <>Next-generation {hl('online medical assistance')} &amp; <span className="text-black">doctor network.</span></>,
+    body: <>MedCred provides <span className="text-[color:var(--t-600)] font-bold">real-time online medical assistance</span>, <span className="text-black font-bold">24/7 doctor tele-consultations</span>, <span className="text-[color:var(--t-600)] font-bold">board-verified practitioners</span>, and <span className="text-black font-bold">digital e-prescriptions</span> built with verified clinical standards.</>,
+    cta: { label: 'Access Portal Free', href: '#login-section' },
+    chips: ['Online consultations', 'Board-verified doctors', 'Signed e-prescriptions'],
+    card: {
+      label: 'Medical Assistance Badge',
+      title: 'Verified Practitioner',
+      status: 'Verified Active',
+      person: { img: '/assets/malaysian_male_doctor.jpg', name: 'Dr. Tan Seng Hock', line1: 'Senior Specialist · MMC Registered', line2: 'Kuala Lumpur Specialist Hospital' },
+      rows: [
+        { k: 'MMC License Number', v: 'MMC-32109', kind: 'mono' },
+        { k: 'Registry Status', v: 'Malaysian Medical Council' },
+        { k: 'Response SLA', v: '< 3 Min On-Call', kind: 'ok' },
+      ],
+      footId: '8F2A-9912',
+    },
+  },
+  {
+    id: 'members',
+    pill: 'For Members & Families',
+    headline: <>Trusted care, {hl('one verified doctor')} away.</>,
+    body: <>Chat or video with a <span className="text-[color:var(--t-600)] font-bold">board-verified doctor</span>, keep your <span className="text-black font-bold">prescriptions and health record</span> in one place, and choose exactly who can see them.</>,
+    cta: { label: 'Join as a Member', role: 'patient', register: true },
+    chips: ['Chat or video', 'Refund if no doctor joins', 'You control access'],
+    card: {
+      label: 'E-Prescription',
+      title: 'Signed Prescription',
+      status: 'Valid',
+      person: { icon: Pill, name: 'Amoxicillin 500 mg', line1: '1 capsule, 3 times daily · 7 days', line2: 'Signed by Dr. Tan Seng Hock' },
+      rows: [
+        { k: 'Prescription code', v: 'RX-7K4M-92QA', kind: 'mono' },
+        { k: 'Safety check', v: 'Allergies & interactions clear', kind: 'ok' },
+        { k: 'Collect from', v: 'Any partner pharmacy' },
+      ],
+      footId: 'RX-7K4M',
+    },
+  },
+  {
+    id: 'practitioners',
+    pill: 'For Doctors & Nurses',
+    headline: <>Get {hl('verified once')}, practise with confidence.</>,
+    body: <>Submit your licence, be <span className="text-[color:var(--t-600)] font-bold">reviewed by our medical board</span>, then take consultations, issue <span className="text-black font-bold">signed e-prescriptions</span> and apply for locum shifts.</>,
+    cta: { label: 'Join as a Practitioner', role: 'practitioner', register: true },
+    chips: ['Manual licence checks', 'Locum shift board', 'Paid consultations'],
+    card: {
+      label: 'Credential Review',
+      title: 'Licence Review',
+      status: 'Approved',
+      person: { icon: ShieldCheck, name: 'Licence & certificates', line1: 'Checked by hand against the council register', line2: 'Re-verified every 12 months' },
+      rows: [
+        { k: 'Documents', v: 'Uploaded' },
+        { k: 'Board review', v: 'Approved', kind: 'ok' },
+        { k: 'Next renewal check', v: 'In 214 days' },
+      ],
+      footId: 'LIC-2041',
+    },
+  },
+  {
+    id: 'boards',
+    pill: 'For Boards & Hospitals',
+    headline: <>Every licence {hl('checked and on record.')}</>,
+    body: <>Review documents, track expiry and renewals, handle <span className="text-[color:var(--t-600)] font-bold">complaints and incidents</span>, and keep a <span className="text-black font-bold">full audit log</span> across the network.</>,
+    cta: { label: 'Open Admin Console', role: 'admin' },
+    chips: ['Review queue', 'Expiry tracking', 'Audit log'],
+    card: {
+      label: 'Board Console',
+      title: 'Review Queue',
+      status: 'Up to date',
+      person: { icon: Building, name: 'Licence review queue', line1: 'Complaints, incidents and peer review', line2: 'Support desk included' },
+      rows: [
+        { k: 'Awaiting review', v: '3 applications' },
+        { k: 'Expiring in 30 days', v: '2 licences' },
+        { k: 'Audit log', v: 'Every action recorded', kind: 'ok' },
+      ],
+      footId: 'BRD-0007',
+    },
+  },
+  {
+    id: 'pharmacies',
+    pill: 'For Pharmacies',
+    headline: <>Dispense with {hl('a code you can trust.')}</>,
+    body: <>Receive prescriptions patients send you, update their status, and keep your own <span className="text-[color:var(--t-600)] font-bold">records, activity and reports</span>. <span className="text-black font-bold">Every prescription is doctor-signed.</span></>,
+    cta: { label: 'Open Pharmacy Workspace', role: 'pharmacy' },
+    chips: ['Your own inbox', 'Status updates', 'Activity reports'],
+    card: {
+      label: 'Pharmacy Check',
+      title: 'Prescription Check',
+      status: 'Signature valid',
+      person: { icon: Pill, name: 'Prescription RX-7K4M-92QA', line1: 'Signed by a verified doctor', line2: 'In your pharmacy inbox' },
+      rows: [
+        { k: 'Prescriber status', v: 'Verified', kind: 'ok' },
+        { k: 'Fill status', v: 'Preparing' },
+        { k: 'First response', v: 'Within 12 min' },
+      ],
+      footId: 'PH-3315',
+    },
   },
 ];
 
@@ -183,7 +313,7 @@ const PERSPECTIVES = [
 // PRACTITIONER ACCOUNT SIGN-UP
 // ═══════════════════════════════════════════════
 function PractitionerSignUp({ onSuccess, onCancel }: {
-  onSuccess: (user: { id: string; role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; profileId?: string | null }) => void;
+  onSuccess: (user: { id: string; role: 'patient' | 'practitioner' | 'admin' | 'pharmacy'; name: string; email: string; profileId?: string | null }) => void;
   onCancel: () => void;
 }) {
   const [name, setName] = useState('');
@@ -259,12 +389,30 @@ function PractitionerSignUp({ onSuccess, onCancel }: {
 // ═══════════════════════════════════════════════
 export default function LandingPage({ professionals, onLoginSuccess }: LandingPageProps) {
   // Login State
-  const [activeTab, setActiveTab] = useState<'patient' | 'practitioner' | 'admin'>('patient');
+  const [activeTab, setActiveTab] = useState<'patient' | 'practitioner' | 'admin' | 'pharmacy'>('patient');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [needsCode, setNeedsCode] = useState(false);
+  const [code, setCode] = useState('');
+
+  // Hero slider
+  const [slideIdx, setSlideIdx] = useState(0);
+  const [heroPaused, setHeroPaused] = useState(false);
+  useEffect(() => {
+    if (heroPaused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const t = setInterval(() => setSlideIdx(i => (i + 1) % HERO_SLIDES.length), 7000);
+    return () => clearInterval(t);
+  }, [heroPaused, slideIdx]);
+
+  const goLogin = (role: PortalRole, register = false) => {
+    setActiveTab(role);
+    setError('');
+    setIsRegistering(register);
+    document.getElementById('login-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   // Active Assistance Module State (Split Layout)
   const [activeModuleId, setActiveModuleId] = useState<string>('telehealth');
@@ -302,13 +450,15 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
       const resp = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, role: activeTab }),
+        body: JSON.stringify({ email, password, role: activeTab, ...(needsCode ? { code } : {}) }),
       });
       const data = await resp.json();
       if (data.status === 'success') {
         setPassword('');
+        setNeedsCode(false); setCode('');
         onLoginSuccess(data.data.user, data.data.patient);
       } else {
+        if (data.needsCode) setNeedsCode(true);
         setError(data.message || 'Sign in failed.');
       }
     } catch {
@@ -327,12 +477,12 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
   const inputClass = 'w-full bg-white/10 border border-white/30 rounded-none px-4 h-[50px] text-base font-medium text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-all';
 
   return (
-    <div className="min-h-screen bg-[color:var(--t-bg)] text-[color:var(--ink)] font-body flex flex-col antialiased selection:bg-[color:var(--t-100)] selection:text-[color:var(--t-600)]">
+    <div className="min-h-dvh bg-[color:var(--t-bg)] text-[color:var(--ink)] font-body flex flex-col antialiased selection:bg-[color:var(--t-100)] selection:text-[color:var(--t-600)]">
 
       {/* ═══════════ TOP BANNER ═══════════ */}
       <div className="bg-[color:var(--t-100)] text-[color:var(--t-600)] text-xs font-semibold py-2 px-4 text-center border-b border-[color:var(--t-200)] flex items-center justify-center gap-2">
         <span className="inline-flex items-center gap-1.5 bg-[color:var(--t-600)] text-white px-2.5 py-0.5 rounded-none text-[10px] uppercase tracking-wider font-bold">
-          <Cross className="h-2.5 w-2.5" /> CareVerified Standard
+          <Cross className="h-2.5 w-2.5" /> MedCred Standard
         </span>
         <span>Online Medical Assistance Platform — Verification &amp; Telehealth Network</span>
       </div>
@@ -374,146 +524,204 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
         </div>
       </nav>
 
-      {/* ═══════════ HERO HEADER (LIGHT CRIMSON BACKGROUND - ZERO BLACK BACKGROUNDS) ═══════════ */}
-      <header id="top" className="relative text-[color:var(--ink)] border-b border-[color:var(--t-200)] overflow-hidden min-h-[560px] bg-[color:var(--t-50)]">
+      {/* ═══════════ HERO SLIDER: one slide per audience, all stacked so the height never changes ═══════════ */}
+      <header
+        id="top"
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="MedCred for every user"
+        onMouseEnter={() => setHeroPaused(true)}
+        onMouseLeave={() => setHeroPaused(false)}
+        onFocus={() => setHeroPaused(true)}
+        onBlur={() => setHeroPaused(false)}
+        className="relative text-[color:var(--ink)] border-b border-[color:var(--t-200)] overflow-hidden bg-[color:var(--t-50)]"
+      >
         {/* Clinical Background Image (Opacity set to 80%) */}
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none z-0"
           style={{ backgroundImage: `url(${heroBgImage})`, opacity: 0.8, filter: "hue-rotate(var(--t-hue)) brightness(var(--t-bright))" }}
         />
         <Cross className="absolute -right-24 -bottom-36 h-[520px] w-[520px] text-[color:var(--t-600)] opacity-5 pointer-events-none z-0" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-12 pb-14 lg:pt-16 lg:pb-18 flex flex-wrap items-center justify-between gap-10 z-10">
-          {/* Left Column — Clean Light Crimson Layout */}
-          <div className="flex-[1_1_500px] min-w-0">
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-none bg-white border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-600)] mb-5 shadow-xs"
-            >
-              <Cross className="h-3 w-3 text-[color:var(--t-600)] animate-pulse" />
-              Online Medical Assistance Network
-            </motion.div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-[4.25rem] pb-12 lg:pt-[4.25rem] z-10">
+          {/* All slides share one grid cell, so the hero is as tall as the tallest slide on every slide */}
+          <div className="grid">
+            {HERO_SLIDES.map((s, i) => {
+              const active = i === slideIdx;
+              const c = s.card;
+              const PersonIcon = c.person.icon;
+              return (
+                <div
+                  key={s.id}
+                  role="group"
+                  aria-roledescription="slide"
+                  aria-label={`${i + 1} of ${HERO_SLIDES.length}`}
+                  inert={!active}
+                  className={`[grid-area:1/1] flex flex-wrap items-center justify-between gap-8 transition-opacity duration-500 ${active ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                >
+                  {/* Left column: message */}
+                  <div className="flex-[1_1_500px] min-w-0">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-none bg-white border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-600)] mb-4 shadow-xs">
+                      <Cross className="h-3 w-3 text-[color:var(--t-600)]" />
+                      {s.pill}
+                    </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="font-display font-black text-3xl sm:text-4xl lg:text-5xl leading-[1.08] tracking-tight text-black mb-4"
-              style={{ textShadow: '0 0 6px #fff, 0 0 12px #fff, 0 0 20px rgba(255,255,255,0.95), 0 1px 2px #fff' }}
-            >
-              Next-generation <span className="text-[color:var(--t-600)]">online medical assistance</span> &amp; <span className="text-black">doctor network.</span>
-            </motion.h1>
+                    {i === 0 ? (
+                      <h1
+                        className="font-display font-black text-3xl sm:text-4xl leading-[1.1] tracking-tight text-black mb-3"
+                        style={{ textShadow: '0 0 6px #fff, 0 0 12px #fff, 0 0 20px rgba(255,255,255,0.95), 0 1px 2px #fff' }}
+                      >
+                        {s.headline}
+                      </h1>
+                    ) : (
+                      <h2
+                        className="font-display font-black text-3xl sm:text-4xl leading-[1.1] tracking-tight text-black mb-3"
+                        style={{ textShadow: '0 0 6px #fff, 0 0 12px #fff, 0 0 20px rgba(255,255,255,0.95), 0 1px 2px #fff' }}
+                      >
+                        {s.headline}
+                      </h2>
+                    )}
 
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-              className="text-base sm:text-lg text-black font-semibold max-w-xl leading-relaxed mb-7 bg-white/20 backdrop-blur-sm border border-[color:var(--t-200)] px-4 py-3"
-              style={{ textShadow: '0 0 6px #fff, 0 0 12px #fff, 0 0 20px rgba(255,255,255,0.95), 0 1px 2px #fff' }}
-            >
-              MedCred provides <span className="text-[color:var(--t-600)] font-bold">real-time online medical assistance</span>, <span className="text-black font-bold">24/7 doctor tele-consultations</span>, <span className="text-[color:var(--t-600)] font-bold">board-verified practitioners</span>, and <span className="text-black font-bold">digital e-prescriptions</span> built with verified clinical standards.
-            </motion.p>
+                    <p
+                      className="text-base text-black font-semibold max-w-xl leading-relaxed mb-5 bg-white/20 backdrop-blur-sm border border-[color:var(--t-200)] px-4 py-3"
+                      style={{ textShadow: '0 0 6px #fff, 0 0 12px #fff, 0 0 20px rgba(255,255,255,0.95), 0 1px 2px #fff' }}
+                    >
+                      {s.body}
+                    </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="flex flex-wrap gap-3.5 mb-8"
-            >
-              <a
-                href="#login-section"
-                className="group inline-flex items-center gap-2.5 min-h-[48px] px-7 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] rounded-none shadow-md transition-all cursor-pointer border border-[color:var(--t-700)]"
-              >
-                Access Portal Free
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </a>
-              <a
-                href="#verify-section"
-                className="inline-flex items-center gap-2 min-h-[48px] px-7 text-sm font-bold text-[color:var(--ink)] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] rounded-none transition-all cursor-pointer shadow-xs"
-              >
-                <Search className="h-4 w-4 text-[color:var(--t-600)]" />
-                Verify a Doctor
-              </a>
-            </motion.div>
+                    <div className="flex flex-wrap gap-3 mb-5">
+                      {s.cta.href ? (
+                        <a
+                          href={s.cta.href}
+                          className="group inline-flex items-center gap-2.5 min-h-[46px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] rounded-none shadow-md transition-all cursor-pointer border border-[color:var(--t-700)]"
+                        >
+                          {s.cta.label}
+                          <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        </a>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => goLogin(s.cta.role!, !!s.cta.register)}
+                          className="group inline-flex items-center gap-2.5 min-h-[46px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] rounded-none shadow-md transition-all cursor-pointer border border-[color:var(--t-700)]"
+                        >
+                          {s.cta.label}
+                          <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                      )}
+                      <a
+                        href="#verify-section"
+                        className="inline-flex items-center gap-2 min-h-[46px] px-6 text-sm font-bold text-[color:var(--ink)] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] rounded-none transition-all cursor-pointer shadow-xs"
+                      >
+                        <Search className="h-4 w-4 text-[color:var(--t-600)]" />
+                        Verify a Doctor
+                      </a>
+                    </div>
 
-            {/* Certification Badges */}
-            <div className="flex flex-wrap items-center gap-2.5 text-[11px] font-bold text-[color:var(--ink)]">
-              {['Online consultations', 'Board-verified doctors', 'Signed e-prescriptions'].map((b) => (
-                <span key={b} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-white/95 border border-[color:var(--t-200)] text-[color:var(--ink)] font-bold shadow-xs">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                  {b}
-                </span>
-              ))}
-            </div>
+                    <div className="flex flex-wrap items-center gap-2.5 text-[11px] font-bold text-[color:var(--ink)]">
+                      {s.chips.map((b) => (
+                        <span key={b} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-white/95 border border-[color:var(--t-200)] text-[color:var(--ink)] font-bold shadow-xs">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                          {b}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right column: badge card that changes with the slide */}
+                  <div className="hidden md:block flex-[1_1_340px] min-w-0 max-w-[420px]">
+                    <div className="bg-white text-[color:var(--ink)] rounded-none p-5 shadow-xl border border-[color:var(--t-200)] relative">
+                      <div className="flex justify-between items-start gap-3 mb-4">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-9 h-9 shrink-0 rounded-none bg-[color:var(--t-100)] border border-[color:var(--t-200)] flex items-center justify-center text-[color:var(--t-600)]">
+                            <Cross className="h-4 w-4" />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-slate-500 block">{c.label}</span>
+                            <span className="text-xs font-bold text-[color:var(--ink)]">{c.title}</span>
+                          </div>
+                        </div>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-none bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-bold shrink-0">
+                          <span className="w-1.5 h-1.5 rounded-none bg-emerald-500" />
+                          {c.status}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-3.5 mb-4">
+                        {c.person.img ? (
+                          <img src={c.person.img} alt={c.person.name} className="w-14 h-14 rounded-full object-cover border border-[color:var(--t-200)] shadow-xs" />
+                        ) : (
+                          <span className="w-14 h-14 shrink-0 rounded-full bg-[color:var(--t-100)] border border-[color:var(--t-200)] flex items-center justify-center text-[color:var(--t-600)]">
+                            {PersonIcon && <PersonIcon className="h-6 w-6" />}
+                          </span>
+                        )}
+                        <div className="min-w-0">
+                          <p className="font-display font-extrabold text-lg tracking-tight text-[color:var(--ink)] leading-tight">{c.person.name}</p>
+                          <p className="text-xs font-semibold text-[color:var(--t-600)] mt-0.5">{c.person.line1}</p>
+                          <p className="text-[11px] text-slate-500 mt-0.5">{c.person.line2}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 bg-[color:var(--t-bg)] rounded-none p-3.5 border border-[color:var(--t-200)] text-xs">
+                        {c.rows.map((r, ri) => (
+                          <div key={r.k} className={`flex justify-between items-center gap-3 py-1 ${ri < c.rows.length - 1 ? 'border-b border-rose-100' : ''}`}>
+                            <span className="text-slate-500 font-medium">{r.k}</span>
+                            {r.kind === 'mono' ? (
+                              <span className="font-mono font-bold text-[color:var(--t-600)] bg-[color:var(--t-100)] px-2 py-0.5 border border-[color:var(--t-200)] rounded-none text-[11px]">{r.v}</span>
+                            ) : r.kind === 'ok' ? (
+                              <span className="font-semibold text-emerald-700 flex items-center gap-1 text-right"><CheckCircle2 className="h-3 w-3 shrink-0" /> {r.v}</span>
+                            ) : (
+                              <span className="font-semibold text-slate-800 text-right">{r.v}</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mt-3.5 pt-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+                        <span className="flex items-center gap-1 text-slate-600 font-medium">
+                          <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> MedCred Standard
+                        </span>
+                        <span className="font-mono text-[10px] text-slate-400">ID: {c.footId}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          {/* Right Column — Glass & Hairline Border Showcase Card */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
-            className="flex-[1_1_340px] min-w-0 max-w-[420px]"
-          >
-            <div className="bg-white text-[color:var(--ink)] rounded-none p-6 shadow-xl border border-[color:var(--t-200)] relative">
-              <div className="flex justify-between items-start gap-3 mb-4">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-none bg-[color:var(--t-100)] border border-[color:var(--t-200)] flex items-center justify-center text-[color:var(--t-600)]">
-                    <Cross className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <span className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-slate-500 block">Medical Assistance Badge</span>
-                    <span className="text-xs font-bold text-[color:var(--ink)]">Verified Practitioner</span>
-                  </div>
-                </div>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-none bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-bold">
-                  <span className="w-1.5 h-1.5 rounded-none bg-emerald-500 animate-ping" />
-                  Verified Active
-                </span>
-              </div>
-
-              {/* Doctor Details */}
-              <div className="flex items-center gap-3.5 mb-4">
-                <img
-                  src="/assets/malaysian_male_doctor.jpg"
-                  alt="Dr. Tan Seng Hock"
-                  className="w-14 h-14 rounded-full object-cover border border-[color:var(--t-200)] shadow-xs"
-                />
-                <div>
-                  <h3 className="font-display font-extrabold text-xl tracking-tight text-[color:var(--ink)]">Dr. Tan Seng Hock</h3>
-                  <p className="text-xs font-semibold text-[color:var(--t-600)] mt-0.5">Senior Specialist · MMC Registered</p>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Kuala Lumpur Specialist Hospital</p>
-                </div>
-              </div>
-
-              {/* Data Rows */}
-              <div className="space-y-2 bg-[color:var(--t-bg)] rounded-none p-3.5 border border-[color:var(--t-200)] text-xs">
-                <div className="flex justify-between items-center py-1 border-b border-rose-100">
-                  <span className="text-slate-500 font-medium">MMC License Number</span>
-                  <span className="font-mono font-bold text-[color:var(--t-600)] bg-[color:var(--t-100)] px-2 py-0.5 border border-[color:var(--t-200)] rounded-none text-[11px]">MMC-32109</span>
-                </div>
-                <div className="flex justify-between items-center py-1 border-b border-rose-100">
-                  <span className="text-slate-500 font-medium">Registry Status</span>
-                  <span className="font-semibold text-slate-800">Malaysian Medical Council</span>
-                </div>
-                <div className="flex justify-between items-center py-1">
-                  <span className="text-slate-500 font-medium">Response SLA</span>
-                  <span className="font-semibold text-emerald-700 flex items-center gap-1">
-                    <Clock className="h-3 w-3" /> &lt; 3 Min On-Call
-                  </span>
-                </div>
-              </div>
-
-              {/* Card Footer */}
-              <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
-                <span className="flex items-center gap-1 text-slate-600 font-medium">
-                  <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> CareVerified Standard
-                </span>
-                <span className="font-mono text-[10px] text-slate-400">ID: 8F2A-9912</span>
-              </div>
+          {/* Slider controls: small arrows and dots, no play button */}
+          <div className="mt-5 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSlideIdx((slideIdx - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
+              aria-label="Previous slide"
+              className="h-7 w-7 inline-flex items-center justify-center bg-white/90 border border-[color:var(--t-200)] text-[color:var(--t-600)] hover:bg-[color:var(--t-100)] cursor-pointer"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <div className="flex items-center gap-1.5 px-1">
+              {HERO_SLIDES.map((s, i) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setSlideIdx(i)}
+                  aria-label={`Go to slide ${i + 1}: ${s.pill}`}
+                  aria-current={i === slideIdx}
+                  className="h-4 inline-flex items-center cursor-pointer"
+                >
+                  <span className={`block h-1.5 transition-all ${i === slideIdx ? 'w-6 bg-[color:var(--t-600)]' : 'w-1.5 bg-[color:var(--t-600)]/30 hover:bg-[color:var(--t-600)]/60'}`} />
+                </button>
+              ))}
             </div>
-          </motion.div>
+            <button
+              type="button"
+              onClick={() => setSlideIdx((slideIdx + 1) % HERO_SLIDES.length)}
+              aria-label="Next slide"
+              className="h-7 w-7 inline-flex items-center justify-center bg-white/90 border border-[color:var(--t-200)] text-[color:var(--t-600)] hover:bg-[color:var(--t-100)] cursor-pointer"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -524,13 +732,13 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
         <section>
           <AnimatedSection className="max-w-3xl mb-12">
             <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-600)] bg-[color:var(--t-100)] px-3.5 py-1.5 rounded-none border border-[color:var(--t-200)] mb-3">
-              <Cross className="h-3.5 w-3.5" /> Professional Assistance Suite
+              <Cross className="h-3.5 w-3.5" /> Assistance Suite
             </div>
             <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight text-[color:var(--ink)] leading-[1.05]">
-              Executive Medical Assistance &amp; Triage Workflows.
+              Four Modules, One Platform.
             </h2>
             <p className="text-lg text-slate-600 mt-3 leading-relaxed">
-              Explore our core medical assistance modules engineered for real-time telehealth, regulatory auditing, and clinical care.
+              Telehealth, credential audits, e-prescriptions and locum shifts.
             </p>
           </AnimatedSection>
 
@@ -644,79 +852,63 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
           </AnimatedSection>
         </section>
 
-        {/* ─── SECTION 2: USER ECOSYSTEM (REDESIGNED ROLE PORTALS) ─── */}
+        {/* ─── SECTION 2: ROLE PORTALS (one connected panel, three columns) ─── */}
         <section>
-          <AnimatedSection className="max-w-3xl mb-12">
+          <AnimatedSection className="max-w-3xl mb-10">
             <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-600)] bg-[color:var(--t-100)] px-3.5 py-1.5 rounded-none border border-[color:var(--t-200)] mb-3">
               <Cross className="h-3.5 w-3.5" /> User Ecosystem
             </div>
-            <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight text-[color:var(--ink)] leading-[1.05]">
-              Tailored Portals for Every Healthcare Role.
+            <h2 className="font-display font-black text-3xl sm:text-4xl tracking-tight text-[color:var(--ink)] leading-[1.05]">
+              A Portal for Every Role.
             </h2>
-            <p className="text-lg text-slate-600 mt-3 leading-relaxed">
-              Direct access into specialized workspaces engineered for patient health, clinical practice, and regulatory oversight.
+            <p className="text-base text-slate-600 mt-2 leading-relaxed">
+              Dedicated workspaces for members, clinicians and boards.
             </p>
           </AnimatedSection>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {PERSPECTIVES.map((card, i) => {
-              const IconComp = card.icon;
-              return (
-                <AnimatedSection key={card.title} delay={i * 0.12}>
-                  <article className="bg-white rounded-none p-8 border border-slate-200 hover:border-[color:var(--t-600)] shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between h-full relative overflow-hidden group">
-                    <div>
-                      {/* Card Header: Icon & Badge */}
-                      <div className="flex justify-between items-center gap-3 mb-6">
-                        <span className="w-12 h-12 rounded-none bg-[color:var(--t-100)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center group-hover:bg-[color:var(--t-600)] group-hover:text-white transition-colors">
-                          <IconComp className="h-6 w-6" />
+          <AnimatedSection>
+            <div className="grid grid-cols-1 md:grid-cols-3 bg-white border border-slate-200 shadow-xs divide-y md:divide-y-0 md:divide-x divide-slate-200">
+              {PERSPECTIVES.map((card, i) => {
+                const IconComp = card.icon;
+                return (
+                  <article key={card.title} className="group flex flex-col min-w-0">
+                    <div className="p-7 flex-1">
+                      <div className="flex items-start justify-between gap-3 mb-5">
+                        <span aria-hidden="true" className="font-display font-black text-5xl leading-none text-[color:var(--t-200)] group-hover:text-[color:var(--t-600)] transition-colors">
+                          {String(i + 1).padStart(2, '0')}
                         </span>
-                        <span className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--t-600)] bg-[color:var(--t-100)] px-3 py-1 rounded-none border border-[color:var(--t-200)]">
-                          {card.badge}
+                        <span className="w-11 h-11 bg-[color:var(--t-100)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center">
+                          <IconComp className="h-5 w-5" />
                         </span>
                       </div>
 
-                      <h3 className="font-display font-extrabold text-2xl tracking-tight text-[color:var(--ink)] mb-1">
-                        {card.title}
-                      </h3>
-                      <p className="text-xs font-bold text-[color:var(--t-600)] uppercase tracking-wider mb-4">
-                        {card.tagline}
-                      </p>
-                      <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                        {card.desc}
-                      </p>
+                      <h3 className="font-display font-extrabold text-xl tracking-tight text-[color:var(--ink)]">{card.title}</h3>
+                      <p className="text-[11px] font-bold text-[color:var(--t-600)] uppercase tracking-wider mt-1 mb-3">{card.tagline}</p>
+                      <p className="text-slate-600 text-sm leading-relaxed mb-5">{card.desc}</p>
 
-                      {/* Key Capabilities List */}
-                      <div className="pt-5 border-t border-slate-200 space-y-2.5">
-                        <h4 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-3">Key Capabilities</h4>
+                      <ul className="space-y-2">
                         {card.features.map((f) => (
-                          <div key={f} className="flex items-center gap-2.5 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-2.5 text-xs font-bold text-slate-800">
-                            <CheckCircle2 className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
+                          <li key={f} className="flex items-start gap-2 text-[13px] font-semibold text-slate-800">
+                            <CheckCircle2 className="h-4 w-4 text-[color:var(--t-600)] shrink-0 mt-px" />
                             <span>{f}</span>
-                          </div>
+                          </li>
                         ))}
-                      </div>
+                      </ul>
                     </div>
 
-                    {/* Direct Portal Entry CTA Button */}
-                    <div className="pt-6 mt-6 border-t border-slate-200">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveTab(card.roleKey);
-                          setIsRegistering(false);
-                          document.getElementById('login-section')?.scrollIntoView({ behavior: 'smooth' });
-                        }}
-                        className="w-full min-h-[46px] px-5 text-xs font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-800)] border border-[color:var(--t-800)] rounded-none shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
-                      >
-                        {card.ctaText}
-                        <ArrowRight className="h-4 w-4" />
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => goLogin(card.roleKey)}
+                      className="w-full min-h-[50px] px-6 text-xs font-extrabold uppercase tracking-wider text-[color:var(--t-600)] bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] hover:text-white border-t border-slate-200 transition-colors cursor-pointer flex items-center justify-between gap-2"
+                    >
+                      {card.ctaText}
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
                   </article>
-                </AnimatedSection>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          </AnimatedSection>
         </section>
 
         {/* ─── SECTION 3: PUBLIC LICENSE LOOKUP (LIGHT CRIMSON DESIGN) ─── */}
@@ -730,10 +922,10 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                   <ShieldCheck className="h-3.5 w-3.5" /> Instant Doctor Lookup
                 </span>
                 <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight leading-tight text-[color:var(--ink)] mb-4">
-                  Confirm Active Medical Licensing.
+                  Verify a License.
                 </h2>
                 <p className="text-[color:var(--ink-2)] text-base sm:text-lg mb-8 leading-relaxed max-w-2xl font-medium">
-                  Search by practitioner name, license code (e.g., MMC-32109), or specialty to verify live practicing status instantly.
+                  Search by name, license code (e.g. MMC-32109) or specialty.
                 </p>
 
                 {/* Instant Search Form */}
@@ -837,10 +1029,10 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               <Cross className="h-7 w-7" />
             </span>
             <h2 className="font-display font-black text-3xl sm:text-5xl tracking-tight text-[color:var(--ink)] mb-3">
-              Access the MedCred Portal
+              Sign In to MedCred
             </h2>
             <p className="text-base sm:text-lg text-slate-600">
-              Select your role below to log into your personalized portal dashboard.
+              Choose your role to continue.
             </p>
           </div>
 
@@ -852,10 +1044,11 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                 <div className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-600)] mb-4">
                   Select User Role
                 </div>
-                <div className="grid grid-cols-3 md:grid-cols-1 gap-2.5">
+                <div className="grid grid-cols-2 md:grid-cols-1 gap-2.5">
                   {[
-                    { key: 'patient' as const, label: 'Patient', desc: 'Vitals, appointments & e-prescriptions', icon: Heart },
+                    { key: 'patient' as const, label: 'Member', desc: 'Vitals, appointments & e-prescriptions', icon: Heart },
                     { key: 'practitioner' as const, label: 'Practitioner', desc: 'Credential verification & clinical shifts', icon: PlusCircle },
+                    { key: 'pharmacy' as const, label: 'Pharmacy', desc: 'Prescription inbox, records & reports', icon: Pill },
                     { key: 'admin' as const, label: 'Board Admin', desc: 'License audit & platform management', icon: Building },
                   ].map((tab) => {
                     const active = activeTab === tab.key;
@@ -863,7 +1056,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                       <button
                         key={tab.key}
                         type="button"
-                        onClick={() => { setActiveTab(tab.key); setError(''); setIsRegistering(false); }}
+                        onClick={() => { setActiveTab(tab.key); setError(''); setIsRegistering(false); setNeedsCode(false); setCode(''); }}
                         aria-pressed={active}
                         className={`rounded-none p-4 transition-all cursor-pointer flex flex-col md:flex-row md:items-start items-center text-center md:text-left gap-3 border ${
                           active
@@ -929,7 +1122,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                     exit={{ opacity: 0, y: -12 }}
                   >
                     <h3 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[color:var(--ink)]">
-                      Sign in as {activeTab === 'patient' ? 'a Patient' : activeTab === 'practitioner' ? 'a Practitioner' : 'a Board Admin'}
+                      Sign in as {activeTab === 'patient' ? 'a Member' : activeTab === 'practitioner' ? 'a Practitioner' : activeTab === 'pharmacy' ? 'a Pharmacy' : 'a Board Admin'}
                     </h3>
                     <p className="text-sm text-slate-600 mt-1">Enter your credentials to access the verified network.</p>
 
@@ -978,6 +1171,25 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                         />
                       </div>
 
+                      {needsCode && (
+                        <div className="space-y-2">
+                          <label htmlFor="login-code" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">
+                            Authenticator code
+                          </label>
+                          <input
+                            id="login-code"
+                            inputMode="numeric"
+                            autoComplete="one-time-code"
+                            placeholder="6-digit code"
+                            value={code}
+                            onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                            autoFocus
+                            className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none px-4 h-[50px] text-base font-mono tracking-widest text-[color:var(--ink)] placeholder-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all"
+                            required
+                          />
+                        </div>
+                      )}
+
                       <button
                         type="submit"
                         disabled={loading}
@@ -990,12 +1202,18 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                           </>
                         ) : (
                           <>
-                            Sign in to {activeTab === 'patient' ? 'Patient Portal' : activeTab === 'practitioner' ? 'Practitioner Hub' : 'Admin Panel'}
+                            Sign in to {activeTab === 'patient' ? 'Member Portal' : activeTab === 'practitioner' ? 'Practitioner Hub' : activeTab === 'pharmacy' ? 'Pharmacy Workspace' : 'Admin Panel'}
                             <ArrowRight className="h-5 w-5 text-white" />
                           </>
                         )}
                       </button>
                     </form>
+
+                    {activeTab === 'pharmacy' && (
+                      <p className="pt-6 text-center text-sm text-slate-600">
+                        Pharmacy accounts are created by the MedCred board. To register your pharmacy, contact the board.
+                      </p>
+                    )}
 
                     {(activeTab === 'patient' || activeTab === 'practitioner') && (
                       <p className="pt-6 text-center text-sm text-slate-600">
@@ -1005,7 +1223,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                           onClick={() => { setError(''); setIsRegistering(true); }}
                           className="text-[color:var(--t-600)] hover:underline font-extrabold cursor-pointer transition-colors"
                         >
-                          {activeTab === 'patient' ? 'Register as a New Patient' : 'Create a Practitioner Account'}
+                          {activeTab === 'patient' ? 'Register as a New Member' : 'Create a Practitioner Account'}
                         </button>
                       </p>
                     )}
@@ -1037,7 +1255,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
             <div>
               <h4 className="text-xs font-extrabold uppercase tracking-widest text-white mb-4">Portals</h4>
               <ul className="space-y-3 text-sm">
-                {['Patient Dashboard', 'Doctor Registry', 'Nurse Registry', 'Locum Clinical Shifts', 'Medical Articles'].map((link) => (
+                {['Member Dashboard', 'Doctor Registry', 'Nurse Registry', 'Locum Clinical Shifts', 'Medical Articles'].map((link) => (
                   <li key={link}>
                     <a href="#login-section" className="text-slate-400 hover:text-white transition-colors cursor-pointer">{link}</a>
                   </li>
@@ -1071,7 +1289,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
 
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 text-xs text-slate-500">
             <p>
-              &copy; {new Date().getFullYear()} MedCred Network. Operating in alignment with Medical Act 1971 credential guidelines. CareVerified Crimson System.
+              &copy; {new Date().getFullYear()} MedCred Network. Operating in alignment with Medical Act 1971 credential guidelines.
             </p>
             <div className="flex items-center gap-4 text-xs font-bold text-slate-300">
               <span className="flex items-center gap-1.5"><Globe className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> English</span>

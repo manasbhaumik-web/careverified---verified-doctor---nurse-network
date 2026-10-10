@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   email TEXT NOT NULL UNIQUE COLLATE NOCASE,
   password_hash TEXT NOT NULL,
-  role TEXT NOT NULL CHECK (role IN ('patient','practitioner','admin')),
+  role TEXT NOT NULL CHECK (role IN ('patient','practitioner','admin','pharmacy')),
   name TEXT NOT NULL,
   avatar_url TEXT,
   profile_id TEXT,
@@ -65,6 +65,38 @@ CREATE TABLE IF NOT EXISTS records (
   PRIMARY KEY (collection, id)
 );
 `);
+
+// ---- Migration: allow the 'pharmacy' role. SQLite cannot alter a CHECK constraint, so the table is rebuilt once
+// (after a file backup). Existing rows, sessions and logins are unchanged. ----
+{
+  const def = (db.prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'users'").get() as { sql?: string } | undefined)?.sql ?? "";
+  if (def && !def.includes("'pharmacy'")) {
+    const next = def
+      .replace(/^CREATE TABLE\s+(IF NOT EXISTS\s+)?["`]?users["`]?/i, "CREATE TABLE users_new")
+      .replace("'admin')", "'admin','pharmacy')");
+    if (!next.startsWith("CREATE TABLE users_new") || !next.includes("'pharmacy'")) throw new Error("Could not migrate the users table for the pharmacy role.");
+    try { db.exec("PRAGMA wal_checkpoint(TRUNCATE)"); } catch { /* not in WAL mode */ }
+    fs.copyFileSync(path.join(dataDir, "careverified.db"), path.join(dataDir, `careverified.before-pharmacy-role-${Date.now()}.db`));
+    db.exec("PRAGMA foreign_keys = OFF");
+    try {
+      db.exec("BEGIN");
+      db.exec(next);
+      db.exec("INSERT INTO users_new SELECT * FROM users");
+      db.exec("DROP TABLE users");
+      db.exec("ALTER TABLE users_new RENAME TO users");
+      db.exec("COMMIT");
+    } catch (e) {
+      try { db.exec("ROLLBACK"); } catch { /* already rolled back */ }
+      throw e;
+    } finally {
+      db.exec("PRAGMA foreign_keys = ON");
+    }
+  }
+}
+// Pharmacy accounts are issued by the board with a temporary password that must be changed.
+for (const col of ["must_change_password INTEGER NOT NULL DEFAULT 0", "totp_secret TEXT", "totp_enabled INTEGER NOT NULL DEFAULT 0", "pharmacy_owner INTEGER NOT NULL DEFAULT 0"]) {
+  try { db.exec(`ALTER TABLE users ADD COLUMN ${col}`); } catch { /* column already exists */ }
+}
 
 // ---- Generic document collections (professionals, bookings, chats, ...) ----
 // Entities are still held as in-memory arrays for speed of iteration and are

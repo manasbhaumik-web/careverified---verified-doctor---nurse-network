@@ -437,7 +437,7 @@ export default function PatientRegistrationForm({
                   className="mt-0.5 h-4 w-4 accent-[color:var(--t-600)]"
                 />
                 <span>
-                  I accept the Terms of Service and Privacy Policy, and consent to CareVerified storing and processing my health information so practitioners can treat me, and agree that verified doctors may review samples of my care for quality and safety with my name hidden. I can export or request deletion of my data at any time.
+                  I accept the Terms of Service and Privacy Policy, and consent to MedCred storing and processing my health information so practitioners can treat me, and agree that verified doctors may review samples of my care for quality and safety with my name hidden. I can export or request deletion of my data at any time.
                 </span>
               </label>
             </div>

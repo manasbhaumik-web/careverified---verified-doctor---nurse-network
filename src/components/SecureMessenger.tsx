@@ -65,7 +65,7 @@ export default function SecureMessenger({ currentUserId }: { currentUserId: stri
         description="Messages are private to you and the other person. Do not use messages for emergencies: call 999. Replies can take time."
       />
 
-      <div className="bg-white border border-[color:var(--t-200)] shadow-xs grid grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)] lg:h-[calc(100vh-300px)] lg:min-h-[480px]">
+      <div className="bg-white border border-[color:var(--t-200)] shadow-xs grid grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)] lg:h-[calc(100dvh-300px)] lg:min-h-[480px]">
         <aside aria-label="Conversations" className="border-b lg:border-b-0 lg:border-r border-[color:var(--t-200)] flex flex-col min-h-0 max-h-[320px] lg:max-h-none">
           <div className="p-3 border-b border-[color:var(--t-200)]">
             <label htmlFor="mailbox-search" className="sr-only">Search conversations</label>
