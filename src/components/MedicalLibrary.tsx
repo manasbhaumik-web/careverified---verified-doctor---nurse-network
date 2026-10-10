@@ -505,7 +505,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
 
               {openArticle.faq?.length > 0 && (
                 <section className="space-y-2.5">
-                  <h3 className="text-sm font-bold text-[color:var(--ink)]">Patient FAQs</h3>
+                  <h3 className="text-sm font-bold text-[color:var(--ink)]">Common questions</h3>
                   {openArticle.faq.map((f, idx) => (
                     <details key={idx} className="group border border-[color:var(--t-200)] bg-white">
                       <summary className="min-h-[44px] px-4 py-3 text-[13px] font-semibold text-[color:var(--ink)] flex justify-between items-center cursor-pointer list-none">

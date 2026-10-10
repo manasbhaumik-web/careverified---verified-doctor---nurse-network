@@ -128,7 +128,7 @@ export default function PatientRegistrationForm({
             <UserCheck className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-base font-black text-[color:var(--ink)]">Create Patient Profile</h3>
+            <h3 className="text-base font-black text-[color:var(--ink)]">Create Member Profile</h3>
             <p className="text-[10px] text-slate-600 font-bold uppercase tracking-wider mt-0.5">Secure National Health Register</p>
           </div>
         </div>
@@ -213,7 +213,7 @@ export default function PatientRegistrationForm({
           <div className="space-y-4 animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Full Patient Name *</label>
+                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Full Name *</label>
                 <div className="relative">
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                   <input
@@ -310,7 +310,7 @@ export default function PatientRegistrationForm({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Patient Age *</label>
+                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Age *</label>
                 <div className="relative">
                   <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                   <input

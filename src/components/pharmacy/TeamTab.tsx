@@ -76,7 +76,7 @@ export default function TeamTab() {
         {issued && (
           <p role="status" className="text-xs bg-amber-50 border border-amber-300 p-3 font-semibold [overflow-wrap:anywhere]">
             Share this with {issued.who} now; the password is not shown again.<br />Email: <span className="font-mono font-bold">{issued.email}</span><br />Temporary password: <span className="font-mono font-bold">{issued.password}</span>
-            <button type="button" className="underline ml-2 cursor-pointer" onClick={() => setIssued(null)}>Done</button>
+            <button type="button" className={`${btnPlain} block mt-2`} onClick={() => setIssued(null)}>Done</button>
           </p>
         )}
       </form>

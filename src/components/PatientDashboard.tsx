@@ -90,14 +90,14 @@ export default function PatientDashboard({
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        tabsLabel="Patient hub sections"
+        tabsLabel="Member hub sections"
       >
         <BannerRow
           identity={
             <BannerIdentity
               name={userName}
               avatarUrl={userAvatar}
-              badges={<BannerBadge>Patient Account</BannerBadge>}
+              badges={<BannerBadge>Member Account</BannerBadge>}
               meta={
                 <>
                   <span className="font-extrabold text-slate-900">{greeting}</span>
