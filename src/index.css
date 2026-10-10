@@ -219,6 +219,10 @@ footer button.bg-slate-800:hover,
   --t-50: #F0F9FF; --t-100: #E0F2FE; --t-200: #BAE6FD; --t-300: #7DD3FC; --t-400: #38BDF8;
   --t-500: #0EA5E9; --t-600: #0284C7; --t-700: #0369A1; --t-800: #075985; --t-900: #0C4A6E;
   --t-bg: #F5FAFF; --t-hue: 205deg;
+  --band-a: color-mix(in srgb, var(--t-50) 50%, white);
+  /* Brand colour for small text and for fills behind white text in the content sections */
+  --t-text: var(--t-600);
+  --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
 }
 
 :root[data-theme="crimson"] {
@@ -227,10 +231,12 @@ footer button.bg-slate-800:hover,
   --t-bg: #FFF8F9; --t-hue: 0deg;
 }
 
-:root[data-theme="green"] {
-  --t-50: #F0FDF4; --t-100: #DCFCE7; --t-200: #BBF7D0; --t-300: #86EFAC; --t-400: #4ADE80;
-  --t-500: #22C55E; --t-600: #16A34A; --t-700: #15803D; --t-800: #166534; --t-900: #14532D;
-  --t-bg: #F7FEF9; --t-hue: 130deg;
+:root[data-theme="teal"] {
+  --t-50: #F0FDFA; --t-100: #CCFBF1; --t-200: #99F6E4; --t-300: #5EEAD4; --t-400: #2DD4BF;
+  --t-500: #0D9488; --t-600: #0F766E; --t-700: #115E59; --t-800: #134E4A; --t-900: #042F2E;
+  --t-bg: #F5FEFC; --t-hue: 175deg;
+  --t-text: var(--t-600);
+  --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
 }
 
 /* -------------------------------------------------------------
@@ -243,6 +249,9 @@ footer button.bg-slate-800:hover,
   --t-50: #0F1D3A; --t-100: #14264B; --t-200: #24407A; --t-300: #3B63B0; --t-400: #60A5FA;
   --t-500: #4F8EF7; --t-600: #3B82F6; --t-700: #2563EB; --t-800: #93C5FD; --t-900: #060E21;
   --t-bg: #0A1128; --t-hue: 205deg; --t-bright: 0.5;
+  --band-a: #0C1730;
+  --t-text: var(--t-600);
+  --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
   --ink: #E6EDF8; --ink-2: #BCC8DC;
   --e-50: #0B2B26; --e-200: #14574A; --e-600: #34D399; --e-700: #6EE7B7; --e-800: #6EE7B7;
   --dark: #060E21;
@@ -300,12 +309,19 @@ footer button.bg-slate-800:hover,
 /* Hero headline is black-with-white-glow over a photo in light themes; invert for navy */
 :root[data-theme="navy"] header#top h1.text-black,
 :root[data-theme="navy"] header#top h2.text-black,
-:root[data-theme="navy"] header#top h1 .text-black { color: #FFFFFF; text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
-:root[data-theme="navy"] header#top h2 .text-black { color: #FFFFFF; text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
+:root[data-theme="navy"] header#top h1 .text-black { color: #FFFFFF !important; text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
+:root[data-theme="navy"] header#top h2 .text-black { color: #FFFFFF !important; text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
+/* the hero letter outline is for the light themes only */
+:root[data-theme="navy"] header#top h1,
+:root[data-theme="navy"] header#top h2,
+:root[data-theme="navy"] header#top p.text-black,
+:root[data-theme="navy"] header#top h1 *,
+:root[data-theme="navy"] header#top h2 *,
+:root[data-theme="navy"] header#top p.text-black * { -webkit-text-stroke: 0 !important; }
 :root[data-theme="navy"] header#top h1 { text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
 :root[data-theme="navy"] header#top h2 { text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
-:root[data-theme="navy"] header#top p.text-black { color: #E6EDF8; background-color: rgba(6, 14, 33, 0.62); text-shadow: none !important; }
-:root[data-theme="navy"] header#top p.text-black .text-black { color: #FFFFFF; }
+:root[data-theme="navy"] header#top p.text-black { color: #E6EDF8 !important; text-shadow: none !important; }
+:root[data-theme="navy"] header#top p.text-black .text-black { color: #FFFFFF !important; }
 :root[data-theme="navy"] header#top p.text-black [class*="text-[color:var(--t-600)]"] { color: #7DB4FF; }
 
 /* Registration form controls (light panel, matches the sign-in inputs) */
