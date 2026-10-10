@@ -259,7 +259,7 @@ export default function App() {
   const navItems: { id: string; name: string; icon: React.ComponentType<any>; isExtension?: boolean }[] = [];
   if (currentUser.role === 'patient') {
     if (isPackageEnabled('patient_dashboard')) {
-      navItems.push({ id: 'patient_dashboard', name: 'Patient Hub', icon: Heart });
+      navItems.push({ id: 'patient_dashboard', name: 'Member Hub', icon: Heart });
     }
     navItems.push({ id: 'consult', name: 'Consult Now', icon: Video });
     navItems.push({ id: 'pharmacies', name: 'Pharmacies', icon: Pill });
@@ -353,7 +353,7 @@ export default function App() {
                 MedCred<span className="text-[color:var(--t-200)]">.</span>
               </span>
               <span className="text-[10px] font-semibold text-[color:var(--t-100)] uppercase tracking-[0.14em] block mt-1">
-                {currentUser.role === 'admin' ? 'Board Console' : currentUser.role === 'practitioner' ? 'Practitioner Hub' : currentUser.role === 'pharmacy' ? 'Pharmacy Workspace' : 'Patient Portal'}
+                {currentUser.role === 'admin' ? 'Board Console' : currentUser.role === 'practitioner' ? 'Practitioner Hub' : currentUser.role === 'pharmacy' ? 'Pharmacy Workspace' : 'Member Portal'}
               </span>
             </div>
           </div>
@@ -381,7 +381,7 @@ export default function App() {
                 <div className="text-left hidden xl:block leading-tight">
                   <p className="text-[13px] font-semibold text-white leading-none">{currentUser.name}</p>
                   <p className="text-xs text-[color:var(--t-100)] mt-1">
-                    {currentUser.role === 'admin' ? 'Board Admin' : currentUser.role === 'practitioner' ? 'Practitioner Account' : currentUser.role === 'pharmacy' ? 'Pharmacy Account' : 'Patient Account'}
+                    {currentUser.role === 'admin' ? 'Board Admin' : currentUser.role === 'practitioner' ? 'Practitioner Account' : currentUser.role === 'pharmacy' ? 'Pharmacy Account' : 'Member Account'}
                   </p>
                 </div>
                 <button
@@ -469,7 +469,7 @@ export default function App() {
                     />
                     <div className="min-w-0">
                       <p className="text-xs font-extrabold text-[color:var(--ink)] leading-none truncate">{currentUser.name}</p>
-                      <p className="text-[11px] text-[color:var(--ink-2)] font-semibold capitalize mt-1">{currentUser.role} Account</p>
+                      <p className="text-[11px] text-[color:var(--ink-2)] font-semibold capitalize mt-1">{currentUser.role === 'patient' ? 'member' : currentUser.role} Account</p>
                     </div>
                   </div>
                   <button

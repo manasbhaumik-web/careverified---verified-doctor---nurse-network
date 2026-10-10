@@ -138,8 +138,8 @@ let patients: any[] = [];
 let appPackages: any[] = [
   {
     id: "patient_dashboard",
-    name: "Patient Portal Hub",
-    description: "Allows patients to manage active bookings, view digital prescriptions, log vital health stats, and save doctor profiles.",
+    name: "Member Portal Hub",
+    description: "Allows members to manage active bookings, view digital prescriptions, log vital health stats, and save doctor profiles.",
     icon: "Heart",
     isEnabled: true,
     category: "Patient Services",
@@ -364,7 +364,7 @@ app.post("/api/register-patient", (req, res) => {
   audit(req, "auth.register", { actor: user, target: ["user", user.id] });
   res.status(201).json({
     status: "success",
-    message: "Patient registered successfully.",
+    message: "Member registered successfully.",
     data: newPatient
   });
 });
