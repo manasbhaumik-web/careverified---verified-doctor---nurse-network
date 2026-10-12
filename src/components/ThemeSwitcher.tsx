@@ -72,7 +72,7 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
   };
 
   const buttonTone = tone === 'onColor'
-    ? 'text-white border-white/60 hover:bg-white/15'
+    ? 'text-white border-transparent hover:bg-white/15'
     : 'text-[color:var(--t-600)] border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)]';
 
   return (
@@ -90,7 +90,7 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white border border-slate-200 shadow-lg text-slate-800 rounded-lg overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white border border-[color:var(--t-200)] shadow-lg text-slate-800 rounded-lg overflow-hidden">
           <p className="px-3 pt-3 pb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
             Application theme
           </p>
@@ -100,11 +100,11 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
                 <button
                   type="button"
                   onClick={() => choose(t.id)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-slate-100 cursor-pointer"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-[color:var(--t-50)] cursor-pointer"
                 >
-                  <span className="h-4 w-4 rounded-full border border-black/10 shrink-0" style={{ backgroundColor: t.swatch }} />
+                  <span className="h-4 w-4 rounded-full border-0 shadow-xs shrink-0" style={{ backgroundColor: t.swatch }} />
                   <span className="flex-1 font-medium">{t.label}</span>
-                  {theme === t.id && <Check className="h-4 w-4 text-slate-700" />}
+                  {theme === t.id && <Check className="h-4 w-4 text-[color:var(--t-600)]" />}
                 </button>
               </li>
             ))}

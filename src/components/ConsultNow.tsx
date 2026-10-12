@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { AlertTriangle, MessageSquare, Video, Clock, CreditCard, UserCheck, Lock } from 'lucide-react';
+import { AlertTriangle, MessageSquare, Video, CreditCard, UserCheck, Lock } from 'lucide-react';
 import PaymentDialog from './PaymentDialog';
 import ConsultRoom from './ConsultRoom';
 import DashboardHeader, { BannerKpis } from './DashboardHeader';
@@ -113,51 +113,80 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_380px] items-start">
         <div className="space-y-5 min-w-0">
           {open?.status === 'queued' && (
-            <div className="bg-white border border-amber-200 p-5 space-y-3">
-              <p className="font-extrabold flex items-center gap-2"><Clock className="h-4 w-4 text-amber-600" /> Waiting for a doctor to join…</p>
-              <p className="text-xs text-slate-600">Paid. Stay on this page. If nobody joins within 10 minutes you are refunded automatically.</p>
-              <button onClick={() => cancel(open.id)} className="text-xs font-bold border border-slate-200 px-4 py-2 cursor-pointer">Cancel and refund</button>
+            <div className="bg-white border-2 border-[color:var(--t-600)] p-6 space-y-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <p className="font-extrabold text-base flex items-center gap-2.5 text-[color:var(--ink)]">
+                  <span className="relative flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[color:var(--t-600)] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-[color:var(--t-600)]"></span>
+                  </span>
+                  Matching with an On-Call Practitioner…
+                </p>
+                <span className="text-xs font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5">Live Queue</span>
+              </div>
+              <p className="text-xs text-[color:var(--ink-2)] leading-relaxed">
+                Consultation payment confirmed. Keep this window open. A licensed practitioner will enter the room within 10 minutes, or your payment is automatically refunded in full.
+              </p>
+              <div className="pt-2">
+                <button onClick={() => cancel(open.id)} className="h-10 text-xs font-bold border border-slate-300 hover:border-rose-400 hover:bg-rose-50 hover:text-rose-700 px-5 cursor-pointer transition-colors">
+                  Cancel and refund immediately
+                </button>
+              </div>
             </div>
           )}
 
           {open?.status === 'awaiting_payment' && (
-            <div className="bg-white border border-amber-200 p-5 space-y-3">
-              <p className="font-extrabold">Your consultation request is waiting for payment.</p>
-              <div className="flex gap-3">
-                <button onClick={() => setPaying(open.id)} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Pay RM {open.fee.toFixed(2)}</button>
-                <button onClick={() => cancel(open.id)} className="text-xs font-bold border border-slate-200 px-4 py-2 cursor-pointer">Cancel</button>
+            <div className="bg-white border border-amber-300 p-6 space-y-4 shadow-sm">
+              <p className="font-extrabold text-base text-[color:var(--ink)]">Your consultation request is awaiting payment.</p>
+              <p className="text-xs text-[color:var(--ink-2)]">Lock in your consultation slot with an on-call physician.</p>
+              <div className="flex items-center gap-3 pt-1">
+                <button onClick={() => setPaying(open.id)} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white h-12 text-xs font-extrabold px-6 cursor-pointer transition-colors shadow-xs">
+                  Pay RM {open.fee.toFixed(2)}
+                </button>
+                <button onClick={() => cancel(open.id)} className="h-12 text-xs font-bold border border-slate-300 hover:bg-slate-50 px-5 cursor-pointer transition-colors">
+                  Cancel request
+                </button>
               </div>
             </div>
           )}
 
           {!open && (
-            <form onSubmit={submit} className="bg-white border border-[color:var(--t-200)] p-5 sm:p-6 space-y-5">
+            <form onSubmit={submit} className="bg-white border border-[color:var(--t-200)] p-6 space-y-6 shadow-xs">
               <div>
-                <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block mb-2">How would you like to talk?</span>
-                <div role="radiogroup" aria-label="Consultation type" className="grid sm:grid-cols-2 gap-3">
-                  {([['chat', 'Chat', 'Type messages with the doctor', MessageSquare], ['video', 'Video', 'Face-to-face video call', Video]] as const).map(([id, label, hint, Icon]) => (
+                <span className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--ink)] block mb-3">
+                  1. How would you like to consult?
+                </span>
+                <div role="radiogroup" aria-label="Consultation type" className="grid sm:grid-cols-2 gap-3.5">
+                  {([['chat', 'Live Text Chat', 'Fast, asynchronous clinical messaging', MessageSquare], ['video', 'Video Consultation', 'Face-to-face encrypted video call', Video]] as const).map(([id, label, hint, Icon]) => (
                     <button type="button" key={id} role="radio" aria-checked={mode === id} onClick={() => setMode(id)}
-                      className={`flex items-center gap-3 px-4 py-3.5 border text-left cursor-pointer ${mode === id ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)] text-[color:var(--t-700)]' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
-                      <Icon className="h-5 w-5 shrink-0" />
-                      <span><span className="block text-sm font-extrabold">{label}</span><span className="block text-xs font-normal opacity-80">{hint}</span></span>
+                      className={`flex items-start gap-3.5 p-4 border text-left cursor-pointer transition-all ${mode === id ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)] shadow-[inset_0_0_0_1px_var(--t-600)]' : 'border-[color:var(--t-200)] text-[color:var(--ink-2)] hover:bg-slate-50'}`}>
+                      <Icon className={`h-5 w-5 shrink-0 mt-0.5 ${mode === id ? 'text-[color:var(--t-600)]' : 'text-slate-400'}`} />
+                      <span>
+                        <span className={`block text-sm font-bold ${mode === id ? 'text-[color:var(--ink)]' : 'text-[color:var(--ink-2)]'}`}>{label}</span>
+                        <span className="block text-xs mt-0.5 opacity-80">{hint}</span>
+                      </span>
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label htmlFor="cn-symptoms" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block mb-1">What is the problem?</label>
-                <textarea id="cn-symptoms" value={symptoms} onChange={e => setSymptoms(e.target.value)} rows={6} minLength={10} maxLength={1000} required
-                  className="w-full border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--t-600)]"
-                  placeholder="Describe your symptoms and how long you have had them" />
-                <p className="text-[11px] text-slate-500 mt-1 text-right tabular-nums">{symptoms.length} / 1000</p>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="cn-symptoms" className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--ink)]">
+                    2. Describe your clinical complaint
+                  </label>
+                  <span className="text-[11px] text-slate-500 font-mono tabular-nums">{symptoms.length} / 1000</span>
+                </div>
+                <textarea id="cn-symptoms" value={symptoms} onChange={e => setSymptoms(e.target.value)} rows={5} minLength={10} maxLength={1000} required
+                  className="w-full border border-[color:var(--t-200)] p-3.5 text-sm text-[color:var(--ink)] bg-[color:var(--t-bg)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors placeholder-slate-400"
+                  placeholder="Detail your symptoms, onset time, pain severity (1-10), and current home medications…" />
               </div>
-              <label className="flex items-start gap-2 text-xs text-slate-700 cursor-pointer bg-slate-50 border border-slate-100 p-3">
-                <input type="checkbox" className="mt-0.5" checked={shareRecord} onChange={e => setShareRecord(e.target.checked)} />
-                <span>Share my health record (allergies, conditions, medicines, readings) with the doctor who takes my consultation. Helps them prescribe safely. I can stop sharing at any time.</span>
+              <label className="flex items-start gap-3 text-xs text-[color:var(--ink)] cursor-pointer bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-3.5">
+                <input type="checkbox" className="mt-0.5 accent-[color:var(--t-600)]" checked={shareRecord} onChange={e => setShareRecord(e.target.checked)} />
+                <span className="leading-relaxed">Share my medical record (allergies, chronic conditions, regular prescriptions) with the responding doctor. Facilitates accurate diagnosis and safe prescribing.</span>
               </label>
               {error && <p className="text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 p-3">{error}</p>}
-              <button disabled={busy || status?.onlineDoctors === 0} className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-sm font-extrabold py-3 cursor-pointer">
-                {busy ? 'Starting…' : status?.onlineDoctors === 0 ? 'No doctors online right now' : 'Continue to payment'}
+              <button disabled={busy || status?.onlineDoctors === 0} className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white h-12 text-sm font-extrabold flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-xs">
+                {busy ? 'Preparing consultation…' : status?.onlineDoctors === 0 ? 'No physicians online right now' : 'Continue to Payment & Queue'}
               </button>
             </form>
           )}

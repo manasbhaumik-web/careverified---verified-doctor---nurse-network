@@ -15,7 +15,7 @@ import { registerPharmacyWorkspace } from "./server/pharmacy";
 import { registerLiteratureRoutes, approvedLiteratureArticles } from "./server/literature";
 import { registerQualityRoutes, accountForChatId, isBlocked } from "./server/quality";
 import { registerVerificationRoutes, notifyAdmins, notify } from "./server/verification";
-import { registerPaymentRoutes, registerPaymentWebhook, setPaymentHandlers, refundPayment, paymentMode } from "./server/payments";
+import { registerPaymentRoutes, registerPaymentWebhook, setPaymentHandlers, refundPayment } from "./server/payments";
 import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
 
 // Load environment variables
@@ -77,7 +77,7 @@ app.use("/api/", rateLimit({ windowMs: 60_000, limit: 300, standardHeaders: true
 
 app.use(loadSession);
 
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 // Initialize Server State In-Memory Database
 let doctors = [...INITIAL_DOCTORS];

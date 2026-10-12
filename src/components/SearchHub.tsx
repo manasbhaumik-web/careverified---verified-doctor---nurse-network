@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import {
-  Search, MapPin, BadgeCheck, Stethoscope, Clock, ShieldCheck,
-  HeartPulse, UserCheck, Star, LayoutGrid, List, Eye, X, Sparkles, Activity,
-  Calendar, Check, SlidersHorizontal, ArrowRight, CheckCircle2, Shield
+  Search, MapPin, Stethoscope, Clock,
+  HeartPulse, UserCheck, Star, LayoutGrid, List, X, Globe, Activity,
+  Check, SlidersHorizontal, ArrowRight, Shield
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, UserRole, Review, ConsultationMode } from '../types';
 
@@ -85,7 +85,7 @@ export default function SearchHub({
     if (spec.includes('cardio')) return HeartPulse;
     if (spec.includes('pediat') || spec.includes('neonat')) return UserCheck;
     if (spec.includes('neuro')) return Activity;
-    if (spec.includes('derm')) return Sparkles;
+    if (spec.includes('derm')) return Shield;
     if (spec.includes('icu') || spec.includes('critical') || spec.includes('emerg')) return Activity;
     if (spec.includes('geriat') || spec.includes('elder')) return Clock;
     return Stethoscope;
@@ -133,7 +133,7 @@ export default function SearchHub({
             <div className="flex items-center gap-2"><Activity className="h-4 w-4 text-slate-500 shrink-0" />{prof.consultationModes.join(' · ')}</div>
           )}
           {prof.languages?.length > 0 && (
-            <div className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-slate-500 shrink-0" />{prof.languages.join(', ')}</div>
+            <div className="flex items-center gap-2"><Globe className="h-4 w-4 text-slate-500 shrink-0" />{prof.languages.join(', ')}</div>
           )}
         </div>
 

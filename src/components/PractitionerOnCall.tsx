@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AlertTriangle, Radio } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import ConsultRoom from './ConsultRoom';
 
 const jpost = (url: string, body?: unknown) =>
@@ -93,44 +93,69 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
   return (
     <div className="space-y-5 w-full">
       {/* Status bar with at-a-glance numbers */}
-      <section className={`border p-5 grid gap-5 lg:grid-cols-[1fr_auto] items-center ${me?.online ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-[color:var(--t-200)]'}`}>
+      <section className={`border p-6 grid gap-6 lg:grid-cols-[1fr_auto] items-center shadow-xs transition-colors ${me?.online ? 'bg-emerald-50/70 border-emerald-300' : 'bg-white border-[color:var(--t-200)]'}`}>
         <div className="flex flex-wrap items-center gap-x-10 gap-y-4">
-          <div className="min-w-[260px] max-w-md">
-            <h2 className="text-lg font-black flex items-center gap-2"><Radio className={`h-5 w-5 ${me?.online ? 'text-emerald-600' : 'text-slate-400'}`} /> {me?.online ? 'You are on call' : 'You are offline'}</h2>
-            <p className="text-xs text-slate-600 mt-1">While online, patients waiting for an instant consultation appear below. Keep this page open.</p>
+          <div className="min-w-[280px] max-w-md">
+            <h2 className="text-lg font-black flex items-center gap-2.5 text-[color:var(--ink)]">
+              <span className="relative flex h-3 w-3">
+                {me?.online && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>}
+                <span className={`relative inline-flex rounded-full h-3 w-3 ${me?.online ? 'bg-emerald-600' : 'bg-slate-400'}`}></span>
+              </span>
+              {me?.online ? 'You are On Call & Accepting Patients' : 'You are Currently Offline'}
+            </h2>
+            <p className="text-xs text-[color:var(--ink-2)] mt-1 leading-relaxed">
+              While online, you are dispatched incoming telehealth consults. Keep this browser tab open to receive audio chimes.
+            </p>
           </div>
           <dl className="flex flex-wrap gap-x-8 gap-y-3">
             {[
-              ['Waiting now', me?.online ? String(offers.length) : '—'],
-              ['Roster hours / week', String(roster.size)],
-              ['Hours of day covered', `${coveredHours} / 24`],
-              ['Net earnings', earnings ? fmtRM(earnings.totals.net) : '—'],
+              ['Waiting Patients', me?.online ? String(offers.length) : '—'],
+              ['Committed Hours / Wk', String(roster.size)],
+              ['Daily Coverage Window', `${coveredHours} / 24 hrs`],
+              ['Accrued Net Earnings', earnings ? fmtRM(earnings.totals.net) : '—'],
             ].map(([l, v]) => (
-              <div key={l}><dt className="text-[10px] uppercase font-bold text-slate-500">{l}</dt><dd className="text-lg font-black tabular-nums">{v}</dd></div>
+              <div key={l} className="bg-white/80 border border-[color:var(--t-200)] px-3.5 py-2">
+                <dt className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">{l}</dt>
+                <dd className="text-lg font-black tabular-nums text-[color:var(--ink)]">{v}</dd>
+              </div>
             ))}
           </dl>
         </div>
-        <button onClick={() => setOnline(!me?.online)} className={`px-8 py-3 text-sm font-extrabold cursor-pointer ${me?.online ? 'bg-white border border-slate-300 text-slate-800' : 'bg-[color:var(--t-600)] text-white'}`}>
-          {me?.online ? 'Go offline' : 'Go online'}
+        <button onClick={() => setOnline(!me?.online)} className={`h-12 px-8 text-xs font-extrabold uppercase tracking-wider cursor-pointer transition-colors shadow-xs ${me?.online ? 'bg-white border border-slate-300 text-slate-800 hover:bg-slate-100' : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white'}`}>
+          {me?.online ? 'Go Offline' : 'Go Online Now'}
         </button>
       </section>
       {msg && <p className="text-xs font-bold text-slate-700 bg-slate-50 border border-slate-200 p-3">{msg}</p>}
 
       {me?.online && (
-        <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
-          <h3 className="text-sm font-extrabold">Waiting patients ({offers.length})</h3>
-          {offers.length === 0 ? <p className="text-xs text-slate-500">Nobody is waiting right now.</p> : (
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <section className="bg-white border border-[color:var(--t-200)] p-6 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)] flex items-center gap-2">
+              <span className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse"></span>
+              Live Consultation Queue ({offers.length} waiting)
+            </h3>
+            <span className="text-xs font-mono text-slate-500 font-semibold">Auto-refreshes every 4s</span>
+          </div>
+          {offers.length === 0 ? (
+            <div className="p-8 text-center border border-dashed border-[color:var(--t-200)] bg-[color:var(--t-bg)]">
+              <p className="text-xs font-bold text-slate-600">No patients waiting in queue right now.</p>
+              <p className="text-[11px] text-slate-500 mt-1">Keep this tab open; newly queued consults will alert immediately.</p>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {offers.map(o => (
-                <div key={o.id} className="border border-slate-200 p-4 space-y-2">
+                <div key={o.id} className="border-2 border-[color:var(--t-600)] bg-white p-5 space-y-3 shadow-xs">
                   {o.redFlags.length > 0 && (
-                    <p className="text-xs font-black text-rose-700 flex items-center gap-1.5"><AlertTriangle className="h-4 w-4" /> Red flags: {o.redFlags.join(', ')}</p>
+                    <p className="text-xs font-extrabold text-rose-800 bg-rose-50 border border-rose-200 p-2 flex items-center gap-1.5"><AlertTriangle className="h-4 w-4 shrink-0" /> Red Flags: {o.redFlags.join(', ')}</p>
                   )}
-                  <p className="text-sm">{o.symptoms}</p>
-                  <p className="text-[11px] text-slate-500">{o.patientFirstName} · {o.mode} · waiting since {new Date(o.queuedAt).toLocaleTimeString()} · RM {o.fee.toFixed(2)}</p>
-                  <div className="flex gap-2">
-                    <button onClick={() => accept(o.id)} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-5 py-2 cursor-pointer">Accept</button>
-                    <button onClick={() => decline(o.id)} className="border border-slate-200 text-xs font-bold px-4 py-2 cursor-pointer">Not for me</button>
+                  <p className="text-sm font-semibold text-[color:var(--ink)] leading-snug line-clamp-3">"{o.symptoms}"</p>
+                  <div className="text-[11px] font-mono text-slate-600 border-t border-[color:var(--t-100)] pt-2 space-y-0.5">
+                    <p><b className="text-[color:var(--ink)]">{o.patientFirstName}</b> · {o.mode.toUpperCase()}</p>
+                    <p>Queued: {new Date(o.queuedAt).toLocaleTimeString()} · Payout: <b className="text-[color:var(--t-700)]">RM {o.fee.toFixed(2)}</b></p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <button onClick={() => accept(o.id)} className="h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer transition-colors shadow-2xs">Accept Consult</button>
+                    <button onClick={() => decline(o.id)} className="h-10 border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 cursor-pointer transition-colors">Decline</button>
                   </div>
                 </div>
               ))}

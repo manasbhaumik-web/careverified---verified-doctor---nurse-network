@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Building2, Briefcase, MapPin, Search, PlusCircle, AlertCircle, 
-  CheckCircle2, Loader, Tag, Users, ShieldCheck, Heart, LayoutGrid, List, Eye, X, Clock 
+  Briefcase, MapPin, Search, PlusCircle, 
+  CheckCircle2, Loader, Tag, Users, ShieldCheck, LayoutGrid, List, Eye, X, Clock 
 } from 'lucide-react';
-import { JobPost, UserRole } from '../types';
+import { JobPost } from '../types';
 import DashboardHeader from './DashboardHeader';
 
 interface JobMarketProps {
@@ -292,16 +292,16 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="border-2 border-slate-200 text-slate-600 text-xs font-bold px-5 py-2.5 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer"
+                  className="border border-slate-300 text-slate-700 text-xs font-bold px-5 h-12 hover:bg-slate-50 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={formLoading}
-                  className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-rose-400 text-white text-xs font-bold px-8 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] cursor-pointer"
+                  className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-bold px-8 h-12 transition-colors shadow-xs flex items-center gap-2 cursor-pointer"
                 >
-                  {formLoading && <Loader className="h-3 w-3 animate-spin" />}
+                  {formLoading && <Loader className="h-4 w-4 animate-spin" />}
                   Publish Job Vacancy
                 </button>
               </div>
@@ -311,14 +311,14 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
       )}
 
       {/* FILTER CONTROLS */}
-      <section aria-label="Filters" className="bg-white border border-[color:var(--t-200)] shadow-xs px-5 py-4 flex flex-wrap gap-3 items-center">
+      <section aria-label="Filters" className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-wrap gap-4 items-center">
         <label htmlFor="job-search" className="sr-only">Search shifts</label>
-        <div className="flex-[2_1_280px] flex items-center gap-2.5 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 min-h-[46px] focus-within:border-[color:var(--t-600)]">
+        <div className="flex-[2_1_300px] flex items-center gap-3 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-4 h-12 focus-within:border-[color:var(--t-600)] transition-colors">
           <Search className="h-4 w-4 text-slate-500 shrink-0" />
           <input
             id="job-search"
             type="text"
-            placeholder="Search by role, hospital or keyword"
+            placeholder="Search clinical shifts by role, hospital name, or ward (e.g. ICU, Neonatal, Emergency)…"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1 min-w-0 bg-transparent text-sm text-[color:var(--ink)] outline-none placeholder-slate-500"
@@ -330,7 +330,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
           id="job-type"
           value={selectedType}
           onChange={(e) => setSelectedType(e.target.value)}
-          className="flex-[1_1_180px] min-h-[46px] border border-[color:var(--t-200)] bg-white px-3 text-sm font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] cursor-pointer"
+          className="flex-[1_1_180px] h-12 border border-[color:var(--t-200)] bg-white px-3 text-sm font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] cursor-pointer"
         >
           <option value="all">All contract types</option>
           <option value="Full-time">Full-time</option>
@@ -344,7 +344,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
           id="job-city"
           value={selectedCity}
           onChange={(e) => setSelectedCity(e.target.value)}
-          className="flex-[1_1_180px] min-h-[46px] border border-[color:var(--t-200)] bg-white px-3 text-sm font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] cursor-pointer"
+          className="flex-[1_1_180px] h-12 border border-[color:var(--t-200)] bg-white px-3 text-sm font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] cursor-pointer"
         >
           <option value="all">All cities</option>
           <option value="Kuala Lumpur">Kuala Lumpur</option>

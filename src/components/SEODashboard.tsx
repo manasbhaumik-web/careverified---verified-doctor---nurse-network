@@ -1,6 +1,6 @@
 import DashboardHeader from './DashboardHeader';
 import React, { useState } from 'react';
-import { Search, Globe, Code, Zap, FileSpreadsheet, Eye, Copy, CheckCircle, List, LayoutGrid, ShieldCheck, X } from 'lucide-react';
+import { Search, Code, Zap, FileSpreadsheet, Eye, Copy, CheckCircle, List, LayoutGrid, X } from 'lucide-react';
 import { DoctorProfile, NurseProfile } from '../types';
 
 interface SEODashboardProps {
@@ -112,22 +112,22 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
         {/* TAB 1: SCHEMA GENERATOR */}
         {activeTab === 'schema' && (
           <div className="space-y-6">
-            <div className="bg-slate-50 p-5 rounded-xl border-2 border-slate-200/60 space-y-4">
+            <div className="bg-slate-50 p-6 rounded-none border border-[color:var(--t-200)] space-y-5">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                  <h3 className="text-sm font-extrabold text-slate-800">Dynamic Physician & Clinic Schema</h3>
-                  <p className="text-xs text-slate-500 font-semibold mt-0.5">Auto-inject Schema.org JSON-LD structured data on profile pages for Google Search rich snippets.</p>
+                  <h3 className="text-sm font-black text-slate-800 uppercase tracking-wide">Dynamic Physician & Clinic Schema</h3>
+                  <p className="text-xs text-slate-500 font-semibold mt-1">Auto-inject Schema.org JSON-LD structured data on profile pages for Google Search rich snippets.</p>
                 </div>
 
                 {/* View Mode Toggle */}
-                <div className="flex bg-slate-200/60 p-1 rounded-xl border border-slate-300 shadow-2xs items-center shrink-0">
+                <div className="flex bg-slate-100 p-0.5 rounded-none border border-slate-300 items-center shrink-0">
                   <button
                     type="button"
                     onClick={() => setViewMode('list')}
-                    className={`p-1.5 rounded-lg transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
+                    className={`h-8 px-3 rounded-none transition-all flex items-center gap-1.5 text-xs font-black uppercase tracking-wider cursor-pointer ${
                       viewMode === 'list'
-                        ? 'bg-white text-[color:var(--t-600)] shadow-xs'
-                        : 'text-slate-500 hover:text-slate-800'
+                        ? 'bg-[color:var(--t-600)] text-white shadow-none'
+                        : 'text-slate-600 hover:text-slate-900 bg-transparent'
                     }`}
                     title="List View"
                   >
@@ -137,10 +137,10 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                   <button
                     type="button"
                     onClick={() => setViewMode('grid')}
-                    className={`p-1.5 rounded-lg transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
+                    className={`h-8 px-3 rounded-none transition-all flex items-center gap-1.5 text-xs font-black uppercase tracking-wider cursor-pointer ${
                       viewMode === 'grid'
-                        ? 'bg-white text-[color:var(--t-600)] shadow-xs'
-                        : 'text-slate-500 hover:text-slate-800'
+                        ? 'bg-[color:var(--t-600)] text-white shadow-none'
+                        : 'text-slate-600 hover:text-slate-900 bg-transparent'
                     }`}
                     title="Grid View"
                   >
@@ -152,7 +152,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
 
               {/* Profiles Selector Interface */}
               <div>
-                <span className="block text-xs font-bold text-slate-600 mb-2.5">Select Practitioner Profile to Generate Structured Schema:</span>
+                <span className="block text-xs font-black text-slate-700 uppercase tracking-wide mb-2.5">Select Practitioner Profile to Generate Structured Schema:</span>
                 
                 <div className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3" : "space-y-2"}>
                   {professionals.map((p) => {
@@ -161,22 +161,22 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                       <div
                         key={p.id}
                         onClick={() => setSelectedProfId(p.id)}
-                        className={`p-3 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between gap-3 ${
+                        className={`p-3.5 rounded-none border cursor-pointer transition-all flex items-center justify-between gap-3 ${
                           isSelected
-                            ? "bg-[color:var(--t-50)] border-[color:var(--t-600)] shadow-xs"
-                            : "bg-white border-slate-200 hover:border-slate-300"
+                            ? "bg-[color:var(--t-50)] border-[color:var(--t-600)]"
+                            : "bg-white border-slate-200 hover:border-slate-350"
                         }`}
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <img
                             src={p.avatar}
                             alt={p.name}
-                            className="h-10 w-10 rounded-lg object-cover shrink-0 border border-slate-200"
+                            className="h-10 w-10 rounded-none object-cover shrink-0 border border-slate-300"
                             referrerPolicy="no-referrer"
                           />
                           <div className="min-w-0">
-                            <h4 className="text-xs font-extrabold text-slate-800 truncate">{p.name}</h4>
-                            <p className="text-[10px] text-slate-500 font-semibold truncate">{p.specialization}</p>
+                            <h4 className="text-xs font-black text-slate-800 truncate">{p.name}</h4>
+                            <p className="text-[10px] text-slate-500 font-bold truncate">{p.specialization}</p>
                           </div>
                         </div>
 
@@ -188,10 +188,11 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                             setSelectedSchemaProf(p);
                             setSelectedProfId(p.id);
                           }}
-                          className="p-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-[color:var(--t-600)] rounded-lg border border-slate-200 shadow-3xs transition-all cursor-pointer shrink-0"
+                          className="h-8 px-2.5 bg-slate-50 hover:bg-[color:var(--t-50)] text-slate-600 hover:text-[color:var(--t-600)] rounded-none border border-slate-200 hover:border-[color:var(--t-200)] transition-all cursor-pointer shrink-0 flex items-center gap-1 text-[11px] font-bold"
                           title="View JSON-LD Schema details"
                         >
                           <Eye className="h-3.5 w-3.5" />
+                          <span>View</span>
                         </button>
                       </div>
                     );
@@ -201,12 +202,12 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
             </div>
 
             <div className="relative">
-              <pre className="bg-slate-100 text-slate-800 text-xs p-5 rounded-xl overflow-x-auto max-h-96 font-mono border-2 border-slate-300 leading-relaxed">
+              <pre className="bg-slate-100 text-slate-850 text-xs p-5 rounded-none overflow-x-auto max-h-96 font-mono border border-slate-300 leading-relaxed">
                 <code>{generateSchema()}</code>
               </pre>
               <button
                 onClick={copyToClipboard}
-                className="absolute top-4 right-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white rounded-lg px-3.5 py-2 text-xs font-bold flex items-center gap-1.5 transition-all hover:scale-[1.02] shadow-md cursor-pointer"
+                className="absolute top-4 right-4 h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] active:bg-slate-900 text-white rounded-none px-4 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-none"
               >
                 {copied ? <CheckCircle className="h-3.5 w-3.5 text-white" /> : <Copy className="h-3.5 w-3.5 text-white" />}
                 {copied ? 'Copied!' : 'Copy Code'}
@@ -214,16 +215,16 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
-              <div className="border-2 border-slate-200/60 p-5 rounded-xl bg-slate-50/50 space-y-2">
-                <h4 className="font-extrabold text-slate-800 mb-1">Google Rich Snippets Achieved:</h4>
+              <div className="border border-slate-200 p-5 rounded-none bg-slate-50 space-y-2">
+                <h4 className="font-black text-slate-800 mb-1 uppercase tracking-wider">Google Rich Snippets Achieved:</h4>
                 <ul className="space-y-1.5 text-slate-600 list-disc list-inside font-semibold">
                   <li><strong>Medical Specialist Badge</strong> in local business listings</li>
                   <li><strong>Active Rating Stars</strong> (e.g. ⭐ {selectedProf?.rating} / 5) based on real feedback</li>
                   <li><strong>Credentials Verification</strong> mapped via Schema markup</li>
                 </ul>
               </div>
-              <div className="border-2 border-slate-200/60 p-5 rounded-xl bg-slate-50/50 space-y-2">
-                <h4 className="font-extrabold text-slate-800 mb-1">E-E-A-T Quality Score Impact:</h4>
+              <div className="border border-slate-200 p-5 rounded-none bg-slate-50 space-y-2">
+                <h4 className="font-black text-slate-800 mb-1 uppercase tracking-wider">E-E-A-T Quality Score Impact:</h4>
                 <p className="text-slate-600 leading-relaxed font-semibold">
                   Google treats health queries under strict **YMYL (Your Money Your Life)** guidelines. Our schema links directly to authorized Medical/Nursing council registrations, improving search rank relevance by 35%.
                 </p>
@@ -235,8 +236,8 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
         {/* TAB 2: PROGRAMMATIC SEO */}
         {activeTab === 'programmatic' && (
           <div className="space-y-6">
-            <div className="bg-[color:var(--t-50)]/60 border-2 border-[color:var(--t-200)] p-5 rounded-xl">
-              <h3 className="text-sm font-extrabold text-[color:var(--ink)] mb-1">Programmatic SEO Landing Page Architecture</h3>
+            <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-5 rounded-none">
+              <h3 className="text-sm font-black text-[color:var(--ink)] mb-1 uppercase tracking-wider">Programmatic SEO Landing Page Architecture</h3>
               <p className="text-xs text-[color:var(--t-600)] leading-relaxed font-semibold">
                 Rather than manually creating pages, our system programmatically generates high-converting localized landers.
                 This allows us to dominate high-intent keywords such as <strong>"Best Cardiologist in Kuala Lumpur"</strong> or <strong>"ICU Nurse in Petaling Jaya"</strong>.
@@ -246,69 +247,69 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left Form: Template Customizer */}
               <div className="space-y-4">
-                <h4 className="font-extrabold text-slate-800 text-sm">Meta Tags Template Configurator</h4>
+                <h4 className="font-black text-slate-800 text-sm uppercase tracking-wider">Meta Tags Template Configurator</h4>
                 
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Programmatic Meta Title Tag</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Programmatic Meta Title Tag</label>
                   <input
                     type="text"
                     value={titleTemplate}
                     onChange={(e) => setTitleTemplate(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3 bg-white outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold"
+                    className="w-full h-12 text-xs border border-slate-300 rounded-none px-3.5 bg-white outline-none focus:border-[color:var(--t-600)] font-semibold text-slate-800"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Programmatic Meta Description Tag</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Programmatic Meta Description Tag</label>
                   <textarea
                     rows={3}
                     value={descTemplate}
                     onChange={(e) => setDescriptionTemplate(e.target.value)}
-                    className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3 bg-white outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold"
+                    className="w-full text-xs border border-slate-300 rounded-none p-3.5 bg-white outline-none focus:border-[color:var(--t-600)] font-semibold text-slate-800"
                   />
                 </div>
               </div>
 
               {/* Right Live Preview */}
-              <div className="border-2 border-slate-200/60 p-5 rounded-xl bg-slate-50/50 space-y-4">
-                <h4 className="font-extrabold text-slate-800 text-sm">Google SERP Live Simulator</h4>
+              <div className="border border-slate-200 p-5 rounded-none bg-slate-50 space-y-4">
+                <h4 className="font-black text-slate-800 text-sm uppercase tracking-wider">Google SERP Live Simulator</h4>
                 
-                <div className="bg-white border-2 border-slate-200 p-4 rounded-xl shadow-xs space-y-2">
-                  <div className="text-xs text-slate-400 font-mono">https://careverified.pro/best-cardiologist-in-kuala-lumpur</div>
-                  <h5 className="text-base text-[color:var(--t-700)] hover:underline cursor-pointer font-extrabold leading-snug">
+                <div className="bg-white border border-slate-250 p-4 rounded-none space-y-2">
+                  <div className="text-xs text-slate-500 font-mono">https://careverified.pro/best-cardiologist-in-kuala-lumpur</div>
+                  <h5 className="text-base text-[color:var(--t-700)] hover:underline cursor-pointer font-black leading-snug">
                     {titleTemplate.replace('[Specialty]', 'Cardiologist').replace('[City]', 'Kuala Lumpur')}
                   </h5>
-                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  <p className="text-xs text-slate-600 leading-relaxed font-semibold">
                     {descTemplate.replace('[Specialty]', 'Cardiology').replace('[City]', 'Kuala Lumpur')}
                   </p>
                 </div>
 
-                <div className="bg-white border-2 border-slate-200 p-4 rounded-xl shadow-xs space-y-2">
-                  <div className="text-xs text-slate-400 font-mono">https://careverified.pro/find-icu-nurse-petaling-jaya</div>
-                  <h5 className="text-base text-[color:var(--t-700)] hover:underline cursor-pointer font-extrabold leading-snug">
+                <div className="bg-white border border-slate-250 p-4 rounded-none space-y-2">
+                  <div className="text-xs text-slate-500 font-mono">https://careverified.pro/find-icu-nurse-petaling-jaya</div>
+                  <h5 className="text-base text-[color:var(--t-700)] hover:underline cursor-pointer font-black leading-snug">
                     {titleTemplate.replace('[Specialty]', 'ICU Critical Care Nurse').replace('[City]', 'Petaling Jaya')}
                   </h5>
-                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  <p className="text-xs text-slate-600 leading-relaxed font-semibold">
                     {descTemplate.replace('[Specialty]', 'ICU & Critical Care Nursing').replace('[City]', 'Petaling Jaya')}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="border-t-2 border-slate-100 pt-5">
-              <h4 className="font-extrabold text-slate-800 text-sm mb-3.5">Programmatic URL Structure</h4>
+            <div className="border-t border-slate-200 pt-5">
+              <h4 className="font-black text-slate-800 text-sm mb-3.5 uppercase tracking-wider">Programmatic URL Structure</h4>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-slate-50 p-4 rounded-xl border-2 border-slate-200/60 text-center">
-                  <div className="text-xs font-bold text-slate-700">Specialty Landing</div>
-                  <code className="text-[10px] text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/best-[specialty]-in-[city]</code>
+                <div className="bg-slate-50 p-4 rounded-none border border-slate-200 text-center">
+                  <div className="text-xs font-black text-slate-700 uppercase tracking-wider">Specialty Landing</div>
+                  <code className="text-[11px] text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/best-[specialty]-in-[city]</code>
                 </div>
-                <div className="bg-slate-50 p-4 rounded-xl border-2 border-slate-200/60 text-center">
-                  <div className="text-xs font-bold text-slate-700">Direct Doctor Link</div>
-                  <code className="text-[10px] text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/doctors/[doctor-name-slug]</code>
+                <div className="bg-slate-50 p-4 rounded-none border border-slate-200 text-center">
+                  <div className="text-xs font-black text-slate-700 uppercase tracking-wider">Direct Doctor Link</div>
+                  <code className="text-[11px] text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/doctors/[doctor-name-slug]</code>
                 </div>
-                <div className="bg-slate-50 p-4 rounded-xl border-2 border-slate-200/60 text-center">
-                  <div className="text-xs font-bold text-slate-700">Sitemap Feed</div>
-                  <code className="text-[10px] text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/sitemap.xml</code>
+                <div className="bg-slate-50 p-4 rounded-none border border-slate-200 text-center">
+                  <div className="text-xs font-black text-slate-700 uppercase tracking-wider">Sitemap Feed</div>
+                  <code className="text-[11px] text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/sitemap.xml</code>
                 </div>
               </div>
             </div>
@@ -320,47 +321,47 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
               <div>
-                <h3 className="text-sm font-extrabold text-slate-800">Core Web Vitals Scoring (Chrome UX Performance)</h3>
+                <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">Core Web Vitals Scoring (Chrome UX Performance)</h3>
                 <p className="text-xs text-slate-500 font-semibold mt-0.5">Google ranks lightning fast pages higher. Our server-bundled SPA is pre-optimized.</p>
               </div>
-              <div className="flex items-center gap-2 bg-emerald-50 border-2 border-emerald-100 px-3.5 py-1 rounded-full shrink-0">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="text-xs font-extrabold text-emerald-800">Passes Google Core Assessment</span>
+              <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3.5 py-1.5 rounded-none shrink-0">
+                <span className="w-2 h-2 rounded-none bg-emerald-500 animate-pulse"></span>
+                <span className="text-xs font-black text-emerald-800 uppercase tracking-wider">Passes Google Core Assessment</span>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="border-2 border-slate-200/80 hover:border-rose-300 p-5 rounded-xl bg-white shadow-xs transition-all duration-300 space-y-2">
+              <div className="border border-slate-250 hover:border-[color:var(--t-600)] p-5 rounded-none bg-white transition-all space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-extrabold text-slate-700 uppercase">LCP</span>
-                  <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-lg">1.1s</span>
+                  <span className="text-xs font-black text-slate-700 uppercase tracking-wider">LCP</span>
+                  <span className="text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">1.1s</span>
                 </div>
-                <h4 className="text-xs font-bold text-slate-800">Largest Contentful Paint</h4>
-                <p className="text-[11px] text-slate-500 font-medium leading-relaxed">Pre-rendered above-the-fold content loads instantly, ensuring maximum crawlability.</p>
+                <h4 className="text-xs font-black text-slate-800">Largest Contentful Paint</h4>
+                <p className="text-[11px] text-slate-500 font-semibold leading-relaxed">Pre-rendered above-the-fold content loads instantly, ensuring maximum crawlability.</p>
               </div>
 
-              <div className="border-2 border-slate-200/80 hover:border-rose-300 p-5 rounded-xl bg-white shadow-xs transition-all duration-300 space-y-2">
+              <div className="border border-slate-250 hover:border-[color:var(--t-600)] p-5 rounded-none bg-white transition-all space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-extrabold text-slate-700 uppercase">INP</span>
-                  <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-lg">24ms</span>
+                  <span className="text-xs font-black text-slate-700 uppercase tracking-wider">INP</span>
+                  <span className="text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">24ms</span>
                 </div>
-                <h4 className="text-xs font-bold text-slate-800">Interaction to Next Paint</h4>
-                <p className="text-[11px] text-slate-500 font-medium leading-relaxed">Fast state mutations and lightweight event hooks prevent tap/click delays.</p>
+                <h4 className="text-xs font-black text-slate-800">Interaction to Next Paint</h4>
+                <p className="text-[11px] text-slate-500 font-semibold leading-relaxed">Fast state mutations and lightweight event hooks prevent tap/click delays.</p>
               </div>
 
-              <div className="border-2 border-slate-200/80 hover:border-rose-300 p-5 rounded-xl bg-white shadow-xs transition-all duration-300 space-y-2">
+              <div className="border border-slate-250 hover:border-[color:var(--t-600)] p-5 rounded-none bg-white transition-all space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-extrabold text-slate-700 uppercase">CLS</span>
-                  <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-lg">0.02</span>
+                  <span className="text-xs font-black text-slate-700 uppercase tracking-wider">CLS</span>
+                  <span className="text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">0.02</span>
                 </div>
-                <h4 className="text-xs font-bold text-slate-800">Cumulative Layout Shift</h4>
-                <p className="text-[11px] text-slate-500 font-medium leading-relaxed">Defined image dimensions and skeletal layouts prevent layout jumping during rendering.</p>
+                <h4 className="text-xs font-black text-slate-800">Cumulative Layout Shift</h4>
+                <p className="text-[11px] text-slate-500 font-semibold leading-relaxed">Defined image dimensions and skeletal layouts prevent layout jumping during rendering.</p>
               </div>
             </div>
 
-            <div className="border-2 border-slate-200/60 p-5 rounded-xl bg-slate-50 space-y-2.5 text-xs">
-              <h4 className="font-bold text-slate-800">Optimizations Implemented:</h4>
-              <ul className="space-y-1 list-disc list-inside text-slate-600 font-medium leading-relaxed">
+            <div className="border border-slate-200 p-5 rounded-none bg-slate-50 space-y-2.5 text-xs">
+              <h4 className="font-black text-slate-800 uppercase tracking-wider">Optimizations Implemented:</h4>
+              <ul className="space-y-1 list-disc list-inside text-slate-600 font-semibold leading-relaxed">
                 <li>Server-Side bundled fast router reduces JS overhead</li>
                 <li>Font swap and fallback system prevents flash of unstyled text (FOUT)</li>
                 <li>Modern next-gen image placeholders optimized directly from CDN</li>
@@ -372,15 +373,15 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
         {/* TAB 4: SITEMAP INSPECTOR */}
         {activeTab === 'sitemap' && (
           <div className="space-y-5">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50 p-5 rounded-xl border-2 border-slate-200/60">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50 p-5 rounded-none border border-slate-200">
               <div>
-                <h3 className="text-sm font-extrabold text-slate-800">Live Dynamic XML Sitemap</h3>
+                <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">Live Dynamic XML Sitemap</h3>
                 <p className="text-xs text-slate-500 font-semibold mt-0.5">Auto-updates as soon as a new doctor or nurse is successfully verified by admin moderators.</p>
               </div>
               <a 
                 href="/sitemap.xml" 
                 target="_blank" 
-                className="text-xs font-bold bg-[color:var(--t-600)] text-white rounded-lg py-2.5 px-4 hover:bg-[color:var(--t-600)] flex items-center gap-1.5 transition-all hover:scale-[1.02] shadow-sm cursor-pointer shrink-0"
+                className="h-10 text-xs font-bold uppercase tracking-wider bg-[color:var(--t-600)] text-white rounded-none px-4 hover:bg-[color:var(--dark)] flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
               >
                 <Eye className="h-4 w-4" />
                 Open Sitemap XML
@@ -388,7 +389,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
             </div>
 
             <div className="relative">
-              <pre className="bg-slate-100 text-slate-800 text-xs p-5 rounded-xl overflow-x-auto max-h-96 font-mono border-2 border-slate-300 leading-relaxed">
+              <pre className="bg-slate-100 text-slate-850 text-xs p-5 rounded-none overflow-x-auto max-h-96 font-mono border border-slate-300 leading-relaxed">
                 <code>{generateSitemapText()}</code>
               </pre>
             </div>
@@ -399,19 +400,19 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
       {/* Schema Structure Lightbox Modal */}
       {selectedSchemaProf && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-100/80 backdrop-blur-xs animate-fade-in"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
           onClick={() => setSelectedSchemaProf(null)}
           id="schema-modal-backdrop"
         >
           <div 
-            className="relative bg-white border-[3px] border-[color:var(--t-600)] rounded-[28px] max-w-xl w-full p-6 shadow-2xl flex flex-col justify-between overflow-hidden scale-100 transition-all duration-300"
+            className="relative bg-white border-2 border-[color:var(--t-600)] rounded-none max-w-xl w-full p-6 shadow-2xl flex flex-col justify-between overflow-hidden"
             onClick={(e) => e.stopPropagation()}
             id="schema-modal-card"
           >
             {/* Close button */}
             <button
               onClick={() => setSelectedSchemaProf(null)}
-              className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer z-10"
+              className="absolute top-4 right-4 h-8 w-8 rounded-none text-slate-400 hover:text-slate-800 hover:bg-slate-100 border border-transparent hover:border-slate-300 transition-all cursor-pointer z-10 flex items-center justify-center"
               title="Close"
             >
               <X className="h-4 w-4" />
@@ -419,32 +420,32 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
 
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-[color:var(--t-50)] text-[color:var(--t-600)] rounded-xl border border-[color:var(--t-200)]">
+                <div className="p-2.5 bg-[color:var(--t-50)] text-[color:var(--t-600)] rounded-none border border-[color:var(--t-200)]">
                   <Code className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-extrabold text-slate-800 leading-tight">Structured Schema.org Metadata</h3>
+                  <h3 className="text-base font-black text-slate-800 leading-tight uppercase tracking-wide">Structured Schema.org Metadata</h3>
                   <p className="text-[11px] text-slate-500 font-semibold">JSON-LD markup validation for search engine indexing</p>
                 </div>
               </div>
 
               {/* Mini practitioner summary */}
-              <div className="bg-slate-50 border border-slate-150 p-3 rounded-xl flex items-center gap-3">
+              <div className="bg-slate-50 border border-slate-200 p-3 rounded-none flex items-center gap-3">
                 <img 
                   src={selectedSchemaProf.avatar} 
                   alt={selectedSchemaProf.name}
-                  className="h-10 w-10 rounded-lg object-cover border border-slate-200"
+                  className="h-10 w-10 rounded-none object-cover border border-slate-300"
                   referrerPolicy="no-referrer"
                 />
                 <div>
-                  <h4 className="text-xs font-bold text-slate-800">{selectedSchemaProf.name}</h4>
-                  <p className="text-[10px] text-slate-500 font-semibold">{selectedSchemaProf.specialization} &bull; {selectedSchemaProf.city}</p>
+                  <h4 className="text-xs font-black text-slate-800">{selectedSchemaProf.name}</h4>
+                  <p className="text-[10px] text-slate-500 font-bold">{selectedSchemaProf.specialization} &bull; {selectedSchemaProf.city}</p>
                 </div>
               </div>
 
               {/* JSON code block in modal */}
               <div className="relative">
-                <pre className="bg-slate-100 text-slate-800 text-[11px] p-4 rounded-xl overflow-x-auto max-h-72 font-mono border border-slate-300 leading-relaxed">
+                <pre className="bg-slate-100 text-slate-850 text-[11px] p-4 rounded-none overflow-x-auto max-h-72 font-mono border border-slate-300 leading-relaxed">
                   <code>{generateSchema()}</code>
                 </pre>
                 <button
@@ -453,7 +454,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }}
-                  className="absolute top-3 right-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white rounded-lg px-2.5 py-1.5 text-[10px] font-bold flex items-center gap-1 shadow-md transition-all cursor-pointer"
+                  className="absolute top-3 right-3 h-8 bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] text-white rounded-none px-3 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
                 >
                   {copied ? <CheckCircle className="h-3 w-3 text-white" /> : <Copy className="h-3 w-3 text-white" />}
                   {copied ? 'Copied!' : 'Copy Schema'}
@@ -461,10 +462,10 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end gap-2 border-t border-slate-150 pt-4">
+            <div className="mt-6 flex justify-end gap-2 border-t border-slate-200 pt-4">
               <button
                 onClick={() => setSelectedSchemaProf(null)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-xl transition-all cursor-pointer"
+                className="h-10 px-5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-black uppercase tracking-wider rounded-none border border-slate-300 transition-all cursor-pointer"
               >
                 Close Preview
               </button>

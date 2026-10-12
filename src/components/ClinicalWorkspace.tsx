@@ -120,41 +120,49 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
         </p>
       </div>
 
-      <div role="tablist" className="flex flex-wrap gap-1 border-b border-slate-200">
+      <div role="tablist" className="flex flex-wrap gap-2 border-b border-[color:var(--t-200)] pb-2">
         {tabs.map(([id, text, Icon]) => (
           <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setError(''); setOk(''); }}
-            className={`px-3 py-2 text-xs font-bold flex items-center gap-1.5 cursor-pointer ${tab === id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-500'}`}>
-            <Icon className="h-3.5 w-3.5" /> {text}
+            className={`px-3.5 py-2 text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors ${tab === id ? 'bg-[color:var(--t-600)] text-white shadow-xs' : 'bg-white border border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'}`}>
+            <Icon className="h-4 w-4" /> {text}
           </button>
         ))}
       </div>
-      {error && <p className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 p-2.5">{error}</p>}
-      {ok && <p className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 p-2.5">{ok}</p>}
+      {error && <p className="text-xs font-bold text-rose-800 bg-rose-50 border border-rose-200 p-3">{error}</p>}
+      {ok && <p className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 p-3">{ok}</p>}
 
       {tab === 'record' && (
         ctx.record ? (
-          <div className="space-y-3 text-xs">
-            <section><h4 className={label}>Allergies</h4>{ctx.record.allergies.length ? ctx.record.allergies.map((a: any, i: number) => <p key={i} className="font-bold text-rose-700">{a.name}{a.severity ? ` (${a.severity})` : ''}{a.detail ? ` — ${a.detail}` : ''}</p>) : <p className="text-slate-500">None recorded.</p>}</section>
-            <section><h4 className={label}>Conditions</h4>{ctx.record.conditions.length ? ctx.record.conditions.map((c: any, i: number) => <p key={i}>{c.name}{c.detail ? ` — ${c.detail}` : ''}</p>) : <p className="text-slate-500">None recorded.</p>}</section>
-            <section><h4 className={label}>Current medicines</h4>{ctx.record.medications.length ? ctx.record.medications.map((m: any, i: number) => <p key={i}>{m.name}{m.detail ? ` — ${m.detail}` : ''}</p>) : <p className="text-slate-500">None recorded.</p>}</section>
-            <section><h4 className={label}>Recent readings</h4>{ctx.record.vitals.length ? ctx.record.vitals.slice(0, 8).map((v: any, i: number) => <p key={i} className="tabular-nums">{new Date(v.ts).toLocaleDateString()} · {v.kind.replace('_', ' ')} {v.value1}{v.value2 ? `/${v.value2}` : ''} {v.unit}</p>) : <p className="text-slate-500">None.</p>}</section>
-            <section><h4 className={label}>Active prescriptions from others</h4>{ctx.record.activePrescriptions.length ? ctx.record.activePrescriptions.map((p: any, i: number) => <p key={i}>{p.items.join(', ')}</p>) : <p className="text-slate-500">None.</p>}</section>
-            <section><h4 className={label}>Lab results</h4>{ctx.record.labResults.length ? ctx.record.labResults.map((l: any) => <p key={l.id}>{l.tests} · <a className="underline font-bold" href={`/api/documents/${l.result_document_id}/download`}>download result</a></p>) : <p className="text-slate-500">None.</p>}</section>
+          <div className="space-y-4 text-xs bg-white border border-[color:var(--t-200)] p-5 shadow-xs">
+            <section><h4 className={label}>Allergies & Sensitivities</h4>{ctx.record.allergies.length ? ctx.record.allergies.map((a: any, i: number) => <p key={i} className="font-bold text-rose-700 bg-rose-50 border border-rose-200 p-2 my-1">{a.name}{a.severity ? ` (${a.severity})` : ''}{a.detail ? ` — ${a.detail}` : ''}</p>) : <p className="text-slate-500">None recorded.</p>}</section>
+            <section><h4 className={label}>Chronic Medical Conditions</h4>{ctx.record.conditions.length ? ctx.record.conditions.map((c: any, i: number) => <p key={i} className="font-semibold text-slate-800 py-0.5">{c.name}{c.detail ? ` — ${c.detail}` : ''}</p>) : <p className="text-slate-500">None recorded.</p>}</section>
+            <section><h4 className={label}>Current Active Medications</h4>{ctx.record.medications.length ? ctx.record.medications.map((m: any, i: number) => <p key={i} className="font-semibold text-slate-800 py-0.5">{m.name}{m.detail ? ` — ${m.detail}` : ''}</p>) : <p className="text-slate-500">None recorded.</p>}</section>
+            <section><h4 className={label}>Vitals & Physiological Readings</h4>{ctx.record.vitals.length ? ctx.record.vitals.slice(0, 8).map((v: any, i: number) => <p key={i} className="tabular-nums font-mono py-0.5">{new Date(v.ts).toLocaleDateString()} · {v.kind.replace('_', ' ')}: <b className="text-[color:var(--t-700)]">{v.value1}{v.value2 ? `/${v.value2}` : ''} {v.unit}</b></p>) : <p className="text-slate-500">None.</p>}</section>
+            <section><h4 className={label}>Active Prescriptions</h4>{ctx.record.activePrescriptions.length ? ctx.record.activePrescriptions.map((p: any, i: number) => <p key={i} className="py-0.5 font-medium">{p.items.join(', ')}</p>) : <p className="text-slate-500">None.</p>}</section>
+            <section><h4 className={label}>Verified Diagnostic Lab Results</h4>{ctx.record.labResults.length ? ctx.record.labResults.map((l: any) => <p key={l.id} className="py-1 flex items-center justify-between">{l.tests} <a className="underline font-bold text-[color:var(--t-700)]" href={`/api/documents/${l.result_document_id}/download`}>Download verified report</a></p>) : <p className="text-slate-500">None.</p>}</section>
           </div>
-        ) : <p className="text-xs text-slate-600">Ask the patient to share their health record with you (they can do this under Health Record → Sharing). Until then, ask about allergies and current medicines directly.</p>
+        ) : <div className="p-6 bg-white border border-[color:var(--t-200)] text-xs text-slate-600">The patient has not enabled health record access for this consultation session. Ask the patient to confirm key drug allergies verbally.</div>
       )}
 
       {tab === 'notes' && (
-        <div className="space-y-3">
-          {([['subjective', 'Subjective (what the patient reports)'], ['objective', 'Objective (findings, readings)'], ['assessment', 'Assessment'], ['plan', 'Plan']] as const).map(([k, l]) => (
-            <div key={k}><label className={label} htmlFor={`soap-${k}`}>{l}</label>
-              <textarea id={`soap-${k}`} rows={k === 'assessment' || k === 'plan' ? 2 : 3} className={field} disabled={signed} maxLength={4000}
-                value={note[k]} onChange={e => setNote(n => ({ ...n, [k]: e.target.value }))} /></div>
+        <div className="space-y-4 bg-white border border-[color:var(--t-200)] p-5 shadow-xs">
+          {([['subjective', 'Subjective (Patient narrative, reported history, onset)'], ['objective', 'Objective (Vital signs, physical exam, camera inspection)'], ['assessment', 'Assessment (Working clinical diagnosis, ICD-10 provisional)'], ['plan', 'Plan (Treatment protocol, lifestyle, next follow-up)']] as const).map(([k, l]) => (
+            <div key={k}>
+              <label className={label} htmlFor={`soap-${k}`}>{l}</label>
+              <textarea id={`soap-${k}`} rows={k === 'assessment' || k === 'plan' ? 2 : 3}
+                className="w-full border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white p-3 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors leading-relaxed"
+                disabled={signed} maxLength={4000}
+                value={note[k]} onChange={e => setNote(n => ({ ...n, [k]: e.target.value }))} />
+            </div>
           ))}
-          {signed ? <p className="text-xs font-bold text-slate-600">Signed {new Date(ctx.encounter.signedAt).toLocaleString()}. This note is locked.</p> : (
-            <div className="flex gap-2">
-              <button onClick={() => saveNote(false)} className="border border-slate-300 text-xs font-bold px-4 py-2 cursor-pointer">Save draft</button>
-              <button onClick={() => saveNote(true)} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Sign note</button>
+          {signed ? (
+            <p className="text-xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 p-3">
+              Digitally signed on {new Date(ctx.encounter.signedAt).toLocaleString()}. Encounter note is locked and archived.
+            </p>
+          ) : (
+            <div className="flex gap-3 pt-2">
+              <button onClick={() => saveNote(false)} className="h-10 border border-slate-300 hover:bg-slate-50 text-xs font-bold px-5 cursor-pointer transition-colors">Save Working Draft</button>
+              <button onClick={() => saveNote(true)} className="h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-6 cursor-pointer transition-colors shadow-xs">Sign & Lock Note</button>
             </div>
           )}
         </div>

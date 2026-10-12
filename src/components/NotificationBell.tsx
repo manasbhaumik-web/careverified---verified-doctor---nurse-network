@@ -33,7 +33,7 @@ export default function NotificationBell() {
     <div className="relative">
       <button
         onClick={toggle}
-        className="relative h-11 w-11 flex items-center justify-center text-white bg-transparent border border-white/60 hover:bg-white/15 rounded-lg transition-colors cursor-pointer"
+        className="relative h-11 w-11 flex items-center justify-center text-white bg-transparent border border-transparent hover:bg-white/15 rounded-lg transition-colors cursor-pointer"
         title="Notifications"
         aria-label={`Notifications${unread ? `, ${unread} unread` : ''}`}
         aria-expanded={open}

@@ -2,13 +2,11 @@ import VerificationStatusCard from './VerificationStatusCard';
 import ClinicalWorkspace from './ClinicalWorkspace';
 import React, { useState, useEffect } from 'react';
 import { 
-  ShieldCheck, UserCheck, Stethoscope, Award, FileText, Loader, 
-  CheckCircle2, AlertCircle, Edit, Star, Shield, MessageSquare, 
-  Save, X, ThumbsUp, MapPin, DollarSign, Activity, Send, Check,
-  Calendar, Clock, TrendingUp, Users, Plus, Trash2, Heart, ShieldAlert,
-  FileSignature, AlertTriangle, Ambulance, ChevronRight, Eye, Bold, Italic, List, Quote, LayoutGrid
+  Award, FileText, Loader, 
+  CheckCircle2, AlertCircle, Edit, Shield, MessageSquare, 
+  X, Send, Check, Calendar, TrendingUp, Eye, LayoutGrid
 } from 'lucide-react';
-import { UserRole, DoctorProfile, NurseProfile, Review, VerificationStatus, Booking, OnCallDispatch, ConsultationMode } from '../types';
+import { UserRole, DoctorProfile, NurseProfile, Review, VerificationStatus, Booking, OnCallDispatch } from '../types';
 import PractitionerOverviewTab from './practitioner/PractitionerOverviewTab';
 import PractitionerAccreditationTab from './practitioner/PractitionerAccreditationTab';
 import PractitionerBookingsTab from './practitioner/PractitionerBookingsTab';

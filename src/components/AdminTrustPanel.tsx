@@ -33,17 +33,17 @@ export function ReviewActions({ request, onDone }: { request: any; onDone: () =>
     }
   };
 
-  const field = 'w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[color:var(--t-600)]';
+  const field = 'w-full border border-slate-300 rounded-none px-3.5 py-2.5 text-xs focus:outline-none focus:border-[color:var(--t-600)] font-semibold text-slate-800 bg-white';
   return (
-    <div className="mt-6 border-t border-slate-100 pt-4 space-y-3">
+    <div className="mt-6 border-t border-slate-200 pt-4 space-y-4">
       {history.length > 0 && (
         <details className="text-xs">
-          <summary className="cursor-pointer font-bold text-slate-600 flex items-center gap-1.5"><History className="h-3.5 w-3.5" /> Decision history ({history.length})</summary>
+          <summary className="cursor-pointer font-black text-slate-700 flex items-center gap-1.5 uppercase tracking-wide"><History className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> Decision history ({history.length})</summary>
           <ul className="mt-2 space-y-1.5">
             {history.map((h, i) => (
-              <li key={i} className="bg-slate-50 border border-slate-100 rounded-lg p-2">
-                <span className="font-bold">{h.action.replace(/_/g, ' ')}</span> · {fmt(h.ts)}{h.actorName ? ` · ${h.actorName}` : ''}
-                {h.note && <span className="block text-slate-600">{h.note}</span>}
+              <li key={i} className="bg-slate-50 border border-slate-200 rounded-none p-2.5">
+                <span className="font-black text-slate-800 uppercase tracking-wide">{h.action.replace(/_/g, ' ')}</span> · <span className="font-mono text-slate-500">{fmt(h.ts)}</span>{h.actorName ? ` · ${h.actorName}` : ''}
+                {h.note && <span className="block text-slate-650 mt-1 font-semibold">{h.note}</span>}
               </li>
             ))}
           </ul>
@@ -51,26 +51,26 @@ export function ReviewActions({ request, onDone }: { request: any; onDone: () =>
       )}
 
       <div>
-        <label className="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Council register check (required to approve)</label>
+        <label className="text-[10px] font-black uppercase text-slate-600 block mb-1.5 tracking-wider">Council register check (required to approve)</label>
         <input className={field} value={registryReference} onChange={e => setRegistryReference(e.target.value)}
           placeholder="e.g. MMC online register, checked today, ref / URL" maxLength={200} />
       </div>
       <div>
-        <label className="text-[10px] font-extrabold uppercase text-slate-500 block mb-1">Note to practitioner (required to reject or request more information)</label>
+        <label className="text-[10px] font-black uppercase text-slate-600 block mb-1.5 tracking-wider">Note to practitioner (required to reject or request more information)</label>
         <textarea className={field} rows={2} value={note} onChange={e => setNote(e.target.value)} maxLength={1000} />
       </div>
-      {error && <p className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-2">{error}</p>}
-      <div className="flex flex-wrap gap-2 justify-end">
+      {error && <p className="text-xs font-bold text-rose-800 bg-rose-50 border border-rose-200 rounded-none p-2.5">{error}</p>}
+      <div className="flex flex-wrap gap-2 justify-end pt-1">
         <button disabled={busy} onClick={() => decide('reject')}
-          className="px-4 py-2.5 bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-extrabold rounded-xl flex items-center gap-1.5 cursor-pointer disabled:opacity-60">
+          className="h-10 px-4 bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-bold uppercase tracking-wider rounded-none flex items-center gap-1.5 cursor-pointer disabled:opacity-60 transition-all">
           <X className="h-4 w-4" /> Reject
         </button>
         <button disabled={busy} onClick={() => decide('request_info')}
-          className="px-4 py-2.5 bg-white border border-amber-200 hover:bg-amber-50 text-amber-800 text-xs font-extrabold rounded-xl cursor-pointer disabled:opacity-60">
+          className="h-10 px-4 bg-white border border-amber-300 hover:bg-amber-50 text-amber-800 text-xs font-bold uppercase tracking-wider rounded-none cursor-pointer disabled:opacity-60 transition-all">
           Request more info
         </button>
         <button disabled={busy} onClick={() => decide('approve')}
-          className="px-5 py-2.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold rounded-xl flex items-center gap-1.5 cursor-pointer disabled:opacity-60">
+          className="h-10 px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] active:bg-slate-900 text-white text-xs font-bold uppercase tracking-wider rounded-none flex items-center gap-1.5 cursor-pointer disabled:opacity-60 transition-all shadow-none">
           <Check className="h-4 w-4" /> Approve & Publish
         </button>
       </div>

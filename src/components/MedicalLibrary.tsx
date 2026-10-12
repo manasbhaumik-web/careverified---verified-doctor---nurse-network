@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, BadgeCheck, Bookmark, BookOpen, Check, ExternalLink, Flag, Printer, Search, Send, ShieldCheck, X } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Bookmark, BookOpen, ExternalLink, Flag, Printer, Search, Send, ShieldCheck, X } from 'lucide-react';
 import { Article, DoctorProfile, NurseProfile } from '../types';
 import DashboardHeader, { BannerKpis, FilterSelect } from './DashboardHeader';
 
@@ -244,20 +244,20 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
         {/* Row 1: search + saved */}
         <div className="flex flex-wrap items-center gap-3">
           <label htmlFor="library-search" className="sr-only">Search articles</label>
-          <div className="flex-1 min-w-[220px] flex items-center gap-2.5 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 min-h-[44px] focus-within:border-[color:var(--t-600)]">
+          <div className="flex-1 min-w-[240px] flex items-center gap-3 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-4 h-12 focus-within:border-[color:var(--t-600)] transition-colors">
             <Search className="h-4 w-4 text-slate-500 shrink-0" />
             <input
               id="library-search"
               type="text"
-              placeholder="Search topics, e.g. “sugar”"
+              placeholder="Search medical topics, symptoms, or clinical terms (e.g. hypertension, diabetes, pediatrics)…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="flex-1 min-w-0 bg-transparent text-sm text-[color:var(--ink)] outline-none placeholder-slate-500"
             />
           </div>
           <button type="button" aria-pressed={onlySaved} onClick={() => setOnlySaved(v => !v)}
-            className={`min-h-[44px] px-4 text-[13px] font-semibold border inline-flex items-center gap-2 cursor-pointer ${onlySaved ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-100)]'}`}>
-            <Bookmark className="h-4 w-4" /> Saved ({savedIds.length})
+            className={`h-12 px-5 text-xs font-bold border inline-flex items-center gap-2 cursor-pointer transition-colors shadow-2xs ${onlySaved ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'}`}>
+            <Bookmark className="h-4 w-4" /> Saved Articles ({savedIds.length})
           </button>
         </div>
 

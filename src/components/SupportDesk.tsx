@@ -69,29 +69,32 @@ export default function SupportDesk() {
         }
       />
 
-      <div className="grid gap-5 xl:grid-cols-[400px_minmax(0,1fr)] items-start">
+      <div className="grid gap-6 xl:grid-cols-[440px_minmax(0,1fr)] items-start">
       <div className="space-y-5 min-w-0">
 
-      <form onSubmit={create} className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
-        <h2 className="text-sm font-extrabold">Open a ticket</h2>
-        <select className={field} value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} required aria-label="Category">
-          <option value="">Choose a category…</option>
+      <form onSubmit={create} className="bg-white border border-[color:var(--t-200)] p-6 space-y-4 shadow-xs">
+        <h2 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)]">Open a Support Ticket</h2>
+        <select className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3 text-sm text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors cursor-pointer" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} required aria-label="Category">
+          <option value="">Select ticket category…</option>
           {cats.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
         </select>
-        {chosen && <p className="text-xs text-slate-600">We aim to reply within <b>{chosen.respondWithinHours} hour{chosen.respondWithinHours === 1 ? '' : 's'}</b>.</p>}
-        {form.category === 'Report a user' && <input className={field} placeholder="Who are you reporting? (their name)" value={form.target} onChange={e => setForm({ ...form, target: e.target.value })} maxLength={100} />}
-        <input className={field} placeholder="Subject" value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} required minLength={3} maxLength={120} />
-        <textarea className={field} rows={4} placeholder="Describe the problem" value={form.body} onChange={e => setForm({ ...form, body: e.target.value })} required minLength={10} maxLength={3000} />
-        {msg && <p role="status" className={`text-xs font-bold ${msg.ok ? 'text-emerald-700' : 'text-rose-700'}`}>{msg.text}</p>}
-        <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Send</button>
+        {chosen && <p className="text-xs text-[color:var(--ink-2)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-2.5">Target resolution window: <b className="text-[color:var(--ink)]">{chosen.respondWithinHours} hour{chosen.respondWithinHours === 1 ? '' : 's'}</b>.</p>}
+        {form.category === 'Report a user' && <input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 text-sm text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors" placeholder="Who are you reporting? (Practitioner or Pharmacy name)" value={form.target} onChange={e => setForm({ ...form, target: e.target.value })} maxLength={100} />}
+        <input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 text-sm text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors" placeholder="Ticket Subject (summary)" value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} required minLength={3} maxLength={120} />
+        <textarea className="w-full border border-[color:var(--t-200)] bg-[color:var(--t-bg)] p-3 text-sm text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors" rows={4} placeholder="Detailed explanation of the issue or clinical question…" value={form.body} onChange={e => setForm({ ...form, body: e.target.value })} required minLength={10} maxLength={3000} />
+        {msg && <p role="status" className={`text-xs font-bold p-3 border ${msg.ok ? 'text-emerald-800 bg-emerald-50 border-emerald-200' : 'text-rose-800 bg-rose-50 border-rose-200'}`}>{msg.text}</p>}
+        <button className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold h-12 flex items-center justify-center cursor-pointer transition-colors shadow-xs">Submit Ticket to Care Operations</button>
       </form>
 
       {cats.length > 0 && (
-        <section className="bg-white border border-slate-200 p-5">
-          <h2 className="text-sm font-extrabold mb-2">How fast we reply</h2>
-          <ul className="divide-y divide-slate-100 text-xs">
+        <section className="bg-white border border-[color:var(--t-200)] p-5 shadow-xs">
+          <h2 className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--ink)] mb-3">Service Level Agreement (SLA)</h2>
+          <ul className="divide-y divide-[color:var(--t-100)] text-xs">
             {cats.map(c => (
-              <li key={c.name} className="py-1.5 flex justify-between gap-3"><span>{c.name}</span><span className="font-bold tabular-nums">within {c.respondWithinHours} h</span></li>
+              <li key={c.name} className="py-2 flex justify-between items-center gap-3">
+                <span className="font-medium text-[color:var(--ink)]">{c.name}</span>
+                <span className="font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">within {c.respondWithinHours}h</span>
+              </li>
             ))}
           </ul>
         </section>

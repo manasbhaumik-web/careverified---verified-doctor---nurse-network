@@ -71,12 +71,12 @@ export default function PharmacyFinder() {
         }
       />
 
-      <section aria-label="Find pharmacies" className="bg-white border border-[color:var(--t-200)] shadow-xs px-5 py-4 space-y-3">
+      <section aria-label="Find pharmacies" className="bg-white border border-[color:var(--t-200)] rounded-none p-5 space-y-4">
         <label htmlFor="pharmacy-search" className="sr-only">Search pharmacies</label>
-        <div className="flex items-center gap-2.5 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 min-h-[44px] focus-within:border-[color:var(--t-600)]">
-          <Search className="h-4 w-4 text-slate-500 shrink-0" />
-          <input id="pharmacy-search" type="text" placeholder="Search by name, address or city" value={query} onChange={e => setQuery(e.target.value)}
-            className="flex-1 min-w-0 bg-transparent text-sm text-[color:var(--ink)] outline-none placeholder-slate-500" />
+        <div className="flex items-center gap-3 border border-slate-300 bg-white px-4 h-12 focus-within:border-[color:var(--t-600)] transition-colors">
+          <Search className="h-4 w-4 text-slate-400 shrink-0" />
+          <input id="pharmacy-search" type="text" placeholder="Search by pharmacy name, street, or city (e.g. Bangsar, Georgetown, Johor Bahru)…" value={query} onChange={e => setQuery(e.target.value)}
+            className="flex-1 min-w-0 bg-transparent text-sm text-slate-900 outline-none placeholder-slate-400 font-medium" />
         </div>
         <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
           <FilterSelect label="City" value={city} onChange={setCity}>
@@ -88,19 +88,32 @@ export default function PharmacyFinder() {
             {services.map(s => <option key={s} value={s}>{s}</option>)}
           </FilterSelect>
           {filtersOn && (
-            <button type="button" onClick={() => { setQuery(''); setCity(ALL); setService(ALL); }} className="min-h-[40px] px-3 text-[13px] font-bold text-[color:var(--t-700)] hover:underline cursor-pointer">Clear filters</button>
+            <button type="button" onClick={() => { setQuery(''); setCity(ALL); setService(ALL); }} className="h-10 px-4 text-xs font-bold uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] cursor-pointer transition-colors rounded-none">
+              Clear filters
+            </button>
           )}
-          <span className="ml-auto self-center text-[13px] text-slate-600 tabular-nums" aria-live="polite">{shown.length} result{shown.length === 1 ? '' : 's'}</span>
+          <span className="ml-auto self-center text-xs font-mono font-bold text-slate-600 tabular-nums bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-none" aria-live="polite">
+            {shown.length} result{shown.length === 1 ? '' : 's'}
+          </span>
         </div>
       </section>
 
       {pharmacies === null ? (
-        <p className="text-sm text-slate-600">Loading pharmacies…</p>
+        <div className="bg-white border border-[color:var(--t-200)] rounded-none p-12 text-center text-sm font-semibold text-slate-600">
+          Loading verified pharmacies…
+        </div>
       ) : shown.length === 0 ? (
-        <div className="bg-white border border-[color:var(--t-200)] p-10 text-center space-y-2">
-          <Pill className="h-10 w-10 text-[color:var(--t-200)] mx-auto" />
-          <h2 className="text-sm font-bold">{list.length === 0 ? 'No partner pharmacies yet' : 'No pharmacies match your search'}</h2>
-          <p className="text-[13px] text-slate-600">{list.length === 0 ? 'Check back soon.' : 'Try a different name, city or service.'}</p>
+        <div className="bg-white border border-[color:var(--t-200)] rounded-none p-12 text-center space-y-3">
+          <Pill className="h-10 w-10 text-[color:var(--t-300)] mx-auto" />
+          <h2 className="text-base font-black text-slate-900 uppercase tracking-wide">{list.length === 0 ? 'No partner pharmacies registered yet' : 'No pharmacies match your criteria'}</h2>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">{list.length === 0 ? 'Partner pharmacies will appear here once onboarding is complete.' : 'Try adjusting your city filter or search terms.'}</p>
+          {filtersOn && (
+            <div className="pt-2">
+              <button type="button" onClick={() => { setQuery(''); setCity(ALL); setService(ALL); }} className="h-10 px-5 text-xs font-bold uppercase tracking-wider text-white bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] cursor-pointer transition-colors rounded-none">
+                Reset All Filters
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <section aria-label="Pharmacies" className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -108,57 +121,57 @@ export default function PharmacyFinder() {
             const sentHere = activeRx.filter(r => r.pharmacyId === p.id);
             const isOpen = openId === p.id;
             return (
-              <article key={p.id} className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-3 min-w-0">
+              <article key={p.id} className="bg-white border border-slate-250 hover:border-[color:var(--t-600)] transition-colors rounded-none p-5 flex flex-col gap-3 min-w-0">
                 <div className="min-w-0">
-                  <h2 className="text-[17px] font-bold text-[color:var(--ink)] leading-snug [overflow-wrap:anywhere]">{p.name}</h2>
-                  <p className="text-[13px] text-[color:var(--ink-2)] mt-1 flex gap-2 [overflow-wrap:anywhere]"><MapPin className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" /><span>{p.address}{p.city && !p.address.toLowerCase().includes(p.city.toLowerCase()) ? `, ${p.city}` : ''}</span></p>
-                  {p.phone && <p className="text-[13px] mt-1 flex gap-2"><Phone className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" /><a href={`tel:${p.phone.replace(/[^+\d]/g, '')}`} className="font-semibold text-[color:var(--t-700)] hover:underline">{p.phone}</a></p>}
-                  {p.hours && <p className="text-[13px] mt-1 flex gap-2 [overflow-wrap:anywhere]"><Clock className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" /><span>{p.hours}</span></p>}
+                  <h2 className="text-base font-black text-slate-900 leading-snug [overflow-wrap:anywhere] uppercase tracking-wide">{p.name}</h2>
+                  <p className="text-xs text-slate-600 font-semibold mt-1.5 flex gap-2 [overflow-wrap:anywhere]"><MapPin className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" /><span>{p.address}{p.city && !p.address.toLowerCase().includes(p.city.toLowerCase()) ? `, ${p.city}` : ''}</span></p>
+                  {p.phone && <p className="text-xs font-semibold text-slate-700 mt-1 flex gap-2"><Phone className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" /><a href={`tel:${p.phone.replace(/[^+\d]/g, '')}`} className="font-bold text-[color:var(--t-700)] hover:underline">{p.phone}</a></p>}
+                  {p.hours && <p className="text-xs font-semibold text-slate-600 mt-1 flex gap-2 [overflow-wrap:anywhere]"><Clock className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" /><span>{p.hours}</span></p>}
                 </div>
                 {p.services.length > 0 && (
-                  <ul className="flex flex-wrap gap-1.5">
+                  <ul className="flex flex-wrap gap-1.5 pt-1">
                     {p.services.map(s => (
-                      <li key={s} className={`text-[11px] font-bold px-2.5 py-0.5 border ${s === '24 hours' ? 'text-[color:var(--e-800)] bg-[color:var(--e-50)] border-[color:var(--e-200)]' : 'text-[color:var(--t-700)] bg-[color:var(--t-50)] border-[color:var(--t-200)]'}`}>{s}</li>
+                      <li key={s} className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 border rounded-none ${s === '24 hours' ? 'text-emerald-800 bg-emerald-50 border-emerald-300' : 'text-[color:var(--t-700)] bg-[color:var(--t-50)] border-[color:var(--t-200)]'}`}>{s}</li>
                     ))}
                   </ul>
                 )}
 
                 {sentHere.length > 0 && (
-                  <p className="text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 p-2.5">
-                    Your prescription {sentHere.map(r => `${r.code}${r.fillStatus ? ` (${FILL_LABEL[r.fillStatus] ?? r.fillStatus}${r.fillStatus === 'cannot_fill' && r.fillReason ? `: ${r.fillReason}` : ''})` : ''}`).join(', ')} {sentHere.length === 1 ? 'was' : 'were'} sent here. The pharmacy can see it in their inbox, or you can show them the code.
+                  <p className="text-xs font-bold text-emerald-900 bg-emerald-50 border border-emerald-300 rounded-none p-3">
+                    Your prescription {sentHere.map(r => `${r.code}${r.fillStatus ? ` (${FILL_LABEL[r.fillStatus] ?? r.fillStatus}${r.fillStatus === 'cannot_fill' && r.fillReason ? `: ${r.fillReason}` : ''})` : ''}`).join(', ')} {sentHere.length === 1 ? 'was' : 'were'} routed here. Show the code at the counter or wait for pickup confirmation.
                   </p>
                 )}
                 {msg?.id === p.id && (
-                  <p role="status" className={`text-xs font-bold p-2.5 border ${msg.ok ? 'text-emerald-800 bg-emerald-50 border-emerald-200' : 'text-rose-700 bg-rose-50 border-rose-200'}`}>{msg.text}</p>
+                  <p role="status" className={`text-xs font-bold p-3 border rounded-none ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-300' : 'text-rose-900 bg-rose-50 border-rose-300'}`}>{msg.text}</p>
                 )}
 
-                <div className="mt-auto pt-3 border-t border-[color:var(--t-100)] space-y-2">
+                <div className="mt-auto pt-3 border-t border-slate-200 space-y-3">
                   {isOpen && (
-                    <div className="space-y-2">
-                      <label htmlFor={`rx-${p.id}`} className="text-[10px] font-extrabold uppercase tracking-wider text-slate-600 block">Choose a prescription</label>
-                      <select id={`rx-${p.id}`} value={chosen} onChange={e => setChosen(e.target.value)} className="w-full border border-slate-200 bg-white px-3 min-h-[40px] text-[13px]">
-                        <option value="">Select…</option>
+                    <div className="space-y-3 bg-slate-50 border border-slate-250 p-3.5 rounded-none">
+                      <label htmlFor={`rx-${p.id}`} className="text-[10px] font-black uppercase tracking-wider text-slate-700 block">Select active prescription to route</label>
+                      <select id={`rx-${p.id}`} value={chosen} onChange={e => setChosen(e.target.value)} className="w-full border border-slate-300 bg-white px-3 h-10 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)]">
+                        <option value="">Select prescription…</option>
                         {activeRx.map(r => (
                           <option key={r.id} value={r.id}>{r.code} · {r.items[0]?.name ?? 'Prescription'}{r.items.length > 1 ? ` +${r.items.length - 1}` : ''} · valid until {fmt(r.validUntil)}</option>
                         ))}
                       </select>
-                      <label className="flex items-start gap-2 text-xs text-slate-700 cursor-pointer">
-                        <input type="checkbox" checked={share} onChange={e => setShare(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[color:var(--t-600)]" />
-                        <span>Share my allergies and current medicines with this pharmacy so the pharmacist can check the medicine is safe for me <b>(recommended)</b>. You choose this each time.</span>
+                      <label className="flex items-start gap-2 text-xs text-slate-700 cursor-pointer font-medium">
+                        <input type="checkbox" checked={share} onChange={e => setShare(e.target.checked)} className="mt-0.5 h-4 w-4 rounded-none accent-[color:var(--t-600)]" />
+                        <span>Share my registered allergies and medication list with this pharmacy for contraindication checks <b>(recommended)</b>.</span>
                       </label>
-                      <div className="flex gap-2">
-                        <button type="button" onClick={() => send(p)} disabled={!chosen || sending} className="flex-1 min-h-[40px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-extrabold cursor-pointer">{sending ? 'Sending…' : 'Send'}</button>
-                        <button type="button" onClick={() => { setOpenId(null); setChosen(''); }} className="min-h-[40px] px-4 border border-slate-200 text-xs font-bold cursor-pointer">Cancel</button>
+                      <div className="flex gap-2 pt-1">
+                        <button type="button" onClick={() => send(p)} disabled={!chosen || sending} className="flex-1 h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] disabled:bg-slate-300 text-white text-xs font-bold uppercase tracking-wider cursor-pointer rounded-none transition-all">{sending ? 'Routing…' : 'Send Prescription'}</button>
+                        <button type="button" onClick={() => { setOpenId(null); setChosen(''); }} className="h-10 px-4 border border-slate-300 bg-white text-slate-700 text-xs font-bold uppercase tracking-wider cursor-pointer rounded-none hover:bg-slate-100 transition-all">Cancel</button>
                       </div>
                     </div>
                   )}
                   {!isOpen && (
                     <button type="button" disabled={activeRx.length === 0} onClick={() => { setOpenId(p.id); setChosen(activeRx.length === 1 ? activeRx[0].id : ''); setMsg(null); }}
-                      className="w-full min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-200 disabled:text-slate-500 disabled:cursor-not-allowed text-white text-[13px] font-bold inline-flex items-center justify-center gap-2 cursor-pointer">
+                      className="w-full h-11 bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] active:bg-slate-900 disabled:bg-slate-200 disabled:text-slate-500 disabled:cursor-not-allowed text-white text-xs font-bold uppercase tracking-wider rounded-none inline-flex items-center justify-center gap-2 cursor-pointer transition-all shadow-none">
                       <Send className="h-4 w-4" /> Send my prescription here
                     </button>
                   )}
-                  {!isOpen && activeRx.length === 0 && <p className="text-[11px] text-slate-500">You have no active prescription to send. After a doctor issues one it will appear here.</p>}
+                  {!isOpen && activeRx.length === 0 && <p className="text-[11px] text-slate-500 font-medium">You have no active prescription to route. Once prescribed by a doctor, it will appear here.</p>}
                 </div>
               </article>
             );

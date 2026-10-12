@@ -2,9 +2,9 @@ import DashboardHeader from './DashboardHeader';
 import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, UserCheck, Check, X, ShieldAlert, Award, FileText, 
-  FileSpreadsheet, Loader, CheckCircle2, List, LayoutGrid, Eye,
+  Loader, CheckCircle2, List, LayoutGrid, Eye,
   Puzzle, Plus, Trash2, Settings, Download, Activity, CreditCard, 
-  TrendingUp, Sparkles, RefreshCw, Heart, Search, Calendar, 
+  TrendingUp, Heart, Search, Calendar, 
   BookOpen, PlusCircle, MessageSquare, Globe
 } from 'lucide-react';
 import AdminTrustPanel, { ReviewActions } from './AdminTrustPanel';
@@ -33,25 +33,25 @@ function RequestDocuments({ requestId }: { requestId: string }) {
     return () => { cancelled = true; };
   }, [requestId]);
 
-  if (docs === null) return <p className="text-xs text-slate-500">Loading documents…</p>;
+  if (docs === null) return <p className="text-xs text-slate-500 font-semibold">Loading documents…</p>;
   if (docs.length === 0) {
-    return <p className="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3">No documents were uploaded. Do not approve without reviewing the practitioner's certificates.</p>;
+    return <p className="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-none p-3">No documents were uploaded. Do not approve without reviewing the practitioner's certificates.</p>;
   }
   return (
-    <>
+    <div className="space-y-2">
       {docs.map(d => (
         <a key={d.id} href={`/api/documents/${d.id}/download`}
-          className="border border-slate-200 rounded-xl p-3 bg-white flex items-center justify-between text-xs hover:border-rose-300">
+          className="border border-slate-200 rounded-none p-3 bg-white flex items-center justify-between text-xs hover:border-[color:var(--t-600)] transition-colors">
           <span className="flex items-center gap-2 min-w-0">
             <FileText className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
-            <span className="font-bold text-slate-700 truncate">{d.originalName}</span>
+            <span className="font-bold text-slate-800 truncate">{d.originalName}</span>
           </span>
-          <span className="text-[10px] bg-slate-100 border border-slate-200 text-slate-600 px-2 py-0.5 rounded font-mono font-bold uppercase">
+          <span className="text-[10px] bg-slate-100 border border-slate-200 text-slate-600 px-2 py-0.5 rounded-none font-mono font-bold uppercase">
             {d.kind} · {Math.max(1, Math.round(d.size / 1024))} KB
           </span>
         </a>
       ))}
-    </>
+    </div>
   );
 }
 
@@ -263,18 +263,18 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
         title="Registry Administrative Control Desk"
         description="Practitioner licence review, trust and complaints, operations, quality and support, and modular extension management."
         actions={
-        <div className="grid grid-cols-3 gap-3 bg-white/90 backdrop-blur-xs p-3 border border-[color:var(--t-200)] rounded-xl text-center min-w-[300px] shadow-xs">
+        <div className="grid grid-cols-3 gap-3 bg-white p-3 border border-[color:var(--t-200)] rounded-none text-center min-w-[300px]">
           <div>
             <span className="font-mono text-xl font-black text-[color:var(--t-600)] block leading-tight">{pendingRequests.length}</span>
-            <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Pending</span>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Pending</span>
           </div>
-          <div className="border-x border-rose-200">
+          <div className="border-x border-slate-200">
             <span className="font-mono text-xl font-black text-[color:var(--t-600)] block leading-tight">{professionals.filter(p => p.verificationStatus === VerificationStatus.VERIFIED).length}</span>
-            <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Verified</span>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Verified</span>
           </div>
           <div>
             <span className="font-mono text-xl font-black text-[color:var(--t-600)] block leading-tight">{packages.filter(p => (p as any).installed).length || 3}</span>
-            <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Modules</span>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Modules</span>
           </div>
         </div>
         }
@@ -295,76 +295,76 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
         <div id="panel-approvals" role="tabpanel" aria-labelledby="tab-approvals" tabIndex={0} className="space-y-6">
           {/* Overview stats cards with high visual distinction */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-2.5">
+        <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">Accredited Directory</span>
-            <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-600)]"><UserCheck className="h-4 w-4" /></span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-700">Accredited Directory</span>
+            <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-600)] rounded-none"><UserCheck className="h-4 w-4" /></span>
           </div>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{professionals.length} Verified</span>
-          <span className="text-xs text-slate-600">Registered with medical & nursing councils.</span>
+          <span className="text-2xl sm:text-3xl font-black tracking-tight text-[color:var(--ink)] tabular-nums">{professionals.length} Verified</span>
+          <span className="text-xs text-slate-600 font-semibold">Registered with medical & nursing councils.</span>
         </div>
 
-        <div className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-2.5">
+        <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">Pending Approvals</span>
-            <span className="h-8 w-8 flex items-center justify-center border bg-amber-50 border-amber-200 text-amber-700"><ShieldAlert className="h-4 w-4 animate-pulse" /></span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-700">Pending Approvals</span>
+            <span className="h-8 w-8 flex items-center justify-center border bg-amber-50 border-amber-200 text-amber-700 rounded-none"><ShieldAlert className="h-4 w-4 animate-pulse" /></span>
           </div>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{pendingRequests.length} Pending</span>
-          <span className="text-xs text-slate-600">Awaiting administrative credential review.</span>
+          <span className="text-2xl sm:text-3xl font-black tracking-tight text-[color:var(--ink)] tabular-nums">{pendingRequests.length} Pending</span>
+          <span className="text-xs text-slate-600 font-semibold">Awaiting administrative credential review.</span>
         </div>
 
-        <div className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-2.5">
+        <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">Verified Status</span>
-            <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--e-50)] border-[color:var(--e-200)] text-[color:var(--e-600)]"><CheckCircle2 className="h-4 w-4" /></span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-700">Verified Status</span>
+            <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--e-50)] border-[color:var(--e-200)] text-[color:var(--e-600)] rounded-none"><CheckCircle2 className="h-4 w-4" /></span>
           </div>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">Board reviewed</span>
-          <span className="text-xs text-slate-600">Each licence is checked by a board reviewer.</span>
+          <span className="text-2xl sm:text-3xl font-black tracking-tight text-[color:var(--ink)] tabular-nums">Board reviewed</span>
+          <span className="text-xs text-slate-600 font-semibold">Each licence is checked by a board reviewer.</span>
         </div>
       </div>
 
       {/* Main moderator queue */}
-      <div className="bg-white border border-[color:var(--t-200)] rounded-xl p-6 shadow-xs space-y-5">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-50 pb-4 gap-3">
+      <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 space-y-5">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 pb-4 gap-3">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-[color:var(--t-600)] text-white rounded-lg">
+            <div className="p-2 bg-[color:var(--t-600)] text-white rounded-none">
               <ShieldCheck className="h-4.5 w-4.5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-800">Practitioner Approval Queue</h3>
-              <p className="text-xs text-slate-500">Review credentials for incoming practitioner registrations.</p>
+              <h3 className="text-sm font-black text-slate-800 uppercase tracking-wide">Practitioner Approval Queue</h3>
+              <p className="text-xs text-slate-500 font-semibold">Review credentials for incoming practitioner registrations.</p>
             </div>
           </div>
 
           {/* List/Grid View Mode Toggle */}
-          <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs shrink-0 items-center">
+          <div className="flex bg-slate-100 p-0.5 rounded-none border border-slate-300 shrink-0 items-center">
             <button
               type="button"
               onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-lg transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
+              className={`h-8 px-3 rounded-none transition-all flex items-center gap-1.5 text-xs font-black uppercase tracking-wider cursor-pointer ${
                 viewMode === 'list'
-                  ? 'bg-white text-[color:var(--t-700)] shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'bg-[color:var(--t-600)] text-white shadow-none'
+                  : 'text-slate-600 hover:text-slate-900 bg-transparent'
               }`}
               title="List View"
               id="toggle-admin-list-view"
             >
               <List className="h-3.5 w-3.5" />
-              <span className="hidden md:inline">List</span>
+              <span>List</span>
             </button>
             <button
               type="button"
               onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-lg transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
+              className={`h-8 px-3 rounded-none transition-all flex items-center gap-1.5 text-xs font-black uppercase tracking-wider cursor-pointer ${
                 viewMode === 'grid'
-                  ? 'bg-white text-[color:var(--t-700)] shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'bg-[color:var(--t-600)] text-white shadow-none'
+                  : 'text-slate-600 hover:text-slate-900 bg-transparent'
               }`}
               title="Grid View"
               id="toggle-admin-grid-view"
             >
               <LayoutGrid className="h-3.5 w-3.5" />
-              <span className="hidden md:inline">Grid</span>
+              <span>Grid</span>
             </button>
           </div>
         </div>
@@ -372,16 +372,16 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
         {loading ? (
           <div className="text-center py-10 space-y-2">
             <Loader className="h-6 w-6 text-[color:var(--t-600)] animate-spin mx-auto" />
-            <p className="text-xs text-slate-500">Fetching registration requests...</p>
+            <p className="text-xs text-slate-500 font-semibold">Fetching registration requests...</p>
           </div>
         ) : pendingRequests.length === 0 ? (
-          <div className="text-center py-10 border border-dashed border-slate-200 rounded-xl space-y-2">
-            <CheckCircle2 className="h-10 w-10 text-emerald-500 mx-auto animate-bounce" />
-            <h4 className="text-sm font-bold text-slate-800">Queue Cleared! All Practitioners Verified</h4>
-            <p className="text-xs text-slate-500">No pending license requests are waiting approval.</p>
+          <div className="text-center py-12 border border-dashed border-slate-300 rounded-none bg-slate-50 space-y-2">
+            <CheckCircle2 className="h-10 w-10 text-emerald-500 mx-auto" />
+            <h4 className="text-sm font-black text-slate-850 uppercase tracking-wide">Queue Cleared! All Practitioners Verified</h4>
+            <p className="text-xs text-slate-500 font-semibold">No pending license requests are waiting approval.</p>
           </div>
         ) : (
-          <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-5" : "space-y-4"}>
+          <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-5" : "space-y-3"}>
             {pendingRequests.map((req) => {
               const isApprovedInLoop = votedId === req.id;
               const reqAvatar = req.avatar || (req.userType === UserRole.DOCTOR || req.role === UserRole.DOCTOR ? "/assets/malaysian_female_doctor.jpg" : "/assets/malaysian_female_nurse.jpg");
@@ -396,40 +396,40 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                   <div 
                     key={req.id} 
                     onClick={() => setSelectedModalRequest(req)}
-                    className={`border border-slate-200/80 rounded-xl p-4 shadow-2xs hover:shadow-sm transition-all flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 cursor-pointer hover:border-rose-300 ${
-                      isApprovedInLoop ? "bg-emerald-50/50 border-emerald-200" : "bg-white"
+                    className={`border rounded-none p-4.5 transition-all flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 cursor-pointer hover:border-[color:var(--t-600)] ${
+                      isApprovedInLoop ? "bg-emerald-50/50 border-emerald-300" : "bg-white border-slate-250"
                     }`}
                   >
                     <div className="flex gap-4 items-center flex-1 min-w-0 w-full lg:w-auto">
                       <img 
                         src={reqAvatar} 
                         alt={reqName}
-                        className="h-12 w-12 rounded-xl object-cover border border-slate-200 shrink-0"
+                        className="h-12 w-12 rounded-none object-cover border border-slate-300 shrink-0"
                         referrerPolicy="no-referrer"
                       />
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 min-w-0">
-                          <h4 className="font-sans text-sm font-semibold text-slate-800 truncate min-w-0">{reqName}</h4>
-                          <span className={`shrink-0 text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
-                            reqRole === UserRole.DOCTOR ? "bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]" : "bg-emerald-50 text-emerald-800 border border-emerald-100"
+                          <h4 className="font-sans text-sm font-black text-slate-900 truncate min-w-0">{reqName}</h4>
+                          <span className={`shrink-0 text-[9px] font-black uppercase px-2 py-0.5 rounded-none border ${
+                            reqRole === UserRole.DOCTOR ? "bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]" : "bg-emerald-50 text-emerald-800 border-emerald-200"
                           }`}>
                             {reqRole === UserRole.DOCTOR ? "Doctor" : "Nurse"}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-500 font-semibold">{reqSpecialization}</p>
+                        <p className="text-xs text-slate-500 font-bold mt-0.5">{reqSpecialization}</p>
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 items-center text-[10px] font-mono font-bold text-slate-500 lg:flex-1">
-                      <span className="bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-lg">Lic: {req.licenseNumber}</span>
-                      <span className="bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-lg truncate max-w-[180px]">{req.medicalCouncil || req.nursingCouncil || "National Council"}</span>
+                    <div className="flex flex-wrap gap-2 items-center text-[10px] font-mono font-bold text-slate-600 lg:flex-1">
+                      <span className="bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-none">Lic: {req.licenseNumber}</span>
+                      <span className="bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-none truncate max-w-[180px]">{req.medicalCouncil || req.nursingCouncil || "National Council"}</span>
                     </div>
 
                     <div className="flex items-center gap-2 self-stretch lg:self-auto justify-end mt-2 lg:mt-0" onClick={(e) => e.stopPropagation()}>
                       <button
                         type="button"
                         onClick={() => setSelectedModalRequest(req)}
-                        className="text-xs font-bold py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all shadow-3xs flex items-center gap-1 cursor-pointer"
+                        className="h-10 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-none border border-slate-300 transition-all text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
                       >
                         <Eye className="h-3.5 w-3.5" />
                         <span>Details</span>
@@ -437,7 +437,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                       <button
                         type="button"
                         onClick={() => setSelectedModalRequest(req)}
-                        className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white rounded-xl py-2 px-3 text-xs font-bold flex items-center gap-1 shadow-3xs transition-all cursor-pointer"
+                        className="h-10 px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] active:bg-slate-900 text-white rounded-none text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-none"
                       >
                         <Check className="h-3.5 w-3.5" />
                         <span>Review</span>
@@ -451,8 +451,8 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
               return (
                 <div 
                   key={req.id} 
-                  className={`border border-slate-100 rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-5 relative overflow-hidden ${
-                    isApprovedInLoop ? "bg-emerald-50/50 border-emerald-200" : "bg-slate-50/30"
+                  className={`border rounded-none p-5 transition-all flex flex-col justify-between gap-5 relative overflow-hidden ${
+                    isApprovedInLoop ? "bg-emerald-50/50 border-emerald-300" : "bg-white border-slate-250"
                   }`}
                 >
                   <div className="space-y-4 flex-1">
@@ -460,52 +460,52 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                       <img 
                         src={reqAvatar} 
                         alt={reqName}
-                        className="h-14 w-14 rounded-xl object-cover border border-slate-200 shrink-0"
+                        className="h-14 w-14 rounded-none object-cover border border-slate-300 shrink-0"
                         referrerPolicy="no-referrer"
                       />
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="text-sm font-extrabold text-slate-800">{reqName}</h4>
-                          <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded ${
-                            reqRole === UserRole.DOCTOR ? "bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]" : "bg-emerald-50 text-emerald-800 border border-emerald-100"
+                          <h4 className="text-sm font-black text-slate-900">{reqName}</h4>
+                          <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-none border ${
+                            reqRole === UserRole.DOCTOR ? "bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]" : "bg-emerald-50 text-emerald-800 border-emerald-200"
                           }`}>
                             {reqRole === UserRole.DOCTOR ? "Doctor" : "Registered Nurse"}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-500 mt-1 font-semibold">{reqSpecialization} specialist</p>
+                        <p className="text-xs text-slate-500 mt-1 font-bold">{reqSpecialization} specialist</p>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                      <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
-                        <span className="text-[10px] text-slate-400 font-bold block uppercase">Submitted License</span>
-                        <code className="text-xs font-bold font-mono text-slate-800 mt-0.5 block">{req.licenseNumber}</code>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                      <div className="bg-slate-50 p-3 rounded-none border border-slate-200">
+                        <span className="text-[10px] text-slate-500 font-black block uppercase tracking-wide">Submitted License</span>
+                        <code className="text-xs font-bold font-mono text-slate-900 mt-0.5 block">{req.licenseNumber}</code>
                       </div>
-                      <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
-                        <span className="text-[10px] text-slate-400 font-bold block uppercase">Council Registry</span>
-                        <p className="text-xs font-semibold text-slate-700 mt-0.5 leading-none">{req.medicalCouncil || req.nursingCouncil || "National Council"}</p>
+                      <div className="bg-slate-50 p-3 rounded-none border border-slate-200">
+                        <span className="text-[10px] text-slate-500 font-black block uppercase tracking-wide">Council Registry</span>
+                        <p className="text-xs font-bold text-slate-800 mt-0.5 truncate">{req.medicalCouncil || req.nursingCouncil || "National Council"}</p>
                       </div>
-                      <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
-                        <span className="text-[10px] text-slate-400 font-bold block uppercase">Primary Degree</span>
-                        <p className="text-xs font-semibold text-slate-700 mt-0.5 leading-none">{reqEducation}</p>
+                      <div className="bg-slate-50 p-3 rounded-none border border-slate-200">
+                        <span className="text-[10px] text-slate-500 font-black block uppercase tracking-wide">Primary Degree</span>
+                        <p className="text-xs font-bold text-slate-800 mt-0.5 truncate">{reqEducation}</p>
                       </div>
                     </div>
 
                     <div>
-                      <span className="text-[10px] text-slate-400 font-bold block uppercase mb-1">Onboarding Philosophy & Bio</span>
-                      <p className="text-xs text-slate-600 leading-relaxed font-medium bg-white p-3.5 rounded-xl border border-slate-100 italic">
+                      <span className="text-[10px] text-slate-500 font-black block uppercase tracking-wide mb-1">Onboarding Philosophy & Bio</span>
+                      <p className="text-xs text-slate-650 leading-relaxed font-semibold bg-slate-50 p-3.5 rounded-none border border-slate-200 italic">
                         "{reqBio}"
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex flex-row justify-end gap-2 shrink-0 border-t border-slate-100 pt-4 mt-2">
+                  <div className="flex flex-row justify-end gap-2 shrink-0 border-t border-slate-200 pt-4 mt-2">
                     <button
                       onClick={() => setSelectedModalRequest(req)}
-                      className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white rounded-xl py-2 px-5 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                      className="h-10 px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] active:bg-slate-900 text-white rounded-none text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-none"
                     >
                       <Check className="h-4 w-4" />
-                      Review application
+                      <span>Review Application</span>
                     </button>
                   </div>
                 </div>
@@ -518,19 +518,19 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
       {/* Verification Details Modal Overlay */}
       {selectedModalRequest && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-100/80 backdrop-blur-xs animate-fade-in"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
           onClick={() => setSelectedModalRequest(null)}
           id="admin-credentials-backdrop"
         >
           <div 
-            className="relative bg-white border-[3px] border-[color:var(--t-200)] rounded-[28px] max-w-xl w-full p-6 shadow-2xl flex flex-col justify-between overflow-hidden scale-100 transition-all duration-300"
+            className="relative bg-white border-2 border-[color:var(--t-600)] rounded-none max-w-xl w-full p-6 shadow-2xl flex flex-col justify-between overflow-hidden"
             onClick={(e) => e.stopPropagation()}
             id="admin-credentials-modal-card"
           >
             {/* Close button */}
             <button
               onClick={() => setSelectedModalRequest(null)}
-              className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer z-10"
+              className="absolute top-4 right-4 h-8 w-8 rounded-none text-slate-400 hover:text-slate-800 hover:bg-slate-100 border border-transparent hover:border-slate-300 transition-all cursor-pointer z-10 flex items-center justify-center"
               title="Close"
             >
               <X className="h-4 w-4" />
@@ -541,18 +541,18 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 <img 
                   src={selectedModalRequest.avatar || (selectedModalRequest.userType === UserRole.DOCTOR || selectedModalRequest.role === UserRole.DOCTOR ? "/assets/malaysian_female_doctor.jpg" : "/assets/malaysian_female_nurse.jpg")} 
                   alt={selectedModalRequest.userName || selectedModalRequest.name}
-                  className="h-20 w-20 rounded-xl object-cover border border-slate-200 shadow-sm"
+                  className="h-16 w-16 rounded-none object-cover border border-slate-300"
                   referrerPolicy="no-referrer"
                 />
                 <div className="space-y-1">
-                  <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded border ${
+                  <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-none border ${
                     (selectedModalRequest.userType || selectedModalRequest.role) === UserRole.DOCTOR 
                       ? "bg-[color:var(--t-50)] text-[color:var(--t-600)] border-[color:var(--t-200)]" 
-                      : "bg-emerald-50 text-emerald-850 border-emerald-100"
+                      : "bg-emerald-50 text-emerald-850 border-emerald-200"
                   }`}>
                     {(selectedModalRequest.userType || selectedModalRequest.role) === UserRole.DOCTOR ? "Doctor Application" : "Nurse Application"}
                   </span>
-                  <h3 className="font-sans text-xl font-semibold text-slate-800 leading-tight">
+                  <h3 className="font-sans text-lg font-black text-slate-900 leading-tight">
                     {selectedModalRequest.userName || selectedModalRequest.name}
                   </h3>
                   <p className="text-xs text-slate-500 font-bold flex items-center gap-1.5">
@@ -563,38 +563,38 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
               </div>
 
               {/* Submitted Licenses details info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-slate-50 border border-slate-150 p-3.5 rounded-xl">
-                  <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider mb-1">State License Key</span>
-                  <code className="font-mono text-sm font-bold text-slate-800">{selectedModalRequest.licenseNumber}</code>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-none">
+                  <span className="text-[10px] text-slate-500 font-black uppercase block tracking-wider mb-1">State License Key</span>
+                  <code className="font-mono text-sm font-bold text-slate-900">{selectedModalRequest.licenseNumber}</code>
                 </div>
-                <div className="bg-slate-50 border border-slate-150 p-3.5 rounded-xl">
-                  <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider mb-1">Assigned Medical Council</span>
-                  <p className="text-xs font-bold text-slate-750">{selectedModalRequest.medicalCouncil || selectedModalRequest.nursingCouncil || "National Regulatory Board"}</p>
+                <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-none">
+                  <span className="text-[10px] text-slate-500 font-black uppercase block tracking-wider mb-1">Assigned Medical Council</span>
+                  <p className="text-xs font-bold text-slate-800">{selectedModalRequest.medicalCouncil || selectedModalRequest.nursingCouncil || "National Regulatory Board"}</p>
                 </div>
               </div>
 
               {/* Bio block */}
               <div className="space-y-1.5">
-                <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider">Statement of Clinical Philosophy</span>
-                <p className="text-xs text-slate-650 italic bg-slate-50/50 p-4 border-l-3 border-[color:var(--t-200)] rounded-r-xl leading-relaxed">
+                <span className="text-[10px] text-slate-500 font-black uppercase block tracking-wider">Statement of Clinical Philosophy</span>
+                <p className="text-xs text-slate-700 italic bg-slate-50 p-4 border-l-4 border-[color:var(--t-600)] rounded-none leading-relaxed font-semibold">
                   "{selectedModalRequest.bio || "Applicant is seeking medical or nurse credential verification."}"
                 </p>
               </div>
 
               {/* Credentials scans and PDF attachments */}
               <div className="space-y-2">
-                <span className="text-[10px] text-slate-400 font-extrabold uppercase block tracking-wider">Proof of Registry & Certifications</span>
+                <span className="text-[10px] text-slate-500 font-black uppercase block tracking-wider">Proof of Registry & Certifications</span>
                 <RequestDocuments requestId={selectedModalRequest.id} />
               </div>
             </div>
 
-            <p className="mt-4 text-xs text-slate-600">Licence expiry on file: <strong>{professionals.find(p => p.id === selectedModalRequest.userId)?.licenseExpiry || 'none'}</strong></p>
+            <p className="mt-4 text-xs text-slate-600 font-semibold">Licence expiry on file: <strong className="font-mono">{professionals.find(p => p.id === selectedModalRequest.userId)?.licenseExpiry || 'none'}</strong></p>
             <ReviewActions request={selectedModalRequest} onDone={handleDecisionDone} />
             <div className="mt-3 flex justify-end">
               <button
                 onClick={() => setSelectedModalRequest(null)}
-                className="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-extrabold rounded-xl border-2 border-slate-200 transition-all cursor-pointer"
+                className="h-10 px-5 bg-white hover:bg-slate-100 text-slate-800 text-xs font-black uppercase tracking-wider rounded-none border border-slate-300 transition-all cursor-pointer"
               >
                 Close
               </button>
@@ -662,16 +662,16 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
           </div>
 
           {/* Search, Filter, and Custom Form Toggle Row */}
-          <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-xl shadow-xs space-y-4">
+          <div className="bg-white border border-[color:var(--t-200)] p-5 shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="flex-1 w-full max-w-md relative">
                 <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Search installed packages..."
+                  placeholder="Search installed clinical packages…"
                   value={packageSearch}
                   onChange={(e) => setPackageSearch(e.target.value)}
-                  className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] transition-all"
+                  className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white h-12 pl-10 pr-4 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors"
                 />
               </div>
 
@@ -679,7 +679,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 <button
                   type="button"
                   onClick={() => setShowCustomForm(!showCustomForm)}
-                  className="w-full sm:w-auto px-4 py-2.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  className="w-full sm:w-auto px-5 h-12 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
                 >
                   <Plus className="h-4 w-4" />
                   <span>Compile Custom Package</span>
@@ -688,15 +688,15 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
             </div>
 
             {/* Category filtering tags */}
-            <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-[color:var(--t-100)]">
               {['All', 'Patient Services', 'Clinical Operations', 'SEO & Growth', 'Communication', 'Credentialing', 'Custom Extension'].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setPackageCategoryFilter(cat)}
-                  className={`px-3 py-1.5 rounded-lg text-[10px] font-bold border transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 text-[11px] font-bold border transition-colors cursor-pointer ${
                     packageCategoryFilter === cat
                       ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white shadow-xs'
-                      : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                      : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'
                   }`}
                 >
                   {cat}
@@ -707,16 +707,16 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
 
           {/* Custom Package Form */}
           {showCustomForm && (
-            <form onSubmit={handleCreateCustomPackage} className="bg-[color:var(--t-50)]/40 border-2 border-[color:var(--t-200)] p-6 rounded-xl shadow-md space-y-5 animate-fade-in">
+            <form onSubmit={handleCreateCustomPackage} className="bg-white border-2 border-[color:var(--t-600)] p-6 shadow-md space-y-5 animate-fade-in">
               <div className="flex items-center justify-between border-b border-[color:var(--t-200)] pb-3">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="h-4.5 w-4.5 text-[color:var(--t-600)]" />
-                  <h4 className="text-sm font-bold text-slate-900">Custom Package Compiler</h4>
+                  <FileText className="h-5 w-5 text-[color:var(--t-600)]" />
+                  <h4 className="text-sm font-bold uppercase tracking-wider text-[color:var(--ink)]">Custom Package Compiler</h4>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowCustomForm(false)}
-                  className="p-1 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-700"
+                  className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-700 cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -724,49 +724,49 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-slate-600 uppercase">Package Unique ID *</label>
+                  <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wider">Package Unique ID *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. diagnostics-charting"
                     value={newPkgId}
                     onChange={(e) => setNewPkgId(e.target.value)}
-                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-700 outline-none focus:border-[color:var(--t-600)]"
+                    className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white h-12 px-3 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)]"
                   />
                 </div>
 
                 <div className="space-y-1.5 col-span-2">
-                  <label className="block text-[10px] font-bold text-slate-600 uppercase">Package Name *</label>
+                  <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wider">Package Name *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Real-Time Vitals Charting Engine"
                     value={newPkgName}
                     onChange={(e) => setNewPkgName(e.target.value)}
-                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-700 outline-none focus:border-[color:var(--t-600)]"
+                    className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white h-12 px-3 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)]"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-bold text-slate-600 uppercase">Package Functional Description *</label>
+                <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wider">Package Functional Description *</label>
                 <textarea
                   required
                   rows={2}
-                  placeholder="Explain exactly what features this modular package mounts in the system, its integration, and patient impact..."
+                  placeholder="Explain exactly what features this modular package mounts in the system, its integration, and patient impact…"
                   value={newPkgDesc}
                   onChange={(e) => setNewPkgDesc(e.target.value)}
-                  className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-medium text-slate-700 outline-none focus:border-[color:var(--t-600)]"
+                  className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white p-3 text-xs font-medium text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)]"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-slate-600 uppercase">Category</label>
+                  <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wider">Category</label>
                   <select
                     value={newPkgCategory}
                     onChange={(e) => setNewPkgCategory(e.target.value)}
-                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 cursor-pointer outline-none focus:border-[color:var(--t-600)]"
+                    className="w-full bg-white border border-[color:var(--t-200)] h-12 px-3 text-xs font-bold text-[color:var(--ink)] cursor-pointer outline-none focus:border-[color:var(--t-600)]"
                   >
                     {['Patient Services', 'Clinical Operations', 'SEO & Growth', 'Communication', 'Credentialing', 'Custom Extension'].map(cat => (
                       <option key={cat} value={cat}>{cat}</option>
@@ -775,11 +775,11 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-slate-600 uppercase">Lucide Icon Badge</label>
+                  <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wider">Lucide Icon Badge</label>
                   <select
                     value={newPkgIcon}
                     onChange={(e) => setNewPkgIcon(e.target.value)}
-                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 cursor-pointer outline-none focus:border-[color:var(--t-600)]"
+                    className="w-full bg-white border border-[color:var(--t-200)] h-12 px-3 text-xs font-bold text-[color:var(--ink)] cursor-pointer outline-none focus:border-[color:var(--t-600)]"
                   >
                     {['Activity', 'CreditCard', 'TrendingUp', 'Heart', 'Search', 'Calendar', 'BookOpen', 'PlusCircle', 'MessageSquare', 'Globe'].map(ic => (
                       <option key={ic} value={ic}>{ic} Icon</option>
@@ -788,24 +788,24 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-slate-600 uppercase">Version</label>
+                  <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wider">Version</label>
                   <input
                     type="text"
                     placeholder="e.g. 1.0.0"
                     value={newPkgVersion}
                     onChange={(e) => setNewPkgVersion(e.target.value)}
-                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-700 outline-none focus:border-[color:var(--t-600)]"
+                    className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white h-12 px-3 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)]"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-slate-600 uppercase">Package Author</label>
+                  <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wider">Package Author</label>
                   <input
                     type="text"
                     placeholder="e.g. Clinical Ops Admin"
                     value={newPkgAuthor}
                     onChange={(e) => setNewPkgAuthor(e.target.value)}
-                    className="w-full bg-white border-2 border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-700 outline-none focus:border-[color:var(--t-600)]"
+                    className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white h-12 px-3 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)]"
                   />
                 </div>
               </div>
@@ -814,16 +814,16 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 <button
                   type="button"
                   onClick={() => setShowCustomForm(false)}
-                  className="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-extrabold rounded-xl border border-slate-200 transition-all cursor-pointer"
+                  className="h-12 px-5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-300 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isCompiling}
-                  className="px-5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold rounded-xl shadow-md flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                  className="h-12 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold shadow-xs flex items-center gap-2 disabled:opacity-50 cursor-pointer transition-colors"
                 >
-                  {isCompiling ? <Loader className="h-4 w-4 animate-spin" /> : <Settings className="h-4 w-4 animate-spin" />}
+                  {isCompiling ? <Loader className="h-4 w-4 animate-spin" /> : <Settings className="h-4 w-4" />}
                   <span>Compile & Hot-Install Package</span>
                 </button>
               </div>
@@ -837,7 +837,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
               <span>Installed Packages ({packages.length})</span>
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {packages
                 .filter(p => {
                   const matchSearch = p.name.toLowerCase().includes(packageSearch.toLowerCase()) || p.description.toLowerCase().includes(packageSearch.toLowerCase());
@@ -848,16 +848,16 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                   return (
                     <div
                       key={pkg.id}
-                      className={`bg-white border-2 rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between gap-5 ${
+                      className={`bg-white border rounded-none p-5 shadow-none transition-all flex flex-col justify-between gap-5 ${
                         pkg.isEnabled
-                          ? 'border-slate-200/90'
-                          : 'border-slate-200 bg-slate-50/60 opacity-75'
+                          ? 'border-[color:var(--t-200)]'
+                          : 'border-slate-250 bg-slate-50/70 opacity-80'
                       }`}
                     >
                       <div className="space-y-3">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex items-center gap-3">
-                            <div className={`p-2.5 rounded-xl border shrink-0 ${
+                            <div className={`p-2.5 rounded-none border shrink-0 ${
                               pkg.isEnabled
                                 ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-600)]'
                                 : 'bg-slate-100 border-slate-200 text-slate-400'
@@ -865,46 +865,46 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                               {renderIcon(pkg.icon)}
                             </div>
                             <div>
-                              <h4 className="text-xs font-extrabold text-slate-800 leading-tight flex items-center gap-1.5 flex-wrap">
+                              <h4 className="text-xs font-black text-slate-800 leading-tight flex items-center gap-1.5 flex-wrap">
                                 {pkg.name}
-                                <span className="bg-slate-100 border border-slate-250 text-slate-500 font-mono text-[9px] px-1.5 py-0.5 rounded-md">v{pkg.version}</span>
+                                <span className="bg-slate-100 border border-slate-200 text-slate-600 font-mono text-[9px] px-1.5 py-0.5 rounded-none font-bold">v{pkg.version}</span>
                               </h4>
-                              <span className="text-[9px] text-slate-400 font-bold block mt-1">by {pkg.author}</span>
+                              <span className="text-[10px] text-slate-400 font-bold block mt-1 tracking-wide">by {pkg.author}</span>
                             </div>
                           </div>
 
-                          <span className={`text-[9px] font-extrabold px-2 py-1 rounded-lg border uppercase tracking-wider shrink-0 ${
+                          <span className={`text-[9px] font-black px-2.5 py-1 rounded-none border uppercase tracking-wider shrink-0 ${
                             pkg.isEnabled
-                              ? 'bg-emerald-50 border-emerald-150 text-emerald-800'
-                              : 'bg-amber-50 border-amber-150 text-amber-850'
+                              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                              : 'bg-amber-50 border-amber-200 text-amber-800'
                           }`}>
                             {pkg.isEnabled ? 'Enabled' : 'Disabled'}
                           </span>
                         </div>
 
-                        <p className="text-xs text-slate-550 leading-relaxed font-semibold">
+                        <p className="text-xs text-slate-600 leading-relaxed font-semibold">
                           {pkg.description}
                         </p>
                       </div>
 
                       <div className="flex items-center justify-between border-t border-slate-100 pt-4 mt-1">
                         <div className="flex items-center gap-2">
-                          {/* Toggle switch */}
+                          {/* Toggle switch (Crisp industrial rectangle) */}
                           <button
                             type="button"
                             onClick={() => handleTogglePackage(pkg.id)}
-                            className={`relative inline-flex h-5.5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                              pkg.isEnabled ? 'bg-[color:var(--t-600)]' : 'bg-slate-300'
+                            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-none border border-slate-300 transition-colors duration-150 ease-in-out focus:outline-none ${
+                              pkg.isEnabled ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)]' : 'bg-slate-200'
                             }`}
                           >
                             <span
-                              className={`pointer-events-none inline-block h-4.5 w-4.5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
-                                pkg.isEnabled ? 'translate-x-4.5' : 'translate-x-0'
+                              className={`pointer-events-none inline-block h-5 w-5 transform rounded-none bg-white shadow-none transition duration-150 ease-in-out ${
+                                pkg.isEnabled ? 'translate-x-5' : 'translate-x-0'
                               }`}
                             />
                           </button>
-                          <span className="text-[10px] font-bold text-slate-500">
-                            {pkg.isEnabled ? 'Active in Runtime' : 'Mounted / Disabled'}
+                          <span className="text-[10px] font-extrabold text-slate-600 uppercase tracking-wide">
+                            {pkg.isEnabled ? 'Active in Runtime' : 'Disabled'}
                           </span>
                         </div>
 
@@ -912,14 +912,15 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                           <button
                             type="button"
                             onClick={() => handleUninstallPackage(pkg.id)}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-transparent hover:border-rose-100 transition-all cursor-pointer"
+                            className="h-8 px-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-none border border-transparent hover:border-rose-200 transition-all cursor-pointer flex items-center gap-1 text-[11px] font-bold"
                             title="Uninstall & Remove Package"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-3.5 w-3.5" />
+                            <span>Remove</span>
                           </button>
                         ) : (
-                          <span className="text-[9px] font-extrabold text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded uppercase">
-                            Core Core-Module
+                          <span className="text-[9px] font-black text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-none uppercase tracking-wider">
+                            Core Module
                           </span>
                         )}
                       </div>
@@ -930,21 +931,21 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
           </div>
 
           {/* Cloud Registry Marketplace */}
-          <div className="bg-slate-100 text-slate-800 p-6 rounded-xl border border-slate-200 space-y-6">
+          <div className="bg-slate-50 text-slate-800 p-6 rounded-none border border-[color:var(--t-200)] space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="space-y-1">
-                <span className="text-[10px] font-extrabold text-[color:var(--t-600)] uppercase tracking-wider block">Official Extensions Registry</span>
-                <h3 className="text-base font-extrabold text-slate-800 leading-tight">MediCert Cloud Marketplace</h3>
+                <span className="text-[10px] font-black text-[color:var(--t-600)] uppercase tracking-wider block">Official Extensions Registry</span>
+                <h3 className="text-base font-black text-slate-800 leading-tight">MediCert Cloud Marketplace</h3>
                 <p className="text-xs text-slate-500 font-semibold leading-relaxed">Expand clinical compliance and services with plug-ins.</p>
               </div>
-              <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-3 py-1.5 rounded-xl text-[10px] font-bold text-[color:var(--t-600)] flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-xs animate-pulse"></span>
+              <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-3 py-1.5 rounded-none text-[10px] font-black text-[color:var(--t-600)] flex items-center gap-1.5 uppercase tracking-wider">
+                <span className="w-2 h-2 bg-emerald-500 rounded-none animate-pulse"></span>
                 <span>Registry Server Active</span>
               </div>
             </div>
 
             {MARKETPLACE_ADDONS.filter(addon => !packages.some(p => p.id === addon.id)).length === 0 ? (
-              <div className="text-center py-8 border border-dashed border-slate-300 rounded-xl bg-white/50">
+              <div className="text-center py-8 border border-dashed border-slate-300 rounded-none bg-white">
                 <CheckCircle2 className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
                 <h4 className="text-xs font-bold text-slate-700">All Available Marketplace Add-ons Installed</h4>
                 <p className="text-[10px] text-slate-400 font-medium mt-1">Your MediCert workspace is running the maximum suite configuration.</p>
@@ -954,21 +955,21 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 {MARKETPLACE_ADDONS
                   .filter(addon => !packages.some(p => p.id === addon.id))
                   .map((addon) => (
-                    <div key={addon.id} className="bg-white border border-slate-200 hover:border-[color:var(--t-200)] p-4.5 rounded-xl flex flex-col justify-between gap-4 transition-all text-slate-700 shadow-3xs">
+                    <div key={addon.id} className="bg-white border border-slate-200 hover:border-[color:var(--t-200)] p-4.5 rounded-none flex flex-col justify-between gap-4 transition-all text-slate-700 shadow-none">
                       <div className="space-y-2.5">
                         <div className="flex items-center justify-between gap-3">
-                          <span className="bg-slate-50 text-slate-500 border border-slate-200 font-mono text-[8px] px-1.5 py-0.5 rounded">v{addon.version}</span>
-                          <span className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] text-[8px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wide">{addon.category}</span>
+                          <span className="bg-slate-50 text-slate-600 border border-slate-200 font-mono text-[9px] px-1.5 py-0.5 rounded-none font-bold">v{addon.version}</span>
+                          <span className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] text-[9px] font-black px-1.5 py-0.5 rounded-none uppercase tracking-wide">{addon.category}</span>
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <div className="p-1.5 bg-[color:var(--t-50)] text-[color:var(--t-600)] rounded-lg shrink-0">
+                          <div className="p-1.5 bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] rounded-none shrink-0">
                             {renderIcon(addon.icon, "h-4 w-4")}
                           </div>
-                          <h4 className="text-xs font-extrabold text-slate-800 truncate">{addon.name}</h4>
+                          <h4 className="text-xs font-black text-slate-800 truncate">{addon.name}</h4>
                         </div>
 
-                        <p className="text-[10px] text-slate-500 font-semibold leading-relaxed line-clamp-3">
+                        <p className="text-[11px] text-slate-500 font-semibold leading-relaxed line-clamp-3">
                           {addon.description}
                         </p>
                       </div>
@@ -976,9 +977,9 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                       <button
                         type="button"
                         onClick={() => handleInstallPackage(addon)}
-                        className="w-full py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-600)] active:bg-[color:var(--dark)] text-white rounded-xl text-[10px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm shadow-rose-500/15"
+                        className="w-full h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] active:bg-slate-900 text-white rounded-none text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-none"
                       >
-                        <Download className="h-3 w-3" />
+                        <Download className="h-3.5 w-3.5" />
                         <span>Hot-Install Package</span>
                       </button>
                     </div>

@@ -74,7 +74,7 @@ export default function DashboardHeader<T extends string>({
         </div>
       )}
 
-      {children && <div className="relative px-5 sm:px-7 pb-5">{children}</div>}
+      {children && <div className="relative px-5 sm:px-7 py-5">{children}</div>}
 
       {tabs && tabs.length > 0 && (
         <div role="tablist" aria-label={tabsLabel} className="relative flex gap-1 overflow-x-auto overflow-y-hidden px-3 sm:px-5 border-t border-[color:var(--t-200)] bg-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -125,7 +125,7 @@ export const bannerSecondaryBtn =
 /** Two-column row: identity on the left, KPIs and actions on the right. */
 export function BannerRow({ identity, aside }: { identity: React.ReactNode; aside?: React.ReactNode }) {
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pt-1">
+    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
       {identity}
       {aside && <div className="flex items-center gap-4 flex-wrap lg:justify-end border-t lg:border-t-0 border-[color:var(--t-200)]/80 pt-4 lg:pt-0 shrink-0">{aside}</div>}
     </div>

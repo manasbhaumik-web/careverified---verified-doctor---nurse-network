@@ -160,6 +160,57 @@ main {
 }
 
 /* -------------------------------------------------------------
+ * APPLICATION COLOR SCHEME BORDER ENFORCEMENT:
+ * Eliminates all black and generic gray/slate borders across the entire app.
+ * Dynamically maps them to the application color system:
+ * - Default & hairline borders -> var(--t-200)
+ * - Light surface dividers     -> var(--t-100)
+ * - Medium dividers            -> var(--t-300)
+ * - Deep dark borders          -> var(--t-800)
+ * ------------------------------------------------------------- */
+*, *::before, *::after {
+  border-color: var(--t-200);
+}
+
+[class*="border-slate-50"],
+[class*="border-slate-100"],
+[class*="border-gray-50"],
+[class*="border-gray-100"] {
+  border-color: var(--t-100) !important;
+}
+
+[class*="border-slate-200"],
+[class*="border-slate-300"],
+[class*="border-gray-200"],
+[class*="border-gray-300"],
+[class*="border-zinc-200"],
+[class*="border-zinc-300"] {
+  border-color: var(--t-200) !important;
+}
+
+[class*="border-slate-400"],
+[class*="border-slate-500"],
+[class*="border-gray-400"],
+[class*="border-gray-500"] {
+  border-color: var(--t-300) !important;
+}
+
+[class*="border-slate-600"],
+[class*="border-slate-700"],
+[class*="border-gray-600"],
+[class*="border-gray-700"] {
+  border-color: var(--t-700) !important;
+}
+
+[class*="border-slate-800"],
+[class*="border-slate-900"],
+[class*="border-gray-800"],
+[class*="border-gray-900"],
+[class*="border-black"] {
+  border-color: var(--t-800) !important;
+}
+
+/* -------------------------------------------------------------
  * APPLICATION DARK FOOTER SYSTEM (High Contrast Dark Slate Palette)
  * ------------------------------------------------------------- */
 
@@ -229,82 +280,198 @@ footer button.bg-slate-800:hover,
   --t-50: #FFF0F2; --t-100: #FFE4E6; --t-200: #FECDD3; --t-300: #FDA4AF; --t-400: #FF8A98;
   --t-500: #E0243F; --t-600: #DC2626; --t-700: #B91C1C; --t-800: #86102A; --t-900: #6B0F24;
   --t-bg: #FFF8F9; --t-hue: 0deg;
+  --band-a: color-mix(in srgb, var(--t-50) 50%, white);
 }
 
 :root[data-theme="teal"] {
   --t-50: #F0FDFA; --t-100: #CCFBF1; --t-200: #99F6E4; --t-300: #5EEAD4; --t-400: #2DD4BF;
   --t-500: #0D9488; --t-600: #0F766E; --t-700: #115E59; --t-800: #134E4A; --t-900: #042F2E;
   --t-bg: #F5FEFC; --t-hue: 175deg;
+  --band-a: color-mix(in srgb, var(--t-50) 50%, white);
   --t-text: var(--t-600);
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
 }
 
 /* -------------------------------------------------------------
- * DARK NAVY THEME
- * Inverts the slate neutral scale (so existing bg-slate-* / text-slate-*
- * utilities flip automatically) and re-tints surfaces and status colours.
+ * DARK NAVY BLUE THEME
+ * Sophisticated deep navy palette (#0A1128) with electric/royal blue accents (#3B82F6 / #60A5FA),
+ * luminous mint signals (#34D399), layered dark glassmorphic surfaces, and crisp high-contrast typography.
  * ------------------------------------------------------------- */
 :root[data-theme="navy"] {
   color-scheme: dark;
-  --t-50: #0F1D3A; --t-100: #14264B; --t-200: #24407A; --t-300: #3B63B0; --t-400: #60A5FA;
-  --t-500: #4F8EF7; --t-600: #3B82F6; --t-700: #2563EB; --t-800: #93C5FD; --t-900: #060E21;
-  --t-bg: #0A1128; --t-hue: 205deg; --t-bright: 0.5;
+
+  /* Brand Blue Palette: 50 is deep dark tint, 600 is electric accent, 800-900 are deepest midnight */
+  --t-50: #0F1D3A;
+  --t-100: #15274E;
+  --t-200: #223F7A;
+  --t-300: #3258A6;
+  --t-400: #60A5FA;
+  --t-500: #4F8EF7;
+  --t-600: #3B82F6;
+  --t-700: #2563EB;
+  --t-800: #0E1A33;
+  --t-900: #060E21;
+
+  --t-bg: #0A1128;
+  --t-hue: 205deg;
+  --t-bright: 0.6;
   --band-a: #0C1730;
-  --t-text: var(--t-600);
-  --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
-  --ink: #E6EDF8; --ink-2: #BCC8DC;
-  --e-50: #0B2B26; --e-200: #14574A; --e-600: #34D399; --e-700: #6EE7B7; --e-800: #6EE7B7;
+
+  /* Text & Primary Actions */
+  --t-text: #60A5FA;
+  --t-btn: #2563EB;
+  --t-btn-hover: #1D4ED8;
+  --ink: #F1F5FB;
+  --ink-2: #CBD5E6;
+
+  /* Luminous Mint/Emerald Status */
+  --e-50: #0B2B26;
+  --e-200: #14574A;
+  --e-600: #10B981;
+  --e-700: #34D399;
+  --e-800: #6EE7B7;
+
+  /* Surface layers */
   --dark: #060E21;
-  --page: #0A1128; --surface: #101C38; --surface-2: #0F1D3A;
+  --page: #0A1128;
+  --surface: #101C38;
+  --surface-2: #0B162C;
 
-  --color-slate-50: #0F1D3A; --color-slate-100: #14264B; --color-slate-200: #22345A;
-  --color-slate-300: #33486F; --color-slate-400: #7A8CAB; --color-slate-500: #94A3BF;
-  --color-slate-600: #B4C0D6; --color-slate-700: #CBD5E6; --color-slate-800: #E2E8F4;
-  --color-slate-900: #F1F5FB; --color-slate-950: #FFFFFF;
+  /* Inverted Slate Scale for automatic dark mode harmony */
+  --color-slate-50: #0F1D3A;
+  --color-slate-100: #15274E;
+  --color-slate-200: #223F7A;
+  --color-slate-300: #3258A6;
+  --color-slate-400: #8899BA;
+  --color-slate-500: #9EB0CE;
+  --color-slate-600: #CBD5E6;
+  --color-slate-700: #E2E8F4;
+  --color-slate-800: #F1F5FB;
+  --color-slate-900: #FFFFFF;
+  --color-slate-950: #FFFFFF;
 
-  --color-emerald-50: #0B2B26; --color-emerald-100: #0F3A32; --color-emerald-200: #14574A;
-  --color-emerald-700: #34D399; --color-emerald-800: #6EE7B7;
-  --color-amber-50: #33270B; --color-amber-100: #3F2F0B; --color-amber-200: #6B4E10;
-  --color-amber-700: #FBBF24; --color-amber-800: #FCD34D;
-  --color-red-50: #3A1216; --color-red-100: #4A171C; --color-red-200: #7A2A31;
-  --color-red-700: #FCA5A5; --color-red-800: #FECACA;
+  /* Luminous Emerald / Success Scale */
+  --color-emerald-50: #0B2B26;
+  --color-emerald-100: #0F3A32;
+  --color-emerald-200: #14574A;
+  --color-emerald-500: #10B981;
+  --color-emerald-600: #34D399;
+  --color-emerald-700: #6EE7B7;
+  --color-emerald-800: #A7F3D0;
+
+  /* Luminous Amber / Warning Scale */
+  --color-amber-50: #33270B;
+  --color-amber-100: #3F2F0B;
+  --color-amber-200: #6B4E10;
+  --color-amber-500: #F59E0B;
+  --color-amber-600: #FBBF24;
+  --color-amber-700: #FCD34D;
+  --color-amber-800: #FEF08A;
+
+  /* Rose / Red Danger Scale */
+  --color-red-50: #3A1216;
+  --color-red-100: #4A171C;
+  --color-red-200: #7A2A31;
+  --color-red-500: #EF4444;
+  --color-red-600: #F87171;
+  --color-red-700: #FCA5A5;
+  --color-red-800: #FECACA;
 }
 
-:root[data-theme="navy"] html, :root[data-theme="navy"] body { background-color: var(--t-bg); }
+:root[data-theme="navy"] html,
+:root[data-theme="navy"] body {
+  background-color: var(--t-bg);
+  color: var(--ink);
+}
 
-/* Surfaces that are literally white in light themes */
+/* Alternating Section Backgrounds: deep navy canvas */
+:root[data-theme="navy"] main > div.bg-white,
+:root[data-theme="navy"] main > section.bg-white {
+  background-color: var(--t-bg) !important;
+}
+
+/* White card surfaces flip to rich navy surface */
 :root[data-theme="navy"] .bg-white,
 :root[data-theme="navy"] .bg-white\/95,
 :root[data-theme="navy"] .bg-white\/90,
 :root[data-theme="navy"] .bg-white\/80,
 :root[data-theme="navy"] .bg-white\/70,
-:root[data-theme="navy"] .bg-white\/60 { background-color: var(--surface); }
+:root[data-theme="navy"] .bg-white\/60 {
+  background-color: var(--surface);
+}
 
-/* Elements that are dark in every theme: keep them dark navy, with light text */
-:root[data-theme="navy"] .bg-slate-900 { background-color: var(--dark); }
+/* Elements that are dark in every theme */
+:root[data-theme="navy"] .bg-slate-900 {
+  background-color: var(--dark);
+}
+:root[data-theme="navy"] .bg-slate-800 {
+  background-color: #0E1A33;
+}
 
-:root[data-theme="navy"] .bg-slate-800 { background-color: #0B1A33; }
+/* Gradients that used white in light mode */
+:root[data-theme="navy"] [class*="from-white"] {
+  --tw-gradient-from: var(--surface) !important;
+}
+:root[data-theme="navy"] [class*="to-white"] {
+  --tw-gradient-to: var(--surface) !important;
+}
+:root[data-theme="navy"] [class*="via-white"] {
+  --tw-gradient-via: var(--t-50) !important;
+}
+:root[data-theme="navy"] #login-section {
+  background-image: linear-gradient(to bottom right, var(--t-50), var(--surface), var(--t-50)) !important;
+}
 
-/* Coloured app header stays deep navy rather than bright accent blue */
-:root[data-theme="navy"] header.sticky { background-color: #0B1B3D !important; border-color: #1E3A6B !important; }
+/* Sticky Navbar & Header */
+:root[data-theme="navy"] nav.sticky,
+:root[data-theme="navy"] header.sticky {
+  background-color: rgba(11, 27, 61, 0.95) !important;
+  border-color: #1E3A6B !important;
+}
 
-/* Footer */
+/* Footer: deep midnight navy */
 :root[data-theme="navy"] footer,
 :root[data-theme="navy"] footer.app-dark-footer,
-:root[data-theme="navy"] .app-dark-footer { background-color: #060E21 !important; border-top-color: #14264B !important; }
-:root[data-theme="navy"] footer *, :root[data-theme="navy"] .app-dark-footer * { border-color: #14264B !important; }
-:root[data-theme="navy"] footer a, :root[data-theme="navy"] .app-dark-footer a { color: #BCC8DC !important; }
-:root[data-theme="navy"] footer a:hover, :root[data-theme="navy"] .app-dark-footer a:hover { color: #FFFFFF !important; }
-
-/* Form controls */
-:root[data-theme="navy"] input, :root[data-theme="navy"] textarea, :root[data-theme="navy"] select {
-  background-color: var(--surface-2); color: var(--ink); border-color: #22345A;
+:root[data-theme="navy"] .app-dark-footer {
+  background-color: #060E21 !important;
+  border-top-color: #15274E !important;
 }
-:root[data-theme="navy"] ::placeholder { color: #7A8CAB; }
+:root[data-theme="navy"] footer *,
+:root[data-theme="navy"] .app-dark-footer * {
+  border-color: #15274E !important;
+}
+:root[data-theme="navy"] footer a,
+:root[data-theme="navy"] .app-dark-footer a {
+  color: #CBD5E6 !important;
+}
+:root[data-theme="navy"] footer a:hover,
+:root[data-theme="navy"] .app-dark-footer a:hover {
+  color: #FFFFFF !important;
+}
 
-/* Light-tinted text that sits on the app header must stay light in the navy theme */
+/* Form controls & Inputs */
+:root[data-theme="navy"] input,
+:root[data-theme="navy"] textarea,
+:root[data-theme="navy"] select {
+  background-color: var(--surface-2) !important;
+  color: var(--ink) !important;
+  border-color: var(--t-200) !important;
+}
+:root[data-theme="navy"] input:focus,
+:root[data-theme="navy"] textarea:focus,
+:root[data-theme="navy"] select:focus {
+  border-color: var(--t-600) !important;
+  box-shadow: 0 0 0 1px var(--t-600) !important;
+}
+:root[data-theme="navy"] ::placeholder {
+  color: #7A8CAB !important;
+}
+
+/* Light-tinted text on app header */
 :root[data-theme="navy"] header.sticky [class*="text-[color:var(--t-1"],
-:root[data-theme="navy"] header.sticky [class*="text-[color:var(--t-2"] { color: #BFD7FF; }
+:root[data-theme="navy"] header.sticky [class*="text-[color:var(--t-2"] {
+  color: #BFD7FF;
+}
 
 /* Hero headline is black-with-white-glow over a photo in light themes; invert for navy */
 :root[data-theme="navy"] header#top h1.text-black,
@@ -323,6 +490,32 @@ footer button.bg-slate-800:hover,
 :root[data-theme="navy"] header#top p.text-black { color: #E6EDF8 !important; text-shadow: none !important; }
 :root[data-theme="navy"] header#top p.text-black .text-black { color: #FFFFFF !important; }
 :root[data-theme="navy"] header#top p.text-black [class*="text-[color:var(--t-600)]"] { color: #7DB4FF; }
+
+/* Emerald Badges, tags & pills */
+:root[data-theme="navy"] .bg-emerald-50 {
+  background-color: #0B2B26 !important;
+  color: #34D399 !important;
+  border-color: #14574A !important;
+}
+:root[data-theme="navy"] .text-emerald-800,
+:root[data-theme="navy"] .text-emerald-700 {
+  color: #34D399 !important;
+}
+:root[data-theme="navy"] .text-emerald-600 {
+  color: #34D399 !important;
+}
+
+/* ThemeSwitcher popup dropdown in Dark Navy */
+:root[data-theme="navy"] [role="listbox"] {
+  background-color: var(--surface) !important;
+  border-color: var(--t-200) !important;
+}
+:root[data-theme="navy"] [role="listbox"] button {
+  color: var(--ink) !important;
+}
+:root[data-theme="navy"] [role="listbox"] button:hover {
+  background-color: var(--t-100) !important;
+}
 
 /* Registration form controls (light panel, matches the sign-in inputs) */
 .form-input, .form-select {
@@ -353,3 +546,26 @@ footer button.bg-slate-800:hover,
   .print-article { position: absolute; inset: 0; max-height: none !important; width: 100% !important; max-width: none !important; box-shadow: none !important; border: 0 !important; }
   .print-article .no-print { display: none !important; }
 }
+
+/* -------------------------------------------------------------
+ * HERO SECTION BACKGROUND IMAGE ANIMATION
+ * Smooth, high-fidelity Ken Burns slow-zoom & breathing motion.
+ * ------------------------------------------------------------- */
+@keyframes heroKenBurns {
+  0% {
+    transform: scale(1.0) translate(0%, 0%);
+  }
+  50% {
+    transform: scale(1.08) translate(-1.2%, -0.8%);
+  }
+  100% {
+    transform: scale(1.04) translate(0.8%, -1.2%);
+  }
+}
+
+.hero-bg-animated {
+  animation: heroKenBurns 24s ease-in-out infinite alternate;
+  will-change: transform;
+  transform-origin: center center;
+}
+

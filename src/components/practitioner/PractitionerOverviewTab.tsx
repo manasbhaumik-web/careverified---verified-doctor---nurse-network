@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, ShieldCheck, FileText, Calendar, ArrowRight, Zap, Check } from 'lucide-react';
+import { Clock, ShieldCheck, FileText, Calendar, ArrowRight, Zap } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking } from '../../types';
 
 interface PractitionerOverviewTabProps {

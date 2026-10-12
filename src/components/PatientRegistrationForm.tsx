@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { 
   UserCheck, ShieldCheck, Mail, Lock, User, Phone, Calendar, 
-  ArrowRight, ArrowLeft, RefreshCw, X, AlertCircle, Sparkles, HeartPulse, Check 
+  ArrowRight, ArrowLeft, RefreshCw, AlertCircle, Check, Activity 
 } from 'lucide-react';
-import { PatientProfile } from '../types';
 
 interface PatientRegistrationFormProps {
   onRegisterSuccess: (user: { id: string; role: 'patient'; name: string; email: string; avatarUrl?: string; profileId?: string | null }, patient?: unknown) => void;
@@ -144,17 +143,18 @@ export default function PatientRegistrationForm({
       <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] rounded-none p-4.5 space-y-3.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[color:var(--t-600)] tracking-wider">
-            <Sparkles className="h-4 w-4" />
+            <Activity className="h-4 w-4" />
             <span>Registration Progress Guide</span>
           </div>
           <span className="text-[10px] text-slate-600 font-mono font-bold">Step {step} of 3</span>
         </div>
         
         {/* Dynamic Timeline Steps */}
-        <div className="flex items-center justify-between relative select-none">
-          {/* Step 1 Indicator */}
-          <div className="flex flex-col items-center z-10">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+        <div className="relative select-none">
+          {/* Row of circles and connecting lines, strictly centered vertically with each other */}
+          <div className="flex items-center">
+            {/* Step 1 Circle */}
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all ${
               step > 1 
                 ? 'bg-[color:var(--t-600)] border-2 border-[color:var(--t-600)] text-white shadow-md' 
                 : step === 1 
@@ -163,14 +163,12 @@ export default function PatientRegistrationForm({
             }`}>
               {step > 1 ? <Check className="h-4 w-4 font-black" /> : <span className="text-xs font-black">1</span>}
             </div>
-            <span className={`text-[9px] font-black uppercase mt-1.5 text-center ${step === 1 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Account Setup</span>
-          </div>
 
-          <div className={`flex-1 h-0.5 mx-2 transition-all ${step > 1 ? 'bg-[color:var(--t-600)]' : 'bg-[color:var(--t-200)]'}`}></div>
+            {/* Line 1 - 2 */}
+            <div className={`flex-1 h-0.5 mx-2 transition-all ${step > 1 ? 'bg-[color:var(--t-600)]' : 'bg-[color:var(--t-200)]'}`}></div>
 
-          {/* Step 2 Indicator */}
-          <div className="flex flex-col items-center z-10">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+            {/* Step 2 Circle */}
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all ${
               step > 2 
                 ? 'bg-[color:var(--t-600)] border-2 border-[color:var(--t-600)] text-white shadow-md' 
                 : step === 2 
@@ -179,21 +177,25 @@ export default function PatientRegistrationForm({
             }`}>
               {step > 2 ? <Check className="h-4 w-4 font-black" /> : <span className="text-xs font-black">2</span>}
             </div>
-            <span className={`text-[9px] font-black uppercase mt-1.5 text-center ${step === 2 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Demographics</span>
-          </div>
 
-          <div className={`flex-1 h-0.5 mx-2 transition-all ${step > 2 ? 'bg-[color:var(--t-600)]' : 'bg-[color:var(--t-200)]'}`}></div>
+            {/* Line 2 - 3 */}
+            <div className={`flex-1 h-0.5 mx-2 transition-all ${step > 2 ? 'bg-[color:var(--t-600)]' : 'bg-[color:var(--t-200)]'}`}></div>
 
-          {/* Step 3 Indicator */}
-          <div className="flex flex-col items-center z-10">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+            {/* Step 3 Circle */}
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all ${
               step === 3 
                 ? 'bg-white border-2 border-[color:var(--t-600)] text-[color:var(--t-600)] ring-4 ring-[color:var(--t-600)]/15' 
                 : 'bg-white border-2 border-[color:var(--t-200)] text-slate-500'
             }`}>
               <span className="text-xs font-black">3</span>
             </div>
-            <span className={`text-[9px] font-black uppercase mt-1.5 text-center ${step === 3 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Medical Background</span>
+          </div>
+
+          {/* Row of labels aligned directly below circles */}
+          <div className="flex items-center justify-between mt-1.5">
+            <span className={`text-[9px] font-black uppercase text-left ${step === 1 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Account Setup</span>
+            <span className={`text-[9px] font-black uppercase text-center ${step === 2 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Demographics</span>
+            <span className={`text-[9px] font-black uppercase text-right ${step === 3 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Medical Background</span>
           </div>
         </div>
       </div>

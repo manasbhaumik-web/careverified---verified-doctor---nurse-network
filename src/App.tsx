@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
-  ShieldCheck, Search, Users, ShieldAlert, Award, FileText,
-  Sparkles, Calendar, BookOpen, Globe, CheckCircle2, RefreshCw,
-  Heart, MessageSquare, AlertTriangle, Menu, X, PlusCircle, UserCheck,
-  Stethoscope, ChevronRight, ChevronLeft, Puzzle, Plus, Trash2,
-  Settings, Download, Activity, CreditCard, TrendingUp, Video, Radio, LifeBuoy, Pill, Store
+  ShieldCheck, Search, Award, FileText,
+  Calendar, BookOpen, Globe, RefreshCw,
+  Heart, MessageSquare, Menu, X, PlusCircle, UserCheck,
+  Stethoscope, Puzzle, Settings, Activity,
+  CreditCard, TrendingUp, Video, Radio, LifeBuoy, Pill, Store, Lock
 } from 'lucide-react';
 
 
@@ -31,9 +31,11 @@ import PatientDashboard from './components/PatientDashboard';
 import PharmacyFinder from './components/PharmacyFinder';
 import PharmacyWorkspace from './components/PharmacyWorkspace';
 import LandingPage from './components/LandingPage';
+import Footer from './components/Footer';
+import LoadingImage from './components/LoadingImage';
 
 // Types import
-import { DoctorProfile, NurseProfile, Booking, Review, JobPost, Article, UserRole, AppPackage } from './types';
+import { DoctorProfile, NurseProfile, Booking, Review, JobPost, Article, AppPackage } from './types';
 import PageBanner from './components/PageBanner';
 
 export default function App() {
@@ -247,7 +249,19 @@ export default function App() {
   };
 
   if (!sessionChecked) {
-    return <div className="min-h-dvh flex items-center justify-center text-sm font-semibold text-slate-500">Loading…</div>;
+    return (
+      <div className="min-h-dvh flex flex-col items-center justify-center bg-[color:var(--t-bg)] text-slate-800 p-6 text-center animate-fade-in">
+        <div className="relative mb-4 flex items-center justify-center">
+          <LoadingImage size={80} />
+        </div>
+        <div className="font-display font-extrabold text-lg text-slate-900 tracking-tight">
+          MedCred<span className="text-[color:var(--t-600)]">.</span>
+        </div>
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">
+          Verifying secure medical session…
+        </p>
+      </div>
+    );
   }
 
   // If not logged in, render landing page
@@ -400,7 +414,7 @@ export default function App() {
           <div className="flex lg:hidden items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="min-h-11 min-w-11 flex items-center justify-center rounded-lg border border-white/60 text-white hover:bg-white/15 cursor-pointer"
+              className="min-h-11 min-w-11 flex items-center justify-center rounded-lg border border-transparent text-white hover:bg-white/15 cursor-pointer"
               aria-label="Toggle navigation"
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -490,25 +504,25 @@ export default function App() {
       {/* Elevated Navigation Bar */}
       <div className="hidden lg:block bg-[color:var(--t-100)]/95 backdrop-blur-md border-b border-[color:var(--t-200)] px-4 sm:px-6 lg:px-8 shrink-0 sticky top-16 z-30 shadow-xs">
         <div className="w-full max-w-[1920px] mx-auto flex items-stretch justify-between gap-4">
-          <div className="flex items-stretch gap-4 py-2 min-w-0">
+          <div className="flex items-stretch min-w-0 flex-1">
 
-            {/* Role is already shown in the header pill, so no duplicate perspective badge here */}
-            {/* Navigation Tabs */}
-            <nav aria-label="Main" className="flex items-center gap-1 xl:gap-1.5 relative z-0 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {/* Navigation Tabs - Full Height & Width Coverage on Hover/Selection */}
+            <nav aria-label="Main" className="flex items-stretch gap-0 relative z-0 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeView === item.id;
                 return (
                   <button
                     key={item.id}
-                    data-active={isActive} onClick={() => { setActiveView(item.id); setSelectedProfId(null); }}
-                    className={`relative flex items-center gap-2 px-3 xl:px-4 py-2 text-xs font-extrabold whitespace-nowrap shrink-0 transition-all duration-200 cursor-pointer select-none rounded-lg border ${
+                    data-active={isActive}
+                    onClick={() => { setActiveView(item.id); setSelectedProfId(null); }}
+                    className={`relative flex items-center gap-2.5 px-4 xl:px-5 h-12 text-xs font-extrabold whitespace-nowrap shrink-0 transition-colors duration-150 cursor-pointer select-none rounded-none border-b-2 border-r border-r-[color:var(--t-200)]/60 first:border-l first:border-l-[color:var(--t-200)]/60 ${
                       isActive
-                        ? 'text-[color:var(--t-600)] bg-white border-[color:var(--t-200)] shadow-xs'
-                        : 'text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-600)] hover:bg-white/60'
+                        ? 'text-[color:var(--t-600)] bg-white border-b-[color:var(--t-600)] shadow-2xs z-10'
+                        : 'text-[color:var(--ink-2)] border-b-transparent hover:text-[color:var(--t-600)] hover:bg-white/80 hover:border-b-[color:var(--t-400)]'
                     }`}
                   >
-                    <Icon className={`h-4 w-4 ${isActive ? 'text-[color:var(--t-600)]' : 'text-slate-400'}`} />
+                    <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? 'text-[color:var(--t-600)]' : 'text-slate-400 group-hover:text-[color:var(--t-600)]'}`} />
                     <span>{item.name}</span>
 
                     {item.id === 'messages' && (
@@ -535,8 +549,8 @@ export default function App() {
                     {isActive && (
                       <motion.div
                         layoutId="activeNavUnderline"
-                        className="absolute left-2 right-2 bottom-0 h-[3px] bg-[color:var(--t-600)]"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                        className="absolute inset-x-0 bottom-[-2px] h-[3px] bg-[color:var(--t-600)]"
+                        transition={{ type: "spring", stiffness: 400, damping: 32 }}
                       />
                     )}
                   </button>
@@ -546,7 +560,7 @@ export default function App() {
           </div>
 
           {/* Right: Registry telemetry indicator */}
-          <div className="hidden 2xl:flex items-center gap-2 self-center shrink-0 whitespace-nowrap bg-white border border-[color:var(--t-200)] px-3.5 py-1.5 rounded-full text-[11px] font-extrabold text-[color:var(--ink)] shadow-xs">
+          <div className="hidden 2xl:flex items-center gap-2 self-center shrink-0 whitespace-nowrap bg-white border border-[color:var(--t-200)] px-3.5 py-1.5 rounded-full text-[11px] font-extrabold text-[color:var(--ink)] shadow-xs my-auto">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
             <span>Board-verified practitioners</span>
           </div>
@@ -557,10 +571,14 @@ export default function App() {
       {/* Primary Screen Area */}
       <main className="flex-grow py-8 px-4 sm:px-6 lg:px-8 w-full max-w-[1920px] mx-auto">
         {loading ? (
-          <div className="text-center py-20 space-y-4">
-            <RefreshCw className="h-10 w-10 text-[color:var(--t-600)] animate-spin mx-auto" />
-            <h3 className="text-sm font-bold text-slate-800">Loading MedCred...</h3>
-            <p className="text-xs text-slate-500 font-semibold">Connecting to medical registry...</p>
+          <div className="text-center py-24 space-y-4 animate-fade-in flex flex-col items-center justify-center">
+            <div className="relative flex items-center justify-center">
+              <LoadingImage size={64} />
+            </div>
+            <div>
+              <h3 className="text-base font-extrabold text-slate-800 tracking-tight">Syncing Clinical Registry…</h3>
+              <p className="text-xs text-slate-500 font-semibold mt-1">Connecting to board verification network</p>
+            </div>
           </div>
         ) : (
           <div className="space-y-8 animate-fade-in">
@@ -690,6 +708,7 @@ export default function App() {
                 onSelectProfessional={(id) => setSelectedProfId(id)}
                 onNavigateToMessages={() => setActiveView('messages')}
                 onConsultNow={() => setActiveView('consult')}
+                onFindDoctors={() => { setActiveView('registry'); setSelectedProfId(null); }}
                 onOpenArticle={(id) => { try { sessionStorage.setItem('open_article', id); } catch { /* ignore */ } setActiveView('articles'); }}
               />
             )}
@@ -786,100 +805,18 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer Sitemap */}
-      <footer className="app-dark-footer bg-[color:var(--dark)] text-slate-300 border-t border-slate-800 pt-10 pb-6 text-xs mt-12 shrink-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-
-          {/* Detailed Sitemap Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-slate-800">
-            {/* Column 1: Brand & Description */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Stethoscope className="h-5 w-5 text-[color:var(--t-600)] animate-pulse" />
-                <span className="font-extrabold text-sm tracking-tight text-white">MedCred</span>
-                <span className="text-[9px] bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Registry</span>
-              </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed font-semibold">
-                National Medical Directory & Verification network connecting licensed doctors and nurses with direct compliance protocols and shift management.
-              </p>
-              <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-bold bg-emerald-950/60 w-max px-2 py-1 rounded border border-emerald-800/40">
-                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>
-                <span>Board-verified practitioners</span>
-              </div>
-            </div>
-
-            {/* Column 2: Portal Sitemap */}
-            <div className="space-y-3">
-              <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Portal Sitemap</h4>
-              <ul className="space-y-2 font-semibold">
-                {navItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeView === item.id;
-                  return (
-                    <li key={item.id}>
-                      <button
-                        onClick={() => { setActiveView(item.id); setSelectedProfId(null); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                        className={`flex items-center gap-2 text-[11px] transition-colors hover:text-white cursor-pointer ${isActive ? 'text-[color:var(--t-600)] font-extrabold' : 'text-slate-300'
-                          }`}
-                      >
-                        <Icon className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-[color:var(--t-600)]' : 'text-slate-400'}`} />
-                        <span>{item.name}</span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-
-            {/* Column 3: Medical Compliance */}
-            <div className="space-y-3">
-              <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Compliance Registry</h4>
-              <ul className="space-y-2 text-[11px] font-semibold text-slate-400">
-                <li className="hover:text-slate-200 cursor-pointer transition-colors">Malaysian Medical Council (MMC)</li>
-                <li className="hover:text-slate-200 cursor-pointer transition-colors">Lembaga Jururawat Malaysia (LJM)</li>
-                <li className="hover:text-slate-200 cursor-pointer transition-colors">Licences checked by the board</li>
-                <li className="hover:text-slate-200 cursor-pointer transition-colors">E-E-A-T Medical Content Standards</li>
-                <li className="hover:text-slate-200 cursor-pointer transition-colors">Kementerian Kesihatan Malaysia (KKM)</li>
-              </ul>
-            </div>
-
-            {/* Column 4: Practitioner & Patient Links */}
-            <div className="space-y-3">
-              <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Global Resources</h4>
-              <p className="text-[11px] text-slate-400 leading-relaxed font-semibold">
-                Log in to alternate credentials to inspect verification terminals, board review portals, and clinical shift scheduling pipelines.
-              </p>
-              <div className="pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleLogout();
-                  }}
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-extrabold rounded-lg border border-slate-700 transition-colors cursor-pointer"
-                >
-                  Sign out
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Copyright & Badges */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[11px]">
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-slate-400 font-bold justify-center">
-              <span className="hover:text-slate-200 cursor-pointer transition-colors">Access to records is logged</span>
-              <span>&bull;</span>
-              <span className="hover:text-slate-200 cursor-pointer transition-colors">MMC Compliance</span>
-              <span>&bull;</span>
-              <span className="hover:text-slate-200 cursor-pointer transition-colors">LJM Registered</span>
-            </div>
-
-            <div className="text-slate-400 font-bold">
-              &copy; {new Date().getFullYear()} MedCred. All rights reserved.
-            </div>
-          </div>
-
-        </div>
-      </footer>
+      {/* ═══════════ STANDARDIZED APPLICATION FOOTER ═══════════ */}
+      <Footer
+        variant="app"
+        navItems={navItems}
+        activeView={activeView}
+        onNavigateView={(viewId) => {
+          setActiveView(viewId);
+          setSelectedProfId(null);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onLogout={handleLogout}
+      />
     </div>
   );
 }

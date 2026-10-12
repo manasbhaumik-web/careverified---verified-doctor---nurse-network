@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { Activity, AlertTriangle, ClipboardList, FileText, FlaskConical, Pill, Share2, Trash2 } from 'lucide-react';
+import { Activity, AlertTriangle, ClipboardList, FileText, FlaskConical, Pill, Share2, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
 
 const jpost = (url: string, body?: unknown, method = 'POST') =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '');
-const field = 'border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--t-600)]';
+const field = 'border border-[color:var(--t-200)] bg-white px-3.5 h-10 text-sm font-medium text-[color:var(--ink)] placeholder-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all';
 
 const FILL_LABEL: Record<string, string> = { received: 'Received by the pharmacy', preparing: 'Being prepared', ready: 'Ready for pickup', cannot_fill: 'The pharmacy could not fill it' };
 const VITAL_LABEL: Record<string, string> = { bp: 'Blood pressure', glucose: 'Blood sugar', heart_rate: 'Heart rate', spo2: 'Oxygen (SpO₂)', temperature: 'Temperature', weight: 'Weight' };
@@ -62,34 +62,71 @@ export default function PatientRecords() {
           </button>
         ))}
       </div>
-      {msg && <p role="status" className={`text-xs font-bold p-2.5 border ${msg.ok ? 'text-emerald-800 bg-emerald-50 border-emerald-200' : 'text-rose-700 bg-rose-50 border-rose-200'}`}>{msg.text}</p>}
+      {msg && (
+        <div
+          role="status"
+          className={`text-xs font-bold p-3 flex items-center justify-between gap-3 border shadow-xs animate-fade-in ${
+            msg.ok
+              ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
+              : 'text-rose-800 bg-rose-50 border-rose-200'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {msg.ok ? <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" /> : <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" />}
+            <span>{msg.text}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setMsg(null)}
+            className="text-[11px] underline cursor-pointer hover:opacity-80 shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {tab === 'overview' && (
         <div className="space-y-5">
           {(['allergy', 'condition', 'medication'] as const).map(t => (
-            <section key={t} className="bg-white border border-slate-200 p-4">
-              <h3 className="text-sm font-extrabold mb-2">{t === 'allergy' ? 'Allergies' : t === 'condition' ? 'Medical conditions' : 'Medicines I take now'}</h3>
-              {data.items.filter((i: any) => i.type === t).length === 0 ? <p className="text-xs text-slate-500">Nothing recorded yet.</p> : (
-                <ul className="divide-y divide-slate-100">
+            <section key={t} className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5">
+              <h3 className="font-display font-black text-sm text-[color:var(--ink)] mb-3 flex items-center gap-2">
+                <span>{t === 'allergy' ? 'Documented Allergies' : t === 'condition' ? 'Chronic Medical Conditions' : 'Active Medications'}</span>
+              </h3>
+              {data.items.filter((i: any) => i.type === t).length === 0 ? (
+                <div className="py-6 px-4 bg-[color:var(--t-50)]/40 border border-dashed border-[color:var(--t-200)] text-center">
+                  <p className="text-xs text-slate-500 font-medium">No {t === 'allergy' ? 'allergies' : t === 'condition' ? 'conditions' : 'medications'} recorded yet.</p>
+                </div>
+              ) : (
+                <ul className="divide-y divide-[color:var(--t-100)]">
                   {data.items.filter((i: any) => i.type === t).map((i: any) => (
-                    <li key={i.id} className="py-2 flex items-center justify-between gap-3 text-sm">
-                      <span><b className={t === 'allergy' ? 'text-rose-700' : ''}>{i.name}</b>{i.severity ? ` (${i.severity})` : ''}{i.detail ? <span className="text-slate-500"> — {i.detail}</span> : null}</span>
-                      <button aria-label={`Remove ${i.name}`} onClick={() => act(() => jpost(`/api/records/items/${i.id}`, undefined, 'DELETE'))} className="text-slate-400 hover:text-rose-600 cursor-pointer"><Trash2 className="h-4 w-4" /></button>
+                    <li key={i.id} className="py-2.5 flex items-center justify-between gap-3 text-xs sm:text-sm">
+                      <span className="min-w-0">
+                        <strong className={t === 'allergy' ? 'text-rose-700 font-bold' : 'text-[color:var(--ink)] font-bold'}>{i.name}</strong>
+                        {i.severity ? <span className="text-[11px] font-mono ml-1 text-slate-500">({i.severity})</span> : ''}
+                        {i.detail ? <span className="text-slate-500"> — {i.detail}</span> : null}
+                      </span>
+                      <button
+                        aria-label={`Remove ${i.name}`}
+                        onClick={() => act(() => jpost(`/api/records/items/${i.id}`, undefined, 'DELETE'))}
+                        className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </li>
                   ))}
                 </ul>
               )}
             </section>
           ))}
-          <form className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap gap-2 items-end" onSubmit={async e => {
+          <form className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 flex flex-wrap gap-3 items-end" onSubmit={async e => {
             e.preventDefault();
             const d = await act(() => jpost('/api/records/items', item), 'Added.');
             if (d.status === 'success') setItem({ ...item, name: '', detail: '' });
           }}>
-            <label className="text-xs font-bold">Type<select className={`${field} block mt-1`} value={item.type} onChange={e => setItem({ ...item, type: e.target.value })}><option value="allergy">Allergy</option><option value="condition">Condition</option><option value="medication">Medicine</option></select></label>
-            <label className="text-xs font-bold flex-1 min-w-[10rem]">Name<input className={`${field} block w-full mt-1`} value={item.name} onChange={e => setItem({ ...item, name: e.target.value })} required maxLength={120} placeholder="e.g. Penicillin" /></label>
-            <label className="text-xs font-bold flex-1 min-w-[10rem]">Details (optional)<input className={`${field} block w-full mt-1`} value={item.detail} onChange={e => setItem({ ...item, detail: e.target.value })} maxLength={300} placeholder="e.g. rash" /></label>
-            <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Add</button>
+            <label className="text-xs font-bold text-slate-700">Type<select className={`${field} block mt-1.5`} value={item.type} onChange={e => setItem({ ...item, type: e.target.value })}><option value="allergy">Allergy</option><option value="condition">Condition</option><option value="medication">Medicine</option></select></label>
+            <label className="text-xs font-bold text-slate-700 flex-1 min-w-[12rem]">Name<input className={`${field} block w-full mt-1.5`} value={item.name} onChange={e => setItem({ ...item, name: e.target.value })} required maxLength={120} placeholder="e.g. Penicillin" /></label>
+            <label className="text-xs font-bold text-slate-700 flex-1 min-w-[12rem]">Details (optional)<input className={`${field} block w-full mt-1.5`} value={item.detail} onChange={e => setItem({ ...item, detail: e.target.value })} maxLength={300} placeholder="e.g. skin rash, mild wheezing" /></label>
+            <button className="h-10 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer border border-[color:var(--t-700)] shadow-xs transition-all">Add Entry</button>
           </form>
           <p className="text-[11px] text-slate-500">Accurate allergies and medicines help doctors prescribe safely. Only practitioners you choose can see this.</p>
         </div>
@@ -97,27 +134,57 @@ export default function PatientRecords() {
 
       {tab === 'vitals' && (
         <div className="space-y-4">
-          <form className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap gap-2 items-end" onSubmit={async e => {
+          <form className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 flex flex-wrap gap-3 items-end" onSubmit={async e => {
             e.preventDefault();
             setVitalFlag(null);
             const d = await act(() => jpost('/api/records/vitals', { kind: vital.kind, value1: Number(vital.value1), value2: vital.kind === 'bp' ? Number(vital.value2) : undefined }), 'Reading saved.');
             if (d.status === 'success') { setVital({ ...vital, value1: '', value2: '' }); setVitalFlag(d.data.flag ? d.data.flag.text : null); }
           }}>
-            <label className="text-xs font-bold">Reading<select className={`${field} block mt-1`} value={vital.kind} onChange={e => setVital({ kind: e.target.value, value1: '', value2: '' })}>{Object.entries(VITAL_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
-            <label className="text-xs font-bold">{vital.kind === 'bp' ? 'Systolic' : 'Value'}<input type="number" step="any" className={`${field} block w-28 mt-1`} value={vital.value1} onChange={e => setVital({ ...vital, value1: e.target.value })} required /></label>
-            {vital.kind === 'bp' && <label className="text-xs font-bold">Diastolic<input type="number" className={`${field} block w-28 mt-1`} value={vital.value2} onChange={e => setVital({ ...vital, value2: e.target.value })} required /></label>}
-            <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Save reading</button>
+            <label className="text-xs font-bold text-slate-700">Reading<select className={`${field} block mt-1.5`} value={vital.kind} onChange={e => setVital({ kind: e.target.value, value1: '', value2: '' })}>{Object.entries(VITAL_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+            <label className="text-xs font-bold text-slate-700">{vital.kind === 'bp' ? 'Systolic' : 'Value'}<input type="number" step="any" className={`${field} block w-32 mt-1.5`} value={vital.value1} onChange={e => setVital({ ...vital, value1: e.target.value })} required /></label>
+            {vital.kind === 'bp' && <label className="text-xs font-bold text-slate-700">Diastolic<input type="number" className={`${field} block w-32 mt-1.5`} value={vital.value2} onChange={e => setVital({ ...vital, value2: e.target.value })} required /></label>}
+            <button className="h-10 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer border border-[color:var(--t-700)] shadow-xs transition-all">Save Reading</button>
           </form>
           {vitalFlag && <p role="alert" className="bg-rose-50 border-2 border-rose-300 text-rose-900 text-sm font-bold p-3 flex gap-2"><AlertTriangle className="h-5 w-5 shrink-0" />{vitalFlag}</p>}
-          <section className="bg-white border border-slate-200 p-4">
-            {data.vitals.length === 0 ? <p className="text-xs text-slate-500">No readings yet.</p> : (
-              <table className="w-full text-xs"><thead><tr className="text-left text-[10px] uppercase text-slate-500"><th className="py-1">Date</th><th>Reading</th><th>Value</th><th /></tr></thead>
-                <tbody>{data.vitals.map((v: any) => (
-                  <tr key={v.id} className="border-t border-slate-100">
-                    <td className="py-1.5">{new Date(v.ts).toLocaleString()}</td><td>{VITAL_LABEL[v.kind]}</td>
-                    <td className={`font-bold tabular-nums ${v.flag?.level === 'urgent' ? 'text-rose-700' : ''}`}>{v.value1}{v.value2 ? `/${v.value2}` : ''} {v.unit}</td>
-                    <td className="text-right"><button aria-label="Delete reading" onClick={() => act(() => jpost(`/api/records/vitals/${v.id}`, undefined, 'DELETE'))} className="text-slate-400 hover:text-rose-600 cursor-pointer"><Trash2 className="h-3.5 w-3.5" /></button></td>
-                  </tr>))}</tbody></table>
+          <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5">
+            <h3 className="font-display font-black text-sm text-[color:var(--ink)] mb-3">Recorded Physiological Readings</h3>
+            {data.vitals.length === 0 ? (
+              <div className="py-6 px-4 bg-[color:var(--t-50)]/40 border border-dashed border-[color:var(--t-200)] text-center">
+                <p className="text-xs text-slate-500 font-medium">No readings recorded yet.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="text-left text-[10px] font-mono font-extrabold uppercase text-slate-500 border-b border-[color:var(--t-200)] pb-2">
+                      <th className="py-2">Date &amp; Time</th>
+                      <th>Metric</th>
+                      <th>Value</th>
+                      <th className="text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[color:var(--t-100)]">
+                    {data.vitals.map((v: any) => (
+                      <tr key={v.id} className="hover:bg-[color:var(--t-50)]/30 transition-colors">
+                        <td className="py-2.5 font-mono text-slate-600">{new Date(v.ts).toLocaleString()}</td>
+                        <td className="font-bold text-[color:var(--ink)]">{VITAL_LABEL[v.kind]}</td>
+                        <td className={`font-mono font-bold ${v.flag?.level === 'urgent' ? 'text-rose-700' : 'text-slate-800'}`}>
+                          {v.value1}{v.value2 ? `/${v.value2}` : ''} {v.unit}
+                        </td>
+                        <td className="text-right">
+                          <button
+                            aria-label="Delete reading"
+                            onClick={() => act(() => jpost(`/api/records/vitals/${v.id}`, undefined, 'DELETE'))}
+                            className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </section>
         </div>
@@ -125,9 +192,14 @@ export default function PatientRecords() {
 
       {tab === 'rx' && (
         <div className="space-y-3">
-          {data.prescriptions.length === 0 && <p className="text-sm text-slate-600 bg-white border border-slate-200 p-4">No prescriptions yet.</p>}
+          {data.prescriptions.length === 0 && (
+            <div className="py-8 px-6 bg-white border border-dashed border-[color:var(--t-200)] text-center">
+              <p className="text-sm font-semibold text-slate-600">No prescriptions issued yet.</p>
+              <p className="text-xs text-slate-400 mt-1">E-prescriptions issued during doctor consultations appear here with tamper-proof QR codes.</p>
+            </div>
+          )}
           {data.prescriptions.map((p: any) => (
-            <article key={p.id} className="bg-white border border-slate-200 p-4 flex flex-wrap gap-4 justify-between">
+            <article key={p.id} className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 flex flex-wrap gap-4 justify-between">
               <div className="space-y-1.5 min-w-[14rem] flex-1">
                 <p className="text-sm font-extrabold">{p.diagnosis}</p>
                 <p className="text-xs text-slate-500">{p.doctor?.name} (licence {p.doctor?.licenseNumber}) · issued {fmt(p.issuedAt)} · valid until {fmt(p.validUntil)}</p>

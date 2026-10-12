@@ -1,5 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { BookOpen, Calendar, Clock, FolderHeart, Heart, Video } from 'lucide-react';
+import { 
+  BookOpen, Calendar, Clock, FolderHeart, Heart, Video, 
+  CheckCircle2, Search, MessageSquare, ShieldCheck, ArrowRight, User
+} from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking } from '../types';
 import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
 import PatientRecords from './PatientRecords';
@@ -15,6 +18,8 @@ interface PatientDashboardProps {
   onConsultNow: () => void;
   /** Opens the Medical Library on a specific article. */
   onOpenArticle: (articleId: string) => void;
+  /** Navigates to the practitioner directory to find/book a doctor */
+  onFindDoctors?: () => void;
 }
 
 type Tab = 'appointments' | 'records' | 'saved';
@@ -24,7 +29,7 @@ const readSaved = (): string[] => {
 };
 
 export default function PatientDashboard({
-  bookings, setBookings, professionals, onSelectProfessional, onNavigateToMessages, onConsultNow, onOpenArticle,
+  bookings, setBookings, professionals, onSelectProfessional, onNavigateToMessages, onConsultNow, onOpenArticle, onFindDoctors,
 }: PatientDashboardProps) {
   const [activeTab, setActiveTab] = useState<Tab>('appointments');
   const [savedIds, setSavedIds] = useState<string[]>(readSaved);
@@ -137,61 +142,284 @@ export default function PatientDashboard({
         />
       </DashboardHeader>
 
-      {msg && <p role="status" className="text-sm font-semibold bg-slate-900 text-white px-4 py-2.5">{msg} <button className="underline ml-3 text-xs cursor-pointer" onClick={() => setMsg(null)}>Dismiss</button></p>}
+      {msg && (
+        <div
+          role="status"
+          className="bg-[color:var(--t-50)] border-l-4 border-l-[color:var(--t-600)] border-t border-r border-b border-[color:var(--t-200)] text-[color:var(--ink)] p-4 flex items-center justify-between gap-3 shadow-xs animate-fade-in"
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <CheckCircle2 className="h-4.5 w-4.5 text-[color:var(--t-600)] shrink-0" />
+            <span className="text-xs sm:text-sm font-bold leading-snug">{msg}</span>
+          </div>
+          <button
+            type="button"
+            className="text-xs font-bold text-[color:var(--t-600)] hover:text-white hover:bg-[color:var(--t-600)] px-3 py-1 bg-white border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer shrink-0"
+            onClick={() => setMsg(null)}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {activeTab === 'appointments' && (
         <div id="panel-appointments" role="tabpanel" aria-labelledby="tab-appointments" tabIndex={0} className="space-y-5">
           {reading.length > 0 && (
-            <section className={card} aria-label="Recommended reading">
-              <h2 className="text-base font-bold mb-3 flex items-center gap-2"><BookOpen className="h-4 w-4 text-[color:var(--t-600)]" /> Recommended by your doctors</h2>
-              <ul className="divide-y divide-slate-100">
+            <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6" aria-label="Recommended reading">
+              <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-[color:var(--t-100)]">
+                <span className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shadow-2xs">
+                  <BookOpen className="h-4 w-4" />
+                </span>
+                <div>
+                  <h2 className="font-display font-black text-base text-[color:var(--ink)] leading-tight">
+                    Doctor Recommended Clinical Articles
+                  </h2>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    Peer-reviewed clinical guidance prescribed for your health record
+                  </p>
+                </div>
+              </div>
+
+              <div className="divide-y divide-[color:var(--t-100)]">
                 {reading.slice(0, 5).map(r => (
-                  <li key={r.id} className="py-3 flex flex-wrap items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold">{r.title} {!r.seen && <span className="ml-1 text-[10px] font-extrabold uppercase bg-[color:var(--t-600)] text-white px-1.5 py-0.5 align-middle">New</span>}</p>
-                      <p className="text-xs text-slate-600">From {r.doctor}{r.note ? `: “${r.note}”` : ''}</p>
+                  <div key={r.id} className="py-3.5 flex flex-wrap items-center justify-between gap-3 group">
+                    <div className="min-w-0 max-w-2xl">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-display font-extrabold text-sm text-[color:var(--ink)] group-hover:text-[color:var(--t-600)] transition-colors">
+                          {r.title}
+                        </h4>
+                        {!r.seen && (
+                          <span className="text-[10px] font-mono font-bold uppercase bg-[color:var(--t-600)] text-white px-2 py-0.5 shadow-2xs">
+                            New
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-600 font-medium flex items-center gap-1.5">
+                        <span className="text-slate-500">Prescribed by</span>
+                        <strong className="text-[color:var(--ink)]">{r.doctor}</strong>
+                        {r.note && (
+                          <span className="italic text-slate-500 before:content-['·_']">
+                            “{r.note}”
+                          </span>
+                        )}
+                      </p>
                     </div>
-                    <button onClick={() => { fetch(`/api/me/recommended-reading/${r.id}/seen`, { method: 'POST' }).catch(() => {}); onOpenArticle(r.articleId); }}
-                      className="border border-slate-200 text-xs font-bold px-4 py-2 cursor-pointer">Read</button>
-                  </li>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        fetch(`/api/me/recommended-reading/${r.id}/seen`, { method: 'POST' }).catch(() => {});
+                        onOpenArticle(r.articleId);
+                      }}
+                      className="min-h-[38px] px-4 bg-white hover:bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] hover:text-[color:var(--t-800)] text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs shrink-0"
+                    >
+                      <span>Read Article</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </section>
           )}
 
-          <section className={card}>
-            <h2 className="text-base font-bold mb-3 flex items-center gap-2"><Clock className="h-4 w-4 text-[color:var(--t-600)]" /> Upcoming appointments</h2>
+          <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-3.5 border-b border-[color:var(--t-100)]">
+              <div className="flex items-center gap-2.5">
+                <span className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shadow-2xs">
+                  <Clock className="h-4 w-4" />
+                </span>
+                <div>
+                  <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
+                    Upcoming Consultations
+                  </h2>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    Confirmed visits and telehealth appointments
+                  </p>
+                </div>
+              </div>
+
+              {upcoming.length > 0 && onFindDoctors && (
+                <button
+                  type="button"
+                  onClick={onFindDoctors}
+                  className="text-xs font-bold text-[color:var(--t-600)] hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <Search className="h-3.5 w-3.5" /> Book Another
+                </button>
+              )}
+            </div>
+
             {upcoming.length === 0 ? (
-              <p className="text-sm text-slate-600">Nothing booked. Find a verified doctor under “Doctors &amp; Nurses”, or use “Consult a doctor now”.</p>
+              <div className="p-8 sm:p-10 text-center flex flex-col items-center justify-center bg-[color:var(--t-50)]/40 border border-dashed border-[color:var(--t-200)] my-1">
+                <div className="w-14 h-14 bg-white border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center mb-3.5 shadow-2xs">
+                  <Calendar className="h-6 w-6 text-[color:var(--t-600)]" />
+                </div>
+                <h3 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] mb-1">
+                  No Scheduled Consultations
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 max-w-md font-medium leading-relaxed mb-6">
+                  You currently have no visits scheduled. Connect immediately with an on-call triage doctor or browse council-verified medical doctors &amp; nurses.
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={onConsultNow}
+                    className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer"
+                  >
+                    <Video className="h-4 w-4" />
+                    <span>Consult a Doctor Now</span>
+                  </button>
+                  {onFindDoctors && (
+                    <button
+                      type="button"
+                      onClick={onFindDoctors}
+                      className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] border border-[color:var(--t-200)] text-xs font-bold shadow-2xs transition-all cursor-pointer"
+                    >
+                      <Search className="h-4 w-4 text-[color:var(--t-600)]" />
+                      <span>Browse Verified Practitioners</span>
+                    </button>
+                  )}
+                </div>
+              </div>
             ) : (
-              <ul className="divide-y divide-slate-100">
-                {upcoming.map(b => (
-                  <li key={b.id} className="py-3 flex flex-wrap items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <button onClick={() => onSelectProfessional(b.professionalId)} className="text-sm font-bold hover:underline cursor-pointer text-left">{b.professionalName}</button>
-                      <p className="text-xs text-slate-600">{b.date} · {b.timeSlot} · {b.mode} · RM {b.fee.toFixed(2)}</p>
-                      {b.paymentStatus === 'Pending' && <p className="text-xs font-bold text-amber-700">Awaiting payment. The slot is held for a short time.</p>}
+              <div className="space-y-3.5">
+                {upcoming.map(b => {
+                  const prof = professionals.find(p => p.id === b.professionalId);
+                  const isPending = b.paymentStatus === 'Pending';
+                  return (
+                    <div
+                      key={b.id}
+                      className="group bg-white p-4 sm:p-5 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs"
+                    >
+                      {/* Left: Professional info & appointment timing */}
+                      <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                        <div className="w-12 h-12 shrink-0 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center text-[color:var(--t-600)] overflow-hidden shadow-2xs">
+                          {prof?.avatar ? (
+                            <img src={prof.avatar} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <User className="h-5 w-5 text-[color:var(--t-600)]" />
+                          )}
+                        </div>
+
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => onSelectProfessional(b.professionalId)}
+                              className="font-display font-black text-sm sm:text-base text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left transition-colors cursor-pointer"
+                            >
+                              {b.professionalName}
+                            </button>
+                            <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
+                              <ShieldCheck className="h-3 w-3 text-emerald-600" /> Council Verified
+                            </span>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-slate-600 font-medium">
+                            <span className="inline-flex items-center gap-1.5 font-bold text-slate-800">
+                              <Calendar className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> {b.date}
+                            </span>
+                            <span className="text-slate-300">&bull;</span>
+                            <span className="inline-flex items-center gap-1.5 font-mono">
+                              <Clock className="h-3.5 w-3.5 text-slate-400" /> {b.timeSlot}
+                            </span>
+                            <span className="text-slate-300">&bull;</span>
+                            <span className="inline-flex items-center gap-1.5">
+                              <Video className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> {b.mode}
+                            </span>
+                            <span className="text-slate-300">&bull;</span>
+                            <span className="font-mono font-bold text-[color:var(--t-700)]">
+                              RM {b.fee.toFixed(2)}
+                            </span>
+                          </div>
+
+                          {isPending && (
+                            <div className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
+                              Awaiting Payment · Slot held temporarily
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right: Actions with Strict Hierarchy */}
+                      <div className="flex flex-wrap items-center gap-2 pt-3 md:pt-0 border-t md:border-t-0 border-[color:var(--t-100)] shrink-0">
+                        {isPending ? (
+                          <button
+                            type="button"
+                            onClick={() => setPaying(b)}
+                            className="min-h-[40px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
+                          >
+                            <span>Pay RM {b.fee.toFixed(2)}</span>
+                            <ArrowRight className="h-3.5 w-3.5" />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={onNavigateToMessages}
+                            className="min-h-[40px] px-4 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                          >
+                            <MessageSquare className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                            <span>Message Doctor</span>
+                          </button>
+                        )}
+
+                        {!isPending && (
+                          <button
+                            type="button"
+                            onClick={() => onSelectProfessional(b.professionalId)}
+                            className="min-h-[40px] px-3.5 bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] text-[color:var(--t-600)] text-xs font-bold border border-[color:var(--t-200)] transition-all cursor-pointer"
+                          >
+                            View Details
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => cancel(b)}
+                          className="min-h-[40px] px-3 text-xs font-semibold text-slate-400 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
+                          title="Cancel appointment"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      {b.paymentStatus === 'Pending' && <button onClick={() => setPaying(b)} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Pay now</button>}
-                      <button onClick={onNavigateToMessages} className="border border-slate-200 text-xs font-bold px-3 py-2 cursor-pointer">Message</button>
-                      <button onClick={() => cancel(b)} className="border border-rose-200 text-rose-700 text-xs font-bold px-3 py-2 cursor-pointer">Cancel</button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                  );
+                })}
+              </div>
             )}
-            <p className="text-[11px] text-slate-500 mt-3">Cancelling at least a day ahead is refunded in full. Scheduled video visits are arranged with your doctor by message; use “Consult a doctor now” for an instant video or chat.</p>
+
+            <div className="mt-4 pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between text-[11px] text-slate-500 font-medium">
+              <span>Cancellations &gt;24h in advance are 100% refunded to the original payment method.</span>
+              <span className="font-bold text-[color:var(--t-600)] hidden sm:inline">Statutory SLA Compliant</span>
+            </div>
           </section>
 
           {past.length > 0 && (
-            <section className={card}>
-              <h2 className="text-base font-bold mb-3">Past appointments</h2>
-              <ul className="divide-y divide-slate-100 text-sm">
+            <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6">
+              <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-[color:var(--t-100)]">
+                <h2 className="font-display font-black text-base text-[color:var(--ink)]">
+                  Consultation History
+                </h2>
+                <span className="text-[11px] font-mono font-bold text-slate-500">
+                  {past.length} Completed Records
+                </span>
+              </div>
+
+              <div className="divide-y divide-[color:var(--t-100)]">
                 {past.map(b => (
-                  <li key={b.id} className="py-2 flex justify-between gap-3"><span>{b.professionalName} · {b.date}</span><span className="font-bold text-slate-600">{b.status}{b.paymentStatus === 'Refunded' ? ' (refunded)' : ''}</span></li>
+                  <div key={b.id} className="py-2.5 flex items-center justify-between gap-3 text-xs">
+                    <div className="min-w-0">
+                      <span className="font-bold text-[color:var(--ink)] block sm:inline">{b.professionalName}</span>
+                      <span className="text-slate-400 hidden sm:inline"> · </span>
+                      <span className="text-slate-600 font-medium font-mono">{b.date} ({b.timeSlot})</span>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-mono font-bold bg-[color:var(--t-50)] text-slate-700 border border-[color:var(--t-200)] shrink-0">
+                      <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                      {b.status}{b.paymentStatus === 'Refunded' ? ' (Refunded)' : ''}
+                    </span>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </section>
           )}
         </div>

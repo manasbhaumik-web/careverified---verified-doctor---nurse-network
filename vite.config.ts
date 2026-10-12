@@ -12,13 +12,28 @@ export default defineConfig(() => {
       },
     },
     build: {
-      chunkSizeWarningLimit: 800,
+      chunkSizeWarningLimit: 600,
       rollupOptions: {
         output: {
-          manualChunks: {
-            react: ['react', 'react-dom'],
-            motion: ['motion'],
-            icons: ['lucide-react'],
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              return 'vendor';
+            }
+            if (id.includes('src/components/AdminDashboard') || id.includes('src/components/SEODashboard') || id.includes('src/components/AdminTrustPanel')) {
+              return 'admin-suite';
+            }
+            if (id.includes('src/components/PharmacyWorkspace') || id.includes('src/components/pharmacy/')) {
+              return 'pharmacy-suite';
+            }
+            if (id.includes('src/components/PatientDashboard') || id.includes('src/components/patient/')) {
+              return 'patient-suite';
+            }
+            if (id.includes('src/components/MedicalLibrary')) {
+              return 'medical-library';
+            }
+            if (id.includes('src/components/LandingPage')) {
+              return 'landing-page';
+            }
           },
         },
       },

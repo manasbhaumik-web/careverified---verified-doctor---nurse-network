@@ -56,51 +56,51 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
   };
 
   return (
-    <div className="bg-gradient-to-br from-[color:var(--t-50)]/50 via-white to-[color:var(--t-50)]/30 border-2 border-[color:var(--t-200)]/80 rounded-2xl p-6 shadow-xs hover:shadow-md transition-all duration-300" id="ai-symptom-matcher">
+    <div className="bg-white border border-[color:var(--t-200)] p-6 shadow-xs" id="ai-symptom-matcher">
       <div className="flex items-center gap-3 mb-5">
-        <div className="p-2 bg-[color:var(--t-600)] text-white rounded-xl shadow-sm">
+        <div className="p-2.5 bg-[color:var(--t-600)] text-white">
           <Activity className="h-5 w-5" />
         </div>
         <div>
-          <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
-            Symptom Triage
+          <h3 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)] flex items-center gap-1.5">
+            Symptom-to-Specialty Triage
           </h3>
-          <p className="text-[11px] text-slate-500 font-semibold">Evaluate symptoms to find recommended medical specialties</p>
+          <p className="text-xs text-[color:var(--ink-2)]">Evaluate clinical complaints to find recommended medical specialties</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-bold text-slate-700 mb-1.5">Describe your symptoms (e.g. chest pressure, red skin rash, chronic headache):</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">Describe your symptoms (e.g. chest pressure, rash, migraine):</label>
           <textarea
             value={symptoms}
             onChange={(e) => setSymptoms(e.target.value)}
-            placeholder="Type symptoms... (e.g. A persistent dry cough and light fever of 101F since last night)"
+            placeholder="Describe symptoms... (e.g. A persistent dry cough and light fever since yesterday)"
             rows={2}
-            className="w-full text-xs border-2 border-slate-200/80 rounded-xl p-3 bg-white shadow-inner outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold placeholder-slate-400 transition-all"
+            className="w-full text-xs border border-[color:var(--t-200)] p-3 bg-[color:var(--t-bg)] focus:bg-white outline-none focus:border-[color:var(--t-600)] font-medium text-[color:var(--ink)] placeholder-slate-400 transition-colors"
             required
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">Age (Optional)</label>
+            <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">Age (Optional)</label>
             <input
               type="number"
               value={age}
               onChange={(e) => setAge(e.target.value)}
-              placeholder="Age"
-              className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3 bg-white outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold transition-all"
+              placeholder="e.g. 35"
+              className="w-full h-12 text-xs border border-[color:var(--t-200)] px-3.5 bg-[color:var(--t-bg)] focus:bg-white outline-none focus:border-[color:var(--t-600)] font-semibold text-[color:var(--ink)] transition-colors"
               min={0}
               max={120}
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">Gender</label>
+            <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">Gender</label>
             <select
               value={gender}
               onChange={(e) => setGender(e.target.value)}
-              className="w-full text-xs border-2 border-slate-200/80 rounded-xl py-2.5 px-3 bg-white outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-extrabold text-slate-700 cursor-pointer transition-all"
+              className="w-full h-12 text-xs border border-[color:var(--t-200)] px-3 bg-[color:var(--t-bg)] focus:bg-white outline-none focus:border-[color:var(--t-600)] font-semibold text-[color:var(--ink)] cursor-pointer transition-colors"
             >
               <option value="any">Any Gender</option>
               <option value="Male">Male</option>
@@ -112,17 +112,17 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
         <button
           type="submit"
           disabled={loading || !symptoms.trim()}
-          className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-rose-400 text-white rounded-xl py-3 text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+          className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white h-12 text-xs font-bold flex items-center justify-center gap-2 transition-colors shadow-xs cursor-pointer"
         >
           {loading ? (
             <>
-              <Loader className="h-3.5 w-3.5 animate-spin" />
-              Evaluating...
+              <Loader className="h-4 w-4 animate-spin" />
+              Evaluating Symptoms…
             </>
           ) : (
             <>
-              <Activity className="h-3.5 w-3.5" />
-              Evaluate Symptoms
+              <Activity className="h-4 w-4" />
+              Evaluate Clinical Symptoms
             </>
           )}
         </button>
@@ -143,57 +143,57 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
       )}
 
       {result && (
-        <div className="mt-5 bg-white border-2 border-[color:var(--t-200)] rounded-xl p-4 shadow-sm space-y-4 animate-fade-in">
-          <div className="flex justify-between items-center border-b-2 border-slate-100/80 pb-3">
+        <div className="mt-5 bg-white border border-[color:var(--t-200)] p-5 shadow-xs space-y-4 animate-fade-in">
+          <div className="flex justify-between items-center border-b border-[color:var(--t-100)] pb-3">
             <div>
-              <span className="text-[10px] font-extrabold text-[color:var(--t-600)] uppercase tracking-wider">Matched Result</span>
-              <h4 className="text-sm font-extrabold text-slate-800">{result.data.recommendedSpecialty}</h4>
+              <span className="text-[10px] font-mono font-bold text-[color:var(--t-700)] uppercase tracking-wider">Suggested Specialty</span>
+              <h4 className="text-sm font-extrabold text-[color:var(--ink)]">{result.data.recommendedSpecialty}</h4>
             </div>
-            <div className="text-right max-w-[11rem]">
-              <span className="text-[10px] text-slate-500 block font-bold">Keyword-based suggestion, not a diagnosis</span>
+            <div className="text-right max-w-[12rem]">
+              <span className="text-[10px] text-slate-500 block font-medium">Algorithmic matching · Non-diagnostic</span>
             </div>
           </div>
 
           <div className="space-y-3 text-xs">
             <div>
-              <span className="font-bold text-slate-700 block mb-1">Clinical Justification:</span>
-              <p className="text-slate-600 leading-relaxed font-semibold bg-slate-50/50 p-3 rounded-lg border-2 border-slate-200/40">{result.data.clinicalJustification}</p>
+              <span className="font-bold uppercase tracking-wider text-[color:var(--ink)] block mb-1">Clinical Justification:</span>
+              <p className="text-[color:var(--ink-2)] leading-relaxed bg-[color:var(--t-bg)] p-3 border border-[color:var(--t-200)]">{result.data.clinicalJustification}</p>
             </div>
 
-            <div className="flex justify-between items-center p-3 rounded-lg border-2 border-slate-200/40">
-              <span className="font-bold text-slate-700">Triage Urgency:</span>
-              <span className={`px-2.5 py-1 rounded-full font-extrabold text-[10px] ${result.data.symptomSeverity === 'High/Urgent'
-                  ? 'bg-red-50 text-red-700 border border-red-100'
+            <div className="flex justify-between items-center p-3 border border-[color:var(--t-200)] bg-[color:var(--t-bg)]">
+              <span className="font-bold text-[color:var(--ink)]">Triage Urgency:</span>
+              <span className={`px-2.5 py-1 font-mono font-bold text-[10px] uppercase tracking-wider ${result.data.symptomSeverity === 'High/Urgent'
+                  ? 'bg-rose-50 text-rose-800 border border-rose-200'
                   : result.data.symptomSeverity === 'Medium'
-                    ? 'bg-amber-50 text-amber-700 border border-amber-100'
-                    : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                    ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                    : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                 }`}>
                 {result.data.symptomSeverity}
               </span>
             </div>
 
             <div>
-              <span className="font-bold text-slate-700 block mb-1">Recommended Clinical Action:</span>
-              <p className="text-slate-600 leading-relaxed font-semibold">{result.data.recommendedAction}</p>
+              <span className="font-bold uppercase tracking-wider text-[color:var(--ink)] block mb-1">Recommended Action:</span>
+              <p className="text-[color:var(--ink-2)] leading-relaxed">{result.data.recommendedAction}</p>
             </div>
           </div>
 
-          <div className="border-t-2 border-slate-100/80 pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5">
+          <div className="border-t border-[color:var(--t-100)] pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <span className="text-[10px] font-mono text-slate-500 flex items-center gap-1.5">
               <HelpCircle className="h-3.5 w-3.5" />
               Source: {result.source}
             </span>
             <button
               onClick={handleApplyFilter}
-              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white rounded-lg px-4 py-2 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all hover:scale-[1.02]"
+              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white h-10 px-5 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-xs"
             >
-              Filter Doctors & Nurses
+              Filter Directory for {result.data.recommendedSpecialty}
               <ChevronRight className="h-3 w-3" />
             </button>
           </div>
 
           {result.warning && (
-            <p className="text-[10px] text-amber-600 bg-amber-50 p-2.5 rounded-lg leading-relaxed text-center font-bold border border-amber-150">
+            <p className="text-[11px] text-amber-800 bg-amber-50 p-2.5 leading-relaxed text-center font-bold border border-amber-200">
               {result.warning}
             </p>
           )}
