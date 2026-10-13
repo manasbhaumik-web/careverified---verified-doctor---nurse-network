@@ -411,7 +411,6 @@ export default function PatientDashboard({
               <BannerKpis items={[
                 { value: upcoming.length, label: 'Upcoming' },
                 { value: summary?.activeRx ?? '–', label: 'Prescriptions' },
-                { value: onCallStatus ? onCallStatus.onlineDoctors : '–', label: 'Doctors On-Call' },
                 { value: careTeam.length, label: 'Care Team' },
               ]} />
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
@@ -608,7 +607,7 @@ export default function PatientDashboard({
                 </p>
               </div>
               <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1">
-                {onCallStatus ? `${onCallStatus.onlineDoctors} Doctors Available Online` : 'Instant Telehealth Available'}
+                {onCallStatus && onCallStatus.onlineDoctors > 0 ? `${onCallStatus.onlineDoctors} Doctors Available Online` : 'Instant Telehealth Available'}
               </span>
             </div>
 
