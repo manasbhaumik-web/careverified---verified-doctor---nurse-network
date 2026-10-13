@@ -709,7 +709,9 @@ export default function App() {
                 onSelectProfessional={(id) => setSelectedProfId(id)}
                 onNavigateToMessages={() => setActiveView('messages')}
                 onConsultNow={() => setActiveView('consult')}
-                onFindDoctors={() => { setActiveView('registry'); setSelectedProfId(null); }}
+                onFindDoctors={() => { setRegistryTab('directory'); setActiveView('registry'); setSelectedProfId(null); }}
+                onOpenTriage={() => { setRegistryTab('triage'); setActiveView('registry'); setSelectedProfId(null); }}
+                onOpenPharmacies={() => setActiveView('pharmacies')}
                 onOpenArticle={(id) => { try { sessionStorage.setItem('open_article', id); } catch { /* ignore */ } setActiveView('articles'); }}
               />
             )}

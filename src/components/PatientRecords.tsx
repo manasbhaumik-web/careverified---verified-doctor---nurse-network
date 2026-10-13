@@ -16,12 +16,20 @@ function Qr({ text }: { text: string }) {
   return src ? <img src={src} alt="QR code to verify this document" width={120} height={120} /> : null;
 }
 
+export type RecordSubTab = 'overview' | 'vitals' | 'rx' | 'docs' | 'labs' | 'notes' | 'sharing';
+
 /** The patient's own health record: allergies, conditions, medicines, readings, prescriptions, certificates, referrals, labs, sharing. */
-export default function PatientRecords() {
+export default function PatientRecords({ initialTab }: { initialTab?: RecordSubTab } = {}) {
   const [data, setData] = useState<any | null>(null);
-  const [tab, setTab] = useState<'overview' | 'vitals' | 'rx' | 'docs' | 'labs' | 'notes' | 'sharing'>('overview');
+  const [tab, setTab] = useState<RecordSubTab>(initialTab || 'overview');
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [pharmacies, setPharmacies] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (initialTab) {
+      setTab(initialTab);
+    }
+  }, [initialTab]);
 
   const load = useCallback(async () => {
     const d = await fetch('/api/records/me').then(r => r.json());
