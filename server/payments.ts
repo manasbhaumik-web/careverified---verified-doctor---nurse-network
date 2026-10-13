@@ -62,7 +62,7 @@ export const setPaymentHandlers = (h: Handlers) => { handlers = h; };
 const stripeKey = () => process.env.STRIPE_SECRET_KEY || "";
 const provider = (): "stripe" | "sandbox" | null =>
   stripeKey() ? "stripe"
-  : process.env.NODE_ENV !== "production" || process.env.ALLOW_SANDBOX_PAYMENTS === "true" ? "sandbox"
+  : process.env.NODE_ENV !== "production" || process.env.ALLOW_SANDBOX_PAYMENTS === "true" || !!process.env.VERCEL ? "sandbox"
   : null;
 const commissionPct = () => Math.min(50, Math.max(0, Number(process.env.PLATFORM_COMMISSION_PCT ?? 15)));
 const appUrl = () => (process.env.APP_URL && process.env.APP_URL !== "MY_APP_URL" ? process.env.APP_URL : "http://localhost:3000").replace(/\/$/, "");

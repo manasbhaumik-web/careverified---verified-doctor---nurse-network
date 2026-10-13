@@ -3,13 +3,13 @@ import fs from "fs";
 import path from "path";
 import multer from "multer";
 import { Router } from "express";
-import { db } from "./db";
+import { db, dataDir } from "./db";
 import { audit } from "./audit";
 import { requireAuth } from "./auth";
 
 // Private storage: never served statically, only through the authorised download route below.
-const root = path.join(process.env.DATA_DIR || path.join(process.cwd(), "data"), "uploads");
-fs.mkdirSync(root, { recursive: true });
+const root = path.join(dataDir, "uploads");
+try { fs.mkdirSync(root, { recursive: true }); } catch { /* serverless read-only fallback */ }
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const KINDS = ["license", "degree", "identity", "lab_result", "cpd", "certificate", "other"];

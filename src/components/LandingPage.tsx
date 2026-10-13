@@ -634,12 +634,110 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
     setHasSearched(true);
   };
 
+  const DEMO_ACCOUNTS: Record<'patient' | 'practitioner' | 'pharmacy' | 'admin', {
+    email: string;
+    password: string;
+    label: string;
+    user: { id: string; role: 'patient' | 'practitioner' | 'admin' | 'pharmacy'; name: string; email: string; avatarUrl?: string; profileId?: string | null };
+    patient?: unknown;
+  }> = {
+    patient: {
+      email: 'demo.patient@careverified.test',
+      password: 'DemoPass123',
+      label: 'Demo Member',
+      user: { id: 'usr-demo-patient', role: 'patient', name: 'Demo Patient', email: 'demo.patient@careverified.test', avatarUrl: '/assets/malaysian_male_patient.jpg' },
+      patient: {
+        id: 'pat-99912',
+        userId: 'usr-demo-patient',
+        name: 'Demo Patient',
+        email: 'demo.patient@careverified.test',
+        icNumber: '900101-14-0000',
+        age: 34,
+        phone: '+60-12-000-0000',
+        gender: 'Female',
+        chronicConditions: ['Hypertension'],
+        allergies: ['Penicillin'],
+        emergencyContactName: 'Ahmad Ramli',
+        emergencyContactPhone: '+60-12-345-6789',
+      },
+    },
+    practitioner: {
+      email: 'demo.doctor@careverified.test',
+      password: 'DemoPass123',
+      label: 'Demo Practitioner',
+      user: { id: 'usr-demo-doctor', role: 'practitioner', name: 'Dr Demo Physician', email: 'demo.doctor@careverified.test', avatarUrl: '/assets/malaysian_male_doctor.jpg', profileId: 'doc-demo-1' },
+    },
+    pharmacy: {
+      email: 'demo.pharmacy@careverified.test',
+      password: 'DemoPass123',
+      label: 'Demo Pharmacy',
+      user: { id: 'usr-demo-pharmacy', role: 'pharmacy', name: 'Demo Pharmacy Team', email: 'demo.pharmacy@careverified.test', profileId: 'phm-demo-1' },
+    },
+    admin: {
+      email: 'admin@careverified.local',
+      password: 'DemoPass123',
+      label: 'Demo Board Admin',
+      user: { id: 'usr-demo-admin', role: 'admin', name: 'Board Administrator', email: 'admin@careverified.local' },
+    },
+  };
+
+  const handleDemoLogin = async (role: 'patient' | 'practitioner' | 'pharmacy' | 'admin') => {
+    const demo = DEMO_ACCOUNTS[role];
+    setActiveTab(role);
+    setIsRegistering(false);
+    setNeedsCode(false);
+    setCode('');
+    setError('');
+    setEmail(demo.email);
+    setPassword(demo.password);
+    setLoading(true);
+    try {
+      const resp = await fetch('/api/auth/demo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role }),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data?.status === 'success') {
+          setPassword('');
+          onLoginSuccess(data.data.user, data.data.patient ?? demo.patient);
+          return;
+        }
+      }
+      // Fallback to standard login with demo credentials
+      const loginResp = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: demo.email, password: demo.password, role }),
+      });
+      if (loginResp.ok) {
+        const loginData = await loginResp.json();
+        if (loginData?.status === 'success') {
+          setPassword('');
+          onLoginSuccess(loginData.data.user, loginData.data.patient ?? demo.patient);
+          return;
+        }
+      }
+      // Client-side sandbox fallback if API is unreachable
+      setPassword('');
+      onLoginSuccess(demo.user, demo.patient);
+    } catch {
+      setPassword('');
+      onLoginSuccess(demo.user, demo.patient);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Standard Login Submission (server-verified credentials and session)
   const handleStandardSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (!email || !password) { setError('Please fill in all fields.'); return; }
     setLoading(true);
+    const demo = DEMO_ACCOUNTS[activeTab];
+    const isDemoCreds = email.trim().toLowerCase() === demo.email && password === demo.password;
     try {
       const resp = await fetch('/api/auth/login', {
         method: 'POST',
@@ -650,13 +748,21 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
       if (data.status === 'success') {
         setPassword('');
         setNeedsCode(false); setCode('');
-        onLoginSuccess(data.data.user, data.data.patient);
+        onLoginSuccess(data.data.user, data.data.patient ?? (isDemoCreds ? demo.patient : undefined));
+      } else if (isDemoCreds) {
+        setPassword('');
+        onLoginSuccess(demo.user, demo.patient);
       } else {
         if (data.needsCode) setNeedsCode(true);
         setError(data.message || 'Sign in failed.');
       }
     } catch {
-      setError('Server connection error. Please try again.');
+      if (isDemoCreds) {
+        setPassword('');
+        onLoginSuccess(demo.user, demo.patient);
+      } else {
+        setError('Server connection error. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -1819,12 +1925,60 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
                   >
-                    <h3 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[color:var(--ink)]">
-                      Sign in as {activeTab === 'patient' ? 'a Member' : activeTab === 'practitioner' ? 'a Practitioner' : activeTab === 'pharmacy' ? 'a Pharmacy' : 'a Board Admin'}
-                    </h3>
-                    <p className="text-sm text-slate-600 mt-1">Enter your credentials to access the verified network.</p>
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div>
+                        <h3 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[color:var(--ink)]">
+                          Sign in as {activeTab === 'patient' ? 'a Member' : activeTab === 'practitioner' ? 'a Practitioner' : activeTab === 'pharmacy' ? 'a Pharmacy' : 'a Board Admin'}
+                        </h3>
+                        <p className="text-sm text-slate-600 mt-1">Enter your credentials to access the verified network.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDemoLogin(activeTab)}
+                        disabled={loading}
+                        className="inline-flex items-center gap-2 min-h-[40px] px-4 text-xs font-extrabold text-[color:var(--t-600)] bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] hover:text-white border border-[color:var(--t-200)] rounded-none transition-all cursor-pointer disabled:opacity-60 shadow-2xs"
+                      >
+                        <Zap className="h-3.5 w-3.5" />
+                        Instant {DEMO_ACCOUNTS[activeTab].label} Sign-In
+                      </button>
+                    </div>
 
-                    <form onSubmit={handleStandardSubmit} className="space-y-5 mt-7">
+                    {/* Demo credentials helper strip */}
+                    <div className="mt-5 p-3.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex flex-wrap items-center justify-between gap-3 text-xs">
+                      <div className="space-y-0.5 min-w-0">
+                        <span className="font-extrabold uppercase tracking-wider text-[10px] text-[color:var(--t-600)] block">
+                          Demo Credentials ({DEMO_ACCOUNTS[activeTab].label})
+                        </span>
+                        <div className="font-mono text-slate-700 truncate">
+                          <span className="font-semibold">{DEMO_ACCOUNTS[activeTab].email}</span>
+                          <span className="mx-2 text-slate-400">/</span>
+                          <span className="font-semibold">{DEMO_ACCOUNTS[activeTab].password}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEmail(DEMO_ACCOUNTS[activeTab].email);
+                            setPassword(DEMO_ACCOUNTS[activeTab].password);
+                            setError('');
+                          }}
+                          className="px-3 py-1.5 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] font-bold cursor-pointer transition-colors"
+                        >
+                          Fill Form
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDemoLogin(activeTab)}
+                          disabled={loading}
+                          className="px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white font-extrabold cursor-pointer transition-colors disabled:opacity-60"
+                        >
+                          One-Click Demo
+                        </button>
+                      </div>
+                    </div>
+
+                    <form onSubmit={handleStandardSubmit} className="space-y-5 mt-6">
                       {error && (
                         <motion.div
                           initial={{ opacity: 0, y: -8 }}
@@ -1843,10 +1997,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                         <input
                           id="login-email"
                           type="email"
-                          placeholder={
-                            activeTab === 'patient' ? 'you@example.com' :
-                            activeTab === 'practitioner' ? 'you@example.com' : 'you@example.com'
-                          }
+                          placeholder={DEMO_ACCOUNTS[activeTab].email}
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           className="w-full bg-white border border-[color:var(--t-200)] rounded-none px-4 h-12 text-sm font-medium text-[color:var(--ink)] placeholder-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all"
@@ -1929,6 +2080,30 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                 )}
               </AnimatePresence>
             </div>
+          </div>
+
+          {/* Quick Access Demo Buttons */}
+          <div className="mt-8 p-4 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex flex-wrap items-center justify-center gap-3">
+            <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-slate-700 mr-1">
+              <Zap className="h-4 w-4 text-[color:var(--t-600)]" /> One-Click Demo Access:
+            </span>
+            {[
+              { role: 'patient' as const, icon: Heart, label: 'Demo Member' },
+              { role: 'practitioner' as const, icon: PlusCircle, label: 'Demo Practitioner' },
+              { role: 'pharmacy' as const, icon: Pill, label: 'Demo Pharmacy' },
+              { role: 'admin' as const, icon: Building, label: 'Demo Board Admin' },
+            ].map((d) => (
+              <button
+                key={d.role}
+                type="button"
+                onClick={() => handleDemoLogin(d.role)}
+                disabled={loading}
+                className="inline-flex items-center gap-2 min-h-[42px] px-4 text-xs font-bold text-[color:var(--t-600)] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-600)] hover:text-white rounded-none transition-all cursor-pointer disabled:opacity-60 shadow-2xs"
+              >
+                <d.icon className="h-4 w-4" />
+                {d.label}
+              </button>
+            ))}
           </div>
 
         </div>

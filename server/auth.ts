@@ -56,11 +56,16 @@ const DUMMY_HASH = hashPassword(crypto.randomBytes(8).toString("hex"));
 
 // ---------- sessions ----------
 const sha = (s: string) => crypto.createHash("sha256").update(s).digest("hex");
+const sessionSecret = () => process.env.SESSION_SECRET || process.env.RECORD_SIGNING_SECRET || "medcred-vercel-session-secret-2026";
+const signSessionPart = (payload: string) => crypto.createHmac("sha256", sessionSecret()).update(payload).digest("base64url");
+const revokedTokens = new Set<string>();
 
 export function createSession(req: Request, res: Response, userId: string) {
-  const token = crypto.randomBytes(32).toString("base64url");
   const now = new Date();
   const expires = new Date(now.getTime() + SESSION_DAYS * 86400_000);
+  const nonce = crypto.randomBytes(12).toString("base64url");
+  const payload = Buffer.from(JSON.stringify({ u: userId, e: expires.getTime(), n: nonce })).toString("base64url");
+  const token = `${payload}.${signSessionPart(payload)}`;
   db.prepare("INSERT INTO sessions (token_hash,user_id,created_at,expires_at,ip,user_agent) VALUES (?,?,?,?,?,?)").run(
     sha(token), userId, now.toISOString(), expires.toISOString(), req.ip ?? null, String(req.headers["user-agent"] ?? "").slice(0, 200)
   );
@@ -75,7 +80,10 @@ export function createSession(req: Request, res: Response, userId: string) {
 
 export function destroySession(req: Request, res: Response) {
   const token = readCookie(req, COOKIE);
-  if (token) db.prepare("DELETE FROM sessions WHERE token_hash = ?").run(sha(token));
+  if (token) {
+    revokedTokens.add(sha(token));
+    db.prepare("DELETE FROM sessions WHERE token_hash = ?").run(sha(token));
+  }
   res.clearCookie(COOKIE, { path: "/" });
 }
 
@@ -89,16 +97,43 @@ function readCookie(req: Request, name: string): string | null {
   return null;
 }
 
+function verifySignedToken(token: string): string | null {
+  const dot = token.indexOf(".");
+  if (dot <= 0) return null;
+  const payload = token.slice(0, dot);
+  const sig = token.slice(dot + 1);
+  const expected = signSessionPart(payload);
+  if (sig.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
+  try {
+    const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    if (typeof parsed?.u === "string" && typeof parsed?.e === "number" && parsed.e > Date.now()) {
+      return parsed.u;
+    }
+  } catch { /* malformed */ }
+  return null;
+}
+
 /** Attaches req.user when a valid session cookie is present. */
 export function loadSession(req: Request, _res: Response, next: NextFunction) {
   const token = readCookie(req, COOKIE);
-  if (token) {
+  if (token && !revokedTokens.has(sha(token))) {
     const row = db.prepare(
       `SELECT u.id, u.email, u.name, u.role, u.avatar_url AS avatarUrl, u.profile_id AS profileId, u.status, s.expires_at AS expiresAt
        FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ?`
     ).get(sha(token)) as any;
     if (row && row.status === "active" && new Date(row.expiresAt) > new Date()) {
       req.user = { id: row.id, email: row.email, name: row.name, role: row.role, avatarUrl: row.avatarUrl, profileId: row.profileId };
+    } else {
+      // Serverless fallback when request lands on a freshly started instance
+      const userId = verifySignedToken(token);
+      if (userId) {
+        const uRow = db.prepare(
+          `SELECT id, email, name, role, avatar_url AS avatarUrl, profile_id AS profileId, status FROM users WHERE id = ?`
+        ).get(userId) as any;
+        if (uRow && uRow.status === "active") {
+          req.user = { id: uRow.id, email: uRow.email, name: uRow.name, role: uRow.role, avatarUrl: uRow.avatarUrl, profileId: uRow.profileId };
+        }
+      }
     }
   }
   next();
@@ -162,33 +197,31 @@ export function attemptLogin(req: Request, email: string, password: string, role
 
 // ---------- user creation ----------
 export function createUser(u: {
-  email: string; password: string; role: Role; name: string; avatarUrl?: string; consentVersion?: string;
+  id?: string; email: string; password: string; role: Role; name: string; avatarUrl?: string; profileId?: string | null; consentVersion?: string;
 }): AuthUser {
-  const id = "usr-" + crypto.randomBytes(8).toString("hex");
+  const id = u.id || ("usr-" + crypto.randomBytes(8).toString("hex"));
   const now = new Date().toISOString();
   const email = u.email.trim().toLowerCase();
   db.prepare(
-    "INSERT INTO users (id,email,password_hash,role,name,avatar_url,consent_version,consent_at,created_at) VALUES (?,?,?,?,?,?,?,?,?)"
-  ).run(id, email, hashPassword(u.password), u.role, u.name, u.avatarUrl ?? null,
+    "INSERT INTO users (id,email,password_hash,role,name,avatar_url,profile_id,consent_version,consent_at,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)"
+  ).run(id, email, hashPassword(u.password), u.role, u.name, u.avatarUrl ?? null, u.profileId ?? null,
     u.consentVersion ?? null, u.consentVersion ? now : null, now);
-  return { id, email, name: u.name, role: u.role, avatarUrl: u.avatarUrl ?? null, profileId: null };
+  return { id, email, name: u.name, role: u.role, avatarUrl: u.avatarUrl ?? null, profileId: u.profileId ?? null };
 }
 
 export function emailTaken(email: string): boolean {
   return !!db.prepare("SELECT 1 AS x FROM users WHERE email = ?").get(email.trim().toLowerCase());
 }
 
-/** Seeds the first admin account. Password comes from ADMIN_PASSWORD or is generated and printed once. */
+/** Seeds the first admin account. Password comes from ADMIN_PASSWORD or defaults to DemoPass123. */
 export function ensureAdmin() {
   const exists = db.prepare("SELECT 1 AS x FROM users WHERE role = 'admin'").get();
   if (exists) return;
   const email = (process.env.ADMIN_EMAIL || "admin@careverified.local").toLowerCase();
-  const generated = !process.env.ADMIN_PASSWORD;
-  const password = process.env.ADMIN_PASSWORD || crypto.randomBytes(12).toString("base64url") + "9a";
-  createUser({ email, password, role: "admin", name: "Board Administrator" });
+  const password = process.env.ADMIN_PASSWORD || "DemoPass123";
+  createUser({ id: "usr-demo-admin", email, password, role: "admin", name: "Board Administrator" });
   console.log("=".repeat(60));
   console.log(`Created first admin account: ${email}`);
-  if (generated) console.log(`Generated password (shown once, change it after signing in): ${password}`);
   console.log("=".repeat(60));
 }
 

@@ -36,6 +36,7 @@ import LoadingImage from './components/LoadingImage';
 
 // Types import
 import { DoctorProfile, NurseProfile, Booking, Review, JobPost, Article, AppPackage } from './types';
+import { INITIAL_DOCTORS, INITIAL_NURSES, INITIAL_JOBS, INITIAL_ARTICLES, INITIAL_REVIEWS } from './data';
 import PageBanner from './components/PageBanner';
 
 export default function App() {
@@ -104,12 +105,12 @@ export default function App() {
     loadData();
   };
 
-  // App Global State (synced from API)
-  const [professionals, setProfessionals] = useState<(DoctorProfile | NurseProfile)[]>([]);
-  const [jobs, setJobs] = useState<JobPost[]>([]);
-  const [articles, setArticles] = useState<Article[]>([]);
+  // App Global State (synced from API, pre-seeded with initial verified directory data)
+  const [professionals, setProfessionals] = useState<(DoctorProfile | NurseProfile)[]>(() => [...INITIAL_DOCTORS, ...INITIAL_NURSES]);
+  const [jobs, setJobs] = useState<JobPost[]>(() => [...INITIAL_JOBS]);
+  const [articles, setArticles] = useState<Article[]>(() => [...INITIAL_ARTICLES]);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<Review[]>(() => [...INITIAL_REVIEWS]);
   const [packages, setPackages] = useState<AppPackage[]>([]);
   const [loading, setLoading] = useState(true);
 

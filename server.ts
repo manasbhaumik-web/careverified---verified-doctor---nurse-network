@@ -7,10 +7,10 @@ import { db, loadCollection, saveCollections } from "./server/db";
 import { audit } from "./server/audit";
 import {
   AuthUser, Role, attemptLogin, changePassword, createSession, createUser, destroySession, emailTaken,
-  ensureAdmin, loadSession, passwordProblem, requireAuth, requireRole, verifyPassword,
+  ensureAdmin, hashPassword, loadSession, passwordProblem, requireAuth, requireRole, verifyPassword,
 } from "./server/auth";
 import { documentsRouter, setRequestOwnerLookup, setClinicalHooks } from "./server/documents";
-import { registerClinicalRoutes, createGrant, seedHealthItems } from "./server/clinical";
+import { registerClinicalRoutes, createGrant, seedHealthItems, sign, rxPayload } from "./server/clinical";
 import { registerPharmacyWorkspace } from "./server/pharmacy";
 import { registerLiteratureRoutes, approvedLiteratureArticles } from "./server/literature";
 import { registerQualityRoutes, accountForChatId, isBlocked } from "./server/quality";
@@ -227,6 +227,215 @@ patients = loadCollection("patients", patients);
 appPackages = loadCollection("appPackages", appPackages);
 ensureAdmin();
 
+const DEMO_PASSWORD = "DemoPass123";
+
+function ensureDemoData() {
+  const now = new Date().toISOString();
+
+  // 1. Demo Doctor profile & user
+  let docProfile = doctors.find(d => d.licenseNumber === "DEMO-MMC-0001" || d.id === "doc-demo-1");
+  if (!docProfile) {
+    docProfile = {
+      id: "doc-demo-1",
+      name: "Dr Demo Physician",
+      avatar: "/assets/malaysian_male_doctor.jpg",
+      role: UserRole.DOCTOR,
+      specialization: "General Physician",
+      licenseNumber: "DEMO-MMC-0001",
+      licenseExpiry: "2029-12-31",
+      medicalCouncil: "Malaysian Medical Council (MMC)",
+      experienceYears: 8,
+      education: ["MBBS (Universiti Malaya)"],
+      bio: "Board-verified general physician providing outpatient and tele-triage consultations.",
+      languages: ["English", "Malay"],
+      consultationModes: [ConsultationMode.IN_PERSON, ConsultationMode.VIDEO],
+      fee: 60,
+      rating: 4.9,
+      reviewCount: 12,
+      verificationStatus: VerificationStatus.VERIFIED,
+      practiceAddress: "1 Jalan Demo, Kuala Lumpur",
+      city: "Kuala Lumpur",
+      availability: {
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        slots: ["09:00 AM", "10:00 AM", "02:00 PM", "04:00 PM"]
+      },
+      seoSlug: "dr-demo-physician-general-physician-kuala-lumpur"
+    };
+    doctors.push(docProfile);
+  }
+
+  let docUser = db.prepare("SELECT * FROM users WHERE email = ?").get("demo.doctor@careverified.test") as any;
+  if (!docUser) {
+    docUser = createUser({
+      id: "usr-demo-doctor",
+      email: "demo.doctor@careverified.test",
+      password: DEMO_PASSWORD,
+      role: "practitioner",
+      name: "Dr Demo Physician",
+      avatarUrl: "/assets/malaysian_male_doctor.jpg",
+      profileId: docProfile.id,
+      consentVersion: "2026-11",
+    });
+  } else if (!docUser.profile_id) {
+    db.prepare("UPDATE users SET profile_id = ? WHERE id = ?").run(docProfile.id, docUser.id);
+  }
+
+  // Weekday on-call roster 08:00-20:00 for Demo Doctor
+  const insRoster = db.prepare("INSERT OR IGNORE INTO roster (profile_id, day, hour) VALUES (?, ?, ?)");
+  for (let day = 0; day < 5; day++) {
+    for (let hour = 8; hour < 20; hour++) {
+      insRoster.run(docProfile.id, day, hour);
+    }
+  }
+
+  // 2. Demo Patient (Member) profile & user
+  let patUser = db.prepare("SELECT * FROM users WHERE email = ?").get("demo.patient@careverified.test") as any;
+  if (!patUser) {
+    patUser = createUser({
+      id: "usr-demo-patient",
+      email: "demo.patient@careverified.test",
+      password: DEMO_PASSWORD,
+      role: "patient",
+      name: "Demo Patient",
+      avatarUrl: "/assets/malaysian_male_patient.jpg",
+      consentVersion: "2026-11",
+    });
+  }
+
+  let patProfile = patients.find(p => p.userId === patUser.id || p.email === "demo.patient@careverified.test");
+  if (!patProfile) {
+    patProfile = {
+      id: "pat-99912",
+      userId: patUser.id,
+      name: "Demo Patient",
+      email: "demo.patient@careverified.test",
+      icNumber: "900101-14-0000",
+      age: 34,
+      phone: "+60-12-000-0000",
+      gender: "Female",
+      chronicConditions: ["Hypertension"],
+      allergies: ["Penicillin"],
+      emergencyContactName: "Ahmad Ramli",
+      emergencyContactPhone: "+60-12-345-6789",
+      registeredAt: now,
+    };
+    patients.push(patProfile);
+  }
+
+  // Attach initial seed bookings to Demo Patient so they appear in Member Portal
+  for (const b of bookings) {
+    if (b.patientId === "pat-99912" && !b.patientUserId) {
+      b.patientUserId = patUser.id;
+      b.patientName = "Demo Patient";
+      b.patientEmail = "demo.patient@careverified.test";
+    }
+  }
+
+  const existingItems = db.prepare("SELECT COUNT(*) AS c FROM health_items WHERE user_id = ?").get(patUser.id) as { c: number };
+  if (!existingItems?.c) {
+    seedHealthItems(patUser.id, ["Hypertension"], ["Penicillin"]);
+    db.prepare(
+      "INSERT INTO health_items (id, user_id, type, name, detail, severity, active, created_at, updated_at) VALUES (?, ?, 'medication', 'Warfarin', '3 mg at night', NULL, 1, ?, ?)"
+    ).run("hi-demo-med-1", patUser.id, now, now);
+    db.prepare(
+      "INSERT INTO vitals (id, user_id, ts, kind, value1, value2, unit, note) VALUES (?, ?, ?, 'bp', 134, 86, 'mmHg', 'Morning reading')"
+    ).run("vit-demo-bp-1", patUser.id, now);
+  }
+  createGrant(patUser.id, docProfile.id, "booking", "bkg-202223", 365);
+
+  // 3. Demo Pharmacies & Pharmacy Workspace User
+  let demoPharm = db.prepare("SELECT * FROM pharmacies WHERE name = 'Demo Pharmacy'").get() as any;
+  if (!demoPharm) {
+    const id = "phm-demo-1";
+    db.prepare(
+      `INSERT INTO pharmacies (id, name, address, city, phone, hours, services, pin_hash, active, licence_no, pharmacist_name, pharmacist_reg, verified_at, verified_by, created_at)
+       VALUES (?, 'Demo Pharmacy', '2 Jalan Demo, Kuala Lumpur', 'Kuala Lumpur', '03-5550 0100', 'Mon–Sat 9am–10pm', ?, ?, 1, 'DEMO-PH-0001', 'Demo Pharmacist', 'DEMO-RPh-0001', ?, 'usr-demo-admin', ?)`
+    ).run(id, JSON.stringify(["Home delivery", "Vaccinations"]), hashPassword("123456"), now, now);
+    demoPharm = db.prepare("SELECT * FROM pharmacies WHERE id = ?").get(id);
+  } else if (!demoPharm.verified_at) {
+    db.prepare(
+      "UPDATE pharmacies SET active = 1, licence_no = 'DEMO-PH-0001', pharmacist_name = 'Demo Pharmacist', pharmacist_reg = 'DEMO-RPh-0001', verified_at = ? WHERE id = ?"
+    ).run(now, demoPharm.id);
+  }
+
+  const secondPharm = db.prepare("SELECT 1 AS x FROM pharmacies WHERE name = 'Demo 24h Pharmacy'").get();
+  if (!secondPharm) {
+    db.prepare(
+      `INSERT INTO pharmacies (id, name, address, city, phone, hours, services, pin_hash, active, licence_no, pharmacist_name, pharmacist_reg, verified_at, verified_by, created_at)
+       VALUES ('phm-demo-2', 'Demo 24h Pharmacy', '15 Jalan Contoh, George Town', 'Penang', '04-5550 0200', 'Open 24 hours', ?, ?, 1, 'DEMO-PH-0002', 'Lim Wei', 'DEMO-RPh-0002', ?, 'usr-demo-admin', ?)`
+    ).run(JSON.stringify(["24 hours", "Drive-through", "Online ordering"]), hashPassword("654321"), now, now);
+  }
+
+  let pharmUser = db.prepare("SELECT * FROM users WHERE email = ?").get("demo.pharmacy@careverified.test") as any;
+  if (!pharmUser) {
+    pharmUser = createUser({
+      id: "usr-demo-pharmacy",
+      email: "demo.pharmacy@careverified.test",
+      password: DEMO_PASSWORD,
+      role: "pharmacy",
+      name: "Demo Pharmacy Team",
+      profileId: demoPharm.id,
+    });
+    db.prepare("UPDATE users SET pharmacy_owner = 1, must_change_password = 0 WHERE id = ?").run(pharmUser.id);
+  } else if (pharmUser.profile_id !== demoPharm.id || pharmUser.must_change_password) {
+    db.prepare("UPDATE users SET profile_id = ?, pharmacy_owner = 1, must_change_password = 0 WHERE id = ?").run(demoPharm.id, pharmUser.id);
+  }
+
+  // Seed sample prescriptions in Demo Pharmacy inbox if empty
+  const rxCount = (db.prepare("SELECT COUNT(*) AS c FROM prescriptions WHERE pharmacy_id = ?").get(demoPharm.id) as { c: number })?.c ?? 0;
+  if (rxCount === 0) {
+    const validUntil = new Date(Date.now() + 30 * 86400_000).toISOString();
+    const samples = [
+      {
+        id: "rx-demo-1",
+        code: "DEMORX2001",
+        diagnosis: "Seasonal allergic rhinitis",
+        items: [{ name: "cetirizine", strength: "10 mg", form: "tablet", dose: "1 tablet", frequency: "once daily", durationDays: 7, quantity: 7, instructions: "At night" }],
+        fillStatus: null,
+        fillReason: null,
+      },
+      {
+        id: "rx-demo-2",
+        code: "DEMORX2002",
+        diagnosis: "Viral upper respiratory infection",
+        items: [{ name: "paracetamol", strength: "500 mg", form: "tablet", dose: "1 tablet", frequency: "every 6 hours if needed", durationDays: 3, quantity: 12, instructions: "After food" }],
+        fillStatus: "preparing",
+        fillReason: null,
+      },
+      {
+        id: "rx-demo-3",
+        code: "DEMORX2003",
+        diagnosis: "Allergic rhinitis, follow-up",
+        items: [{ name: "cetirizine", strength: "10 mg", form: "tablet", dose: "1 tablet", frequency: "once daily", durationDays: 14, quantity: 14, instructions: "In the morning" }],
+        fillStatus: "cannot_fill",
+        fillReason: "Out of stock until Tuesday",
+      },
+    ];
+    for (const s of samples) {
+      const rowObj = {
+        id: s.id,
+        code: s.code,
+        patient_user_id: patUser.id,
+        professional_id: docProfile.id,
+        issued_at: now,
+        valid_until: validUntil,
+        diagnosis: s.diagnosis,
+        items: JSON.stringify(s.items),
+      };
+      const signature = sign(rxPayload(rowObj));
+      db.prepare(
+        `INSERT OR IGNORE INTO prescriptions (id, code, patient_user_id, professional_id, kind, ref_id, items, diagnosis, issued_at, valid_until, status, pharmacy_id, sent_at, fill_status, fill_reason, fill_updated_at, first_response_at, share_safety, signature, record_checked)
+         VALUES (?, ?, ?, ?, 'booking', 'bkg-202223', ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, 1, ?, 1)`
+      ).run(
+        s.id, s.code, patUser.id, docProfile.id, rowObj.items, s.diagnosis, now, validUntil,
+        demoPharm.id, now, s.fillStatus, s.fillReason, s.fillStatus ? now : null, s.fillStatus ? now : null, signature
+      );
+    }
+  }
+}
+
+ensureDemoData();
+
 const persistState = () =>
   saveCollections({ doctors, nurses, verificationRequests, reviews, jobs, bookings, chats, patients, appPackages });
 persistState();
@@ -279,6 +488,34 @@ app.post("/api/auth/login", (req, res) => {
   audit(req, "auth.login", { actor: result });
   const patient = result.role === "patient" ? patients.find(p => p.userId === result.id) : undefined;
   res.json({ status: "success", data: { user: publicUser(result), patient } });
+});
+
+app.post("/api/auth/demo", (req, res) => {
+  const role: Role = ["patient", "practitioner", "admin", "pharmacy"].includes(req.body?.role) ? req.body.role : "patient";
+  ensureDemoData();
+  const demoEmails: Record<Role, string> = {
+    patient: "demo.patient@careverified.test",
+    practitioner: "demo.doctor@careverified.test",
+    pharmacy: "demo.pharmacy@careverified.test",
+    admin: (process.env.ADMIN_EMAIL || "admin@careverified.local").toLowerCase(),
+  };
+  let row = db.prepare("SELECT * FROM users WHERE email = ?").get(demoEmails[role]) as any;
+  if (!row && role === "admin") {
+    row = db.prepare("SELECT * FROM users WHERE role = 'admin' ORDER BY created_at LIMIT 1").get() as any;
+  }
+  if (!row) return fail(res, 404, "Demo account not available.");
+  const user: AuthUser = {
+    id: row.id,
+    email: row.email,
+    name: row.name,
+    role: row.role,
+    avatarUrl: row.avatar_url,
+    profileId: row.profile_id,
+  };
+  createSession(req, res, user.id);
+  audit(req, "auth.login.demo", { actor: user });
+  const patient = user.role === "patient" ? patients.find(p => p.userId === user.id) : undefined;
+  res.json({ status: "success", data: { user: publicUser(user), patient } });
 });
 
 app.post("/api/auth/logout", (req, res) => {

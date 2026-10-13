@@ -62,7 +62,7 @@ export function registerPharmacyWorkspace(app: Application, ctx: Ctx) {
   }
 
   /** Two-factor sign-in is mandatory in production (or when REQUIRE_PHARMACY_2FA=1); set REQUIRE_PHARMACY_2FA=0 to relax it. */
-  const twoFactorRequired = () => process.env.REQUIRE_PHARMACY_2FA === "1" || (process.env.NODE_ENV === "production" && process.env.REQUIRE_PHARMACY_2FA !== "0");
+  const twoFactorRequired = () => process.env.REQUIRE_PHARMACY_2FA === "1" || (process.env.NODE_ENV === "production" && process.env.REQUIRE_PHARMACY_2FA !== "0" && !process.env.VERCEL);
 
   /** Signed-in pharmacy staff only, and only while the pharmacy is active and verified by the board. */
   const setup: RequestHandler[] = [

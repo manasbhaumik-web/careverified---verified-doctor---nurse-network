@@ -1,12 +1,31 @@
 import { DatabaseSync } from "node:sqlite";
 import fs from "fs";
+import os from "os";
 import path from "path";
 
-const dataDir = process.env.DATA_DIR || path.join(process.cwd(), "data");
-fs.mkdirSync(dataDir, { recursive: true });
+export const dataDir =
+  process.env.DATA_DIR ||
+  (process.env.VERCEL ? path.join(os.tmpdir(), "medcred-data") : path.join(process.cwd(), "data"));
 
-export const db = new DatabaseSync(path.join(dataDir, "careverified.db"));
-db.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;");
+try {
+  fs.mkdirSync(dataDir, { recursive: true });
+} catch {
+  // Ignore on read-only filesystems; openDb falls back to :memory:
+}
+
+function openDb(): DatabaseSync {
+  try {
+    const instance = new DatabaseSync(path.join(dataDir, "careverified.db"));
+    instance.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;");
+    return instance;
+  } catch {
+    const instance = new DatabaseSync(":memory:");
+    instance.exec("PRAGMA foreign_keys = ON;");
+    return instance;
+  }
+}
+
+export const db = openDb();
 
 db.exec(`
 CREATE TABLE IF NOT EXISTS users (
