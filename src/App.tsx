@@ -712,6 +712,7 @@ export default function App() {
                 onFindDoctors={() => { setRegistryTab('directory'); setActiveView('registry'); setSelectedProfId(null); }}
                 onOpenTriage={() => { setRegistryTab('triage'); setActiveView('registry'); setSelectedProfId(null); }}
                 onOpenPharmacies={() => setActiveView('pharmacies')}
+                onOpenHelp={() => setActiveView('help')}
                 onOpenArticle={(id) => { try { sessionStorage.setItem('open_article', id); } catch { /* ignore */ } setActiveView('articles'); }}
               />
             )}

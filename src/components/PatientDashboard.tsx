@@ -3,9 +3,10 @@ import {
   BookOpen, Calendar, Clock, FolderHeart, Heart, Video, 
   CheckCircle2, Search, MessageSquare, ShieldCheck, ArrowRight, User,
   AlertTriangle, Stethoscope, Sparkles, Pill, Activity, PhoneCall,
-  HeartPulse, ShieldAlert, ChevronRight, ExternalLink
+  HeartPulse, ShieldAlert, ChevronRight, ExternalLink, LifeBuoy,
+  Send, X, Star, MapPin, Radio, AlertCircle
 } from 'lucide-react';
-import { DoctorProfile, NurseProfile, Booking, PatientProfile } from '../types';
+import { DoctorProfile, NurseProfile, Booking, PatientProfile, UserRole } from '../types';
 import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
 import PatientRecords, { RecordSubTab } from './PatientRecords';
 import SavedTab from './patient/SavedTab';
@@ -26,9 +27,30 @@ interface PatientDashboardProps {
   onOpenTriage?: () => void;
   /** Opens the Pharmacy Dispensary directory */
   onOpenPharmacies?: () => void;
+  /** Opens the Help & Support Desk */
+  onOpenHelp?: () => void;
 }
 
 type Tab = 'appointments' | 'records' | 'saved';
+
+interface Pharmacy {
+  id: string;
+  name: string;
+  address: string;
+  city: string | null;
+  phone: string | null;
+  hours: string | null;
+  services: string[];
+}
+
+interface SupportTicket {
+  id: string;
+  category: string;
+  subject: string;
+  status: string;
+  createdAt: string;
+  respondWithinHours?: number;
+}
 
 const readSaved = (): string[] => {
   try { return JSON.parse(localStorage.getItem('saved_practitioners') || '[]'); } catch { return []; }
@@ -52,11 +74,13 @@ const fmtDate = (iso?: string | null) => {
 };
 
 export default function PatientDashboard({
-  bookings, setBookings, professionals, onSelectProfessional, onNavigateToMessages, onConsultNow, onOpenArticle, onFindDoctors, onOpenTriage, onOpenPharmacies,
+  bookings, setBookings, professionals, onSelectProfessional, onNavigateToMessages, onConsultNow, onOpenArticle, onFindDoctors, onOpenTriage, onOpenPharmacies, onOpenHelp,
 }: PatientDashboardProps) {
   const [activeTab, setActiveTab] = useState<Tab>('appointments');
   const [recordsSubTab, setRecordsSubTab] = useState<RecordSubTab>('overview');
   const [savedIds, setSavedIds] = useState<string[]>(readSaved);
+  
+  // Clinical Summary & Record Data
   const [summary, setSummary] = useState<{
     activeRx: number;
     bp: any | null;
@@ -66,10 +90,28 @@ export default function PatientDashboard({
     temp: any | null;
   } | null>(null);
   const [recordsData, setRecordsData] = useState<any | null>(null);
+
+  // Live Telehealth & Queue State
+  const [onCallStatus, setOnCallStatus] = useState<{ onlineDoctors: number; consultFee: number; paymentsEnabled?: boolean } | null>(null);
+  const [myConsults, setMyConsults] = useState<any[]>([]);
+
+  // Pharmacies & Inline Dispatch Modal
+  const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
+  const [dispatchingRx, setDispatchingRx] = useState<any | null>(null);
+  const [selectedPharmacyId, setSelectedPharmacyId] = useState<string>('');
+  const [shareSafetyRecord, setShareSafetyRecord] = useState<boolean>(true);
+  const [dispatchBusy, setDispatchBusy] = useState<boolean>(false);
+  const [dispatchResult, setDispatchResult] = useState<{ ok: boolean; text: string } | null>(null);
+
+  // Care Concierge Support Tickets
+  const [supportTickets, setSupportTickets] = useState<SupportTicket[]>([]);
+
+  // Modals & Messages
   const [paying, setPaying] = useState<Booking | null>(null);
   const [reading, setReading] = useState<{ id: string; articleId: string; title: string; doctor: string; note: string | null; seen: boolean }[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
 
+  // Load Recommended Reading
   useEffect(() => {
     fetch('/api/me/recommended-reading').then(r => r.json()).then(d => d.status === 'success' && setReading(d.data)).catch(() => {});
   }, []);
@@ -83,6 +125,7 @@ export default function PatientDashboard({
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
+  // Load Primary Records Data
   const loadSummary = useCallback(async () => {
     const d = await fetch('/api/records/me').then(r => r.json()).catch(() => null);
     if (d?.status !== 'success' || !d.data) return;
@@ -98,7 +141,43 @@ export default function PatientDashboard({
     });
   }, []);
 
-  useEffect(() => { loadSummary(); }, [loadSummary, activeTab]);
+  // Load On-Call, Consults, Pharmacies, and Support Inquiries
+  const loadClinicalIntegrations = useCallback(async () => {
+    const [onCall, consults, pharms, support] = await Promise.all([
+      fetch('/api/on-call/status').then(r => r.json()).catch(() => null),
+      fetch('/api/consults/mine').then(r => r.json()).catch(() => null),
+      fetch('/api/pharmacies').then(r => r.json()).catch(() => null),
+      fetch('/api/support/tickets').then(r => r.json()).catch(() => null),
+    ]);
+
+    if (onCall?.status === 'success') setOnCallStatus(onCall.data);
+    if (consults?.status === 'success') setMyConsults(consults.data);
+    if (pharms?.status === 'success') {
+      setPharmacies(pharms.data);
+      if (pharms.data.length > 0 && !selectedPharmacyId) {
+        setSelectedPharmacyId(pharms.data[0].id);
+      }
+    }
+    if (support?.status === 'success') setSupportTickets(support.data);
+  }, [selectedPharmacyId]);
+
+  useEffect(() => { 
+    loadSummary(); 
+    loadClinicalIntegrations();
+  }, [loadSummary, loadClinicalIntegrations, activeTab]);
+
+  // Active Consult State & Auto-Polling when Queued
+  const activeConsult = myConsults.find(c => ['awaiting_payment', 'queued', 'active'].includes(c.status));
+  useEffect(() => {
+    if (activeConsult?.status !== 'queued') return;
+    const interval = setInterval(() => {
+      fetch('/api/consults/mine')
+        .then(r => r.json())
+        .then(d => d.status === 'success' && setMyConsults(d.data))
+        .catch(() => {});
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [activeConsult?.status]);
 
   const upcoming = bookings.filter(b => b.status === 'Upcoming');
   const past = bookings.filter(b => b.status !== 'Upcoming');
@@ -125,13 +204,46 @@ export default function PatientDashboard({
     return combined;
   })();
 
-  const cancel = async (b: Booking) => {
+  // Condition-Aware Specialist Matching Engine
+  const recommendedSpecialists: (DoctorProfile | NurseProfile)[] = (() => {
+    const conditionsStr = patientConditions.join(' ').toLowerCase();
+    const hasHypertension = conditionsStr.includes('hyper') || conditionsStr.includes('pressure') || (summary?.bp && summary.bp.value1 >= 130);
+    const hasDermatology = conditionsStr.includes('skin') || conditionsStr.includes('derm') || conditionsStr.includes('eczema') || conditionsStr.includes('rash');
+    const hasPediatric = conditionsStr.includes('pediat') || conditionsStr.includes('child');
+    const hasNeuro = conditionsStr.includes('neuro') || conditionsStr.includes('migraine') || conditionsStr.includes('headache');
+
+    const matched = professionals.filter(p => {
+      const spec = p.specialization.toLowerCase();
+      if (hasHypertension && (spec.includes('cardio') || spec.includes('physician') || spec.includes('general'))) return true;
+      if (hasDermatology && spec.includes('derm')) return true;
+      if (hasPediatric && spec.includes('pediat')) return true;
+      if (hasNeuro && spec.includes('neuro')) return true;
+      return false;
+    });
+
+    if (matched.length > 0) return matched.slice(0, 3);
+    // Fallback: top verified doctors
+    return professionals.filter(p => p.role === UserRole.DOCTOR).slice(0, 3);
+  })();
+
+  const cancelBooking = async (b: Booking) => {
     if (!window.confirm('Cancel this appointment?')) return;
     const d = await fetch(`/api/bookings/${b.id}/cancel`, { method: 'POST' }).then(r => r.json()).catch(() => null);
     if (d?.status === 'success') {
       setBookings(prev => prev.map(x => (x.id === b.id ? d.data : x)));
       setMsg(d.message);
     } else setMsg(d?.message || 'Could not cancel.');
+  };
+
+  const cancelActiveConsult = async (id: string) => {
+    if (!window.confirm('Cancel this consultation request and receive an immediate refund?')) return;
+    const d = await fetch(`/api/consults/${id}/end`, { method: 'POST' }).then(r => r.json()).catch(() => null);
+    if (d?.status === 'success') {
+      setMsg('Consultation request cancelled. Refund processed automatically.');
+      loadClinicalIntegrations();
+    } else {
+      setMsg(d?.message || 'Failed to cancel consultation.');
+    }
   };
 
   const removeSaved = (id: string) => {
@@ -161,6 +273,39 @@ export default function PatientDashboard({
     return { label: 'Normal Target Range', badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-300' };
   };
 
+  // Dispatch Prescription Handler
+  const handleDispatchPrescription = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!dispatchingRx || !selectedPharmacyId) return;
+    setDispatchBusy(true);
+    setDispatchResult(null);
+
+    try {
+      const resp = await fetch(`/api/prescriptions/${dispatchingRx.id}/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pharmacyId: selectedPharmacyId, shareSafety: shareSafetyRecord })
+      });
+      const data = await resp.json();
+      if (data.status === 'success') {
+        setDispatchResult({ ok: true, text: data.message || 'Prescription transferred to pharmacy.' });
+        loadSummary();
+        setTimeout(() => {
+          setDispatchingRx(null);
+          setDispatchResult(null);
+        }, 1500);
+      } else {
+        setDispatchResult({ ok: false, text: data.message || 'Could not transfer prescription.' });
+      }
+    } catch {
+      setDispatchResult({ ok: false, text: 'Server connection error.' });
+    } finally {
+      setDispatchBusy(false);
+    }
+  };
+
+  const openTickets = supportTickets.filter(t => t.status !== 'resolved');
+
   const tabs: { id: Tab; label: string; icon: React.ComponentType<any>; count?: number }[] = [
     { id: 'appointments', label: 'Medical Assistance Hub', icon: Calendar, count: upcoming.length },
     { id: 'records', label: 'Clinical Health Record', icon: FolderHeart },
@@ -169,7 +314,69 @@ export default function PatientDashboard({
 
   return (
     <div className="w-full max-w-[1920px] mx-auto space-y-5" id="patient-dashboard-root">
-      {/* 1. INSTITUTIONAL PATIENT HEADER */}
+      {/* 1. PERSISTENT ACTIVE CONSULTATION QUEUE RIBBON (IF LIVE) */}
+      {activeConsult && (
+        <aside 
+          aria-label="Active consultation alert" 
+          className={`border-2 p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in ${
+            activeConsult.status === 'active'
+              ? 'bg-emerald-600 text-white border-emerald-700'
+              : activeConsult.status === 'queued'
+              ? 'bg-[color:var(--t-50)] text-[color:var(--ink)] border-[color:var(--t-600)]'
+              : 'bg-amber-50 text-amber-950 border-amber-400'
+          }`}
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="relative flex h-3.5 w-3.5 shrink-0">
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                activeConsult.status === 'active' ? 'bg-white' : 'bg-[color:var(--t-600)]'
+              }`} />
+              <span className={`relative inline-flex rounded-full h-3.5 w-3.5 ${
+                activeConsult.status === 'active' ? 'bg-white' : 'bg-[color:var(--t-600)]'
+              }`} />
+            </span>
+            <div className="min-w-0">
+              <p className="font-display font-black text-xs sm:text-sm leading-tight">
+                {activeConsult.status === 'active' && 'LIVE VIDEO CONSULTATION IN PROGRESS'}
+                {activeConsult.status === 'queued' && 'ON-CALL DOCTOR QUEUE: MATCHING PRACTITIONER'}
+                {activeConsult.status === 'awaiting_payment' && 'CONSULTATION SLOT RESERVED · AWAITING PAYMENT'}
+              </p>
+              <p className={`text-[11px] font-medium mt-0.5 ${activeConsult.status === 'active' ? 'text-emerald-100' : 'text-slate-600'}`}>
+                {activeConsult.status === 'active' && 'A licensed physician is waiting in the encrypted WebRTC consultation room.'}
+                {activeConsult.status === 'queued' && 'Consultation payment confirmed. Keep window open. A doctor will connect within 10 min or refund automatically.'}
+                {activeConsult.status === 'awaiting_payment' && `Fee: RM ${activeConsult.fee?.toFixed(2) || '50.00'} · Complete payment to be matched with on-call doctor.`}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={onConsultNow}
+              className={`min-h-[38px] px-4 text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 w-full sm:w-auto ${
+                activeConsult.status === 'active'
+                  ? 'bg-white text-emerald-900 hover:bg-emerald-50 shadow-2xs'
+                  : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white shadow-xs'
+              }`}
+            >
+              <Video className="h-3.5 w-3.5" />
+              <span>{activeConsult.status === 'active' ? 'Enter Video Room' : 'View Live Room'}</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+            {activeConsult.status === 'queued' && (
+              <button
+                type="button"
+                onClick={() => cancelActiveConsult(activeConsult.id)}
+                className="min-h-[38px] px-3 text-xs font-bold border border-slate-300 hover:border-rose-400 hover:bg-rose-50 hover:text-rose-700 transition-colors cursor-pointer bg-white"
+              >
+                Cancel &amp; Refund
+              </button>
+            )}
+          </div>
+        </aside>
+      )}
+
+      {/* 2. INSTITUTIONAL PATIENT HEADER */}
       <DashboardHeader
         tabs={tabs}
         activeTab={activeTab}
@@ -204,6 +411,7 @@ export default function PatientDashboard({
               <BannerKpis items={[
                 { value: upcoming.length, label: 'Upcoming' },
                 { value: summary?.activeRx ?? '–', label: 'Prescriptions' },
+                { value: onCallStatus ? onCallStatus.onlineDoctors : '–', label: 'Doctors On-Call' },
                 { value: careTeam.length, label: 'Care Team' },
               ]} />
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
@@ -231,7 +439,7 @@ export default function PatientDashboard({
         />
       </DashboardHeader>
 
-      {/* 2. NOTIFICATION / STATUS DISMISSAL */}
+      {/* 3. NOTIFICATION / STATUS DISMISSAL */}
       {msg && (
         <div
           role="status"
@@ -251,7 +459,7 @@ export default function PatientDashboard({
         </div>
       )}
 
-      {/* 3. PATIENT SAFETY & CLINICAL IDENTIFIER STRIP */}
+      {/* 4. PATIENT SAFETY & CLINICAL IDENTIFIER STRIP */}
       <section 
         className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-4 sm:p-5"
         aria-label="Clinical safety and patient identity"
@@ -382,7 +590,7 @@ export default function PatientDashboard({
         </div>
       </section>
 
-      {/* 4. MAIN WORKSPACE VIEW */}
+      {/* 5. MAIN WORKSPACE VIEW */}
       {activeTab === 'appointments' && (
         <div id="panel-appointments" role="tabpanel" aria-labelledby="tab-appointments" tabIndex={0} className="space-y-5">
           {/* IMMEDIATE MEDICAL ASSISTANCE HUB (3 PRIMARY CARE PATHWAYS) */}
@@ -400,7 +608,7 @@ export default function PatientDashboard({
                 </p>
               </div>
               <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1">
-                Instant Telehealth Available
+                {onCallStatus ? `${onCallStatus.onlineDoctors} Doctors Available Online` : 'Instant Telehealth Available'}
               </span>
             </div>
 
@@ -410,10 +618,11 @@ export default function PatientDashboard({
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-3">
                     <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-black uppercase text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> 24/7 Active On-Call
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> 
+                      {onCallStatus && onCallStatus.onlineDoctors > 0 ? `${onCallStatus.onlineDoctors} Doctors On Duty` : '24/7 Active On-Call'}
                     </span>
                     <span className="text-[11px] font-mono font-extrabold text-[color:var(--t-700)]">
-                      &lt; 3 Min Wait
+                      {onCallStatus ? `RM ${onCallStatus.consultFee.toFixed(0)} / consult` : '< 3 Min Wait'}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 mb-2">
@@ -526,7 +735,7 @@ export default function PatientDashboard({
                   <ul className="space-y-1.5 text-[11px] font-medium text-slate-700 border-t border-[color:var(--t-100)] pt-3 mb-4">
                     <li className="flex items-center gap-1.5 text-slate-800">
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                      <span>50+ Verified Retail Pharmacies (Guardian, Caring, etc.)</span>
+                      <span>{pharmacies.length > 0 ? `${pharmacies.length} Partner Pharmacies Registered` : '50+ Verified Retail Pharmacies'}</span>
                     </li>
                     <li className="flex items-center gap-1.5 text-slate-800">
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
@@ -737,9 +946,16 @@ export default function PatientDashboard({
                                   {rx.pharmacyName}
                                 </span>
                               ) : (
-                                <span className="inline-block text-[10px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5">
-                                  Awaiting Pharmacy Dispatch
-                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setDispatchingRx(rx);
+                                    if (pharmacies.length > 0) setSelectedPharmacyId(pharmacies[0].id);
+                                  }}
+                                  className="inline-flex items-center gap-1 text-[11px] font-mono font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white px-2.5 py-1 shadow-2xs cursor-pointer transition-colors"
+                                >
+                                  <Send className="h-3 w-3" /> Dispatch to Pharmacy
+                                </button>
                               )}
                               <p className="text-[10px] font-mono text-slate-400 mt-1">
                                 Valid until: {fmtDate(rx.validUntil)}
@@ -753,10 +969,13 @@ export default function PatientDashboard({
                             </span>
                             <button
                               type="button"
-                              onClick={() => { setRecordsSubTab('rx'); setActiveTab('records'); }}
+                              onClick={() => {
+                                setDispatchingRx(rx);
+                                if (pharmacies.length > 0) setSelectedPharmacyId(pharmacies[0].id);
+                              }}
                               className="text-[11px] font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
                             >
-                              Fulfill or View QR &rarr;
+                              Transfer or View Details &rarr;
                             </button>
                           </div>
                         </div>
@@ -786,6 +1005,197 @@ export default function PatientDashboard({
               </div>
             </section>
           </div>
+
+          {/* CONDITION-AWARE SPECIALIST RECOMMENDATION ENGINE */}
+          {recommendedSpecialists.length > 0 && (
+            <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6" aria-label="Personalized specialist care recommendations">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-[color:var(--t-100)]">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shadow-2xs">
+                    <Stethoscope className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <h2 className="font-display font-black text-base text-[color:var(--ink)] leading-tight">
+                      Specialists Recommended for Your Health Profile
+                    </h2>
+                    <p className="text-xs text-slate-500 font-medium mt-0.5">
+                      Personalized matching based on {patientConditions.length > 0 ? `active conditions: ${patientConditions.join(', ')}` : 'vitals and primary wellness'}
+                    </p>
+                  </div>
+                </div>
+
+                {onFindDoctors && (
+                  <button
+                    type="button"
+                    onClick={onFindDoctors}
+                    className="text-xs font-bold text-[color:var(--t-600)] hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <Search className="h-3.5 w-3.5" /> Full Registry
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {recommendedSpecialists.map(prof => (
+                  <div
+                    key={prof.id}
+                    className="p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all bg-white flex flex-col justify-between shadow-2xs group"
+                  >
+                    <div>
+                      <div className="flex items-start gap-3 mb-3">
+                        <img
+                          src={prof.avatar || '/assets/malaysian_male_doctor.jpg'}
+                          alt={prof.name}
+                          className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <button
+                            type="button"
+                            onClick={() => onSelectProfessional(prof.id)}
+                            className="font-display font-extrabold text-sm text-[color:var(--ink)] hover:text-[color:var(--t-600)] transition-colors text-left truncate block w-full cursor-pointer"
+                          >
+                            {prof.name}
+                          </button>
+                          <p className="text-xs text-[color:var(--t-700)] font-bold">{prof.specialization}</p>
+                          <div className="flex items-center gap-1 text-[11px] text-slate-500 mt-0.5">
+                            <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
+                            <strong className="text-slate-800">{prof.rating ? prof.rating.toFixed(1) : '5.0'}</strong>
+                            <span>({prof.reviewCount || 12} reviews)</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5 text-[11px] text-slate-600 mb-3 border-t border-[color:var(--t-100)] pt-2.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-500">Registration:</span>
+                          <span className="font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200">
+                            MMC Verified
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-500">Location:</span>
+                          <span className="font-medium text-slate-800">{prof.city || 'Kuala Lumpur'}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-500">Consultation Fee:</span>
+                          <span className="font-mono font-extrabold text-[color:var(--ink)]">RM {prof.fee ? prof.fee.toFixed(2) : '80.00'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => onSelectProfessional(prof.id)}
+                      className="w-full min-h-[38px] px-3 bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] hover:text-white text-[color:var(--t-700)] text-xs font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>Book Consultation</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* CARE CONCIERGE & SUPPORT INQUIRIES WIDGET */}
+          <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6" aria-label="Care operations and assistance support">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-[color:var(--t-100)]">
+              <div className="flex items-center gap-2.5">
+                <span className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shadow-2xs">
+                  <LifeBuoy className="h-4 w-4" />
+                </span>
+                <div>
+                  <h2 className="font-display font-black text-base text-[color:var(--ink)] leading-tight">
+                    Care Concierge &amp; Clinical Helpdesk
+                  </h2>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    Direct access to MedCred medical operations for assistance, digital MC inquiries, and dosage advice
+                  </p>
+                </div>
+              </div>
+
+              {onOpenHelp && (
+                <button
+                  type="button"
+                  onClick={onOpenHelp}
+                  className="text-xs font-bold text-[color:var(--t-600)] hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Open Help Center</span>
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+              {/* TICKET STATUS / PROMPT */}
+              <div className="p-4 bg-[color:var(--t-50)]/40 border border-[color:var(--t-200)]">
+                {openTickets.length > 0 ? (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold uppercase text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5">
+                        <AlertCircle className="h-3 w-3 text-amber-600" /> {openTickets.length} Active Inquiry
+                      </span>
+                      <span className="text-[11px] font-mono text-slate-500">SLA: Response &lt; 2h</span>
+                    </div>
+                    <h4 className="font-display font-black text-sm text-[color:var(--ink)] mb-1">
+                      {openTickets[0].subject}
+                    </h4>
+                    <p className="text-xs text-slate-600 font-medium mb-3">
+                      Category: {openTickets[0].category} · Status: <span className="font-bold text-[color:var(--t-700)] capitalize">{openTickets[0].status}</span>
+                    </p>
+                    {onOpenHelp && (
+                      <button
+                        type="button"
+                        onClick={onOpenHelp}
+                        className="min-h-[36px] px-4 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] text-xs font-bold border border-[color:var(--t-200)] transition-colors cursor-pointer"
+                      >
+                        View Reply Thread &rarr;
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <h4 className="font-display font-black text-sm text-[color:var(--ink)] mb-1">
+                      Have a Clinical or Administrative Question?
+                    </h4>
+                    <p className="text-xs text-slate-600 font-medium leading-relaxed mb-3">
+                      Our care desk assists with prescription transfers, Medical Certificate (MC) verification, and appointment scheduling. Safety concerns are responded to within 1 hour.
+                    </p>
+                    {onOpenHelp && (
+                      <button
+                        type="button"
+                        onClick={onOpenHelp}
+                        className="min-h-[36px] px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors cursor-pointer"
+                      >
+                        Contact Care Operations
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* QUICK CLINICAL PROTOCOLS */}
+              <div className="p-4 bg-white border border-[color:var(--t-200)] space-y-2.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> Clinical Quality Guarantees
+                </h4>
+                <ul className="text-xs space-y-2 text-slate-600 font-medium">
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--t-600)] mt-1.5 shrink-0" />
+                    <span><strong>100% Council Verified:</strong> All doctors hold active MMC APC registrations.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--t-600)] mt-1.5 shrink-0" />
+                    <span><strong>Automatic Telehealth Refund:</strong> 10-minute maximum wait time or fee is returned in full.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--t-600)] mt-1.5 shrink-0" />
+                    <span><strong>Licensed Pharmacy Dispatch:</strong> Digital signatures cryptographically checked.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
 
           {/* DOCTOR RECOMMENDED CLINICAL ARTICLES */}
           {reading.length > 0 && (
@@ -1014,7 +1424,7 @@ export default function PatientDashboard({
 
                         <button
                           type="button"
-                          onClick={() => cancel(b)}
+                          onClick={() => cancelBooking(b)}
                           className="min-h-[40px] px-3 text-xs font-semibold text-slate-400 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
                           title="Cancel appointment"
                         >
@@ -1082,6 +1492,147 @@ export default function PatientDashboard({
             onSelectProfessional={onSelectProfessional}
             onVerifyCredentials={p => onSelectProfessional(p.id)}
           />
+        </div>
+      )}
+
+      {/* INLINE PHARMACY DISPATCH MODAL */}
+      {dispatchingRx && (
+        <div 
+          role="dialog" 
+          aria-modal="true" 
+          aria-labelledby="dispatch-dialog-title" 
+          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in"
+        >
+          <div className="bg-white border-2 border-[color:var(--t-600)] max-w-lg w-full shadow-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-[color:var(--t-100)] pb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]">
+                  <Pill className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 id="dispatch-dialog-title" className="font-display font-black text-sm text-[color:var(--ink)] leading-tight">
+                    Dispatch Prescription to Pharmacy
+                  </h3>
+                  <p className="text-[11px] font-mono text-slate-500">RX CODE: {dispatchingRx.code}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setDispatchingRx(null); setDispatchResult(null); }}
+                className="text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
+                aria-label="Close dialog"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* PRESCRIPTION DETAILS */}
+            <div className="p-3 bg-[color:var(--t-50)]/40 border border-[color:var(--t-200)] text-xs space-y-1">
+              <p className="font-bold text-[color:var(--ink)]">
+                {Array.isArray(dispatchingRx.items) && dispatchingRx.items[0]?.name ? dispatchingRx.items[0].name : dispatchingRx.diagnosis || 'Prescribed Medicine'}
+              </p>
+              {Array.isArray(dispatchingRx.items) && dispatchingRx.items[0]?.instructions && (
+                <p className="text-slate-600 font-medium">{dispatchingRx.items[0].instructions}</p>
+              )}
+              <p className="text-[11px] font-mono text-slate-500 pt-0.5">
+                Prescribing Doctor: {dispatchingRx.doctor?.name || 'Verified Physician'}
+              </p>
+            </div>
+
+            <form onSubmit={handleDispatchPrescription} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                  Select Partner Pharmacy for Dispensing:
+                </label>
+                {pharmacies.length === 0 ? (
+                  <p className="text-xs text-slate-500 p-3 bg-slate-50 border border-slate-200">
+                    Loading partner pharmacies…
+                  </p>
+                ) : (
+                  <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+                    {pharmacies.map(p => (
+                      <label
+                        key={p.id}
+                        className={`block p-3 border cursor-pointer transition-all ${
+                          selectedPharmacyId === p.id 
+                            ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)]/60' 
+                            : 'border-[color:var(--t-200)] bg-white hover:border-[color:var(--t-300)]'
+                        }`}
+                      >
+                        <div className="flex items-start gap-2.5">
+                          <input
+                            type="radio"
+                            name="pharmacyChoice"
+                            value={p.id}
+                            checked={selectedPharmacyId === p.id}
+                            onChange={() => setSelectedPharmacyId(p.id)}
+                            className="mt-1 text-[color:var(--t-600)] focus:ring-[color:var(--t-600)]"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="font-bold text-xs text-[color:var(--ink)] leading-snug">{p.name}</p>
+                            <p className="text-[11px] text-slate-500 truncate mt-0.5 flex items-center gap-1">
+                              <MapPin className="h-3 w-3 shrink-0 text-slate-400" />
+                              <span>{p.address}, {p.city}</span>
+                            </p>
+                            {p.services.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-1.5">
+                                {p.services.map((s, idx) => (
+                                  <span key={idx} className="text-[9px] font-bold uppercase bg-white border border-[color:var(--t-200)] px-1.5 py-0.2 text-slate-700">
+                                    {s}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* SAFETY SHARING CONSENT */}
+              <label className="flex items-start gap-2 text-xs font-medium text-slate-700 cursor-pointer pt-1">
+                <input
+                  type="checkbox"
+                  checked={shareSafetyRecord}
+                  onChange={e => setShareSafetyRecord(e.target.checked)}
+                  className="mt-0.5 text-[color:var(--t-600)] focus:ring-[color:var(--t-600)]"
+                />
+                <span>
+                  Authorize pharmacist to view documented drug allergies &amp; conditions for safety cross-checking.
+                </span>
+              </label>
+
+              {dispatchResult && (
+                <div className={`p-3 text-xs font-bold border ${
+                  dispatchResult.ok 
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+                    : 'bg-rose-50 text-rose-800 border-rose-200'
+                }`}>
+                  {dispatchResult.text}
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-[color:var(--t-100)]">
+                <button
+                  type="button"
+                  onClick={() => { setDispatchingRx(null); setDispatchResult(null); }}
+                  className="min-h-[40px] px-4 text-xs font-bold border border-slate-300 hover:bg-slate-50 cursor-pointer transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={dispatchBusy || !selectedPharmacyId}
+                  className="min-h-[40px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:opacity-50 text-white text-xs font-black shadow-xs cursor-pointer transition-colors flex items-center gap-1.5"
+                >
+                  <Send className="h-3.5 w-3.5" />
+                  <span>{dispatchBusy ? 'Transmitting…' : 'Confirm Dispatch to Pharmacy'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
