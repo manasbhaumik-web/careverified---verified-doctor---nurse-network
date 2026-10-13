@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Award, Lock, FileText, Globe, ChevronRight, LogOut } from 'lucide-react';
+import { Globe, ChevronRight, LogOut } from 'lucide-react';
 
 export interface NavItem {
   id: string;
@@ -241,25 +241,6 @@ export default function Footer({
 
         </div>
 
-        {/* ─── TIER 2: INSTITUTIONAL COMPLIANCE & TRUST BADGES STRIP ─── */}
-        <div className="py-4 border-b border-[color:var(--t-800)] grid grid-cols-2 sm:grid-cols-4 gap-3 text-slate-400 text-[11px]">
-          <div className="flex items-center gap-2 p-2.5 bg-slate-900/40 border border-slate-800/60">
-            <ShieldCheck className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
-            <span className="font-semibold">MMC Verified Register</span>
-          </div>
-          <div className="flex items-center gap-2 p-2.5 bg-slate-900/40 border border-slate-800/60">
-            <Award className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
-            <span className="font-semibold">LJM Nursing Registry</span>
-          </div>
-          <div className="flex items-center gap-2 p-2.5 bg-slate-900/40 border border-slate-800/60">
-            <Lock className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
-            <span className="font-semibold">PDPA Encrypted Vault</span>
-          </div>
-          <div className="flex items-center gap-2 p-2.5 bg-slate-900/40 border border-slate-800/60">
-            <FileText className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
-            <span className="font-semibold">Immutable Audit Logs</span>
-          </div>
-        </div>
 
         {/* ─── TIER 3: CLINICAL & REGULATORY DISCLAIMER ─── */}
         <div className="py-4 border-b border-[color:var(--t-800)] text-[11px] text-slate-400 leading-relaxed">
