@@ -458,131 +458,131 @@ export default function PatientDashboard({
         </div>
       )}
 
-      {/* 4. PATIENT SAFETY & CLINICAL IDENTIFIER STRIP */}
+      {/* 4. PATIENT SAFETY & CLINICAL IDENTIFIER STRIP (COMPACT) */}
       <section 
-        className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-4 sm:p-5"
+        className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-3.5 sm:p-4"
         aria-label="Clinical safety and patient identity"
       >
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-[color:var(--t-100)]">
-          <div className="flex items-center gap-2">
-            <ShieldAlert className="h-4 w-4 text-[color:var(--t-600)]" />
-            <h2 className="font-mono text-xs font-black tracking-wider text-slate-800 uppercase">
-              Patient Clinical Safety &amp; Emergency Registry
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-[color:var(--t-100)]">
+          <div className="flex items-center gap-1.5">
+            <ShieldAlert className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+            <h2 className="font-mono text-[11px] font-black tracking-wider text-slate-800 uppercase">
+              Clinical Safety &amp; Emergency Registry
             </h2>
           </div>
-          <span className="text-[11px] font-mono font-medium text-slate-500">
+          <span className="text-[10px] font-mono font-medium text-slate-500">
             EHR ID: <strong className="text-[color:var(--ink)] font-bold">{patientUser?.id ? patientUser.id.slice(0, 10).toUpperCase() : 'MED-PT-8842'}</strong> · PDPA Encrypted
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
           {/* ALLERGY SAFETY STATUS */}
-          <div className={`p-3.5 border transition-all ${
+          <div className={`p-2.5 border transition-all ${
             patientAllergies.length > 0 
               ? 'bg-rose-50/70 border-rose-200 text-rose-950' 
               : 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
           }`}>
-            <div className="flex items-center justify-between gap-2 mb-1.5">
-              <span className="text-[10px] font-mono font-black uppercase tracking-wider flex items-center gap-1.5">
+            <div className="flex items-center justify-between gap-1.5 mb-1">
+              <span className="text-[9px] font-mono font-black uppercase tracking-wider flex items-center gap-1">
                 {patientAllergies.length > 0 ? (
                   <>
-                    <AlertTriangle className="h-3.5 w-3.5 text-rose-600" />
-                    <span className="text-rose-900">Allergy Alert (High)</span>
+                    <AlertTriangle className="h-3 w-3 text-rose-600" />
+                    <span className="text-rose-900">Allergy Alert</span>
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                    <span className="text-emerald-900">Safety Verified</span>
+                    <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                    <span className="text-emerald-900">Verified</span>
                   </>
                 )}
               </span>
               <button
                 type="button"
                 onClick={() => { setRecordsSubTab('overview'); setActiveTab('records'); }}
-                className="text-[10px] font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
+                className="text-[9px] font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
               >
                 Update
               </button>
             </div>
             {patientAllergies.length > 0 ? (
-              <div className="flex flex-wrap gap-1 mt-1">
+              <div className="flex flex-wrap gap-1">
                 {patientAllergies.map((alg, idx) => (
-                  <span key={idx} className="inline-block text-[11px] font-bold bg-white text-rose-900 border border-rose-300 px-2 py-0.5 shadow-2xs">
+                  <span key={idx} className="inline-block text-[10px] font-bold bg-white text-rose-900 border border-rose-300 px-1.5 py-0.2 shadow-2xs">
                     {alg}
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="text-xs font-semibold text-emerald-900 mt-1">
-                NKDA · No Known Drug Allergies recorded on patient file.
+              <p className="text-[11px] font-semibold text-emerald-900 leading-tight">
+                NKDA · No Known Drug Allergies
               </p>
             )}
           </div>
 
           {/* NATIONAL CLINICAL IDENTITY */}
-          <div className="p-3.5 bg-[color:var(--t-50)]/40 border border-[color:var(--t-200)]">
-            <div className="flex items-center justify-between gap-2 mb-1">
-              <span className="text-[10px] font-mono font-black uppercase tracking-wider text-slate-600 flex items-center gap-1">
-                <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> Clinical Demographics
+          <div className="p-2.5 bg-[color:var(--t-50)]/40 border border-[color:var(--t-200)]">
+            <div className="flex items-center justify-between gap-1.5 mb-1">
+              <span className="text-[9px] font-mono font-black uppercase tracking-wider text-slate-600 flex items-center gap-1">
+                <ShieldCheck className="h-3 w-3 text-[color:var(--t-600)]" /> Clinical Demographics
               </span>
             </div>
-            <p className="text-xs font-bold text-[color:var(--ink)]">
+            <p className="text-[11px] font-bold text-[color:var(--ink)] leading-tight">
               NRIC: <span className="font-mono">{maskNric(patientUser?.icNumber)}</span>
             </p>
-            <p className="text-[11px] text-slate-600 font-medium mt-0.5">
-              {patientUser?.age ? `${patientUser.age} Years` : 'Adult'} · {patientUser?.gender || 'Gender Unspecified'}
+            <p className="text-[10px] text-slate-600 font-medium mt-0.5">
+              {patientUser?.age ? `${patientUser.age} Yrs` : 'Adult'} · {patientUser?.gender || 'Unspecified'}
             </p>
           </div>
 
           {/* CHRONIC MEDICAL CONDITIONS */}
-          <div className="p-3.5 bg-slate-50 border border-[color:var(--t-200)]">
-            <div className="flex items-center justify-between gap-2 mb-1">
-              <span className="text-[10px] font-mono font-black uppercase tracking-wider text-slate-600 flex items-center gap-1">
-                <Activity className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> Chronic Profile
+          <div className="p-2.5 bg-slate-50 border border-[color:var(--t-200)]">
+            <div className="flex items-center justify-between gap-1.5 mb-1">
+              <span className="text-[9px] font-mono font-black uppercase tracking-wider text-slate-600 flex items-center gap-1">
+                <Activity className="h-3 w-3 text-[color:var(--t-600)]" /> Chronic Profile
               </span>
               <button
                 type="button"
                 onClick={() => { setRecordsSubTab('overview'); setActiveTab('records'); }}
-                className="text-[10px] font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
+                className="text-[9px] font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
               >
                 Edit
               </button>
             </div>
             {patientConditions.length > 0 ? (
-              <div className="flex flex-wrap gap-1 mt-1">
+              <div className="flex flex-wrap gap-1">
                 {patientConditions.map((cond, idx) => (
-                  <span key={idx} className="inline-block text-[11px] font-bold bg-white text-slate-800 border border-[color:var(--t-200)] px-2 py-0.5 shadow-2xs">
+                  <span key={idx} className="inline-block text-[10px] font-bold bg-white text-slate-800 border border-[color:var(--t-200)] px-1.5 py-0.2 shadow-2xs">
                     {cond}
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="text-xs font-medium text-slate-500 mt-1">
-                No chronic medical conditions documented.
+              <p className="text-[11px] font-medium text-slate-500 leading-tight">
+                No chronic conditions documented.
               </p>
             )}
           </div>
 
           {/* ICE EMERGENCY CONTACT */}
-          <div className="p-3.5 bg-amber-50/50 border border-amber-200 text-amber-950">
-            <div className="flex items-center justify-between gap-2 mb-1">
-              <span className="text-[10px] font-mono font-black uppercase tracking-wider text-amber-900 flex items-center gap-1">
-                <PhoneCall className="h-3.5 w-3.5 text-amber-700" /> Emergency (ICE)
+          <div className="p-2.5 bg-amber-50/50 border border-amber-200 text-amber-950">
+            <div className="flex items-center justify-between gap-1.5 mb-1">
+              <span className="text-[9px] font-mono font-black uppercase tracking-wider text-amber-900 flex items-center gap-1">
+                <PhoneCall className="h-3 w-3 text-amber-700" /> Emergency (ICE)
               </span>
             </div>
-            <p className="text-xs font-bold text-amber-950 truncate">
+            <p className="text-[11px] font-bold text-amber-950 truncate leading-tight">
               {patientUser?.emergencyContactName || 'Designated Contact'}
             </p>
             <div className="mt-0.5">
               {patientUser?.emergencyContactPhone ? (
                 <a 
                   href={`tel:${patientUser.emergencyContactPhone}`}
-                  className="text-xs font-mono font-extrabold text-[color:var(--t-700)] hover:underline inline-flex items-center gap-1"
+                  className="text-[10px] font-mono font-extrabold text-[color:var(--t-700)] hover:underline inline-flex items-center gap-1"
                 >
                   {patientUser.emergencyContactPhone}
                 </a>
               ) : (
-                <span className="text-[11px] text-amber-800 italic">Call 999 for medical emergencies</span>
+                <span className="text-[10px] text-amber-800 italic">Call 999 for emergencies</span>
               )}
             </div>
           </div>
@@ -591,170 +591,141 @@ export default function PatientDashboard({
 
       {/* 5. MAIN WORKSPACE VIEW */}
       {activeTab === 'appointments' && (
-        <div id="panel-appointments" role="tabpanel" aria-labelledby="tab-appointments" tabIndex={0} className="space-y-5">
-          {/* IMMEDIATE MEDICAL ASSISTANCE HUB (3 PRIMARY CARE PATHWAYS) */}
-          <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6" aria-label="Immediate medical assistance channels">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-3.5 border-b border-[color:var(--t-100)]">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
-                    Immediate Medical Assistance &amp; On-Demand Care
-                  </h2>
-                </div>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Connect immediately with verified medical staff, triage symptoms, or dispatch prescriptions.
-                </p>
+        <div id="panel-appointments" role="tabpanel" aria-labelledby="tab-appointments" tabIndex={0} className="space-y-4">
+          {/* COMPACT IMMEDIATE MEDICAL ASSISTANCE ACTION BAR */}
+          <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-3.5 sm:p-4" aria-label="Immediate medical assistance channels">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2.5 border-b border-[color:var(--t-100)]">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <h2 className="font-display font-black text-sm sm:text-base text-[color:var(--ink)] leading-tight">
+                  Immediate Medical Assistance
+                </h2>
+                <span className="hidden sm:inline text-xs text-slate-400">&bull;</span>
+                <span className="hidden sm:inline text-xs text-slate-500 font-medium">On-demand video doctor, clinical AI triage &amp; dispensary routing</span>
               </div>
-              <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1">
-                {onCallStatus && onCallStatus.onlineDoctors > 0 ? `${onCallStatus.onlineDoctors} Doctors Available Online` : 'Instant Telehealth Available'}
+              <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
+                {onCallStatus && onCallStatus.onlineDoctors > 0 ? `${onCallStatus.onlineDoctors} Doctors Online` : '24/7 Care Triage'}
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* CARD 1: ON-CALL VIDEO DOCTOR */}
-              <div className="border-2 border-[color:var(--t-600)] bg-white p-5 shadow-xs flex flex-col justify-between relative group hover:border-[color:var(--t-700)] transition-colors">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {/* CARD 1: ON-CALL VIDEO DOCTOR (COMPACT) */}
+              <div className="border-2 border-[color:var(--t-600)] hover:border-[color:var(--t-700)] bg-white p-3 shadow-2xs flex flex-col justify-between transition-colors">
                 <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-black uppercase text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> 
-                      {onCallStatus && onCallStatus.onlineDoctors > 0 ? `${onCallStatus.onlineDoctors} Doctors On Duty` : '24/7 Active On-Call'}
-                    </span>
-                    <span className="text-[11px] font-mono font-extrabold text-[color:var(--t-700)]">
-                      {onCallStatus ? `RM ${onCallStatus.consultFee.toFixed(0)} / consult` : '< 3 Min Wait'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shrink-0">
-                      <Video className="h-4 w-4" />
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-7 h-7 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shrink-0">
+                        <Video className="h-3.5 w-3.5" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-display font-black text-xs sm:text-sm text-[color:var(--ink)] leading-tight truncate">
+                          On-Call Video Doctor
+                        </h3>
+                        <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
+                          &lt; 3 min wait · MMC Certified
+                        </p>
+                      </div>
                     </div>
-                    <h3 className="font-display font-black text-base text-[color:var(--ink)]">
-                      Instant Video Doctor
-                    </h3>
+                    <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
+                    </span>
                   </div>
-                  <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4">
-                    Connect immediately with an on-call MMC-registered doctor for clinical diagnosis, verified medical certificates (MC), and instant digital prescriptions.
-                  </p>
-                  <ul className="space-y-1.5 text-[11px] font-medium text-slate-700 border-t border-[color:var(--t-100)] pt-3 mb-4">
-                    <li className="flex items-center gap-1.5 text-slate-800">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                      <span>Official Digital Medical Certificate (MC)</span>
-                    </li>
-                    <li className="flex items-center gap-1.5 text-slate-800">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                      <span>Direct e-prescription dispensary routing</span>
-                    </li>
-                    <li className="flex items-center gap-1.5 text-slate-800">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                      <span>Encrypted WebRTC high-definition tunnel</span>
-                    </li>
-                  </ul>
+
+                  <div className="flex flex-wrap gap-1 mb-2.5">
+                    <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Digital MC</span>
+                    <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">e-Prescription</span>
+                    <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">WebRTC HD</span>
+                  </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={onConsultNow}
-                  className="w-full min-h-[42px] px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full min-h-[34px] px-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-[11px] font-black border border-[color:var(--t-700)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
                 >
-                  <Video className="h-4 w-4" />
-                  <span>Start Instant Video Consult</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
+                  <Video className="h-3.5 w-3.5" />
+                  <span>Start Instant Consult</span>
+                  <ArrowRight className="h-3 w-3" />
                 </button>
               </div>
 
-              {/* CARD 2: AI CLINICAL SYMPTOM MATCHER */}
-              <div className="border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] bg-white p-5 shadow-xs flex flex-col justify-between transition-colors group">
+              {/* CARD 2: AI CLINICAL SYMPTOM MATCHER (COMPACT) */}
+              <div className="border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] bg-white p-3 shadow-2xs flex flex-col justify-between transition-colors group">
                 <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="inline-flex items-center gap-1 text-[10px] font-mono font-black uppercase text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
-                      <Sparkles className="h-3 w-3 text-[color:var(--t-600)]" /> MOH Clinical Protocol
-                    </span>
-                    <span className="text-[11px] font-mono text-slate-500">Free Assessment</span>
-                  </div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shrink-0">
-                      <Stethoscope className="h-4 w-4" />
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-7 h-7 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shrink-0">
+                        <Stethoscope className="h-3.5 w-3.5" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-display font-black text-xs sm:text-sm text-[color:var(--ink)] leading-tight truncate">
+                          AI Symptom Triage
+                        </h3>
+                        <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
+                          MOH Protocol · Free Assessment
+                        </p>
+                      </div>
                     </div>
-                    <h3 className="font-display font-black text-base text-[color:var(--ink)]">
-                      AI Symptom Triage
-                    </h3>
+                    <span className="text-[9px] font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-1.5 py-0.2 shrink-0">
+                      Triage
+                    </span>
                   </div>
-                  <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4">
-                    Input your active symptoms to receive algorithmic acuity grading (Emergent vs Urgent vs Routine) and department-specific specialist matching.
-                  </p>
-                  <ul className="space-y-1.5 text-[11px] font-medium text-slate-700 border-t border-[color:var(--t-100)] pt-3 mb-4">
-                    <li className="flex items-center gap-1.5 text-slate-800">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                      <span>180+ Primary &amp; Specialty Conditions Mapped</span>
-                    </li>
-                    <li className="flex items-center gap-1.5 text-slate-800">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                      <span>Emergency Red-Flag clinical screening</span>
-                    </li>
-                    <li className="flex items-center gap-1.5 text-slate-800">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                      <span>Instant doctor department routing</span>
-                    </li>
-                  </ul>
+
+                  <div className="flex flex-wrap gap-1 mb-2.5">
+                    <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">180+ Conditions</span>
+                    <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Red-Flag Check</span>
+                    <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Dept Route</span>
+                  </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={onOpenTriage ? onOpenTriage : onConsultNow}
-                  className="w-full min-h-[42px] px-4 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full min-h-[34px] px-3 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-[11px] font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
                 >
-                  <Stethoscope className="h-4 w-4 text-[color:var(--t-600)]" />
-                  <span>Run Symptom Assessment</span>
-                  <ArrowRight className="h-3.5 w-3.5 text-slate-400 group-hover:text-[color:var(--t-600)]" />
+                  <Stethoscope className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                  <span>Run Symptom Triage</span>
+                  <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)]" />
                 </button>
               </div>
 
-              {/* CARD 3: E-PRESCRIPTION & PHARMACY REFILL */}
-              <div className="border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] bg-white p-5 shadow-xs flex flex-col justify-between transition-colors group">
+              {/* CARD 3: E-PRESCRIPTION & PHARMACY REFILL (COMPACT) */}
+              <div className="border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] bg-white p-3 shadow-2xs flex flex-col justify-between transition-colors group">
                 <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="inline-flex items-center gap-1 text-[10px] font-mono font-black uppercase text-cyan-800 bg-cyan-50 border border-cyan-200 px-2 py-0.5">
-                      <Pill className="h-3 w-3 text-cyan-600" /> Dispensary Network
-                    </span>
-                    <span className="text-[11px] font-mono font-extrabold text-[color:var(--ink)]">
-                      {summary?.activeRx || 0} Active Prescriptions
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shrink-0">
-                      <Pill className="h-4 w-4" />
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-7 h-7 bg-cyan-50 border border-cyan-200 text-cyan-600 flex items-center justify-center shrink-0">
+                        <Pill className="h-3.5 w-3.5" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-display font-black text-xs sm:text-sm text-[color:var(--ink)] leading-tight truncate">
+                          Pharmacy Dispensary
+                        </h3>
+                        <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
+                          {summary?.activeRx || 0} Active Prescriptions
+                        </p>
+                      </div>
                     </div>
-                    <h3 className="font-display font-black text-base text-[color:var(--ink)]">
-                      Pharmacy Dispensary
-                    </h3>
+                    <span className="text-[9px] font-mono font-bold text-cyan-800 bg-cyan-50 border border-cyan-200 px-1.5 py-0.2 shrink-0">
+                      Dispensary
+                    </span>
                   </div>
-                  <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4">
-                    Fulfill doctor e-prescriptions with accredited retail pharmacies across Malaysia. Track preparation status and request home courier or counter pickup.
-                  </p>
-                  <ul className="space-y-1.5 text-[11px] font-medium text-slate-700 border-t border-[color:var(--t-100)] pt-3 mb-4">
-                    <li className="flex items-center gap-1.5 text-slate-800">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                      <span>{pharmacies.length > 0 ? `${pharmacies.length} Partner Pharmacies Registered` : '50+ Verified Retail Pharmacies'}</span>
-                    </li>
-                    <li className="flex items-center gap-1.5 text-slate-800">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                      <span>QR Code &amp; Digital Signature Verification</span>
-                    </li>
-                    <li className="flex items-center gap-1.5 text-slate-800">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                      <span>Same-day home medicine courier available</span>
-                    </li>
-                  </ul>
+
+                  <div className="flex flex-wrap gap-1 mb-2.5">
+                    <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">50+ Retail Branches</span>
+                    <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">QR Verified</span>
+                    <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Home Courier</span>
+                  </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={onOpenPharmacies ? onOpenPharmacies : () => { setRecordsSubTab('rx'); setActiveTab('records'); }}
-                  className="w-full min-h-[42px] px-4 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full min-h-[34px] px-3 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-[11px] font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
                 >
-                  <Pill className="h-4 w-4 text-[color:var(--t-600)]" />
-                  <span>Explore Partner Pharmacies</span>
-                  <ArrowRight className="h-3.5 w-3.5 text-slate-400 group-hover:text-[color:var(--t-600)]" />
+                  <Pill className="h-3.5 w-3.5 text-cyan-600" />
+                  <span>Refill Prescriptions</span>
+                  <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)]" />
                 </button>
               </div>
             </div>
