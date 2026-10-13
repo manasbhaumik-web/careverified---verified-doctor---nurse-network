@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { Activity, AlertTriangle, ClipboardList, FileText, FlaskConical, Pill, Share2, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Activity, AlertTriangle, ClipboardList, FileText, FlaskConical, Pill, Share2, Trash2, CheckCircle2, AlertCircle, Plus } from 'lucide-react';
 
 const jpost = (url: string, body?: unknown, method = 'POST') =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -94,49 +94,197 @@ export default function PatientRecords({ initialTab }: { initialTab?: RecordSubT
       )}
 
       {tab === 'overview' && (
-        <div className="space-y-5">
-          {(['allergy', 'condition', 'medication'] as const).map(t => (
-            <section key={t} className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5">
-              <h3 className="font-display font-black text-sm text-[color:var(--ink)] mb-3 flex items-center gap-2">
-                <span>{t === 'allergy' ? 'Documented Allergies' : t === 'condition' ? 'Chronic Medical Conditions' : 'Active Medications'}</span>
-              </h3>
-              {data.items.filter((i: any) => i.type === t).length === 0 ? (
-                <div className="py-6 px-4 bg-[color:var(--t-50)]/40 border border-dashed border-[color:var(--t-200)] text-center">
-                  <p className="text-xs text-slate-500 font-medium">No {t === 'allergy' ? 'allergies' : t === 'condition' ? 'conditions' : 'medications'} recorded yet.</p>
+        <div className="space-y-3.5">
+          {/* 3-COLUMN CLINICAL PROFILE BENTO GRID */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {/* 1. ALLERGIES */}
+            <div className="bg-white border-t-2 border-t-rose-600 border-x border-b border-[color:var(--t-200)] shadow-xs p-3.5 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-2 mb-2 border-b border-[color:var(--t-100)]">
+                  <div className="flex items-center gap-1.5">
+                    <AlertTriangle className="h-3.5 w-3.5 text-rose-600" />
+                    <h3 className="font-display font-extrabold text-xs text-[color:var(--ink)] uppercase tracking-wider">
+                      Documented Allergies
+                    </h3>
+                  </div>
+                  <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 border ${
+                    data.items.filter((i: any) => i.type === 'allergy').length > 0
+                      ? 'bg-rose-50 text-rose-800 border-rose-200'
+                      : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                  }`}>
+                    {data.items.filter((i: any) => i.type === 'allergy').length}
+                  </span>
                 </div>
-              ) : (
-                <ul className="divide-y divide-[color:var(--t-100)]">
-                  {data.items.filter((i: any) => i.type === t).map((i: any) => (
-                    <li key={i.id} className="py-2.5 flex items-center justify-between gap-3 text-xs sm:text-sm">
-                      <span className="min-w-0">
-                        <strong className={t === 'allergy' ? 'text-rose-700 font-bold' : 'text-[color:var(--ink)] font-bold'}>{i.name}</strong>
-                        {i.severity ? <span className="text-[11px] font-mono ml-1 text-slate-500">({i.severity})</span> : ''}
-                        {i.detail ? <span className="text-slate-500"> — {i.detail}</span> : null}
-                      </span>
-                      <button
-                        aria-label={`Remove ${i.name}`}
-                        onClick={() => act(() => jpost(`/api/records/items/${i.id}`, undefined, 'DELETE'))}
-                        className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          ))}
-          <form className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 flex flex-wrap gap-3 items-end" onSubmit={async e => {
-            e.preventDefault();
-            const d = await act(() => jpost('/api/records/items', item), 'Added.');
-            if (d.status === 'success') setItem({ ...item, name: '', detail: '' });
-          }}>
-            <label className="text-xs font-bold text-slate-700">Type<select className={`${field} block mt-1.5`} value={item.type} onChange={e => setItem({ ...item, type: e.target.value })}><option value="allergy">Allergy</option><option value="condition">Condition</option><option value="medication">Medicine</option></select></label>
-            <label className="text-xs font-bold text-slate-700 flex-1 min-w-[12rem]">Name<input className={`${field} block w-full mt-1.5`} value={item.name} onChange={e => setItem({ ...item, name: e.target.value })} required maxLength={120} placeholder="e.g. Penicillin" /></label>
-            <label className="text-xs font-bold text-slate-700 flex-1 min-w-[12rem]">Details (optional)<input className={`${field} block w-full mt-1.5`} value={item.detail} onChange={e => setItem({ ...item, detail: e.target.value })} maxLength={300} placeholder="e.g. skin rash, mild wheezing" /></label>
-            <button className="h-10 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer border border-[color:var(--t-700)] shadow-xs transition-all">Add Entry</button>
+
+                {data.items.filter((i: any) => i.type === 'allergy').length === 0 ? (
+                  <div className="py-3 px-2 text-center bg-emerald-50/40 border border-dashed border-emerald-200 my-1">
+                    <p className="text-[11px] text-emerald-800 font-semibold">NKDA · No Known Allergies</p>
+                  </div>
+                ) : (
+                  <ul className="divide-y divide-[color:var(--t-100)] max-h-48 overflow-y-auto">
+                    {data.items.filter((i: any) => i.type === 'allergy').map((i: any) => (
+                      <li key={i.id} className="py-1.5 flex items-center justify-between gap-2 text-xs group">
+                        <div className="min-w-0">
+                          <strong className="text-rose-900 font-bold block truncate">{i.name}</strong>
+                          {i.detail && <p className="text-[10px] text-slate-500 truncate">{i.detail}</p>}
+                        </div>
+                        <button
+                          type="button"
+                          aria-label={`Remove ${i.name}`}
+                          onClick={() => act(() => jpost(`/api/records/items/${i.id}`, undefined, 'DELETE'))}
+                          className="p-1 text-slate-300 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            {/* 2. CHRONIC CONDITIONS */}
+            <div className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-3.5 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-2 mb-2 border-b border-[color:var(--t-100)]">
+                  <div className="flex items-center gap-1.5">
+                    <Activity className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                    <h3 className="font-display font-extrabold text-xs text-[color:var(--ink)] uppercase tracking-wider">
+                      Chronic Conditions
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 border bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]">
+                    {data.items.filter((i: any) => i.type === 'condition').length}
+                  </span>
+                </div>
+
+                {data.items.filter((i: any) => i.type === 'condition').length === 0 ? (
+                  <div className="py-3 px-2 text-center bg-[color:var(--t-50)]/40 border border-dashed border-[color:var(--t-200)] my-1">
+                    <p className="text-[11px] text-slate-500 font-medium">No chronic conditions</p>
+                  </div>
+                ) : (
+                  <ul className="divide-y divide-[color:var(--t-100)] max-h-48 overflow-y-auto">
+                    {data.items.filter((i: any) => i.type === 'condition').map((i: any) => (
+                      <li key={i.id} className="py-1.5 flex items-center justify-between gap-2 text-xs group">
+                        <div className="min-w-0">
+                          <strong className="text-[color:var(--ink)] font-bold block truncate">{i.name}</strong>
+                          {i.detail && <p className="text-[10px] text-slate-500 truncate">{i.detail}</p>}
+                        </div>
+                        <button
+                          type="button"
+                          aria-label={`Remove ${i.name}`}
+                          onClick={() => act(() => jpost(`/api/records/items/${i.id}`, undefined, 'DELETE'))}
+                          className="p-1 text-slate-300 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            {/* 3. MEDICATIONS */}
+            <div className="bg-white border-t-2 border-t-cyan-600 border-x border-b border-[color:var(--t-200)] shadow-xs p-3.5 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-2 mb-2 border-b border-[color:var(--t-100)]">
+                  <div className="flex items-center gap-1.5">
+                    <Pill className="h-3.5 w-3.5 text-cyan-600" />
+                    <h3 className="font-display font-extrabold text-xs text-[color:var(--ink)] uppercase tracking-wider">
+                      Active Medications
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 border bg-cyan-50 text-cyan-800 border-cyan-200">
+                    {data.items.filter((i: any) => i.type === 'medication').length}
+                  </span>
+                </div>
+
+                {data.items.filter((i: any) => i.type === 'medication').length === 0 ? (
+                  <div className="py-3 px-2 text-center bg-cyan-50/30 border border-dashed border-cyan-200 my-1">
+                    <p className="text-[11px] text-slate-500 font-medium">No active medications</p>
+                  </div>
+                ) : (
+                  <ul className="divide-y divide-[color:var(--t-100)] max-h-48 overflow-y-auto">
+                    {data.items.filter((i: any) => i.type === 'medication').map((i: any) => (
+                      <li key={i.id} className="py-1.5 flex items-center justify-between gap-2 text-xs group">
+                        <div className="min-w-0">
+                          <strong className="text-[color:var(--ink)] font-bold block truncate">{i.name}</strong>
+                          {i.detail && <p className="text-[10px] text-slate-500 truncate">{i.detail}</p>}
+                        </div>
+                        <button
+                          type="button"
+                          aria-label={`Remove ${i.name}`}
+                          onClick={() => act(() => jpost(`/api/records/items/${i.id}`, undefined, 'DELETE'))}
+                          className="p-1 text-slate-300 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* COMPACT INLINE QUICK-ADD FORM */}
+          <form 
+            onSubmit={async e => {
+              e.preventDefault();
+              const d = await act(() => jpost('/api/records/items', item), 'Added.');
+              if (d.status === 'success') setItem({ ...item, name: '', detail: '' });
+            }}
+            className="bg-white border border-[color:var(--t-200)] p-3 shadow-2xs flex flex-wrap sm:flex-nowrap items-center gap-2.5"
+          >
+            <div className="w-full sm:w-36 shrink-0">
+              <label className="sr-only">Entry Type</label>
+              <select 
+                value={item.type} 
+                onChange={e => setItem({ ...item, type: e.target.value })}
+                className="w-full border border-[color:var(--t-200)] bg-white px-2.5 h-9 text-xs font-bold text-[color:var(--ink)] focus:outline-none focus:border-[color:var(--t-600)] transition-colors cursor-pointer"
+              >
+                <option value="allergy">Allergy</option>
+                <option value="condition">Condition</option>
+                <option value="medication">Medicine</option>
+              </select>
+            </div>
+
+            <div className="flex-1 min-w-[140px] w-full sm:w-auto">
+              <label className="sr-only">Name</label>
+              <input 
+                value={item.name} 
+                onChange={e => setItem({ ...item, name: e.target.value })} 
+                required 
+                maxLength={120} 
+                placeholder={item.type === 'allergy' ? 'Allergy name (e.g. Penicillin)' : item.type === 'condition' ? 'Condition (e.g. Hypertension)' : 'Medicine name (e.g. Metformin)'}
+                className="w-full border border-[color:var(--t-200)] bg-white px-3 h-9 text-xs font-semibold text-[color:var(--ink)] placeholder-slate-400 focus:outline-none focus:border-[color:var(--t-600)] transition-colors"
+              />
+            </div>
+
+            <div className="flex-1 min-w-[140px] w-full sm:w-auto">
+              <label className="sr-only">Details</label>
+              <input 
+                value={item.detail} 
+                onChange={e => setItem({ ...item, detail: e.target.value })} 
+                maxLength={300} 
+                placeholder="Details (optional, e.g. severe rash, 5mg daily)"
+                className="w-full border border-[color:var(--t-200)] bg-white px-3 h-9 text-xs font-medium text-[color:var(--ink)] placeholder-slate-400 focus:outline-none focus:border-[color:var(--t-600)] transition-colors"
+              />
+            </div>
+
+            <button 
+              type="submit"
+              className="w-full sm:w-auto shrink-0 h-9 px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black border border-[color:var(--t-700)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>Add Entry</span>
+            </button>
           </form>
-          <p className="text-[11px] text-slate-500">Accurate allergies and medicines help doctors prescribe safely. Only practitioners you choose can see this.</p>
+
+          <p className="text-[10px] text-slate-500 font-medium">
+            Accurate clinical history and drug allergies are encrypted under Malaysian PDPA guidelines. Only authorized treating practitioners can view these records during active consultations.
+          </p>
         </div>
       )}
 
