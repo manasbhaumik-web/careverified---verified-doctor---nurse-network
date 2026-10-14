@@ -668,6 +668,7 @@ export default function App() {
                 jobs={jobs}
                 onNewJobCreated={handleNewJobCreated}
                 onApplyJob={handleApplyJob}
+                role={currentUser.role}
               />
             )}
 

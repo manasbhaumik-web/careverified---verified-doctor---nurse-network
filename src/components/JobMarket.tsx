@@ -5,14 +5,16 @@ import {
 } from 'lucide-react';
 import { JobPost } from '../types';
 import DashboardHeader from './DashboardHeader';
+import { JobFormFields, JobFilters, JobBadges, JobDetailExtras, EligibilityInfo, LocumBoard, blankExtras, blankFilter, extrasPayload, matchesFilter, type JobExtras, type JobFilter } from './JobMarketMy';
 
 interface JobMarketProps {
   jobs: JobPost[];
   onNewJobCreated: (job: JobPost) => void;
   onApplyJob: (id: string, userId: string) => void;
+  role?: string;
 }
 
-export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMarketProps) {
+export default function JobMarket({ jobs, onNewJobCreated, onApplyJob, role = 'practitioner' }: JobMarketProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedCity, setSelectedCity] = useState<string>('all');
@@ -23,7 +25,11 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
   // Job form inputs
   const [hospitalName, setHospitalName] = useState('');
   const [title, setTitle] = useState('');
-  const [type, setType] = useState<'Full-time' | 'Part-time' | 'Contract' | 'Shift-based'>('Full-time');
+  const [type, setType] = useState<'Full-time' | 'Part-time' | 'Contract' | 'Shift-based' | 'Locum'>('Full-time');
+  const [extras, setExtras] = useState<JobExtras>(blankExtras);
+  const [filter, setFilter] = useState<JobFilter>(blankFilter);
+  const [formError, setFormError] = useState('');
+  const [applyMsg, setApplyMsg] = useState('');
   const [location, setLocation] = useState('');
   const [city, setCity] = useState('Kuala Lumpur');
   const [specialtyRequired, setSpecialtyRequired] = useState('ICU & Critical Care');
@@ -36,9 +42,10 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
   // Application tracker
   const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
 
-  const [activeTab, setActiveTab] = useState<'open' | 'applied'>('open');
+  const [activeTab, setActiveTab] = useState<'open' | 'applied' | 'locums' | 'eligibility'>('open');
   const myApplications = jobs.filter(j => appliedJobs.includes(j.id) || (j.appliedUserIds?.length ?? 0) > 0);
   const baseJobs = activeTab === 'applied' ? myApplications : jobs;
+  const licensedEmployers = new Set(jobs.filter(j => j.employer?.licenceOk).map(j => j.hospitalName)).size;
   const shiftBasedCount = jobs.filter(j => j.type === 'Shift-based').length;
   const hospitalCount = new Set(jobs.map(j => j.hospitalName)).size;
 
@@ -52,7 +59,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
     const matchesType = selectedType === 'all' || job.type === selectedType;
     const matchesCity = selectedCity === 'all' || job.city === selectedCity;
 
-    return matchesSearch && matchesType && matchesCity;
+    return matchesSearch && matchesType && matchesCity && matchesFilter(job, filter);
   });
 
   const handleCreateJob = async (e: React.FormEvent) => {
@@ -60,6 +67,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
     if (!hospitalName || !title || !description) return;
 
     setFormLoading(true);
+    setFormError('');
     try {
       const response = await fetch('/api/jobs', {
         method: 'POST',
@@ -72,12 +80,13 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
           city,
           specialtyRequired,
           description,
-          salaryRange,
+          ...extrasPayload(extras),
           requirements: requirementText.split('\n').filter(r => r.trim() !== '')
         })
       });
 
       const data = await response.json();
+      if (data.status !== 'success') setFormError(data.message || 'Could not publish the listing.');
       if (data.status === 'success') {
         onNewJobCreated(data.data);
         setFormSuccess(true);
@@ -89,6 +98,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
           setTitle('');
           setDescription('');
           setSalaryRange('');
+          setExtras(blankExtras);
           setRequirementText('');
         }, 1500);
       }
@@ -104,6 +114,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
       const response = await fetch(`/api/jobs/${jobId}/apply`, { method: 'POST' });
 
       const data = await response.json();
+      setApplyMsg(data.status === 'success' ? '' : data.message);
       if (data.status === 'success') {
         onApplyJob(jobId, data.data.appliedUserIds?.[0] ?? '');
         setAppliedJobs([...appliedJobs, jobId]);
@@ -132,6 +143,8 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
         tabs={[
           { id: 'open' as const, label: 'Open shifts', icon: Briefcase, count: jobs.length },
           { id: 'applied' as const, label: 'My applications', icon: CheckCircle2, count: myApplications.length },
+          { id: 'locums' as const, label: 'Locums', icon: Users },
+          { id: 'eligibility' as const, label: 'Eligibility', icon: ShieldCheck },
         ]}
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -144,7 +157,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
           { label: 'Open listings', value: jobs.length, caption: 'Across all contract types', icon: Briefcase, tone: 'crimson' },
           { label: 'Shift-based roles', value: shiftBasedCount, caption: 'Temporary cover, nights & weekends', icon: Clock, tone: 'emerald' },
           { label: 'Applications sent', value: myApplications.length, caption: 'Awaiting hospital response', icon: CheckCircle2, tone: 'crimson' },
-          { label: 'Verified hospitals', value: hospitalCount, caption: 'Credential-checked posters', icon: ShieldCheck, tone: 'emerald' },
+          { label: 'Licensed employers', value: licensedEmployers, caption: 'Facility licence checked by us', icon: ShieldCheck, tone: 'emerald' },
         ].map(card => (
           <div key={card.label} className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
@@ -207,19 +220,8 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                     <option value="Part-time">Part-time Role</option>
                     <option value="Contract">Contractual Term</option>
                     <option value="Shift-based">Shift-based Marketplace</option>
+                    <option value="Locum">Locum cover (dated shifts)</option>
                   </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Salary Range / Shift Allowance</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. RM 5,000 - RM 8,000 / month"
-                    value={salaryRange}
-                    onChange={(e) => setSalaryRange(e.target.value)}
-                    className="w-full text-xs border border-[color:var(--t-200)] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold transition-all"
-                    required
-                  />
                 </div>
 
                 <div>
@@ -235,17 +237,8 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Metro Area / City</label>
-                  <select
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className="w-full text-xs border border-[color:var(--t-200)] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-extrabold text-slate-700 cursor-pointer transition-all"
-                  >
-                    <option value="Kuala Lumpur">Kuala Lumpur</option>
-                    <option value="Petaling Jaya">Petaling Jaya</option>
-                    <option value="Penang">Penang</option>
-                    <option value="Johor Bahru">Johor Bahru</option>
-                  </select>
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">City / Town</label>
+                  <input type="text" placeholder="Petaling Jaya" value={city} onChange={(e) => setCity(e.target.value)} className="w-full text-xs border border-[color:var(--t-200)] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold transition-all" required />
                 </div>
 
                 <div>
@@ -263,6 +256,8 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   </select>
                 </div>
               </div>
+
+              <JobFormFields value={extras} onChange={setExtras} jobType={type} />
 
               <div>
                 <label className="block text-xs font-bold text-slate-600 mb-1.5">Detailed Description of Clinical Roles</label>
@@ -288,6 +283,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                 />
               </div>
 
+              {formError && <p role="alert" className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 p-3">{formError}</p>}
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
@@ -309,6 +305,11 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
           )}
         </form>
       )}
+
+      {activeTab === 'eligibility' && <EligibilityInfo />}
+      {activeTab === 'locums' && <LocumBoard role={role} jobs={jobs} />}
+      {(activeTab === 'open' || activeTab === 'applied') && <JobFilters value={filter} onChange={setFilter} />}
+      {applyMsg && <p role="alert" className="text-xs font-bold text-rose-800 bg-rose-50 border border-rose-200 p-3">{applyMsg}</p>}
 
       {/* FILTER CONTROLS */}
       <section aria-label="Filters" className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-wrap gap-4 items-center">
@@ -409,14 +410,16 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); handleApply(job.id); }}
-                disabled={hasApplied}
+                disabled={hasApplied || !!job.applyBlockedReason}
+                title={job.applyBlockedReason ?? undefined}
                 className={`min-h-[44px] px-5 text-[13px] font-bold transition-colors flex items-center justify-center gap-1.5 ${
                   hasApplied
                     ? 'bg-[color:var(--e-50)] border border-[color:var(--e-200)] text-[color:var(--e-800)] cursor-not-allowed'
+                    : job.applyBlockedReason ? 'bg-slate-100 border border-slate-300 text-slate-500 cursor-not-allowed'
                     : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer'
                 }`}
               >
-                {hasApplied ? (<><CheckCircle2 className="h-4 w-4 text-[color:var(--e-600)]" />Applied</>) : 'Apply for shift'}
+                {hasApplied ? (<><CheckCircle2 className="h-4 w-4 text-[color:var(--e-600)]" />Applied</>) : job.applyBlockedReason ? 'Not eligible' : 'Apply for shift'}
               </button>
             );
 
@@ -441,6 +444,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   </div>
                   <div className="flex items-center justify-between md:justify-end gap-4 shrink-0">
                     <span className="text-[15px] font-bold text-[color:var(--ink)]">{job.salaryRange}</span>
+                    <JobBadges job={job} />
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
@@ -479,6 +483,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
 
                 <div className="border-t border-[color:var(--t-100)] pt-3.5 flex flex-wrap items-center justify-between gap-2">
                   <span className="text-[15px] font-bold text-[color:var(--ink)]">{job.salaryRange}</span>
+                    <JobBadges job={job} />
                   <span className="text-xs text-slate-600 inline-flex items-center gap-1.5"><Users className="h-3.5 w-3.5" /><span className="tabular-nums">{job.applicantsCount}</span> applicants</span>
                 </div>
 
@@ -529,7 +534,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                     {selectedModalJob.title}
                   </h4>
                   <p className="text-xs text-[color:var(--ink-2)] mt-0.5">
-                    {selectedModalJob.hospitalName} &bull; Verified Employer
+                    {selectedModalJob.hospitalName} &bull; {selectedModalJob.employer?.licenceOk ? 'Licence checked' : 'Licence not checked'}
                   </p>
                 </div>
               </div>
@@ -597,14 +602,16 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                 </div>
               </div>
 
+              <JobDetailExtras job={selectedModalJob} />
+
               {/* Employer verification signature */}
               <div className="border-t border-slate-100 pt-4 flex justify-between items-center text-xs text-slate-500 font-bold">
                 <span className="flex items-center gap-1.5">
                   <Users className="h-4 w-4 text-slate-400" />
                   {selectedModalJob.applicantsCount} Practitioners applied
                 </span>
-                <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[10px] font-extrabold uppercase border border-emerald-100">
-                  Verified Healthcare Center
+                <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase border ${selectedModalJob.employer?.licenceOk ? 'text-emerald-700 bg-emerald-50 border-emerald-100' : 'text-amber-800 bg-amber-50 border-amber-200'}`}>
+                  {selectedModalJob.employer?.licenceOk ? 'Facility licence checked' : 'Employer not checked'}
                 </span>
               </div>
             </div>
@@ -624,9 +631,9 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob }: JobMark
                   handleApply(selectedModalJob.id);
                   setSelectedModalJob(null);
                 }}
-                disabled={appliedJobs.includes(selectedModalJob.id)}
+                disabled={appliedJobs.includes(selectedModalJob.id) || !!selectedModalJob.applyBlockedReason}
                 className={`flex-1 text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer ${
-                  appliedJobs.includes(selectedModalJob.id) 
+                  appliedJobs.includes(selectedModalJob.id) || selectedModalJob.applyBlockedReason 
                     ? "bg-emerald-50 border-2 border-emerald-100 text-emerald-800 cursor-not-allowed" 
                     : "bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white hover:scale-[1.01]"
                 }`}

@@ -149,7 +149,7 @@ export interface JobPost {
   hospitalName: string;
   hospitalLogo: string;
   title: string;
-  type: 'Full-time' | 'Part-time' | 'Contract' | 'Shift-based';
+  type: 'Full-time' | 'Part-time' | 'Contract' | 'Shift-based' | 'Locum';
   location: string;
   city: string;
   specialtyRequired: string;
@@ -160,6 +160,21 @@ export interface JobPost {
   status: 'Active' | 'Closed';
   postedAt: string;
   appliedUserIds: string[];
+  // Malaysian recruitment fields (optional: older listings do not have them)
+  sector?: 'public' | 'private' | 'other';
+  state?: string | null;
+  roleRequired?: 'doctor' | 'nurse' | 'any';
+  facilityId?: string | null;
+  salaryMin?: number | null;
+  salaryMax?: number | null;
+  salaryPeriod?: 'month' | 'day' | 'hour' | 'shift' | null;
+  shifts?: { date: string; start: string; end: string }[];
+  acceptsForeign?: boolean;
+  visaSupport?: boolean;
+  foreignNotes?: string;
+  employer?: { verified: boolean; licenceChecked: boolean; licenceExpiry: string | null; licenceOk: boolean; problem: string | null };
+  /** Why the signed-in practitioner cannot apply, or null. */
+  applyBlockedReason?: string | null;
 }
 
 export interface ChatMessage {

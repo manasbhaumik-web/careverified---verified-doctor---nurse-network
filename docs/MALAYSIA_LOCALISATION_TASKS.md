@@ -91,8 +91,13 @@ Code in `server/tourism.ts` and the MedicalTourism / TourismDesk / SharedSummary
 - [ ] Not built: package payment/deposit in the app, facility self-service editing, record transfer standards (HL7/FHIR), translation, travel facilitators, public (signed-out) browsing page, facility reviews.
 
 ## 8. Practitioners and jobs
-- [ ] [JobMarket.tsx](../src/components/JobMarket.tsx): Malaysian states, MYR salary bands, locum and shift listings, public vs private sector, foreign-doctor eligibility notes.
-- [ ] Locum profiles with APC validity and the facility's licensed status.
+Code in `server/jobsMy.ts`, the job routes in `server.ts` and `JobMarket.tsx` / `JobMarketMy.tsx`; rules and gaps in docs/JOBS_MALAYSIA.md. Tested (36 API checks plus unit checks). Foreign-practitioner rules are unconfirmed.
+- [x] Malaysian states, MYR salary as a structured range and period (validated), public/private sector, role, and locum / shift listings with dated shifts; filters for state, sector, role and foreign-friendly.
+- [x] Employer licence status: private-sector posts must link to a facility with a checked, unexpired licence and be posted by its staff or an admin; listings show licence checked/not checked. Government hospitals are never shown as checked.
+- [x] Apply rules enforced on the server and shown on the button: role, APC valid on the last shift date, and foreign registration only where the employer accepts it.
+- [x] Locum profiles: states, specialties, minimum rate, availability, hide/show; employers (facility staff and admins) browse only verified practitioners with a valid APC, and invite them without sharing contact details.
+- [~] Foreign-doctor eligibility notes are a draft from web research (temporary practising certificate is not for employment; employer-sponsored MMC registration; work permit unconfirmed). Not immigration advice.
+- [ ] Not built: salary benchmarks, public-sector grading, nurse-specific rules, editing or closing listings from the UI, applicant tracking beyond "applied".
 
 ## 9. Content and UX
 - [ ] Landing page ([LandingPage.tsx](../src/components/LandingPage.tsx)): Malaysian testimonials, "MMC-verified" trust messaging, BM and Chinese language switcher.

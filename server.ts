@@ -1,4 +1,5 @@
 import express from "express";
+import { registerJobsMy, readJobFields, salaryText, employerInfo, applyProblem, inferState } from "./server/jobsMy";
 import { registerTourism } from "./server/tourism";
 import { registerPharmacyMy } from "./server/pharmacyMy";
 import { parseNric, isPassportNumber, normalisePassport, toE164, addressProblem, RELATIONSHIPS, PREFERRED_LANGUAGES } from "./src/identity";
@@ -676,6 +677,7 @@ app.post("/api/register-patient", (req, res) => {
 // Data subject rights: consents, access / correction / deletion requests, export
 registerPrivacyRoutes(app);
 registerPharmacyMy(app);
+registerJobsMy(app, { findProfessional, allProfessionals, jobs: () => jobs });
 registerTourism(app, { findProfessional, allProfessionals });
 registerDataOps(app, {
   // De-identify what lives outside SQL: patient profile, bookings and chat messages.
@@ -1143,17 +1145,39 @@ app.post("/api/bookings/:id/cancel", requireRole("patient"), async (req, res) =>
 app.get("/api/jobs", (req, res) => {
   // Applicant identities stay private: callers only ever see their own application.
   const me = req.user?.id;
-  res.json({ status: "success", data: jobs.map(j => ({ ...j, appliedUserIds: me && j.appliedUserIds.includes(me) ? [me] : [] })) });
+  const prof: any = req.user?.role === "practitioner" && req.user.profileId ? findProfessional(req.user.profileId) : null;
+  res.json({ status: "success", data: jobs.map(j => ({
+    ...j, appliedUserIds: me && j.appliedUserIds.includes(me) ? [me] : [],
+    state: (j as any).state ?? inferState(j.city) ?? null,
+    employer: employerInfo(j),
+    // Why the signed-in practitioner cannot apply (null = can apply)
+    applyBlockedReason: prof ? applyProblem(j, prof) : null,
+  })) });
 });
 
 app.post("/api/jobs", requireRole("practitioner", "admin"), (req, res) => {
-  const { type, requirements } = req.body;
+  const { requirements } = req.body;
   const hospitalName = str(req.body.hospitalName, 120);
   const title = str(req.body.title, 120);
   const specialtyRequired = str(req.body.specialtyRequired, 100);
 
   if (!hospitalName || !title || !specialtyRequired) {
     return res.status(400).json({ status: "error", message: "Missing core job description fields." });
+  }
+  const f = readJobFields(req.body);
+  if (typeof f === "string") return fail(res, 400, f);
+  // Posting for a facility needs the facility register: staff of that facility, or an admin.
+  if (f.facilityId) {
+    const fac = db.prepare("SELECT id, name, active FROM tourism_facilities WHERE id = ?").get(f.facilityId) as any;
+    if (!fac || !fac.active) return fail(res, 404, "Employer not found in the facility register.");
+    const allowed = req.user!.role === "admin" || !!db.prepare("SELECT 1 AS x FROM tourism_facility_staff WHERE facility_id = ? AND user_id = ?").get(fac.id, req.user!.id);
+    if (!allowed) return fail(res, 403, "You can only post for a facility you are assigned to.");
+  }
+  if (f.sector === "private") {
+    // Private healthcare facilities must hold a valid licence: only a checked, unexpired one may advertise.
+    const emp = employerInfo(f);
+    if (!f.facilityId) return fail(res, 400, "A private-sector post must be linked to a licensed facility in our register. Ask an admin to add the facility, then assign yourself to it.");
+    if (!emp.licenceOk) return fail(res, 400, `This facility cannot advertise yet: ${emp.problem}`);
   }
 
   const newJob = {
@@ -1162,12 +1186,15 @@ app.post("/api/jobs", requireRole("practitioner", "admin"), (req, res) => {
     hospitalName,
     hospitalLogo: "🏥",
     title,
-    type: type || "Full-time",
+    type: f.type,
+    sector: f.sector, state: f.state, roleRequired: f.roleRequired, facilityId: f.facilityId,
+    salaryMin: f.salaryMin, salaryMax: f.salaryMax, salaryPeriod: f.salaryPeriod, shifts: f.shifts,
+    acceptsForeign: f.acceptsForeign, visaSupport: f.visaSupport, foreignNotes: f.foreignNotes,
     location: str(req.body.location, 120) || "Main Wing",
     city: str(req.body.city, 80) || "Kuala Lumpur",
     specialtyRequired,
     description: str(req.body.description, 2000) || "Join our care team.",
-    salaryRange: str(req.body.salaryRange, 60) || "Negotiable",
+    salaryRange: salaryText(f.salaryMin, f.salaryMax, f.salaryPeriod) ?? (str(req.body.salaryRange, 60) || "Negotiable"),
     requirements: Array.isArray(requirements) ? requirements.map((r: unknown) => str(r, 200)) : ["Registered and licensed with local medical board"],
     applicantsCount: 0,
     status: "Active" as const,
@@ -1189,9 +1216,8 @@ app.post("/api/jobs/:id/apply", requireRole("practitioner"), (req, res) => {
     return res.status(404).json({ status: "error", message: "Job post not found." });
   }
   const prof: any = req.user!.profileId ? findProfessional(req.user!.profileId) : null;
-  if (!prof || prof.verificationStatus !== VerificationStatus.VERIFIED) {
-    return fail(res, 403, "Only verified practitioners can apply to positions.");
-  }
+  const blocked = applyProblem(job, prof);
+  if (blocked) return fail(res, 403, blocked);
   if (job.appliedUserIds.includes(userId)) {
     return res.status(400).json({ status: "error", message: "You have already applied to this position." });
   }
