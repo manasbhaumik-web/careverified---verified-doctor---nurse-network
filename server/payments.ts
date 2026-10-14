@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { computeTax, indicativeConversions, methodsFor, paymentMethods, refundPolicy, sstConfig, type PatientRegion } from "./paymentPolicy";
 import express, { Application, Response } from "express";
 import { db } from "./db";
 import { audit } from "./audit";
@@ -36,6 +37,10 @@ CREATE TABLE IF NOT EXISTS payments (
 CREATE INDEX IF NOT EXISTS idx_pay_ref ON payments(kind, ref_id);
 CREATE INDEX IF NOT EXISTS idx_pay_pro ON payments(professional_id, status);
 `);
+// Service tax is stored separately: amount_sen is the total charged, amount_sen - tax_sen the professional fee.
+for (const col of ["tax_sen INTEGER NOT NULL DEFAULT 0", "tax_rate_pct REAL NOT NULL DEFAULT 0", "patient_region TEXT NOT NULL DEFAULT 'MY'"]) {
+  try { db.exec("ALTER TABLE payments ADD COLUMN " + col); } catch { /* column already exists */ }
+}
 
 export interface Payable {
   kind: "booking" | "consult";
@@ -50,11 +55,14 @@ export interface PaymentRow {
   amount_sen: number; platform_fee_sen: number; currency: string; status: string; provider: string;
   provider_ref: string | null; payment_intent: string | null; description: string;
   created_at: string; paid_at: string | null; refunded_at: string | null; refund_reason: string | null;
+  tax_sen: number; tax_rate_pct: number; patient_region: string;
 }
 interface Handlers {
   resolve: (kind: string, refId: string) => Payable | null;
   onPaid: (p: PaymentRow) => void;
   onRefunded: (p: PaymentRow) => void;
+  /** Malaysian citizen/resident (MY) or foreign visitor (INTL): decides tax, methods and refund policy. */
+  patientRegion: (userId: string) => PatientRegion;
 }
 let handlers: Handlers | null = null;
 export const setPaymentHandlers = (h: Handlers) => { handlers = h; };
@@ -123,8 +131,15 @@ export function registerPaymentWebhook(app: Application) {
 }
 
 export function registerPaymentRoutes(app: Application) {
-  app.get("/api/payments/config", (_req, res) => {
-    res.json({ status: "success", data: { mode: provider(), currency: "MYR" } });
+  app.get("/api/payments/config", (req, res) => {
+    const region = req.user ? handlers?.patientRegion(req.user.id) ?? "MY" : "MY";
+    res.json({ status: "success", data: { mode: provider(), currency: "MYR", methods: methodsFor(region), sstEnabled: sstConfig().enabled } });
+  });
+
+  // Refund and cancellation policy for the signed-in patient's region (Malaysia when signed out)
+  app.get("/api/payments/policy", (req, res) => {
+    const region: PatientRegion = req.query.region === "INTL" ? "INTL" : req.user ? handlers?.patientRegion(req.user.id) ?? "MY" : "MY";
+    res.json({ status: "success", data: refundPolicy(region) });
   });
 
   app.post("/api/payments/checkout", requireRole("patient"), async (req, res) => {
@@ -137,28 +152,43 @@ export function registerPaymentRoutes(app: Application) {
     const existing = db.prepare("SELECT * FROM payments WHERE kind=? AND ref_id=? ORDER BY created_at DESC").all(kind, payable.id) as unknown as PaymentRow[];
     if (existing.some(p => p.status === "paid")) return fail(res, 409, "This has already been paid.");
 
-    const amountSen = Math.round(payable.amount * 100);
-    if (!(amountSen > 0)) return fail(res, 400, "Invalid amount.");
-    let pay = existing.find(p => p.status === "pending" && p.provider === prov && p.amount_sen === amountSen);
+    const subtotalSen = Math.round(payable.amount * 100);
+    if (!(subtotalSen > 0)) return fail(res, 400, "Invalid amount.");
+    const region = handlers?.patientRegion(payable.userId) ?? "MY";
+    const tax = computeTax(subtotalSen, region);
+    const amountSen = subtotalSen + tax.taxSen;
+    let pay = existing.find(p => p.status === "pending" && p.provider === prov && p.amount_sen === amountSen && p.tax_sen === tax.taxSen);
     if (!pay) {
       const id = "pay-" + crypto.randomBytes(8).toString("hex");
+      // The platform commission is on the professional fee only; tax is passed through, not earned.
       db.prepare(
-        `INSERT INTO payments (id,user_id,kind,ref_id,professional_id,amount_sen,platform_fee_sen,provider,description,created_at)
-         VALUES (?,?,?,?,?,?,?,?,?,?)`
-      ).run(id, payable.userId, kind, payable.id, payable.professionalId, amountSen, Math.round(amountSen * commissionPct() / 100), prov, payable.description, new Date().toISOString());
+        `INSERT INTO payments (id,user_id,kind,ref_id,professional_id,amount_sen,platform_fee_sen,provider,description,created_at,tax_sen,tax_rate_pct,patient_region)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`
+      ).run(id, payable.userId, kind, payable.id, payable.professionalId, amountSen, Math.round(subtotalSen * commissionPct() / 100), prov, payable.description, new Date().toISOString(), tax.taxSen, tax.ratePct, region);
       pay = getPayment(id)!;
     }
+    const breakdown = {
+      amount: amountSen / 100, subtotal: subtotalSen / 100, tax: tax.taxSen / 100, taxRatePct: tax.ratePct, taxNote: tax.note,
+      methods: methodsFor(region), indicative: indicativeConversions(amountSen / 100), policy: refundPolicy(region),
+    };
 
     if (prov === "sandbox") {
-      return res.json({ status: "success", data: { paymentId: pay.id, provider: "sandbox", amount: payable.amount } });
+      return res.json({ status: "success", data: { paymentId: pay.id, provider: "sandbox", ...breakdown } });
     }
 
     const body = new URLSearchParams({
       mode: "payment",
+      ...Object.fromEntries(paymentMethods().map((m, i) => [`payment_method_types[${i}]`, m])),
       "line_items[0][quantity]": "1",
       "line_items[0][price_data][currency]": "myr",
-      "line_items[0][price_data][unit_amount]": String(amountSen),
+      "line_items[0][price_data][unit_amount]": String(subtotalSen),
       "line_items[0][price_data][product_data][name]": payable.description,
+      ...(tax.taxSen > 0 ? {
+        "line_items[1][quantity]": "1",
+        "line_items[1][price_data][currency]": "myr",
+        "line_items[1][price_data][unit_amount]": String(tax.taxSen),
+        "line_items[1][price_data][product_data][name]": `Service tax (SST) ${tax.ratePct}%`,
+      } : {}),
       client_reference_id: pay.id,
       "metadata[payment_id]": pay.id,
       success_url: `${appUrl()}/?payment=success&pid=${pay.id}`,
@@ -172,7 +202,7 @@ export function registerPaymentRoutes(app: Application) {
     const session: any = await r.json().catch(() => ({}));
     if (!r.ok || !session.url) return fail(res, 502, "Could not start the payment. Please try again.");
     db.prepare("UPDATE payments SET provider_ref = ? WHERE id = ?").run(session.id, pay.id);
-    res.json({ status: "success", data: { paymentId: pay.id, provider: "stripe", checkoutUrl: session.url } });
+    res.json({ status: "success", data: { paymentId: pay.id, provider: "stripe", checkoutUrl: session.url, ...breakdown } });
   });
 
   // Test-mode confirmation (no real money)
@@ -204,6 +234,8 @@ export function registerPaymentRoutes(app: Application) {
       data: {
         invoiceNumber: "INV-" + p.id.slice(4).toUpperCase(), paymentId: p.id, issuedAt: p.paid_at,
         billedTo: patient, description: p.description, currency: p.currency, total: p.amount_sen / 100,
+        subtotal: (p.amount_sen - p.tax_sen) / 100, tax: p.tax_sen / 100, taxRatePct: p.tax_rate_pct,
+        seller: { name: process.env.PRIVACY_CONTROLLER_NAME || "MedCred Healthcare Network Sdn Bhd", sstRegistrationNo: sstConfig().registrationNo || null },
         status: p.status, refundedAt: p.refunded_at, provider: p.provider,
         testMode: p.provider === "sandbox",
       },
@@ -215,15 +247,16 @@ export function registerPaymentRoutes(app: Application) {
     const pid = req.user!.profileId;
     if (!pid) return res.json({ status: "success", data: { rows: [], totals: { gross: 0, fee: 0, net: 0 } } });
     const rows = db.prepare(
-      "SELECT id, kind, description, amount_sen, platform_fee_sen, status, paid_at, refunded_at, provider FROM payments WHERE professional_id = ? AND status IN ('paid','refunded') ORDER BY paid_at DESC LIMIT 200"
+      "SELECT id, kind, description, amount_sen, tax_sen, platform_fee_sen, status, paid_at, refunded_at, provider FROM payments WHERE professional_id = ? AND status IN ('paid','refunded') ORDER BY paid_at DESC LIMIT 200"
     ).all(pid) as any[];
     const paid = rows.filter(r => r.status === "paid");
-    const gross = paid.reduce((s, r) => s + r.amount_sen, 0);
+    // Earnings are on the professional fee: service tax collected is passed on, not income.
+    const gross = paid.reduce((s, r) => s + r.amount_sen - r.tax_sen, 0);
     const fee = paid.reduce((s, r) => s + r.platform_fee_sen, 0);
     res.json({
       status: "success",
       data: {
-        rows: rows.map(r => ({ ...r, net: (r.amount_sen - r.platform_fee_sen) / 100, gross: r.amount_sen / 100, testMode: r.provider === "sandbox" })),
+        rows: rows.map(r => ({ ...r, net: (r.amount_sen - r.tax_sen - r.platform_fee_sen) / 100, gross: (r.amount_sen - r.tax_sen) / 100, testMode: r.provider === "sandbox" })),
         totals: { gross: gross / 100, fee: fee / 100, net: (gross - fee) / 100 },
         commissionPct: commissionPct(),
       },
@@ -235,8 +268,8 @@ export function registerPaymentRoutes(app: Application) {
     const rows = db.prepare(
       `SELECT p.*, u.name AS patientName FROM payments p LEFT JOIN users u ON u.id = p.user_id ORDER BY p.created_at DESC LIMIT 200`
     ).all();
-    const totals = db.prepare("SELECT COALESCE(SUM(amount_sen),0) AS gross, COALESCE(SUM(platform_fee_sen),0) AS fee FROM payments WHERE status='paid'").get() as any;
-    res.json({ status: "success", data: { rows, mode: provider(), totals: { gross: totals.gross / 100, platformFee: totals.fee / 100 } } });
+    const totals = db.prepare("SELECT COALESCE(SUM(amount_sen - tax_sen),0) AS gross, COALESCE(SUM(platform_fee_sen),0) AS fee, COALESCE(SUM(tax_sen),0) AS tax FROM payments WHERE status='paid'").get() as any;
+    res.json({ status: "success", data: { rows, mode: provider(), totals: { gross: totals.gross / 100, platformFee: totals.fee / 100, serviceTaxCollected: totals.tax / 100 } } });
   });
 
   app.post("/api/payments/:id/refund", requireRole("admin"), async (req, res) => {

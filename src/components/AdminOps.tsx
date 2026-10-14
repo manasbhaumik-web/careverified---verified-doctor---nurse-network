@@ -136,7 +136,7 @@ export default function AdminOps() {
       <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-sm font-extrabold">Payments</h3>
-          {payments && <p className="text-xs font-bold">Mode: {payments.mode ?? 'not configured'} · Gross {formatMoney(payments.totals.gross)} · Platform fee {formatMoney(payments.totals.platformFee)}</p>}
+          {payments && <p className="text-xs font-bold">Mode: {payments.mode ?? 'not configured'} · Gross {formatMoney(payments.totals.gross)} · Platform fee {formatMoney(payments.totals.platformFee)} · SST collected {formatMoney(payments.totals.serviceTaxCollected ?? 0)}</p>}
         </div>
         {payments?.mode === 'sandbox' && <p className="text-xs bg-amber-50 border border-amber-200 text-amber-900 font-semibold p-2">Test mode: set STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET to take real payments.</p>}
         {payments && (

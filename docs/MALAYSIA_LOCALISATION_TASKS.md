@@ -59,10 +59,15 @@ Shared rules in `src/identity.ts` (form and server use the same code); fields in
 - [ ] Verified identity: the MyKad/passport number is checked for format only, not against any register or document.
 
 ## 5. Payments
-- [ ] [PaymentDialog.tsx](../src/components/PaymentDialog.tsx): add MYR pricing, FPX online banking, TNG eWallet, GrabPay, Boost, DuitNow QR via a Malaysian-capable gateway (e.g. Stripe MY, Billplz, iPay88, Toyyibpay: choose one).
-- [ ] Keep international card payments for tourists; show price in MYR with an indicative conversion.
-- [ ] SST (service tax) handling and receipts/invoices (?) confirm applicability to healthcare services.
-- [ ] Refund and cancellation policy per region.
+Code in `server/payments.ts` and `server/paymentPolicy.ts`; details and decisions in docs/PAYMENTS_MALAYSIA.md. Tax, refund and method assumptions are unconfirmed.
+- [x] MYR pricing everywhere (section 0); checkout dialog shows fee, tax, total, accepted methods and the refund policy before paying.
+- [~] Gateway: decision is to keep Stripe for launch (cards incl. international, FPX, GrabPay: supported per Stripe docs). **Not yet run against a live Stripe account.**
+- [ ] Touch 'n Go eWallet, Boost and DuitNow QR are not available: not confirmed on Stripe, they need a Malaysian aggregator (to evaluate; not implemented).
+- [x] International cards stay available; FPX is offered to Malaysian patients only.
+- [x] Indicative conversion: shown only when the operator supplies rates (`FX_RATES_JSON`); charged in MYR.
+- [~] SST: implemented but **off by default** (`SST_ENABLED`). 6% on the professional fee for foreign visitors, passed through (not commission or earnings), shown on the receipt with the SST registration number, refunded with the payment. Who must charge it, the PR/MyKad question, the threshold and the tax-invoice format need an accountant.
+- [x] Refund and cancellation policy per region (`refundPolicy`), configurable, shown at checkout and applied when cancelling. Defaults are identical for both regions: a business decision.
+- [ ] Practitioner payouts are not automated; no payment-method breakdown on receipts.
 
 ## 6. Pharmacy and care delivery
 - [ ] [PharmacyFinder.tsx](../src/components/PharmacyFinder.tsx) and workspace: Malaysian pharmacy licensing, Pharmacy Board / premises licence number, Poisons Act schedule handling.

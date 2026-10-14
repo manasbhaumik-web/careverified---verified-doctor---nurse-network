@@ -22,6 +22,7 @@ import { assessConsult, isVirtualMode, normaliseCountry, practitionerMayTreat } 
 import { findRegistry, inferRegistryId, scopeFor, REGISTRIES, REGISTRATION_TYPES } from "./server/registries";
 import { registerVerificationRoutes, notifyAdmins, notify } from "./server/verification";
 import { registerPaymentRoutes, registerPaymentWebhook, setPaymentHandlers, refundPayment } from "./server/payments";
+import { refundPolicy } from "./server/paymentPolicy";
 import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
 
 // Load environment variables
@@ -978,6 +979,10 @@ registerPharmacyWorkspace(app, { findProfessional });
 setClinicalHooks(clinical);
 registerPaymentRoutes(app);
 const UNPAID_HOLD_MS = 15 * 60_000;
+const paymentRegion = (userId: string): "MY" | "INTL" => {
+  const pt = (patients as any[]).find(p => p.userId === userId);
+  return pt && (pt.idType === "passport" || (pt.nationality && pt.nationality !== "MY")) ? "INTL" : "MY";
+};
 setPaymentHandlers({
   resolve: (kind, refId) => {
     if (kind === "consult") return care.resolveConsultPayable(refId);
@@ -1000,6 +1005,8 @@ setPaymentHandlers({
     if (pro && account) notify(account.id, "New booking", `${b.patientName} booked ${b.date} at ${b.timeSlot}.`);
     persistState();
   },
+  // Passport holders are foreign visitors (service tax, no FPX); MyKad holders are treated as Malaysian citizens/residents.
+  patientRegion: paymentRegion,
   onRefunded: (p) => {
     if (p.kind === "consult") { care.onConsultRefunded(p.ref_id); return; }
     const b = bookings.find(x => x.id === p.ref_id);
@@ -1114,15 +1121,16 @@ app.post("/api/bookings/:id/cancel", requireRole("patient"), async (req, res) =>
   const b = bookings.find(x => x.id === req.params.id && x.patientUserId === req.user!.id);
   if (!b) return res.status(404).json({ status: "error", message: "Booking not found." });
   if (b.status !== "Upcoming") return fail(res, 409, "Only upcoming appointments can be cancelled.");
-  const tomorrow = new Date(Date.now() + 86400_000).toISOString().slice(0, 10);
-  const refundable = b.paymentStatus === "Paid" && b.date >= tomorrow;
+  const policy = refundPolicy(paymentRegion(req.user!.id));
+  const earliest = new Date(Date.now() + policy.fullRefundMinDays * 86400_000).toISOString().slice(0, 10);
+  const refundable = b.paymentStatus === "Paid" && b.date >= earliest;
   b.status = "Cancelled";
   let refunded = false;
   if (refundable && b.paymentId) refunded = (await refundPayment(b.paymentId, "Cancelled by patient", null)).ok;
   audit(req, "booking.cancel", { target: ["booking", b.id], details: { refunded } });
   persistState();
   res.json({ status: "success", data: b, refunded,
-    message: refunded ? "Cancelled and refunded in full." : b.paymentStatus === "Paid" ? "Cancelled. Appointments less than a day away are not refundable." : "Cancelled." });
+    message: refunded ? "Cancelled and refunded in full." : b.paymentStatus === "Paid" ? `Cancelled. ${policy.summary.split(". ")[0]}.` : "Cancelled." });
 });
 
 // -------------------------------------------------------------
