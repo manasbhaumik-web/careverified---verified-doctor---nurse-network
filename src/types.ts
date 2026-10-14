@@ -223,13 +223,22 @@ export interface PatientProfile {
   name: string;
   email: string;
   icNumber: string;
+  /** What icNumber holds: a MyKad number or a passport number. */
+  idType?: 'nric' | 'passport';
+  nationality?: string;
+  dateOfBirth?: string;
   age: number;
+  /** E.164, e.g. +60123456789 */
   phone: string;
+  address?: { line1: string; line2?: string; city: string; state?: string; postcode: string; country: string } | null;
+  preferredLanguage?: string;
   gender: string;
   chronicConditions: string[];
   allergies: string[];
   emergencyContactName: string;
+  emergencyContactRelationship?: string;
   emergencyContactPhone: string;
+  nextOfKin?: { name: string; relationship: string; phone: string } | null;
   registeredAt: string;
 }
 

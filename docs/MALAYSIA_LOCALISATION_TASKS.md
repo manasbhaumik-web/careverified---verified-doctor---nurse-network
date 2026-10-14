@@ -48,10 +48,15 @@ Code in `server/privacy.ts`, `server/dataops.ts`, `src/components/PrivacyCentre.
 - [ ] Open: support tickets, complaints and reviews are not erased automatically; no automated breach detection; the retention period and all legal texts still need counsel.
 
 ## 4. Patients: identity and forms
-- [ ] [PatientRegistrationForm.tsx](../src/components/PatientRegistrationForm.tsx): MyKad (NRIC) for citizens/PRs, passport number and nationality for tourists; validate NRIC format and mask in the UI.
-- [ ] Address fields: Malaysian state, postcode (5 digits); international address for visitors.
-- [ ] Phone: E.164 with `+60` default and a country picker.
-- [ ] Emergency contact and next of kin; preferred language.
+Shared rules in `src/identity.ts` (form and server use the same code); fields in `src/components/IdentityFields.tsx`; enforced in `/api/register-patient`. Formats come from general knowledge of Malaysian conventions: confirm edge cases (place-of-birth codes, number lengths) before launch.
+- [x] MyKad (NRIC) for citizens and permanent residents: 12 digits, valid birth date, place code; auto-dashes while typing; age, birth date and a gender hint derived from the number; duplicate IDs refused. Passport path for visitors with nationality and date of birth.
+- [x] Masking: the number can be hidden while typing, and is shown masked (first six digits only) on the dashboard. Passports mask the middle.
+- [x] Address: Malaysian state (13 states + 3 federal territories) and 5-digit postcode, or an international address with country.
+- [x] Phone: country-code picker defaulting to +60, stored as E.164; Malaysian lengths checked; same for the emergency contact.
+- [x] Emergency contact with relationship, optional separate next of kin, and preferred language for care (includes Tamil).
+- [~] Existing profiles (demo data) keep their old formats; no screen to edit these details after sign-up yet; phone numbers are not yet formatted for display (`formatPhone` exists).
+- [ ] Minors and guardians (ID for under-12s, parent/guardian consent) are not handled.
+- [ ] Verified identity: the MyKad/passport number is checked for format only, not against any register or document.
 
 ## 5. Payments
 - [ ] [PaymentDialog.tsx](../src/components/PaymentDialog.tsx): add MYR pricing, FPX online banking, TNG eWallet, GrabPay, Boost, DuitNow QR via a Malaysian-capable gateway (e.g. Stripe MY, Billplz, iPay88, Toyyibpay: choose one).

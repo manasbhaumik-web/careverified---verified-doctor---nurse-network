@@ -1,4 +1,5 @@
 import express from "express";
+import { parseNric, isPassportNumber, normalisePassport, toE164, addressProblem, RELATIONSHIPS, PREFERRED_LANGUAGES } from "./src/identity";
 import { registerDataOps } from "./server/dataops";
 import { registerPrivacyRoutes, recordConsent, CONSENT_VERSION } from "./server/privacy";
 import path from "path";
@@ -580,11 +581,51 @@ app.post("/api/register-patient", (req, res) => {
   } = req.body;
   const name = str(req.body.name, 100);
   const email = str(req.body.email, 254).toLowerCase();
-  const icNumber = str(req.body.icNumber, 30);
-  const phone = str(req.body.phone, 30);
-
-  if (!name || !icNumber || !EMAIL_RE.test(email)) {
+  if (!name || !EMAIL_RE.test(email)) {
     return fail(res, 400, "Missing essential patient registration fields.");
+  }
+
+  // Identity: MyKad for citizens / permanent residents, passport for visitors
+  const idType = req.body.idType === "passport" ? "passport" : "nric";
+  let icNumber: string, nationality: string, dateOfBirth: string, computedAge: number;
+  if (idType === "nric") {
+    const n = parseNric(str(req.body.icNumber, 30));
+    if (!n) return fail(res, 400, "Enter a valid 12-digit MyKad number (YYMMDD-PB-####).");
+    icNumber = n.normalised; nationality = "MY"; dateOfBirth = n.birthDate; computedAge = n.age;
+  } else {
+    const pn = str(req.body.icNumber, 30);
+    if (!isPassportNumber(pn)) return fail(res, 400, "Enter a valid passport number.");
+    icNumber = normalisePassport(pn);
+    nationality = str(req.body.nationality, 2).toUpperCase();
+    if (!/^[A-Z]{2}$/.test(nationality) || nationality === "MY") return fail(res, 400, "Choose your nationality.");
+    const dob = str(req.body.dateOfBirth, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dob) || Number.isNaN(Date.parse(dob)) || new Date(dob) > new Date()) return fail(res, 400, "Enter a valid date of birth.");
+    dateOfBirth = dob;
+    const d = new Date(dob), t = new Date();
+    computedAge = t.getFullYear() - d.getFullYear() - (t < new Date(t.getFullYear(), d.getMonth(), d.getDate()) ? 1 : 0);
+  }
+  if (patients.some(p => p.icNumber && p.icNumber.toLowerCase() === icNumber.toLowerCase())) {
+    return fail(res, 409, "An account already exists for this ID. Sign in instead, or contact support.");
+  }
+
+  // Contact details are stored in E.164 so they can be used for calls and SMS
+  const phone = toE164(str(req.body.phone, 30));
+  if (!phone) return fail(res, 400, "Enter a valid phone number.");
+  const emergencyPhoneE164 = toE164(str(emergencyContactPhone, 30));
+  if (!str(emergencyContactName, 100) || !emergencyPhoneE164) return fail(res, 400, "Enter your emergency contact's name and a valid phone number.");
+  const a = req.body.address ?? {};
+  const address = {
+    line1: str(a.line1, 120), line2: str(a.line2, 120), city: str(a.city, 60), state: str(a.state, 60),
+    postcode: str(a.postcode, 12), country: str(a.country, 2).toUpperCase(),
+  };
+  const addrProblem = addressProblem(address);
+  if (addrProblem) return fail(res, 400, addrProblem);
+  let nextOfKin: { name: string; relationship: string; phone: string } | null = null;
+  if (req.body.nextOfKin) {
+    const nokPhone = toE164(str(req.body.nextOfKin.phone, 30));
+    const nokName = str(req.body.nextOfKin.name, 100);
+    if (!nokName || !nokPhone) return fail(res, 400, "Enter your next of kin's name and a valid phone number.");
+    nextOfKin = { name: nokName, relationship: RELATIONSHIPS.includes(req.body.nextOfKin.relationship) ? req.body.nextOfKin.relationship : "Other", phone: nokPhone };
   }
   const problem = passwordProblem(password);
   if (problem) return fail(res, 400, problem);
@@ -601,13 +642,20 @@ app.post("/api/register-patient", (req, res) => {
     name,
     email,
     icNumber,
-    age: Number(age) || 30,
+    idType,
+    nationality,
+    dateOfBirth,
+    age: computedAge,
     phone,
-    gender: gender || "Male",
+    address,
+    preferredLanguage: PREFERRED_LANGUAGES.some(l => l.code === req.body.preferredLanguage) ? req.body.preferredLanguage : "en",
+    gender: ["Male", "Female", "Other"].includes(gender) ? gender : "Male",
     chronicConditions: Array.isArray(chronicConditions) ? chronicConditions.map((c: unknown) => str(c, 100)) : [],
     allergies: Array.isArray(allergies) ? allergies.map((a: unknown) => str(a, 200)) : [],
     emergencyContactName: str(emergencyContactName, 100),
-    emergencyContactPhone: str(emergencyContactPhone, 30),
+    emergencyContactRelationship: RELATIONSHIPS.includes(req.body.emergencyContactRelationship) ? req.body.emergencyContactRelationship : "Other",
+    emergencyContactPhone: emergencyPhoneE164,
+    nextOfKin,
     registeredAt: new Date().toISOString()
   };
   patients.push(newPatient);
@@ -630,7 +678,7 @@ registerDataOps(app, {
     let patientProfiles = 0, bookingCount = 0, chatMessages = 0;
     for (const p of patients as any[]) {
       if (p.userId !== userId) continue;
-      Object.assign(p, { name: "Deleted patient", email: "", icNumber: "", phone: "", emergencyContactName: "", emergencyContactPhone: "", chronicConditions: [], allergies: [] });
+      Object.assign(p, { name: "Deleted patient", email: "", icNumber: "", dateOfBirth: "", nationality: "", phone: "", address: null, nextOfKin: null, emergencyContactName: "", emergencyContactRelationship: "", emergencyContactPhone: "", chronicConditions: [], allergies: [] });
       patientProfiles++;
     }
     for (const b of bookings as any[]) {

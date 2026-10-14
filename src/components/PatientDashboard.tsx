@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { maskNric } from '../identity';
 import { 
   BookOpen, Calendar, Clock, FolderHeart, Heart, Video, 
   CheckCircle2, Search, MessageSquare, ShieldCheck, ArrowRight, User,
@@ -57,12 +58,6 @@ const readSaved = (): string[] => {
   try { return JSON.parse(localStorage.getItem('saved_practitioners') || '[]'); } catch { return []; }
 };
 
-const maskNric = (nric?: string | null) => {
-  if (!nric) return '900101-14-••••';
-  const clean = nric.trim();
-  if (clean.length <= 4) return clean;
-  return clean.slice(0, clean.length - 4) + '••••';
-};
 
 const fmtDate = (iso?: string | null) => {
   if (!iso) return '';

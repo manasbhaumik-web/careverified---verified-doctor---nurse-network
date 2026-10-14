@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { openLegal } from '../legal';
+import { IdFields, PhoneField, AddressFields, emptyId, emptyPhone, emptyAddress, idProblem, phoneE164, type IdState, type PhoneState } from './IdentityFields';
+import { addressProblem, parseNric, toE164, PREFERRED_LANGUAGES, RELATIONSHIPS, type Address } from '../identity';
 import { 
   UserCheck, ShieldCheck, Mail, Lock, User, Phone, Calendar, 
   ArrowRight, ArrowLeft, RefreshCw, AlertCircle, Check, Activity 
@@ -21,12 +23,18 @@ export default function PatientRegistrationForm({
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [icNumber, setIcNumber] = useState('');
-  const [age, setAge] = useState<number>(30);
-  const [phone, setPhone] = useState('');
+  const [idState, setIdState] = useState<IdState>(emptyId);
+  const [phone, setPhone] = useState<PhoneState>(emptyPhone);
+  const [address, setAddress] = useState<Address>(emptyAddress);
   const [gender, setGender] = useState('Male');
+  const [preferredLanguage, setPreferredLanguage] = useState('en');
   const [emergencyContactName, setEmergencyContactName] = useState('');
-  const [emergencyContactPhone, setEmergencyContactPhone] = useState('');
+  const [emergencyRelationship, setEmergencyRelationship] = useState('Spouse');
+  const [emergencyPhone, setEmergencyPhone] = useState<PhoneState>(emptyPhone);
+  const [separateNok, setSeparateNok] = useState(false);
+  const [nokName, setNokName] = useState('');
+  const [nokRelationship, setNokRelationship] = useState('Parent');
+  const [nokPhone, setNokPhone] = useState<PhoneState>(emptyPhone);
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const [allergiesText, setAllergiesText] = useState('');
   const [error, setError] = useState('');
@@ -40,30 +48,37 @@ export default function PatientRegistrationForm({
     }
   };
 
-  // Validation checks for each step
-  const isStep1Valid = () => {
-    return name.trim() !== '' && email.trim() !== '' && password.trim() !== '' && icNumber.trim() !== '';
-  };
+  // Birth date and age come from the MyKad number, or from the date of birth entered with a passport.
+  const nric = idState.idType === 'nric' ? parseNric(idState.idNumber) : null;
+  const dateOfBirth = nric ? nric.birthDate : idState.dob;
+  const age = (() => {
+    if (nric) return nric.age;
+    if (!idState.dob) return 0;
+    const d = new Date(idState.dob), t = new Date();
+    return t.getFullYear() - d.getFullYear() - (t < new Date(t.getFullYear(), d.getMonth(), d.getDate()) ? 1 : 0);
+  })();
 
-  const isStep2Valid = () => {
-    return phone.trim() !== '' && age > 0;
+  const step1Problem = () => {
+    if (!name.trim() || !email.trim() || !password.trim()) return 'Please fill in all mandatory account details before continuing.';
+    return idProblem(idState);
   };
+  const step2Problem = () => {
+    if (!phoneE164(phone)) return 'Enter a valid mobile or phone number.';
+    if (age < 0 || age > 120) return 'The birth date looks wrong.';
+    return addressProblem(address);
+  };
+  const isStep1Valid = () => step1Problem() === null;
+  const isStep2Valid = () => step2Problem() === null;
 
   const [consent, setConsent] = useState(false);
-  const isStep3Valid = () => {
-    return emergencyContactName.trim() !== '' && emergencyContactPhone.trim() !== '' && consent;
-  };
+  const isStep3Valid = () =>
+    emergencyContactName.trim() !== '' && phoneE164(emergencyPhone) !== null && consent &&
+    (!separateNok || (nokName.trim() !== '' && phoneE164(nokPhone) !== null));
 
   const handleNextStep = () => {
     setError('');
-    if (step === 1 && !isStep1Valid()) {
-      setError('Please fill in all mandatory account details before continuing.');
-      return;
-    }
-    if (step === 2 && !isStep2Valid()) {
-      setError('Please fill in your valid contact phone and age before continuing.');
-      return;
-    }
+    const problem = step === 1 ? step1Problem() : step === 2 ? step2Problem() : null;
+    if (problem) { setError(problem); return; }
     setStep(prev => prev + 1);
   };
 
@@ -92,14 +107,21 @@ export default function PatientRegistrationForm({
           name,
           email,
           password,
-          icNumber,
+          idType: idState.idType,
+          icNumber: nric ? nric.normalised : idState.idNumber,
+          nationality: idState.nationality,
+          dateOfBirth,
           age,
-          phone,
+          phone: phoneE164(phone),
           gender,
+          preferredLanguage,
+          address,
           chronicConditions: selectedConditions,
           allergies: allergiesText ? [allergiesText] : [],
           emergencyContactName,
-          emergencyContactPhone,
+          emergencyContactRelationship: emergencyRelationship,
+          emergencyContactPhone: phoneE164(emergencyPhone),
+          nextOfKin: separateNok ? { name: nokName, relationship: nokRelationship, phone: phoneE164(nokPhone) } : null,
           consent
         })
       });
@@ -216,76 +238,31 @@ export default function PatientRegistrationForm({
           <div className="space-y-4 animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Full Name *</label>
+                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Full Name (as on your ID) *</label>
                 <div className="relative">
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Ahmad Fauzi Bin Ramli"
-                    className="form-input pl-10"
-                    required
-                  />
+                  <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ahmad Fauzi Bin Ramli" className="form-input pl-10" required />
                 </div>
               </div>
-              
               <div className="space-y-1.5">
                 <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Email Address *</label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="ahmad@gmail.com"
-                    className="form-input pl-10"
-                    required
-                  />
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ahmad@gmail.com" className="form-input pl-10" required />
                 </div>
               </div>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Account Password *</label>
-                <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="form-input pl-10"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">National ID / IC / Passport *</label>
-                <div className="relative">
-                  <ShieldCheck className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={icNumber}
-                    onChange={(e) => setIcNumber(e.target.value)}
-                    placeholder="720815-14-5399"
-                    className="form-input pl-10"
-                    required
-                  />
-                </div>
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Account Password *</label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters, letters and numbers" className="form-input pl-10" required />
               </div>
             </div>
-
-            {/* Stepped Navigation */}
+            <IdFields value={idState} onChange={setIdState} />
             <div className="flex justify-end pt-3">
-              <button
-                type="button"
-                onClick={handleNextStep}
-                disabled={!isStep1Valid()}
-                className="py-2.5 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-none text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-md"
-              >
+              <button type="button" onClick={handleNextStep} disabled={!isStep1Valid()}
+                className="py-2.5 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-none text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-md">
                 <span>Continue</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
@@ -296,69 +273,35 @@ export default function PatientRegistrationForm({
         {/* STEP 2: DEMOGRAPHICS */}
         {step === 2 && (
           <div className="space-y-4 animate-fade-in">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="space-y-1.5 col-span-1 sm:col-span-1">
-                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Phone Number *</label>
-                <div className="relative">
-                  <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+60123456789"
-                    className="form-input pl-10"
-                    required
-                  />
-                </div>
-              </div>
-
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <PhoneField id="reg-phone" title="Mobile number" value={phone} onChange={setPhone} />
               <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Age *</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                  <input
-                    type="number"
-                    value={age}
-                    onChange={(e) => setAge(Number(e.target.value))}
-                    className="form-input pl-10"
-                    required
-                    min="1"
-                    max="120"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Gender</label>
-                <select
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
-                  className="form-select"
-                >
+                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block" htmlFor="reg-gender">Gender</label>
+                <select id="reg-gender" value={gender} onChange={(e) => setGender(e.target.value)} className="form-select">
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
                   <option value="Other">Other</option>
                 </select>
+                {nric && nric.gender !== gender && <p className="text-[11px] font-semibold text-amber-700 mt-1">Your MyKad number suggests {nric.gender}. Keep your choice if you prefer.</p>}
               </div>
             </div>
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block" htmlFor="reg-lang">Preferred language for care</label>
+              <select id="reg-lang" value={preferredLanguage} onChange={(e) => setPreferredLanguage(e.target.value)} className="form-select">
+                {PREFERRED_LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
+              </select>
+              <p className="text-[11px] text-slate-500 font-semibold mt-1">Used to match you with a practitioner who speaks your language{age ? `. Age on record: ${age}.` : '.'}</p>
+            </div>
+            <AddressFields value={address} onChange={setAddress} />
 
-            {/* Stepped Navigation */}
             <div className="flex justify-between pt-3">
-              <button
-                type="button"
-                onClick={handlePrevStep}
-                className="py-2.5 px-5 border border-[color:var(--t-200)] bg-white text-slate-700 hover:text-[color:var(--t-800)] hover:bg-[color:var(--t-100)] rounded-none text-xs font-black transition-all flex items-center gap-2 cursor-pointer"
-              >
+              <button type="button" onClick={handlePrevStep}
+                className="py-2.5 px-5 border border-[color:var(--t-200)] bg-white text-slate-700 hover:text-[color:var(--t-800)] hover:bg-[color:var(--t-100)] rounded-none text-xs font-black transition-all flex items-center gap-2 cursor-pointer">
                 <ArrowLeft className="h-4 w-4" />
                 <span>Back</span>
               </button>
-
-              <button
-                type="button"
-                onClick={handleNextStep}
-                disabled={!isStep2Valid()}
-                className="py-2.5 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-none text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-md"
-              >
+              <button type="button" onClick={handleNextStep} disabled={!isStep2Valid()}
+                className="py-2.5 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-none text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-md">
                 <span>Continue</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
@@ -407,31 +350,33 @@ export default function PatientRegistrationForm({
 
             {/* Emergency Contacts */}
             <div className="space-y-3.5 pt-2 border-t border-[color:var(--t-200)]">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Emergency Contact (Crucial for Doctor-on-Call dispatches) *</span>
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Emergency Contact (used for Doctor-on-Call dispatches) *</span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 block">Contact Person Name</label>
-                  <input
-                    type="text"
-                    value={emergencyContactName}
-                    onChange={(e) => setEmergencyContactName(e.target.value)}
-                    placeholder="Fatimah Binti Fauzi"
-                    className="form-input"
-                    required
-                  />
+                  <input type="text" value={emergencyContactName} onChange={(e) => setEmergencyContactName(e.target.value)} placeholder="Fatimah Binti Fauzi" className="form-input" required />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 block">Emergency Phone Number</label>
-                  <input
-                    type="text"
-                    value={emergencyContactPhone}
-                    onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                    placeholder="+6017-987-6543"
-                    className="form-input"
-                    required
-                  />
+                  <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 block">Relationship</label>
+                  <select value={emergencyRelationship} onChange={(e) => setEmergencyRelationship(e.target.value)} className="form-select">
+                    {RELATIONSHIPS.map(r => <option key={r} value={r}>{r}</option>)}
+                  </select>
                 </div>
               </div>
+              <PhoneField id="reg-emergency-phone" title="Emergency phone number" value={emergencyPhone} onChange={setEmergencyPhone} />
+              <label className="flex items-start gap-3 text-xs text-slate-700 cursor-pointer">
+                <input type="checkbox" checked={!separateNok} onChange={(e) => setSeparateNok(!e.target.checked)} className="mt-0.5 h-4 w-4 accent-[color:var(--t-600)]" />
+                <span>This person is also my next of kin (the person we contact about your records if you cannot).</span>
+              </label>
+              {separateNok && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-[color:var(--t-200)] p-3">
+                  <input type="text" value={nokName} onChange={(e) => setNokName(e.target.value)} placeholder="Next of kin name" aria-label="Next of kin name" className="form-input" required />
+                  <select value={nokRelationship} onChange={(e) => setNokRelationship(e.target.value)} aria-label="Next of kin relationship" className="form-select">
+                    {RELATIONSHIPS.map(r => <option key={r} value={r}>{r}</option>)}
+                  </select>
+                  <div className="sm:col-span-2"><PhoneField id="reg-nok-phone" title="Next of kin phone" value={nokPhone} onChange={setNokPhone} /></div>
+                </div>
+              )}
               <label className="flex items-start gap-3 text-xs text-slate-700 cursor-pointer pt-2">
                 <input
                   type="checkbox"
