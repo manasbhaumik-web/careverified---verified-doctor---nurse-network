@@ -15,6 +15,7 @@ import { registerPharmacyWorkspace } from "./server/pharmacy";
 import { registerLiteratureRoutes, approvedLiteratureArticles } from "./server/literature";
 import { registerQualityRoutes, accountForChatId, isBlocked } from "./server/quality";
 import { integrationStatus } from "./server/registryProviders";
+import { assessConsult, isVirtualMode, normaliseCountry, practitionerMayTreat } from "./server/telemedicine";
 import { findRegistry, inferRegistryId, scopeFor, REGISTRIES, REGISTRATION_TYPES } from "./server/registries";
 import { registerVerificationRoutes, notifyAdmins, notify } from "./server/verification";
 import { registerPaymentRoutes, registerPaymentWebhook, setPaymentHandlers, refundPayment } from "./server/payments";
@@ -866,7 +867,11 @@ registerVerificationRoutes(app, {
 });
 
 // ---- Payments and the 24/7 care engine ----
-const care = registerCareRoutes(app, { findProfessional, allProfessionals });
+const care = registerCareRoutes(app, {
+  findProfessional,
+  allProfessionals,
+  hasCompletedBooking: userId => bookings.some(b => b.patientUserId === userId && b.paymentStatus === "Paid" && b.status === "Completed"),
+});
 const clinical = registerClinicalRoutes(app, {
   findProfessional,
   getBooking: id => bookings.find(b => b.id === id),
@@ -968,6 +973,27 @@ app.post("/api/bookings", requireRole("patient"), (req, res) => {
   if (!prof || prof.verificationStatus !== VerificationStatus.VERIFIED) {
     return res.status(404).json({ status: "error", message: "Professional not found." });
   }
+  // Telemedicine rules apply to booked video appointments with doctors and nurses alike.
+  const bookingMode = mode || ConsultationMode.IN_PERSON;
+  let teleFields: { patientCountry: string; firstVisit: boolean; chronicCondition: boolean; crossBorderAck: boolean } | null = null;
+  if (isVirtualMode(bookingMode)) {
+    const country = normaliseCountry(req.body.patientCountry);
+    const hasPrior = !!db.prepare("SELECT 1 AS x FROM consults WHERE patient_user_id = ? AND status = 'completed'").get(req.user!.id) ||
+      bookings.some(b => b.patientUserId === req.user!.id && b.paymentStatus === "Paid" && b.status === "Completed");
+    const chronic = req.body.chronicCondition === true;
+    const assessment = assessConsult({ country, declaredFirstVisit: req.body.firstVisit === true, hasPriorConsult: hasPrior, attestedSeenBefore: req.body.seenInPersonBefore === true, chronic });
+    if (!assessment.allowed) {
+      audit(req, "booking.blocked", { details: { reason: "first_visit_policy", country, chronic } });
+      return res.status(422).json({ status: "error", message: assessment.message, data: { route: "in-person" } });
+    }
+    if (assessment.crossBorder && req.body.acknowledgeCrossBorder !== true) {
+      return fail(res, 400, "Please confirm you understand this is a cross-border consultation before booking.");
+    }
+    if (!practitionerMayTreat(country, prof)) {
+      return fail(res, 403, "Patients in Malaysia can only have online appointments with practitioners registered in Malaysia. Choose an in-person visit or another practitioner.");
+    }
+    teleFields = { patientCountry: country, firstVisit: assessment.firstVisit, chronicCondition: chronic, crossBorderAck: assessment.crossBorder };
+  }
   // Emergency on-call dispatches are not tied to a scheduled slot.
   if (timeSlot !== "Immediate Emergency Call" &&
       bookings.some(b => b.professionalId === professionalId && b.date === date && b.timeSlot === timeSlot && holdsSlot(b))) {
@@ -988,7 +1014,8 @@ app.post("/api/bookings", requireRole("patient"), (req, res) => {
     patientEmail: user.email,
     date,
     timeSlot,
-    mode: mode || ConsultationMode.IN_PERSON,
+    mode: bookingMode,
+    ...(teleFields ?? {}),
     fee: prof.fee, // always priced server-side
     paymentStatus: "Pending" as const, // becomes "Paid" when the payment provider confirms
     holdExpiresAt: new Date(Date.now() + UNPAID_HOLD_MS).toISOString(), // slot is held while the patient pays

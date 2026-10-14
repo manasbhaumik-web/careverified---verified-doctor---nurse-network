@@ -4,15 +4,29 @@ import { Siren, X } from 'lucide-react';
 /** Always-visible emergency button for patients: numbers first, then an optional alert to the on-call team. */
 export default function SOSButton() {
   const [open, setOpen] = useState(false);
-  const [info, setInfo] = useState<{ numbers: { label: string; number: string }[]; disclaimer: string } | null>(null);
+  const [info, setInfo] = useState<{ numbers: { label: string; number: string }[]; disclaimer: string; verifyLocal?: boolean } | null>(null);
+  const [country, setCountry] = useState(() => { try { return localStorage.getItem('medcred-sos-country') || 'MY'; } catch { return 'MY'; } });
   const [result, setResult] = useState<{ mapUrl: string | null; message: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
+  const load = async (c: string) => {
+    const d = await fetch(`/api/emergency/info?country=${encodeURIComponent(c)}`).then(r => r.json()).catch(() => null);
+    if (d?.status === 'success') setInfo(d.data);
+  };
+
   const show = async () => {
     setOpen(true); setResult(null); setError('');
-    const d = await fetch('/api/emergency/info').then(r => r.json()).catch(() => null);
-    if (d?.status === 'success') setInfo(d.data);
+    await load(country);
+  };
+
+  const changeCountry = (v: string) => {
+    const c = v.replace(/[^a-zA-Z]/g, '').slice(0, 2).toUpperCase();
+    setCountry(c);
+    if (c.length === 2) {
+      try { localStorage.setItem('medcred-sos-country', c); } catch { /* ignore */ }
+      load(c);
+    }
   };
 
   const alertTeam = async () => {
@@ -50,6 +64,12 @@ export default function SOSButton() {
                 </a>
               ))}
             </div>
+            <label className="flex items-center gap-2 text-xs text-slate-600">
+              Where are you? (country code)
+              <input value={country} onChange={e => changeCountry(e.target.value)} maxLength={2} aria-label="Country code for emergency numbers"
+                className="w-14 border border-slate-300 p-1 text-center font-bold uppercase" />
+            </label>
+            {info?.verifyLocal && <p className="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 p-2">We do not have the local number for this country. 112 works on many mobile networks, but check the local emergency number.</p>}
             <p className="text-xs text-slate-600">{info?.disclaimer ?? 'MedCred is not an emergency service. Call the number above first.'}</p>
 
             {!result ? (

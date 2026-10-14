@@ -23,13 +23,15 @@ Regulatory notes are from web research (Oct 2026) and need confirmation with Mal
 - [x] Badge: "Register checked in Malaysia" / "Verified abroad" on the profile page, search cards and landing registry lookup.
 
 ## 2. Telemedicine compliance (limits what we can offer)
-Current understanding: Telemedicine Act 1997 never in force (abolition proposed); Medical Act 1971, MMC telemedicine guideline and PDPA 2010 apply; MoH guidance restricts first-time and NCD patients to follow-ups; MMC banned MCs from teleconsults (Sept 2025). Digital Health Act pending (?).
-- [ ] Consult flow: ask "first visit?" and "chronic condition?"; for MY-resident patients route first visits to in-person or booking, allow teleconsult for follow-ups.
-- [ ] Block sick-certificate (MC) issuance from virtual consults for Malaysian-regulated practitioners.
-- [ ] Practitioner must hold valid MMC registration and APC to teleconsult a patient located in Malaysia.
-- [ ] Cross-border teleconsult: record patient location and practitioner licensing jurisdiction; show a disclaimer when they differ.
-- [ ] Prescribing: restrict controlled medicines and follow Malaysian Poisons Act scheduling (?); no prescribing across borders without legal sign-off.
-- [ ] Emergency copy: Malaysian emergency number 999 (112 from mobile) in the SOS button, with country-aware numbers for tourists.
+Current understanding: Telemedicine Act 1997 never in force (abolition proposed); Medical Act 1971, MMC telemedicine guideline and PDPA 2010 apply; MoH guidance restricts first-time and NCD patients to follow-ups; MMC banned MCs from teleconsults (Sept 2025). Digital Health Act pending (?). Rules live in `server/telemedicine.ts`; every item below still needs Malaysian legal review.
+- [x] Instant consults and booked video appointments (doctors and nurses) ask "first visit?", "long-term condition?" and "in Malaysia?" (shared `TelemedicineQuestions`). Default `TELE_FIRST_VISIT=block_chronic` blocks a first visit for a long-term condition and points to in-person booking (`block_all` / `allow` available).
+- [x] "First visit" counts completed consults and paid, completed bookings on this platform. Visits elsewhere are covered by a patient attestation ("a doctor has seen me in person for this"), stored in the audit log; it is not verified.
+- [x] MC after a virtual consult or video booking is refused for Malaysian-registered doctors (`certificate.blocked` audit).
+- [x] Patients in Malaysia can only be matched or booked with practitioners whose register was checked in Malaysia (request, offers, accept, booking).
+- [x] Cross-border: patient country recorded, acknowledgement required.
+- [x] Prescribing guardrails: controlled medicines are never e-prescribed (existing list); online care for a patient outside Malaysia cannot issue an e-prescription unless `TELE_CROSS_BORDER_RX=allow`; `TELE_EXTRA_RESTRICTED` lists drugs that need an in-person visit. The controlled list is a short built-in list, not the official Poisons Act schedules: legal/pharmacist sign-off still required.
+- [x] Emergency numbers by country (`server/emergency.ts`, compiled from general knowledge: verify before launch); SOS dialog has a country selector and warns when a country is unknown (falls back to 112).
+- [ ] Prescribing UI does not yet show the policy block before submit (the API returns it in `/api/prescriptions/check` as `policyBlock`).
 
 ## 3. Privacy and data (PDPA 2010 plus international)
 - [ ] PDPA notice and consent screens in English and BM; record consent timestamp and version.

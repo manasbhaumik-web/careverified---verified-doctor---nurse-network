@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { isMalaysianRegistered, isVirtualMode, prescribingBlock, MC_AFTER_TELECONSULT_MESSAGE } from "./telemedicine";
 import type { Application, Request, Response } from "express";
 import rateLimit from "express-rate-limit";
 import { db } from "./db";
@@ -212,6 +213,15 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     }
     return null;
   };
+  /** Whether the care happened online, and where the patient was. */
+  const contextOf = (rel: { kind: "booking" | "consult"; refId: string }) => {
+    if (rel.kind === "consult") {
+      const c = row("SELECT patient_country FROM consults WHERE id = ?", rel.refId);
+      return { virtual: true, patientCountry: (c?.patient_country as string) ?? "MY" };
+    }
+    const b: any = ctx.getBooking(rel.refId);
+    return { virtual: isVirtualMode(b?.mode), patientCountry: (b?.patientCountry as string) ?? "MY" };
+  };
   const patientHasRelationTo = (patientUserId: string, professionalId: string) =>
     ctx.allBookings().some(b => b.patientUserId === patientUserId && b.professionalId === professionalId && b.paymentStatus === "Paid") ||
     !!row("SELECT 1 AS x FROM consults WHERE patient_user_id = ? AND professional_id = ?", patientUserId, professionalId);
@@ -408,7 +418,7 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     const items = parseItems(req.body.items);
     if (typeof items === "string") return fail(res, 400, items);
     const { shared, warnings } = safety(rel.patientUserId, req.user!.profileId!, items);
-    res.json({ status: "success", data: { recordShared: shared, warnings, unknown: items.filter(i => !findDrug(i.name) && !isRestricted(i.name)).map(i => i.name) } });
+    res.json({ status: "success", data: { policyBlock: prescribingBlock(contextOf(rel), items.map(i => i.name)), recordShared: shared, warnings, unknown: items.filter(i => !findDrug(i.name) && !isRestricted(i.name)).map(i => i.name) } });
   });
 
   app.post("/api/prescriptions", requireRole("practitioner"), (req, res) => {
@@ -421,6 +431,12 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     const items = parseItems(req.body.items);
     if (typeof items === "string") return fail(res, 400, items);
 
+    const rxCtx = contextOf(rel);
+    const policyBlock = prescribingBlock(rxCtx, items.map(i => i.name));
+    if (policyBlock) {
+      audit(req, "prescription.blocked", { target: [rel.kind, rel.refId], details: { reason: "telemedicine_policy" } });
+      return res.status(422).json({ status: "error", message: policyBlock, data: { policyBlock } });
+    }
     const { shared, warnings } = safety(rel.patientUserId, pro.id, items);
     // Controlled medicines can never be e-prescribed.
     if (warnings.some(w => w.type === "restricted")) return res.status(422).json({ status: "error", message: "A controlled medicine cannot be e-prescribed.", data: { warnings } });
@@ -610,6 +626,12 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     if (!pro || pro.role !== "doctor") return fail(res, 403, "Only verified doctors can issue medical certificates.");
     const rel = relation(req, String(req.body.kind), String(req.body.refId));
     if (!rel) return fail(res, 404, "No treatment relationship found.");
+    // MMC: no medical certificate after a teleconsultation alone.
+    const virtual = contextOf(rel).virtual;
+    if (virtual && isMalaysianRegistered(pro)) {
+      audit(req, "certificate.blocked", { target: [rel.kind, rel.refId], details: { reason: "teleconsult" } });
+      return fail(res, 403, MC_AFTER_TELECONSULT_MESSAGE);
+    }
     const from = dateOnly(req.body.fromDate), to = dateOnly(req.body.toDate);
     if (!from || !to || to < from) return fail(res, 400, "Enter valid start and end dates.");
     const today = new Date().toISOString().slice(0, 10);

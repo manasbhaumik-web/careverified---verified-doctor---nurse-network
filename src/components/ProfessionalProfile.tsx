@@ -1,4 +1,5 @@
 import ReportPractitioner from './ReportPractitioner';
+import TelemedicineQuestions, { defaultTeleAnswers, teleToPayload, type TeleAnswers } from './TelemedicineQuestions';
 import VerificationScopeBadge from './VerificationScopeBadge';
 import React, { useState, useEffect } from 'react';
 import { 
@@ -58,6 +59,7 @@ export default function ProfessionalProfile({
   const [bookingDate, setBookingDate] = useState('');
   const [bookingSlot, setBookingSlot] = useState('');
   const [bookingMode, setBookingMode] = useState<ConsultationMode>(ConsultationMode.IN_PERSON);
+  const [tele, setTele] = useState<TeleAnswers>(defaultTeleAnswers);
   const [symptoms, setSymptoms] = useState('');
   const [shareRecord, setShareRecord] = useState(false);
   const [canReview, setCanReview] = useState<boolean | null>(null);
@@ -125,7 +127,8 @@ export default function ProfessionalProfile({
           timeSlot: bookingSlot,
           mode: bookingMode,
           symptoms,
-          shareRecord
+          shareRecord,
+          ...(/video|tele/i.test(bookingMode) ? teleToPayload(tele) : {})
         })
       });
       const data = await response.json();
@@ -611,6 +614,8 @@ export default function ProfessionalProfile({
                     ))}
                   </div>
                 </div>
+
+                {/video|tele/i.test(bookingMode) && <TelemedicineQuestions value={tele} onChange={setTele} />}
 
                 {/* Calendar Date selector */}
                 <div>

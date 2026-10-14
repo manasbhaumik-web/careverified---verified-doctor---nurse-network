@@ -1,4 +1,6 @@
 import crypto from "crypto";
+import { emergencyNumbersForCountry, hasEmergencyNumbersFor } from "./emergency";
+import { assessConsult, normaliseCountry, practitionerMayTreat } from "./telemedicine";
 import type { Application, Response } from "express";
 import { db } from "./db";
 import { audit } from "./audit";
@@ -78,6 +80,9 @@ CREATE TABLE IF NOT EXISTS emergency_events (
 `);
 
 try { db.exec("ALTER TABLE consults ADD COLUMN share_record INTEGER NOT NULL DEFAULT 0"); } catch { /* column already exists */ }
+for (const col of ["patient_country TEXT NOT NULL DEFAULT 'MY'", "first_visit INTEGER NOT NULL DEFAULT 0", "chronic_condition INTEGER NOT NULL DEFAULT 0", "cross_border_ack INTEGER NOT NULL DEFAULT 0"]) {
+  try { db.exec("ALTER TABLE consults ADD COLUMN " + col); } catch { /* column already exists */ }
+}
 
 const PRESENCE_TTL_MS = 90_000;
 const ESCALATE_AFTER_MS = 3 * 60_000;
@@ -100,7 +105,8 @@ export function redFlags(text: string): string[] {
   return RED_FLAG_RULES.filter(([re]) => re.test(text)).map(([, label]) => label);
 }
 
-export const emergencyNumbers = (): { label: string; number: string }[] => {
+export const emergencyNumbers = (country = "MY"): { label: string; number: string }[] => {
+  if (country !== "MY") return emergencyNumbersForCountry(country);
   try {
     const v = process.env.EMERGENCY_NUMBERS ? JSON.parse(process.env.EMERGENCY_NUMBERS) : null;
     if (Array.isArray(v) && v.every(x => x?.label && x?.number)) return v;
@@ -119,6 +125,8 @@ const iso = () => new Date().toISOString();
 interface Ctx {
   findProfessional: (id: string) => any | undefined;
   allProfessionals: () => any[];
+  /** True if the patient has a paid, completed booking on the platform. */
+  hasCompletedBooking?: (patientUserId: string) => boolean;
 }
 
 export function registerCareRoutes(app: Application, ctx: Ctx) {
@@ -208,14 +216,27 @@ export function registerCareRoutes(app: Application, ctx: Ctx) {
     if (symptoms.length < 10) return fail(res, 400, "Please describe your symptoms (at least 10 characters).");
     const open = db.prepare("SELECT id, status FROM consults WHERE patient_user_id = ? AND status IN ('awaiting_payment','queued','active')").get(req.user!.id) as any;
     if (open) return res.status(409).json({ status: "error", message: "You already have a consultation in progress.", data: { id: open.id } });
-    if (onlineDoctorIds().length === 0) {
-      return fail(res, 409, "No doctors are online right now. You can book an appointment instead. If this is an emergency, call 999.");
+    // Telemedicine rules (first visit / long-term condition / patient location)
+    const country = normaliseCountry(req.body.patientCountry);
+    const hasPriorConsult = !!db.prepare("SELECT 1 AS x FROM consults WHERE patient_user_id = ? AND status = 'completed'").get(req.user!.id) || !!ctx.hasCompletedBooking?.(req.user!.id);
+    const chronic = req.body.chronicCondition === true;
+    const assessment = assessConsult({ country, declaredFirstVisit: req.body.firstVisit === true, hasPriorConsult, attestedSeenBefore: req.body.seenInPersonBefore === true, chronic });
+    if (!assessment.allowed) {
+      audit(req, "consult.blocked", { details: { reason: "first_visit_policy", country, chronic } });
+      return res.status(422).json({ status: "error", message: assessment.message, data: { route: "in-person" } });
+    }
+    if (assessment.crossBorder && req.body.acknowledgeCrossBorder !== true) {
+      return fail(res, 400, "Please confirm you understand this is a cross-border consultation: the doctor is licensed in Malaysia and cannot provide emergency care or prescribe controlled medicines to you where you are.");
+    }
+    if (!onlineDoctorIds().some(pid => practitionerMayTreat(country, verifiedDoctor(pid)))) {
+      return fail(res, 409, "No eligible doctors are online right now. You can book an appointment instead. If this is an emergency, call 999.");
     }
     const flags = redFlags(symptoms);
     const id = newId("con");
-    db.prepare("INSERT INTO consults (id, patient_user_id, status, mode, symptoms, red_flags, fee_sen, created_at, share_record) VALUES (?,?,?,?,?,?,?,?,?)")
-      .run(id, req.user!.id, "awaiting_payment", mode, symptoms, flags.length ? JSON.stringify(flags) : null, consultFeeSen(), iso(), req.body.shareRecord === true ? 1 : 0);
-    audit(req, "consult.create", { target: ["consult", id], details: { mode, redFlags: flags } });
+    db.prepare("INSERT INTO consults (id, patient_user_id, status, mode, symptoms, red_flags, fee_sen, created_at, share_record, patient_country, first_visit, chronic_condition, cross_border_ack) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)")
+      .run(id, req.user!.id, "awaiting_payment", mode, symptoms, flags.length ? JSON.stringify(flags) : null, consultFeeSen(), iso(), req.body.shareRecord === true ? 1 : 0,
+        country, assessment.firstVisit ? 1 : 0, chronic ? 1 : 0, assessment.crossBorder ? 1 : 0);
+    audit(req, "consult.create", { target: ["consult", id], details: { mode, redFlags: flags, country, firstVisit: assessment.firstVisit, attestedSeenBefore: req.body.seenInPersonBefore === true } });
     res.status(201).json({ status: "success", data: { id, redFlags: flags, fee: consultFeeSen() / 100 } });
   });
 
@@ -237,7 +258,8 @@ export function registerCareRoutes(app: Application, ctx: Ctx) {
        WHERE c.status = 'queued' AND c.id NOT IN (SELECT consult_id FROM consult_declines WHERE professional_id = ?)
        ORDER BY c.queued_at ASC LIMIT 20`
     ).all(pid) as any[];
-    res.json({ status: "success", data: rows.map(c => ({
+    const me = verifiedDoctor(pid);
+    res.json({ status: "success", data: rows.filter(c => practitionerMayTreat(c.patient_country, me)).map(c => ({
       id: c.id, mode: c.mode, symptoms: c.symptoms, redFlags: c.red_flags ? JSON.parse(c.red_flags) : [],
       queuedAt: c.queued_at, fee: c.fee_sen / 100, patientFirstName: String(c.pname).split(" ")[0],
     })) });
@@ -254,6 +276,10 @@ export function registerCareRoutes(app: Application, ctx: Ctx) {
     if (!verifiedDoctor(pid) || !isOnline(pid!)) return fail(res, 403, "You must be a verified doctor and online to accept.");
     const busy = db.prepare("SELECT 1 AS x FROM consults WHERE professional_id = ? AND status = 'active'").get(pid);
     if (busy) return fail(res, 409, "Finish your current consultation first.");
+    const target = loadConsult(req.params.id);
+    if (target && !practitionerMayTreat(target.patient_country, verifiedDoctor(pid))) {
+      return fail(res, 403, "This patient is in Malaysia. Only doctors registered in Malaysia can treat them online.");
+    }
     // Atomic claim: only one doctor can win.
     const won = db.prepare("UPDATE consults SET status='active', professional_id=?, accepted_at=? WHERE id=? AND status='queued' AND professional_id IS NULL")
       .run(pid, iso(), req.params.id).changes;
@@ -342,9 +368,12 @@ export function registerCareRoutes(app: Application, ctx: Ctx) {
   });
 
   // ---------- emergency SOS ----------
-  app.get("/api/emergency/info", (_req, res) => {
+  app.get("/api/emergency/info", (req, res) => {
+    const country = normaliseCountry(req.query.country);
     res.json({ status: "success", data: {
-      numbers: emergencyNumbers(),
+      country,
+      numbers: emergencyNumbers(country),
+      verifyLocal: !hasEmergencyNumbersFor(country),
       disclaimer: "MedCred is not an emergency service and cannot send an ambulance. In an emergency call the number below first.",
     } });
   });

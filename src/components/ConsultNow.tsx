@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import TelemedicineQuestions, { defaultTeleAnswers, teleToPayload, type TeleAnswers } from './TelemedicineQuestions';
 import { AlertTriangle, MessageSquare, Video, CreditCard, UserCheck, Lock } from 'lucide-react';
 import PaymentDialog from './PaymentDialog';
 import ConsultRoom from './ConsultRoom';
@@ -19,6 +20,8 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
   const [mode, setMode] = useState<'chat' | 'video'>('chat');
   const [symptoms, setSymptoms] = useState('');
   const [shareRecord, setShareRecord] = useState(false);
+  const [tele, setTele] = useState<TeleAnswers>(defaultTeleAnswers);
+  const [needInPerson, setNeedInPerson] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [redFlags, setRedFlags] = useState<string[]>([]);
@@ -29,12 +32,12 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
     const [s, m, e] = await Promise.all([
       fetch('/api/on-call/status').then(r => r.json()),
       fetch('/api/consults/mine').then(r => r.json()),
-      fetch('/api/emergency/info').then(r => r.json()),
+      fetch(`/api/emergency/info?country=${tele.inMalaysia ? 'MY' : tele.country.trim().toUpperCase() || 'MY'}`).then(r => r.json()),
     ]);
     if (s.status === 'success') setStatus(s.data);
     if (m.status === 'success') setMine(m.data);
     if (e.status === 'success') setEmergency(e.data.numbers);
-  }, []);
+  }, [tele.inMalaysia, tele.country]);
 
   useEffect(() => { load().catch(() => {}); }, [load]);
 
@@ -51,13 +54,17 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
     e.preventDefault();
     setError(''); setBusy(true);
     try {
-      const d = await jpost('/api/consults', { mode, symptoms, shareRecord });
+      setNeedInPerson(false);
+      const d = await jpost('/api/consults', { mode, symptoms, shareRecord, ...teleToPayload(tele) });
       if (d.status === 'success') {
         setRedFlags(d.data.redFlags ?? []);
         setSymptoms('');
         await load();
         setPaying(d.data.id);
-      } else setError(d.message || 'Could not start the consultation.');
+      } else {
+        setNeedInPerson(d.data?.route === 'in-person');
+        setError(d.message || 'Could not start the consultation.');
+      }
     } catch { setError('Server connection error.'); }
     finally { setBusy(false); }
   };
@@ -181,11 +188,17 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
                   className="w-full border border-[color:var(--t-200)] p-3.5 text-sm text-[color:var(--ink)] bg-[color:var(--t-bg)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors placeholder-slate-400"
                   placeholder="Detail your symptoms, onset time, pain severity (1-10), and current home medications…" />
               </div>
+              <TelemedicineQuestions value={tele} onChange={setTele} />
               <label className="flex items-start gap-3 text-xs text-[color:var(--ink)] cursor-pointer bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-3.5">
                 <input type="checkbox" className="mt-0.5 accent-[color:var(--t-600)]" checked={shareRecord} onChange={e => setShareRecord(e.target.checked)} />
                 <span className="leading-relaxed">Share my medical record (allergies, chronic conditions, regular prescriptions) with the responding doctor. Facilitates accurate diagnosis and safe prescribing.</span>
               </label>
-              {error && <p className="text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 p-3">{error}</p>}
+              {error && (
+                <div className={`text-sm font-bold p-3 border ${needInPerson ? 'text-amber-900 bg-amber-50 border-amber-300' : 'text-rose-700 bg-rose-50 border-rose-200'}`} role="alert">
+                  {error}
+                  {needInPerson && <span className="block text-xs font-semibold mt-1">Use Find a doctor to book an in-person or follow-up appointment.</span>}
+                </div>
+              )}
               <button disabled={busy || status?.onlineDoctors === 0} className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white h-12 text-sm font-extrabold flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-xs">
                 {busy ? 'Preparing consultation…' : status?.onlineDoctors === 0 ? 'No physicians online right now' : 'Continue to Payment & Queue'}
               </button>
