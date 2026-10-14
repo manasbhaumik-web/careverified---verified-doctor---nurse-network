@@ -1,4 +1,6 @@
 import crypto from "crypto";
+import { isColdChain } from "./formulary";
+import { cleanDeliveryMethods, cleanList, pharmacyLicenceProblem } from "./pharmacyLicence";
 import type { Application, Request, RequestHandler, Response } from "express";
 import rateLimit from "express-rate-limit";
 import { db } from "./db";
@@ -70,6 +72,8 @@ export function registerPharmacyWorkspace(app: Application, ctx: Ctx) {
     (req, res, next) => {
       const ph = req.user!.profileId ? row("SELECT * FROM pharmacies WHERE id = ?", req.user!.profileId) : null;
       if (!ph || !ph.active || !ph.verified_at) return fail(res, 403, "This pharmacy account is not active. Contact the MedCred board.");
+      const lic = pharmacyLicenceProblem(ph);
+      if (lic) return fail(res, 403, `${lic} Contact the MedCred board to renew it.`);
       res.locals.ph = ph;
       next();
     },
@@ -116,6 +120,16 @@ export function registerPharmacyWorkspace(app: Application, ctx: Ctx) {
       prescriber: prescriberOf(r),
       safety: safetyOf(r, pharmacyId),
       cancelledReason: r.cancelled_reason ?? null,
+      insurance: r.pharmacy_id === pharmacyId && r.insurance_policy_id ? (() => {
+        const p = row("SELECT insurer, member_no, policy_type, employer FROM insurance_policies WHERE id = ?", r.insurance_policy_id);
+        return p ? { insurer: p.insurer, memberNo: p.member_no, policyType: p.policy_type, employer: p.employer, glStatus: r.gl_status ?? "requested", glNumber: r.gl_number ?? null, glNote: r.gl_note ?? null } : null;
+      })() : null,
+      delivery: (() => {
+        const d = row("SELECT id, method, status, cold_chain FROM deliveries WHERE prescription_id = ? AND pharmacy_id = ? ORDER BY requested_at DESC", r.id, pharmacyId);
+        return d ? { id: d.id, method: d.method, status: d.status, coldChain: !!d.cold_chain } : null;
+      })(),
+      coldChainItems: (JSON.parse(r.items) as { name: string }[]).filter(i => isColdChain(i.name)).map(i => i.name),
+      dispensingPharmacist: r.dispensing_pharmacist ?? null, poisonsEntryNo: r.poisons_entry_no ?? null,
     };
   }
 
@@ -154,6 +168,12 @@ export function registerPharmacyWorkspace(app: Application, ctx: Ctx) {
       "phone" in b ? str(b.phone, 30) || null : ph.phone,
       "hours" in b ? str(b.hours, 120) || null : ph.hours,
       "services" in b ? JSON.stringify(cleanServices(b.services)) : ph.services,
+      ph.id,
+    );
+    db.prepare("UPDATE pharmacies SET delivery_methods = ?, cold_chain = ?, panel_insurers = ? WHERE id = ?").run(
+      "deliveryMethods" in b ? JSON.stringify(cleanDeliveryMethods(b.deliveryMethods)) : ph.delivery_methods,
+      "coldChain" in b ? (b.coldChain === true ? 1 : 0) : ph.cold_chain,
+      "panelInsurers" in b ? JSON.stringify(cleanList(b.panelInsurers)) : ph.panel_insurers,
       ph.id,
     );
     pharmacyEvent(ph.id, null, "profile_update", req.user!.id);
@@ -219,9 +239,14 @@ export function registerPharmacyWorkspace(app: Application, ctx: Ctx) {
     if (r.pharmacy_id && r.pharmacy_id !== ph.id) return fail(res, 409, "This prescription was sent to a different pharmacy.");
     const st = rxEffectiveStatus(r);
     if (st !== "active") return fail(res, 409, `This prescription is ${st}.`);
+    // Dispensing record: who dispensed, and the poisons / prescription book entry where the pharmacy's rules require one.
+    const pharmacist = str(req.body?.pharmacistName, 100) || ph.pharmacist_name || "";
+    const poisonsEntryNo = str(req.body?.poisonsEntryNo, 40);
+    if (!pharmacist) return fail(res, 400, "Record which pharmacist dispensed it.");
+    if (process.env.POISONS_BOOK_REQUIRED === "true" && !poisonsEntryNo) return fail(res, 400, "Enter the poisons / prescription book entry number.");
     const now = iso();
-    const changed = db.prepare("UPDATE prescriptions SET status = 'dispensed', dispensed_at = ?, dispensed_by = ?, pharmacy_id = ?, fill_updated_at = ?, first_response_at = COALESCE(first_response_at, ?) WHERE id = ? AND status = 'active'")
-      .run(now, ph.id, ph.id, now, now, r.id).changes;
+    const changed = db.prepare("UPDATE prescriptions SET status = 'dispensed', dispensed_at = ?, dispensed_by = ?, pharmacy_id = ?, fill_updated_at = ?, first_response_at = COALESCE(first_response_at, ?), dispensing_pharmacist = ?, poisons_entry_no = ? WHERE id = ? AND status = 'active'")
+      .run(now, ph.id, ph.id, now, now, pharmacist, poisonsEntryNo || null, r.id).changes;
     if (!changed) return fail(res, 409, "Already dispensed.");
     pharmacyEvent(ph.id, r.id, "dispensed", req.user!.id, { via: "workspace" });
     notify(r.patient_user_id, "Prescription dispensed", `${ph.name} dispensed your prescription.`);
@@ -327,14 +352,14 @@ export function registerPharmacyWorkspace(app: Application, ctx: Ctx) {
   app.get("/api/admin/pharmacies/summary", requireRole("admin"), (_req, res) => {
     const since = new Date(Date.now() - 30 * DAY).toISOString();
     const out: Record<string, unknown> = {};
-    for (const p of rows("SELECT id, licence_no, pharmacist_name, pharmacist_reg, verified_at FROM pharmacies")) {
+    for (const p of rows("SELECT id, licence_no, pharmacist_name, pharmacist_reg, verified_at, licence_expiry, pharmacist_apc_expiry FROM pharmacies")) {
       const acct = row("SELECT name, email, must_change_password AS mustChange, totp_enabled AS tf FROM users WHERE role = 'pharmacy' AND profile_id = ? AND pharmacy_owner = 1", p.id);
       const staffCount = row("SELECT COUNT(*) AS n FROM users WHERE role = 'pharmacy' AND profile_id = ? AND status = 'active'", p.id).n as number;
       const counts = countBuckets(p.id);
       const resp = rows("SELECT sent_at, first_response_at FROM prescriptions WHERE pharmacy_id = ? AND sent_at >= ? AND first_response_at IS NOT NULL", p.id, since)
         .map(r => minutesBetween(r.sent_at, r.first_response_at)).filter(n => n >= 0);
       out[p.id] = {
-        verification: p.verified_at ? { licenceNumber: p.licence_no, pharmacistName: p.pharmacist_name, pharmacistRegNo: p.pharmacist_reg, verifiedAt: p.verified_at } : null,
+        verification: p.verified_at ? { licenceNumber: p.licence_no, pharmacistName: p.pharmacist_name, pharmacistRegNo: p.pharmacist_reg, verifiedAt: p.verified_at, licenceExpiry: p.licence_expiry ?? null, pharmacistApcExpiry: p.pharmacist_apc_expiry ?? null, problem: pharmacyLicenceProblem(p) } : null,
         account: acct ? { name: acct.name, email: acct.email, mustChangePassword: !!acct.mustChange, twoFactor: !!acct.tf } : null,
         staffCount,
         inbox: counts.new, inProgress: counts.in_progress, dispensed: counts.dispensed,
@@ -378,9 +403,16 @@ export function registerPharmacyWorkspace(app: Application, ctx: Ctx) {
     if (!ph) return fail(res, 404, "Pharmacy not found.");
     const licenceNumber = str(req.body.licenceNumber, 60), pharmacistName = str(req.body.pharmacistName, 100), pharmacistReg = str(req.body.pharmacistRegNo, 60);
     if (!licenceNumber || !pharmacistName || !pharmacistReg) return fail(res, 400, "Enter the pharmacy licence number and the pharmacist's name and registration number.");
+    const t = new Date().toISOString().slice(0, 10);
+    const licenceExpiry = str(req.body.licenceExpiry, 10), apcExpiry = str(req.body.pharmacistApcExpiry, 10);
+    for (const [label, v] of [["licence expiry", licenceExpiry], ["pharmacist retention certificate expiry", apcExpiry]] as const) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(v) || Number.isNaN(Date.parse(v)) || v <= t) return fail(res, 400, `Enter the ${label} date (it must be in the future).`);
+    }
+    const reference = str(req.body.registryReference, 200);
+    if (!reference) return fail(res, 400, "Record how the licence and pharmacist registration were checked (reference, URL or who confirmed).");
     if (req.body.confirmed !== true) return fail(res, 400, "Confirm that you checked these details against the official register.");
-    db.prepare("UPDATE pharmacies SET licence_no = ?, pharmacist_name = ?, pharmacist_reg = ?, verified_at = ?, verified_by = ? WHERE id = ?")
-      .run(licenceNumber, pharmacistName, pharmacistReg, iso(), req.user!.id, ph.id);
+    db.prepare("UPDATE pharmacies SET licence_no = ?, pharmacist_name = ?, pharmacist_reg = ?, licence_expiry = ?, pharmacist_apc_expiry = ?, licence_type = ?, registry_reference = ?, verified_at = ?, verified_by = ? WHERE id = ?")
+      .run(licenceNumber, pharmacistName, pharmacistReg, licenceExpiry, apcExpiry, str(req.body.licenceType, 30) || null, reference, iso(), req.user!.id, ph.id);
     audit(req, "pharmacy.verify", { target: ["pharmacy", ph.id], details: { licenceNumber, pharmacistReg } });
     res.json({ status: "success" });
   });

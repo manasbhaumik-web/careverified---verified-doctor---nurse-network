@@ -69,11 +69,15 @@ Code in `server/payments.ts` and `server/paymentPolicy.ts`; details and decision
 - [x] Refund and cancellation policy per region (`refundPolicy`), configurable, shown at checkout and applied when cancelling. Defaults are identical for both regions: a business decision.
 - [ ] Practitioner payouts are not automated; no payment-method breakdown on receipts.
 
-## 6. Pharmacy and care delivery
-- [ ] [PharmacyFinder.tsx](../src/components/PharmacyFinder.tsx) and workspace: Malaysian pharmacy licensing, Pharmacy Board / premises licence number, Poisons Act schedule handling.
-- [ ] Local delivery partners (Grab, Lalamove, own courier) and cold-chain notes.
-- [ ] Medicine names: local brand and generic names, NPRA registration reference (?).
-- [ ] Insurance: panel/guarantee letter (GL) fields for insurers and corporate clients (a BookDoc-style differentiator).
+## 6. Pharmacy and delivery
+Code in `server/pharmacyMy.ts`, `server/pharmacyLicence.ts`, `src/components/PrescriptionExtras.tsx` and the pharmacy workspace; rules and gaps in docs/PHARMACY_MALAYSIA.md. Statute references are unconfirmed.
+- [x] Licensing: pharmacy licence and pharmacist retention-certificate expiry, licence type and how it was checked are required to verify or renew; expiry blocks the workspace, hides the pharmacy from patients and stops new prescriptions or deliveries; reminders 30 days before.
+- [~] Poisons Act: dispensing pharmacist and optional poisons/prescription book entry number recorded at every dispense (`POISONS_BOOK_REQUIRED` makes it mandatory). `Drug.poisonGroup` exists but is **empty**: the groups must come from the official Poisons List via a pharmacist; sources conflict on Groups C and D.
+- [~] Medicine names: optional NPRA registration number per prescribed item (format check only: no public NPRA lookup found). Malaysian brand names not yet added to the formulary.
+- [x] Delivery: partners (own rider, Grab, Lalamove, other), Malaysia-only addresses, status flow with notifications, tracking link, recipient record; delivered counts as dispensed. **No live Grab/Lalamove API**: the pharmacy books manually and records the reference.
+- [x] Cold chain: insulin, vaccines and `COLD_CHAIN_DRUGS` need a pharmacy that has declared cold-chain delivery; refrigeration note to patient and pharmacist. The built-in list is tiny and storage rules need a pharmacist.
+- [x] Insurance: patient policies (individual / corporate), attach to a prescription, pharmacy insurance panel shown in the finder, guarantee-letter approve/decline with GL number.
+- [ ] Not built: insurer integrations, claims, co-payment, delivery payment through the app, delivery partner API.
 
 ## 7. Medical tourism module (new, stays international)
 - [ ] Facility and practitioner listings filtered by "accepts international patients", languages spoken, and JCI/MSQH accreditation (MSQH is the Malaysian hospital accreditation body).

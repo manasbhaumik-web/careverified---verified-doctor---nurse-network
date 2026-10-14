@@ -91,8 +91,10 @@ async function main() {
   // ---- patient
   const pat = new Client();
   r = await pat.call("POST", "/api/register-patient", {
-    name: ACCOUNTS.patient.name, email: ACCOUNTS.patient.email, password: DEMO_PASSWORD, icNumber: "900101-14-0000", age: 34, gender: "Female",
-    phone: "+60-12-000-0000", allergies: ["Penicillin"], chronicConditions: ["Hypertension"], consent: true,
+    name: ACCOUNTS.patient.name, email: ACCOUNTS.patient.email, password: DEMO_PASSWORD, idType: "nric", icNumber: "900101-14-0000", gender: "Female",
+    phone: "012-000 0000", allergies: ["Penicillin"], chronicConditions: ["Hypertension"], consent: true,
+    address: { line1: "1 Jalan Demo", city: "Kuala Lumpur", state: "W.P. Kuala Lumpur", postcode: "50450", country: "MY" },
+    emergencyContactName: "Demo Relative", emergencyContactRelationship: "Spouse", emergencyContactPhone: "019-000 0001", preferredLanguage: "en",
   });
   const patientIsNew = r.status !== 409;
   if (!patientIsNew) must("patient sign-in", await pat.call("POST", "/api/auth/login", { email: ACCOUNTS.patient.email, password: DEMO_PASSWORD, role: "patient" }));
@@ -142,8 +144,10 @@ async function main() {
   if (demoPharmacy) {
     const summary = must("pharmacy summary", await admin.call("GET", "/api/admin/pharmacies/summary")).data[demoPharmacy.id];
     if (!summary?.verification) {
-      must("pharmacy verification", await admin.call("POST", `/api/admin/pharmacies/${demoPharmacy.id}/verification`, { licenceNumber: "DEMO-PH-0001", pharmacistName: "Demo Pharmacist", pharmacistRegNo: "DEMO-RPh-0001", confirmed: true }));
+      must("pharmacy verification", await admin.call("POST", `/api/admin/pharmacies/${demoPharmacy.id}/verification`, { licenceNumber: "DEMO-PH-0001", pharmacistName: "Demo Pharmacist", pharmacistRegNo: "DEMO-RPh-0001", licenceExpiry: "2030-12-31", pharmacistApcExpiry: "2030-12-31", registryReference: "Demo data: not a real licence", confirmed: true }));
     }
+    // Delivery partners, cold-chain and insurance panel for the demo pharmacy
+    must("pharmacy listing", await admin.call("PATCH", `/api/admin/pharmacies/${demoPharmacy.id}`, { deliveryMethods: ["pharmacy_courier", "grab", "lalamove"], coldChain: true, panelInsurers: ["Demo Insurer"] }));
     const signIn = (password: string) => phc.call("POST", "/api/auth/login", { email: PHARMACY_EMAIL, password, role: "pharmacy" });
     const adopt = async (temp: string) => {
       must("pharmacy sign-in (temporary password)", await signIn(temp));

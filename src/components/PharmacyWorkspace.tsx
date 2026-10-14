@@ -12,7 +12,7 @@ type Fill = 'received' | 'preparing' | 'ready' | 'cannot_fill';
 
 interface Counts { new: number; in_progress: number; ready: number; cannot_fill: number; dispensed: number; closed: number; waitingOver24h: number }
 interface Me {
-  pharmacy: { id: string; name: string; address: string; city: string | null; phone: string | null; hours: string | null; services: string[] };
+  pharmacy: { id: string; name: string; address: string; city: string | null; phone: string | null; hours: string | null; services: string[]; deliveryMethods?: string[]; coldChain?: boolean; panelInsurers?: string[] };
   account: { name: string; email: string; mustChangePassword: boolean; isOwner: boolean; twoFactor: { enabled: boolean; required: boolean } };
   counts: Counts;
 }
@@ -23,6 +23,9 @@ interface Rx {
   sentAt: string | null; firstResponseAt: string | null; dispensedAt: string | null; assignedToMe: boolean; assignedElsewhere: boolean; note: string;
   prescriber: { name: string; licenseNumber: string; stillVerified: boolean } | null;
   cancelledReason: string | null;
+  insurance: { insurer: string; memberNo: string; policyType: string; employer: string | null; glStatus: string; glNumber: string | null; glNote: string | null } | null;
+  delivery: { id: string; method: string; status: string; coldChain: boolean } | null;
+  coldChainItems: string[]; dispensingPharmacist: string | null; poisonsEntryNo: string | null;
   safety: { shared: false } | { shared: true; allergies: { name: string; detail: string | null; severity: string | null }[]; medicines: { name: string; detail: string | null }[]; doctorWarnings: { severity: string; type: string; message: string }[] };
 }
 interface EventRow { id: number; ts: string; type: string; code: string | null; actorName: string | null; detail: { reason?: string; name?: string; active?: boolean; on?: boolean } | null }
@@ -247,6 +250,10 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
   const [noting, setNoting] = useState(false);
   const [note, setNote] = useState(rx.note);
   const [confirming, setConfirming] = useState(false);
+  const [pharmacist, setPharmacist] = useState('');
+  const [poisonsNo, setPoisonsNo] = useState('');
+  const [glNumber, setGlNumber] = useState('');
+  const [glNote, setGlNote] = useState('');
   const active = rx.status === 'active';
 
   const run = async (url: string, method: string, body?: unknown, done?: string) => {
@@ -258,7 +265,16 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
     return d;
   };
   const setStatus = (status: Fill) => run(`/api/pharmacy/prescriptions/${rx.id}/status`, 'POST', { status, reason }, 'Status updated. The patient was notified.');
-  const dispense = () => run(`/api/pharmacy/prescriptions/${rx.id}/dispense`, 'POST', undefined, 'Recorded as dispensed.');
+  const dispense = () => run(`/api/pharmacy/prescriptions/${rx.id}/dispense`, 'POST', { pharmacistName: pharmacist || undefined, poisonsEntryNo: poisonsNo || undefined }, 'Recorded as dispensed.');
+  const decideGl = (status: 'approved' | 'declined') => run(`/api/pharmacy/prescriptions/${rx.id}/guarantee-letter`, 'POST', { status, glNumber, note: glNote }, status === 'approved' ? 'Guarantee letter recorded.' : 'The patient was told to pay directly.');
+  const deliveryStep = async (status: string) => {
+    if (!rx.delivery) return;
+    const body: Record<string, unknown> = { status };
+    if (status === 'arranged') { const ref = rx.delivery.method === 'pharmacy_courier' ? '' : prompt('Booking reference from the delivery partner:') || ''; if (rx.delivery.method !== 'pharmacy_courier' && !ref) return; body.partnerRef = ref; const t = prompt('Tracking link (https://…), optional:'); if (t) body.trackingUrl = t; }
+    if (status === 'delivered') { const who = prompt('Who received the medicine?'); if (!who) return; body.recipientName = who; }
+    if (status === 'failed') { const why = prompt('Why did the delivery fail?'); if (!why) return; body.reason = why; }
+    await run(`/api/pharmacy/deliveries/${rx.delivery.id}/status`, 'POST', body, 'Delivery updated. The patient was notified.');
+  };
   const saveNote = async () => { const d = await run(`/api/pharmacy/prescriptions/${rx.id}/note`, 'PUT', { note }, 'Note saved.'); if (d.status === 'success') setNoting(false); };
 
   const overdue = rx.bucket === 'new' && rx.sentAt && Date.now() - Date.parse(rx.sentAt) > 86_400_000;
@@ -290,6 +306,43 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
         {rx.fillStatus === 'cannot_fill' && rx.fillReason && <p className="font-semibold text-rose-700 [overflow-wrap:anywhere]">Could not fill: {rx.fillReason}</p>}
         {rx.dispensedAt && <p className="font-semibold text-emerald-700 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Dispensed {fmtTime(rx.dispensedAt)}</p>}
       </div>
+
+      {rx.coldChainItems.length > 0 && (
+        <p className="text-xs font-bold text-sky-900 bg-sky-50 border border-sky-200 p-2.5 [overflow-wrap:anywhere]">
+          Cold chain: {rx.coldChainItems.join(', ')} must stay refrigerated (commonly 2 to 8 °C). Confirm the storage rule for each product.
+        </p>
+      )}
+
+      {rx.insurance && (
+        <div className="border border-slate-200 bg-slate-50 p-3 text-xs space-y-2">
+          <p className="font-black uppercase tracking-wide text-slate-700">Insurance</p>
+          <p className="[overflow-wrap:anywhere]"><b>{rx.insurance.insurer}</b> · member no. <span className="font-mono">{rx.insurance.memberNo}</span>{rx.insurance.policyType === 'corporate' && rx.insurance.employer ? ` · employer ${rx.insurance.employer}` : ''}</p>
+          <p>Guarantee letter: <b className={rx.insurance.glStatus === 'declined' ? 'text-rose-700' : rx.insurance.glStatus === 'approved' ? 'text-emerald-700' : 'text-amber-700'}>{rx.insurance.glStatus === 'requested' ? 'waiting for you' : rx.insurance.glStatus}</b>{rx.insurance.glNumber ? ` (${rx.insurance.glNumber})` : ''}</p>
+          {active && (
+            <div className="flex flex-wrap gap-2 items-center">
+              <input value={glNumber} onChange={e => setGlNumber(e.target.value)} placeholder="GL number" aria-label="Guarantee letter number" className="border border-slate-300 px-2 py-1.5 w-36" />
+              <input value={glNote} onChange={e => setGlNote(e.target.value)} placeholder="Note (required to decline)" aria-label="Guarantee letter note" className="border border-slate-300 px-2 py-1.5 flex-1 min-w-[10rem]" />
+              <button type="button" disabled={busy || !glNumber.trim()} onClick={() => decideGl('approved')} className={btnPlain}>GL approved</button>
+              <button type="button" disabled={busy || glNote.trim().length < 3} onClick={() => decideGl('declined')} className={btnDanger}>GL declined</button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {rx.delivery && (
+        <div className="border border-slate-200 bg-slate-50 p-3 text-xs space-y-2">
+          <p className="font-black uppercase tracking-wide text-slate-700">Home delivery</p>
+          <p><b>{rx.delivery.status.replace(/_/g, ' ')}</b> · {{ pharmacy_courier: 'own rider', grab: 'Grab', lalamove: 'Lalamove', other_courier: 'other courier' }[rx.delivery.method] ?? rx.delivery.method}{rx.delivery.coldChain ? ' · cold chain' : ''}</p>
+          {['requested', 'arranged', 'out_for_delivery'].includes(rx.delivery.status) && (
+            <div className="flex flex-wrap gap-2">
+              {rx.delivery.status === 'requested' && <button type="button" disabled={busy} onClick={() => deliveryStep('arranged')} className={btnPlain}>Arranged</button>}
+              {rx.delivery.status !== 'out_for_delivery' && <button type="button" disabled={busy} onClick={() => deliveryStep('out_for_delivery')} className={btnPlain}>Out for delivery</button>}
+              <button type="button" disabled={busy} onClick={() => deliveryStep('delivered')} className={btnPrimary}>Delivered</button>
+              <button type="button" disabled={busy} onClick={() => deliveryStep('failed')} className={btnDanger}>Failed</button>
+            </div>
+          )}
+        </div>
+      )}
 
       {rx.status === 'cancelled' && (
         <p role="alert" className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 p-2.5 [overflow-wrap:anywhere]">
@@ -329,6 +382,10 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
             <div role="alertdialog" aria-label="Confirm dispensing" className="border-2 border-[color:var(--t-600)] bg-[color:var(--t-50)] rounded-none p-4 space-y-3">
               <p className="text-xs font-black text-slate-900 [overflow-wrap:anywhere] uppercase tracking-wide">Confirm Dispensing: {rx.code} to {rx.patientName}?</p>
               <p className="text-xs text-slate-700 font-semibold leading-relaxed">This action marks the prescription as fulfilled and cannot be undone.</p>
+              <div className="grid sm:grid-cols-2 gap-2">
+                <input value={pharmacist} onChange={e => setPharmacist(e.target.value)} placeholder="Dispensing pharmacist (default: registered pharmacist)" aria-label="Dispensing pharmacist" maxLength={100} className="border border-slate-300 px-2 py-2 text-xs bg-white" />
+                <input value={poisonsNo} onChange={e => setPoisonsNo(e.target.value)} placeholder="Poisons / prescription book entry no." aria-label="Poisons book entry number" maxLength={40} className="border border-slate-300 px-2 py-2 text-xs bg-white" />
+              </div>
               {!rx.safety.shared && <p className="text-[11px] font-bold text-amber-900 bg-amber-100 border border-amber-300 p-2 rounded-none">Allergies and current medicines were not shared. Have you confirmed verbally with the patient?</p>}
               {rx.prescriber && !rx.prescriber.stillVerified && <p className="text-[11px] font-black text-rose-800 bg-rose-100 border border-rose-300 p-2 rounded-none uppercase tracking-wide">Warning: The prescribing doctor is not currently verified by the medical board.</p>}
               <div className="flex gap-2 pt-1">
@@ -537,6 +594,9 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
   const [phone, setPhone] = useState(p.phone ?? '');
   const [hours, setHours] = useState(p.hours ?? '');
   const [services, setServices] = useState<string[]>(p.services);
+  const [deliveryMethods, setDeliveryMethods] = useState<string[]>(p.deliveryMethods ?? []);
+  const [coldChain, setColdChain] = useState(!!p.coldChain);
+  const [panel, setPanel] = useState((p.panelInsurers ?? []).join(', '));
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -547,7 +607,7 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true); setMsg(null);
-    const d = await jfetch('/api/pharmacy/me', 'PATCH', { address, city, phone, hours, services });
+    const d = await jfetch('/api/pharmacy/me', 'PATCH', { address, city, phone, hours, services, deliveryMethods, coldChain, panelInsurers: panel.split(',').map(x => x.trim()).filter(Boolean) });
     setSaving(false);
     setMsg({ ok: d.status === 'success', text: d.status === 'success' ? 'Your listing was updated. Patients see the new details straight away.' : d.message || 'Could not save.' });
     if (d.status === 'success') onSaved();
@@ -590,6 +650,23 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
             ))}
           </div>
         </fieldset>
+        <fieldset className="border border-slate-200 p-4 rounded-none bg-slate-50">
+          <legend className="text-[10px] font-black uppercase tracking-wider text-slate-700 px-1.5 bg-white border border-slate-200">Home delivery partners (Malaysia)</legend>
+          <div className="flex flex-wrap gap-x-5 gap-y-2.5 pt-1">
+            {([['pharmacy_courier', 'Own rider'], ['grab', 'Grab'], ['lalamove', 'Lalamove'], ['other_courier', 'Other courier']] as const).map(([id, label]) => (
+              <label key={id} className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-800 cursor-pointer">
+                <input type="checkbox" checked={deliveryMethods.includes(id)} onChange={e => setDeliveryMethods(prev => e.target.checked ? [...prev, id] : prev.filter(x => x !== id))} className="h-4 w-4 rounded-none accent-[color:var(--t-600)]" />
+                {label}
+              </label>
+            ))}
+          </div>
+          <label className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-800 cursor-pointer mt-3">
+            <input type="checkbox" checked={coldChain} onChange={e => setColdChain(e.target.checked)} className="h-4 w-4 rounded-none accent-[color:var(--t-600)]" />
+            We can deliver refrigerated (cold-chain) medicines such as insulin
+          </label>
+          <p className="text-[11px] text-slate-500 mt-1">Delivery also needs "Home delivery" ticked above. Only tick cold chain if you have proper cold packs and handling.</p>
+        </fieldset>
+        <label className="block"><span className={field}>Insurance panel (comma-separated insurers)</span><input value={panel} onChange={e => setPanel(e.target.value)} maxLength={400} placeholder="e.g. AIA, Great Eastern, Allianz" className={inputCls} /></label>
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <button type="submit" disabled={saving} className={bannerPrimaryBtn}>{saving ? 'Saving Changes…' : 'Save Registry Listing'}</button>
           {msg && <p role="status" className={`text-xs font-bold p-3 border rounded-none ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-300' : 'text-rose-900 bg-rose-50 border-rose-300'}`}>{msg.text}</p>}

@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { NPRA_RE, cleanDeliveryMethods, cleanList, normaliseNpra, pharmacyLicenceOk } from "./pharmacyLicence";
 import { isMalaysianRegistered, isVirtualMode, prescribingBlock, MC_AFTER_TELECONSULT_MESSAGE } from "./telemedicine";
 import type { Application, Request, Response } from "express";
 import rateLimit from "express-rate-limit";
@@ -92,6 +93,10 @@ CREATE TABLE IF NOT EXISTS pharmacy_notes (
 export const PHARMACY_SERVICES = ["24 hours", "Home delivery", "Drive-through", "Vaccinations", "Online ordering"] as const;
 export const cleanServices = (v: unknown): string[] => (Array.isArray(v) ? [...new Set(v.filter((x): x is string => typeof x === "string" && (PHARMACY_SERVICES as readonly string[]).includes(x)))] : []);
 export const pharmacyView = (p: any) => ({
+  deliveryMethods: (() => { try { return cleanDeliveryMethods(JSON.parse(p.delivery_methods ?? "[]")); } catch { return []; } })(),
+  coldChain: !!p.cold_chain,
+  panelInsurers: (() => { try { return cleanList(JSON.parse(p.panel_insurers ?? "[]")); } catch { return []; } })(),
+  licenceVerified: !!p.verified_at, licenceExpiresOn: p.licence_expiry ?? null,
   id: p.id, name: p.name, address: p.address, city: p.city ?? null, phone: p.phone ?? null, hours: p.hours ?? null,
   services: (() => { try { return cleanServices(JSON.parse(p.services ?? "[]")); } catch { return []; } })(),
 });
@@ -385,7 +390,7 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
   });
 
   // ---------- prescriptions ----------
-  interface RxItem { name: string; strength: string; form: string; dose: string; frequency: string; durationDays: number; quantity: number; instructions: string }
+  interface RxItem { name: string; strength: string; form: string; dose: string; frequency: string; durationDays: number; quantity: number; instructions: string; npraReg?: string }
   const parseItems = (raw: unknown): RxItem[] | string => {
     if (!Array.isArray(raw) || raw.length === 0) return "Add at least one medicine.";
     if (raw.length > 12) return "A prescription can have at most 12 medicines.";
@@ -396,6 +401,11 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
         frequency: str(it?.frequency, 60), durationDays: Math.trunc(Number(it?.durationDays)), quantity: Math.trunc(Number(it?.quantity)), instructions: str(it?.instructions, 200),
       };
       if (!item.name || !item.dose || !item.frequency) return "Every medicine needs a name, dose and frequency.";
+      const npra = normaliseNpra(str(it?.npraReg, 30));
+      if (npra) {
+        if (!NPRA_RE.test(npra)) return `The NPRA registration number for ${item.name} should look like MAL12345678A (MAL, 8 digits, then letters).`;
+        (item as RxItem).npraReg = npra;
+      }
       if (!(item.durationDays >= 1 && item.durationDays <= 90)) return `Duration for ${item.name} must be 1 to 90 days.`;
       if (!(item.quantity >= 1 && item.quantity <= 999)) return `Quantity for ${item.name} must be 1 to 999.`;
       out.push(item);
@@ -495,20 +505,23 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
       status: effectiveStatus(r), pharmacyId: r.pharmacy_id, dispensedAt: r.dispensed_at,
       pharmacyName: r.pharmacy_id ? (row("SELECT name FROM pharmacies WHERE id = ?", r.pharmacy_id)?.name as string | undefined) ?? null : null,
       sentAt: r.sent_at ?? null, fillStatus: r.fill_status ?? null, fillReason: r.fill_reason ?? null, fillUpdatedAt: r.fill_updated_at ?? null, sharedSafety: !!r.share_safety,
+      insurancePolicyId: r.insurance_policy_id ?? null, glStatus: r.gl_status ?? null, glNumber: r.gl_number ?? null, glNote: r.gl_note ?? null,
       doctor: prof ? { name: prof.name, licenseNumber: prof.licenseNumber } : null,
     };
   }
 
   // Patient: send a prescription to a partner pharmacy
   app.get("/api/pharmacies", requireAuth, (_req, res) => {
-    res.json({ status: "success", data: rows("SELECT id, name, address, city, phone, hours, services FROM pharmacies WHERE active = 1 ORDER BY name").map(pharmacyView) });
+    // A pharmacy whose licence or pharmacist certificate has expired is not listed.
+    res.json({ status: "success", data: rows("SELECT * FROM pharmacies WHERE active = 1 ORDER BY name").filter(pharmacyLicenceOk).map(pharmacyView) });
   });
   app.post("/api/prescriptions/:id/send", requireRole("patient"), (req, res) => {
     const r = row("SELECT * FROM prescriptions WHERE id = ? AND patient_user_id = ?", req.params.id, req.user!.id);
     if (!r) return fail(res, 404, "Prescription not found.");
     if (effectiveStatus(r) !== "active") return fail(res, 409, "This prescription can no longer be sent.");
-    const ph = row("SELECT id, name FROM pharmacies WHERE id = ? AND active = 1", str(req.body.pharmacyId, 60));
+    const ph = row("SELECT * FROM pharmacies WHERE id = ? AND active = 1", str(req.body.pharmacyId, 60));
     if (!ph) return fail(res, 404, "Pharmacy not found.");
+    if (!pharmacyLicenceOk(ph)) return fail(res, 409, "This pharmacy cannot take new prescriptions right now. Choose another pharmacy.");
     const share = req.body.shareSafety === true ? 1 : 0;
     if (r.pharmacy_id === ph.id) {
       db.prepare("UPDATE prescriptions SET share_safety = ? WHERE id = ?").run(share, r.id);
@@ -579,7 +592,7 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
 
   // Admin: pharmacy directory
   app.get("/api/admin/pharmacies", requireRole("admin"), (_req, res) => {
-    res.json({ status: "success", data: rows("SELECT id, name, address, city, phone, hours, services, active, created_at FROM pharmacies ORDER BY created_at DESC").map(p => ({ ...pharmacyView(p), active: p.active, created_at: p.created_at })) });
+    res.json({ status: "success", data: rows("SELECT * FROM pharmacies ORDER BY created_at DESC").map(p => ({ ...pharmacyView(p), active: p.active, created_at: p.created_at })) });
   });
   app.post("/api/admin/pharmacies", requireRole("admin"), (req, res) => {
     const name = str(req.body.name, 120), address = str(req.body.address, 250);
@@ -604,6 +617,12 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
       "phone" in b ? str(b.phone, 30) || null : p.phone,
       "hours" in b ? str(b.hours, 120) || null : p.hours,
       "services" in b ? JSON.stringify(cleanServices(b.services)) : p.services,
+      p.id,
+    );
+    db.prepare("UPDATE pharmacies SET delivery_methods = ?, cold_chain = ?, panel_insurers = ? WHERE id = ?").run(
+      "deliveryMethods" in b ? JSON.stringify(cleanDeliveryMethods(b.deliveryMethods)) : p.delivery_methods,
+      "coldChain" in b ? (b.coldChain === true ? 1 : 0) : p.cold_chain,
+      "panelInsurers" in b ? JSON.stringify(cleanList(b.panelInsurers)) : p.panel_insurers,
       p.id,
     );
     audit(req, "pharmacy.update", { target: ["pharmacy", p.id] });

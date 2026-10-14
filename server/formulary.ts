@@ -11,6 +11,13 @@ export interface Drug {
   aliases?: string[];    // common brand/alternative names, matched case-insensitively
   classes: string[];     // therapeutic/pharmacological groups used by the rules below
   allergyGroups?: string[]; // allergy groups this drug belongs to
+  /** Needs refrigeration in transit (commonly 2 to 8 °C). */
+  coldChain?: boolean;
+  /**
+   * Poisons Act 1952 group (A to D) when known. Deliberately left unpopulated: the group of each product must come from
+   * the official Poisons List via a pharmacist; see docs/PHARMACY_MALAYSIA.md.
+   */
+  poisonGroup?: "A" | "B" | "C" | "D";
 }
 
 export const FORMULARY: Drug[] = [
@@ -68,7 +75,7 @@ export const FORMULARY: Drug[] = [
   { name: "metformin", classes: ["biguanide", "antidiabetic"] },
   { name: "gliclazide", classes: ["sulfonylurea", "antidiabetic"] },
   { name: "glibenclamide", aliases: ["glyburide"], classes: ["sulfonylurea", "antidiabetic"] },
-  { name: "insulin", classes: ["insulin", "antidiabetic"] },
+  { name: "insulin", classes: ["insulin", "antidiabetic"], coldChain: true },
   // Neuro / psych
   { name: "sertraline", classes: ["ssri", "serotonergic", "antidepressant"] },
   { name: "fluoxetine", classes: ["ssri", "serotonergic", "antidepressant"] },
@@ -245,3 +252,15 @@ export function checkPrescription(
   const order: Record<Severity, number> = { contraindicated: 0, major: 1, moderate: 2 };
   return warnings.sort((x, y) => order[x.severity] - order[y.severity]);
 }
+
+/**
+ * Medicines that must travel refrigerated. Built from the formulary flag, a vaccine keyword, and COLD_CHAIN_DRUGS
+ * (comma-separated names) for products not in the built-in list. A pharmacist must confirm the storage rule per product.
+ */
+export const isColdChain = (input: string): boolean => {
+  const n = norm(input);
+  if (!n) return false;
+  if (findDrug(input)?.coldChain) return true;
+  if (/\bvaccine\b|\binsulin\b/.test(n)) return true;
+  return (process.env.COLD_CHAIN_DRUGS ?? "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean).some(x => n.includes(x));
+};

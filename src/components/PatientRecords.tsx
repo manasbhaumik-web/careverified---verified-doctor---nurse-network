@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import PrescriptionExtras from './PrescriptionExtras';
 import QRCode from 'qrcode';
 import { Activity, AlertTriangle, ClipboardList, FileText, FlaskConical, Pill, Share2, Trash2, CheckCircle2, AlertCircle, Plus } from 'lucide-react';
 
@@ -388,6 +389,7 @@ export default function PatientRecords({ initialTab }: { initialTab?: RecordSubT
                   </label>
                 )}
                 {p.status === 'active' && <button className="text-xs font-bold underline cursor-pointer" onClick={() => window.print()}>Print</button>}
+                <PrescriptionExtras rx={p} pharmacies={pharmacies} onChange={load} />
               </div>
               <div className="text-center"><Qr text={`${window.location.origin}/rx/${p.code}`} /><p className="text-[10px] text-slate-500 mt-1">Scan to verify</p></div>
             </article>

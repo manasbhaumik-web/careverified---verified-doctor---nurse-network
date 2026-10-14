@@ -1,4 +1,5 @@
 import express from "express";
+import { registerPharmacyMy } from "./server/pharmacyMy";
 import { parseNric, isPassportNumber, normalisePassport, toE164, addressProblem, RELATIONSHIPS, PREFERRED_LANGUAGES } from "./src/identity";
 import { registerDataOps } from "./server/dataops";
 import { registerPrivacyRoutes, recordConsent, CONSENT_VERSION } from "./server/privacy";
@@ -673,6 +674,7 @@ app.post("/api/register-patient", (req, res) => {
 
 // Data subject rights: consents, access / correction / deletion requests, export
 registerPrivacyRoutes(app);
+registerPharmacyMy(app);
 registerDataOps(app, {
   // De-identify what lives outside SQL: patient profile, bookings and chat messages.
   anonymiseJson: userId => {

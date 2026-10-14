@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Clock, MapPin, Phone, Pill, Search, Send } from 'lucide-react';
 import DashboardHeader, { BannerKpis, FilterSelect } from './DashboardHeader';
 
-interface Pharmacy { id: string; name: string; address: string; city: string | null; phone: string | null; hours: string | null; services: string[] }
+interface Pharmacy { id: string; name: string; address: string; city: string | null; phone: string | null; hours: string | null; services: string[]; deliveryMethods?: string[]; coldChain?: boolean; panelInsurers?: string[]; licenceVerified?: boolean; licenceExpiresOn?: string | null }
 interface Rx { id: string; code: string; status: string; validUntil: string; pharmacyId: string | null; fillStatus?: string | null; fillReason?: string | null; items: { name: string; strength?: string }[] }
 const FILL_LABEL: Record<string, string> = { received: 'received', preparing: 'being prepared', ready: 'ready for pickup', cannot_fill: 'could not be filled' };
 
@@ -136,7 +136,13 @@ export default function PharmacyFinder() {
                   </ul>
                 )}
 
-                {sentHere.length > 0 && (
+                <div className="text-[11px] text-slate-600 font-semibold space-y-1">
+                  {p.licenceVerified && <p className="text-emerald-800">Licence and pharmacist checked by MedCred{p.licenceExpiresOn ? ` · licence valid to ${p.licenceExpiresOn}` : ''}</p>}
+                  {p.deliveryMethods && p.deliveryMethods.length > 0 && <p>Delivers (Malaysia): {p.deliveryMethods.map(m => ({ pharmacy_courier: 'own rider', grab: 'Grab', lalamove: 'Lalamove', other_courier: 'courier' } as Record<string, string>)[m] ?? m).join(', ')}{p.coldChain ? ' · cold-chain medicines (e.g. insulin) can be delivered' : ''}</p>}
+                  {p.panelInsurers && p.panelInsurers.length > 0 && <p>Insurance panel: {p.panelInsurers.join(', ')}</p>}
+                </div>
+
+                {sentHere.length > 0 && (
                   <p className="text-xs font-bold text-emerald-900 bg-emerald-50 border border-emerald-300 rounded-none p-3">
                     Your prescription {sentHere.map(r => `${r.code}${r.fillStatus ? ` (${FILL_LABEL[r.fillStatus] ?? r.fillStatus}${r.fillStatus === 'cannot_fill' && r.fillReason ? `: ${r.fillReason}` : ''})` : ''}`).join(', ')} {sentHere.length === 1 ? 'was' : 'were'} routed here. Show the code at the counter or wait for pickup confirmation.
                   </p>

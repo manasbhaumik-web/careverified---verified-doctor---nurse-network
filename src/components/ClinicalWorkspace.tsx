@@ -12,7 +12,7 @@ const SEV: Record<string, string> = {
   major: 'bg-amber-100 border-amber-400 text-amber-900',
   moderate: 'bg-slate-100 border-slate-300 text-slate-800',
 };
-const blankItem = () => ({ name: '', strength: '', form: 'tablet', dose: '', frequency: '', durationDays: 5, quantity: 10, instructions: '' });
+const blankItem = () => ({ name: '', strength: '', form: 'tablet', dose: '', frequency: '', durationDays: 5, quantity: 10, instructions: '', npraReg: '' });
 const field = 'w-full border border-slate-200 bg-white px-2.5 py-1.5 text-xs focus:outline-none focus:border-[color:var(--t-600)]';
 const label = 'text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
 
@@ -182,6 +182,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
                 <div><label className={label}>Days</label><input type="number" min={1} max={90} className={field} value={it.durationDays} onChange={e => setItem(i, { durationDays: e.target.value })} /></div>
                 <div><label className={label}>Quantity</label><input type="number" min={1} max={999} className={field} value={it.quantity} onChange={e => setItem(i, { quantity: e.target.value })} /></div>
                 <div className="col-span-2 sm:col-span-4"><label className={label}>Instructions</label><input className={field} value={it.instructions} onChange={e => setItem(i, { instructions: e.target.value })} placeholder="After meals" maxLength={200} /></div>
+                <div className="col-span-2 sm:col-span-4"><label className={label}>NPRA registration no. (optional)</label><input className={`${field} font-mono`} value={it.npraReg ?? ''} onChange={e => setItem(i, { npraReg: e.target.value.toUpperCase() })} placeholder="MAL12345678A" maxLength={20} /></div>
               </div>
               {items.length > 1 && <button onClick={() => { setItems(items.filter((_, x) => x !== i)); setWarnings(null); }} className="text-[11px] font-bold text-rose-700 flex items-center gap-1 cursor-pointer"><Trash2 className="h-3 w-3" /> Remove</button>}
             </fieldset>

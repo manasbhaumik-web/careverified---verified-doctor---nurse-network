@@ -25,7 +25,7 @@ export default function AdminOps() {
   const [loginDraft, setLoginDraft] = useState({ name: '', email: '' });
   const [loginIssued, setLoginIssued] = useState<{ pharmacy: string; email: string; password: string } | null>(null);
   const [verifyFor, setVerifyFor] = useState<string | null>(null);
-  const blankVerify = { licenceNumber: '', pharmacistName: '', pharmacistRegNo: '', confirmed: false };
+  const blankVerify = { licenceNumber: '', pharmacistName: '', pharmacistRegNo: '', licenceExpiry: '', pharmacistApcExpiry: '', registryReference: '', confirmed: false };
   const [verifyDraft, setVerifyDraft] = useState(blankVerify);
 
   const load = async () => {
@@ -195,23 +195,32 @@ export default function AdminOps() {
               {summary[p.id] && (
                 <div className="text-slate-600 space-y-2">
                   {summary[p.id].verification ? (
-                    <p className="[overflow-wrap:anywhere]">Verified by the board · licence <b>{summary[p.id].verification.licenceNumber}</b> · pharmacist <b>{summary[p.id].verification.pharmacistName}</b> ({summary[p.id].verification.pharmacistRegNo}) · {new Date(summary[p.id].verification.verifiedAt).toLocaleDateString()}</p>
-                  ) : verifyFor === p.id ? (
+                    <p className="[overflow-wrap:anywhere]">Verified by the board · licence <b>{summary[p.id].verification.licenceNumber}</b> · pharmacist <b>{summary[p.id].verification.pharmacistName}</b> ({summary[p.id].verification.pharmacistRegNo}) · {new Date(summary[p.id].verification.verifiedAt).toLocaleDateString()}
+                      {summary[p.id].verification.licenceExpiry ? <> · licence expires <b>{summary[p.id].verification.licenceExpiry}</b>, pharmacist certificate <b>{summary[p.id].verification.pharmacistApcExpiry ?? 'not recorded'}</b></> : <> · <b className="text-amber-700">no expiry dates on file</b></>}
+                      {summary[p.id].verification.problem && <b className="text-rose-700"> · {summary[p.id].verification.problem} The pharmacy is suspended and hidden from patients.</b>}
+                      {' '}<button onClick={() => { setVerifyFor(p.id); setVerifyDraft({ ...blankVerify, licenceNumber: summary[p.id].verification.licenceNumber ?? '', pharmacistName: summary[p.id].verification.pharmacistName ?? '', pharmacistRegNo: summary[p.id].verification.pharmacistRegNo ?? '' }); }} className="font-bold underline cursor-pointer">Renew / update</button></p>
+                  ) : null}
+                  {verifyFor === p.id ? (
                     <form onSubmit={e => { e.preventDefault(); verifyPharmacy(p); }} className="bg-slate-50 border border-slate-200 p-3 space-y-2">
                       <div className="flex flex-wrap gap-2">
                         <input aria-label="Pharmacy licence number" placeholder="Pharmacy licence number" required className="border border-slate-200 bg-white px-3 py-2 text-xs flex-1 min-w-[10rem]" value={verifyDraft.licenceNumber} onChange={e => setVerifyDraft({ ...verifyDraft, licenceNumber: e.target.value })} />
                         <input aria-label="Pharmacist name" placeholder="Pharmacist name" required className="border border-slate-200 bg-white px-3 py-2 text-xs flex-1 min-w-[10rem]" value={verifyDraft.pharmacistName} onChange={e => setVerifyDraft({ ...verifyDraft, pharmacistName: e.target.value })} />
                         <input aria-label="Pharmacist registration number" placeholder="Pharmacist registration no." required className="border border-slate-200 bg-white px-3 py-2 text-xs flex-1 min-w-[10rem]" value={verifyDraft.pharmacistRegNo} onChange={e => setVerifyDraft({ ...verifyDraft, pharmacistRegNo: e.target.value })} />
                       </div>
+                      <div className="flex flex-wrap gap-2 items-center text-xs">
+                        <label className="flex items-center gap-1.5">Licence expires <input type="date" required className="border border-slate-200 bg-white px-2 py-1.5" value={verifyDraft.licenceExpiry} onChange={e => setVerifyDraft({ ...verifyDraft, licenceExpiry: e.target.value })} /></label>
+                        <label className="flex items-center gap-1.5">Pharmacist retention certificate expires <input type="date" required className="border border-slate-200 bg-white px-2 py-1.5" value={verifyDraft.pharmacistApcExpiry} onChange={e => setVerifyDraft({ ...verifyDraft, pharmacistApcExpiry: e.target.value })} /></label>
+                      </div>
+                      <input aria-label="How it was checked" placeholder="How you checked it (register URL, who confirmed, reference)" required className="border border-slate-200 bg-white px-3 py-2 text-xs w-full" value={verifyDraft.registryReference} onChange={e => setVerifyDraft({ ...verifyDraft, registryReference: e.target.value })} />
                       <label className="text-xs inline-flex items-start gap-2 cursor-pointer"><input type="checkbox" className="mt-0.5" checked={verifyDraft.confirmed} onChange={e => setVerifyDraft({ ...verifyDraft, confirmed: e.target.checked })} /> I checked these details against the official pharmacy and pharmacist registers.</label>
                       <div className="flex gap-3 items-center">
                         <button disabled={!verifyDraft.confirmed} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 py-2 cursor-pointer">Record verification</button>
                         <button type="button" onClick={() => setVerifyFor(null)} className="font-bold cursor-pointer">Cancel</button>
                       </div>
                     </form>
-                  ) : (
+                  ) : !summary[p.id].verification ? (
                     <p>Not verified yet. <button onClick={() => { setVerifyFor(p.id); setVerifyDraft(blankVerify); }} className="font-bold underline cursor-pointer">Verify pharmacy</button></p>
-                  )}
+                  ) : null}
                 </div>
               )}
               {(() => {
