@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { openLegal } from '../legal';
 import { 
   UserCheck, ShieldCheck, Mail, Lock, User, Phone, Calendar, 
   ArrowRight, ArrowLeft, RefreshCw, AlertCircle, Check, Activity 
@@ -439,7 +440,7 @@ export default function PatientRegistrationForm({
                   className="mt-0.5 h-4 w-4 accent-[color:var(--t-600)]"
                 />
                 <span>
-                  I accept the Terms of Service and Privacy Policy, and consent to MedCred storing and processing my health information so practitioners can treat me, and agree that verified doctors may review samples of my care for quality and safety with my name hidden. I can export or request deletion of my data at any time.
+                  I accept the <button type="button" onClick={() => openLegal('terms')} className="underline font-bold text-[color:var(--t-700)] cursor-pointer">Terms of Service</button> and <button type="button" onClick={() => openLegal('notice')} className="underline font-bold text-[color:var(--t-700)] cursor-pointer">Privacy Notice</button>, and consent to MedCred storing and processing my health information so practitioners can treat me, and agree that verified doctors may review samples of my care for quality and safety with my name hidden. I can export or request deletion of my data at any time.
                 </span>
               </label>
             </div>

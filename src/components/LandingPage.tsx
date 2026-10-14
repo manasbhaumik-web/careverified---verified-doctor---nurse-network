@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { openLegal } from '../legal';
 import VerificationScopeBadge from './VerificationScopeBadge';
 import ThemeSwitcher from './ThemeSwitcher';
 import LocaleSwitcher from './LocaleSwitcher';
@@ -216,7 +217,7 @@ const TRUST_PARTNERS = [
     icon: Building,
   },
   {
-    title: 'PDPA / 256-Bit Cryptographic Vault',
+    title: 'Built around PDPA 2010 and encrypted storage',
     category: 'Data Sovereignty',
     status: 'Patient-Authorized Access Only',
     icon: Lock,
@@ -296,8 +297,8 @@ const CORPORATE_SOLUTIONS = [
   {
     icon: ShieldCheck,
     title: 'Corporate Health Dashboard & EMR',
-    desc: 'Aggregated, anonymized organizational wellness analytics and compliance reporting with stringent PDPA cryptographic safety.',
-    metric: 'PDPA Compliant',
+    desc: 'Aggregated, anonymized organizational wellness analytics and compliance reporting designed around PDPA 2010.',
+    metric: 'PDPA-aligned',
     tag: 'Enterprise Analytics',
   },
 ];
@@ -550,7 +551,7 @@ function PractitionerSignUp({ onSuccess, onCancel }: {
         </div>
         <label className="flex items-start gap-3 text-xs text-slate-700 cursor-pointer">
           <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[color:var(--t-600)]" required />
-          <span>I accept the Terms of Service and Privacy Policy, and agree that my credentials may be checked with the relevant medical council.</span>
+          <span>I accept the <button type="button" onClick={() => openLegal('terms')} className="underline font-bold text-[color:var(--t-700)] cursor-pointer">Terms of Service</button> and <button type="button" onClick={() => openLegal('notice')} className="underline font-bold text-[color:var(--t-700)] cursor-pointer">Privacy Notice</button>, and agree that my credentials may be checked with the relevant medical council.</span>
         </label>
         <button type="submit" disabled={loading || !consent}
           className="w-full h-12 min-h-[48px] text-sm font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-800)] text-white shadow-xs disabled:opacity-70 border border-[color:var(--t-800)] cursor-pointer flex items-center justify-center gap-2">

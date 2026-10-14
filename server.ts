@@ -1,4 +1,6 @@
 import express from "express";
+import { registerDataOps } from "./server/dataops";
+import { registerPrivacyRoutes, recordConsent, CONSENT_VERSION } from "./server/privacy";
 import path from "path";
 import dotenv from "dotenv";
 import helmet from "helmet";
@@ -467,7 +469,6 @@ const generateId = (prefix: string) => `${prefix}-${Math.floor(100000 + Math.ran
 // -------------------------------------------------------------
 // Auth & account
 // -------------------------------------------------------------
-const CONSENT_VERSION = "2026-11";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const str = (v: unknown, max = 200) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const fail = (res: express.Response, code: number, message: string) =>
@@ -565,6 +566,8 @@ app.post("/api/auth/register-practitioner", (req, res) => {
   if (emailTaken(email)) return fail(res, 409, "An account with this email already exists.");
 
   const user = createUser({ email, password: req.body.password, role: "practitioner", name, consentVersion: CONSENT_VERSION });
+  recordConsent(user.id, "terms_privacy");
+  recordConsent(user.id, "credential_check");
   createSession(req, res, user.id);
   audit(req, "auth.register", { actor: user, target: ["user", user.id] });
   res.status(201).json({ status: "success", data: { user: publicUser(user) } });
@@ -589,6 +592,9 @@ app.post("/api/register-patient", (req, res) => {
   if (emailTaken(email)) return fail(res, 409, "A patient with this email already exists.");
 
   const user = createUser({ email, password, role: "patient", name, consentVersion: CONSENT_VERSION });
+  recordConsent(user.id, "terms_privacy");
+  recordConsent(user.id, "health_data");
+  recordConsent(user.id, "quality_review");
   const newPatient = {
     id: generateId("pat"),
     userId: user.id,
@@ -616,7 +622,29 @@ app.post("/api/register-patient", (req, res) => {
   });
 });
 
-// Data subject rights: export and deletion request
+// Data subject rights: consents, access / correction / deletion requests, export
+registerPrivacyRoutes(app);
+registerDataOps(app, {
+  // De-identify what lives outside SQL: patient profile, bookings and chat messages.
+  anonymiseJson: userId => {
+    let patientProfiles = 0, bookingCount = 0, chatMessages = 0;
+    for (const p of patients as any[]) {
+      if (p.userId !== userId) continue;
+      Object.assign(p, { name: "Deleted patient", email: "", icNumber: "", phone: "", emergencyContactName: "", emergencyContactPhone: "", chronicConditions: [], allergies: [] });
+      patientProfiles++;
+    }
+    for (const b of bookings as any[]) {
+      if (b.patientUserId !== userId) continue;
+      Object.assign(b, { patientName: "Deleted patient", patientPhone: "", patientEmail: "" });
+      bookingCount++;
+    }
+    const before = chats.length;
+    chats = chats.filter(m => m.senderId !== userId && m.receiverId !== userId);
+    chatMessages = before - chats.length;
+    persistState();
+    return { patientProfiles, bookings: bookingCount, chatMessages };
+  },
+});
 app.get("/api/me/export", requireAuth, (req, res) => {
   const u = req.user!;
   const me = chatIdOf(u);
@@ -638,8 +666,10 @@ app.get("/api/me/export", requireAuth, (req, res) => {
 
 app.post("/api/me/deletion-request", requireAuth, (req, res) => {
   db.prepare("UPDATE users SET deletion_requested_at = ? WHERE id = ?").run(new Date().toISOString(), req.user!.id);
+  const open = db.prepare("SELECT 1 AS x FROM data_requests WHERE user_id = ? AND kind = 'deletion' AND status = 'open'").get(req.user!.id);
+  if (!open) app.locals.createDataRequest?.(req.user!.id, "deletion", "Deletion requested from the account menu");
   audit(req, "account.deletion.requested");
-  res.json({ status: "success", message: "Deletion request recorded. Our team will confirm within 30 days." });
+  res.json({ status: "success", message: "Deletion request recorded. Our team will respond within 21 days. Medical records may have to be kept for the legal retention period." });
 });
 
 // Admin: audit trail

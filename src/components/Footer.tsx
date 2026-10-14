@@ -1,4 +1,5 @@
 import React from 'react';
+import { openLegal } from '../legal';
 import { Globe, ChevronRight, LogOut } from 'lucide-react';
 
 export interface NavItem {
@@ -196,7 +197,7 @@ export default function Footer({
             <ul className="space-y-2 text-xs text-slate-400">
               <li className="hover:text-slate-200 cursor-pointer transition-colors">PHFSA Act 1998</li>
               <li className="hover:text-slate-200 cursor-pointer transition-colors">KKM Telemedicine Norms</li>
-              <li className="hover:text-slate-200 cursor-pointer transition-colors">PDPA 2010 Privacy</li>
+              <li onClick={() => openLegal('notice')} className="hover:text-slate-200 cursor-pointer transition-colors">PDPA 2010 Privacy</li>
               <li className="hover:text-slate-200 cursor-pointer transition-colors">E-E-A-T Medical Review</li>
               <li className="hover:text-slate-200 cursor-pointer transition-colors">MMA Clinical Ethics</li>
               <li className="hover:text-slate-200 cursor-pointer transition-colors">Indemnity Protocols</li>
@@ -255,9 +256,9 @@ export default function Footer({
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 justify-center md:justify-start">
             <span>&copy; {currentYear} MedCred Healthcare Network Sdn Bhd. All rights reserved.</span>
             <span className="text-slate-700 hidden sm:inline">&bull;</span>
-            <span className="hover:text-slate-200 cursor-pointer transition-colors">Privacy Policy</span>
+            <span onClick={() => openLegal('notice')} className="hover:text-slate-200 cursor-pointer transition-colors">Privacy Policy</span>
             <span className="text-slate-700 hidden sm:inline">&bull;</span>
-            <span className="hover:text-slate-200 cursor-pointer transition-colors">Terms of Service</span>
+            <span onClick={() => openLegal('terms')} className="hover:text-slate-200 cursor-pointer transition-colors">Terms of Service</span>
             <span className="text-slate-700 hidden sm:inline">&bull;</span>
             <span className="hover:text-slate-200 cursor-pointer transition-colors">Clinical Governance</span>
             <span className="text-slate-700 hidden sm:inline">&bull;</span>

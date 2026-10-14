@@ -34,11 +34,18 @@ Current understanding: Telemedicine Act 1997 never in force (abolition proposed)
 - [ ] Prescribing UI does not yet show the policy block before submit (the API returns it in `/api/prescriptions/check` as `policyBlock`).
 
 ## 3. Privacy and data (PDPA 2010 plus international)
-- [ ] PDPA notice and consent screens in English and BM; record consent timestamp and version.
-- [ ] Data residency decision: where `data/` and uploads are hosted. PDPA cross-border transfer rules; also GDPR/other for tourists from those regions.
-- [ ] Keep existing export and deletion endpoints; add a PDPA-style access and correction request path.
-- [ ] Retention policy for medical records (Malaysian practice is typically at least 6 years (?)). Confirm.
-- [ ] Update Terms, Privacy and disclaimers in [Footer.tsx](../src/components/Footer.tsx) and landing copy.
+Code in `server/privacy.ts`, `server/dataops.ts`, `src/components/PrivacyCentre.tsx` and `PrivacyAdmin.tsx`. Notice, Terms and runbook texts are developer drafts: counsel must review them.
+- [x] Bilingual privacy notice (English + Bahasa Malaysia), versioned, opened from the footer and the registration forms.
+- [x] Terms of Service draft (English + Bahasa Malaysia) with its own tab; footer and sign-up links open it.
+- [x] Consent records with version and timestamp; withdrawal; re-consent prompt when the notice version changes.
+- [x] Data requests (access, correction, deletion, withdrawal) with a 21-day due date (confirm the legal period) and an admin queue.
+- [x] Transfer register: processors, country, PDPA s.129 basis, TIA date (3-year validity); notice lists them; readiness check flags gaps. See docs/DATA_RESIDENCY.md.
+- [ ] **Hosting choice is the owner's decision.** The docs recommend hosting in Malaysia. Until `DATA_HOSTING_COUNTRY` and the register are filled in, the notice shows placeholders and the readiness check fails. Counsel must confirm the basis for any transfer abroad.
+- [x] Erasure: an admin can erase a patient from a deletion/withdrawal request after a preview. It deletes sessions, notifications, self-recorded health data, grants, uploads and SOS events, de-identifies the account, profile, bookings and chats, and keeps clinical records, payments and the audit log. Practitioner accounts need manual review. Tested on a scratch database.
+- [x] Retention purge: removes retained clinical records of erased patients after the retention period. **It refuses to run until `RETENTION_YEARS` is set deliberately.** The default of 6 is only a placeholder: I could not find the statutory period (MMC "Medical Records and Medical Reports" guideline and the Private Healthcare Facilities rules should be read for it). `RETENTION_AUTO_PURGE=true` enables a daily purge. Payments are never purged automatically (accounting rules unconfirmed).
+- [x] Breach register with a 72-hour Commissioner target and 7-day individuals target (internal targets; the Act says "as soon as practicable"), overdue reminders to admins, and a close step that requires the notifications to be recorded. Runbook: docs/BREACH_RESPONSE.md.
+- [x] DPO: readiness check asks for `DPO_NAME` and notification to the Commissioner (manual).
+- [ ] Open: support tickets, complaints and reviews are not erased automatically; no automated breach detection; the retention period and all legal texts still need counsel.
 
 ## 4. Patients: identity and forms
 - [ ] [PatientRegistrationForm.tsx](../src/components/PatientRegistrationForm.tsx): MyKad (NRIC) for citizens/PRs, passport number and nationality for tourists; validate NRIC format and mask in the UI.
