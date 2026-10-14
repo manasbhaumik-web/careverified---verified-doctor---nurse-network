@@ -5,7 +5,7 @@ import {
   Calendar, BookOpen, Globe, RefreshCw,
   Heart, MessageSquare, Menu, X, PlusCircle, UserCheck,
   Stethoscope, Puzzle, Settings, Activity,
-  CreditCard, TrendingUp, Video, Radio, LifeBuoy, Pill, Store, Lock
+  CreditCard, TrendingUp, Video, Radio, LifeBuoy, Pill, Store, Lock, Plane
 } from 'lucide-react';
 
 
@@ -31,6 +31,8 @@ import ConsultNow from './components/ConsultNow';
 import PractitionerOnCall from './components/PractitionerOnCall';
 import PatientDashboard from './components/PatientDashboard';
 import PharmacyFinder from './components/PharmacyFinder';
+import MedicalTourism from './components/MedicalTourism';
+import TourismDesk from './components/TourismDesk';
 import PharmacyWorkspace from './components/PharmacyWorkspace';
 import LandingPage from './components/LandingPage';
 import Footer from './components/Footer';
@@ -281,6 +283,7 @@ export default function App() {
     }
     navItems.push({ id: 'consult', name: 'Consult Now', icon: Video });
     navItems.push({ id: 'pharmacies', name: 'Pharmacies', icon: Pill });
+    navItems.push({ id: 'tourism', name: 'Medical Tourism', icon: Plane });
     navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
     if (isPackageEnabled('registry')) {
       navItems.push({ id: 'registry', name: 'Doctors & Nurses', icon: Search });
@@ -296,6 +299,7 @@ export default function App() {
       navItems.push({ id: 'onboard', name: 'Practitioner Portal', icon: PlusCircle });
     }
     navItems.push({ id: 'oncall', name: 'On Call', icon: Radio });
+    navItems.push({ id: 'tourism_desk', name: 'Tourism Desk', icon: Plane });
     navItems.push({ id: 'quality', name: 'Quality & CPD', icon: Award });
     navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
     if (isPackageEnabled('recruitment')) {
@@ -312,6 +316,7 @@ export default function App() {
     navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
   } else if (currentUser.role === 'admin') {
     navItems.push({ id: 'admin', name: 'Admin Panel', icon: ShieldCheck });
+    navItems.push({ id: 'tourism_desk', name: 'Medical Tourism', icon: Plane });
     if (isPackageEnabled('seo')) {
       navItems.push({ id: 'seo', name: 'SEO Compliance', icon: Globe });
     }
@@ -674,6 +679,12 @@ export default function App() {
             {activeView === 'consult' && currentUser.role === 'patient' && (
               <ConsultNow myUserId={currentUser.id} />
             )}
+
+            {activeView === 'tourism' && currentUser.role === 'patient' && (
+              <MedicalTourism onOpenProfessional={(id) => { setSelectedProfId(id); setActiveView('registry'); }} />
+            )}
+
+            {activeView === 'tourism_desk' && (currentUser.role === 'practitioner' || currentUser.role === 'admin') && <TourismDesk isAdmin={currentUser.role === 'admin'} />}
 
             {activeView === 'help' && currentUser.role !== 'admin' && <SupportDesk />}
 

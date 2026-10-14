@@ -21,8 +21,8 @@ export const CONSENT_VERSION = "2026-11";
 /** Days allowed to answer an access request. PDPA s.? sets 21 days (unconfirmed: check with counsel). */
 export const REQUEST_DUE_DAYS = 21;
 
-export type ConsentKind = "terms_privacy" | "health_data" | "credential_check" | "quality_review";
-const CONSENT_KINDS: ConsentKind[] = ["terms_privacy", "health_data", "credential_check", "quality_review"];
+export type ConsentKind = "terms_privacy" | "health_data" | "credential_check" | "quality_review" | "medical_tourism";
+const CONSENT_KINDS: ConsentKind[] = ["terms_privacy", "health_data", "credential_check", "quality_review", "medical_tourism"];
 /** Withdrawing these ends the service, so it becomes an account-closure request for staff to action. */
 const CORE_KINDS: ConsentKind[] = ["terms_privacy", "health_data", "credential_check"];
 

@@ -10,7 +10,7 @@ const jpost = (url: string, body?: unknown) =>
 
 const KIND_LABEL: Record<string, string> = {
   terms_privacy: 'Terms and privacy notice', health_data: 'Processing of my health data',
-  credential_check: 'Checking my credentials with the council', quality_review: 'Care-quality review (name hidden)',
+  credential_check: 'Checking my credentials with the council', quality_review: 'Care-quality review (name hidden)', medical_tourism: 'Sharing medical tourism enquiries with facilities',
 };
 const REQUEST_LABEL: Record<string, string> = {
   access: 'Get a copy of my data', correction: 'Correct my data', deletion: 'Delete my data', withdrawal: 'Withdraw consent',

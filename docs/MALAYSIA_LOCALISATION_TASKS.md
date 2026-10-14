@@ -80,12 +80,15 @@ Code in `server/pharmacyMy.ts`, `server/pharmacyLicence.ts`, `src/components/Pre
 - [ ] Not built: insurer integrations, claims, co-payment, delivery payment through the app, delivery partner API.
 
 ## 7. Medical tourism module (new, stays international)
-- [ ] Facility and practitioner listings filtered by "accepts international patients", languages spoken, and JCI/MSQH accreditation (MSQH is the Malaysian hospital accreditation body).
-- [ ] Pre-arrival flow: enquiry, remote consult, quote with package price (procedure, stay, follow-up), and treatment itinerary.
-- [ ] Documents for visitors: medical visa / Malaysia Healthcare Travel Council (MHTC) facilitation info (?) confirm, passport upload, medical records transfer with consent.
-- [ ] Services: interpreter, airport pickup, halal food and prayer-room flags, accommodation partners.
-- [ ] Post-treatment: follow-up teleconsult in the patient's home country with licensing disclaimer; record sharing with the home doctor.
-- [ ] Transparent pricing and complaint channel (reuse [ReportPractitioner.tsx](../src/components/ReportPractitioner.tsx)).
+Code in `server/tourism.ts` and the MedicalTourism / TourismDesk / SharedSummary components; design and gaps in docs/MEDICAL_TOURISM.md. Tested end to end (67 API checks on a scratch database); visa/MHTC text is a draft from web research.
+- [x] Facility listings filtered by language, specialty, accreditation (JCI/MSQH) and services; shown only while active, accepting international patients and licence unexpired. Accreditation and licence are recorded by an admin with how they were checked and expiry: unverified or expired claims are never shown. Nothing is fetched from JCI, MSQH or MOH.
+- [x] Pre-arrival flow: enquiry (with consent), itemised quote, accept/decline, itinerary, messages. Remote consults reuse the booking flow under the section 2 cross-border rules.
+- [x] Documents: passport and medical-record uploads, visible to the facility only if the patient agrees, withdrawable at any time, every staff view audited.
+- [x] Services: interpreter, airport pickup, halal food, prayer room flags and accommodation partners, plus the patient's needs on the enquiry.
+- [x] Post-treatment: discharge summary by a verified doctor, follow-up plan, and a revocable time-limited share link for the home doctor (no sign-in; summary only).
+- [x] Transparent pricing: a quote must itemise the procedure and state exclusions and cancellation terms; SST shown separately when enabled. Complaint channel: "Report a problem" opens a support ticket.
+- [~] Visa / MHTC information is a draft and unconfirmed: no official source found for current MHTC registration or visa fast-track rules.
+- [ ] Not built: package payment/deposit in the app, facility self-service editing, record transfer standards (HL7/FHIR), translation, travel facilitators, public (signed-out) browsing page, facility reviews.
 
 ## 8. Practitioners and jobs
 - [ ] [JobMarket.tsx](../src/components/JobMarket.tsx): Malaysian states, MYR salary bands, locum and shift listings, public vs private sector, foreign-doctor eligibility notes.

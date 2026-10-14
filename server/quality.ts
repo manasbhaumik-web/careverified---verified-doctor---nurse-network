@@ -60,7 +60,7 @@ const dateOnly = (v: unknown) => (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/
 const SLA_HOURS: Record<string, number> = { urgent: 1, high: 4, normal: 24, low: 72 };
 const CATEGORIES: Record<string, string> = {
   "Safety concern": "urgent", "Report a user": "high", "Payment problem": "high", "Account or login": "normal",
-  "Technical problem": "normal", "Feedback": "low", "Other": "low",
+  "Technical problem": "normal", "Feedback": "low", "Other": "low", "Medical tourism": "high",
 };
 const INCIDENT_KINDS = ["adverse_drug_event", "near_miss", "patient_harm", "misconduct", "privacy", "system", "other"];
 const SEVERITIES = ["low", "medium", "high", "critical"];
