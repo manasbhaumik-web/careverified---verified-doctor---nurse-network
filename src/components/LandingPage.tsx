@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocale, useT } from '../locale';
+import { HERO_TR } from '../locale/landing';
 import { openLegal } from '../legal';
 import VerificationScopeBadge from './VerificationScopeBadge';
 import ThemeSwitcher from './ThemeSwitcher';
@@ -172,23 +174,23 @@ function StatCounter({ end, duration = 1800, suffix = '', prefix = '' }: { end: 
 const QUANTIFIED_METRICS = [
   {
     icon: Clock,
-    valueComponent: <StatCounter end={3} prefix="< " suffix=" min" />,
-    label: 'Average On-Call Response',
-    subtext: 'Time to connect with an on-call verified doctor',
-    badge: 'Real-Time Triage',
+    valueComponent: <StatCounter end={10} suffix=" min" />,
+    label: 'Refund if No Doctor Joins',
+    subtext: 'An instant consultation that no doctor joins within 10 minutes is refunded automatically',
+    badge: 'Money-back rule',
   },
   {
     icon: ShieldCheck,
     valueComponent: <StatCounter end={100} suffix="%" />,
     label: 'Manual Council Verification',
-    subtext: 'Every licence verified by our medical board',
-    badge: 'MMC Register Audited',
+    subtext: 'Every listed practitioner is checked by our team before going public',
+    badge: 'Manual register check',
   },
   {
     icon: RefreshCw,
     valueComponent: <StatCounter end={12} suffix=" mo" />,
     label: 'Continuous Re-Verification',
-    subtext: 'Automated council check & renewal tracking',
+    subtext: 'Expiry tracking, with re-verification every 12 months',
     badge: 'Active Expiry Audit',
   },
   {
@@ -207,13 +209,13 @@ const TRUST_PARTNERS = [
   {
     title: 'Malaysian Medical Council (MMC)',
     category: 'Practitioner Registry',
-    status: 'Direct Register Cross-Check',
+    status: 'Checked by hand, date recorded',
     icon: ShieldCheck,
   },
   {
     title: 'Ministry of Health Digital Standards',
     category: 'Clinical Framework',
-    status: 'MOH Telehealth Guideline Compliant',
+    status: 'Built around MoH and MMC telemedicine guidance',
     icon: Building,
   },
   {
@@ -233,39 +235,6 @@ const TRUST_PARTNERS = [
     category: 'Clinical Governance',
     status: 'Tamper-Evident Chronological Trail',
     icon: Award,
-  },
-];
-
-// ─────────────────────────────────────────────
-// PHASE 3: CLINICAL TESTIMONIALS & CASE STUDIES (Voices from the Network)
-// ─────────────────────────────────────────────
-const TESTIMONIALS = [
-  {
-    roleBadge: 'Member & Family Care',
-    quote: 'Late on a Sunday evening, my 4-year-old had an escalating fever. In less than 4 minutes, Dr. Tan confirmed the symptoms over secure video, issued an antibiotic prescription, and sent it directly to our nearby guardian pharmacy for collection.',
-    author: 'Sharifah A.',
-    title: 'Parent & Verified Member',
-    location: 'Kuala Lumpur',
-    rating: 5,
-    tag: 'Urgent Paediatric Consultation',
-  },
-  {
-    roleBadge: 'Practitioner Network',
-    quote: 'MedCred eliminated the administrative fatigue of constant credential verification. My medical council licence was audited by hand once, and now I consult patients and accept hospital locum shifts under full statutory and clinical compliance.',
-    author: 'Dr. K. Arumugam',
-    title: 'Senior Specialist Physician · MMC Registered',
-    location: 'Petaling Jaya',
-    rating: 5,
-    tag: 'Credentialing & Tele-Triage',
-  },
-  {
-    roleBadge: 'Dispensing Pharmacy',
-    quote: 'With cryptographic e-prescriptions, our dispensing pharmacists can verify the prescriber’s licence number and signature instantly by scanning the QR. It completely removes prescription fraud and transcription errors.',
-    author: 'Lim Wei Chen, RPh',
-    title: 'Chief Pharmacist · Apex Community Care',
-    location: 'Penang',
-    rating: 5,
-    tag: 'Digital RX Validation',
   },
 ];
 
@@ -397,7 +366,7 @@ const HERO_SLIDES: HeroSlide[] = [
       status: 'Verified Active',
       person: { img: '/assets/malaysian_male_doctor.jpg', name: 'Dr. Tan Seng Hock', line1: 'Senior Specialist · MMC Registered', line2: 'Kuala Lumpur Specialist Hospital' },
       rows: [
-        { k: 'MMC Licence Number', v: 'MMC-32109', kind: 'mono' },
+        { k: 'MMC Licence Number', v: 'DEMO-MMC-32109', kind: 'mono' },
         { k: 'Registry Status', v: 'Malaysian Medical Council' },
         { k: 'Consultations', v: 'Chat or video' },
       ],
@@ -567,6 +536,11 @@ function PractitionerSignUp({ onSuccess, onCancel }: {
 // MAIN COMPONENT (THIN BORDERS - LIGHT NAVBAR & HERO - NO BLACK BORDERS)
 // ═══════════════════════════════════════════════
 export default function LandingPage({ professionals, onLoginSuccess }: LandingPageProps) {
+  const { lang } = useLocale();
+  const t = useT();
+  const heroTr = HERO_TR[lang];
+  const [testimonials, setTestimonials] = useState<{ id: string; text: string; rating: number | null; name: string; location: string | null; demo: boolean }[]>([]);
+  useEffect(() => { fetch('/api/testimonials').then(r => r.json()).then(d => d.status === 'success' && setTestimonials(d.data)).catch(() => {}); }, []);
   // Login State
   const [activeTab, setActiveTab] = useState<'patient' | 'practitioner' | 'admin' | 'pharmacy'>('patient');
   const [email, setEmail] = useState('');
@@ -780,7 +754,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
   return (
     <div className="min-h-dvh bg-[color:var(--t-bg)] text-[color:var(--ink)] font-body flex flex-col antialiased selection:bg-[color:var(--t-100)] selection:text-[color:var(--t-600)]">
 
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-[color:var(--t-700)] focus:px-4 focus:py-2 focus:border focus:border-[color:var(--t-600)] focus:font-bold">Skip to content</a>
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-[color:var(--t-700)] focus:px-4 focus:py-2 focus:border focus:border-[color:var(--t-600)] focus:font-bold">{t('nav.skip')}</a>
 
       {/* ═══════════ TOP BANNER ═══════════ */}
       <div className="bg-[color:var(--t-100)] text-[color:var(--t-600)] text-xs font-semibold py-2 px-4 text-center border-b border-[color:var(--t-200)] flex items-center justify-center gap-2">
@@ -802,7 +776,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                 MedCred<span className="text-[color:var(--t-600)]">.</span>
               </span>
               <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--t-600)] mt-1">
-                Medical Assistance Platform
+                {t('nav.tagline')}
               </span>
             </span>
           </a>
@@ -813,13 +787,13 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-5 text-sm font-bold text-[color:var(--t-600)] bg-white border border-[color:var(--t-200)] rounded-none hover:bg-[color:var(--t-100)] transition-all cursor-pointer"
             >
               <Search className="h-4 w-4" />
-              Verify a Licence
+              {t('nav.verify')}
             </a>
             <a
               href="#login-section"
               className="inline-flex items-center gap-2 min-h-[44px] px-6 text-sm font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none shadow-xs transition-all cursor-pointer"
             >
-              Access Portal
+              {t('nav.portal')}
               <ArrowRight className="h-4 w-4" />
             </a>
             <LocaleSwitcher />
@@ -858,6 +832,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               const active = i === slideIdx;
               const c = s.card;
               const PersonIcon = c.person.icon;
+              const tr = heroTr?.[s.id];
               return (
                 <div
                   key={s.id}
@@ -871,7 +846,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                   <div className="flex-[1_1_500px] min-w-0">
                     <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-none bg-white border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-600)] mb-4 shadow-xs">
                       <Cross className="h-3 w-3 text-[color:var(--t-600)]" />
-                      {s.pill}
+                      {tr?.pill ?? s.pill}
                     </div>
 
                     {i === 0 ? (
@@ -879,14 +854,14 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                         className="font-display font-black text-3xl sm:text-4xl leading-[1.1] tracking-tight text-black mb-3"
                         style={HERO_OUTLINE_HEAD}
                       >
-                        {s.headline}
+                        {tr?.headline ?? s.headline}
                       </h1>
                     ) : (
                       <h2
                         className="font-display font-black text-3xl sm:text-4xl leading-[1.1] tracking-tight text-black mb-3"
                         style={HERO_OUTLINE_HEAD}
                       >
-                        {s.headline}
+                        {tr?.headline ?? s.headline}
                       </h2>
                     )}
 
@@ -894,7 +869,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                       className="text-base text-black font-semibold max-w-xl leading-relaxed mb-5"
                       style={HERO_OUTLINE_BODY}
                     >
-                      {s.body}
+                      {tr?.body ?? s.body}
                     </p>
 
                     <div className="flex flex-wrap gap-3 mb-5">
@@ -903,7 +878,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                           href={s.cta.href}
                           className="group inline-flex items-center gap-2.5 min-h-[46px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] rounded-none shadow-md transition-all cursor-pointer border border-[color:var(--t-700)]"
                         >
-                          {s.cta.label}
+                          {tr?.cta ?? s.cta.label}
                           <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                         </a>
                       ) : (
@@ -912,7 +887,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                           onClick={() => goLogin(s.cta.role!, !!s.cta.register)}
                           className="group inline-flex items-center gap-2.5 min-h-[46px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] rounded-none shadow-md transition-all cursor-pointer border border-[color:var(--t-700)]"
                         >
-                          {s.cta.label}
+                          {tr?.cta ?? s.cta.label}
                           <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                         </button>
                       )}
@@ -921,12 +896,12 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                         className="inline-flex items-center gap-2 min-h-[46px] px-6 text-sm font-bold text-[color:var(--ink)] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] rounded-none transition-all cursor-pointer shadow-xs"
                       >
                         <Search className="h-4 w-4 text-[color:var(--t-600)]" />
-                        Verify a Licence
+                        {t('nav.verify')}
                       </a>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2.5 text-[11px] font-bold text-[color:var(--ink)]">
-                      {s.chips.map((b) => (
+                      {(tr?.chips ?? s.chips).map((b) => (
                         <span key={b} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-white/95 border border-[color:var(--t-200)] text-[color:var(--ink)] font-bold shadow-xs">
                           <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
                           {b}
@@ -1151,12 +1126,12 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                     Cross-Council <span className="text-[color:var(--t-600)]">Verification Networks.</span>
                   </h2>
                   <p className="text-sm sm:text-base text-slate-600 mt-2 leading-relaxed font-medium">
-                    Direct statutory synchronization with accredited national councils and sovereign health databases.
+                    We check each licence with the relevant council and record when and how. Nothing is synchronised automatically.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 shrink-0">
                   <span className="text-xs font-mono font-bold text-slate-700 bg-white px-3.5 py-2 border border-[color:var(--t-200)] shadow-2xs">
-                    MMC Act 1971 · Telemedicine Act 1997 · PDPA 2010
+                    Medical Act 1971 · MMC telemedicine guideline · PDPA 2010
                   </span>
                 </div>
               </div>
@@ -1243,7 +1218,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                           <input
                             id="licence-search"
                             type="text"
-                            placeholder="e.g. MMC-32109, Dr. Tan, or Cardiology"
+                            placeholder="e.g. DEMO-MMC-32109, Dr. Tan, or Cardiology"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full h-12 pl-10 pr-4 bg-white border border-[color:var(--t-200)] rounded-none text-[color:var(--ink)] placeholder-slate-400 font-medium focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all text-sm"
@@ -1261,7 +1236,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                       {/* Quick-Search Sample Tags */}
                       <div className="flex flex-wrap items-center gap-2 mt-4 text-xs">
                         <span className="text-slate-500 font-bold text-[11px] uppercase tracking-wider">Quick Search:</span>
-                        {['MMC-32109', 'Cardiology', 'Dr. Tan Seng Hock', 'LJM-88412'].map((sample) => (
+                        {['DEMO-MMC-32109', 'Cardiology', 'Dr. Tan Seng Hock', 'DEMO-LJM-88412'].map((sample) => (
                           <button
                             key={sample}
                             type="button"
@@ -1370,13 +1345,13 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                           <h3 className="font-display font-black text-lg text-[color:var(--ink)]">Verification Standard</h3>
                         </div>
                         <span className="text-[10px] font-mono font-bold text-slate-500 bg-[color:var(--t-50)] px-2 py-0.5 border border-[color:var(--t-200)]">
-                          ISO 27001
+                          Manual check
                         </span>
                       </div>
                       <ul className="space-y-5">
                         {[
-                          { icon: ShieldCheck, title: 'Direct Register Cross-Check', text: 'Licences are matched directly against MMC & LJM statutory registries before any practitioner profile is activated.' },
-                          { icon: Clock, title: 'Annual Practising Certificate (APC)', text: 'Automatic expiry tracking. Practitioners without valid APC renewal are suspended within 24 hours.' },
+                          { icon: ShieldCheck, title: 'Checked against the council register', text: 'Doctors are checked against the MMC register and nurses are confirmed with the Nursing Board before a profile goes public. Our team records how and when, and whether the practitioner is registered in Malaysia.' },
+                          { icon: Clock, title: 'Annual Practising Certificate (APC)', text: 'Expiry dates are tracked. A practitioner whose certificate expires is suspended automatically (checked hourly) until they renew.' },
                           { icon: Award, title: 'Tamper-Evident Medical Board Review', text: 'Senior medical board reviewers stamp verified practitioners with non-repudiable audit logs.' },
                         ].map((n) => {
                           const NoteIcon = n.icon;
@@ -1474,10 +1449,10 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                     <div className="mt-8 pt-5 border-t border-[color:var(--t-200)] space-y-2">
                       <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
                         <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
-                        <span>Malaysian Telemedicine Act 1997 Compliant</span>
+                        <span>Built around MMC telemedicine guidance</span>
                       </div>
                       <div className="text-[10px] font-mono text-slate-400">
-                        Audit Trail: 256-Bit Cryptographic Ledger
+                        Audit trail: every decision is logged
                       </div>
                     </div>
                   </div>
@@ -1755,70 +1730,39 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
           </div>
         </section>
 
-        {/* ─── POSITION 8: CLINICAL TESTIMONIALS & CASE STUDIES (VOICES FROM THE NETWORK) ─── */}
-        <section aria-label="Clinical network testimonials" className="relative overflow-hidden bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] py-14 sm:py-18">
-          <Cross className="absolute -right-24 -bottom-28 h-[480px] w-[480px] text-[color:var(--t-600)] opacity-5 pointer-events-none z-0" />
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10">
-            <AnimatedSection className="max-w-3xl mb-10">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-none bg-white border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-600)] mb-3 shadow-2xs">
-                <Award className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> Clinical Network Validation
-              </div>
-              <h2 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl tracking-tight text-[color:var(--ink)] leading-tight">
-                Voices from the <span className="text-[color:var(--t-600)]">MedCred Network.</span>
-              </h2>
-              <p className="text-sm sm:text-base text-slate-600 mt-2 leading-relaxed font-medium">
-                Verified clinical feedback from patients, hospital locum specialists, and licensed dispensing pharmacists.
-              </p>
-            </AnimatedSection>
-
-            <AnimatedSection>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {TESTIMONIALS.map((t) => (
-                  <article
-                    key={t.author}
-                    className="group bg-white p-7 border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between"
-                  >
-                    <div>
-                      {/* Badge & Stars */}
-                      <div className="flex items-center justify-between gap-2 mb-5">
-                        <span className="text-[10px] font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-600)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)]">
-                          {t.roleBadge}
-                        </span>
-                        <div className="flex items-center gap-1 text-amber-500">
-                          {Array.from({ length: t.rating }).map((_, i) => (
-                            <span key={i} className="text-sm">★</span>
-                          ))}
-                        </div>
+        {/* ─── PATIENT TESTIMONIALS: only real, approved ones are shown (none are invented) ─── */}
+        {testimonials.length > 0 && (
+          <section aria-label="Patient testimonials" className="relative overflow-hidden bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] py-14 sm:py-18">
+            <Cross className="absolute -right-24 -bottom-28 h-[480px] w-[480px] text-[color:var(--t-600)] opacity-5 pointer-events-none z-0" />
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10">
+              <AnimatedSection className="max-w-3xl mb-10">
+                <h2 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl tracking-tight text-[color:var(--ink)] leading-tight">
+                  What patients <span className="text-[color:var(--t-600)]">say.</span>
+                </h2>
+                <p className="text-sm sm:text-base text-slate-600 mt-2 leading-relaxed font-medium">
+                  Shared by patients who paid for care on MedCred, with their permission, and approved by our team. Names are shortened.
+                </p>
+              </AnimatedSection>
+              <AnimatedSection>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {testimonials.map((tm) => (
+                    <article key={tm.id} className="bg-white p-7 border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs flex flex-col justify-between">
+                      <div>
+                        {tm.demo && <span className="inline-block mb-3 text-[10px] font-extrabold uppercase tracking-wider text-amber-900 bg-amber-50 border border-amber-300 px-2 py-0.5">Demo testimonial, not a real patient</span>}
+                        {tm.rating && <div className="flex items-center gap-1 text-amber-500 mb-3" aria-label={`${tm.rating} out of 5`}>{Array.from({ length: tm.rating }).map((_, i) => <span key={i} className="text-sm">★</span>)}</div>}
+                        <p className="text-sm text-slate-700 leading-relaxed font-medium mb-6">“{tm.text}”</p>
                       </div>
-
-                      {/* Quote */}
-                      <p className="text-sm text-slate-700 leading-relaxed font-medium mb-6 relative">
-                        <span className="text-3xl font-serif text-[color:var(--t-600)]/30 leading-none -ml-1 mr-1">“</span>
-                        {t.quote}
-                      </p>
-                    </div>
-
-                    {/* Author Footnote */}
-                    <div className="pt-4 border-t border-[color:var(--t-100)]">
-                      <div className="font-display font-black text-sm text-[color:var(--ink)] group-hover:text-[color:var(--t-600)] transition-colors">
-                        {t.author}
+                      <div className="pt-4 border-t border-[color:var(--t-100)]">
+                        <div className="font-display font-black text-sm text-[color:var(--ink)]">{tm.name}</div>
+                        {tm.location && <div className="text-xs font-semibold text-slate-500 mt-0.5">{tm.location}</div>}
                       </div>
-                      <div className="text-xs font-semibold text-slate-500 mt-0.5">
-                        {t.title}
-                      </div>
-                      <div className="flex items-center justify-between mt-2.5 text-[11px] text-slate-400 font-medium">
-                        <span>{t.location}</span>
-                        <span className="text-emerald-700 font-bold flex items-center gap-1">
-                          <CheckCircle2 className="h-3 w-3 text-emerald-600" /> Statutory Verified
-                        </span>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </AnimatedSection>
-          </div>
-        </section>
+                    </article>
+                  ))}
+                </div>
+              </AnimatedSection>
+            </div>
+          </section>
+        )}
 
       </main>
 
@@ -1887,7 +1831,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
 
               <div className="hidden md:block pt-6 border-t border-[color:var(--t-200)] mt-6">
                 <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
-                  <Lock className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> 256-Bit Encrypted Session
+                  <Lock className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> Encrypted session (HTTPS)
                 </span>
               </div>
             </div>

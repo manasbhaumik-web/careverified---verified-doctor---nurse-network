@@ -1,4 +1,5 @@
 import { DoctorProfile, NurseProfile, UserRole, VerificationStatus, JobPost, Article, Review, VerificationRequest } from './types';
+import { MY_DEMO_DOCTORS, MY_DEMO_NURSES, MY_HEALTH_ARTICLES } from './data.my';
 
 export const INITIAL_DOCTORS: DoctorProfile[] = [
   {
@@ -7,7 +8,7 @@ export const INITIAL_DOCTORS: DoctorProfile[] = [
     avatar: "/assets/malaysian_female_doctor.jpg",
     role: UserRole.DOCTOR,
     specialization: "Cardiologist",
-    licenseNumber: "MMC-87429",
+    licenseNumber: "DEMO-MMC-87429",
     medicalCouncil: "Malaysian Medical Council (MMC)",
     experienceYears: 14,
     education: ["MD - Cardiology (UM)", "MBBS (Universiti Malaya)"],
@@ -32,7 +33,7 @@ export const INITIAL_DOCTORS: DoctorProfile[] = [
     avatar: "/assets/malaysian_male_doctor.jpg",
     role: UserRole.DOCTOR,
     specialization: "Pediatrician",
-    licenseNumber: "MMC-32109",
+    licenseNumber: "DEMO-MMC-32109",
     medicalCouncil: "Malaysian Medical Council (MMC)",
     experienceYears: 18,
     education: ["Master of Paediatrics (UKM)", "MBBS (Universiti Kebangsaan Malaysia)"],
@@ -57,7 +58,7 @@ export const INITIAL_DOCTORS: DoctorProfile[] = [
     avatar: "/assets/malaysian_male_doctor.jpg",
     role: UserRole.DOCTOR,
     specialization: "Neurologist",
-    licenseNumber: "MMC-55412",
+    licenseNumber: "DEMO-MMC-55412",
     medicalCouncil: "Malaysian Medical Council (MMC)",
     experienceYears: 11,
     education: ["Master of Neurology (UM)", "MBBS (USM)"],
@@ -82,7 +83,7 @@ export const INITIAL_DOCTORS: DoctorProfile[] = [
     avatar: "/assets/malaysian_female_doctor.jpg",
     role: UserRole.DOCTOR,
     specialization: "Dermatologist",
-    licenseNumber: "MMC-99213",
+    licenseNumber: "DEMO-MMC-99213",
     medicalCouncil: "Malaysian Medical Council (MMC)",
     experienceYears: 9,
     education: ["Advanced Master in Dermatology (UKM)", "MBBS (UM)"],
@@ -110,7 +111,7 @@ export const INITIAL_NURSES: NurseProfile[] = [
     avatar: "/assets/malaysian_female_nurse.jpg",
     role: UserRole.NURSE,
     specialization: "ICU & Critical Care",
-    licenseNumber: "LJM-RN-41223",
+    licenseNumber: "DEMO-LJM-RN-41223",
     nursingCouncil: "Malaysian Nursing Board (LJM)",
     experienceYears: 12,
     education: ["B.Sc Nursing (Universiti Malaya)", "Post-Basic Critical Care Diploma"],
@@ -136,7 +137,7 @@ export const INITIAL_NURSES: NurseProfile[] = [
     avatar: "/assets/malaysian_male_patient.jpg",
     role: UserRole.NURSE,
     specialization: "Geriatric & Eldercare",
-    licenseNumber: "LJM-RN-11892",
+    licenseNumber: "DEMO-LJM-RN-11892",
     nursingCouncil: "Malaysian Nursing Board (LJM)",
     experienceYears: 8,
     education: ["Diploma in Nursing (National Healthcare University College)"],
@@ -162,7 +163,7 @@ export const INITIAL_NURSES: NurseProfile[] = [
     avatar: "/assets/malaysian_female_nurse.jpg",
     role: UserRole.NURSE,
     specialization: "Pediatric & Neonatal Care",
-    licenseNumber: "LJM-RN-88314",
+    licenseNumber: "DEMO-LJM-RN-88314",
     nursingCouncil: "Malaysian Nursing Board (LJM)",
     experienceYears: 6,
     education: ["B.Sc Nursing (IMU - International Medical University)"],
@@ -190,7 +191,7 @@ export const INITIAL_VERIFICATION_REQUESTS: VerificationRequest[] = [
     userId: "pending-doc-1",
     userName: "Dr. Khairul Azman Bin Ibrahim",
     userType: UserRole.DOCTOR,
-    licenseNumber: "MMC-77341",
+    licenseNumber: "DEMO-MMC-77341",
     medicalCouncil: "Malaysian Medical Council (MMC)",
     degreeName: "Master of Medicine in Internal Medicine (UM)",
     fileUrl: "med_certificate_khairul_azman.pdf",
@@ -202,7 +203,7 @@ export const INITIAL_VERIFICATION_REQUESTS: VerificationRequest[] = [
     userId: "pending-nur-1",
     userName: "Tan Choon Wei",
     userType: UserRole.NURSE,
-    licenseNumber: "LJM-RN-99451",
+    licenseNumber: "DEMO-LJM-RN-99451",
     medicalCouncil: "Malaysian Nursing Board (LJM)",
     degreeName: "B.Sc Nursing (Universiti Malaya)",
     fileUrl: "bsc_degree_tan_choon_wei.pdf",
@@ -420,3 +421,9 @@ Always have a manual resuscitation bag (Ambu bag) and a backup battery/power sou
     ]
   }
 ];
+
+// Malaysian demo practitioners and health topics (see data.my.ts). Every seeded profile is labelled as a demo.
+for (const p of [...INITIAL_DOCTORS, ...INITIAL_NURSES]) (p as any).isDemo = true;
+INITIAL_DOCTORS.push(...MY_DEMO_DOCTORS);
+INITIAL_NURSES.push(...MY_DEMO_NURSES);
+INITIAL_ARTICLES.push(...MY_HEALTH_ARTICLES);

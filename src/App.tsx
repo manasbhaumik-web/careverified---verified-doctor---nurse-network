@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { TestimonialAdmin } from './components/TestimonialPanels';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ShieldCheck, Search, Award, FileText,
@@ -703,12 +704,15 @@ export default function App() {
 
             {/* VIEW 6: MEDICAL BOARD ADMIN */}
             {activeView === 'admin' && (
-              <AdminDashboard
-                professionals={professionals}
-                onProfessionalApproved={handleProfessionalApprovedByAdmin}
-                packages={packages}
-                onPackagesChanged={handlePackagesChanged}
-              />
+              <>
+                <AdminDashboard
+                  professionals={professionals}
+                  onProfessionalApproved={handleProfessionalApprovedByAdmin}
+                  packages={packages}
+                  onPackagesChanged={handlePackagesChanged}
+                />
+                <TestimonialAdmin />
+              </>
             )}
 
             {/* VIEW 7: SEO DASHBOARD */}

@@ -52,6 +52,8 @@ export interface DoctorProfile {
     slots: string[];
   };
   seoSlug: string;
+  /** Invented test profile: shown with a "Demo" label, with a DEMO- registration number. */
+  isDemo?: boolean;
 }
 
 export interface NurseProfile {
@@ -87,6 +89,8 @@ export interface NurseProfile {
     slots: string[];
   };
   seoSlug: string;
+  /** Invented test profile: shown with a "Demo" label, with a DEMO- registration number. */
+  isDemo?: boolean;
   shiftTypes: string[]; // e.g. "Day Shift", "Night Shift", "24-Hour Care"
 }
 
@@ -204,6 +208,15 @@ export interface Article {
   faq: { question: string; answer: string; }[];
   /** Plain-language summary written or approved by the board (research papers). */
   takeaway?: string | null;
+  /** Malay version of the title, excerpt and body (a draft until a clinician and a native speaker review it). */
+  titleMs?: string;
+  excerptMs?: string;
+  contentMs?: string;
+  translationStatus?: 'draft' | 'reviewed';
+  /** True until a registered doctor has reviewed the article. */
+  draft?: boolean;
+  /** Malaysian figures with their source and date. */
+  localBurden?: { facts: { text: string; textMs?: string; source: string; url: string; asOf: string }[] };
   /** Malay version of the key takeaway, written by the board. */
   takeawayMs?: string | null;
   /** Strength of evidence for research papers. */

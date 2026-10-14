@@ -100,9 +100,13 @@ Code in `server/jobsMy.ts`, the job routes in `server.ts` and `JobMarket.tsx` / 
 - [ ] Not built: salary benchmarks, public-sector grading, nurse-specific rules, editing or closing listings from the UI, applicant tracking beyond "applied".
 
 ## 9. Content and UX
-- [ ] Landing page ([LandingPage.tsx](../src/components/LandingPage.tsx)): Malaysian testimonials, "MMC-verified" trust messaging, BM and Chinese language switcher.
-- [ ] Medical library: BM translations of key topics, local disease burden (dengue, diabetes, hypertension).
-- [ ] Demo seed data ([scripts/seed-demo.ts](../scripts/seed-demo.ts)): add Malaysian demo practitioners (use clearly fake registration numbers) alongside the existing ones.
+Details in docs/CONTENT_MALAYSIA.md. Tested (46 API checks, migration of an older database, browser checks). Malay and Chinese text is a developer draft: native review needed.
+- [x] Landing page: language switcher now translates the navigation and all hero slides into Bahasa Malaysia and Chinese (other languages fall back to English).
+- [x] Testimonials: the invented ones were removed. Only testimonials from paying patients, published with consent (first name + initial) and approved by an admin are shown; the section is hidden when there are none. The seed adds one clearly labelled "Demo testimonial".
+- [x] "MMC-verified" trust messaging rewritten to what the system does (manual register checks with date and expiry, Malaysia vs abroad); removed an invented response-time statistic, an ISO 27001 badge, a "cryptographic ledger" claim and "Telemedicine Act compliant".
+- [~] Medical library: Malay versions with a language toggle, a "Malaysia in numbers" box with sourced figures, and three topics (dengue, diabetes, high blood pressure). They are labelled drafts: **a registered doctor must review the content and a native speaker the translation.**
+- [x] Demo data: every seeded practitioner is labelled "Demo", original numbers renamed with a DEMO- prefix (older databases migrate on start), six new Malaysian demo practitioners added, no invented ratings.
+- [ ] Not done: translating the rest of the landing page and the app screens; Indonesian and Arabic; Malay versions of the FAQ and existing articles; more topics; real testimonials (none exist yet).
 
 ## 10. Launch and ops
 - [ ] Legal review: MMC advertising rules for doctors (promotion limits), PDPA registration, telemedicine position.

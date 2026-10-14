@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useLocale } from '../locale';
 import { ArrowRight, BadgeCheck, Bookmark, BookOpen, ExternalLink, Flag, Printer, Search, Send, ShieldCheck, X } from 'lucide-react';
 import { Article, DoctorProfile, NurseProfile } from '../types';
 import DashboardHeader, { BannerKpis, FilterSelect } from './DashboardHeader';
@@ -77,9 +78,39 @@ const readSaved = (): string[] => {
   try { return JSON.parse(localStorage.getItem('saved_articles') || '[]'); } catch { return []; }
 };
 
+/** Minimal rendering for article bodies: ### headings, "- " bullets, numbered lists, **bold** and *italic*. No HTML is ever inserted. */
+function inline(text: string): React.ReactNode[] {
+  return text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).filter(Boolean).map((part, i) =>
+    part.startsWith('**') ? <strong key={i}>{part.slice(2, -2)}</strong> : part.startsWith('*') ? <em key={i}>{part.slice(1, -1)}</em> : <React.Fragment key={i}>{part}</React.Fragment>);
+}
+function ArticleBody({ text, lang }: { text: string; lang: string }) {
+  const blocks: React.ReactNode[] = [];
+  let list: string[] = [];
+  let ordered = false;
+  const flush = () => {
+    if (!list.length) return;
+    const items = list.map((l, i) => <li key={i}>{inline(l)}</li>);
+    blocks.push(ordered ? <ol key={blocks.length} className="list-decimal ml-5 space-y-1">{items}</ol> : <ul key={blocks.length} className="list-disc ml-5 space-y-1">{items}</ul>);
+    list = [];
+  };
+  for (const raw of text.split('\n')) {
+    const line = raw.trimEnd();
+    const head = line.match(/^#{2,4}\s+(.*)$/);
+    const bullet = line.match(/^\s*-\s+(.*)$/);
+    const num = line.match(/^\s*\d+\.\s+(.*)$/);
+    if (head) { flush(); blocks.push(<h3 key={blocks.length} className="text-sm font-bold text-[color:var(--ink)] mt-1">{head[1]}</h3>); }
+    else if (bullet) { if (ordered) flush(); ordered = false; list.push(bullet[1]); }
+    else if (num) { if (!ordered) flush(); ordered = true; list.push(num[1]); }
+    else if (!line.trim()) flush();
+    else { flush(); blocks.push(<p key={blocks.length}>{inline(line)}</p>); }
+  }
+  flush();
+  return <div lang={lang} className="text-sm leading-relaxed text-[color:var(--ink-2)] space-y-3">{blocks}</div>;
+}
+
 function EvidenceBadge({ article }: { article: Article }) {
   if (!article.evidence) {
-    return <span className="text-[11px] font-bold text-slate-700 bg-slate-50 border border-slate-200 px-2.5 py-0.5">Practitioner article</span>;
+    return <span className="text-[11px] font-bold text-slate-700 bg-slate-50 border border-slate-200 px-2.5 py-0.5">{article.draft ? 'Editorial draft' : 'Practitioner article'}</span>;
   }
   const tone = article.evidence.level === 'high'
     ? 'text-[color:var(--e-800)] bg-[color:var(--e-50)] border-[color:var(--e-200)]'
@@ -148,6 +179,11 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
   const [evidence, setEvidence] = useState<string>('all');
   const [sort, setSort] = useState<SortKey>('newest');
   const [openArticle, setOpenArticle] = useState<Article | null>(null);
+  // Reading language: follows the interface language, and can be switched per article when a Malay version exists.
+  const { lang: uiLang } = useLocale();
+  const [readLang, setReadLang] = useState<'en' | 'ms'>('en');
+  useEffect(() => { setReadLang(uiLang === 'ms' ? 'ms' : 'en'); }, [openArticle?.id, uiLang]);
+  const ms = readLang === 'ms' && !!openArticle?.contentMs;
   const [savedIds, setSavedIds] = useState<string[]>(readSaved);
   const [onlySaved, setOnlySaved] = useState(false);
   const [factSheets, setFactSheets] = useState<{ topic: string; title: string; summary: string; url: string }[]>([]);
@@ -449,7 +485,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
           <div
             role="dialog"
             aria-modal="true"
-            aria-label={openArticle.title}
+            aria-label={ms && openArticle.titleMs ? openArticle.titleMs : openArticle.title}
             className="print-article bg-white border border-[color:var(--t-200)] w-full max-w-3xl max-h-[90dvh] flex flex-col shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
@@ -460,7 +496,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
                   <EvidenceBadge article={openArticle} />
                   <span className="text-xs text-slate-600">{openArticle.date}</span>
                 </div>
-                <h2 className="text-xl font-bold text-[color:var(--ink)] leading-snug [overflow-wrap:anywhere]">{openArticle.title}</h2>
+                <h2 lang={ms ? 'ms' : 'en'} className="text-xl font-bold text-[color:var(--ink)] leading-snug [overflow-wrap:anywhere]">{ms && openArticle.titleMs ? openArticle.titleMs : openArticle.title}</h2>
               </div>
               <button
                 type="button"
@@ -476,12 +512,41 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
               <div className="flex items-center gap-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3.5">
                 <AuthorBadge article={openArticle} large />
                 <span className="ml-auto hidden sm:inline-flex items-center gap-1 text-[11px] font-bold text-[color:var(--e-800)] bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-2 py-1">
-                  <BadgeCheck className="h-3.5 w-3.5 text-[color:var(--e-600)]" /> {openArticle.source ? 'PubMed paper · board-approved' : 'Verified & accredited'}
+                  <BadgeCheck className="h-3.5 w-3.5 text-[color:var(--e-600)]" /> {openArticle.source ? 'PubMed paper · board-approved' : openArticle.draft ? 'Draft · not yet doctor-reviewed' : 'Verified & accredited'}
                 </span>
               </div>
 
+              {openArticle.draft && (
+                <p role="note" className="text-xs bg-amber-50 border border-amber-200 text-amber-900 p-3 font-semibold">
+                  {ms
+                    ? 'Draf: ditulis oleh pasukan editorial MedCred dan belum disemak oleh doktor berdaftar. Terjemahan ini ialah draf yang belum disemak oleh doktor dan penutur asli bahasa Melayu.'
+                    : 'Draft: written by the MedCred editorial team and not yet reviewed by a registered doctor.' + (openArticle.contentMs ? ' The Malay version is a draft translation, not yet checked by a clinician and a native speaker.' : '')}
+                </p>
+              )}
+              {openArticle.contentMs && (
+                <div role="group" aria-label="Reading language" className="flex gap-1 text-[11px] font-bold">
+                  {([['en', 'English'], ['ms', 'Bahasa Malaysia']] as const).map(([id, label]) => (
+                    <button key={id} type="button" aria-pressed={readLang === id} onClick={() => setReadLang(id)}
+                      className={`px-2.5 py-1 border cursor-pointer ${readLang === id ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-600)]' : 'bg-white text-[color:var(--ink)] border-[color:var(--t-200)]'}`}>{label}</button>
+                  ))}
+                </div>
+              )}
               <Takeaway text={openArticle.takeaway} ms={openArticle.takeawayMs} />
-              <div className="text-sm leading-relaxed text-[color:var(--ink-2)] whitespace-pre-line">{openArticle.content}</div>
+              <ArticleBody lang={ms ? 'ms' : 'en'} text={(ms ? openArticle.contentMs : openArticle.content) ?? ''} />
+
+              {openArticle.localBurden && openArticle.localBurden.facts.length > 0 && (
+                <section className="border border-sky-200 bg-sky-50/60 p-4 space-y-2" aria-label={ms ? 'Angka di Malaysia' : 'Malaysia in numbers'}>
+                  <h3 className="text-sm font-bold text-[color:var(--ink)]">{ms ? 'Angka di Malaysia' : 'Malaysia in numbers'}</h3>
+                  <ul className="space-y-2 text-[13px] text-[color:var(--ink-2)] leading-relaxed">
+                    {openArticle.localBurden.facts.map((f, i) => (
+                      <li key={i}>
+                        {ms && f.textMs ? f.textMs : f.text}{' '}
+                        <a href={f.url} target="_blank" rel="noopener noreferrer" className="font-bold text-[color:var(--t-700)] hover:underline inline-flex items-center gap-1">{f.source} ({f.asOf}) <ExternalLink className="h-3 w-3" /></a>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
 
               {openArticle.source?.approvedAt && (
                 <p className="text-xs text-slate-600 flex items-center gap-1.5"><BadgeCheck className="h-3.5 w-3.5 text-[color:var(--e-600)]" /> Approved for this library by the medical board on {new Date(openArticle.source.approvedAt).toLocaleDateString()}.</p>

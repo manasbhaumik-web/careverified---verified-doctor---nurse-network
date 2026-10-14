@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { TestimonialForm } from './TestimonialPanels';
 import { AlertTriangle, LifeBuoy } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
 
@@ -135,6 +136,7 @@ export default function SupportDesk() {
         </section>
       </div>
       </div>
+      <TestimonialForm />
     </div>
   );
 }

@@ -179,6 +179,24 @@ async function main() {
     }
   }
 
+  // A labelled demo testimonial, so the home page section can be seen. It is shown as "Demo testimonial, not a real patient".
+  let mine = (await pat.call("GET", "/api/testimonials/mine")).data;
+  if (mine?.status === "success" && !mine.canWrite && !mine.data && profileId) {
+    // a testimonial needs a paid visit: make one (test mode payment)
+    const date = new Date(Date.now() + 30 * 86400_000).toISOString().slice(0, 10);
+    const bk = (await pat.call("POST", "/api/bookings", { professionalId: profileId, date, timeSlot: "11:30 AM", symptoms: "Demo visit for the testimonial" })).data?.data;
+    if (bk) {
+      const pay = (await pat.call("POST", "/api/payments/checkout", { kind: "booking", refId: bk.id })).data?.data;
+      if (pay) await pat.call("POST", `/api/payments/${pay.paymentId}/sandbox-confirm`);
+    }
+    mine = (await pat.call("GET", "/api/testimonials/mine")).data;
+  }
+  if (mine?.status === "success" && mine.canWrite && !mine.data) {
+    must("testimonial", await pat.call("POST", "/api/testimonials", { text: "Demo text: the doctor joined quickly and explained my results clearly, and the prescription reached my pharmacy the same day.", rating: 5, location: "Selangor", consent: true }));
+    const pending = (await admin.call("GET", "/api/admin/testimonials")).data?.data?.find((t: any) => t.status === "pending");
+    if (pending) must("approve testimonial", await admin.call("POST", `/api/admin/testimonials/${pending.id}/approve`, { demo: true }));
+  }
+
   console.log(`
 Demo data is ready at ${BASE}
 

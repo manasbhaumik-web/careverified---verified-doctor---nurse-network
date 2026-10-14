@@ -1,4 +1,5 @@
 import express from "express";
+import { registerTestimonials } from "./server/testimonials";
 import { registerJobsMy, readJobFields, salaryText, employerInfo, applyProblem, inferState } from "./server/jobsMy";
 import { registerTourism } from "./server/tourism";
 import { registerPharmacyMy } from "./server/pharmacyMy";
@@ -446,6 +447,17 @@ function ensureDemoData() {
 
 ensureDemoData();
 
+// Seed data added after a database was created: add what is missing, and rename the original demo registration numbers
+// (which looked like real MMC / Nursing Board numbers) so a demo profile can never be mistaken for a real practitioner.
+{
+  const RENAMED: Record<string, string> = Object.fromEntries(
+    ["MMC-87429", "MMC-32109", "MMC-55412", "MMC-99213", "LJM-RN-41223", "LJM-RN-11892", "LJM-RN-88314"].map(n => [n, "DEMO-" + n]),
+  );
+  for (const p of [...doctors, ...nurses] as any[]) if (RENAMED[p.licenseNumber]) { p.licenseNumber = RENAMED[p.licenseNumber]; p.isDemo = true; }
+  for (const d of INITIAL_DOCTORS) if (!doctors.some(x => x.id === d.id)) doctors.push(JSON.parse(JSON.stringify(d)));
+  for (const n of INITIAL_NURSES) if (!nurses.some(x => x.id === n.id)) nurses.push(JSON.parse(JSON.stringify(n)));
+}
+
 // Backfill regulator fields on profiles created before registry support
 for (const p of [...doctors, ...nurses] as any[]) {
   p.registryId ??= inferRegistryId(p.medicalCouncil ?? p.nursingCouncil);
@@ -677,6 +689,7 @@ app.post("/api/register-patient", (req, res) => {
 // Data subject rights: consents, access / correction / deletion requests, export
 registerPrivacyRoutes(app);
 registerPharmacyMy(app);
+registerTestimonials(app);
 registerJobsMy(app, { findProfessional, allProfessionals, jobs: () => jobs });
 registerTourism(app, { findProfessional, allProfessionals });
 registerDataOps(app, {
