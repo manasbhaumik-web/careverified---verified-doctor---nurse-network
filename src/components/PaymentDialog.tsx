@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle2, FlaskConical, Lock, X } from 'lucide-react';
+import { formatMoney } from '../locale';
 
 interface Props {
   kind: 'booking' | 'consult';
@@ -82,7 +83,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
               <FlaskConical className="h-4 w-4 shrink-0 mt-0.5" />
               <span>Test mode: no real payment is taken. A live payment provider has not been connected yet.</span>
             </div>
-            <p className="text-3xl font-black text-slate-900 tabular-nums">RM {amount.toFixed(2)}</p>
+            <p className="text-3xl font-black text-slate-900 tabular-nums">{formatMoney(amount)}</p>
             {error && <p className="text-xs font-bold text-rose-700">{error}</p>}
             <button onClick={confirmTest} className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-extrabold py-3 cursor-pointer">
               Confirm test payment
@@ -96,7 +97,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
             {invoice && (
               <dl className="text-xs grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 bg-slate-50 border border-slate-200 p-3">
                 <dt className="text-slate-500">Invoice</dt><dd className="font-mono font-bold">{invoice.invoiceNumber}</dd>
-                <dt className="text-slate-500">Amount</dt><dd className="font-bold">RM {Number(invoice.total).toFixed(2)}</dd>
+                <dt className="text-slate-500">Amount</dt><dd className="font-bold">{formatMoney(invoice.total)}</dd>
                 <dt className="text-slate-500">For</dt><dd>{invoice.description}</dd>
                 {invoice.testMode && (<><dt className="text-slate-500">Mode</dt><dd className="font-bold text-amber-700">Test payment</dd></>)}
               </dl>

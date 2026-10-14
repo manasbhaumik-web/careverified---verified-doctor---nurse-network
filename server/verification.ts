@@ -4,6 +4,7 @@ import { db } from "./db";
 import { audit } from "./audit";
 import { requireAuth, requireRole } from "./auth";
 import { VerificationStatus } from "../src/types";
+import { findRegistry, inferRegistryId, scopeFor } from "./registries";
 
 /**
  * Practitioner trust pipeline: review decisions with history, licence expiry and
@@ -112,6 +113,7 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
         verificationStatus: prof?.verificationStatus,
         requestId: request?.id,
         requestStatus: request?.status,
+        council: prof?.medicalCouncil ?? prof?.nursingCouncil ?? null,
         licenseExpiry: prof?.licenseExpiry ?? null,
         verifiedAt: prof?.verifiedAt ?? null,
         verifiedUntil: prof?.verifiedUntil ?? null,
@@ -229,6 +231,9 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
       request.registryCheck = { reference: registryReference, checkedAt: now.toISOString(), checkedBy: actor.id };
       prof.verificationStatus = VerificationStatus.VERIFIED;
       prof.verifiedAt = now.toISOString();
+      prof.registryId = findRegistry(prof.registryId)?.id ?? inferRegistryId(prof.medicalCouncil ?? prof.nursingCouncil);
+      prof.verificationScope = scopeFor(prof.registryId);
+      request.registryCheck.scope = prof.verificationScope;
       prof.verifiedUntil = addMonths(now, REVERIFY_MONTHS).toISOString().slice(0, 10);
       delete prof.suspensionReason;
       logEvent(request.id, prof.id, actor.id, "registry_checked", registryReference);
@@ -308,7 +313,7 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
     res.json({
       status: "success",
       data: {
-        verified: true, name: p.name, role: p.role, specialization: p.specialization,
+        verified: true, name: p.name, verificationScope: p.verificationScope ?? scopeFor(p.registryId ?? inferRegistryId(p.medicalCouncil ?? p.nursingCouncil)), registrationType: p.registrationType ?? "full", registryId: p.registryId ?? null, role: p.role, specialization: p.specialization,
         council: p.medicalCouncil ?? p.nursingCouncil, verifiedUntil: p.verifiedUntil ?? null,
       },
     });

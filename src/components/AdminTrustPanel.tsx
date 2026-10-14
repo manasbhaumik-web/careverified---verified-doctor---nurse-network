@@ -13,11 +13,19 @@ export function ReviewActions({ request, onDone }: { request: any; onDone: () =>
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [history, setHistory] = useState<any[]>([]);
+  const [registry, setRegistry] = useState<any>(null);
 
   useEffect(() => {
     fetch(`/api/verification-requests/${request.id}/history`).then(r => r.json())
       .then(d => setHistory(d.status === 'success' ? d.data : [])).catch(() => {});
   }, [request.id]);
+
+  useEffect(() => {
+    fetch('/api/registries').then(r => r.json()).then(d => {
+      const list: any[] = d.status === 'success' ? d.data.registries : [];
+      setRegistry(list.find(x => x.name === (request.medicalCouncil || request.nursingCouncil)) ?? list.find(x => x.id === 'OTHER') ?? null);
+    }).catch(() => {});
+  }, [request.medicalCouncil, request.nursingCouncil]);
 
   const decide = async (decision: 'approve' | 'reject' | 'request_info') => {
     setBusy(true);
@@ -52,6 +60,13 @@ export function ReviewActions({ request, onDone }: { request: any; onDone: () =>
 
       <div>
         <label className="text-[10px] font-black uppercase text-slate-600 block mb-1.5 tracking-wider">Council register check (required to approve)</label>
+        {registry && (
+          <p className="text-[11px] text-slate-600 font-semibold mb-1.5 bg-slate-50 border border-slate-200 p-2">
+            <b>{registry.name}</b>: {registry.lookup.note}
+            {registry.lookup.url && <> <a href={registry.lookup.url} target="_blank" rel="noopener noreferrer" className="underline text-[color:var(--t-600)]">Open register</a></>}
+            {registry.lookup.contact && <> · Contact: {registry.lookup.contact}</>}
+          </p>
+        )}
         <input className={field} value={registryReference} onChange={e => setRegistryReference(e.target.value)}
           placeholder="e.g. MMC online register, checked today, ref / URL" maxLength={200} />
       </div>

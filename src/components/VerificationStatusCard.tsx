@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { expiryLabel } from '../registries';
 import { AlertCircle, CheckCircle2, Clock, ShieldOff, Upload } from 'lucide-react';
 
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '—');
@@ -82,7 +83,7 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
                 : 'Pending: under review by the medical board'}
             </p>
             <p className="text-xs text-slate-600">
-              Licence expires {fmt(info.licenseExpiry)}{verified ? ` · re-verification due ${fmt(info.verifiedUntil)}` : ''}
+              {expiryLabel(info.council)}: {fmt(info.licenseExpiry)}{verified ? ` · re-verification due ${fmt(info.verifiedUntil)}` : ''}
               {dueSoon ? ' · renewal needed soon' : ''}
             </p>
             {suspended && info.suspensionReason && <p className="text-xs font-semibold text-rose-800 mt-0.5">Reason: {info.suspensionReason}</p>}

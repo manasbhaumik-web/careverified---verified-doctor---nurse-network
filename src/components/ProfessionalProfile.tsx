@@ -1,4 +1,5 @@
 import ReportPractitioner from './ReportPractitioner';
+import VerificationScopeBadge from './VerificationScopeBadge';
 import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, BadgeCheck, Stethoscope, Award, GraduationCap, MapPin, 
@@ -7,6 +8,7 @@ import {
 } from 'lucide-react';
 import { ConsultationMode, UserRole, Booking, Review } from '../types';
 import PaymentDialog from './PaymentDialog';
+import { formatMoney } from '../locale';
 
 interface ProfessionalProfileProps {
   professionalId: string;
@@ -300,6 +302,7 @@ export default function ProfessionalProfile({
               <div>
                 <span className="text-[10px] font-bold text-emerald-900 uppercase block tracking-wider">Council Accreditation</span>
                 <p className="text-xs font-semibold text-slate-800 mt-0.5">{prof.medicalCouncil || (prof as any).nursingCouncil}</p>
+                <VerificationScopeBadge prof={prof as any} className="mt-1" />
               </div>
               <div>
                 <span className="text-[10px] font-bold text-emerald-900 uppercase block tracking-wider">Annual Practising Certificate</span>
@@ -666,7 +669,7 @@ export default function ProfessionalProfile({
                   disabled={bookingLoading || !bookingDate || !bookingSlot}
                   className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white h-12 text-xs font-bold shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
-                  {bookingLoading ? "Securing appointment slot…" : `Confirm & Pay RM ${prof.fee}`}
+                  {bookingLoading ? "Securing appointment slot…" : `Confirm & Pay ${formatMoney(prof.fee)}`}
                 </button>
               </form>
             )}

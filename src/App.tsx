@@ -22,6 +22,8 @@ import SEODashboard from './components/SEODashboard';
 import AdminDashboard from './components/AdminDashboard';
 import NotificationBell from './components/NotificationBell';
 import ThemeSwitcher from './components/ThemeSwitcher';
+import LocaleSwitcher from './components/LocaleSwitcher';
+import { useLocale } from './locale';
 import SOSButton from './components/SOSButton';
 import SupportDesk from './components/SupportDesk';
 import PractitionerQuality from './components/PractitionerQuality';
@@ -40,6 +42,7 @@ import { INITIAL_DOCTORS, INITIAL_NURSES, INITIAL_JOBS, INITIAL_ARTICLES, INITIA
 import PageBanner from './components/PageBanner';
 
 export default function App() {
+  useLocale(); // re-render the tree when language/region changes
   // Navigation & View State
   const [activeView, setActiveView] = useState<'registry' | 'profile' | 'onboard' | 'recruitment' | 'messages' | 'admin' | 'seo' | 'articles' | 'patient_dashboard' | string>('patient_dashboard');
   useEffect(() => {
@@ -380,6 +383,7 @@ export default function App() {
               <span>Board-verified practitioners</span>
             </div>
 
+            <LocaleSwitcher tone="onColor" />
             <ThemeSwitcher tone="onColor" />
             <div className="flex items-center gap-3 border-l border-white/30 pl-5">
               {currentUser.role === 'patient' && <SOSButton />}
@@ -472,7 +476,7 @@ export default function App() {
 
                 <div className="flex items-center justify-between px-1 pt-3 mt-3 border-t border-[color:var(--t-200)]">
                   <span className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--ink-2)]">Settings</span>
-                  <ThemeSwitcher />
+                  <span className="flex items-center gap-2"><LocaleSwitcher /><ThemeSwitcher /></span>
                 </div>
                 <div className="pt-3 mt-3 border-t border-[color:var(--t-200)] flex items-center justify-between gap-3 px-1">
                   <div className="flex items-center gap-2.5 min-w-0">

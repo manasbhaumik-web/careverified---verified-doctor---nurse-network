@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrendingUp, Star } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking, OnCallDispatch, ConsultationMode } from '../../types';
+import { formatMoney } from '../../locale';
 
 interface PractitionerAnalyticsTabProps {
   matchedProfile: DoctorProfile | NurseProfile;
@@ -33,7 +34,7 @@ export default function PractitionerAnalyticsTab({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
           <span className="text-[13px] font-semibold text-[color:var(--ink-2)] block">Generated Income</span>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">RM {totalEarnings.toLocaleString()}</span>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{formatMoney(totalEarnings)}</span>
           <p className="text-xs text-emerald-600 font-bold flex items-center gap-0.5">
             <TrendingUp className="h-3 w-3" />
             <span>100% practitioner distribution</span>
@@ -72,7 +73,7 @@ export default function PractitionerAnalyticsTab({
         <div className="space-y-3 max-w-xl text-xs font-bold text-slate-700">
           <div>
             <div className="flex justify-between mb-1">
-              <span>Video Telehealth Booking (RM {videoEarned})</span>
+              <span>Video Telehealth Booking ({formatMoney(videoEarned)})</span>
               <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((videoEarned / totalEarnings) * 100) : 0}%</span>
             </div>
             <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
@@ -82,7 +83,7 @@ export default function PractitionerAnalyticsTab({
 
           <div>
             <div className="flex justify-between mb-1">
-              <span>In-Person Clinic consultations (RM {inPersonEarned})</span>
+              <span>In-Person Clinic consultations ({formatMoney(inPersonEarned)})</span>
               <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((inPersonEarned / totalEarnings) * 100) : 0}%</span>
             </div>
             <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
@@ -92,7 +93,7 @@ export default function PractitionerAnalyticsTab({
 
           <div>
             <div className="flex justify-between mb-1">
-              <span>Urgent On-Call Ambulance Dispatches (RM {totalDispatchesEarned})</span>
+              <span>Urgent On-Call Ambulance Dispatches ({formatMoney(totalDispatchesEarned)})</span>
               <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((totalDispatchesEarned / totalEarnings) * 100) : 0}%</span>
             </div>
             <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
@@ -127,7 +128,7 @@ export default function PractitionerAnalyticsTab({
                   <td className="py-3 text-slate-700">{b.mode}</td>
                   <td className="py-3 font-semibold max-w-[200px] truncate">{b.prescription?.diagnosis}</td>
                   <td className="py-3 font-mono tabular-nums">{b.date}</td>
-                  <td className="py-3 text-right font-mono tabular-nums font-bold text-slate-900">RM {b.fee}</td>
+                  <td className="py-3 text-right font-mono tabular-nums font-bold text-slate-900">{formatMoney(b.fee)}</td>
                 </tr>
               ))}
               {completedDispatches.map(d => (

@@ -1,4 +1,5 @@
 import DashboardHeader from './DashboardHeader';
+import { expiryLabel } from '../registries';
 import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, UserCheck, Check, X, ShieldAlert, Award, FileText, 
@@ -589,7 +590,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
               </div>
             </div>
 
-            <p className="mt-4 text-xs text-slate-600 font-semibold">Licence expiry on file: <strong className="font-mono">{professionals.find(p => p.id === selectedModalRequest.userId)?.licenseExpiry || 'none'}</strong></p>
+            <p className="mt-4 text-xs text-slate-600 font-semibold">{expiryLabel(selectedModalRequest.medicalCouncil)} on file: <strong className="font-mono">{professionals.find(p => p.id === selectedModalRequest.userId)?.licenseExpiry || 'none'}</strong></p>
             <ReviewActions request={selectedModalRequest} onDone={handleDecisionDone} />
             <div className="mt-3 flex justify-end">
               <button

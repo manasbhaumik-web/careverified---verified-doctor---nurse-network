@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Siren } from 'lucide-react';
+import { formatMoney } from '../locale';
 
 const post = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -135,7 +136,7 @@ export default function AdminOps() {
       <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-sm font-extrabold">Payments</h3>
-          {payments && <p className="text-xs font-bold">Mode: {payments.mode ?? 'not configured'} · Gross RM {payments.totals.gross.toFixed(2)} · Platform fee RM {payments.totals.platformFee.toFixed(2)}</p>}
+          {payments && <p className="text-xs font-bold">Mode: {payments.mode ?? 'not configured'} · Gross {formatMoney(payments.totals.gross)} · Platform fee {formatMoney(payments.totals.platformFee)}</p>}
         </div>
         {payments?.mode === 'sandbox' && <p className="text-xs bg-amber-50 border border-amber-200 text-amber-900 font-semibold p-2">Test mode: set STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET to take real payments.</p>}
         {payments && (
@@ -148,7 +149,7 @@ export default function AdminOps() {
                     <td className="py-2 pr-3">{new Date(p.created_at).toLocaleString()}</td>
                     <td className="pr-3">{p.patientName}</td>
                     <td className="pr-3">{p.description}</td>
-                    <td className="pr-3 tabular-nums">RM {(p.amount_sen / 100).toFixed(2)}</td>
+                    <td className="pr-3 tabular-nums">{formatMoney(p.amount_sen, { fromMinor: true })}</td>
                     <td className="pr-3 font-bold">{p.status}{p.provider === 'sandbox' ? ' (test)' : ''}</td>
                     <td>{p.status === 'paid' && <button onClick={() => refund(p.id)} className="font-bold text-rose-700 cursor-pointer">Refund</button>}</td>
                   </tr>

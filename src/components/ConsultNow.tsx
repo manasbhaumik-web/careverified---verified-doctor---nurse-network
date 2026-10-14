@@ -3,6 +3,7 @@ import { AlertTriangle, MessageSquare, Video, CreditCard, UserCheck, Lock } from
 import PaymentDialog from './PaymentDialog';
 import ConsultRoom from './ConsultRoom';
 import DashboardHeader, { BannerKpis } from './DashboardHeader';
+import { formatMoney, formatDateTime } from '../locale';
 
 const jpost = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -97,7 +98,7 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
         actions={
           <BannerKpis items={[
             { value: status ? status.onlineDoctors : '—', label: 'Doctors online' },
-            { value: status ? `RM ${status.consultFee.toFixed(0)}` : '—', label: 'Per consult' },
+            { value: status ? formatMoney(status.consultFee, { decimals: 0 }) : '—', label: 'Per consult' },
             { value: '10 min', label: 'Refund if unmatched' },
           ]} />
         }
@@ -141,7 +142,7 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
               <p className="text-xs text-[color:var(--ink-2)]">Lock in your consultation slot with an on-call physician.</p>
               <div className="flex items-center gap-3 pt-1">
                 <button onClick={() => setPaying(open.id)} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white h-12 text-xs font-extrabold px-6 cursor-pointer transition-colors shadow-xs">
-                  Pay RM {open.fee.toFixed(2)}
+                  Pay {formatMoney(open.fee)}
                 </button>
                 <button onClick={() => cancel(open.id)} className="h-12 text-xs font-bold border border-slate-300 hover:bg-slate-50 px-5 cursor-pointer transition-colors">
                   Cancel request
@@ -216,7 +217,7 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
               <ul className="divide-y divide-slate-100 text-xs">
                 {past.map(c => (
                   <li key={c.id} className="py-2 flex justify-between gap-3">
-                    <span>{new Date(c.createdAt).toLocaleString()} · {c.mode}{c.professional ? ` · ${c.professional.name}` : ''}</span>
+                    <span>{formatDateTime(c.createdAt)} · {c.mode}{c.professional ? ` · ${c.professional.name}` : ''}</span>
                     <span className="font-bold text-right">{STATUS_TEXT[c.status] ?? c.status}</span>
                   </li>
                 ))}

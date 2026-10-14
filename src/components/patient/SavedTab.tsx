@@ -4,6 +4,7 @@ import {
   Heart, Trash2, Stethoscope, MapPin, Star, ShieldCheck, MessageSquare, CalendarRange, CheckCircle2, Search
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, UserRole } from '../../types';
+import { formatMoney } from '../../locale';
 
 interface SavedTabProps {
   savedProfessionals: (DoctorProfile | NurseProfile)[];
@@ -138,7 +139,7 @@ export default function SavedTab({
                         <span className="text-slate-400 font-medium text-[11px]">({p.reviewCount})</span>
                       </div>
                       <span className="text-xs font-mono font-bold text-[color:var(--t-700)] bg-white border border-[color:var(--t-200)] px-2 py-0.5 shadow-2xs">
-                        RM {p.fee}/consult
+                        {formatMoney(p.fee)}/consult
                       </span>
                     </div>
                   </div>

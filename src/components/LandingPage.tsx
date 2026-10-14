@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import VerificationScopeBadge from './VerificationScopeBadge';
 import ThemeSwitcher from './ThemeSwitcher';
+import LocaleSwitcher from './LocaleSwitcher';
 import { motion, AnimatePresence, useInView } from 'motion/react';
 import {
   ShieldCheck, Search, CheckCircle2, RefreshCw, Heart,
@@ -819,6 +821,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               Access Portal
               <ArrowRight className="h-4 w-4" />
             </a>
+            <LocaleSwitcher />
             <ThemeSwitcher />
           </div>
         </div>
@@ -1327,7 +1330,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                                         </div>
                                         <div className="min-w-0">
                                           <dt className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Statutory Council</dt>
-                                          <dd className="mt-0.5 font-bold text-[color:var(--ink)] break-words">{council}</dd>
+                                          <dd className="mt-0.5 font-bold text-[color:var(--ink)] break-words">{council}<VerificationScopeBadge prof={p as any} className="ml-2 align-middle" /></dd>
                                         </div>
                                         <div>
                                           <dt className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Practice Clearance</dt>

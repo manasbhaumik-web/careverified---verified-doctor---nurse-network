@@ -27,6 +27,10 @@ export interface DoctorProfile {
   specialization: string;
   licenseNumber: string;
   medicalCouncil: string;
+  registryId?: "MMC" | "LJM" | "MDC" | "PHARMACY_BOARD" | "FACILITY_586" | "OTHER";
+  registrationType?: "full" | "provisional" | "specialist";
+  specialistRegNo?: string;
+  verificationScope?: "verified-in-malaysia" | "verified-abroad";
   licenseExpiry?: string;
   verifiedAt?: string;
   verifiedUntil?: string;
@@ -58,6 +62,10 @@ export interface NurseProfile {
   specialization: string; // e.g. "ICU Care", "Geriatric Care", "Pediatrics"
   licenseNumber: string;
   nursingCouncil: string;
+  registryId?: "MMC" | "LJM" | "MDC" | "PHARMACY_BOARD" | "FACILITY_586" | "OTHER";
+  registrationType?: "full" | "provisional" | "specialist";
+  specialistRegNo?: string;
+  verificationScope?: "verified-in-malaysia" | "verified-abroad";
   licenseExpiry?: string;
   verifiedAt?: string;
   verifiedUntil?: string;

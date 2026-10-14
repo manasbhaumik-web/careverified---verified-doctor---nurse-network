@@ -14,6 +14,8 @@ import { registerClinicalRoutes, createGrant, seedHealthItems, sign, rxPayload }
 import { registerPharmacyWorkspace } from "./server/pharmacy";
 import { registerLiteratureRoutes, approvedLiteratureArticles } from "./server/literature";
 import { registerQualityRoutes, accountForChatId, isBlocked } from "./server/quality";
+import { integrationStatus } from "./server/registryProviders";
+import { findRegistry, inferRegistryId, scopeFor, REGISTRIES, REGISTRATION_TYPES } from "./server/registries";
 import { registerVerificationRoutes, notifyAdmins, notify } from "./server/verification";
 import { registerPaymentRoutes, registerPaymentWebhook, setPaymentHandlers, refundPayment } from "./server/payments";
 import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
@@ -436,6 +438,13 @@ function ensureDemoData() {
 
 ensureDemoData();
 
+// Backfill regulator fields on profiles created before registry support
+for (const p of [...doctors, ...nurses] as any[]) {
+  p.registryId ??= inferRegistryId(p.medicalCouncil ?? p.nursingCouncil);
+  p.registrationType ??= "full";
+  if (p.verificationStatus === VerificationStatus.VERIFIED) p.verificationScope ??= scopeFor(p.registryId);
+}
+
 const persistState = () =>
   saveCollections({ doctors, nurses, verificationRequests, reviews, jobs, bookings, chats, patients, appPackages });
 persistState();
@@ -686,6 +695,10 @@ app.get("/api/professionals/:id", (req, res) => {
   res.json({ status: "success", data: prof });
 });
 
+app.get("/api/admin/registry-integrations", requireRole("admin"), (_req, res) => res.json({ status: "success", data: integrationStatus() }));
+
+app.get("/api/registries", (_req, res) => res.json({ status: "success", data: { registries: REGISTRIES, registrationTypes: REGISTRATION_TYPES } }));
+
 // Submit practitioner profile + licence details for verification (one profile per account)
 app.post("/api/register", requireRole("practitioner"), (req, res) => {
   const user = req.user!;
@@ -695,7 +708,17 @@ app.post("/api/register", requireRole("practitioner"), (req, res) => {
   const name = str(req.body.name, 100);
   const specialization = str(req.body.specialization, 100);
   const licenseNumber = str(req.body.licenseNumber, 50);
-  const medicalCouncil = str(req.body.medicalCouncil, 100);
+  const registryId = findRegistry(req.body.registryId)?.id ?? inferRegistryId(str(req.body.medicalCouncil, 100));
+  const registry = findRegistry(registryId)!;
+  if (!registry.roles.includes(req.body.role === UserRole.NURSE ? "nurse" : "doctor")) {
+    return fail(res, 400, "That regulator does not register this type of practitioner.");
+  }
+  const registrationType = REGISTRATION_TYPES.includes(req.body.registrationType) ? req.body.registrationType : "full";
+  if (registrationType === "specialist" && !registry.supportsSpecialist) return fail(res, 400, "This regulator has no specialist register.");
+  const specialistRegNo = str(req.body.specialistRegNo, 50);
+  if (registrationType === "specialist" && !specialistRegNo) return fail(res, 400, "Enter your specialist register number.");
+  // Malaysian regulators use the canonical name; other countries are free text (e.g. "General Medical Council (UK)")
+  const medicalCouncil = registry.id === "OTHER" ? str(req.body.medicalCouncil, 100) : registry.name;
   const city = str(req.body.city, 80);
   const practiceAddress = str(req.body.practiceAddress, 250);
   const { experienceYears, education, bio, languages, consultationModes, fee, shiftTypes, avatar } = req.body;
@@ -727,6 +750,9 @@ app.post("/api/register", requireRole("practitioner"), (req, res) => {
       licenseNumber,
       licenseExpiry,
       medicalCouncil,
+      registryId,
+      registrationType,
+      specialistRegNo: specialistRegNo || undefined,
       experienceYears: Number(experienceYears) || 1,
       education: educationList,
       bio: str(bio, 1000) || "Licensed medical practitioner.",
@@ -754,6 +780,9 @@ app.post("/api/register", requireRole("practitioner"), (req, res) => {
       licenseNumber,
       licenseExpiry,
       nursingCouncil: medicalCouncil,
+      registryId,
+      registrationType,
+      specialistRegNo: specialistRegNo || undefined,
       experienceYears: Number(experienceYears) || 1,
       education: educationList,
       bio: str(bio, 1000) || "Licensed care professional.",

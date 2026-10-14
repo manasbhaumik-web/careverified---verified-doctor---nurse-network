@@ -1,4 +1,5 @@
 import VerificationStatusCard from './VerificationStatusCard';
+import { expiryLabel } from '../registries';
 import ClinicalWorkspace from './ClinicalWorkspace';
 import React, { useState, useEffect } from 'react';
 import { 
@@ -89,6 +90,9 @@ export default function VerificationTerminal({
   const [licenseNumber, setLicenseNumber] = useState('');
   const [licenseExpiry, setLicenseExpiry] = useState('');
   const [medicalCouncil, setMedicalCouncil] = useState('Malaysian Medical Council (MMC)');
+  const [registryId, setRegistryId] = useState<string>('MMC');
+  const [registrationType, setRegistrationType] = useState<string>('full');
+  const [specialistRegNo, setSpecialistRegNo] = useState('');
   const [experienceYears, setExperienceYears] = useState('');
   const [education, setEducation] = useState('');
   const [bio, setBio] = useState('');
@@ -159,6 +163,9 @@ export default function VerificationTerminal({
           licenseNumber,
           licenseExpiry,
           medicalCouncil,
+          registryId,
+          registrationType,
+          specialistRegNo,
           experienceYears: Number(experienceYears),
           education: [education],
           bio,
@@ -773,6 +780,8 @@ export default function VerificationTerminal({
                   setRole(e.target.value as any);
                   setSpecialization(e.target.value === UserRole.DOCTOR ? 'Cardiologist' : 'ICU & Critical Care');
                   setMedicalCouncil(e.target.value === UserRole.DOCTOR ? 'Malaysian Medical Council (MMC)' : 'Malaysian Nursing Board (LJM)');
+                  setRegistryId(e.target.value === UserRole.DOCTOR ? 'MMC' : 'LJM');
+                  setRegistrationType('full');
                 }}
                 className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-extrabold text-slate-700"
               >
@@ -853,16 +862,31 @@ export default function VerificationTerminal({
                 {role === UserRole.DOCTOR ? "Medical Council Registry" : "Nursing Council Registry"}
               </label>
               <select
-                value={medicalCouncil}
-                onChange={(e) => setMedicalCouncil(e.target.value)}
+                value={registryId}
+                onChange={(e) => {
+                  setRegistryId(e.target.value);
+                  if (e.target.value === "MMC") setMedicalCouncil("Malaysian Medical Council (MMC)");
+                  else if (e.target.value === "LJM") setMedicalCouncil("Malaysian Nursing Board (LJM)");
+                  else setMedicalCouncil("");
+                  if (e.target.value === "LJM") setRegistrationType("full");
+                }}
                 className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
               >
-                {role === UserRole.DOCTOR ? (
-                  <option value="Malaysian Medical Council (MMC)">Malaysian Medical Council (MMC)</option>
-                ) : (
-                  <option value="Malaysian Nursing Board (LJM)">Malaysian Nursing Board (LJM)</option>
-                )}
+                {role === UserRole.DOCTOR ? <option value="MMC">Malaysian Medical Council (MMC)</option> : <option value="LJM">Malaysian Nursing Board (LJM)</option>}
+                <option value="OTHER">Another country's regulator (international)</option>
               </select>
+              {registryId === "OTHER" && (
+                <input type="text" required maxLength={100} placeholder="Regulator name and country, e.g. General Medical Council (UK)" value={medicalCouncil} onChange={(e) => setMedicalCouncil(e.target.value)} className="mt-2 w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-800" />
+              )}
+              <label className="block text-xs font-bold text-slate-600 mt-3 mb-1">Registration type</label>
+              <select value={registrationType} onChange={(e) => setRegistrationType(e.target.value)} className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705">
+                <option value="full">Full registration</option>
+                <option value="provisional">Provisional registration</option>
+                {registryId !== "LJM" && <option value="specialist">Specialist register</option>}
+              </select>
+              {registrationType === "specialist" && (
+                <input type="text" required maxLength={50} placeholder="Specialist register number" value={specialistRegNo} onChange={(e) => setSpecialistRegNo(e.target.value)} className="mt-2 w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-mono font-bold text-slate-800" />
+              )}
             </div>
 
             <div>
@@ -878,7 +902,7 @@ export default function VerificationTerminal({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Licence expiry date</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1">{expiryLabel(medicalCouncil)} date</label>
               <input
                 type="date"
                 min={new Date(Date.now() + 86400_000).toISOString().slice(0, 10)}

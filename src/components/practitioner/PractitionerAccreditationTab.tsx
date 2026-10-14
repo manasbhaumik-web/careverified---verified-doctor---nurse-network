@@ -1,6 +1,7 @@
 ﻿import React from 'react';
 import { Award, CheckCircle2, Loader, AlertCircle, MapPin, DollarSign } from 'lucide-react';
 import { DoctorProfile, NurseProfile } from '../../types';
+import { formatMoney } from '../../locale';
 
 interface PractitionerAccreditationTabProps {
   matchedProfile: DoctorProfile | NurseProfile;
@@ -125,7 +126,7 @@ export default function PractitionerAccreditationTab({
               <DollarSign className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
               <span>
                 <strong className="text-slate-800 font-extrabold block">Base Co-Pay Fee:</strong>
-                {isDoc ? `RM ${matchedProfile.fee} per consult` : `RM ${matchedProfile.fee} per hour`}
+                {isDoc ? `${formatMoney(matchedProfile.fee)} per consult` : `${formatMoney(matchedProfile.fee)} per hour`}
               </span>
             </p>
           </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import VerificationScopeBadge from './VerificationScopeBadge';
 import {
   Search, MapPin, Stethoscope, Clock,
   HeartPulse, UserCheck, Star, LayoutGrid, List, X, Globe, Activity,
@@ -123,7 +124,7 @@ export default function SearchHub({
           <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[color:var(--e-800)] bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-2 py-1">
             <Check className="h-3 w-3 text-[color:var(--e-600)]" /> {council} verified
           </span>
-          <span className="text-[11px] font-semibold text-[color:var(--ink-2)] bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-1">{prof.licenseNumber}</span>
+          <span className="text-[11px] font-semibold text-[color:var(--ink-2)] bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-1">{prof.licenseNumber}</span><VerificationScopeBadge prof={prof as any} className="self-center" />
           <span className="text-[11px] font-semibold text-[color:var(--ink-2)] bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-1">{prof.experienceYears} yrs experience</span>
         </div>
 

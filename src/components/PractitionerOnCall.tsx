@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import ConsultRoom from './ConsultRoom';
+import { formatMoney } from '../locale';
 
 const jpost = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -88,7 +89,7 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
 
   const dayCount = (d: number) => Array.from({ length: 24 }, (_, h) => roster.has(`${d}-${h}`)).filter(Boolean).length;
   const coveredHours = Array.from({ length: 24 }, (_, h) => DAYS.some((_, d) => roster.has(`${d}-${h}`))).filter(Boolean).length;
-  const fmtRM = (v?: number) => `RM ${(v ?? 0).toFixed(2)}`;
+  const fmtRM = (v?: number) => formatMoney(v ?? 0);
 
   return (
     <div className="space-y-5 w-full">
@@ -151,7 +152,7 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
                   <p className="text-sm font-semibold text-[color:var(--ink)] leading-snug line-clamp-3">"{o.symptoms}"</p>
                   <div className="text-[11px] font-mono text-slate-600 border-t border-[color:var(--t-100)] pt-2 space-y-0.5">
                     <p><b className="text-[color:var(--ink)]">{o.patientFirstName}</b> · {o.mode.toUpperCase()}</p>
-                    <p>Queued: {new Date(o.queuedAt).toLocaleTimeString()} · Payout: <b className="text-[color:var(--t-700)]">RM {o.fee.toFixed(2)}</b></p>
+                    <p>Queued: {new Date(o.queuedAt).toLocaleTimeString()} · Payout: <b className="text-[color:var(--t-700)]">{formatMoney(o.fee)}</b></p>
                   </div>
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <button onClick={() => accept(o.id)} className="h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer transition-colors shadow-2xs">Accept Consult</button>
@@ -220,7 +221,7 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
                 {earnings.rows.slice(0, 10).map((r: any) => (
                   <li key={r.id} className="py-2 flex justify-between gap-3">
                     <span>{r.description}{r.testMode ? ' (test)' : ''}</span>
-                    <span className={`font-bold tabular-nums ${r.status === 'refunded' ? 'text-slate-400 line-through' : ''}`}>RM {r.net.toFixed(2)}</span>
+                    <span className={`font-bold tabular-nums ${r.status === 'refunded' ? 'text-slate-400 line-through' : ''}`}>{formatMoney(r.net)}</span>
                   </li>
                 ))}
               </ul>

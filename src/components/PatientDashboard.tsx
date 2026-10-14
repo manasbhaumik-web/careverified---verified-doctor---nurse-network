@@ -11,6 +11,7 @@ import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, ba
 import PatientRecords, { RecordSubTab } from './PatientRecords';
 import SavedTab from './patient/SavedTab';
 import PaymentDialog from './PaymentDialog';
+import { formatMoney, formatDate } from '../locale';
 
 interface PatientDashboardProps {
   bookings: Booking[];
@@ -67,7 +68,7 @@ const fmtDate = (iso?: string | null) => {
   if (!iso) return '';
   try {
     const d = new Date(iso);
-    return d.toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+    return formatDate(d, { day: 'numeric', month: 'short', year: 'numeric' });
   } catch {
     return iso;
   }
@@ -344,7 +345,7 @@ export default function PatientDashboard({
               <p className={`text-[11px] font-medium mt-0.5 ${activeConsult.status === 'active' ? 'text-emerald-100' : 'text-slate-600'}`}>
                 {activeConsult.status === 'active' && 'A licensed physician is waiting in the encrypted WebRTC consultation room.'}
                 {activeConsult.status === 'queued' && 'Consultation payment confirmed. Keep window open. A doctor will connect within 10 min or refund automatically.'}
-                {activeConsult.status === 'awaiting_payment' && `Fee: RM ${activeConsult.fee?.toFixed(2) || '50.00'} · Complete payment to be matched with on-call doctor.`}
+                {activeConsult.status === 'awaiting_payment' && `Fee: ${formatMoney(activeConsult.fee || 50)} · Complete payment to be matched with on-call doctor.`}
               </p>
             </div>
           </div>
@@ -582,7 +583,7 @@ export default function PatientDashboard({
                             </span>
                             <span className="text-slate-300">&bull;</span>
                             <span className="font-mono font-bold text-[color:var(--t-700)]">
-                              RM {b.fee.toFixed(2)}
+                              {formatMoney(b.fee)}
                             </span>
                           </div>
 
@@ -603,7 +604,7 @@ export default function PatientDashboard({
                             onClick={() => setPaying(b)}
                             className="min-h-[40px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
                           >
-                            <span>Pay RM {b.fee.toFixed(2)}</span>
+                            <span>Pay {formatMoney(b.fee)}</span>
                             <ArrowRight className="h-3.5 w-3.5" />
                           </button>
                         ) : (
@@ -1293,7 +1294,7 @@ export default function PatientDashboard({
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-slate-500">Consultation Fee:</span>
-                          <span className="font-mono font-extrabold text-[color:var(--ink)]">RM {prof.fee ? prof.fee.toFixed(2) : '80.00'}</span>
+                          <span className="font-mono font-extrabold text-[color:var(--ink)]">{formatMoney(prof.fee || 80)}</span>
                         </div>
                       </div>
                     </div>
