@@ -626,7 +626,7 @@ export default function PatientDashboard({
                         <button
                           type="button"
                           onClick={() => cancelBooking(b)}
-                          className="min-h-[40px] px-3 text-xs font-semibold text-slate-400 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
+                          className="min-h-[40px] px-3 text-xs font-semibold text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
                           title="Cancel appointment"
                         >
                           Cancel
@@ -1110,7 +1110,7 @@ export default function PatientDashboard({
                                   <Send className="h-3 w-3" /> Dispatch to Pharmacy
                                 </button>
                               )}
-                              <p className="text-[10px] font-mono text-slate-400 mt-1">
+                              <p className="text-[10px] font-mono text-slate-600 mt-1">
                                 Valid until: {fmtDate(rx.validUntil)}
                               </p>
                             </div>

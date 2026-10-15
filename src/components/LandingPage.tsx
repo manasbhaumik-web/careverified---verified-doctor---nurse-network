@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocale, useT } from '../locale';
 import { HERO_TR } from '../locale/landing';
+import PatientAccess from './PatientAccess';
 import { openLegal } from '../legal';
 import VerificationScopeBadge from './VerificationScopeBadge';
 import ThemeSwitcher from './ThemeSwitcher';
@@ -1075,6 +1076,8 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
 
       {/* ═══════════ MAIN CONTENT ═══════════ */}
       <main id="main-content" className="flex-grow w-full">
+
+        <PatientAccess />
 
         {/* ─── SECTION 3: STATUTORY GOVERNANCE & LIVE PRACTITIONER LICENCE VERIFICATION ─── */}
         <section id="verify-section" aria-label="Statutory governance and licence verification" className="relative overflow-hidden bg-white border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">

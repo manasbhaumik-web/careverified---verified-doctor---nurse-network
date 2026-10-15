@@ -86,7 +86,6 @@ export default function DashboardHeader<T extends string>({
                 type="button"
                 role="tab"
                 id={`tab-${tab.id}`}
-                aria-controls={`panel-${tab.id}`}
                 aria-selected={selected}
                 tabIndex={selected ? 0 : -1}
                 onClick={() => onTabChange?.(tab.id)}

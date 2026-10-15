@@ -4,8 +4,8 @@ import { Settings, Check } from 'lucide-react';
 export type ThemeName = 'crimson' | 'sky' | 'cyan' | 'navy';
 
 const THEMES: { id: ThemeName; label: string; swatch: string }[] = [
-  { id: 'crimson', label: 'Crimson Red', swatch: '#DC2626' },
-  { id: 'sky', label: 'Sky Blue', swatch: '#0284C7' },
+  { id: 'crimson', label: 'Crimson Red', swatch: '#C81E1E' },
+  { id: 'sky', label: 'Sky Blue', swatch: '#0270A9' },
   { id: 'cyan', label: 'Bright Cyan', swatch: '#00E5FF' },
   { id: 'navy', label: 'Dark Navy Blue', swatch: '#0A1128' },
 ];
@@ -24,7 +24,7 @@ function readTheme(): ThemeName {
 function applyTheme(theme: ThemeName) {
   document.documentElement.setAttribute('data-theme', theme);
   const color = THEMES.find(t => t.id === theme)?.swatch;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color || '#0284C7');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color || '#0270A9');
 }
 
 interface Props {

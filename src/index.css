@@ -242,6 +242,15 @@ footer a,
   color: var(--t-100) !important;
 }
 
+/* Footer labels: the slate-400/500 and brand-blue text classes are too dim on the dark band (contrast under 4.5:1) */
+.app-dark-footer .text-slate-400,
+.app-dark-footer .text-slate-500 {
+  color: var(--t-200) !important;
+}
+.app-dark-footer button[class*="--t-600"] {
+  color: #FFFFFF !important;
+}
+
 footer a:hover,
 .app-dark-footer a:hover {
   color: #FFFFFF !important;
@@ -268,7 +277,7 @@ footer button.bg-slate-800:hover,
   --e-50: #ECFDF5; --e-200: #A7F3D0; --e-600: #059669; --e-700: #047857; --e-800: #065F46;
   --dark: #0F172A;
   --t-50: #F0F9FF; --t-100: #E0F2FE; --t-200: #BAE6FD; --t-300: #7DD3FC; --t-400: #38BDF8;
-  --t-500: #0EA5E9; --t-600: #0284C7; --t-700: #0369A1; --t-800: #075985; --t-900: #0C4A6E;
+  --t-500: #0EA5E9; --t-600: #0270A9; --t-700: #0369A1; --t-800: #075985; --t-900: #0C4A6E;
   --t-bg: #F5FAFF; --t-hue: 205deg;
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
   /* Brand colour for small text and for fills behind white text in the content sections */
@@ -278,7 +287,7 @@ footer button.bg-slate-800:hover,
 
 :root[data-theme="crimson"] {
   --t-50: #FFF0F2; --t-100: #FFE4E6; --t-200: #FECDD3; --t-300: #FDA4AF; --t-400: #FF8A98;
-  --t-500: #E0243F; --t-600: #DC2626; --t-700: #B91C1C; --t-800: #86102A; --t-900: #6B0F24;
+  --t-500: #E0243F; --t-600: #C81E1E; --t-700: #B91C1C; --t-800: #86102A; --t-900: #6B0F24;
   --t-bg: #FFF8F9; --t-hue: 0deg;
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
 }
