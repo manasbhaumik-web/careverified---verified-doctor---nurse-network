@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { MACROS, MACRO_LANGS, fillMacro, type MacroLang, type SupportHours } from '../supportMy';
 
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -37,6 +38,9 @@ function Support({ say }: { say: (t: string) => void }) {
   const [view, setView] = useState<'active' | 'resolved'>('active');
   const [open, setOpen] = useState<any | null>(null);
   const [reply, setReply] = useState('');
+  const [macroLang, setMacroLang] = useState<MacroLang>('en');
+  const [hoursCfg, setHoursCfg] = useState<SupportHours | undefined>(undefined);
+  useEffect(() => { fetch('/api/support/hours').then(r => r.json()).then(d => d.status === 'success' && setHoursCfg(d.data.hours)).catch(() => {}); }, []);
   const load = useCallback(() => fetch(`/api/admin/support/tickets?status=${view}`).then(r => r.json()).then(d => d.status === 'success' && setData(d.data)), [view]);
   useEffect(() => { load(); const t = setInterval(load, 20000); return () => clearInterval(t); }, [load]);
   const openT = async (id: string) => { const d = await fetch(`/api/support/tickets/${id}`).then(r => r.json()); if (d.status === 'success') setOpen(d.data); };
@@ -64,7 +68,15 @@ function Support({ say }: { say: (t: string) => void }) {
                 <select aria-label="Priority" className="border border-slate-200 text-xs px-2 h-fit" value={open.priority} onChange={async e => { await jreq(`/api/admin/support/tickets/${open.id}/priority`, 'POST', { priority: e.target.value }); openT(open.id); load(); }}>
                   {['urgent', 'high', 'normal', 'low'].map(p => <option key={p}>{p}</option>)}</select></div>
               <ul className="space-y-2 max-h-64 overflow-y-auto">{open.messages.map((m: any) => <li key={m.id} className={`text-sm p-2.5 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}><p className="text-[10px] font-extrabold uppercase text-slate-500">{m.fromStaff ? 'Staff' : 'User'} · {when(m.ts)}</p>{m.body}</li>)}</ul>
-              <div className="flex gap-2"><input className={field} value={reply} onChange={e => setReply(e.target.value)} placeholder="Reply" aria-label="Reply" /><button onClick={send} disabled={!reply.trim()} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 cursor-pointer">Send</button></div>
+              <div className="flex flex-wrap gap-2 items-center text-xs">
+                <label className="font-bold text-slate-600" htmlFor="macro-lang">Reply template</label>
+                <select id="macro-lang" aria-label="Template language" className="border border-slate-200 px-2 h-9" value={macroLang} onChange={e => setMacroLang(e.target.value as MacroLang)}>
+                  {MACRO_LANGS.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}</select>
+                <select aria-label="Reply template" className="border border-slate-200 px-2 h-9 min-w-0 flex-1" value="" onChange={e => { const m = MACROS.find(x => x.id === e.target.value); if (m) setReply(fillMacro(m, macroLang, { name: open.requester, hours: hoursCfg })); }}>
+                  <option value="">Insert a template…</option>
+                  {MACROS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}</select>
+              </div>
+              <div className="flex gap-2"><textarea rows={3} className={field} value={reply} onChange={e => setReply(e.target.value)} placeholder="Reply" aria-label="Reply" maxLength={3000} /><button onClick={send} disabled={!reply.trim()} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 cursor-pointer">Send</button></div>
               {open.status !== 'resolved' && <button onClick={async () => { await jreq(`/api/support/tickets/${open.id}/resolve`); openT(open.id); load(); }} className={`${btn} text-emerald-700`}>Mark resolved</button>}
             </>
           )}

@@ -5,6 +5,7 @@ import { audit } from "./audit";
 import { requireAuth, requireRole } from "./auth";
 import { notify, notifyAdmins } from "./verification";
 import { VerificationStatus } from "../src/types";
+import { MACRO_LANGS, describeHours, parseSupportHours, supportStatus } from "../src/supportMy";
 
 /**
  * Quality and safety: review moderation, support desk with response-time targets, blocking, incident reporting,
@@ -147,6 +148,12 @@ export function registerQualityRoutes(app: Application, ctx: Ctx) {
   // =========================================================
   app.get("/api/support/categories", (_req, res) => {
     res.json({ status: "success", data: Object.entries(CATEGORIES).map(([name, priority]) => ({ name, priority, respondWithinHours: SLA_HOURS[priority] })) });
+  });
+
+  // Support hours in Malaysia time. Set SUPPORT_HOURS="1-5 09:00-18:00" (days 0-6, Sunday = 0) to match the real rota.
+  app.get("/api/support/hours", (_req, res) => {
+    const hours = parseSupportHours(process.env.SUPPORT_HOURS);
+    res.json({ status: "success", data: { hours, text: Object.fromEntries(MACRO_LANGS.map(l => [l.code, describeHours(hours, l.code)])), ...supportStatus(hours) } });
   });
 
   const ticketView = (t: any) => ({

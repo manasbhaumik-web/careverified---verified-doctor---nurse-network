@@ -109,10 +109,22 @@ Details in docs/CONTENT_MALAYSIA.md. Tested (46 API checks, migration of an olde
 - [ ] Not done: translating the rest of the landing page and the app screens; Indonesian and Arabic; Malay versions of the FAQ and existing articles; more topics; real testimonials (none exist yet).
 
 ## 10. Launch and ops
-- [ ] Legal review: MMC advertising rules for doctors (promotion limits), PDPA registration, telemedicine position.
-- [ ] Partner conversations: clinics, MHTC, insurers.
-- [ ] Support hours in MYT; BM/EN/ZH support macros ([SupportDesk.tsx](../src/components/SupportDesk.tsx)).
-- [ ] Tests: locale switching, NRIC and passport validation, MC block, first-visit routing.
+- [ ] Legal review: MMC advertising rules for doctors (promotion limits), PDPA registration, telemedicine position. Needs counsel; nothing to build. Hand over the list in [Legal review brief](#legal-review-brief) below.
+- [ ] Partner conversations: clinics, MHTC, insurers. Business outreach; nothing to build.
+- [x] Support hours in Malaysia time: `SUPPORT_HOURS` (default Mon-Fri 09:00-18:00, a placeholder until you set the real rota, format `1-5 09:00-18:00`, days 0-6 with Sunday = 0), `GET /api/support/hours`, and an online/away banner on the support page in the viewer's language ([supportMy.ts](../src/supportMy.ts), [SupportDesk.tsx](../src/components/SupportDesk.tsx)). The ticket reply targets (1, 4, 24, 72 hours) still count calendar hours, not working hours.
+- [x] English, Bahasa Malaysia and Chinese reply templates for staff: nine drafts (received, need details, MC after video consult, first visit in person, licence check, privacy request, refund, out of hours, closing) in the admin Support desk. Staff pick a language and a template, edit, then send. Malay and Chinese text needs a native reader before launch.
+- [x] Tests: `npm test` runs 47 tests (Node's built-in runner through tsx, no new dependency) in [tests](../tests): MyKad and passport validation, phone and address rules, locale switching and translation fallback, first-visit routing, MC block, prescribing limits, support hours and templates. Run `node node_modules/tsx/dist/cli.mjs --test "tests/*.test.ts"` if `npm test` fails because the folder path contains an ampersand (Windows).
+- [ ] Not done: tests that call the running server (the MC rule is tested as a function, not through `POST /api/certificates`), browser tests, and translation coverage beyond the small dictionary (the landing text in `src/locale/landing.ts` is not checked for missing languages).
+
+### Legal review brief
+Questions for Malaysian counsel, collected from sections 1 to 9:
+1. MMC and doctor advertising: what may the doctor directory, ratings and testimonials say, and may a doctor be listed with a fee?
+2. PDPA 2010: do we need to register as a data user, what is the right retention period (`RETENTION_YEARS`), is the 21-day access-request period right, and what are the breach-notification duties?
+3. Telemedicine: first visits for long-term conditions, no MC after a teleconsultation, practitioners registered abroad treating patients in Malaysia, cross-border e-prescriptions.
+4. Payments and tax: service tax (SST) on consultations, refund wording, indicative foreign exchange wording.
+5. Pharmacy: delivery of Group B/C medicines, cold chain wording, insurance panel claims.
+6. Medical tourism: facility listings and MHTC links, enquiry handling, disclaimers.
+7. Terms of service, privacy notice and consent wording in Malay and Chinese.
 
 ## Suggested order
 1. Section 0 (region config) and Section 1 (MMC verification), the differentiator and the base for the rest.

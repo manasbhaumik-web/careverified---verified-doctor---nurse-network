@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { TestimonialForm } from './TestimonialPanels';
 import { AlertTriangle, LifeBuoy } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
+import { useLocale } from '../locale/store';
 
 const jpost = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -23,6 +24,9 @@ export default function SupportDesk() {
     if (t.status === 'success') setTickets(t.data);
   }, []);
   useEffect(() => { load().catch(() => {}); }, [load]);
+  const { lang } = useLocale();
+  const [hours, setHours] = useState<{ open: boolean; nextChange: string; text: Record<string, string> } | null>(null);
+  useEffect(() => { fetch('/api/support/hours').then(r => r.json()).then(d => d.status === 'success' && setHours(d.data)).catch(() => {}); }, []);
 
   // Other pages (e.g. the Medical Library's "Report a problem") can hand over a draft subject.
   useEffect(() => {
@@ -69,6 +73,13 @@ export default function SupportDesk() {
           <p className="text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-900 p-3 flex gap-2 items-center max-w-sm"><AlertTriangle className="h-4 w-4 shrink-0" />If you or someone else is in danger, call 999. Do not wait for a support reply.</p>
         }
       />
+
+      {hours && (
+        <p role="status" className={`text-xs font-semibold border p-3 ${hours.open ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
+          {hours.open ? 'Our team is online now.' : `Our team is away. We will reply from ${new Date(hours.nextChange).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur', weekday: 'short', hour: '2-digit', minute: '2-digit' })} Malaysia time.`}
+          {' '}Support hours: {hours.text[lang] ?? hours.text.en}. Replies to urgent safety concerns are prioritised.
+        </p>
+      )}
 
       <div className="grid gap-6 xl:grid-cols-[440px_minmax(0,1fr)] items-start">
       <div className="space-y-5 min-w-0">

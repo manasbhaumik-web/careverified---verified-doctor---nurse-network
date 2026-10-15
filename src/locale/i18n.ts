@@ -40,7 +40,7 @@ const zh: Dict = {
   'trust.heading': '我们如何核查医疗人员',
 };
 
-const DICTS: Partial<Record<LangCode, Dict>> = { en, ms, zh };
+export const DICTS: Partial<Record<LangCode, Dict>> = { en, ms, zh };
 
 export function translate(lang: LangCode, key: string): string {
   return DICTS[lang]?.[key] ?? en[key] ?? key;
