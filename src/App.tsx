@@ -36,6 +36,8 @@ import MedicalTourism from './components/MedicalTourism';
 import TourismDesk from './components/TourismDesk';
 import PharmacyWorkspace from './components/PharmacyWorkspace';
 import LandingPage from './components/LandingPage';
+import LoginPage from './components/LoginPage';
+import { navigate, useLocation } from './nav';
 import Footer from './components/Footer';
 import LoadingImage from './components/LoadingImage';
 
@@ -60,6 +62,9 @@ export default function App() {
   // User Session State (server-side session cookie; nothing sensitive is kept in localStorage)
   type SessionUser = { id: string; role: 'patient' | 'practitioner' | 'admin' | 'pharmacy'; name: string; email: string; avatarUrl?: string; profileId?: string | null };
   const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
+  const route = useLocation();
+  // A signed-in user who opens /login is sent home
+  useEffect(() => { if (currentUser && route.path === '/login') navigate('/', { replace: true }); }, [currentUser, route.path]);
   const [sessionChecked, setSessionChecked] = useState(false);
   const [notice, setNotice] = useState<string | null>(() => {
     // Stripe sends the patient back here with ?payment=success|cancelled
@@ -97,6 +102,8 @@ export default function App() {
   }, []);
 
   const handleLoginSuccess = (user: SessionUser, patient?: unknown) => {
+    // Leave the /login address behind once signed in
+    if (window.location.pathname === '/login') navigate('/', { replace: true });
     setCurrentUser(user);
     rememberPatient(patient);
     routeForRole(user.role);
@@ -106,6 +113,7 @@ export default function App() {
   const handleLogout = async () => {
     try { await fetch('/api/auth/logout', { method: 'POST' }); } catch { /* ignore */ }
     setCurrentUser(null);
+    navigate('/', { replace: true });
     rememberPatient(undefined);
     setBookings([]);
     loadData();
@@ -273,7 +281,9 @@ export default function App() {
 
   // If not logged in, render landing page
   if (!currentUser) {
-    return <LandingPage professionals={professionals} onLoginSuccess={handleLoginSuccess} />;
+    return route.path === '/login'
+      ? <LoginPage onLoginSuccess={handleLoginSuccess} />
+      : <LandingPage professionals={professionals} />;
   }
 
   // Define Horizontal Menu Items based on logged-in perspective

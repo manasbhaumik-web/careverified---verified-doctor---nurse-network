@@ -28,6 +28,6 @@ The "Travel information" tab is a **draft** from web research: visitors from vis
 - **Facility self-service.** Facilities cannot edit their own listing; the admin does. Staff cannot yet add accommodation or interpreter details after creation except via the admin API.
 - **Medical records transfer between systems** (HL7/FHIR) and **document translation**.
 - **Travel facilitators/agents** (the intermediaries MHTC reportedly works with) have no role in the app.
-- **Public browsing without an account** (facility search needs the signed-in portal; only the API is public). A landing-page section would help discovery.
+- **Public browsing** is built: the landing page has an "International patients" section (English, Malay, Chinese) with the facility list, filters and travel notes, no account needed ([TouristAccess.tsx](../src/components/TouristAccess.tsx)). Enquiries still need a patient account. Arabic and Indonesian are not available.
 - **Reviews of facilities** and a structured price comparison across facilities.
 - **Legal review** of the quote terms, the cross-border consent and the share-link consent for medical tourism, plus the treatment of foreign patients' data (privacy notice, transfer register).

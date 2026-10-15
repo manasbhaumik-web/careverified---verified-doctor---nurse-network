@@ -428,7 +428,7 @@ footer button.bg-slate-800:hover,
 :root[data-theme="navy"] [class*="via-white"] {
   --tw-gradient-via: var(--t-50) !important;
 }
-:root[data-theme="navy"] #login-section {
+:root[data-theme="navy"] #login-page {
   background-image: linear-gradient(to bottom right, var(--t-50), var(--surface), var(--t-50)) !important;
 }
 

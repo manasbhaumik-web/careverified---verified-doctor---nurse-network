@@ -9,7 +9,7 @@ Automated: axe-core 4.10.2, rule sets WCAG 2.0 A/AA and WCAG 2.1 A/AA, run in th
 
 | Screen | Theme | Result |
 |---|---|---|
-| Landing page (signed out), English, Malay, Chinese | Sky Blue | 0 failures |
+| Landing page (signed out), including the international-patients section, English, Malay, Chinese | Sky Blue | 0 failures |
 | Landing page, English | Bright Cyan, Crimson Red | 0 failures |
 | Landing page, English | Dark Navy Blue | 43 failures (contrast), **not fixed** |
 | Patient screens: Member Hub, Consult Now, Pharmacies, Medical Tourism, Help, Doctors & Nurses, Medical Library, Secure Mailbox | Sky Blue | 0 failures |

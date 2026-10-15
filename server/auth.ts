@@ -213,15 +213,20 @@ export function emailTaken(email: string): boolean {
   return !!db.prepare("SELECT 1 AS x FROM users WHERE email = ?").get(email.trim().toLowerCase());
 }
 
-/** Seeds the first admin account. Password comes from ADMIN_PASSWORD or defaults to DemoPass123. */
+/**
+ * Seeds the first admin account. The password comes from ADMIN_PASSWORD. If it is not set, development uses DemoPass123
+ * and production generates a random one that is printed once in the server log (change it after signing in).
+ */
 export function ensureAdmin() {
   const exists = db.prepare("SELECT 1 AS x FROM users WHERE role = 'admin'").get();
   if (exists) return;
   const email = (process.env.ADMIN_EMAIL || "admin@careverified.local").toLowerCase();
-  const password = process.env.ADMIN_PASSWORD || "DemoPass123";
+  const generated = !process.env.ADMIN_PASSWORD && process.env.NODE_ENV === "production";
+  const password = process.env.ADMIN_PASSWORD || (generated ? crypto.randomBytes(15).toString("base64url") : "DemoPass123");
   createUser({ id: "usr-demo-admin", email, password, role: "admin", name: "Board Administrator" });
   console.log("=".repeat(60));
   console.log(`Created first admin account: ${email}`);
+  if (generated) console.log(`Generated admin password (shown once): ${password}`);
   console.log("=".repeat(60));
 }
 

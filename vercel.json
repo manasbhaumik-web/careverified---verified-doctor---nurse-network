@@ -9,6 +9,10 @@
     {
       "source": "/sitemap.xml",
       "destination": "/api"
+    },
+    {
+      "source": "/login",
+      "destination": "/index.html"
     }
   ]
 }

@@ -27,6 +27,7 @@ import { findRegistry, inferRegistryId, scopeFor, REGISTRIES, REGISTRATION_TYPES
 import { registerVerificationRoutes, notifyAdmins, notify } from "./server/verification";
 import { registerPaymentRoutes, registerPaymentWebhook, setPaymentHandlers, refundPayment } from "./server/payments";
 import { refundPolicy } from "./server/paymentPolicy";
+import { demoEnabled, DEMO_ROLES } from "./server/demo";
 import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
 
 // Load environment variables
@@ -445,7 +446,7 @@ function ensureDemoData() {
   }
 }
 
-ensureDemoData();
+if (demoEnabled()) ensureDemoData();
 
 // Seed data added after a database was created: add what is missing, and rename the original demo registration numbers
 // (which looked like real MMC / Nursing Board numbers) so a demo profile can never be mistaken for a real practitioner.
@@ -518,19 +519,35 @@ app.post("/api/auth/login", (req, res) => {
   res.json({ status: "success", data: { user: publicUser(result), patient } });
 });
 
+// What the sign-in page may offer. Demo sign-in exists only in demo mode (see server/demo.ts).
+app.get("/api/auth/options", (_req, res) => {
+  const demo = demoEnabled();
+  res.json({
+    status: "success",
+    data: {
+      demoLogin: demo,
+      // The published demo credentials are sent only in demo mode, so they never reach a production page.
+      demoAccounts: demo ? {
+        patient: { label: "Demo Member", email: "demo.patient@careverified.test", password: DEMO_PASSWORD },
+        practitioner: { label: "Demo Practitioner", email: "demo.doctor@careverified.test", password: DEMO_PASSWORD },
+        pharmacy: { label: "Demo Pharmacy", email: "demo.pharmacy@careverified.test", password: DEMO_PASSWORD },
+      } : undefined,
+    },
+  });
+});
+
+// One-click demo sign-in: development and showcases only, never for admin, off in production.
 app.post("/api/auth/demo", (req, res) => {
-  const role: Role = ["patient", "practitioner", "admin", "pharmacy"].includes(req.body?.role) ? req.body.role : "patient";
+  if (!demoEnabled()) return fail(res, 404, "Not found.");
+  if (req.body?.role === "admin") return fail(res, 403, "Board admins must sign in with their password.");
+  const role: Role = (DEMO_ROLES as readonly string[]).includes(req.body?.role) ? req.body.role : "patient";
   ensureDemoData();
-  const demoEmails: Record<Role, string> = {
+  const demoEmails: Partial<Record<Role, string>> = {
     patient: "demo.patient@careverified.test",
     practitioner: "demo.doctor@careverified.test",
     pharmacy: "demo.pharmacy@careverified.test",
-    admin: (process.env.ADMIN_EMAIL || "admin@careverified.local").toLowerCase(),
   };
-  let row = db.prepare("SELECT * FROM users WHERE email = ?").get(demoEmails[role]) as any;
-  if (!row && role === "admin") {
-    row = db.prepare("SELECT * FROM users WHERE role = 'admin' ORDER BY created_at LIMIT 1").get() as any;
-  }
+  const row = db.prepare("SELECT * FROM users WHERE email = ?").get(demoEmails[role]) as any;
   if (!row) return fail(res, 404, "Demo account not available.");
   const user: AuthUser = {
     id: row.id,

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocale, useT } from '../locale';
 import { HERO_TR } from '../locale/landing';
 import PatientAccess from './PatientAccess';
-import { openLegal } from '../legal';
+import TouristAccess from './TouristAccess';
 import VerificationScopeBadge from './VerificationScopeBadge';
 import ThemeSwitcher from './ThemeSwitcher';
 import LocaleSwitcher from './LocaleSwitcher';
@@ -15,7 +15,7 @@ import {
   Clock, PhoneCall, Pill, Hospital, ChevronLeft
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile } from '../types';
-import PatientRegistrationForm from './PatientRegistrationForm';
+import { loginUrl, navigate } from '../nav';
 import Footer from './Footer';
 import heroBgImage from '../../assets/medical_hero_bg.jpg';
 
@@ -24,7 +24,6 @@ import heroBgImage from '../../assets/medical_hero_bg.jpg';
 // ─────────────────────────────────────────────
 interface LandingPageProps {
   professionals: (DoctorProfile | NurseProfile)[];
-  onLoginSuccess: (user: { id: string; role: 'patient' | 'practitioner' | 'admin' | 'pharmacy'; name: string; email: string; avatarUrl?: string; profileId?: string | null }, patient?: unknown) => void;
 }
 
 // ─────────────────────────────────────────────
@@ -100,7 +99,7 @@ const PROFESSIONAL_ASSISTANCE_MODULES = [
     metricValue: 'Chat & video',
     metricLabel: 'Subject to doctors being online',
     ctaText: 'Sign in to consult',
-    href: '#login-section'
+    href: '/login'
   },
   {
     id: 'credential',
@@ -134,7 +133,7 @@ const PROFESSIONAL_ASSISTANCE_MODULES = [
     metricValue: 'QR',
     metricLabel: 'Every prescription can be verified',
     ctaText: 'Sign in to view prescriptions',
-    href: '#login-section'
+    href: '/login'
   },
   {
     id: 'locum',
@@ -151,7 +150,7 @@ const PROFESSIONAL_ASSISTANCE_MODULES = [
     metricValue: 'Verified',
     metricLabel: 'Applicants only',
     ctaText: 'Sign in to browse shifts',
-    href: '#login-section'
+    href: '/login'
   }
 ];
 
@@ -425,108 +424,14 @@ const HERO_SLIDES: HeroSlide[] = [
 
 
 // ═══════════════════════════════════════════════
-// PRACTITIONER ACCOUNT SIGN-UP
-// ═══════════════════════════════════════════════
-function PractitionerSignUp({ onSuccess, onCancel }: {
-  onSuccess: (user: { id: string; role: 'patient' | 'practitioner' | 'admin' | 'pharmacy'; name: string; email: string; profileId?: string | null }) => void;
-  onCancel: () => void;
-}) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [consent, setConsent] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const field = 'w-full bg-white border border-[color:var(--t-200)] rounded-none px-4 h-12 text-sm font-medium text-[color:var(--ink)] placeholder-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all';
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const resp = await fetch('/api/auth/register-practitioner', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, consent }),
-      });
-      const data = await resp.json();
-      if (data.status === 'success') onSuccess(data.data.user);
-      else setError(data.message || 'Could not create the account.');
-    } catch {
-      setError('Server connection error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div>
-      <h3 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[color:var(--ink)]">Create a Practitioner Account</h3>
-      <p className="text-sm text-slate-600 mt-1">
-        After signing up you will submit your licence details and certificates. You appear in the public registry only once the medical board verifies you.
-      </p>
-      <form onSubmit={submit} className="space-y-5 mt-7">
-        {error && (
-          <div className="bg-[color:var(--t-100)] border border-[color:var(--t-200)] text-[color:var(--t-600)] p-4 flex gap-3 text-xs font-bold">
-            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" /><span>{error}</span>
-          </div>
-        )}
-        <div className="space-y-2">
-          <label htmlFor="pr-name" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Full name (as on licence)</label>
-          <input id="pr-name" className={field} value={name} onChange={e => setName(e.target.value)} required maxLength={100} />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="pr-email" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Email address</label>
-          <input id="pr-email" type="email" inputMode="email" autoComplete="email" autoCapitalize="none" spellCheck={false} className={field} value={email} onChange={e => setEmail(e.target.value)} required />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="pr-password" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Password</label>
-          <input id="pr-password" type="password" className={field} value={password} onChange={e => setPassword(e.target.value)} required minLength={8} autoComplete="new-password" />
-          <p className="text-[11px] text-slate-500">At least 8 characters, with letters and numbers.</p>
-        </div>
-        <label className="flex items-start gap-3 text-xs text-slate-700 cursor-pointer">
-          <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[color:var(--t-600)]" required />
-          <span>I accept the <button type="button" onClick={() => openLegal('terms')} className="underline font-bold text-[color:var(--t-700)] cursor-pointer">Terms of Service</button> and <button type="button" onClick={() => openLegal('notice')} className="underline font-bold text-[color:var(--t-700)] cursor-pointer">Privacy Notice</button>, and agree that my credentials may be checked with the relevant medical council.</span>
-        </label>
-        <button type="submit" disabled={loading || !consent}
-          className="w-full h-12 min-h-[48px] text-sm font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-800)] text-white shadow-xs disabled:opacity-70 border border-[color:var(--t-800)] cursor-pointer flex items-center justify-center gap-2">
-          {loading ? 'Creating account…' : 'Create account'}
-        </button>
-        <button type="button" onClick={onCancel} className="w-full text-sm font-bold text-slate-600 hover:underline cursor-pointer">Back to sign in</button>
-      </form>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════
 // MAIN COMPONENT (THIN BORDERS - LIGHT NAVBAR & HERO - NO BLACK BORDERS)
 // ═══════════════════════════════════════════════
-export default function LandingPage({ professionals, onLoginSuccess }: LandingPageProps) {
-  const { lang } = useLocale();
+export default function LandingPage({ professionals }: LandingPageProps) {
+  const { lang, region } = useLocale();
   const t = useT();
   const heroTr = HERO_TR[lang];
-  // The phone sign-in bar hides while the sign-in form itself is on screen
-  const [showCtaBar, setShowCtaBar] = useState(true);
-  useEffect(() => {
-    const el = document.getElementById('login-section');
-    if (!el || typeof IntersectionObserver === 'undefined') return;
-    const io = new IntersectionObserver(([e]) => setShowCtaBar(!e.isIntersecting), { threshold: 0.15 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
   const [testimonials, setTestimonials] = useState<{ id: string; text: string; rating: number | null; name: string; location: string | null; demo: boolean }[]>([]);
   useEffect(() => { fetch('/api/testimonials').then(r => r.json()).then(d => d.status === 'success' && setTestimonials(d.data)).catch(() => {}); }, []);
-  // Login State
-  const [activeTab, setActiveTab] = useState<'patient' | 'practitioner' | 'admin' | 'pharmacy'>('patient');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [needsCode, setNeedsCode] = useState(false);
-  const [code, setCode] = useState('');
-
   // Hero slider
   const [slideIdx, setSlideIdx] = useState(0);
   const [heroPaused, setHeroPaused] = useState(false); // temporary: while the pointer or keyboard focus is on the hero
@@ -545,12 +450,8 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
     return () => clearTimeout(t);
   }, [autoplay, heroPaused, slideIdx]);
 
-  const goLogin = (role: PortalRole, register = false) => {
-    setActiveTab(role);
-    setError('');
-    setIsRegistering(register);
-    document.getElementById('login-section')?.scrollIntoView({ behavior: 'smooth' });
-  };
+  // Sign-in and sign-up live on their own page (/login)
+  const goLogin = (role: PortalRole, register = false) => navigate(loginUrl(role, register));
 
   // Active Assistance Module State (Split Layout)
 
@@ -585,140 +486,6 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
     });
     setLookupResult(results);
     setHasSearched(true);
-  };
-
-  const DEMO_ACCOUNTS: Record<'patient' | 'practitioner' | 'pharmacy' | 'admin', {
-    email: string;
-    password: string;
-    label: string;
-    user: { id: string; role: 'patient' | 'practitioner' | 'admin' | 'pharmacy'; name: string; email: string; avatarUrl?: string; profileId?: string | null };
-    patient?: unknown;
-  }> = {
-    patient: {
-      email: 'demo.patient@careverified.test',
-      password: 'DemoPass123',
-      label: 'Demo Member',
-      user: { id: 'usr-demo-patient', role: 'patient', name: 'Demo Patient', email: 'demo.patient@careverified.test', avatarUrl: '/assets/malaysian_male_patient.jpg' },
-      patient: {
-        id: 'pat-99912',
-        userId: 'usr-demo-patient',
-        name: 'Demo Patient',
-        email: 'demo.patient@careverified.test',
-        icNumber: '900101-14-0000',
-        age: 34,
-        phone: '+60-12-000-0000',
-        gender: 'Female',
-        chronicConditions: ['Hypertension'],
-        allergies: ['Penicillin'],
-        emergencyContactName: 'Ahmad Ramli',
-        emergencyContactPhone: '+60-12-345-6789',
-      },
-    },
-    practitioner: {
-      email: 'demo.doctor@careverified.test',
-      password: 'DemoPass123',
-      label: 'Demo Practitioner',
-      user: { id: 'usr-demo-doctor', role: 'practitioner', name: 'Dr Demo Physician', email: 'demo.doctor@careverified.test', avatarUrl: '/assets/malaysian_male_doctor.jpg', profileId: 'doc-demo-1' },
-    },
-    pharmacy: {
-      email: 'demo.pharmacy@careverified.test',
-      password: 'DemoPass123',
-      label: 'Demo Pharmacy',
-      user: { id: 'usr-demo-pharmacy', role: 'pharmacy', name: 'Demo Pharmacy Team', email: 'demo.pharmacy@careverified.test', profileId: 'phm-demo-1' },
-    },
-    admin: {
-      email: 'admin@careverified.local',
-      password: 'DemoPass123',
-      label: 'Demo Board Admin',
-      user: { id: 'usr-demo-admin', role: 'admin', name: 'Board Administrator', email: 'admin@careverified.local' },
-    },
-  };
-
-  const handleDemoLogin = async (role: 'patient' | 'practitioner' | 'pharmacy' | 'admin') => {
-    const demo = DEMO_ACCOUNTS[role];
-    setActiveTab(role);
-    setIsRegistering(false);
-    setNeedsCode(false);
-    setCode('');
-    setError('');
-    setEmail(demo.email);
-    setPassword(demo.password);
-    setLoading(true);
-    try {
-      const resp = await fetch('/api/auth/demo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role }),
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        if (data?.status === 'success') {
-          setPassword('');
-          onLoginSuccess(data.data.user, data.data.patient ?? demo.patient);
-          return;
-        }
-      }
-      // Fallback to standard login with demo credentials
-      const loginResp = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: demo.email, password: demo.password, role }),
-      });
-      if (loginResp.ok) {
-        const loginData = await loginResp.json();
-        if (loginData?.status === 'success') {
-          setPassword('');
-          onLoginSuccess(loginData.data.user, loginData.data.patient ?? demo.patient);
-          return;
-        }
-      }
-      // Client-side sandbox fallback if API is unreachable
-      setPassword('');
-      onLoginSuccess(demo.user, demo.patient);
-    } catch {
-      setPassword('');
-      onLoginSuccess(demo.user, demo.patient);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Standard Login Submission (server-verified credentials and session)
-  const handleStandardSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    if (!email || !password) { setError('Please fill in all fields.'); return; }
-    setLoading(true);
-    const demo = DEMO_ACCOUNTS[activeTab];
-    const isDemoCreds = email.trim().toLowerCase() === demo.email && password === demo.password;
-    try {
-      const resp = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, role: activeTab, ...(needsCode ? { code } : {}) }),
-      });
-      const data = await resp.json();
-      if (data.status === 'success') {
-        setPassword('');
-        setNeedsCode(false); setCode('');
-        onLoginSuccess(data.data.user, data.data.patient ?? (isDemoCreds ? demo.patient : undefined));
-      } else if (isDemoCreds) {
-        setPassword('');
-        onLoginSuccess(demo.user, demo.patient);
-      } else {
-        if (data.needsCode) setNeedsCode(true);
-        setError(data.message || 'Sign in failed.');
-      }
-    } catch {
-      if (isDemoCreds) {
-        setPassword('');
-        onLoginSuccess(demo.user, demo.patient);
-      } else {
-        setError('Server connection error. Please try again.');
-      }
-    } finally {
-      setLoading(false);
-    }
   };
 
   // Animated counters
@@ -766,7 +533,8 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
               {t('nav.verify')}
             </a>
             <a
-              href="#login-section"
+              href="/login"
+              onClick={e => { e.preventDefault(); navigate('/login'); }}
               className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-4 sm:px-6 text-[13px] sm:text-sm font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none shadow-xs transition-all cursor-pointer whitespace-nowrap"
             >
               {t('nav.portal')}
@@ -779,7 +547,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
       </nav>
 
       {/* Phones: sign-in and sign-up stay in reach on the long page */}
-      <div className={`${showCtaBar ? '' : 'hidden'} sm:hidden fixed inset-x-0 bottom-0 z-40 bg-white/95 backdrop-blur border-t border-[color:var(--t-200)] px-4 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] grid grid-cols-2 gap-2.5 shadow-[0_-4px_12px_rgba(15,23,42,0.08)]`}>
+      <div className={`sm:hidden fixed inset-x-0 bottom-0 z-40 bg-white/95 backdrop-blur border-t border-[color:var(--t-200)] px-4 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] grid grid-cols-2 gap-2.5 shadow-[0_-4px_12px_rgba(15,23,42,0.08)]`}>
         <button type="button" onClick={() => goLogin('patient', false)} className="min-h-[46px] text-sm font-extrabold text-[color:var(--t-700)] bg-white border border-[color:var(--t-300,var(--t-200))] cursor-pointer">Sign in</button>
         <button type="button" onClick={() => goLogin('patient', true)} className="min-h-[46px] text-sm font-extrabold text-white bg-[color:var(--t-600)] border border-[color:var(--t-700)] cursor-pointer">Create account</button>
       </div>
@@ -858,6 +626,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                       {s.cta.href ? (
                         <a
                           href={s.cta.href}
+                          onClick={e => { if (s.cta.href!.startsWith('/')) { e.preventDefault(); navigate(s.cta.href!); } }}
                           className="group inline-flex items-center gap-2.5 min-h-[46px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] rounded-none shadow-md transition-all cursor-pointer border border-[color:var(--t-700)]"
                         >
                           {tr?.cta ?? s.cta.label}
@@ -1077,7 +846,9 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
       {/* ═══════════ MAIN CONTENT ═══════════ */}
       <main id="main-content" className="flex-grow w-full">
 
-        <PatientAccess />
+        {region === 'INTL'
+          ? <><TouristAccess onSignUp={() => goLogin('patient', true)} /><PatientAccess /></>
+          : <><PatientAccess /><TouristAccess onSignUp={() => goLogin('patient', true)} /></>}
 
         {/* ─── SECTION 3: STATUTORY GOVERNANCE & LIVE PRACTITIONER LICENCE VERIFICATION ─── */}
         <section id="verify-section" aria-label="Statutory governance and licence verification" className="relative overflow-hidden bg-white border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
@@ -1464,6 +1235,7 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
 
                       <a
                         href={activeModule.href}
+                        onClick={e => { if (activeModule.href.startsWith('/')) { e.preventDefault(); navigate(activeModule.href); } }}
                         className="inline-flex items-center gap-2.5 min-h-[48px] px-8 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer"
                       >
                         {activeModule.ctaText}
@@ -1653,304 +1425,6 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
 
       </main>
 
-
-      {/* ═══════════ LOGIN PORTAL (REDESIGNED LIGHT THEME & THIN BORDERS) ═══════════ */}
-      <section id="login-section" className="relative bg-white text-[color:var(--ink)] border-t border-[color:var(--t-200)] overflow-hidden scroll-mt-20">
-        <Cross className="absolute -right-24 -bottom-28 h-[520px] w-[520px] text-[color:var(--t-600)] opacity-5 pointer-events-none" />
-
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-12 py-20">
-          {/* Heading */}
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="inline-flex items-center justify-center w-14 h-14 rounded-none bg-[color:var(--t-600)] text-white shadow-md mb-5 border border-[color:var(--t-700)]">
-              <Cross className="h-7 w-7" />
-            </span>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-none bg-white border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-600)] mb-3 shadow-xs">
-              <ShieldCheck className="h-3 w-3 text-[color:var(--t-600)]" /> Direct Gateway Access
-            </div>
-            <h2 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl tracking-tight text-[color:var(--ink)] mb-2.5">
-              Secure <span className="text-[color:var(--t-600)]">Portal Sign-In</span>
-            </h2>
-            <p className="text-sm sm:text-base text-slate-600 font-medium">
-              Select your role to access the verified clinical network.
-            </p>
-          </div>
-
-          {/* Split card: role picker + form */}
-          <div className="grid md:grid-cols-[280px_1fr] bg-white text-[color:var(--ink)] rounded-none border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xl">
-            {/* Role picker side */}
-            <div className="p-6 bg-[color:var(--t-50)] md:border-r border-b md:border-b-0 border-[color:var(--t-200)] flex flex-col justify-between">
-              <div>
-                <div className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-600)] mb-4">
-                  Select User Role
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-1 gap-2.5">
-                  {[
-                    { key: 'patient' as const, label: 'Member', desc: 'Vitals, appointments & e-prescriptions', icon: Heart },
-                    { key: 'practitioner' as const, label: 'Practitioner', desc: 'Credential verification & clinical shifts', icon: PlusCircle },
-                    { key: 'pharmacy' as const, label: 'Pharmacy', desc: 'Prescription inbox, records & reports', icon: Pill },
-                    { key: 'admin' as const, label: 'Board Admin', desc: 'Licence audit & platform management', icon: Building },
-                  ].map((tab) => {
-                    const active = activeTab === tab.key;
-                    return (
-                      <button
-                        key={tab.key}
-                        type="button"
-                        onClick={() => { setActiveTab(tab.key); setError(''); setIsRegistering(false); setNeedsCode(false); setCode(''); }}
-                        aria-pressed={active}
-                        className={`rounded-none p-4 transition-all cursor-pointer flex flex-col md:flex-row md:items-start items-center text-center md:text-left gap-3 border ${
-                          active
-                            ? 'bg-[color:var(--t-600)] border-[color:var(--t-700)] text-white shadow-xs'
-                            : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-100)]'
-                        }`}
-                      >
-                        <tab.icon className="h-5 w-5 shrink-0 md:mt-0.5" />
-                        <span className="min-w-0">
-                          <span className="block text-sm font-extrabold">{tab.label}</span>
-                          <span className={`hidden md:block text-xs mt-0.5 leading-snug ${active ? 'text-white/90' : 'text-slate-500'}`}>
-                            {tab.desc}
-                          </span>
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="hidden md:block pt-6 border-t border-[color:var(--t-200)] mt-6">
-                <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
-                  <Lock className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> Encrypted session (HTTPS)
-                </span>
-              </div>
-            </div>
-
-            {/* Form pane */}
-            <div className="p-6 sm:p-12 min-w-0 bg-white">
-              <AnimatePresence mode="wait">
-                {isRegistering && activeTab === 'patient' ? (
-                  <motion.div
-                    key="register"
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -12 }}
-                  >
-                    <PatientRegistrationForm
-                      onRegisterSuccess={(user, patient) => {
-                        onLoginSuccess(user, patient);
-                        setIsRegistering(false);
-                      }}
-                      onCancel={() => setIsRegistering(false)}
-                    />
-                  </motion.div>
-                ) : isRegistering && activeTab === 'practitioner' ? (
-                  <motion.div
-                    key="register-practitioner"
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -12 }}
-                  >
-                    <PractitionerSignUp
-                      onSuccess={(user) => { onLoginSuccess(user); setIsRegistering(false); }}
-                      onCancel={() => setIsRegistering(false)}
-                    />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key={`login-${activeTab}`}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -12 }}
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-4">
-                      <div>
-                        <h3 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[color:var(--ink)]">
-                          Sign in as {activeTab === 'patient' ? 'a Member' : activeTab === 'practitioner' ? 'a Practitioner' : activeTab === 'pharmacy' ? 'a Pharmacy' : 'a Board Admin'}
-                        </h3>
-                        <p className="text-sm text-slate-600 mt-1">Enter your credentials to access the verified network.</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleDemoLogin(activeTab)}
-                        disabled={loading}
-                        className="inline-flex items-center gap-2 min-h-[40px] px-4 text-xs font-extrabold text-[color:var(--t-600)] bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] hover:text-white border border-[color:var(--t-200)] rounded-none transition-all cursor-pointer disabled:opacity-60 shadow-2xs"
-                      >
-                        <Zap className="h-3.5 w-3.5" />
-                        Instant {DEMO_ACCOUNTS[activeTab].label} Sign-In
-                      </button>
-                    </div>
-
-                    {/* Demo credentials helper strip */}
-                    <div className="mt-5 p-3.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex flex-wrap items-center justify-between gap-3 text-xs">
-                      <div className="space-y-0.5 min-w-0">
-                        <span className="font-extrabold uppercase tracking-wider text-[10px] text-[color:var(--t-600)] block">
-                          Demo Credentials ({DEMO_ACCOUNTS[activeTab].label})
-                        </span>
-                        <div className="font-mono text-slate-700 truncate">
-                          <span className="font-semibold">{DEMO_ACCOUNTS[activeTab].email}</span>
-                          <span className="mx-2 text-slate-400">/</span>
-                          <span className="font-semibold">{DEMO_ACCOUNTS[activeTab].password}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEmail(DEMO_ACCOUNTS[activeTab].email);
-                            setPassword(DEMO_ACCOUNTS[activeTab].password);
-                            setError('');
-                          }}
-                          className="px-3 py-1.5 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] font-bold cursor-pointer transition-colors"
-                        >
-                          Fill Form
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDemoLogin(activeTab)}
-                          disabled={loading}
-                          className="px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white font-extrabold cursor-pointer transition-colors disabled:opacity-60"
-                        >
-                          One-Click Demo
-                        </button>
-                      </div>
-                    </div>
-
-                    <form onSubmit={handleStandardSubmit} className="space-y-5 mt-6">
-                      {error && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="bg-[color:var(--t-100)] border border-[color:var(--t-200)] text-[color:var(--t-text)] p-4 rounded-none flex gap-3 text-xs font-bold"
-                        >
-                          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-text)]" />
-                          <span>{error}</span>
-                        </motion.div>
-                      )}
-
-                      <div className="space-y-2">
-                        <label htmlFor="login-email" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">
-                          Email Address
-                        </label>
-                        <input
-                          id="login-email"
-                          type="email"
-                          inputMode="email"
-                          autoComplete="username"
-                          autoCapitalize="none"
-                          autoCorrect="off"
-                          spellCheck={false}
-                          enterKeyHint="next"
-                          placeholder={DEMO_ACCOUNTS[activeTab].email}
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="w-full bg-white border border-[color:var(--t-200)] rounded-none px-4 h-12 text-sm font-medium text-[color:var(--ink)] placeholder-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all"
-                          required
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label htmlFor="login-password" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">
-                          Password
-                        </label>
-                        <input
-                          id="login-password"
-                          type="password"
-                          autoComplete="current-password"
-                          enterKeyHint="go"
-                          placeholder="••••••••"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="w-full bg-white border border-[color:var(--t-200)] rounded-none px-4 h-12 text-sm font-medium text-[color:var(--ink)] placeholder-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all"
-                          required
-                        />
-                      </div>
-
-                      {needsCode && (
-                        <div className="space-y-2">
-                          <label htmlFor="login-code" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">
-                            Authenticator code
-                          </label>
-                          <input
-                            id="login-code"
-                            inputMode="numeric"
-                            autoComplete="one-time-code"
-                            placeholder="6-digit code"
-                            value={code}
-                            onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                            autoFocus
-                            className="w-full bg-white border border-[color:var(--t-200)] rounded-none px-4 h-12 text-sm font-mono tracking-widest text-[color:var(--ink)] placeholder-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all"
-                            required
-                          />
-                        </div>
-                      )}
-
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full h-12 min-h-[48px] rounded-none text-sm font-extrabold transition-all cursor-pointer flex justify-center items-center gap-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white shadow-xs disabled:opacity-70 border border-[color:var(--t-700)]"
-                      >
-                        {loading ? (
-                          <>
-                            <RefreshCw className="h-5 w-5 animate-spin text-white" />
-                            Authenticating...
-                          </>
-                        ) : (
-                          <>
-                            Sign in to {activeTab === 'patient' ? 'Member Portal' : activeTab === 'practitioner' ? 'Practitioner Hub' : activeTab === 'pharmacy' ? 'Pharmacy Workspace' : 'Board Admin Console'}
-                            <ArrowRight className="h-5 w-5 text-white" />
-                          </>
-                        )}
-                      </button>
-                    </form>
-
-                    {activeTab === 'pharmacy' && (
-                      <p className="pt-6 text-center text-sm text-slate-600">
-                        Pharmacy accounts are created by the MedCred board. To register your pharmacy, contact the board.
-                      </p>
-                    )}
-
-                    {(activeTab === 'patient' || activeTab === 'practitioner') && (
-                      <p className="pt-6 text-center text-sm text-slate-600">
-                        Need a new account?{' '}
-                        <button
-                          type="button"
-                          onClick={() => { setError(''); setIsRegistering(true); }}
-                          className="inline-block py-2 text-[color:var(--t-600)] hover:underline font-extrabold cursor-pointer transition-colors"
-                        >
-                          {activeTab === 'patient' ? 'Register as a New Member' : 'Create a Practitioner Account'}
-                        </button>
-                      </p>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* Quick Access Demo Buttons */}
-          <div className="mt-8 p-4 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex flex-wrap items-center justify-center gap-3">
-            <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-slate-700 mr-1">
-              <Zap className="h-4 w-4 text-[color:var(--t-600)]" /> One-Click Demo Access:
-            </span>
-            {[
-              { role: 'patient' as const, icon: Heart, label: 'Demo Member' },
-              { role: 'practitioner' as const, icon: PlusCircle, label: 'Demo Practitioner' },
-              { role: 'pharmacy' as const, icon: Pill, label: 'Demo Pharmacy' },
-              { role: 'admin' as const, icon: Building, label: 'Demo Board Admin' },
-            ].map((d) => (
-              <button
-                key={d.role}
-                type="button"
-                onClick={() => handleDemoLogin(d.role)}
-                disabled={loading}
-                className="inline-flex items-center gap-2 min-h-[42px] px-4 text-xs font-bold text-[color:var(--t-600)] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-600)] hover:text-white rounded-none transition-all cursor-pointer disabled:opacity-60 shadow-2xs"
-              >
-                <d.icon className="h-4 w-4" />
-                {d.label}
-              </button>
-            ))}
-          </div>
-
-        </div>
-      </section>
 
       {/* ═══════════ STANDARDIZED APPLICATION FOOTER ═══════════ */}
       <Footer

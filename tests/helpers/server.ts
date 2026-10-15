@@ -47,7 +47,7 @@ function killTree(child: ChildProcess) {
   else child.kill('SIGKILL');
 }
 
-export async function startTestServer(extraEnv: Record<string, string> = {}): Promise<TestServer> {
+export async function startTestServer(extraEnv: Record<string, string> = {}, opts: { seed?: boolean } = {}): Promise<TestServer> {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'medcred-test-'));
   const port = await freePort();
   const base = `http://127.0.0.1:${port}`;
@@ -77,10 +77,12 @@ export async function startTestServer(extraEnv: Record<string, string> = {}): Pr
     }
     if (!up) throw new Error(`Server did not start in time.\n${log}`);
 
-    const seed = spawnSync(process.execPath, [TSX, 'scripts/seed-demo.ts'], {
-      cwd: ROOT, env: { ...env, SEED_BASE_URL: base }, encoding: 'utf8', timeout: 120_000,
-    });
-    if (seed.status !== 0) throw new Error(`Seeding failed.\n${seed.stdout}\n${seed.stderr}`);
+    if (opts.seed !== false) {
+      const seed = spawnSync(process.execPath, [TSX, 'scripts/seed-demo.ts'], {
+        cwd: ROOT, env: { ...env, SEED_BASE_URL: base }, encoding: 'utf8', timeout: 120_000,
+      });
+      if (seed.status !== 0) throw new Error(`Seeding failed.\n${seed.stdout}\n${seed.stderr}`);
+    }
   } catch (e) {
     await stop();
     throw e;

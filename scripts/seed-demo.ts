@@ -137,6 +137,17 @@ async function main() {
     pharmacyLine += `\n                                          Second pharmacy:  ID ${ph2.id}   PIN ${ph2.pin}`;
   }
 
+  // A demo facility so the public medical-tourism list is not empty. It has no licence or accreditation recorded on purpose.
+  const facilities = must("facilities", await admin.call("GET", "/api/admin/tourism/facilities")).data as any[];
+  if (!facilities.some(f => f.name === "Demo Specialist Hospital (demo data)")) {
+    must("demo facility", await admin.call("POST", "/api/admin/tourism/facilities", {
+      name: "Demo Specialist Hospital (demo data)", kind: "hospital", city: "Kuala Lumpur", state: "W.P. Kuala Lumpur",
+      description: "Demo data for development. Not a real hospital.", languages: ["English", "Malay", "Mandarin", "Arabic"],
+      specialties: ["Cardiology", "Orthopaedics"], acceptsInternational: true,
+      services: { interpreter: true, halalFood: true, prayerRoom: true, airportPickup: false, accommodationPartners: [] },
+    }));
+  }
+
   // ---- pharmacy workspace login (email + password) and a few prescriptions in its inbox
   const demoPharmacy = (must("pharmacies", await admin.call("GET", "/api/admin/pharmacies")).data as any[]).find(p => p.name === "Demo Pharmacy");
   const phc = new Client();
