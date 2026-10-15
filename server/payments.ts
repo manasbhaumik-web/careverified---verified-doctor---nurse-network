@@ -131,6 +131,12 @@ export function registerPaymentWebhook(app: Application) {
 }
 
 export function registerPaymentRoutes(app: Application) {
+  // Public, and registered before /api/payments/:id so that route does not catch it.
+  // What a practitioner is told before joining: the commission actually in force, and that payouts are manual.
+  app.get("/api/payments/terms", (_req, res) => {
+    res.json({ status: "success", data: { commissionPct: commissionPct(), commissionOn: "professional fee, before service tax", payoutsAutomated: false, currency: "MYR" } });
+  });
+
   app.get("/api/payments/config", (req, res) => {
     const region = req.user ? handlers?.patientRegion(req.user.id) ?? "MY" : "MY";
     res.json({ status: "success", data: { mode: provider(), currency: "MYR", methods: methodsFor(region), sstEnabled: sstConfig().enabled } });

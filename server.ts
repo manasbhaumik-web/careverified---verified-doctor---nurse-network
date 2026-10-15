@@ -1532,6 +1532,12 @@ app.get("/sitemap.xml", (req, res) => {
     <lastmod>2026-07-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careverified.pro/for-doctors</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
   </url>`;
 
   // Append programmatic SEO landing pages

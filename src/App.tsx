@@ -37,6 +37,7 @@ import TourismDesk from './components/TourismDesk';
 import PharmacyWorkspace from './components/PharmacyWorkspace';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
+import PractitionerPage from './components/PractitionerPage';
 import { navigate, useLocation } from './nav';
 import Footer from './components/Footer';
 import LoadingImage from './components/LoadingImage';
@@ -281,9 +282,9 @@ export default function App() {
 
   // If not logged in, render landing page
   if (!currentUser) {
-    return route.path === '/login'
-      ? <LoginPage onLoginSuccess={handleLoginSuccess} />
-      : <LandingPage professionals={professionals} />;
+    if (route.path === '/login') return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+    if (route.path === '/for-doctors') return <PractitionerPage />;
+    return <LandingPage professionals={professionals} />;
   }
 
   // Define Horizontal Menu Items based on logged-in perspective

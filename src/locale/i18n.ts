@@ -12,6 +12,7 @@ const en: Dict = {
   'nav.skip': 'Skip to content',
   'nav.verify': 'Verify a Licence',
   'nav.portal': 'Access Portal',
+  'nav.doctors': 'For doctors and nurses',
   'nav.tagline': 'Medical Assistance Platform',
   'trust.heading': 'How we check practitioners',
 };
@@ -24,6 +25,7 @@ const ms: Dict = {
   'nav.skip': 'Langkau ke kandungan',
   'nav.verify': 'Semak Lesen',
   'nav.portal': 'Akses Portal',
+  'nav.doctors': 'Untuk doktor dan jururawat',
   'nav.tagline': 'Platform Bantuan Perubatan',
   'trust.heading': 'Cara kami menyemak pengamal',
 };
@@ -36,6 +38,7 @@ const zh: Dict = {
   'nav.skip': '跳到主要内容',
   'nav.verify': '核实执业证书',
   'nav.portal': '进入门户',
+  'nav.doctors': '医生和护士入口',
   'nav.tagline': '医疗协助平台',
   'trust.heading': '我们如何核查医疗人员',
 };

@@ -364,7 +364,7 @@ const HERO_SLIDES: HeroSlide[] = [
     pill: 'For Doctors & Nurses',
     headline: <>Get {hl('verified once')}, practise with confidence.</>,
     body: <>Submit your licence, be <span className="text-[#FBFCFD] [-webkit-text-stroke:2px_var(--t-600)] font-bold">reviewed by our medical board</span>, then take consultations, issue <span className="text-black font-bold">signed e-prescriptions</span> and apply for locum shifts.</>,
-    cta: { label: 'Join as a Practitioner', role: 'practitioner', register: true },
+    cta: { label: 'Join as a Practitioner', href: '/for-doctors' },
     chips: ['Manual licence checks', 'Locum shift board', 'Paid consultations'],
     card: {
       label: 'Credential Review',
@@ -525,6 +525,13 @@ export default function LandingPage({ professionals }: LandingPageProps) {
           </a>
 
           <div className="flex items-center gap-2 sm:gap-3 sm:flex-wrap shrink-0">
+            <a
+              href="/for-doctors"
+              onClick={e => { e.preventDefault(); navigate('/for-doctors'); }}
+              className="hidden lg:inline-flex items-center min-h-[44px] px-3 text-sm font-bold text-[color:var(--t-700)] hover:underline cursor-pointer whitespace-nowrap"
+            >
+              {t('nav.doctors')}
+            </a>
             <a
               href="#verify-section"
               className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-5 text-sm font-bold text-[color:var(--t-600)] bg-white border border-[color:var(--t-200)] rounded-none hover:bg-[color:var(--t-100)] transition-all cursor-pointer"
