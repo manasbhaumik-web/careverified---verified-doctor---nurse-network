@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BadgeCheck, Globe, LifeBuoy, Receipt, Smartphone, Stethoscope } from 'lucide-react';
+import { BadgeCheck, Globe, Heart, LifeBuoy, Receipt, Smartphone, Stethoscope } from 'lucide-react';
 import { useLocale } from '../locale/store';
 import type { LangCode } from '../locale/config';
 
@@ -156,8 +156,11 @@ export default function PatientAccess() {
   return (
     <section id="access-section" aria-labelledby="access-heading" className="bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] py-12 sm:py-16 scroll-mt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
-        <p className="text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-2">{tx.eyebrow}</p>
-        <h2 id="access-heading" className="font-display font-black text-2xl sm:text-3xl lg:text-4xl tracking-tight text-[color:var(--ink)] leading-tight">{tx.title}</h2>
+        <div className="eyebrow mb-3">
+          <Heart className="h-3 w-3 text-[color:var(--t-600)]" />
+          {tx.eyebrow}
+        </div>
+        <h2 id="access-heading" className="section-title">{tx.title}</h2>
         <p className="text-sm sm:text-base text-slate-600 mt-2 font-medium max-w-2xl">{tx.intro}</p>
 
         <ul className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -35,6 +35,45 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   plane: Plane, brief: Briefcase, search: UserSearch, steth: Stethoscope, pill: Pill, doc: FileSignature, hour: Hourglass, msg: MessageSquare, lang: Languages, build: Building2, list: ClipboardList,
 };
 
+function DualTitle({ text }: { text: string }) {
+  const parts = text.trim().split(' ');
+  if (parts.length <= 1) return <span>{text}</span>;
+  const splitIdx = parts.length > 3 ? parts.length - 2 : parts.length - 1;
+  const lead = parts.slice(0, splitIdx).join(' ');
+  const accent = parts.slice(splitIdx).join(' ');
+  return (
+    <>
+      <span>{lead} </span>
+      <span className="text-[color:var(--t-600)]">{accent}</span>
+    </>
+  );
+}
+
+function renderAudienceHeroTitle(text: string, lang: Lang) {
+  if (lang === 'zh') {
+    if (text.includes('已认证')) {
+      const idx = text.indexOf('已认证');
+      return (
+        <>
+          <span>{text.slice(0, idx)}</span>
+          <span className="text-[color:var(--t-600)]">{text.slice(idx)}</span>
+        </>
+      );
+    }
+  }
+  const parts = text.trim().split(' ');
+  if (parts.length <= 1) return <span>{text}</span>;
+  const splitIdx = parts.length >= 4 ? parts.length - 2 : parts.length - 1;
+  const lead = parts.slice(0, splitIdx).join(' ');
+  const accent = parts.slice(splitIdx).join(' ');
+  return (
+    <>
+      <span>{lead} </span>
+      <span className="text-[color:var(--t-600)]">{accent}</span>
+    </>
+  );
+}
+
 export default function AudiencePage({ kind, signInRole, content }: { kind: 'clinic' | 'pharmacy'; signInRole: PortalRole; content: Record<Lang, PageContent> }) {
   const { lang } = useLocale();
   const L = pickLang(lang);
@@ -85,16 +124,41 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
       </header>
 
       <main id="main-content" className="flex-grow w-full">
-        <section className="bg-white border-b border-[color:var(--t-200)] py-12 sm:py-16">
-          <div className={wrap}>
-            <p className="text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-2">{tx.hero.eyebrow}</p>
-            <h1 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-[1.1] max-w-3xl">{tx.hero.h1}</h1>
-            <p className="text-base sm:text-lg text-slate-700 font-medium mt-4 max-w-2xl leading-relaxed">{tx.hero.sub}</p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <button type="button" onClick={toApply} className={btnPrimary}>{tx.hero.apply}<ArrowRight className="h-4 w-4" aria-hidden="true" /></button>
-              <button type="button" onClick={signIn} className={btnSecondary}>{tx.hero.signin}</button>
+        <section className="relative border-b border-[color:var(--t-200)] py-12 sm:py-20 overflow-hidden min-h-[520px] flex items-center">
+          {/* Full High-Key Sunlit Clinical Background */}
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none"
+            style={{
+              backgroundImage: "url('/assets/clean_light_doctor_suite_full.jpg')",
+              filter: "hue-rotate(var(--t-hue)) brightness(var(--t-bright))"
+            }}
+          />
+
+          <div className={`relative z-10 ${wrap} w-full`}>
+            <div className="max-w-2xl space-y-4">
+              <p className="text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
+                <span className="w-2 h-2 bg-[color:var(--t-600)] inline-block" />
+                {tx.hero.eyebrow}
+              </p>
+              <h1 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-[1.1] text-slate-900">
+                {renderAudienceHeroTitle(tx.hero.h1, L)}
+              </h1>
+              <p className="text-base sm:text-lg text-slate-700 font-medium leading-relaxed">
+                {tx.hero.sub}
+              </p>
+              <div className="pt-2 flex flex-wrap gap-3">
+                <button type="button" onClick={toApply} className={btnPrimary}>
+                  {tx.hero.apply}
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </button>
+                <button type="button" onClick={signIn} className={btnSecondary}>
+                  {tx.hero.signin}
+                </button>
+              </div>
+              <p className="text-sm font-semibold text-slate-700 pt-1">
+                {tx.hero.who}
+              </p>
             </div>
-            <p className="mt-4 text-sm font-semibold text-slate-700 max-w-2xl">{tx.hero.who}</p>
           </div>
         </section>
 
@@ -104,7 +168,7 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
               <section key={s.id} aria-labelledby={`${s.id}-h`} className="py-10 border-b border-[color:var(--t-200)] bg-white">
                 <div className={wrap}>
                   <div role="note" className="bg-amber-50 border border-amber-300 p-5 max-w-3xl">
-                    <h2 id={`${s.id}-h`} className="font-display font-extrabold text-lg text-amber-950">{s.title}</h2>
+                    <h2 id={`${s.id}-h`} className="font-display font-extrabold text-lg text-amber-950"><DualTitle text={s.title} /></h2>
                     <p className="text-sm text-amber-950 mt-1.5 leading-relaxed font-medium">{s.text}</p>
                   </div>
                 </div>
@@ -115,7 +179,7 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
             return (
               <section key={s.id} aria-labelledby={`${s.id}-h`} className={`py-12 sm:py-16 border-b border-[color:var(--t-200)] ${bg(i)}`}>
                 <div className={wrap}>
-                  <h2 id={`${s.id}-h`} className={h2}>{s.title}</h2>
+                  <h2 id={`${s.id}-h`} className={h2}><DualTitle text={s.title} /></h2>
                   <ol className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {s.items.map((it, n) => (
                       <li key={it.t} className="bg-white border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] p-5">
@@ -133,7 +197,7 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
             return (
               <section key={s.id} aria-labelledby={`${s.id}-h`} className={`py-12 sm:py-16 border-b border-[color:var(--t-200)] ${bg(i, s.tint)}`}>
                 <div className={wrap}>
-                  <h2 id={`${s.id}-h`} className={h2}>{s.title}</h2>
+                  <h2 id={`${s.id}-h`} className={h2}><DualTitle text={s.title} /></h2>
                   {s.intro && <p className="mt-2 text-sm sm:text-base text-slate-700 font-medium max-w-2xl">{s.intro}</p>}
                   <ul className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {s.items.map(it => (
@@ -152,7 +216,7 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
             return (
               <section key={s.id} aria-labelledby={`${s.id}-h`} className={`py-12 sm:py-16 border-b border-[color:var(--t-200)] ${bg(i, s.tint)}`}>
                 <div className={wrap}>
-                  <h2 id={`${s.id}-h`} className={h2}>{s.title}</h2>
+                  <h2 id={`${s.id}-h`} className={h2}><DualTitle text={s.title} /></h2>
                   {s.intro && <p className="mt-2 text-sm sm:text-base text-slate-700 font-medium max-w-2xl">{s.intro}</p>}
                   <ul className="mt-6 grid md:grid-cols-2 gap-x-8 gap-y-3 text-sm text-slate-800 font-medium list-disc pl-5">
                     {s.items.map(x => <li key={x} className="leading-relaxed">{x}</li>)}
@@ -166,7 +230,7 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
             <section key={s.id} aria-labelledby={`${s.id}-h`} className={`py-12 sm:py-16 border-b border-[color:var(--t-200)] ${bg(i)}`}>
               <div className={`${wrap} grid md:grid-cols-2 gap-8`}>
                 <div>
-                  <h2 id={`${s.id}-h`} className={h2}>{s.left.title}</h2>
+                  <h2 id={`${s.id}-h`} className={h2}><DualTitle text={s.left.title} /></h2>
                   <ul className="mt-5 space-y-3 text-sm text-slate-800 font-medium list-disc pl-5">{s.left.items.map(x => <li key={x} className="leading-relaxed">{x}</li>)}</ul>
                   {s.left.subTitle && (
                     <>
@@ -178,7 +242,7 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
                 <div className="grid gap-8 content-start">
                   {s.right.map(r => (
                     <div key={r.title}>
-                      <h2 className={h2}>{r.title}</h2>
+                      <h2 className={h2}><DualTitle text={r.title} /></h2>
                       <ul className="mt-5 space-y-3 text-sm text-slate-800 font-medium list-disc pl-5">{r.items.map(x => <li key={x} className="leading-relaxed">{x}</li>)}</ul>
                     </div>
                   ))}
@@ -191,7 +255,7 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
         <section id="apply" aria-labelledby="apply-h" className="py-12 sm:py-16 bg-white scroll-mt-20">
           <div className={`${wrap} grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10`}>
             <div>
-              <h2 id="apply-h" className={h2}>{tx.apply.title}</h2>
+              <h2 id="apply-h" className={h2}><DualTitle text={tx.apply.title} /></h2>
               <p className="mt-3 text-sm sm:text-base text-slate-700 font-medium leading-relaxed">{tx.apply.intro}</p>
             </div>
             <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] p-5 sm:p-7">

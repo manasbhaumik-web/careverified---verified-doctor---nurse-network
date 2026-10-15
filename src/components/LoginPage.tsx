@@ -130,7 +130,7 @@ export default function LoginPage({ onLoginSuccess }: { onLoginSuccess: (user: S
           <p className="text-sm sm:text-base text-slate-700 font-medium mt-1">Choose your role first. Each role has its own sign-in.</p>
         </div>
 
-        <div className="grid md:grid-cols-[280px_1fr] bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-md">
+        <div className="grid md:grid-cols-[280px_1fr] bg-white panel-edge">
           <div className="p-5 bg-[color:var(--t-50)] md:border-r border-b md:border-b-0 border-[color:var(--t-200)]">
             <p className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-3" id="role-label">Your role</p>
             <div role="group" aria-labelledby="role-label" className="grid grid-cols-2 md:grid-cols-1 gap-2.5">

@@ -649,3 +649,220 @@ a, button, [role="button"], summary, label, select, input { touch-action: manipu
 @media (pointer: coarse) {
   button.w-full, a.w-full { min-height: 44px; }
 }
+
+/* -------------------------------------------------------------
+ * SHARED CONTENT-SECTION COMPONENTS
+ * One definition for the section label, heading, intro text and
+ * card styles that used to be repeated as long utility strings.
+ * Sharp corners only; colours come from the theme tokens.
+ * ------------------------------------------------------------- */
+
+/* Small label above a section heading (minimum 12px for legibility) */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.875rem;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--t-200);
+  color: var(--t-600);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  box-shadow: 0 1px 0 var(--t-100);
+}
+
+/* Section heading: fluid size, tighter tracking, balanced wrapping */
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+/* Intro paragraph under a heading: comfortable line length and leading */
+.section-lead {
+  max-width: 62ch;
+  font-size: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
+  line-height: 1.65;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+/* Card edge: hairline border, 2px brand top rule, layered soft shadow */
+.panel-edge {
+  border: 1px solid var(--t-200);
+  border-top: 2px solid var(--t-600);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.06), 0 10px 24px -14px rgb(15 23 42 / 0.16);
+}
+
+/* Interactive card: crisp offset shadow and a growing left accent bar on hover */
+.card-feature {
+  position: relative;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.card-feature::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: var(--t-600);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.22s ease;
+  pointer-events: none;
+}
+.card-feature:hover,
+.card-feature:focus-within {
+  border-color: var(--t-600);
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--t-200);
+}
+.card-feature:hover::before,
+.card-feature:focus-within::before {
+  transform: scaleY(1);
+}
+
+/* -------------------------------------------------------------
+ * ARCHITECTURAL TEXTURES (Sharp, Zero Border-Radius)
+ * Replaces repetitive full-screen watermarks with subtle clinical textures
+ * ------------------------------------------------------------- */
+.bg-grid-blueprint {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--t-200) 65%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--t-200) 65%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.bg-dots-clinical {
+  background-image: radial-gradient(color-mix(in srgb, var(--t-300) 50%, transparent) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* -------------------------------------------------------------
+ * STAT & METRIC CALLOUTS (High Contrast, Tabular Precision)
+ * ------------------------------------------------------------- */
+.stat-display {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.section-index-badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  color: var(--t-600);
+  background: var(--t-50);
+  border: 1px solid var(--t-200);
+  padding: 0.125rem 0.375rem;
+  margin-right: 0.375rem;
+  letter-spacing: 0.05em;
+  display: inline-block;
+}
+
+/* -------------------------------------------------------------
+ * CUT-CORNER ACCENTS (Angular Chamfer, Zero Rounding) - Item 5
+ * ------------------------------------------------------------- */
+.cut-corners-sm {
+  clip-path: polygon(
+    8px 0%,
+    calc(100% - 8px) 0%,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0% calc(100% - 8px),
+    0% 8px
+  );
+}
+
+.cut-corners-md {
+  clip-path: polygon(
+    14px 0%,
+    calc(100% - 14px) 0%,
+    100% 14px,
+    100% calc(100% - 14px),
+    calc(100% - 14px) 100%,
+    14px 100%,
+    0% calc(100% - 14px),
+    0% 14px
+  );
+}
+
+/* Precision architectural corner ticks / brackets */
+.corner-bracket {
+  position: relative;
+}
+
+.corner-bracket::before,
+.corner-bracket::after {
+  content: '';
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-color: var(--t-600);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.corner-bracket::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid;
+  border-left: 2px solid;
+}
+
+.corner-bracket::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid;
+  border-right: 2px solid;
+}
+
+/* -------------------------------------------------------------
+ * CLINICAL PHOTO TINTING & SQUARE CROPS - Item 7
+ * ------------------------------------------------------------- */
+.photo-clinical-frame {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  background-color: var(--t-100);
+  border: 1px solid var(--t-200);
+}
+
+.photo-clinical-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(104%) saturate(95%);
+}
+
+.photo-clinical-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--t-600);
+  mix-blend-mode: multiply;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+/* Utility to hide horizontal scrollbars on mobile snap strips */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

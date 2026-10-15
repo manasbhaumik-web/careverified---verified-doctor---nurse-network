@@ -38,6 +38,7 @@ import PharmacyWorkspace from './components/PharmacyWorkspace';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import PractitionerPage from './components/PractitionerPage';
+import ClinicHospitalPage from './components/ClinicHospitalPage';
 import AccountRecovery from './components/AccountRecovery';
 import PractitionerEarnings from './components/PractitionerEarnings';
 import AudiencePage from './components/AudiencePage';
@@ -293,11 +294,13 @@ export default function App() {
   // If not logged in, render landing page
   if (!currentUser) {
     if (route.path === '/login') return <LoginPage onLoginSuccess={handleLoginSuccess} />;
-    if (route.path === '/for-doctors') return <PractitionerPage />;
+    if (route.path === '/for-practitioners') return <PractitionerPage initialRole="all" />;
+    if (route.path === '/for-doctors') return <PractitionerPage initialRole="doctor" />;
+    if (route.path === '/for-nurses') return <PractitionerPage initialRole="nurse" />;
     if (route.path === '/forgot-password') return <AccountRecovery mode="forgot" />;
     if (route.path === '/reset-password') return <AccountRecovery mode="reset" />;
     if (route.path === '/for-pharmacies') return <AudiencePage kind="pharmacy" signInRole="pharmacy" content={FOR_PHARMACIES} />;
-    if (route.path === '/for-clinics') return <AudiencePage kind="clinic" signInRole="practitioner" content={FOR_CLINICS} />;
+    if (route.path === '/for-clinics' || route.path === '/for-hospitals') return <ClinicHospitalPage />;
     return <LandingPage professionals={professionals} />;
   }
 

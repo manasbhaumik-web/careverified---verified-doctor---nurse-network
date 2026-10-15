@@ -1,5 +1,6 @@
 import React from 'react';
 import { openLegal } from '../legal';
+import { navigate } from '../nav';
 import { Globe, ChevronRight, LogOut } from 'lucide-react';
 
 export interface NavItem {
@@ -38,10 +39,10 @@ export default function Footer({
 
   return (
     <footer className="app-dark-footer bg-[color:var(--dark)] text-slate-300 border-t border-[color:var(--t-800)] shrink-0 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-8 pb-8 md:pt-14 md:pb-12 space-y-6 md:space-y-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-8 pb-8 md:pt-12 md:pb-10 space-y-5 md:space-y-6">
         
         {/* ─── TIER 1: 5-COLUMN STRUCTURED NAVIGATION & TELEMETRY HUB ─── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-6 md:pb-10 border-b border-[color:var(--t-800)]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-6 md:pb-8 border-b border-[color:var(--t-800)]">
           
           {/* Column 1: Ecosystem Identity & Live Status Telemetry (4 Cols) */}
           <div className="lg:col-span-4 space-y-4">
@@ -134,13 +135,13 @@ export default function Footer({
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
               <li>
-                <a href="#verify-section" className="hover:text-white transition-colors cursor-pointer block">
-                  MMC Doctor Registry
+                <a href="/for-doctors" onClick={e => { e.preventDefault(); navigate('/for-doctors'); }} className="hover:text-white transition-colors cursor-pointer block">
+                  MMC Doctor Portal
                 </a>
               </li>
               <li>
-                <a href="#verify-section" className="hover:text-white transition-colors cursor-pointer block">
-                  LJM Nurse Credentials
+                <a href="/for-nurses" onClick={e => { e.preventDefault(); navigate('/for-nurses'); }} className="hover:text-white transition-colors cursor-pointer block">
+                  LJM Nurse Portal
                 </a>
               </li>
               <li>
@@ -222,12 +223,19 @@ export default function Footer({
         </div>
 
 
-        {/* ─── TIER 3: CLINICAL & REGULATORY DISCLAIMER ─── */}
-        <div className="py-4 border-b border-[color:var(--t-800)] text-[11px] text-slate-400 leading-relaxed">
-          <p>
-            <strong className="text-slate-300 uppercase tracking-wider text-[10px] mr-1">Medical Disclaimer:</strong>
-            MedCred operates as an independent medical directory, credential validation authority, and tele-consultation facilitation network. It is not an acute emergency response dispatch. Medical opinions, diagnoses, and prescriptions issued through the platform are rendered solely by autonomous, board-verified practitioners who maintain active Annual Practising Certificates (APC) under the Malaysian Medical Council or Lembaga Jururawat Malaysia. In the event of an urgent or life-threatening emergency, immediately contact national dispatch services at <strong className="text-slate-200">999</strong> or present at the nearest accredited hospital casualty department.
-          </p>
+        {/* ─── TIER 2: CLINICAL & REGULATORY DISCLAIMER CALLOUT ─── */}
+        <div className="bg-black/25 border border-[color:var(--t-800)] p-4 sm:p-5 text-[11px] leading-relaxed">
+          <div className="flex items-start gap-3">
+            <span className="w-6 h-6 shrink-0 bg-[color:var(--t-600)]/20 border border-[color:var(--t-600)]/40 text-white flex items-center justify-center mt-0.5">
+              <Cross className="h-3.5 w-3.5 text-[color:var(--t-200)]" />
+            </span>
+            <p className="flex-1 text-[11px] text-slate-400 leading-relaxed">
+              <strong className="text-white uppercase tracking-wider text-[10px] mr-1.5 font-bold">
+                Medical Disclaimer:
+              </strong>
+              MedCred operates as an independent medical directory, credential validation authority, and tele-consultation facilitation network. It is not an acute emergency response dispatch. Medical opinions, diagnoses, and prescriptions issued through the platform are rendered solely by autonomous, board-verified practitioners who maintain active Annual Practising Certificates (APC) under the Malaysian Medical Council or Lembaga Jururawat Malaysia. In the event of an urgent or life-threatening emergency, immediately contact national dispatch services at <strong className="text-white font-bold">999</strong> (112 from a mobile phone) or present at the nearest accredited hospital casualty department.
+            </p>
+          </div>
         </div>
 
         {/* ─── TIER 4: BOTTOM UTILITY BAR & LOCALIZATION ─── */}
