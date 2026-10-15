@@ -11,7 +11,7 @@ export const HERO_TR: Partial<Record<LangCode, Record<string, HeroText>>> = {
     network: {
       pill: 'Rangkaian Bantuan Perubatan Dalam Talian',
       headline: 'Rangkaian doktor dan bantuan perubatan dalam talian generasi baharu.',
-      body: 'MedCred menyediakan bantuan perubatan dalam talian masa nyata, konsultasi doktor 24/7, pengamal yang disahkan oleh lembaga, dan preskripsi digital.',
+      body: 'MedCred menyediakan bantuan perubatan dalam talian masa nyata, konsultasi doktor dalam talian, pengamal yang disahkan oleh lembaga, dan preskripsi digital.',
       cta: 'Daftar Akaun',
       chips: ['Konsultasi dalam talian', 'Doktor disahkan lembaga', 'E-preskripsi bertandatangan'],
     },
@@ -48,7 +48,7 @@ export const HERO_TR: Partial<Record<LangCode, Record<string, HeroText>>> = {
     network: {
       pill: '在线医疗协助网络',
       headline: '新一代在线医疗协助与医生网络。',
-      body: 'MedCred 提供实时在线医疗协助、24/7 医生远程问诊、经委员会核实的医疗人员以及电子处方。',
+      body: 'MedCred 提供实时在线医疗协助、在线医生问诊、经委员会核实的医疗人员以及电子处方。',
       cta: '创建账户',
       chips: ['在线问诊', '经委员会核实的医生', '已签名电子处方'],
     },

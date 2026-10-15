@@ -108,6 +108,8 @@ Details in docs/CONTENT_MALAYSIA.md. Tested (46 API checks, migration of an olde
 - [x] Demo data: every seeded practitioner is labelled "Demo", original numbers renamed with a DEMO- prefix (older databases migrate on start), six new Malaysian demo practitioners added, no invented ratings.
 - [ ] Not done: translating the rest of the landing page and the app screens; Indonesian and Arabic; Malay versions of the FAQ and existing articles; more topics; real testimonials (none exist yet).
 
+- [x] Landing page claims cleaned up: removed the "99.98% Statutory SLA" footers, the invented triage phone number (1-800-88-CARE), the whole corporate/enterprise section (no employer product exists: "< 3 Min Access", "100% Verifiable", "Compliant", EMR dashboard), the "sha256-verified tamper-proof" log label (the audit log has no hash chain), "MySejahtera Compatible", "encrypted" messaging, "24/7" (also in the Malay and Chinese hero text) and "partners" that are only references (MMC, MoH, a pharmacy network). Remaining claims match what the code does.
+
 ## 10. Launch and ops
 - [ ] Legal review: MMC advertising rules for doctors (promotion limits), PDPA registration, telemedicine position. Needs counsel; nothing to build. Hand over the list in [Legal review brief](#legal-review-brief) below.
 - [ ] Partner conversations: clinics, MHTC, insurers. Business outreach; nothing to build.
