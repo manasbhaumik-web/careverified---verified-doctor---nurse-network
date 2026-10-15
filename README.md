@@ -27,7 +27,9 @@ Sign-in has its own page, `/login` (`/login?role=practitioner&register=1` opens 
 
 **Demo mode** creates well-known demo accounts (password `DemoPass123`) on every start and offers one-click demo sign-in on the login page. It is on in development and **off when `NODE_ENV=production`**. Override with `ALLOW_DEMO=true` or `ALLOW_DEMO=false`. Demo sign-in never covers the admin account.
 
-- Always set `NODE_ENV=production` and a strong `ADMIN_PASSWORD` on a real deployment. If `ADMIN_PASSWORD` is missing in production, a random admin password is generated and printed once in the server log.
+- Always set `NODE_ENV=production`, a strong `ADMIN_PASSWORD`, and a long random `SESSION_SECRET` on a real deployment. Without `SESSION_SECRET` sessions still work but a restart signs everyone out. Set `SMTP_HOST`, `MAIL_FROM` and `APP_URL` too, or no email is sent and password reset is unavailable ([docs/EMAIL.md](docs/EMAIL.md)).
+- If `ADMIN_PASSWORD` is missing in production, a random admin password is generated and printed once in the server log.
+- Earlier versions signed sessions with a key written in the source when `SESSION_SECRET` was not set, which let anyone forge a session (including the admin). If such a version was ever deployed, set `SESSION_SECRET`, change the admin password and clear the `sessions` table.
 - A database that was ever started with demo mode on already contains the demo accounts (`*@careverified.test`) and two demo pharmacies. Remove them before launch.
 - An earlier version let anyone sign in as the admin through `POST /api/auth/demo`. If a copy of that version was ever deployed, treat the admin password and every session as compromised: change the password, clear the `sessions` table, and review the audit log for `auth.login.demo` entries.
 

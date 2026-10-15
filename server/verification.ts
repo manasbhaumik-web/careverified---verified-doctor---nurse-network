@@ -1,3 +1,4 @@
+import { email, emailAdmins } from "./mail";
 import crypto from "crypto";
 import type { Application, Response } from "express";
 import { db } from "./db";
@@ -207,6 +208,7 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
       prof.verificationStatus = VerificationStatus.PENDING;
       logEvent(request.id, prof.id, actor.id, "info_requested", note, true);
       notify(target, "More information needed", note);
+      email({ userId: target, template: "verification_info_needed", vars: { note } });
     } else if (decision === "reject") {
       if (!note) return fail(res, 400, "A reason is required to reject an application.");
       request.status = VerificationStatus.REJECTED;
@@ -214,6 +216,7 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
       prof.verificationStatus = VerificationStatus.REJECTED;
       logEvent(request.id, prof.id, actor.id, "rejected", note, true);
       notify(target, "Application rejected", note);
+      email({ userId: target, template: "verification_rejected", vars: { note } });
     } else if (decision === "approve") {
       const docCount = (db.prepare("SELECT COUNT(*) AS n FROM documents WHERE verification_request_id = ?").get(request.id) as any).n;
       if (docCount === 0) return fail(res, 400, "Cannot approve: no documents were uploaded for this application.");
@@ -239,6 +242,7 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
       logEvent(request.id, prof.id, actor.id, "registry_checked", registryReference);
       logEvent(request.id, prof.id, actor.id, "approved", note, true);
       notify(target, "You are verified", `Your profile is now public. Re-verification is due by ${prof.verifiedUntil}.`);
+      email({ userId: target, template: "verification_approved", vars: { until: prof.verifiedUntil } });
     } else {
       return fail(res, 400, "Decision must be approve, reject or request_info.");
     }
@@ -260,6 +264,7 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
     prof.suspensionReason = reason;
     logEvent(null, prof.id, req.user!.id, "suspended", reason, true);
     notify(accountOfProfile(prof.id), "Your profile has been suspended", reason);
+    email({ userId: accountOfProfile(prof.id), template: "profile_suspended", vars: { reason } });
     audit(req, "professional.suspend", { target: ["professional", prof.id], details: { reason } });
     res.json({ status: "success", data: prof });
   });
@@ -279,6 +284,7 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
     delete prof.suspensionReason;
     logEvent(null, prof.id, req.user!.id, "reinstated", str(req.body.note, 1000), true);
     notify(accountOfProfile(prof.id), "Your profile has been reinstated", "You are visible in the directory again.");
+    email({ userId: accountOfProfile(prof.id), template: "profile_reinstated" });
     audit(req, "professional.reinstate", { target: ["professional", prof.id] });
     res.json({ status: "success", data: prof });
   });
@@ -411,6 +417,7 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
         p.suspensionReason = reason;
         logEvent(null, p.id, null, "auto_suspended", reason, true);
         notify(account, "Your profile was suspended", `${reason} Upload your renewed documents to be reinstated.`);
+        email({ userId: account, template: "profile_suspended", vars: { reason } });
         notifyAdmins("Practitioner auto-suspended", `${p.name}: ${reason}`);
         audit(null, "professional.auto_suspend", { actor: null, target: ["professional", p.id], details: { reason } });
         continue;
@@ -421,6 +428,7 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
         p.lastWarning = warnKey;
         const what = warnKey.startsWith("licence") ? `Your licence expires on ${p.licenseExpiry}.` : `Re-verification is due by ${p.verifiedUntil}.`;
         notify(account, "Action needed soon", `${what} Please upload renewed documents.`);
+        email({ userId: account, template: "licence_expiry_soon", vars: { what } });
         notifyAdmins("Practitioner needs renewal", `${p.name}: ${what}`);
       }
     }

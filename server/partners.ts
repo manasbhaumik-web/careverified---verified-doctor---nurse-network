@@ -5,6 +5,8 @@ import { db } from "./db";
 import { audit } from "./audit";
 import { requireRole } from "./auth";
 import { notifyAdmins } from "./verification";
+import { email, emailAdmins } from "./mail";
+import { pickMailLang } from "./mailTemplates";
 import { MY_STATES, toE164 } from "../src/identity";
 
 /**
@@ -54,19 +56,22 @@ export function registerPartners(app: Application) {
     const problem = enquiryProblem(req.body);
     if (problem) return fail(res, 400, problem);
 
-    const email = str(req.body.email, 120).toLowerCase();
+    const email_ = str(req.body.email, 120).toLowerCase();
     const kind = str(req.body.kind, 10);
-    const dup = db.prepare("SELECT 1 AS x FROM partner_enquiries WHERE email = ? AND kind = ? AND created_at > ?").get(email, kind, new Date(Date.now() - 86_400_000).toISOString());
+    const dup = db.prepare("SELECT 1 AS x FROM partner_enquiries WHERE email = ? AND kind = ? AND created_at > ?").get(email_, kind, new Date(Date.now() - 86_400_000).toISOString());
     if (dup) return fail(res, 409, "We already have an enquiry from this email today. We will be in touch.");
 
     const id = "ENQ-" + crypto.randomBytes(3).toString("hex").toUpperCase();
     const now = iso();
     db.prepare(`INSERT INTO partner_enquiries (id,kind,org_name,contact_name,email,phone,city,state,licence_no,message,consent_at,created_at,updated_at)
       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(
-      id, kind, str(req.body.orgName, 120), str(req.body.contactName, 100), email, toE164(str(req.body.phone, 30), "+60"),
+      id, kind, str(req.body.orgName, 120), str(req.body.contactName, 100), email_, toE164(str(req.body.phone, 30), "+60"),
       str(req.body.city, 60), str(req.body.state, 40), str(req.body.licenceNo, 50) || null, str(req.body.message, 1500) || null, now, now, now,
     );
     notifyAdmins(`New ${kind} enquiry`, `${str(req.body.orgName, 120)}, ${str(req.body.city, 60)}. Reference ${id}.`);
+    // Confirmation to the person who sent it, and an email to the board so an enquiry is never missed.
+    email({ to: email_, lang: pickMailLang(req.body.lang), template: "partner_enquiry_received", vars: { org: str(req.body.orgName, 120), ref: id } });
+    emailAdmins("partner_enquiry_admin", { kind, org: str(req.body.orgName, 120), city: str(req.body.city, 60), ref: id });
     audit(req, "partner.enquiry.create", { target: ["partner_enquiry", id], details: { kind } });
     res.status(201).json({ status: "success", data: { id } });
   });

@@ -1,3 +1,4 @@
+import { getLocale } from '../locale/store';
 import React, { useState } from 'react';
 import { openLegal } from '../legal';
 import { IdFields, PhoneField, AddressFields, emptyId, emptyPhone, emptyAddress, idProblem, phoneE164, type IdState, type PhoneState } from './IdentityFields';
@@ -107,6 +108,7 @@ export default function PatientRegistrationForm({
           name,
           email,
           password,
+          lang: getLocale().lang,
           idType: idState.idType,
           icNumber: nric ? nric.normalised : idState.idNumber,
           nationality: idState.nationality,

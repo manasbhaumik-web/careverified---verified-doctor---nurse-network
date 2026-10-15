@@ -38,6 +38,7 @@ import PharmacyWorkspace from './components/PharmacyWorkspace';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import PractitionerPage from './components/PractitionerPage';
+import AccountRecovery from './components/AccountRecovery';
 import PractitionerEarnings from './components/PractitionerEarnings';
 import AudiencePage from './components/AudiencePage';
 import { FOR_PHARMACIES } from './content/forPharmacies';
@@ -68,6 +69,11 @@ export default function App() {
   type SessionUser = { id: string; role: 'patient' | 'practitioner' | 'admin' | 'pharmacy'; name: string; email: string; avatarUrl?: string; profileId?: string | null };
   const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
   const route = useLocation();
+  // Emails to a signed-in person are sent in the language they use in the app
+  const { lang: appLang } = useLocale();
+  useEffect(() => {
+    if (currentUser) fetch('/api/me/language', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lang: appLang }) }).catch(() => {});
+  }, [currentUser?.id, appLang]);
   // A signed-in user who opens /login is sent home
   useEffect(() => { if (currentUser && route.path === '/login') navigate('/', { replace: true }); }, [currentUser, route.path]);
   const [sessionChecked, setSessionChecked] = useState(false);
@@ -288,6 +294,8 @@ export default function App() {
   if (!currentUser) {
     if (route.path === '/login') return <LoginPage onLoginSuccess={handleLoginSuccess} />;
     if (route.path === '/for-doctors') return <PractitionerPage />;
+    if (route.path === '/forgot-password') return <AccountRecovery mode="forgot" />;
+    if (route.path === '/reset-password') return <AccountRecovery mode="reset" />;
     if (route.path === '/for-pharmacies') return <AudiencePage kind="pharmacy" signInRole="pharmacy" content={FOR_PHARMACIES} />;
     if (route.path === '/for-clinics') return <AudiencePage kind="clinic" signInRole="practitioner" content={FOR_CLINICS} />;
     return <LandingPage professionals={professionals} />;

@@ -62,7 +62,7 @@ export default function PartnerEnquiryForm({ kind }: { kind: 'clinic' | 'pharmac
     if (!toE164(f.phone, '+60')) { setError(tx.errPhone); return; }
     setBusy(true);
     try {
-      const r = await fetch('/api/partner-enquiries', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...f, kind }) });
+      const r = await fetch('/api/partner-enquiries', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...f, kind, lang }) });
       const d = await r.json();
       if (d.status === 'success') setDoneId(d.data.id); else setError(d.message || tx.errServer);
     } catch { setError(tx.errServer); }

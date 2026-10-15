@@ -1,3 +1,4 @@
+import { email } from "./mail";
 import crypto from "crypto";
 import type { Application, Response } from "express";
 import { db } from "./db";
@@ -206,6 +207,7 @@ export function registerQualityRoutes(app: Application, ctx: Ctx) {
     if (staff) {
       db.prepare("UPDATE tickets SET status = 'pending', first_response_at = COALESCE(first_response_at, ?), resolved_at = NULL, updated_at = ? WHERE id = ?").run(iso(), iso(), t.id);
       notify(t.user_id, "Support replied to your ticket", t.subject);
+      email({ userId: t.user_id, template: "support_reply", vars: { subject: t.subject } });
     } else {
       db.prepare("UPDATE tickets SET status = 'open', resolved_at = NULL, updated_at = ? WHERE id = ?").run(iso(), t.id);
       if (t.first_response_at) notifyAdmins("Customer replied", t.subject);

@@ -1,3 +1,4 @@
+import { getLocale } from '../locale/store';
 import React, { useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { openLegal } from '../legal';
@@ -24,7 +25,7 @@ export default function PractitionerSignUp({ onSuccess, onCancel }: {
       const resp = await fetch('/api/auth/register-practitioner', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, consent }),
+        body: JSON.stringify({ name, email, password, consent, lang: getLocale().lang }),
       });
       const data = await resp.json();
       if (data.status === 'success') onSuccess(data.data.user);

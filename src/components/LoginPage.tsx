@@ -182,6 +182,9 @@ export default function LoginPage({ onLoginSuccess }: { onLoginSuccess: (user: S
                       <input id="login-password" type="password" autoComplete="current-password" enterKeyHint="go" placeholder="••••••••"
                         value={password} onChange={e => setPassword(e.target.value)} className={inputCls} required />
                     </div>
+                    {role !== 'admin' && (
+                      <p className="-mt-2"><a href="/forgot-password" onClick={e => { e.preventDefault(); navigate('/forgot-password'); }} className="inline-block py-2 text-xs font-bold text-[color:var(--t-700)] hover:underline">Forgot your password?</a></p>
+                    )}
                     {needsCode && (
                       <div className="space-y-2">
                         <label htmlFor="login-code" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Authenticator code</label>

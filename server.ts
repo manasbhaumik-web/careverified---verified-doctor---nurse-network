@@ -30,6 +30,8 @@ import { refundPolicy } from "./server/paymentPolicy";
 import { demoEnabled, DEMO_ROLES } from "./server/demo";
 import { registerPartners } from "./server/partners";
 import { registerPayouts } from "./server/payouts";
+import { registerMail, email as sendMail } from "./server/mail";
+import { registerRecovery } from "./server/accountRecovery";
 import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
 
 // Load environment variables
@@ -601,11 +603,12 @@ app.post("/api/auth/register-practitioner", (req, res) => {
   if (req.body.consent !== true) return fail(res, 400, "You must accept the Terms and Privacy Policy.");
   if (emailTaken(email)) return fail(res, 409, "An account with this email already exists.");
 
-  const user = createUser({ email, password: req.body.password, role: "practitioner", name, consentVersion: CONSENT_VERSION });
+  const user = createUser({ email, password: req.body.password, role: "practitioner", name, consentVersion: CONSENT_VERSION, lang: req.body.lang });
   recordConsent(user.id, "terms_privacy");
   recordConsent(user.id, "credential_check");
   createSession(req, res, user.id);
   audit(req, "auth.register", { actor: user, target: ["user", user.id] });
+  sendMail({ userId: user.id, template: "practitioner_welcome", vars: { name: user.name } });
   res.status(201).json({ status: "success", data: { user: publicUser(user) } });
 });
 
@@ -667,7 +670,7 @@ app.post("/api/register-patient", (req, res) => {
   if (req.body.consent !== true) return fail(res, 400, "You must consent to the processing of your health data to register.");
   if (emailTaken(email)) return fail(res, 409, "A patient with this email already exists.");
 
-  const user = createUser({ email, password, role: "patient", name, consentVersion: CONSENT_VERSION });
+  const user = createUser({ email, password, role: "patient", name, consentVersion: CONSENT_VERSION, lang: req.body.lang });
   recordConsent(user.id, "terms_privacy");
   recordConsent(user.id, "health_data");
   recordConsent(user.id, "quality_review");
@@ -711,6 +714,8 @@ registerPharmacyMy(app);
 registerTestimonials(app);
 registerJobsMy(app, { findProfessional, allProfessionals, jobs: () => jobs });
 registerTourism(app, { findProfessional, allProfessionals });
+registerMail(app);
+registerRecovery(app);
 registerPartners(app);
 registerPayouts(app, { getBooking: id => bookings.find(b => b.id === id), findProfessional });
 registerDataOps(app, {

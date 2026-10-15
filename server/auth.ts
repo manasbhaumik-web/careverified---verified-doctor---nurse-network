@@ -23,6 +23,8 @@ declare global {
   }
 }
 
+try { db.exec("ALTER TABLE users ADD COLUMN sessions_valid_after TEXT"); } catch { /* column already exists */ }
+
 const COOKIE = "cv_session";
 const SESSION_DAYS = 7;
 const MAX_FAILED = 5;
@@ -56,7 +58,21 @@ const DUMMY_HASH = hashPassword(crypto.randomBytes(8).toString("hex"));
 
 // ---------- sessions ----------
 const sha = (s: string) => crypto.createHash("sha256").update(s).digest("hex");
-const sessionSecret = () => process.env.SESSION_SECRET || process.env.RECORD_SIGNING_SECRET || "medcred-vercel-session-secret-2026";
+/**
+ * The key that signs session tokens. It must be secret: anyone who knows it can forge a session for any user, including the admin.
+ * Set SESSION_SECRET (a long random string) in production. Without it a random key is made for this process only, so nothing can
+ * be forged from the source code, but signed tokens stop working after a restart or on another server instance.
+ */
+let processSecret: string | null = null;
+const sessionSecret = () => {
+  const fromEnv = process.env.SESSION_SECRET || process.env.RECORD_SIGNING_SECRET;
+  if (fromEnv) return fromEnv;
+  if (!processSecret) {
+    processSecret = crypto.randomBytes(32).toString("hex");
+    if (isProd()) console.warn("[auth] SESSION_SECRET is not set. Sessions work, but a restart or a second instance signs everyone out. Set SESSION_SECRET.");
+  }
+  return processSecret;
+};
 const signSessionPart = (payload: string) => crypto.createHmac("sha256", sessionSecret()).update(payload).digest("base64url");
 const revokedTokens = new Set<string>();
 
@@ -64,7 +80,7 @@ export function createSession(req: Request, res: Response, userId: string) {
   const now = new Date();
   const expires = new Date(now.getTime() + SESSION_DAYS * 86400_000);
   const nonce = crypto.randomBytes(12).toString("base64url");
-  const payload = Buffer.from(JSON.stringify({ u: userId, e: expires.getTime(), n: nonce })).toString("base64url");
+  const payload = Buffer.from(JSON.stringify({ u: userId, e: expires.getTime(), n: nonce, i: now.getTime() })).toString("base64url");
   const token = `${payload}.${signSessionPart(payload)}`;
   db.prepare("INSERT INTO sessions (token_hash,user_id,created_at,expires_at,ip,user_agent) VALUES (?,?,?,?,?,?)").run(
     sha(token), userId, now.toISOString(), expires.toISOString(), req.ip ?? null, String(req.headers["user-agent"] ?? "").slice(0, 200)
@@ -97,7 +113,8 @@ function readCookie(req: Request, name: string): string | null {
   return null;
 }
 
-function verifySignedToken(token: string): string | null {
+/** The signed token is a fallback for a freshly started serverless instance that has no session rows. */
+function verifySignedToken(token: string): { userId: string; issuedAt: number } | null {
   const dot = token.indexOf(".");
   if (dot <= 0) return null;
   const payload = token.slice(0, dot);
@@ -106,8 +123,9 @@ function verifySignedToken(token: string): string | null {
   if (sig.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
   try {
     const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-    if (typeof parsed?.u === "string" && typeof parsed?.e === "number" && parsed.e > Date.now()) {
-      return parsed.u;
+    // A token without an issued-at (made before sessions could be revoked) is not accepted without its row.
+    if (typeof parsed?.u === "string" && typeof parsed?.e === "number" && typeof parsed?.i === "number" && parsed.e > Date.now()) {
+      return { userId: parsed.u, issuedAt: parsed.i };
     }
   } catch { /* malformed */ }
   return null;
@@ -125,12 +143,14 @@ export function loadSession(req: Request, _res: Response, next: NextFunction) {
       req.user = { id: row.id, email: row.email, name: row.name, role: row.role, avatarUrl: row.avatarUrl, profileId: row.profileId };
     } else {
       // Serverless fallback when request lands on a freshly started instance
-      const userId = verifySignedToken(token);
-      if (userId) {
+      const signed = verifySignedToken(token);
+      if (signed) {
         const uRow = db.prepare(
-          `SELECT id, email, name, role, avatar_url AS avatarUrl, profile_id AS profileId, status FROM users WHERE id = ?`
-        ).get(userId) as any;
-        if (uRow && uRow.status === "active") {
+          `SELECT id, email, name, role, avatar_url AS avatarUrl, profile_id AS profileId, status, sessions_valid_after AS validAfter FROM users WHERE id = ?`
+        ).get(signed.userId) as any;
+        // Deleting a person's session rows must really end their sessions: a token made before the last password change is refused.
+        const revoked = uRow?.validAfter && signed.issuedAt < Date.parse(uRow.validAfter);
+        if (uRow && uRow.status === "active" && !revoked) {
           req.user = { id: uRow.id, email: uRow.email, name: uRow.name, role: uRow.role, avatarUrl: uRow.avatarUrl, profileId: uRow.profileId };
         }
       }
@@ -197,7 +217,7 @@ export function attemptLogin(req: Request, email: string, password: string, role
 
 // ---------- user creation ----------
 export function createUser(u: {
-  id?: string; email: string; password: string; role: Role; name: string; avatarUrl?: string; profileId?: string | null; consentVersion?: string;
+  id?: string; email: string; password: string; role: Role; name: string; avatarUrl?: string; profileId?: string | null; consentVersion?: string; lang?: string;
 }): AuthUser {
   const id = u.id || ("usr-" + crypto.randomBytes(8).toString("hex"));
   const now = new Date().toISOString();
@@ -206,6 +226,8 @@ export function createUser(u: {
     "INSERT INTO users (id,email,password_hash,role,name,avatar_url,profile_id,consent_version,consent_at,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)"
   ).run(id, email, hashPassword(u.password), u.role, u.name, u.avatarUrl ?? null, u.profileId ?? null,
     u.consentVersion ?? null, u.consentVersion ? now : null, now);
+  // The language emails are sent in (set again whenever the person changes language in the app).
+  if (u.lang === "ms" || u.lang === "zh" || u.lang === "en") { try { db.prepare("UPDATE users SET lang = ? WHERE id = ?").run(u.lang, id); } catch { /* column not created yet */ } }
   return { id, email, name: u.name, role: u.role, avatarUrl: u.avatarUrl ?? null, profileId: u.profileId ?? null };
 }
 
@@ -230,7 +252,13 @@ export function ensureAdmin() {
   console.log("=".repeat(60));
 }
 
+/** Ends every session of a person, including signed-token fallbacks: only tokens issued after this moment are accepted. */
+export function revokeAllSessions(userId: string) {
+  db.prepare("DELETE FROM sessions WHERE user_id = ?").run(userId);
+  db.prepare("UPDATE users SET sessions_valid_after = ? WHERE id = ?").run(new Date().toISOString(), userId);
+}
+
 export function changePassword(userId: string, newPassword: string) {
   db.prepare("UPDATE users SET password_hash = ?, must_change_password = 0 WHERE id = ?").run(hashPassword(newPassword), userId);
-  db.prepare("DELETE FROM sessions WHERE user_id = ?").run(userId);
+  revokeAllSessions(userId);
 }

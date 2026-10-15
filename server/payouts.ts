@@ -7,6 +7,7 @@ import { db, dataDir } from "./db";
 import { audit } from "./audit";
 import { requireRole, verifyPassword } from "./auth";
 import { notify, notifyAdmins } from "./verification";
+import { email } from "./mail";
 
 /**
  * Practitioner payouts.
@@ -271,6 +272,7 @@ export function registerPayouts(app: Application, ctx: { getBooking: (id: string
     if (ok && req.body?.nameChecked !== true) return fail(res, 400, "Confirm you have checked that the account holder name matches the practitioner's name.");
     if (!ok && !note) return fail(res, 400, "Say why it is not verified, so the practitioner can fix it.");
     db.prepare("UPDATE payout_accounts SET status = ?, verified_by = ?, verified_at = ?, note = ? WHERE professional_id = ?").run(ok ? "verified" : "rejected", ok ? req.user!.id : null, ok ? iso() : null, note, a.professional_id);
+    email({ userId: a.user_id, template: ok ? "bank_verified" : "bank_rejected", vars: { note } });
     notify(a.user_id, ok ? "Your bank account is verified" : "Your bank details need attention", ok ? "You will be included in the next payout." : note!);
     audit(req, "payout.account.verify", { target: ["professional", a.professional_id], details: { verified: ok } });
     res.json({ status: "success" });
@@ -393,6 +395,7 @@ export function registerPayouts(app: Application, ctx: { getBooking: (id: string
     if (refundedItems([p.id]).length) return fail(res, 409, "A payment in this payout was refunded after approval. Mark it failed so the rest is released, then prepare a new batch.");
     db.prepare("UPDATE payouts SET status = 'paid', reference = ?, paid_on = ?, updated_at = ? WHERE id = ?").run(reference, paidOn, iso(), p.id);
     refreshBatch(p.batch_id);
+    email({ userId: p.user_id, template: "payout_paid", vars: { amount: myr(p.amount_sen), bank: `${p.bank_name} ••••${p.last4}`, reference } });
     notify(p.user_id, "A payout was sent to you", `RM ${myr(p.amount_sen)} to ${p.bank_name} ••••${p.last4}. Bank reference ${reference}.`);
     audit(req, "payout.paid", { target: ["payout", p.id], details: { amountSen: p.amount_sen } });
     res.json({ status: "success" });
@@ -412,6 +415,7 @@ export function registerPayouts(app: Application, ctx: { getBooking: (id: string
       db.exec("COMMIT");
     } catch (e) { try { db.exec("ROLLBACK"); } catch { /* done */ } throw e; }
     refreshBatch(p.batch_id);
+    email({ userId: p.user_id, template: "payout_failed", vars: { reason } });
     notify(p.user_id, "A payout could not be completed", `${reason}. Check your bank details. Your earnings are safe and will be in the next payout.`);
     audit(req, "payout.failed", { target: ["payout", p.id], details: { reason } });
     res.json({ status: "success" });
