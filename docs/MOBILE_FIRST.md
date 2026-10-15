@@ -36,7 +36,6 @@ Resize the browser pane to 375 x 812, sign in as each demo role (`npm run seed:d
 ## Not done / next
 - Pages not reviewed one by one beyond the audit and the key flows: admin dashboards, the clinical workspace, pharmacy workspace, tourism desk and job board were audited for overflow and size but not redesigned. Dense tables there scroll sideways rather than reflowing into cards.
 - The landing page is still very long on a phone (about 17 screens; the corporate section is gone, so a little shorter). The invented badges and metrics were removed or reworded (see the task list, section 9).
-- The "Syncing Clinical Registry…" loading screen renders the whole footer under it.
 - No offline support or install prompt: a web app manifest with PNG icons and a service worker would make it installable.
 - No real-device testing yet: emulation does not reproduce iOS keyboard behaviour, safe areas or scroll chaining. Test on an iPhone and a mid-range Android before launch.
 - Chinese, Arabic and long Malay strings were not stress-tested in the narrow tab bar labels (they are truncated, not wrapped).

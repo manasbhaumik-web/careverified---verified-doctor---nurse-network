@@ -604,13 +604,13 @@ export default function App() {
       {/* Primary Screen Area */}
       <main id="main-content" className="flex-grow py-4 sm:py-8 px-4 sm:px-6 lg:px-8 w-full max-w-[1920px] mx-auto">
         {loading ? (
-          <div className="text-center py-24 space-y-4 animate-fade-in flex flex-col items-center justify-center">
+          <div role="status" aria-live="polite" className="text-center min-h-[60vh] space-y-4 animate-fade-in flex flex-col items-center justify-center">
             <div className="relative flex items-center justify-center">
               <LoadingImage size={64} />
             </div>
             <div>
-              <h3 className="text-base font-extrabold text-slate-800 tracking-tight">Syncing Clinical Registry…</h3>
-              <p className="text-xs text-slate-500 font-semibold mt-1">Connecting to board verification network</p>
+              <h3 className="text-base font-extrabold text-slate-800 tracking-tight">Loading your workspace…</h3>
+              <p className="text-xs text-slate-500 font-semibold mt-1">This takes a moment.</p>
             </div>
           </div>
         ) : (
@@ -887,7 +887,8 @@ export default function App() {
       </nav>
 
       {/* ═══════════ STANDARDIZED APPLICATION FOOTER ═══════════ */}
-      <Footer
+      {/* The footer waits until the page has loaded, so it does not sit under the spinner */}
+      {!loading && <Footer
         variant="app"
         navItems={navItems}
         activeView={activeView}
@@ -897,7 +898,7 @@ export default function App() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onLogout={handleLogout}
-      />
+      />}
     </div>
   );
 }
