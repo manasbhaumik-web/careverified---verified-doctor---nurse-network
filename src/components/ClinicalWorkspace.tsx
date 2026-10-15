@@ -54,6 +54,8 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
   const [validDays, setValidDays] = useState(30);
   const [warnings, setWarnings] = useState<any[] | null>(null);
   const [unknown, setUnknown] = useState<string[]>([]);
+  // Malaysian online-care rules (patient abroad, restricted after a video visit). Blocks issuing, unlike an interaction override.
+  const [policyBlock, setPolicyBlock] = useState<string | null>(null);
   const [overrides, setOverrides] = useState<Record<string, string>>({});
   const [attested, setAttested] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -68,7 +70,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
     const d = await jpost('/api/prescriptions/check', rxBody());
     setBusy(false);
     if (d.status !== 'success') return setError(d.message);
-    setWarnings(d.data.warnings); setUnknown(d.data.unknown);
+    setWarnings(d.data.warnings); setUnknown(d.data.unknown); setPolicyBlock(d.data.policyBlock ?? null);
   };
   const issue = async () => {
     setError(''); setOk(''); setBusy(true);
@@ -76,10 +78,11 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
     setBusy(false);
     if (d.status === 'success') {
       setOk(`Prescription issued. Verification code: ${d.data.code}`);
-      setItems([blankItem()]); setDiagnosis(''); setRxNotes(''); setWarnings(null); setOverrides({}); setAttested(false);
+      setItems([blankItem()]); setDiagnosis(''); setRxNotes(''); setWarnings(null); setPolicyBlock(null); setOverrides({}); setAttested(false);
       return load();
     }
     if (d.data?.warnings) setWarnings(d.data.warnings);
+    if (d.data?.policyBlock) { setPolicyBlock(d.data.policyBlock); if (!d.data?.warnings) setWarnings([]); }
     setError(d.message || 'Could not issue the prescription.');
   };
   const cancelRx = async (id: string) => {
@@ -88,7 +91,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
     const d = await jpost(`/api/prescriptions/${id}/cancel`, { reason });
     if (d.status !== 'success') setError(d.message); else load();
   };
-  const setItem = (i: number, patch: object) => { setItems(prev => prev.map((it, idx) => idx === i ? { ...it, ...patch } : it)); setWarnings(null); };
+  const setItem = (i: number, patch: object) => { setItems(prev => prev.map((it, idx) => idx === i ? { ...it, ...patch } : it)); setWarnings(null); setPolicyBlock(null); };
 
   // ---- certificate / referral / lab ----
   const today = new Date().toISOString().slice(0, 10);
@@ -109,7 +112,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
   ] as const;
   const needOverride = (warnings ?? []).filter(w => w.severity === 'major');
   const blocked = (warnings ?? []).some(w => w.severity === 'contraindicated');
-  const canIssue = !blocked && needOverride.every(w => (overrides[w.key] ?? '').trim().length >= 5) && (ctx.recordShared || attested);
+  const canIssue = !blocked && !policyBlock && needOverride.every(w => (overrides[w.key] ?? '').trim().length >= 5) && (ctx.recordShared || attested);
 
   return (
     <div className="space-y-3 text-slate-800">
@@ -204,7 +207,14 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
 
           {warnings && (
             <div className="space-y-2" aria-live="polite">
-              {warnings.length === 0 && unknown.length === 0 && <p className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 p-2.5">No issues found by the built-in checks.</p>}
+              {policyBlock && (
+                <div role="alert" className="border border-rose-300 bg-rose-50 text-rose-900 p-2.5 text-xs space-y-1">
+                  <p className="font-extrabold flex items-center gap-1.5"><Ban className="h-3.5 w-3.5" /> NOT ALLOWED FOR THIS CONSULTATION</p>
+                  <p>{policyBlock}</p>
+                  <p className="font-bold">Cannot be issued.</p>
+                </div>
+              )}
+              {warnings.length === 0 && unknown.length === 0 && !policyBlock && <p className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 p-2.5">No issues found by the built-in checks.</p>}
               {warnings.map(w => (
                 <div key={w.key} className={`border p-2.5 text-xs space-y-1.5 ${SEV[w.severity]}`}>
                   <p className="font-extrabold flex items-center gap-1.5">{w.severity === 'contraindicated' ? <Ban className="h-3.5 w-3.5" /> : <AlertTriangle className="h-3.5 w-3.5" />} {w.severity.toUpperCase()} · {w.drugs.join(' + ')}</p>

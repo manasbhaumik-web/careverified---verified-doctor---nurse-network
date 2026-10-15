@@ -31,7 +31,7 @@ Current understanding: Telemedicine Act 1997 never in force (abolition proposed)
 - [x] Cross-border: patient country recorded, acknowledgement required.
 - [x] Prescribing guardrails: controlled medicines are never e-prescribed (existing list); online care for a patient outside Malaysia cannot issue an e-prescription unless `TELE_CROSS_BORDER_RX=allow`; `TELE_EXTRA_RESTRICTED` lists drugs that need an in-person visit. The controlled list is a short built-in list, not the official Poisons Act schedules: legal/pharmacist sign-off still required.
 - [x] Emergency numbers by country (`server/emergency.ts`, compiled from general knowledge: verify before launch); SOS dialog has a country selector and warns when a country is unknown (falls back to 112).
-- [ ] Prescribing UI does not yet show the policy block before submit (the API returns it in `/api/prescriptions/check` as `policyBlock`).
+- [x] Prescribing screen shows the policy block after "Check safety" (patient outside Malaysia, drugs restricted after online care) as a red "not allowed" notice and keeps "Sign and issue" disabled; it also appears if the server refuses at issue time ([ClinicalWorkspace.tsx](../src/components/ClinicalWorkspace.tsx)).
 
 ## 3. Privacy and data (PDPA 2010 plus international)
 Code in `server/privacy.ts`, `server/dataops.ts`, `src/components/PrivacyCentre.tsx` and `PrivacyAdmin.tsx`. Notice, Terms and runbook texts are developer drafts: counsel must review them.
