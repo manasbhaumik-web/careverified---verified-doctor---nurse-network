@@ -253,6 +253,16 @@ export default function ProfessionalProfile({
       {currentUser?.role === 'patient' && <ReportPractitioner professionalId={prof.id} />}
 
       {/* Main Profile Header */}
+      {!bookingSuccess && (
+        <div className="lg:hidden fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 bg-white border-t border-[color:var(--t-200)] shadow-[0_-4px_12px_rgba(15,23,42,0.08)] px-4 py-2.5 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold text-slate-500 leading-none">Consultation fee</p>
+            <p className="text-base font-black text-[color:var(--ink)] tabular-nums leading-tight">{formatMoney(prof.fee)}</p>
+          </div>
+          <button type="button" onClick={() => document.getElementById('booking-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="min-h-[44px] px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-extrabold cursor-pointer">Book</button>
+        </div>
+      )}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Primary Details Card */}
         <div className="lg:col-span-8 space-y-6">
@@ -541,8 +551,8 @@ export default function ProfessionalProfile({
         </div>
 
         {/* Right Appointment Booking Drawer Column */}
-        <div className="lg:col-span-4">
-          <div className="bg-white border border-[color:var(--t-200)] p-5 shadow-xs sticky top-24 space-y-6">
+        <div className="lg:col-span-4" id="booking-panel">
+          <div className="bg-white border border-[color:var(--t-200)] p-4 sm:p-5 shadow-xs lg:sticky lg:top-24 space-y-6 scroll-mt-20">
             <h3 className="text-sm font-bold text-[color:var(--ink)] flex items-center gap-1.5 uppercase tracking-wider">
               <Calendar className="h-4 w-4 text-[color:var(--t-600)]" />
               Book Clinical Consultation

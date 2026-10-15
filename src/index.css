@@ -283,10 +283,11 @@ footer button.bg-slate-800:hover,
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
 }
 
-:root[data-theme="teal"] {
-  --t-50: #F0FDFA; --t-100: #CCFBF1; --t-200: #99F6E4; --t-300: #5EEAD4; --t-400: #2DD4BF;
-  --t-500: #0D9488; --t-600: #0F766E; --t-700: #115E59; --t-800: #134E4A; --t-900: #042F2E;
-  --t-bg: #F5FEFC; --t-hue: 175deg;
+:root[data-theme="cyan"] {
+  /* Bright cyan #00E5FF is the signature colour (400); 600 and up are darker so white text and small text stay readable */
+  --t-50: #ECFEFF; --t-100: #CFFAFE; --t-200: #A5F3FC; --t-300: #67E8F9; --t-400: #00E5FF;
+  --t-500: #06B6D4; --t-600: #0E7490; --t-700: #155E75; --t-800: #164E63; --t-900: #083344;
+  --t-bg: #F4FEFF; --t-hue: 190deg;
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
   --t-text: var(--t-600);
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
@@ -569,3 +570,73 @@ footer button.bg-slate-800:hover,
   transform-origin: center center;
 }
 
+
+/* ───────────────────────────────────────────────────────────────────────────
+ * Mobile-first layer. The base styles above are written for small screens; these rules
+ * make touch use comfortable. Kept unlayered so they win over utilities where intended.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+/* Smooth, tap-friendly defaults */
+html { scroll-padding-top: 5rem; }
+a, button, [role="button"], summary, label, select, input { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+/* Safe-area helpers used by the bottom navigation and sheets */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+.mb-bottom-nav { margin-bottom: calc(4rem + env(safe-area-inset-bottom)); }
+
+/* Touch screens: form fields are at least 44px tall, and small controls get an invisible larger hit area
+ * (a 6px halo) without changing how they look. Positioned buttons (absolute, fixed, sticky) are left alone. */
+@media (pointer: coarse) {
+  select,
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]) { min-height: 44px; }
+  textarea { min-height: 88px; }
+  input[type="checkbox"], input[type="radio"] { width: 1.25rem; height: 1.25rem; }
+
+  button:not(.absolute):not(.fixed):not(.sticky):not(.relative),
+  [role="button"]:not(.absolute):not(.fixed):not(.sticky):not(.relative),
+  summary:not(.absolute):not(.fixed):not(.sticky):not(.relative) { position: relative; }
+  button:not(:disabled)::after,
+  [role="button"]::after,
+  summary::after { content: ""; position: absolute; inset: -6px; }
+  /* A button that is already large does not need the halo, and it must not swallow taps meant for its neighbours */
+  button.min-h-\[44px\]::after, button.min-h-11::after, button.h-11::after, button.h-12::after, button.h-14::after { inset: 0; }
+}
+
+/* Small screens: nothing under 11px, long words and codes wrap instead of pushing the layout */
+@media (max-width: 639px) {
+  .text-\[8px\], .text-\[9px\], .text-\[10px\] { font-size: 11px; }
+  h1, h2, h3, p, li, dd, td { overflow-wrap: anywhere; }
+  table { font-size: 12px; }
+}
+
+/* Dialogs become bottom sheets on phones: reachable with a thumb, full width, scrollable, above the keyboard */
+@media (max-width: 639px) {
+  .fixed.inset-0.flex.items-center.justify-center,
+  .fixed.inset-0.flex.items-start.justify-center {
+    align-items: flex-end;
+    padding: 0 !important;
+  }
+  .fixed.inset-0.flex.items-center.justify-center > *,
+  .fixed.inset-0.flex.items-start.justify-center > * {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92dvh;
+    overflow-y: auto;
+    border-radius: 16px 16px 0 0;
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+    animation: sheet-up 0.22s ease-out;
+  }
+}
+@keyframes sheet-up { from { transform: translateY(24px); opacity: 0.6; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { @keyframes sheet-up { from, to { transform: none; opacity: 1; } } }
+
+/* Bottom tab bar (mobile app shell) */
+.bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
+.bottom-nav button { -webkit-user-select: none; user-select: none; }
+
+/* Print and large screens are unchanged */
+
+/* Full-width buttons are primary actions: give them a comfortable touch height */
+@media (pointer: coarse) {
+  button.w-full, a.w-full { min-height: 44px; }
+}

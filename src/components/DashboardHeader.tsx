@@ -66,7 +66,7 @@ export default function DashboardHeader<T extends string>({
       <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-[color:var(--t-50)] to-transparent" />
 
       {title && (
-        <div className="relative px-5 sm:px-7 pt-5 pb-5">
+        <div className="relative px-4 sm:px-7 pt-4 pb-4 sm:pt-5 sm:pb-5">
           <BannerRow
             identity={<BannerIdentity as="h1" icon={icon ?? ShieldCheck} name={title} badges={eyebrow ? <BannerBadge>{eyebrow}</BannerBadge> : undefined} description={description} />}
             aside={actions}
@@ -125,9 +125,9 @@ export const bannerSecondaryBtn =
 /** Two-column row: identity on the left, KPIs and actions on the right. */
 export function BannerRow({ identity, aside }: { identity: React.ReactNode; aside?: React.ReactNode }) {
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
       {identity}
-      {aside && <div className="flex items-center gap-4 flex-wrap lg:justify-end border-t lg:border-t-0 border-[color:var(--t-200)]/80 pt-4 lg:pt-0 shrink-0">{aside}</div>}
+      {aside && <div className="flex items-center gap-4 flex-wrap lg:justify-end border-t lg:border-t-0 border-[color:var(--t-200)]/80 pt-3 sm:pt-4 lg:pt-0 shrink-0">{aside}</div>}
     </div>
   );
 }
@@ -168,7 +168,7 @@ export function BannerIdentity({ name, avatarUrl, icon: Icon, as: Heading = 'h2'
           <Heading className="text-xl sm:text-2xl font-bold text-[color:var(--ink)] tracking-tight">{name}</Heading>
           {badges}
         </div>
-        {description && <p className="text-sm text-[color:var(--ink-2)] leading-relaxed max-w-3xl">{description}</p>}
+        {description && <p className="text-sm text-[color:var(--ink-2)] leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
         {meta && <div className="flex items-center gap-2.5 text-xs text-slate-700 font-semibold flex-wrap">{meta}</div>}
       </div>
     </div>

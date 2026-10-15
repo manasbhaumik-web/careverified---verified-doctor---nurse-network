@@ -241,14 +241,14 @@ export default function PatientRegistrationForm({
                 <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Full Name (as on your ID) *</label>
                 <div className="relative">
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                  <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ahmad Fauzi Bin Ramli" className="form-input pl-10" required />
+                  <input type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ahmad Fauzi Bin Ramli" className="form-input pl-10" required />
                 </div>
               </div>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Email Address *</label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ahmad@gmail.com" className="form-input pl-10" required />
+                  <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" spellCheck={false} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ahmad@gmail.com" className="form-input pl-10" required />
                 </div>
               </div>
             </div>
@@ -256,7 +256,7 @@ export default function PatientRegistrationForm({
               <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Account Password *</label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters, letters and numbers" className="form-input pl-10" required />
+                <input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters, letters and numbers" className="form-input pl-10" required />
               </div>
             </div>
             <IdFields value={idState} onChange={setIdState} />

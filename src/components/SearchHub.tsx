@@ -37,6 +37,8 @@ export default function SearchHub({
   const [selectedCity, setSelectedCity] = useState<string>('all');
   const [maxFee, setMaxFee] = useState<number>(500);
   const [showMap, setShowMap] = useState(false);
+  // On phones the filters start closed so the practitioners come first.
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedModes, setSelectedModes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'rating' | 'fee' | 'experience'>('rating');
@@ -80,6 +82,7 @@ export default function SearchHub({
     setSelectedModes(prev => (prev.includes(m) ? prev.filter(x => x !== m) : [...prev, m]));
 
   const specialties = Array.from(new Set(professionals.map(p => p.specialization)));
+  const cities = Array.from(new Set(professionals.map(p => p.city).filter(Boolean))).sort();
 
   const getSpecialtyIcon = (specialty: string) => {
     const spec = specialty.toLowerCase();
@@ -197,8 +200,14 @@ export default function SearchHub({
         <aside aria-label="Filters" className="flex-[1_1_280px] max-w-full lg:max-w-[320px] min-w-0 bg-white border border-[color:var(--t-200)] shadow-xs p-5 space-y-5">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-[color:var(--ink)] flex items-center gap-2"><SlidersHorizontal className="h-4 w-4 text-[color:var(--t-600)]" /> Filters</h2>
-            <button type="button" onClick={resetFilters} className="text-[13px] font-semibold text-[color:var(--e-700)] hover:text-[color:var(--e-800)] min-h-[44px] cursor-pointer">Clear all</button>
+            <div className="flex items-center gap-3">
+              <button type="button" onClick={resetFilters} className="text-[13px] font-semibold text-[color:var(--e-700)] hover:text-[color:var(--e-800)] min-h-[44px] cursor-pointer">Clear all</button>
+              <button type="button" onClick={() => setFiltersOpen(o => !o)} aria-expanded={filtersOpen} aria-controls="directory-filter-body"
+                className="lg:hidden min-h-[44px] px-4 border border-[color:var(--t-200)] text-[13px] font-bold text-[color:var(--t-700)] cursor-pointer">{filtersOpen ? 'Hide' : 'Show'}</button>
+            </div>
           </div>
+
+          <div id="directory-filter-body" className={`space-y-5 ${filtersOpen ? '' : 'hidden'} lg:block`}>
 
           <fieldset className="space-y-2">
             <legend className={`${labelCls} mb-2`}>Practitioner type</legend>
@@ -238,11 +247,7 @@ export default function SearchHub({
             <label htmlFor="directory-city" className={labelCls}>City</label>
             <select id="directory-city" value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)} className={selectCls}>
               <option value="all">All cities</option>
-              <option value="Kuala Lumpur">Kuala Lumpur</option>
-              <option value="Petaling Jaya">Petaling Jaya</option>
-              <option value="Penang">Penang</option>
-              <option value="Johor Bahru">Johor Bahru</option>
-              <option value="Ampang">Ampang</option>
+              {cities.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
 
@@ -274,6 +279,7 @@ export default function SearchHub({
               className="w-full accent-[color:var(--t-600)] cursor-pointer"
             />
             <div className="flex justify-between text-xs text-slate-600"><span>RM 30</span><span className="font-semibold text-[color:var(--ink)]">RM {maxFee}</span></div>
+          </div>
           </div>
         </aside>
 

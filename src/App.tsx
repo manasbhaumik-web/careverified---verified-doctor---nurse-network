@@ -345,10 +345,27 @@ export default function App() {
     navItems.push({ id: p.id, name: p.name, icon, isExtension: true });
   });
 
+  // The mobile bottom bar shows the places each role uses most (up to four); everything else is under "More".
+  const PRIORITY: Record<string, string[]> = {
+    patient: ['patient_dashboard', 'consult', 'pharmacies', 'messages'],
+    practitioner: ['onboard', 'oncall', 'recruitment', 'messages'],
+    pharmacy: ['pharmacy_workspace', 'help'],
+    admin: ['admin', 'registry', 'tourism_desk', 'seo'],
+  };
+  const SHORT_LABEL: Record<string, string> = {
+    patient_dashboard: 'Home', consult: 'Consult', pharmacies: 'Pharmacy', messages: 'Mailbox', registry: 'Doctors', oncall: 'On Call', onboard: 'Portal',
+    recruitment: 'Shifts', admin: 'Admin', tourism_desk: 'Tourism', pharmacy_workspace: 'Workspace', help: 'Help', articles: 'Library', tourism: 'Tourism', quality: 'Quality', seo: 'SEO',
+  };
+  const mobileTabs = (() => {
+    const wanted = (PRIORITY[currentUser.role] ?? []).map(id => navItems.find(n => n.id === id)).filter(Boolean) as typeof navItems;
+    const rest = navItems.filter(n => !wanted.includes(n) && n.id !== 'help');
+    return [...wanted, ...rest].slice(0, 4);
+  })();
+
   return (
-    <div className="min-h-dvh bg-[color:var(--t-bg)] text-slate-800 flex flex-col font-sans antialiased selection:bg-[color:var(--t-100)] selection:text-[color:var(--t-600)]">
+    <div className="min-h-dvh bg-[color:var(--t-bg)] text-slate-800 flex flex-col font-sans antialiased selection:bg-[color:var(--t-100)] selection:text-[color:var(--t-600)] pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
       {notice && (
-        <div role="status" className="fixed top-3 left-1/2 -translate-x-1/2 z-[120] bg-slate-900 text-white text-sm font-semibold px-5 py-3 shadow-lg flex items-center gap-4">
+        <div role="status" className="fixed top-[calc(0.75rem+env(safe-area-inset-top))] left-3 right-3 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[120] bg-slate-900 text-white text-sm font-semibold px-4 sm:px-5 py-3 shadow-lg flex items-center justify-between sm:justify-start gap-4">
           {notice}
           <button onClick={() => setNotice(null)} className="underline text-xs cursor-pointer">Dismiss</button>
         </div>
@@ -422,11 +439,14 @@ export default function App() {
           </div>
 
           {/* Mobile Navigation Toggler */}
-          <div className="flex lg:hidden items-center gap-3">
+          <div className="flex lg:hidden items-center gap-1.5">
+            {currentUser.role === 'patient' && <SOSButton />}
+            <NotificationBell />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="min-h-11 min-w-11 flex items-center justify-center rounded-lg border border-transparent text-white hover:bg-white/15 cursor-pointer"
               aria-label="Toggle navigation"
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -437,13 +457,15 @@ export default function App() {
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="lg:hidden bg-white text-[color:var(--ink)] -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-[color:var(--t-200)] overflow-hidden"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="lg:hidden fixed inset-x-0 top-16 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-40 bg-white text-[color:var(--ink)] px-4 sm:px-6 border-t border-[color:var(--t-200)] overflow-y-auto overscroll-contain"
+              role="dialog"
+              aria-label="Menu"
             >
-              <div className="py-3 space-y-1 text-sm font-bold text-[color:var(--ink)]">
+              <div className="py-3 space-y-1 text-sm font-bold text-[color:var(--ink)] pb-6">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeView === item.id;
@@ -580,7 +602,7 @@ export default function App() {
       </div>
 
       {/* Primary Screen Area */}
-      <main className="flex-grow py-8 px-4 sm:px-6 lg:px-8 w-full max-w-[1920px] mx-auto">
+      <main id="main-content" className="flex-grow py-4 sm:py-8 px-4 sm:px-6 lg:px-8 w-full max-w-[1920px] mx-auto">
         {loading ? (
           <div className="text-center py-24 space-y-4 animate-fade-in flex flex-col items-center justify-center">
             <div className="relative flex items-center justify-center">
@@ -828,6 +850,41 @@ export default function App() {
           </div>
         )}
       </main>
+
+
+      {/* Mobile bottom tab bar: the few places used most, plus a menu for the rest */}
+      <nav aria-label="Primary" className="bottom-nav lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-[color:var(--t-200)] shadow-[0_-2px_10px_rgba(15,23,42,0.08)]">
+        <ul className="grid" style={{ gridTemplateColumns: `repeat(${mobileTabs.length + 1}, minmax(0, 1fr))` }}>
+          {mobileTabs.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeView === item.id && !mobileMenuOpen;
+            return (
+              <li key={item.id}>
+                <button
+                  type="button"
+                  onClick={() => { setActiveView(item.id); setSelectedProfId(null); setMobileMenuOpen(false); window.scrollTo({ top: 0 }); }}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`w-full h-16 flex flex-col items-center justify-center gap-1 text-[11px] font-bold cursor-pointer ${isActive ? 'text-[color:var(--t-700)]' : 'text-slate-500'}`}
+                >
+                  <span className={`h-7 w-12 rounded-full flex items-center justify-center transition-colors ${isActive ? 'bg-[color:var(--t-100)]' : ''}`}><Icon className="h-5 w-5" /></span>
+                  <span className="max-w-full truncate px-1">{SHORT_LABEL[item.id] ?? item.name}</span>
+                </button>
+              </li>
+            );
+          })}
+          <li>
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(o => !o)}
+              aria-expanded={mobileMenuOpen}
+              className={`w-full h-16 flex flex-col items-center justify-center gap-1 text-[11px] font-bold cursor-pointer ${mobileMenuOpen ? 'text-[color:var(--t-700)]' : 'text-slate-500'}`}
+            >
+              <span className={`h-7 w-12 rounded-full flex items-center justify-center ${mobileMenuOpen ? 'bg-[color:var(--t-100)]' : ''}`}>{mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</span>
+              <span>{mobileMenuOpen ? 'Close' : 'More'}</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
 
       {/* ═══════════ STANDARDIZED APPLICATION FOOTER ═══════════ */}
       <Footer

@@ -38,10 +38,10 @@ export default function Footer({
 
   return (
     <footer className="app-dark-footer bg-[color:var(--dark)] text-slate-300 border-t border-[color:var(--t-800)] shrink-0 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-14 pb-12 space-y-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-8 pb-8 md:pt-14 md:pb-12 space-y-6 md:space-y-10">
         
         {/* ─── TIER 1: 5-COLUMN STRUCTURED NAVIGATION & TELEMETRY HUB ─── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-10 border-b border-[color:var(--t-800)]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-6 md:pb-10 border-b border-[color:var(--t-800)]">
           
           {/* Column 1: Ecosystem Identity & Live Status Telemetry (4 Cols) */}
           <div className="lg:col-span-4 space-y-4">
@@ -55,33 +55,12 @@ export default function Footer({
               </span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
-              Malaysia's sovereign clinical verification infrastructure. Real-time board credential auditing, authenticated e-prescriptions, and hospital shift locum governance.
+              A network of verified doctors, nurses and pharmacies in Malaysia: licence checks, online consultations and doctor-signed e-prescriptions.
             </p>
-
-            {/* Real-time Health Telemetry Widget */}
-            <div className="p-3.5 bg-slate-900/80 border border-slate-800 space-y-2 max-w-sm">
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="flex items-center gap-1.5 text-slate-300 font-bold">
-                  <span className="w-2 h-2 bg-emerald-400 rounded-none animate-ping" />
-                  Registry Network
-                </span>
-                <span className="text-emerald-400 font-mono font-bold text-[10px]">100% OPERATIONAL</span>
-              </div>
-              <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800/80 text-[10px] text-slate-400 font-mono">
-                <div>
-                  <span className="block text-slate-500 text-[9px] uppercase">Latency</span>
-                  <span className="text-slate-300 font-bold">14ms (KUL-01)</span>
-                </div>
-                <div>
-                  <span className="block text-slate-500 text-[9px] uppercase">Encryption</span>
-                  <span className="text-slate-300 font-bold">256-Bit AES / TLS 1.3</span>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Column 2: Portals & Navigation (2 Cols) */}
-          <div className="lg:col-span-2 space-y-3">
+          <div className="hidden md:block lg:col-span-2 space-y-3">
             <h4 className="text-[11px] font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
               {variant === 'app' ? 'Portal Sitemap' : 'Portal Lounges'}
             </h4>
@@ -149,7 +128,7 @@ export default function Footer({
           </div>
 
           {/* Column 3: Verification & Registers (2 Cols) */}
-          <div className="lg:col-span-2 space-y-3">
+          <div className="hidden md:block lg:col-span-2 space-y-3">
             <h4 className="text-[11px] font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
               Verification Hub
             </h4>
@@ -190,7 +169,7 @@ export default function Footer({
           </div>
 
           {/* Column 4: Compliance & Medical Governance (2 Cols) */}
-          <div className="lg:col-span-2 space-y-3">
+          <div className="hidden md:block lg:col-span-2 space-y-3">
             <h4 className="text-[11px] font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
               Governance & Law
             </h4>
@@ -205,7 +184,7 @@ export default function Footer({
           </div>
 
           {/* Column 5: Headquarters & Session Desk (2 Cols) */}
-          <div className="lg:col-span-2 space-y-3">
+          <div className="hidden md:block lg:col-span-2 space-y-3">
             <h4 className="text-[11px] font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
               {variant === 'app' ? 'Session & HQ' : 'Operational HQ'}
             </h4>

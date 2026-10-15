@@ -16,6 +16,7 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
   const [mine, setMine] = useState<any[]>([]);
   const [roster, setRoster] = useState<Set<string>>(new Set());
   const [rosterDirty, setRosterDirty] = useState(false);
+  const [mobileDay, setMobileDay] = useState(0);
   const [earnings, setEarnings] = useState<any | null>(null);
   const [msg, setMsg] = useState('');
   const onlineRef = useRef(false);
@@ -94,9 +95,9 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
   return (
     <div className="space-y-5 w-full">
       {/* Status bar with at-a-glance numbers */}
-      <section className={`border p-6 grid gap-6 lg:grid-cols-[1fr_auto] items-center shadow-xs transition-colors ${me?.online ? 'bg-emerald-50/70 border-emerald-300' : 'bg-white border-[color:var(--t-200)]'}`}>
-        <div className="flex flex-wrap items-center gap-x-10 gap-y-4">
-          <div className="min-w-[280px] max-w-md">
+      <section className={`border p-4 sm:p-6 grid gap-4 sm:gap-6 lg:grid-cols-[1fr_auto] items-center shadow-xs transition-colors ${me?.online ? 'bg-emerald-50/70 border-emerald-300' : 'bg-white border-[color:var(--t-200)]'}`}>
+        <div className="flex flex-wrap items-center gap-x-10 gap-y-4 min-w-0">
+          <div className="min-w-0 sm:min-w-[280px] max-w-md">
             <h2 className="text-lg font-black flex items-center gap-2.5 text-[color:var(--ink)]">
               <span className="relative flex h-3 w-3">
                 {me?.online && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>}
@@ -108,7 +109,7 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
               While online, you are dispatched incoming telehealth consults. Keep this browser tab open to receive audio chimes.
             </p>
           </div>
-          <dl className="flex flex-wrap gap-x-8 gap-y-3">
+          <dl className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-x-8 sm:gap-y-3 w-full sm:w-auto">
             {[
               ['Waiting Patients', me?.online ? String(offers.length) : '—'],
               ['Committed Hours / Wk', String(roster.size)],
@@ -122,7 +123,7 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
             ))}
           </dl>
         </div>
-        <button onClick={() => setOnline(!me?.online)} className={`h-12 px-8 text-xs font-extrabold uppercase tracking-wider cursor-pointer transition-colors shadow-xs ${me?.online ? 'bg-white border border-slate-300 text-slate-800 hover:bg-slate-100' : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white'}`}>
+        <button onClick={() => setOnline(!me?.online)} className={`h-12 w-full lg:w-auto px-8 text-xs font-extrabold uppercase tracking-wider cursor-pointer transition-colors shadow-xs ${me?.online ? 'bg-white border border-slate-300 text-slate-800 hover:bg-slate-100' : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white'}`}>
           {me?.online ? 'Go Offline' : 'Go Online Now'}
         </button>
       </section>
@@ -172,7 +173,7 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
               <h3 className="text-sm font-extrabold">On-call roster</h3>
               <p className="text-xs text-slate-600 mt-1">Tick the hours you commit to be available. The board uses this to make sure every hour of the day is covered.</p>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
               <button onClick={() => applyPreset('weekdays')} className="border border-slate-200 text-xs font-bold px-3 py-2 cursor-pointer hover:bg-slate-50">Weekdays 08–20</button>
               <button onClick={() => applyPreset('all')} className="border border-slate-200 text-xs font-bold px-3 py-2 cursor-pointer hover:bg-slate-50">24/7</button>
               <button onClick={() => applyPreset('clear')} className="border border-slate-200 text-xs font-bold px-3 py-2 cursor-pointer hover:bg-slate-50">Clear</button>
@@ -180,7 +181,30 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Phones: one day at a time with large hour buttons */}
+          <div className="sm:hidden space-y-3">
+            <div role="tablist" aria-label="Day of the week" className="grid grid-cols-7 gap-1">
+              {DAYS.map((d, day) => (
+                <button key={d} role="tab" aria-selected={mobileDay === day} onClick={() => setMobileDay(day)}
+                  className={`h-12 flex flex-col items-center justify-center text-[11px] font-bold border cursor-pointer ${mobileDay === day ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-600)]' : 'bg-white text-slate-700 border-slate-200'}`}>
+                  <span>{d.slice(0, 3)}</span><span className="tabular-nums opacity-80">{dayCount(day)}h</span>
+                </button>
+              ))}
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {Array.from({ length: 24 }, (_, h) => {
+                const on = roster.has(`${mobileDay}-${h}`);
+                return (
+                  <button key={h} onClick={() => toggleCell(mobileDay, h)} aria-pressed={on} aria-label={`${DAYS[mobileDay]} ${h}:00`}
+                    className={`h-12 text-xs font-bold tabular-nums cursor-pointer border ${on ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-600)]' : 'bg-slate-50 text-slate-700 border-slate-200'}`}>
+                    {String(h).padStart(2, '0')}:00
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="hidden sm:block overflow-x-auto">
             <div className="min-w-[640px] grid gap-[3px] items-center" style={{ gridTemplateColumns: 'auto repeat(24, minmax(0, 1fr)) auto' }}>
               <span />
               {Array.from({ length: 24 }, (_, h) => <span key={h} className="text-[10px] font-semibold text-slate-500 text-center">{h}</span>)}

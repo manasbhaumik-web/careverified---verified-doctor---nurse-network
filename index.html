@@ -2,7 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="color-scheme" content="light" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="format-detection" content="telephone=no" />
     <title>MedCred — Verified Doctor & Nurse Network | Medical Credential Verification</title>
     <meta name="description" content="MedCred is an online medical assistance platform. Check that a doctor or nurse holds a current licence, take online consultations, and keep digital prescriptions in one place." />
     <meta name="theme-color" content="#c8102e" />
@@ -60,7 +65,7 @@
     <script>
       try {
         var t = localStorage.getItem('medcred-theme');
-        if (t === 'green') t = 'teal';
+        if (t === 'green' || t === 'teal') t = 'sky';
         if (t) document.documentElement.setAttribute('data-theme', t);
       } catch (e) {}
     </script>

@@ -89,7 +89,7 @@ export function PhoneField({ id, title, value, onChange, required = true }: { id
         <select aria-label="Country code" className="form-select w-28 shrink-0" value={value.dial} onChange={e => onChange({ ...value, dial: e.target.value })}>
           {DIAL_CODES.map(d => <option key={d.code} value={d.dial}>{d.code} {d.dial}</option>)}
         </select>
-        <input id={id} type="tel" inputMode="tel" className="form-input" required={required} placeholder={value.dial === '+60' ? '12-345 6789' : 'Phone number'}
+        <input id={id} type="tel" inputMode="tel" autoComplete="tel-national" className="form-input" required={required} placeholder={value.dial === '+60' ? '12-345 6789' : 'Phone number'}
           value={value.number} onChange={e => onChange({ ...value, number: e.target.value })} />
       </div>
       {!ok && <p className={`${hint} text-rose-700`}>This does not look like a valid phone number for {value.dial}.</p>}

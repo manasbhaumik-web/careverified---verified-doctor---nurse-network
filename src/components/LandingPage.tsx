@@ -511,7 +511,7 @@ function PractitionerSignUp({ onSuccess, onCancel }: {
         </div>
         <div className="space-y-2">
           <label htmlFor="pr-email" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Email address</label>
-          <input id="pr-email" type="email" className={field} value={email} onChange={e => setEmail(e.target.value)} required />
+          <input id="pr-email" type="email" inputMode="email" autoComplete="email" autoCapitalize="none" spellCheck={false} className={field} value={email} onChange={e => setEmail(e.target.value)} required />
         </div>
         <div className="space-y-2">
           <label htmlFor="pr-password" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Password</label>
@@ -539,6 +539,15 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
   const { lang } = useLocale();
   const t = useT();
   const heroTr = HERO_TR[lang];
+  // The phone sign-in bar hides while the sign-in form itself is on screen
+  const [showCtaBar, setShowCtaBar] = useState(true);
+  useEffect(() => {
+    const el = document.getElementById('login-section');
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([e]) => setShowCtaBar(!e.isIntersecting), { threshold: 0.15 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   const [testimonials, setTestimonials] = useState<{ id: string; text: string; rating: number | null; name: string; location: string | null; demo: boolean }[]>([]);
   useEffect(() => { fetch('/api/testimonials').then(r => r.json()).then(d => d.status === 'success' && setTestimonials(d.data)).catch(() => {}); }, []);
   // Login State
@@ -752,12 +761,12 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
   const activeModule = PROFESSIONAL_ASSISTANCE_MODULES.find(m => m.id === activeModuleId) || PROFESSIONAL_ASSISTANCE_MODULES[0];
 
   return (
-    <div className="min-h-dvh bg-[color:var(--t-bg)] text-[color:var(--ink)] font-body flex flex-col antialiased selection:bg-[color:var(--t-100)] selection:text-[color:var(--t-600)]">
+    <div className="min-h-dvh bg-[color:var(--t-bg)] text-[color:var(--ink)] font-body flex flex-col antialiased selection:bg-[color:var(--t-100)] selection:text-[color:var(--t-600)] pb-[calc(4.5rem+env(safe-area-inset-bottom))] sm:pb-0">
 
       <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-[color:var(--t-700)] focus:px-4 focus:py-2 focus:border focus:border-[color:var(--t-600)] focus:font-bold">{t('nav.skip')}</a>
 
       {/* ═══════════ TOP BANNER ═══════════ */}
-      <div className="bg-[color:var(--t-100)] text-[color:var(--t-600)] text-xs font-semibold py-2 px-4 text-center border-b border-[color:var(--t-200)] flex items-center justify-center gap-2">
+      <div className="hidden sm:flex bg-[color:var(--t-100)] text-[color:var(--t-600)] text-xs font-semibold py-2 px-4 text-center border-b border-[color:var(--t-200)] items-center justify-center gap-2">
         <span className="inline-flex items-center gap-1.5 bg-[color:var(--t-600)] text-white px-2.5 py-0.5 rounded-none text-[11px] uppercase tracking-wider font-bold">
           <Cross className="h-2.5 w-2.5" /> MedCred Standard
         </span>
@@ -766,22 +775,22 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
 
       {/* ═══════════ NAVBAR (LIGHT TONE PRIMARY BACKGROUND) ═══════════ */}
       <nav className="sticky top-0 z-50 bg-[color:var(--t-50)]/95 backdrop-blur-md border-b border-[color:var(--t-200)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-3.5 flex flex-wrap justify-between items-center gap-4">
-          <a href="#top" className="flex items-center gap-3.5 group">
-            <span className="w-10 h-10 rounded-none bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-700)] group-hover:bg-[color:var(--t-700)] transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-2.5 sm:py-3.5 flex flex-nowrap sm:flex-wrap justify-between items-center gap-2 sm:gap-4">
+          <a href="#top" className="flex items-center gap-2.5 sm:gap-3.5 group min-w-0">
+            <span className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-none bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-700)] group-hover:bg-[color:var(--t-700)] transition-colors">
               <Cross className="h-5 w-5" />
             </span>
             <span className="flex flex-col leading-none">
-              <span className="font-display font-black text-2xl tracking-tight text-[color:var(--ink)]">
+              <span className="font-display font-black text-xl sm:text-2xl tracking-tight text-[color:var(--ink)]">
                 MedCred<span className="text-[color:var(--t-600)]">.</span>
               </span>
-              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--t-600)] mt-1">
+              <span className="hidden sm:block text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--t-600)] mt-1">
                 {t('nav.tagline')}
               </span>
             </span>
           </a>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 sm:flex-wrap shrink-0">
             <a
               href="#verify-section"
               className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-5 text-sm font-bold text-[color:var(--t-600)] bg-white border border-[color:var(--t-200)] rounded-none hover:bg-[color:var(--t-100)] transition-all cursor-pointer"
@@ -791,16 +800,22 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
             </a>
             <a
               href="#login-section"
-              className="inline-flex items-center gap-2 min-h-[44px] px-6 text-sm font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none shadow-xs transition-all cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-4 sm:px-6 text-[13px] sm:text-sm font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none shadow-xs transition-all cursor-pointer whitespace-nowrap"
             >
               {t('nav.portal')}
               <ArrowRight className="h-4 w-4" />
             </a>
             <LocaleSwitcher />
-            <ThemeSwitcher />
+            <span className="hidden sm:inline-flex"><ThemeSwitcher /></span>
           </div>
         </div>
       </nav>
+
+      {/* Phones: sign-in and sign-up stay in reach on the long page */}
+      <div className={`${showCtaBar ? '' : 'hidden'} sm:hidden fixed inset-x-0 bottom-0 z-40 bg-white/95 backdrop-blur border-t border-[color:var(--t-200)] px-4 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] grid grid-cols-2 gap-2.5 shadow-[0_-4px_12px_rgba(15,23,42,0.08)]`}>
+        <button type="button" onClick={() => goLogin('patient', false)} className="min-h-[46px] text-sm font-extrabold text-[color:var(--t-700)] bg-white border border-[color:var(--t-300,var(--t-200))] cursor-pointer">Sign in</button>
+        <button type="button" onClick={() => goLogin('patient', true)} className="min-h-[46px] text-sm font-extrabold text-white bg-[color:var(--t-600)] border border-[color:var(--t-700)] cursor-pointer">Create account</button>
+      </div>
 
       {/* ═══════════ HERO SLIDER: one slide per audience, all stacked so the height never changes ═══════════ */}
       <header
@@ -1945,6 +1960,12 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                         <input
                           id="login-email"
                           type="email"
+                          inputMode="email"
+                          autoComplete="username"
+                          autoCapitalize="none"
+                          autoCorrect="off"
+                          spellCheck={false}
+                          enterKeyHint="next"
                           placeholder={DEMO_ACCOUNTS[activeTab].email}
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
@@ -1960,6 +1981,8 @@ export default function LandingPage({ professionals, onLoginSuccess }: LandingPa
                         <input
                           id="login-password"
                           type="password"
+                          autoComplete="current-password"
+                          enterKeyHint="go"
                           placeholder="••••••••"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
