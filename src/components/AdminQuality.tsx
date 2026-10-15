@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { MACROS, MACRO_LANGS, fillMacro, type MacroLang, type SupportHours } from '../supportMy';
+import AdminPartners from './AdminPartners';
 
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -8,13 +9,13 @@ const lab = 'text-[10px] font-extrabold uppercase tracking-wider text-slate-500'
 const btn = 'text-xs font-bold cursor-pointer';
 const field = 'border border-slate-200 px-3 py-2 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
 
-type Sub = 'support' | 'reviews' | 'incidents' | 'peer' | 'credentials';
+type Sub = 'support' | 'partners' | 'reviews' | 'incidents' | 'peer' | 'credentials';
 
 /** Admin quality and safety: support queue with response targets, review moderation, incidents, peer review, credentials. */
 export default function AdminQuality() {
   const [sub, setSub] = useState<Sub>('support');
   const [msg, setMsg] = useState('');
-  const subs: [Sub, string][] = [['support', 'Support desk'], ['reviews', 'Review moderation'], ['incidents', 'Incidents'], ['peer', 'Peer review & audits'], ['credentials', 'CPD & certificates']];
+  const subs: [Sub, string][] = [['support', 'Support desk'], ['partners', 'Partner enquiries'], ['reviews', 'Review moderation'], ['incidents', 'Incidents'], ['peer', 'Peer review & audits'], ['credentials', 'CPD & certificates']];
   return (
     <div className="space-y-4 text-slate-800">
       <div role="tablist" className="flex flex-wrap gap-1 border-b border-slate-200">
@@ -25,6 +26,7 @@ export default function AdminQuality() {
       </div>
       {msg && <p role="status" className="text-xs font-bold bg-slate-50 border border-slate-200 p-2.5">{msg}</p>}
       {sub === 'support' && <Support say={setMsg} />}
+      {sub === 'partners' && <AdminPartners say={setMsg} />}
       {sub === 'reviews' && <Reviews say={setMsg} />}
       {sub === 'incidents' && <Incidents say={setMsg} />}
       {sub === 'peer' && <Peer say={setMsg} />}

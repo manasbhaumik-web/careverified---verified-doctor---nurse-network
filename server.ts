@@ -28,6 +28,7 @@ import { registerVerificationRoutes, notifyAdmins, notify } from "./server/verif
 import { registerPaymentRoutes, registerPaymentWebhook, setPaymentHandlers, refundPayment } from "./server/payments";
 import { refundPolicy } from "./server/paymentPolicy";
 import { demoEnabled, DEMO_ROLES } from "./server/demo";
+import { registerPartners } from "./server/partners";
 import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
 
 // Load environment variables
@@ -709,6 +710,7 @@ registerPharmacyMy(app);
 registerTestimonials(app);
 registerJobsMy(app, { findProfessional, allProfessionals, jobs: () => jobs });
 registerTourism(app, { findProfessional, allProfessionals });
+registerPartners(app);
 registerDataOps(app, {
   // De-identify what lives outside SQL: patient profile, bookings and chat messages.
   anonymiseJson: userId => {
@@ -1538,6 +1540,18 @@ app.get("/sitemap.xml", (req, res) => {
     <lastmod>2026-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://careverified.pro/for-pharmacies</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://careverified.pro/for-clinics</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>`;
 
   // Append programmatic SEO landing pages

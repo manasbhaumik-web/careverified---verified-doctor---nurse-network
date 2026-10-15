@@ -17,6 +17,14 @@
     {
       "source": "/for-doctors",
       "destination": "/index.html"
+    },
+    {
+      "source": "/for-pharmacies",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/for-clinics",
+      "destination": "/index.html"
     }
   ]
 }

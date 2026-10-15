@@ -38,6 +38,9 @@ import PharmacyWorkspace from './components/PharmacyWorkspace';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import PractitionerPage from './components/PractitionerPage';
+import AudiencePage from './components/AudiencePage';
+import { FOR_PHARMACIES } from './content/forPharmacies';
+import { FOR_CLINICS } from './content/forClinics';
 import { navigate, useLocation } from './nav';
 import Footer from './components/Footer';
 import LoadingImage from './components/LoadingImage';
@@ -284,6 +287,8 @@ export default function App() {
   if (!currentUser) {
     if (route.path === '/login') return <LoginPage onLoginSuccess={handleLoginSuccess} />;
     if (route.path === '/for-doctors') return <PractitionerPage />;
+    if (route.path === '/for-pharmacies') return <AudiencePage kind="pharmacy" signInRole="pharmacy" content={FOR_PHARMACIES} />;
+    if (route.path === '/for-clinics') return <AudiencePage kind="clinic" signInRole="practitioner" content={FOR_CLINICS} />;
     return <LandingPage professionals={professionals} />;
   }
 

@@ -3,6 +3,7 @@ import { useLocale, useT } from '../locale';
 import { HERO_TR } from '../locale/landing';
 import PatientAccess from './PatientAccess';
 import TouristAccess from './TouristAccess';
+import JoinNetwork from './JoinNetwork';
 import VerificationScopeBadge from './VerificationScopeBadge';
 import ThemeSwitcher from './ThemeSwitcher';
 import LocaleSwitcher from './LocaleSwitcher';
@@ -853,6 +854,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
       {/* ═══════════ MAIN CONTENT ═══════════ */}
       <main id="main-content" className="flex-grow w-full">
 
+        <JoinNetwork />
         {region === 'INTL'
           ? <><TouristAccess onSignUp={() => goLogin('patient', true)} /><PatientAccess /></>
           : <><PatientAccess /><TouristAccess onSignUp={() => goLogin('patient', true)} /></>}
