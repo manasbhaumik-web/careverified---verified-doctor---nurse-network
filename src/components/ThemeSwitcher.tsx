@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Settings, Check } from 'lucide-react';
 
-export type ThemeName = 'crimson' | 'sky' | 'teal' | 'navy';
+export type ThemeName = 'crimson' | 'sky' | 'cyan' | 'navy';
 
 const THEMES: { id: ThemeName; label: string; swatch: string }[] = [
   { id: 'crimson', label: 'Crimson Red', swatch: '#DC2626' },
   { id: 'sky', label: 'Sky Blue', swatch: '#0284C7' },
-  { id: 'teal', label: 'Light Teal', swatch: '#0F766E' },
+  { id: 'cyan', label: 'Bright Cyan', swatch: '#00E5FF' },
   { id: 'navy', label: 'Dark Navy Blue', swatch: '#0A1128' },
 ];
 
@@ -15,8 +15,8 @@ const STORAGE_KEY = 'medcred-theme';
 function readTheme(): ThemeName {
   try {
     const t = localStorage.getItem(STORAGE_KEY);
-    if (t === 'green') return 'teal'; // the old green theme became teal
-    if (t === 'crimson' || t === 'sky' || t === 'teal' || t === 'navy') return t;
+    if (t === 'green') return 'sky'; // removed themes fall back to the default
+    if (t === 'crimson' || t === 'sky' || t === 'cyan' || t === 'navy') return t;
   } catch { /* storage unavailable */ }
   return 'sky';
 }
