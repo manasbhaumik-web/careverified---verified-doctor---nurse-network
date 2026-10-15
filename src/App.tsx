@@ -6,7 +6,7 @@ import {
   Calendar, BookOpen, Globe, RefreshCw,
   Heart, MessageSquare, Menu, X, PlusCircle, UserCheck,
   Stethoscope, Puzzle, Settings, Activity,
-  CreditCard, TrendingUp, Video, Radio, LifeBuoy, Pill, Store, Lock, Plane
+  CreditCard, TrendingUp, Video, Radio, LifeBuoy, Pill, Store, Lock, Plane, Wallet
 } from 'lucide-react';
 
 
@@ -38,6 +38,7 @@ import PharmacyWorkspace from './components/PharmacyWorkspace';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import PractitionerPage from './components/PractitionerPage';
+import PractitionerEarnings from './components/PractitionerEarnings';
 import AudiencePage from './components/AudiencePage';
 import { FOR_PHARMACIES } from './content/forPharmacies';
 import { FOR_CLINICS } from './content/forClinics';
@@ -316,6 +317,7 @@ export default function App() {
       navItems.push({ id: 'onboard', name: 'Practitioner Portal', icon: PlusCircle });
     }
     navItems.push({ id: 'oncall', name: 'On Call', icon: Radio });
+    navItems.push({ id: 'earnings', name: 'Earnings', icon: Wallet });
     navItems.push({ id: 'tourism_desk', name: 'Tourism Desk', icon: Plane });
     navItems.push({ id: 'quality', name: 'Quality & CPD', icon: Award });
     navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
@@ -343,7 +345,7 @@ export default function App() {
   }
 
   // Append any active extensions that aren't standard
-  const standardIds = ['patient_dashboard', 'registry', 'recruitment', 'articles', 'onboard', 'messages', 'seo', 'admin', 'consult', 'oncall', 'quality', 'help'];
+  const standardIds = ['patient_dashboard', 'registry', 'recruitment', 'articles', 'onboard', 'messages', 'seo', 'admin', 'consult', 'oncall', 'earnings', 'quality', 'help'];
   const customPackages = currentUser.role === 'pharmacy' ? [] : packages.filter(p => !standardIds.includes(p.id) && p.isEnabled);
   customPackages.forEach(p => {
     let icon = Puzzle;
@@ -369,7 +371,7 @@ export default function App() {
     admin: ['admin', 'registry', 'tourism_desk', 'seo'],
   };
   const SHORT_LABEL: Record<string, string> = {
-    patient_dashboard: 'Home', consult: 'Consult', pharmacies: 'Pharmacy', messages: 'Mailbox', registry: 'Doctors', oncall: 'On Call', onboard: 'Portal',
+    patient_dashboard: 'Home', consult: 'Consult', pharmacies: 'Pharmacy', messages: 'Mailbox', registry: 'Doctors', oncall: 'On Call', earnings: 'Earnings', onboard: 'Portal',
     recruitment: 'Shifts', admin: 'Admin', tourism_desk: 'Tourism', pharmacy_workspace: 'Workspace', help: 'Help', articles: 'Library', tourism: 'Tourism', quality: 'Quality', seo: 'SEO',
   };
   const mobileTabs = (() => {
@@ -731,6 +733,8 @@ export default function App() {
             {activeView === 'quality' && currentUser.role === 'practitioner' && (
               <PractitionerQuality profileId={currentUser.profileId ?? null} />
             )}
+
+            {activeView === 'earnings' && currentUser.role === 'practitioner' && <PractitionerEarnings />}
 
             {activeView === 'oncall' && currentUser.role === 'practitioner' && (
               <PractitionerOnCall myUserId={currentUser.id} />

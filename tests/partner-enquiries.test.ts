@@ -1,4 +1,5 @@
 // Clinics, hospitals and pharmacies can ask to join without an account; only the board can read or change what they send.
+import './helpers/isolatedDb';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { enquiryProblem } from '../server/partners';

@@ -13,6 +13,7 @@ test('the commission shown to prospective practitioners is the one in force, and
     assert.equal(r.data.data.payoutsAutomated, false);
     assert.equal(r.data.data.currency, 'MYR');
     assert.match(r.data.data.commissionOn, /before service tax/);
+    assert.deepEqual({ ...r.data.data.payout }, { method: 'bank transfer', runBy: 'the board', automated: false, schedule: 'monthly', holdDays: 7, minimumPayout: 50, currency: 'MYR', bankAccounts: 'Malaysian bank accounts in your own name' }, 'the payout terms shown to prospective practitioners');
   } finally { await srv.stop(); }
 });
 

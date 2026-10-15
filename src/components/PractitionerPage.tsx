@@ -16,13 +16,14 @@ import type { LangCode } from '../locale/config';
 type Lang = 'en' | 'ms' | 'zh';
 const pick = (l: LangCode): Lang => (l === 'ms' || l === 'zh' ? l : 'en');
 type Item = { t: string; d: string };
+interface PayoutTerms { schedule: string; holdDays: number; minimumPayout: number }
 
 const T: Record<Lang, {
   title: string; description: string;
   hero: { eyebrow: string; h1: string; sub: string; join: string; signin: string; who: string };
   steps: { title: string; items: Item[] };
   does: { title: string; items: Item[] };
-  paid: { title: string; lead: (pct: number | null) => string; earnings: string; refunds: string; warnTitle: string; warn: string };
+  paid: { title: string; lead: (pct: number | null) => string; process: (t: PayoutTerms) => string; earnings: string; refunds: string; warnTitle: string; warn: string };
   rules: { title: string; intro: string; items: string[] };
   who: { title: string; yes: string[]; notTitle: string; not: string[] };
   listing: { title: string; items: string[] };
@@ -64,10 +65,11 @@ const T: Record<Lang, {
     paid: {
       title: 'How you are paid',
       lead: pct => (pct === null ? 'We take a commission on your consultation fee.' : `We take ${pct}% of your consultation fee.`) + ' It is calculated on your fee before service tax, and service tax is not part of your income.',
-      earnings: 'Your earnings page lists every paid consultation, the commission, and what is left for you.',
-      refunds: 'A refunded consultation is taken out of your earnings.',
-      warnTitle: 'Payouts are not automated yet',
-      warn: 'Earnings are tracked in your account, but transfers to your bank are not sent automatically. Ask the board how and when you will be paid before you start taking patients.',
+      process: t => `Payouts are made by bank transfer, ${t.schedule}. Earnings become payable ${t.holdDays} days after a visit is completed. Anything under RM ${t.minimumPayout} rolls over to the next payout.`,
+      earnings: 'Your earnings page lists every paid consultation, the commission, and what is left for you, and you can download a statement for each payout.',
+      refunds: 'A refunded consultation is taken out of your earnings. If it was already paid out, it is deducted from your next payout.',
+      warnTitle: 'How a payout happens',
+      warn: 'You add your bank account in Earnings after you join. The board checks that it is in your own name, prepares each payout and sends the transfer. Nothing is sent automatically, and no income tax is deducted, so speak to an accountant about your own tax.',
     },
     rules: {
       title: 'The rules you work under',
@@ -143,10 +145,11 @@ const T: Record<Lang, {
     paid: {
       title: 'Cara anda dibayar',
       lead: pct => (pct === null ? 'Kami mengenakan komisen ke atas yuran konsultasi anda.' : `Kami mengambil ${pct}% daripada yuran konsultasi anda.`) + ' Ia dikira atas yuran anda sebelum cukai perkhidmatan, dan cukai perkhidmatan bukan sebahagian daripada pendapatan anda.',
-      earnings: 'Halaman pendapatan anda menyenaraikan setiap konsultasi yang dibayar, komisen, dan baki untuk anda.',
-      refunds: 'Konsultasi yang dibayar balik dikeluarkan daripada pendapatan anda.',
-      warnTitle: 'Bayaran keluar belum automatik',
-      warn: 'Pendapatan dijejak dalam akaun anda, tetapi pemindahan ke bank anda tidak dihantar secara automatik. Tanya lembaga bagaimana dan bila anda akan dibayar sebelum mula menerima pesakit.',
+      process: t => `Bayaran dibuat melalui pindahan bank, ${t.schedule}. Pendapatan boleh dibayar ${t.holdDays} hari selepas lawatan selesai. Jumlah di bawah RM ${t.minimumPayout} dibawa ke bayaran seterusnya.`,
+      earnings: 'Halaman pendapatan anda menyenaraikan setiap konsultasi yang dibayar, komisen, dan baki untuk anda, dan anda boleh memuat turun penyata bagi setiap bayaran.',
+      refunds: 'Konsultasi yang dibayar balik dikeluarkan daripada pendapatan anda. Jika ia sudah dibayar kepada anda, ia ditolak daripada bayaran seterusnya.',
+      warnTitle: 'Bagaimana bayaran dibuat',
+      warn: 'Anda menambah akaun bank anda dalam Pendapatan selepas menyertai. Lembaga menyemak ia atas nama anda sendiri, menyediakan setiap bayaran dan menghantar pindahan. Tiada yang dihantar secara automatik, dan tiada cukai pendapatan ditolak, jadi berbincanglah dengan akauntan tentang cukai anda sendiri.',
     },
     rules: {
       title: 'Peraturan yang anda ikuti',
@@ -222,10 +225,11 @@ const T: Record<Lang, {
     paid: {
       title: '您如何获得收入',
       lead: pct => (pct === null ? '我们对您的问诊费收取佣金。' : `我们收取您问诊费的 ${pct}%。`) + ' 佣金按您的诊费（服务税之前）计算，服务税不属于您的收入。',
-      earnings: '您的收入页面会列出每笔已付款问诊、佣金，以及您实得的金额。',
-      refunds: '已退款的问诊会从您的收入中扣除。',
-      warnTitle: '付款尚未自动化',
-      warn: '收入会记录在您的账户中，但转账到您银行的操作不会自动发送。开始接诊之前，请先向委员会确认您何时以及如何收款。',
+      process: t => `款项通过银行转账支付，${t.schedule}。问诊完成 ${t.holdDays} 天后，收入才可支付。低于 RM ${t.minimumPayout} 的金额会顺延到下一次付款。`,
+      earnings: '您的收入页面会列出每笔已付款问诊、佣金，以及您实得的金额，并可下载每次付款的对账单。',
+      refunds: '已退款的问诊会从您的收入中扣除。如果这笔款项已经付给您，会从您下一次的付款中扣减。',
+      warnTitle: '付款如何进行',
+      warn: '加入后，您在“收入”页面添加银行账户。委员会会核实账户是您本人名下，准备每笔付款并发送转账。没有任何款项会自动发出，也不会扣除所得税，所以请就您自己的税务咨询会计师。',
     },
     rules: {
       title: '您需要遵守的规则',
@@ -275,9 +279,10 @@ export default function PractitionerPage() {
   const L = pick(lang);
   const tx = T[L];
   const [pct, setPct] = useState<number | null>(null);
+  const [payout, setPayout] = useState<PayoutTerms | null>(null);
 
   useEffect(() => {
-    fetch('/api/payments/terms').then(r => r.json()).then(d => d.status === 'success' && typeof d.data.commissionPct === 'number' && setPct(d.data.commissionPct)).catch(() => {});
+    fetch('/api/payments/terms').then(r => r.json()).then(d => { if (d.status !== 'success') return; if (typeof d.data.commissionPct === 'number') setPct(d.data.commissionPct); if (d.data.payout) setPayout(d.data.payout); }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -369,6 +374,7 @@ export default function PractitionerPage() {
             <div>
               <h2 id="paid-h" className={h2}>{tx.paid.title}</h2>
               <p className="mt-4 text-base text-slate-800 font-semibold leading-relaxed">{tx.paid.lead(pct)}</p>
+              {payout && <p className="mt-3 text-sm text-slate-800 font-semibold leading-relaxed">{tx.paid.process(payout)}</p>}
               <p className="mt-3 text-sm text-slate-700 font-medium leading-relaxed">{tx.paid.earnings}</p>
               <p className="mt-2 text-sm text-slate-700 font-medium leading-relaxed">{tx.paid.refunds}</p>
             </div>

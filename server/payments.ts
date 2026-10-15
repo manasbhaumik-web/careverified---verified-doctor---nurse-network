@@ -1,3 +1,4 @@
+import { payoutTerms } from "./payouts";
 import crypto from "crypto";
 import { computeTax, indicativeConversions, methodsFor, paymentMethods, refundPolicy, sstConfig, type PatientRegion } from "./paymentPolicy";
 import express, { Application, Response } from "express";
@@ -134,7 +135,7 @@ export function registerPaymentRoutes(app: Application) {
   // Public, and registered before /api/payments/:id so that route does not catch it.
   // What a practitioner is told before joining: the commission actually in force, and that payouts are manual.
   app.get("/api/payments/terms", (_req, res) => {
-    res.json({ status: "success", data: { commissionPct: commissionPct(), commissionOn: "professional fee, before service tax", payoutsAutomated: false, currency: "MYR" } });
+    res.json({ status: "success", data: { commissionPct: commissionPct(), commissionOn: "professional fee, before service tax", payoutsAutomated: false, currency: "MYR", payout: payoutTerms() } });
   });
 
   app.get("/api/payments/config", (req, res) => {

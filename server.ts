@@ -29,6 +29,7 @@ import { registerPaymentRoutes, registerPaymentWebhook, setPaymentHandlers, refu
 import { refundPolicy } from "./server/paymentPolicy";
 import { demoEnabled, DEMO_ROLES } from "./server/demo";
 import { registerPartners } from "./server/partners";
+import { registerPayouts } from "./server/payouts";
 import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
 
 // Load environment variables
@@ -711,6 +712,7 @@ registerTestimonials(app);
 registerJobsMy(app, { findProfessional, allProfessionals, jobs: () => jobs });
 registerTourism(app, { findProfessional, allProfessionals });
 registerPartners(app);
+registerPayouts(app, { getBooking: id => bookings.find(b => b.id === id), findProfessional });
 registerDataOps(app, {
   // De-identify what lives outside SQL: patient profile, bookings and chat messages.
   anonymiseJson: userId => {

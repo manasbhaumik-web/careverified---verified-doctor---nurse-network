@@ -8,7 +8,7 @@ Malay and Chinese wording is a developer draft: have a native reader check it.
 | Claim on the page | Source |
 |---|---|
 | Commission is X% of the fee, before service tax | `GET /api/payments/terms` reads `PLATFORM_COMMISSION_PCT` (default 15, capped at 50). Tax is passed through, not earned ([payments.ts](../server/payments.ts)). Tested in [practitioner-terms.test.ts](../tests/practitioner-terms.test.ts). |
-| **Payouts are not automated** | Comment and behaviour in `payments.ts`: earnings are tracked, no transfers are sent. The page says so in a highlighted note. |
+| How payouts work: bank transfer on a schedule, payable after the hold, minimum rolls over, board verifies the account and sends it, nothing automatic, no tax deducted, refunds netted | `GET /api/payments/terms` (reads `PAYOUT_*` settings) and [PAYOUTS.md](PAYOUTS.md). The page still says nothing is sent automatically. |
 | Earnings page lists payments, commission, net; refunds are removed | `GET /api/me/earnings` (totals use paid rows only). |
 | Joining steps and what is asked | `PractitionerSignUp.tsx`, `POST /api/register` (licence number, council, future expiry), document upload in `VerificationStatusCard.tsx`. |
 | Checked by hand, how and when recorded, notified | Admin verification flow ([registries.ts](../server/registries.ts), `verification.ts`). No review time is promised because none is measured. |
@@ -28,7 +28,7 @@ Malay and Chinese wording is a developer draft: have a native reader check it.
 | You set your own fee | Fee is part of registration and profile updates. |
 
 ## Gaps this page makes visible (decide before recruiting)
-1. **Payouts.** A doctor's first question is "when do I get paid?" Today the honest answer is "ask the board". Decide the payout schedule and method, then build transfers (or at least a documented manual process) before recruiting at scale.
+1. **Payouts.** Built as a manual, auditable process ([PAYOUTS.md](PAYOUTS.md)). Confirm the schedule, hold and minimum, have an accountant review it, and decide whether to automate transfers later.
 2. **Review time.** Verification is by hand with no target. Set one (for example five working days), measure it, and then publish it.
 3. **Commission.** The default is 15%. Check it is a rate you want to put in front of doctors.
 4. **Dentists, pharmacists and other professions** cannot register. Say so now or build their registers.

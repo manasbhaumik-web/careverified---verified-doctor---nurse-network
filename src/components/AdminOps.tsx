@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import AdminPayouts from './AdminPayouts';
 import { Siren } from 'lucide-react';
 import { formatMoney } from '../locale';
 
@@ -159,6 +160,8 @@ export default function AdminOps() {
           </div>
         )}
       </section>
+
+      <AdminPayouts />
 
       <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
         <h3 className="text-sm font-extrabold">Partner pharmacies</h3>
