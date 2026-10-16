@@ -457,9 +457,10 @@ export default function ClinicHospitalPage() {
             <button
               type="button"
               onClick={() => navigate(loginUrl('practitioner', false))}
-              className="hidden sm:inline-flex min-h-[44px] px-3.5 text-xs font-bold text-[color:var(--t-700)] hover:underline cursor-pointer items-center"
+              className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-4 sm:px-5 text-xs sm:text-sm font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none shadow-xs transition-all cursor-pointer whitespace-nowrap"
             >
-              {tx.hero.ctaSignin}
+              <span>{tx.hero.ctaSignin}</span>
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
             <LocaleSwitcher />
             <ThemeSwitcher />
@@ -473,13 +474,13 @@ export default function ClinicHospitalPage() {
           className="relative border-b border-[color:var(--t-200)] overflow-hidden h-[660px] sm:h-[640px] lg:h-[620px] flex items-center bg-transparent"
           aria-label="Clinics and Hospitals Hero"
         >
-          {/* AI-Generated High-Resolution Clinics & Hospitals Hero Image at exactly 55% Opacity */}
+          {/* AI-Generated High-Resolution Clinics & Hospitals Hero Image at 70% Opacity */}
           <div
-            className="absolute inset-0 pointer-events-none bg-cover bg-no-repeat opacity-[0.55]"
+            className="absolute inset-0 pointer-events-none bg-cover bg-no-repeat opacity-[0.7]"
             style={{
               backgroundImage: "url('/assets/clinics_hospital_hero_bg.jpg')",
               backgroundPosition: 'right 20% center',
-              opacity: 0.55,
+              opacity: 0.7,
             }}
           />
 

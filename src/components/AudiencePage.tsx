@@ -124,22 +124,26 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
       </header>
 
       <main id="main-content" className="flex-grow w-full">
-        <section className="relative border-b border-[color:var(--t-200)] py-12 sm:py-20 overflow-hidden min-h-[520px] flex items-center">
-          {/* Full High-Key Sunlit Clinical Background */}
+        <section
+          className="relative border-b border-[color:var(--t-200)] overflow-hidden h-[660px] sm:h-[640px] lg:h-[620px] flex items-center bg-transparent"
+          aria-label="Community Pharmacies Hero"
+        >
+          {/* AI-Generated High-Resolution Community Pharmacies Hero Image at 70% Opacity */}
           <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none"
+            className="absolute inset-0 pointer-events-none bg-cover bg-no-repeat opacity-[0.7]"
             style={{
-              backgroundImage: "url('/assets/clean_light_doctor_suite_full.jpg')",
-              filter: "hue-rotate(var(--t-hue)) brightness(var(--t-bright))"
+              backgroundImage: "url('/assets/pharmacies_hero_bg.jpg')",
+              backgroundPosition: 'right 20% center',
+              opacity: 0.7,
             }}
           />
 
           <div className={`relative z-10 ${wrap} w-full`}>
             <div className="max-w-2xl space-y-4">
-              <p className="text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
-                <span className="w-2 h-2 bg-[color:var(--t-600)] inline-block" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 {tx.hero.eyebrow}
-              </p>
+              </div>
               <h1 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-[1.1] text-slate-900">
                 {renderAudienceHeroTitle(tx.hero.h1, L)}
               </h1>

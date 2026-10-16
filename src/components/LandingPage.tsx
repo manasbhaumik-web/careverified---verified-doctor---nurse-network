@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocale, useT } from '../locale';
+import { setLocale, useLocale, useT } from '../locale';
 import { HERO_TR } from '../locale/landing';
 import PatientAccess from './PatientAccess';
 import TouristAccess from './TouristAccess';
@@ -12,7 +12,7 @@ import {
   AlertTriangle, ArrowRight, Lock, AlertCircle, PlusCircle,
   Building, ChevronRight, Zap, Globe, Award, FileText,
   Stethoscope, Activity, Check,
-  Clock, PhoneCall, Pill, Hospital, ChevronLeft, ChevronDown, UserCheck
+  Clock, PhoneCall, Pill, Hospital, ChevronLeft, ChevronDown, UserCheck, Users
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile } from '../types';
 import { loginUrl, navigate } from '../nav';
@@ -109,69 +109,69 @@ function StaggerItem({ children, className = '', index = 0 }: { children: React.
 const PROFESSIONAL_ASSISTANCE_MODULES = [
   {
     id: 'telehealth',
-    title: 'On-Call Consultations',
-    tagline: 'Urgent, non-emergency consults with doctors who are online',
+    title: 'Attentive Doctor Consultations',
+    tagline: 'Gentle, unhurried care with doctors ready to listen',
     icon: PhoneCall,
-    badge: 'Chat or video',
-    summary: 'Chat or video with a verified doctor who is online. Not for emergencies: in an emergency call 999 first.',
+    badge: 'Video or Chat',
+    summary: 'Connect from the comfort of home with a caring, board-verified doctor. Take all the time you need to share your symptoms in a calm, supportive setting. For severe medical emergencies, please dial 999 first.',
     highlights: [
-      'Doctors are verified by our medical board before they can take consultations',
-      'Refunded automatically if no doctor joins',
-      'Red-flag symptoms show emergency numbers immediately'
+      'Doctors are verified individually by our medical board before caring for patients',
+      'Automatic refund guarantee if an on-call doctor cannot join within 10 minutes',
+      'Immediate 999 emergency safety routing whenever red-flag symptoms arise'
     ],
-    metricValue: 'Chat & video',
-    metricLabel: 'Subject to doctors being online',
-    ctaText: 'Sign in to consult',
+    metricValue: 'Warm Care',
+    metricLabel: 'Attentive, unhurried consultations',
+    ctaText: 'Consult a Caring Doctor',
     href: '/login'
   },
   {
     id: 'credential',
-    title: 'Regulatory Credential Audit',
-    tagline: 'Manual licence checks by our board',
+    title: 'Careful Credential Verification',
+    tagline: 'Hand-checked licences to protect you and your loved ones',
     icon: ShieldCheck,
-    badge: 'Board reviewed',
-    summary: 'Every practitioner uploads their licence and certificates. A board reviewer checks the licence against the council register by hand and records how it was checked before approving.',
+    badge: 'Board Reviewed',
+    summary: 'Your peace of mind is our sacred trust. Before any physician or nurse joins MedCred, our medical board carefully verifies their statutory licence and practising certificate against official registers by hand.',
     highlights: [
-      'Licence expiry tracked, with automatic suspension when it lapses',
-      'Re-verification every 12 months',
-      'Public licence lookup shows only currently verified practitioners'
+      'Continuous Annual Practising Certificate (APC) expiry tracking',
+      'Regular 12-month re-verification to maintain patient safety',
+      'Public register shows only in-good-standing, verified practitioners'
     ],
-    metricValue: 'Every one',
-    metricLabel: 'Practitioner reviewed before going public',
-    ctaText: 'Verify a Licence',
+    metricValue: 'Every Doctor',
+    metricLabel: 'Verified by hand before caring for you',
+    ctaText: 'Verify a Practitioner',
     href: '#verify-section'
   },
   {
     id: 'prescriptions',
-    title: 'E-Prescriptions & Vitals Vault',
-    tagline: 'Digital Pharmacy & Health Record',
+    title: 'Safety-Checked E-Prescriptions',
+    tagline: 'Doctor-signed prescriptions delivered with care',
     icon: Pill,
-    badge: 'Doctor-signed',
-    summary: 'Doctor-signed digital prescriptions with a code and QR that pharmacies can check, alongside your own health record and readings.',
+    badge: 'Doctor-Signed',
+    summary: 'Receive doctor-signed digital prescriptions with built-in allergy and drug interaction checks. Pick up medicine easily at your trusted neighbourhood pharmacy or request thoughtful delivery.',
     highlights: [
-      'Check any prescription by its code, no sign-in needed',
-      'Safety checks for allergies and interactions before issuing',
-      'You choose which doctors can see your record'
+      'Every prescription carries a cryptographic QR code that pharmacies can check',
+      'Automated allergy and interaction safety checks before any medication is issued',
+      'You choose your preferred neighbourhood community pharmacy'
     ],
-    metricValue: 'QR',
-    metricLabel: 'Every prescription can be verified',
-    ctaText: 'Sign in to view prescriptions',
+    metricValue: 'Safe QR',
+    metricLabel: 'Every prescription verified for safety',
+    ctaText: 'View Your Prescriptions',
     href: '/login'
   },
   {
     id: 'records',
     title: 'Personal Health Records & Care Vault',
-    tagline: 'PDPA 2010 compliant medical history you control',
+    tagline: 'Your health story, protected with dignity under PDPA 2010',
     icon: Lock,
-    badge: 'Encrypted & Private',
-    summary: 'Keep your consultation summaries, vital readings, and prescription history securely in one private place. You decide which doctors or facilities can access your records.',
+    badge: 'Protected & Private',
+    summary: 'Keep your consultation summaries, vital readings, and family medical histories safely guarded in one private space. You always stay in complete control of who views your records.',
     highlights: [
-      'Full patient data ownership under Malaysian PDPA 2010',
-      'Share temporary time-limited summaries with outside doctors',
-      'Track vitals, consultation history and medical notes'
+      'Full patient ownership of health data under Malaysian PDPA 2010',
+      'Share temporary, encrypted summaries with family doctors or outside specialists',
+      'Track your vitals, care notes, and recovery milestones over time'
     ],
     metricValue: 'PDPA 2010',
-    metricLabel: 'Full patient control over your data',
+    metricLabel: 'Complete, patient-centred privacy',
     ctaText: 'Open Member Portal',
     href: '/login'
   }
@@ -198,30 +198,30 @@ const QUANTIFIED_METRICS = [
   {
     icon: Clock,
     valueComponent: <StatCounter end={10} suffix=" min" />,
-    label: 'Refund if No Doctor Joins',
-    subtext: 'An instant consultation that no doctor joins within 10 minutes is refunded automatically',
-    badge: 'Money-back rule',
+    label: 'Prompt Care or Full Refund',
+    subtext: 'If an on-call doctor cannot join your consultation within 10 minutes, your payment is refunded automatically with our apologies',
+    badge: 'Our Promise',
   },
   {
     icon: ShieldCheck,
     valueComponent: <StatCounter end={100} suffix="%" />,
-    label: 'Manual Council Verification',
-    subtext: 'Every listed practitioner is checked by our team before going public',
-    badge: 'Manual register check',
+    label: 'Hand-Checked Practitioners',
+    subtext: 'Every doctor and nurse is checked against official council registers before caring for you and your family',
+    badge: 'Verified for You',
   },
   {
     icon: RefreshCw,
     valueComponent: <StatCounter end={12} suffix=" mo" />,
-    label: 'Continuous Re-Verification',
-    subtext: 'Expiry tracking, with re-verification every 12 months',
-    badge: 'Expiry tracking',
+    label: 'Continuous Safety Oversight',
+    subtext: 'Continuous verification and APC expiry monitoring to ensure you always receive safe, compliant medical care',
+    badge: 'Continuous Care',
   },
   {
     icon: Zap,
     valueComponent: <StatCounter end={100} suffix="%" />,
     label: 'Doctor-Signed Prescriptions',
-    subtext: 'Every prescription carries a code and QR that a pharmacy can check on MedCred',
-    badge: 'Doctor-signed',
+    subtext: 'Every prescription carries a cryptographic QR code and allergy check for your peace of mind',
+    badge: 'Safe Dispensing',
   },
 ];
 
@@ -230,41 +230,41 @@ const QUANTIFIED_METRICS = [
 // ─────────────────────────────────────────────
 const TRUST_PARTNERS = [
   {
-    title: 'Malaysian Medical Council (MMC) register',
-    category: 'Practitioner register',
-    status: 'Checked by hand, date recorded',
+    title: 'Malaysian Medical Council (MMC) Register',
+    category: 'Doctor Verification',
+    status: 'Checked by hand before profile activation',
     icon: ShieldCheck,
   },
   {
-    title: 'MoH and MMC telemedicine guidance',
-    category: 'Clinical rules',
-    status: 'Built in: no MC after a video visit alone',
+    title: 'MoH & MMC Clinical Telemedicine Guidance',
+    category: 'Patient Safety',
+    status: 'Strict boundaries for safe clinical care',
     icon: Building,
   },
   {
-    title: 'Built around PDPA 2010',
-    category: 'Your data',
-    status: 'You choose who sees your record',
+    title: 'Personal Data Protection Act 2010',
+    category: 'Your Privacy',
+    status: 'Your health history is strictly confidential',
     icon: Lock,
   },
   {
-    title: 'Prescription code and QR',
-    category: 'Pharmacy',
-    status: 'A pharmacy can check any code',
+    title: 'Poisons Act 1952 Dispensing Protocols',
+    category: 'Pharmacy Care',
+    status: 'Verified community pharmacies check every code',
     icon: Pill,
   },
   {
-    title: 'Audit log and incident review',
-    category: 'Governance',
-    status: 'Admin actions are recorded',
+    title: 'Medical Board Audit & Incident Review',
+    category: 'Caring Governance',
+    status: 'Independent oversight focused on patient well-being',
     icon: Award,
   },
 ];
 
 const HOW_STEPS = [
-  { title: 'Create an account', text: 'Register as a member in a couple of minutes.' },
-  { title: 'Talk to a verified doctor', text: 'Start a chat or video consultation with a doctor who is online.' },
-  { title: 'Collect your prescription', text: 'Send it to a pharmacy and follow its status from your account.' },
+  { title: 'Tell us how you are feeling', text: 'Register in minutes with your MyKad or passport. Clear upfront fees and no complicated apps to install.' },
+  { title: 'Speak with a dedicated doctor', text: 'Consult unhurriedly via video or chat in your browser with a verified doctor who is online and ready to listen.' },
+  { title: 'Receive medicine & recovery guidance', text: 'Have doctor-signed prescriptions sent to your chosen pharmacy, and keep your care summary safe in your record.' },
 ];
 
 // ─────────────────────────────────────────────
@@ -294,62 +294,82 @@ interface HeroSlide {
 const HERO_SLIDES: HeroSlide[] = [
   {
     id: 'network',
-    pill: 'Online Doctor Consultations',
-    headline: <>Next-generation {hl('online medical assistance')} &amp; <span className="text-black">doctor network.</span></>,
-    body: <>MedCred connects patients with <span className="text-[#FBFCFD] [-webkit-text-stroke:2px_var(--t-600)] font-bold">board-verified doctors</span> across Malaysia for <span className="text-black font-bold">online chat and video consultations</span>, licensed care, and digital e-prescriptions.</>,
-    cta: { label: 'Start Online Consultation', role: 'patient', register: true },
-    chips: ['Online consultations', 'Board-verified doctors', 'Signed e-prescriptions'],
+    pill: 'Gentle Doctor Consultations',
+    headline: <>Thoughtful {hl('medical care & verified doctors')} <span className="text-black">always by your side.</span></>,
+    body: <>When you or your loved ones feel unwell, MedCred connects you gently with <span className="text-[color:var(--t-600)] font-bold">board-verified doctors</span> across Malaysia for <span className="text-black font-bold">unhurried video or chat consultations</span>, doctor-signed e-prescriptions, and caring support.</>,
+    cta: { label: 'Talk With a Caring Doctor', role: 'patient', register: true },
+    chips: ['Attentive, unhurried consultations', 'Every doctor manually verified', 'Doctor-signed e-prescriptions'],
     card: {
-      label: 'Medical Assistance Badge',
-      title: 'Verified Practitioner',
+      label: 'Verified Doctor on Call',
+      title: 'Attentive Clinical Care',
       status: 'Verified Active',
       person: { img: '/assets/malaysian_male_doctor.jpg', name: 'Dr. Tan Seng Hock', line1: 'Senior Specialist · MMC Registered', line2: 'Kuala Lumpur Specialist Hospital' },
       rows: [
-        { k: 'MMC Licence Number', v: 'DEMO-MMC-32109', kind: 'mono' },
-        { k: 'Registry Status', v: 'Malaysian Medical Council' },
-        { k: 'Consultations', v: 'Chat or video' },
+        { k: 'Council Registration', v: 'DEMO-MMC-32109', kind: 'mono' },
+        { k: 'Statutory Standing', v: 'Good Standing · Active APC', kind: 'ok' },
+        { k: 'Consultation Mode', v: 'Unhurried Video or Chat' },
       ],
       footId: '8F2A-9912',
     },
   },
   {
     id: 'prescriptions',
-    pill: 'Digital Pharmacy & Prescriptions',
-    headline: <>Doctor-signed {hl('digital e-prescriptions')}, ready <span className="text-black">at your pharmacy.</span></>,
-    body: <>Get doctor-signed <span className="text-[#FBFCFD] [-webkit-text-stroke:2px_var(--t-600)] font-bold">e-prescriptions with security QR codes</span> and automated allergy safety checks. Pick up medicine easily at any registered <span className="text-black font-bold">community pharmacy</span>.</>,
-    cta: { label: 'Create Patient Account', role: 'patient', register: true },
-    chips: ['Doctor-signed QR code', 'Allergy safety checks', 'Community pharmacy pickup'],
+    pill: 'Neighbourhood Pharmacy & Care',
+    headline: <>Carefully reviewed {hl('e-prescriptions')}, ready at <span className="text-black">your trusted pharmacy.</span></>,
+    body: <>Your safety is our first priority. Receive doctor-signed <span className="text-[color:var(--t-600)] font-bold">digital e-prescriptions with safety allergy checks</span>, ready for pickup at your neighbourhood pharmacy or gentle delivery to your home.</>,
+    cta: { label: 'Register for Patient Care', role: 'patient', register: true },
+    chips: ['Safety & allergy checks', 'Doctor-signed QR code', 'Neighbourhood pharmacy pickup'],
     card: {
-      label: 'E-Prescription',
-      title: 'Signed Prescription',
-      status: 'Valid',
+      label: 'Doctor-Signed E-Prescription',
+      title: 'Safety-Checked Dispensing',
+      status: 'Valid & Clear',
       person: { icon: Pill, name: 'Amoxicillin 500 mg', line1: '1 capsule, 3 times daily · 7 days', line2: 'Signed by Dr. Tan Seng Hock' },
       rows: [
-        { k: 'Prescription code', v: 'RX-7K4M-92QA', kind: 'mono' },
-        { k: 'Safety check', v: 'Allergies & interactions clear', kind: 'ok' },
-        { k: 'Collect from', v: 'A pharmacy you choose' },
+        { k: 'Prescription Code', v: 'RX-7K4M-92QA', kind: 'mono' },
+        { k: 'Allergy & Drug Safety', v: 'Allergies & interactions clear', kind: 'ok' },
+        { k: 'Fulfilment Method', v: 'Trusted Community Pharmacy' },
       ],
       footId: 'RX-7K4M',
     },
   },
   {
     id: 'members',
-    pill: 'Patient Privacy & Health Records',
-    headline: <>Trusted medical care, {hl('protected by statutory privacy.')}</>,
-    body: <>Keep your health history, vital signs, and consultation summaries in one <span className="text-[#FBFCFD] [-webkit-text-stroke:2px_var(--t-600)] font-bold">private vault under PDPA 2010</span>. You choose <span className="text-black font-bold">exactly which doctors</span> can see your records.</>,
-    cta: { label: 'Join as a Member', role: 'patient', register: true },
-    chips: ['10-min refund guarantee', 'PDPA 2010 compliance', 'You control health data'],
+    pill: 'Privacy & Gentle Record Keeping',
+    headline: <>Your personal health story, {hl('protected with respect and care.')}</>,
+    body: <>Keep your health history, vital readings, and consultation summaries guarded in a <span className="text-[color:var(--t-600)] font-bold">private vault under PDPA 2010</span>. You remain in <span className="text-black font-bold">complete, dignified control</span> over who sees your health records.</>,
+    cta: { label: 'Join Our Caring Community', role: 'patient', register: true },
+    chips: ['10-min refund guarantee', 'Protected under PDPA 2010', 'You own your health story'],
     card: {
-      label: 'Health Record Vault',
+      label: 'Confidential Health Vault',
       title: 'Personal Health Records',
       status: 'PDPA Protected',
-      person: { icon: ShieldCheck, name: 'Personal Health Records', line1: 'Protected under Malaysian PDPA 2010', line2: 'Encrypted patient health history' },
+      person: { icon: ShieldCheck, name: 'Patient Medical Vault', line1: 'Protected under Malaysian PDPA 2010', line2: 'Encrypted patient health history' },
       rows: [
-        { k: 'Data sovereignty', v: 'Patient-controlled', kind: 'ok' },
-        { k: 'Record encryption', v: 'AES-256 Cloud Vault' },
-        { k: 'Access sharing', v: 'Time-limited links you control' },
+        { k: 'Patient Ownership', v: 'Full Patient Control', kind: 'ok' },
+        { k: 'Vault Security', v: 'AES-256 Encrypted Cloud' },
+        { k: 'Record Sharing', v: 'Time-Limited Links You Control' },
       ],
       footId: 'PHR-2026',
+    },
+  },
+  {
+    id: 'tourism',
+    pill: 'Warm Welcome For International Patients',
+    headline: <>Malaysia’s accredited {hl('hospitals & specialist care')}, with <span className="text-black">transparent itemised quotes.</span></>,
+    body: <>We are honoured to help you plan specialist treatment across <span className="text-[color:var(--t-600)] font-bold">Kuala Lumpur, Penang, Johor Bahru &amp; Melaka</span>. Register with your <span className="text-black font-bold">international passport</span> for pre-travel specialist video reviews and hospital quotes before you travel.</>,
+    cta: { label: 'Explore Accredited Hospitals', href: '#tourist-section' },
+    chips: ['Passport registration with care', 'JCI & MSQH accredited facilities', 'Transparent MYR & FX quotes'],
+    card: {
+      label: 'Accredited Hospital Network',
+      title: 'International Care Quote',
+      status: 'JCI Verified',
+      person: { icon: Hospital, name: 'KL & Penang Specialist Centres', line1: 'KKM Act 586 · JCI & MSQH Accredited', line2: 'Cardiology · Oncology · Fertility · Ortho' },
+      rows: [
+        { k: 'Itemised Package', v: 'RM 3,200 (~USD 725)', kind: 'mono' },
+        { k: 'Patient Intake', v: 'Passport · No MyKad needed', kind: 'ok' },
+        { k: 'Concierge & Language', v: 'EN · ID · ZH · AR Interpreters' },
+      ],
+      footId: 'INTL-MHTC',
     },
   },
 ];
@@ -366,7 +386,10 @@ export default function LandingPage({ professionals }: LandingPageProps) {
   const [testimonials, setTestimonials] = useState<{ id: string; text: string; rating: number | null; name: string; location: string | null; demo: boolean }[]>([]);
   useEffect(() => { fetch('/api/testimonials').then(r => r.json()).then(d => d.status === 'success' && setTestimonials(d.data)).catch(() => {}); }, []);
   // Hero slider
-  const [slideIdx, setSlideIdx] = useState(0);
+  const [slideIdx, setSlideIdx] = useState(() => (region === 'INTL' ? 3 : 0));
+  useEffect(() => {
+    if (region === 'INTL') setSlideIdx(3);
+  }, [region]);
   const [heroPaused, setHeroPaused] = useState(false); // temporary: while the pointer or keyboard focus is on the hero
   // Autoplay is limited so it never moves content the visitor did not ask for (WCAG 2.2.2):
   // it plays one pass (ending back on the first slide) and stops for good after any interaction.
@@ -465,9 +488,9 @@ export default function LandingPage({ professionals }: LandingPageProps) {
       {/* ═══════════ TOP BANNER ═══════════ */}
       <div className="hidden sm:flex bg-[color:var(--t-100)] text-[color:var(--t-600)] text-xs font-semibold py-2 px-4 text-center border-b border-[color:var(--t-200)] items-center justify-center gap-2">
         <span className="inline-flex items-center gap-1.5 bg-[color:var(--t-600)] text-white px-2.5 py-0.5 rounded-none text-xs uppercase tracking-wider font-bold">
-          <Cross className="h-2.5 w-2.5" /> MedCred Standard
+          <Cross className="h-2.5 w-2.5" /> Compassionate Care Standard
         </span>
-        <span>Online Medical Assistance Platform — Verification &amp; Telehealth Network</span>
+        <span>Dedicated to Patient Well-Being, Verified Practitioners &amp; Gentle Medical Support Across Malaysia</span>
       </div>
 
       {/* ═══════════ NAVBAR (LIGHT TONE PRIMARY BACKGROUND) ═══════════ */}
@@ -516,11 +539,75 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     <Activity className="h-3 w-3" />
                   </div>
 
-                  {/* Patient Intake & Access Modalities */}
+                  {/* Clinical Protocols & Governance */}
                   <div className="px-3 pt-2 pb-1 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                    Patient Access &amp; Intake
+                    Clinical Protocols &amp; Services
                   </div>
                   <div className="px-1.5 space-y-0.5">
+                    <a
+                      href="#verify-section"
+                      onClick={() => setQuickViewsOpen(false)}
+                      className="flex items-center justify-between px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors group"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="section-index-badge">01</span>
+                        <span className="truncate">Statutory Licence Verification</span>
+                      </div>
+                      <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+                    </a>
+                    <a
+                      href="#services-section"
+                      onClick={() => setQuickViewsOpen(false)}
+                      className="flex items-center justify-between px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors group"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="section-index-badge">02</span>
+                        <span className="truncate">Clinical Services &amp; Modalities</span>
+                      </div>
+                      <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+                    </a>
+                    <a
+                      href="#pathway-section"
+                      onClick={() => setQuickViewsOpen(false)}
+                      className="flex items-center justify-between px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors group"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="section-index-badge">03</span>
+                        <span className="truncate">Outpatient Care Pathway</span>
+                      </div>
+                      <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+                    </a>
+                    <a
+                      href="#ecosystem-section"
+                      onClick={() => setQuickViewsOpen(false)}
+                      className="flex items-center justify-between px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors group"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="section-index-badge">05</span>
+                        <span className="truncate">Partner &amp; Practitioner Ecosystem</span>
+                      </div>
+                      <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+                    </a>
+                    {testimonials.length > 0 && (
+                      <a
+                        href="#feedback-section"
+                        onClick={() => setQuickViewsOpen(false)}
+                        className="flex items-center justify-between px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors group"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="section-index-badge">06</span>
+                          <span className="truncate">Verified Clinical Feedback</span>
+                        </div>
+                        <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+                      </a>
+                    )}
+                  </div>
+
+                  {/* Patient Intake & Access Modalities */}
+                  <div className="border-t border-slate-100 my-1 pt-1.5 px-3 pb-1 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                    04 · Patient Access &amp; Intake
+                  </div>
+                  <div className="px-1.5 pb-1.5 space-y-0.5">
                     <a
                       href="#access-section"
                       onClick={() => setQuickViewsOpen(false)}
@@ -554,59 +641,6 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                       </div>
                       <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
                     </a>
-                  </div>
-
-                  {/* Clinical Protocols & Governance */}
-                  <div className="border-t border-slate-100 my-1 pt-1.5 px-3 pb-1 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                    Clinical Protocols &amp; Services
-                  </div>
-                  <div className="px-1.5 pb-1.5 space-y-0.5">
-                    <a
-                      href="#verify-section"
-                      onClick={() => setQuickViewsOpen(false)}
-                      className="flex items-center justify-between px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors group"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="section-index-badge">02</span>
-                        <span className="truncate">Statutory Licence Verification</span>
-                      </div>
-                      <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
-                    </a>
-                    <a
-                      href="#services-section"
-                      onClick={() => setQuickViewsOpen(false)}
-                      className="flex items-center justify-between px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors group"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="section-index-badge">03</span>
-                        <span className="truncate">Clinical Services &amp; Modalities</span>
-                      </div>
-                      <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
-                    </a>
-                    <a
-                      href="#pathway-section"
-                      onClick={() => setQuickViewsOpen(false)}
-                      className="flex items-center justify-between px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors group"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="section-index-badge">04</span>
-                        <span className="truncate">Outpatient Care Pathway</span>
-                      </div>
-                      <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
-                    </a>
-                    {testimonials.length > 0 && (
-                      <a
-                        href="#feedback-section"
-                        onClick={() => setQuickViewsOpen(false)}
-                        className="flex items-center justify-between px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors group"
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="section-index-badge">05</span>
-                          <span className="truncate">Verified Clinical Feedback</span>
-                        </div>
-                        <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
-                      </a>
-                    )}
                   </div>
                 </div>
               )}
@@ -766,13 +800,13 @@ export default function LandingPage({ professionals }: LandingPageProps) {
         onKeyDown={stopAutoplay}
         className="relative text-[color:var(--ink)] border-b border-[color:var(--t-200)] overflow-hidden bg-[color:var(--t-50)] h-[660px] sm:h-[640px] lg:h-[620px] flex items-center"
       >
-        {/* Clinical Background Image (Restored natural orientation with 55% opacity) */}
+        {/* Clinical Background Image (Restored natural orientation with 70% opacity) */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <div
             className="hero-bg-animated absolute -inset-6 bg-cover bg-center bg-no-repeat pointer-events-none"
             style={{
               backgroundImage: `url(${heroBgImage})`,
-              opacity: 0.55,
+              opacity: 0.7,
               filter: "hue-rotate(var(--t-hue)) brightness(var(--t-bright))",
             }}
           />
@@ -796,20 +830,21 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                 >
                   {/* Left column: message */}
                   <div className="max-w-2xl min-w-0">
-                    <div className="eyebrow mb-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-4">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                       <Cross className="h-3 w-3 text-[color:var(--t-600)]" />
                       {tr?.pill ?? s.pill}
                     </div>
 
                     {i === 0 ? (
                       <h1
-                        className="font-display font-black text-3xl sm:text-4xl leading-[1.1] tracking-tight text-slate-900 mb-3"
+                        className="font-display font-black text-3xl sm:text-4xl lg:text-[42px] leading-[1.12] tracking-tight text-slate-900 mb-3"
                       >
                         {tr?.headline ?? s.headline}
                       </h1>
                     ) : (
                       <h2
-                        className="font-display font-black text-3xl sm:text-4xl leading-[1.1] tracking-tight text-slate-900 mb-3"
+                        className="font-display font-black text-3xl sm:text-4xl lg:text-[42px] leading-[1.12] tracking-tight text-slate-900 mb-3"
                       >
                         {tr?.headline ?? s.headline}
                       </h2>
@@ -826,7 +861,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                         <a
                           href={s.cta.href}
                           onClick={e => { if (s.cta.href!.startsWith('/')) { e.preventDefault(); navigate(s.cta.href!); } }}
-                          className="group inline-flex items-center gap-2.5 min-h-[46px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] rounded-none shadow-md transition-all cursor-pointer border border-[color:var(--t-700)]"
+                          className="group inline-flex items-center gap-2.5 min-h-[48px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] rounded-none shadow-xs transition-all cursor-pointer border border-[color:var(--t-700)]"
                         >
                           {tr?.cta ?? s.cta.label}
                           <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -835,7 +870,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                         <button
                           type="button"
                           onClick={() => goLogin(s.cta.role!, !!s.cta.register)}
-                          className="group inline-flex items-center gap-2.5 min-h-[46px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] rounded-none shadow-md transition-all cursor-pointer border border-[color:var(--t-700)]"
+                          className="group inline-flex items-center gap-2.5 min-h-[48px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] rounded-none shadow-xs transition-all cursor-pointer border border-[color:var(--t-700)]"
                         >
                           {tr?.cta ?? s.cta.label}
                           <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -843,7 +878,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                       )}
                       <a
                         href="#verify-section"
-                        className="inline-flex items-center gap-2 min-h-[46px] px-6 text-sm font-bold text-[color:var(--ink)] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] rounded-none transition-all cursor-pointer shadow-xs"
+                        className="inline-flex items-center gap-2 min-h-[48px] px-6 text-sm font-bold text-[color:var(--ink)] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] rounded-none transition-all cursor-pointer shadow-xs"
                       >
                         <Search className="h-4 w-4 text-[color:var(--t-600)]" />
                         {t('nav.verify')}
@@ -859,43 +894,126 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                       ))}
                     </div>
                   </div>
+
+                  {/* Right column: live credential / prescription / international quote preview card */}
+                  <div className="hidden lg:block w-[360px] shrink-0 bg-white/95 backdrop-blur-md border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] p-5 shadow-lg panel-edge corner-bracket">
+                    <div className="flex items-center justify-between gap-2 pb-3 border-b border-[color:var(--t-100)]">
+                      <div>
+                        <span className="block text-[10px] font-mono font-extrabold uppercase tracking-widest text-[color:var(--t-600)]">
+                          {s.card.label}
+                        </span>
+                        <span className="font-display font-black text-sm text-[color:var(--ink)]">
+                          {s.card.title}
+                        </span>
+                      </div>
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-extrabold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        {s.card.status}
+                      </span>
+                    </div>
+
+                    <div className="py-3.5 flex items-center gap-3 border-b border-[color:var(--t-100)]">
+                      {s.card.person.img ? (
+                        <img
+                          src={s.card.person.img}
+                          alt={s.card.person.name}
+                          className="w-11 h-11 rounded-full object-cover border border-[color:var(--t-200)] shrink-0"
+                        />
+                      ) : s.card.person.icon ? (
+                        <span className="w-11 h-11 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shrink-0">
+                          <s.card.person.icon className="h-5 w-5" />
+                        </span>
+                      ) : null}
+                      <div className="min-w-0">
+                        <p className="font-display font-extrabold text-sm text-[color:var(--ink)] truncate">{s.card.person.name}</p>
+                        <p className="text-xs text-slate-600 font-semibold truncate">{s.card.person.line1}</p>
+                        <p className="text-[11px] text-slate-500 font-medium truncate">{s.card.person.line2}</p>
+                      </div>
+                    </div>
+
+                    <dl className="py-3 space-y-2 text-xs">
+                      {s.card.rows.map((r) => (
+                        <div key={r.k} className="flex items-center justify-between gap-2">
+                          <dt className="text-slate-500 font-medium">{r.k}</dt>
+                          <dd className={
+                            r.kind === 'mono'
+                              ? 'font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2 py-0.5 border border-[color:var(--t-200)]'
+                              : r.kind === 'ok'
+                                ? 'font-bold text-emerald-700 inline-flex items-center gap-1'
+                                : 'font-bold text-[color:var(--ink)]'
+                          }>
+                            {r.kind === 'ok' && <Check className="h-3.5 w-3.5 text-emerald-600" />}
+                            {r.v}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+
+                    <div className="pt-2.5 border-t border-[color:var(--t-100)] flex items-center justify-between text-[10px] font-mono font-bold text-slate-500">
+                      <span>AUDIT REF: {s.card.footId}</span>
+                      <span className="text-[color:var(--t-600)]">MEDCRED REGISTRY</span>
+                    </div>
+                  </div>
                 </div>
               );
             })}
           </div>
 
-          {/* Slider controls: small arrows and dots, no play button */}
-          <div className="mt-5 flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => { stopAutoplay(); setSlideIdx((slideIdx - 1 + HERO_SLIDES.length) % HERO_SLIDES.length); }}
-              aria-label="Previous slide"
-              className="relative h-5 w-5 inline-flex items-center justify-center text-[color:var(--t-600)] hover:text-[color:var(--t-800)] cursor-pointer after:content-[''] after:absolute after:-inset-3"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-            </button>
-            <div className="flex items-center gap-1.5 px-1">
-              {HERO_SLIDES.map((s, i) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => { stopAutoplay(); setSlideIdx(i); }}
-                  aria-label={`Go to slide ${i + 1}: ${s.pill}`}
-                  aria-current={i === slideIdx}
-                  className="h-8 min-w-6 justify-center inline-flex items-center cursor-pointer"
-                >
-                  <span className={`block h-1.5 transition-all ${i === slideIdx ? 'w-6 bg-[color:var(--t-600)]' : 'w-1.5 bg-[color:var(--t-600)]/30 hover:bg-[color:var(--t-600)]/60'}`} />
-                </button>
-              ))}
+          {/* Interactive Audience & Care Navigator Strip */}
+          <div className="mt-6 pt-3.5 border-t border-[color:var(--t-200)]/80 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-slate-500 mr-1 hidden md:inline-block">
+                Explore Care:
+              </span>
+              {[
+                { id: 'network', label: 'Doctor Consults', icon: Stethoscope },
+                { id: 'prescriptions', label: 'E-Prescriptions', icon: Pill },
+                { id: 'members', label: 'Health Vault', icon: ShieldCheck },
+                { id: 'tourism', label: 'Hospital Tourism', icon: Globe },
+              ].map((item, idx) => {
+                const ItemIcon = item.icon;
+                const isSelected = idx === slideIdx;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => { stopAutoplay(); setSlideIdx(idx); }}
+                    className={`px-3 py-1.5 text-xs font-extrabold border transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
+                      isSelected
+                        ? 'bg-white text-[color:var(--t-700)] border-[color:var(--t-600)] shadow-xs ring-1 ring-[color:var(--t-600)]/20'
+                        : 'bg-white/80 text-slate-600 border-[color:var(--t-200)] hover:bg-white hover:text-[color:var(--ink)] hover:border-[color:var(--t-300)]'
+                    }`}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
+                    <ItemIcon className={`h-3.5 w-3.5 ${isSelected ? 'text-[color:var(--t-600)]' : 'text-slate-400'}`} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
             </div>
-            <button
-              type="button"
-              onClick={() => { stopAutoplay(); setSlideIdx((slideIdx + 1) % HERO_SLIDES.length); }}
-              aria-label="Next slide"
-              className="relative h-5 w-5 inline-flex items-center justify-center text-[color:var(--t-600)] hover:text-[color:var(--t-800)] cursor-pointer after:content-[''] after:absolute after:-inset-3"
-            >
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
+
+            {/* Quick arrows & step count */}
+            <div className="flex items-center gap-2 self-end sm:self-auto ml-auto">
+              <span className="text-[11px] font-mono font-bold text-slate-500">
+                0{slideIdx + 1} / 0{HERO_SLIDES.length}
+              </span>
+              <button
+                type="button"
+                onClick={() => { stopAutoplay(); setSlideIdx((slideIdx - 1 + HERO_SLIDES.length) % HERO_SLIDES.length); }}
+                aria-label="Previous slide"
+                className="w-7 h-7 bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] hover:bg-[color:var(--t-50)] text-[color:var(--t-600)] flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => { stopAutoplay(); setSlideIdx((slideIdx + 1) % HERO_SLIDES.length); }}
+                aria-label="Next slide"
+                className="w-7 h-7 bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] hover:bg-[color:var(--t-50)] text-[color:var(--t-600)] flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -938,79 +1056,53 @@ export default function LandingPage({ professionals }: LandingPageProps) {
         </div>
       </section>
 
-      {/* ═══════════ CLINICAL COMMAND & EMERGENCY CONSOLE ═══════════ */}
-      <section aria-label="Clinical Command and Rapid Verification" className="relative bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] mt-0 pt-8 pb-12 sm:pb-14 overflow-hidden">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 space-y-6 pt-0 z-10">
-          
-          {/* PRIMARY COMMAND BAR: EMERGENCY & ACUTE HOTLINE PROTOCOL */}
-          <div className="w-full mt-0 pt-0">
-            {/* Emergency & Acute Hotline Protocol */}
-            <div className="bg-white p-6 sm:p-7 border-t-2 border-t-rose-500 border-x border-b border-[color:var(--t-200)] shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-              <div>
-                <div className="flex flex-wrap items-center justify-between gap-3 mb-3.5">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-none bg-rose-50 border border-rose-200 text-xs font-extrabold uppercase tracking-widest text-rose-700 shadow-2xs">
-                    <span className="section-index-badge bg-rose-100 text-rose-800 border-rose-300">01</span>
-                    <AlertCircle className="h-3.5 w-3.5 text-rose-600 animate-pulse" />
-                    Emergency Protocol
-                  </div>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-none bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold">
-                    <span className="w-1.5 h-1.5 rounded-none bg-rose-500 animate-ping" />
-                    Emergency number: 999
-                  </span>
-                </div>
-
-                <h3 className="font-display font-black text-xl sm:text-2xl text-[color:var(--ink)] tracking-tight leading-snug">
-                  Acute Condition or Medical Emergency?
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mt-2 max-w-3xl">
-                  MedCred provides credential verification and elective tele-consults. If you experience severe chest pain, shortness of breath, acute trauma, or loss of consciousness, dial <strong className="text-rose-700 font-black">999</strong> immediately.
-                </p>
-              </div>
-
-              <div className="mt-5 pt-4 border-t border-[color:var(--t-100)] flex flex-wrap items-center gap-3">
-                <a 
-                  href="tel:999" 
-                  className="inline-flex items-center justify-center gap-2 min-h-[44px] px-6 text-xs font-black text-white bg-rose-600 hover:bg-rose-700 border border-rose-700 rounded-none shadow-xs transition-all cursor-pointer"
-                >
-                  <PhoneCall className="h-4 w-4" />
-                  Call 999 Immediately
-                </a>
-              </div>
-            </div>
+      {/* ═══════════ COMPACT CLINICAL EMERGENCY ADVISORY BAR ═══════════ */}
+      <section aria-label="Emergency Hotline Protocol" className="relative bg-rose-50/80 border-b border-rose-200 py-3.5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start sm:items-center gap-3 min-w-0">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-600 text-white text-[11px] font-mono font-extrabold uppercase tracking-wider shrink-0">
+              <AlertCircle className="h-3.5 w-3.5 animate-pulse" />
+              Emergency 999
+            </span>
+            <p className="text-xs sm:text-sm text-slate-800 font-medium leading-snug">
+              <strong className="font-extrabold text-slate-900">Your Health &amp; Safety Come First:</strong> MedCred is dedicated to outpatient tele-consultations and practitioner verification. For acute chest discomfort, sudden breathlessness, or severe trauma, please dial <strong className="text-rose-700 font-black">999</strong> (or 112 from a mobile) immediately.
+            </p>
           </div>
-
-
+          <a
+            href="tel:999"
+            className="inline-flex items-center justify-center gap-2 min-h-[38px] px-4 text-xs font-black text-white bg-rose-600 hover:bg-rose-700 border border-rose-700 rounded-none shadow-2xs transition-all cursor-pointer shrink-0 self-start sm:self-auto"
+          >
+            <PhoneCall className="h-3.5 w-3.5" />
+            Call 999 Now
+          </a>
         </div>
       </section>
 
       {/* ═══════════ MAIN CONTENT ═══════════ */}
       <main id="main-content" className="flex-grow w-full">
 
-        {region === 'INTL'
-          ? <><TouristAccess onSignUp={() => goLogin('patient', true)} /><PatientAccess /></>
-          : <><PatientAccess /><TouristAccess onSignUp={() => goLogin('patient', true)} /></>}
-
-        {/* ─── SECTION 2: STATUTORY GOVERNANCE & LIVE PRACTITIONER LICENCE VERIFICATION ─── */}
+        {/* ─── SECTION 01: STATUTORY GOVERNANCE & LIVE PRACTITIONER LICENCE VERIFICATION ─── */}
         <section id="verify-section" aria-label="Statutory governance and licence verification" className="relative overflow-hidden bg-white border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10 space-y-12">
             <div>
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 pb-6 border-b border-[color:var(--t-200)]">
                 <div>
-                  <div className="eyebrow mb-3">
-                    <span className="section-index-badge">02</span>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="section-index-badge">01</span>
                     <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                    Regulatory &amp; Statutory Governance
+                    Caring For Your Safety &amp; Peace of Mind
                   </div>
                   <h2 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl text-[color:var(--ink)] tracking-tight leading-tight">
-                    How we check <span className="text-[color:var(--t-600)]">licences.</span>
+                    How we carefully verify every <span className="text-[color:var(--t-600)]">practitioner who cares for you.</span>
                   </h2>
-                  <p className="section-lead mt-2">
-                    We check each licence with the relevant council and record when and how. Nothing is synchronised automatically.
+                  <p className="text-sm sm:text-base text-slate-600 mt-2 font-medium max-w-2xl leading-relaxed">
+                    We believe patient trust is a sacred responsibility. Every doctor and nurse is verified individually by hand against official council registers (MMC &amp; LJM) with active Annual Practising Certificates before they can offer consultations.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 shrink-0">
                   <span className="text-xs font-mono font-bold text-slate-700 bg-white px-3.5 py-2 border border-[color:var(--t-200)] shadow-2xs">
-                    Medical Act 1971 · MMC telemedicine guideline · PDPA 2010
+                    Medical Act 1971 · Nurses Act 1950 · PDPA 2010
                   </span>
                 </div>
               </div>
@@ -1053,24 +1145,27 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                   <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.95fr)] gap-10 lg:gap-14 items-start">
                     {/* Left: heading, council filter tabs, search, results */}
                     <div className="min-w-0">
-                      <div className="eyebrow mb-3">
-                        <Cross className="h-3 w-3 text-[color:var(--t-600)]" /> Public Statutory Practitioner Register
+                      <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <Cross className="h-3 w-3 text-[color:var(--t-600)]" />
+                        Public Statutory Practitioner Register
                       </div>
                       <h2 id="verify-heading" className="font-display font-black text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-tight text-[color:var(--ink)] mb-2">
                         Practitioner Licence <span className="text-[color:var(--t-600)]">Verification.</span>
                       </h2>
                       <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium mb-6 max-w-lg">
-                        Verify active medical and nursing licences against statutory council registers by name, council number, or clinical specialty.
+                        Check active medical and nursing licences against statutory council registers with complete transparency before booking care.
                       </p>
 
                       {/* Council Selector Tabs */}
                       <div className="flex flex-wrap items-center gap-2 mb-4">
                         {[
-                          { key: 'all' as const, label: 'All Practitioners' },
-                          { key: 'doctor' as const, label: 'MMC Doctors (Act 1971)' },
-                          { key: 'nurse' as const, label: 'LJM Nurses (Act 1950)' },
+                          { key: 'all' as const, label: 'All Practitioners', icon: Users },
+                          { key: 'doctor' as const, label: 'MMC Doctors (Act 1971)', icon: Stethoscope },
+                          { key: 'nurse' as const, label: 'LJM Nurses (Act 1950)', icon: UserCheck },
                         ].map(c => {
                           const isSel = registryCouncilFilter === c.key;
+                          const TabIcon = c.icon;
                           return (
                             <button
                               key={c.key}
@@ -1079,13 +1174,14 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                                 setRegistryCouncilFilter(c.key);
                                 setTimeout(() => handleInstantLookup(), 0);
                               }}
-                              className={`px-3.5 py-2 text-xs font-extrabold border transition-colors cursor-pointer ${
+                              className={`px-3.5 py-2 text-xs font-extrabold border transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
                                 isSel
-                                  ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)] shadow-2xs'
-                                  : 'bg-white text-slate-700 border-[color:var(--t-200)] hover:bg-[color:var(--t-50)]'
+                                  ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)] shadow-xs ring-1 ring-[color:var(--t-600)]/20'
+                                  : 'bg-white text-slate-700 border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] hover:border-[color:var(--t-300)]'
                               }`}
                             >
-                              {c.label}
+                              <TabIcon className={`h-3.5 w-3.5 ${isSel ? 'text-white' : 'text-[color:var(--t-600)]'}`} />
+                              <span>{c.label}</span>
                             </button>
                           );
                         })}
@@ -1258,21 +1354,22 @@ export default function LandingPage({ professionals }: LandingPageProps) {
           </div>
         </section>
 
-        {/* ─── POSITION 3: INTEGRATED CLINICAL SERVICES SUITE (HIGH-FIDELITY MEDICAL CONSOLE) ─── */}
-        <div id="services-section" className="relative overflow-hidden bg-grid-blueprint bg-[color:var(--t-50)]/70 border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
+        {/* ─── SECTION 02: INTEGRATED CLINICAL SERVICES SUITE ─── */}
+        <div id="services-section" className="relative overflow-hidden bg-[color:var(--t-50)]/30 border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10">
             <section aria-label="Integrated clinical services">
               <AnimatedSection className="max-w-3xl mb-10">
-                <div className="eyebrow mb-3">
-                  <span className="section-index-badge">03</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="section-index-badge">02</span>
                   <Stethoscope className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                  Clinical Systems &amp; Care Modalities
+                  Compassionate Outpatient Care
                 </div>
-                <h2 className="section-title">
-                  Integrated <span className="text-[color:var(--t-600)]">Clinical Services.</span>
+                <h2 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl text-[color:var(--ink)] tracking-tight leading-tight">
+                  Thoughtful clinical services <span className="text-[color:var(--t-600)]">designed around your well-being.</span>
                 </h2>
-                <p className="section-lead mt-2">
-                  Interoperable hospital modules: on-call emergency triage, statutory credential audits, cryptographic e-prescriptions, and hospital locum staffing.
+                <p className="text-sm sm:text-base text-slate-600 mt-2 font-medium max-w-2xl leading-relaxed">
+                  Healthcare should feel gentle, attentive, and dependable. From unhurried video visits when you need rest, to doctor-signed prescriptions and confidential health vaults, we are here to support your health journey.
                 </p>
               </AnimatedSection>
 
@@ -1394,7 +1491,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
           </div>
         </div>
 
-        {/* ─── POSITION 4: 3-STEP CARE PATHWAY ("HOW IT WORKS") ─── */}
+        {/* ─── SECTION 03: 3-STEP CARE PATHWAY ("HOW IT WORKS") ─── */}
         <div id="pathway-section" className="relative overflow-hidden bg-white border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10">
             <section aria-label="Get started">
@@ -1403,25 +1500,26 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                   {/* Top row: the clinical care triage advisory */}
                   <div className="p-7 sm:p-9 flex flex-wrap items-center justify-between gap-x-10 gap-y-6 bg-gradient-to-r from-white via-[color:var(--t-50)] to-white border-b border-[color:var(--t-200)]">
                     <div className="max-w-xl">
-                      <div className="eyebrow mb-3">
-                        <span className="section-index-badge">04</span>
+                      <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="section-index-badge">03</span>
                         <Cross className="h-3 w-3 text-[color:var(--t-600)]" />
-                        Clinical Care Pathway
+                        Your Gentle Care Pathway
                       </div>
                       <h3 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-tight text-[color:var(--ink)]">
-                        Standardized <span className="text-[color:var(--t-600)]">Patient Journey.</span>
+                        Simple, transparent steps from <span className="text-[color:var(--t-600)]">consultation to recovery.</span>
                       </h3>
-                      <p className="mt-2 text-sm sm:text-base text-slate-600 leading-normal font-medium">
-                        Standard elective outpatient pathway. For acute emergencies, chest pain, or severe trauma, call <strong className="text-slate-900 font-bold">999</strong> immediately.
+                      <p className="mt-2 text-sm sm:text-base text-slate-600 leading-relaxed font-medium">
+                        No complicated steps or hidden surprises. Here is how we support you and your loved ones with promptness, dignity, and gentle care.
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-3">
                       <button
                         type="button"
                         onClick={() => goLogin('patient', true)}
-                        className="inline-flex items-center gap-2.5 min-h-[46px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none transition-all cursor-pointer shadow-xs"
+                        className="inline-flex items-center gap-2.5 min-h-[48px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none transition-all cursor-pointer shadow-xs"
                       >
-                        Create Patient Account
+                        Start Your Care Journey
                         <ArrowRight className="h-4 w-4" />
                       </button>
                     </div>
@@ -1458,35 +1556,184 @@ export default function LandingPage({ professionals }: LandingPageProps) {
           </div>
         </div>
 
-        {/* ─── PATIENT TESTIMONIALS: only real, approved ones are shown (none are invented) ─── */}
+        {/* ─── SECTION 04 (04A / 04B): MALAYSIA PATIENT ACCESS & INTERNATIONAL MEDICAL TOURISM ─── */}
+        <div className="bg-gradient-to-r from-white via-[color:var(--t-50)]/50 to-white border-b border-[color:var(--t-200)] py-4.5">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
+            <div className="flex items-center gap-3 text-xs sm:text-sm font-extrabold text-[color:var(--ink)]">
+              <span className="w-8 h-8 bg-white border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shadow-2xs shrink-0">
+                <Globe className="h-4 w-4" />
+              </span>
+              <div>
+                <span className="font-display font-black text-sm text-[color:var(--ink)] block">
+                  Select Your Care Pathway
+                </span>
+                <span className="text-xs font-medium text-slate-500 hidden sm:inline">
+                  Personalises services for Malaysian citizens (MyKad) or cross-border medical travel (Passport)
+                </span>
+              </div>
+            </div>
+            <div role="group" aria-label="Patient audience mode" className="grid grid-cols-2 sm:inline-flex bg-white border border-[color:var(--t-200)] p-1 shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setLocale({ region: 'MY' })}
+                aria-pressed={region === 'MY'}
+                className={`px-4 py-2 text-xs font-extrabold transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                  region === 'MY'
+                    ? 'bg-[color:var(--t-600)] text-white shadow-xs'
+                    : 'text-slate-700 hover:text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'
+                }`}
+              >
+                <span className="font-mono text-[10px] px-1.5 py-0.5 bg-black/10 border border-current/20">MY</span>
+                <span>Malaysia Resident (MyKad)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setLocale({ region: 'INTL' })}
+                aria-pressed={region === 'INTL'}
+                className={`px-4 py-2 text-xs font-extrabold transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                  region === 'INTL'
+                    ? 'bg-[color:var(--t-600)] text-white shadow-xs'
+                    : 'text-slate-700 hover:text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'
+                }`}
+              >
+                <span className="font-mono text-[10px] px-1.5 py-0.5 bg-black/10 border border-current/20">INTL</span>
+                <span>International Patient (Passport)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        {region === 'INTL'
+          ? <><TouristAccess onSignUp={() => goLogin('patient', true)} /><PatientAccess /></>
+          : <><PatientAccess /><TouristAccess onSignUp={() => goLogin('patient', true)} /></>}
+
+        {/* ─── SECTION 05: PARTNER & PRACTITIONER NETWORK ECOSYSTEM ─── */}
+        <section id="ecosystem-section" aria-label="Practitioner and partner network" className="relative overflow-hidden bg-[color:var(--t-50)]/60 border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+            <AnimatedSection className="max-w-3xl mb-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="section-index-badge">05</span>
+                <PlusCircle className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                Serving Together In Healthcare
+              </div>
+              <h2 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl text-[color:var(--ink)] tracking-tight leading-tight">
+                Dedicated to supporting Malaysia's <span className="text-[color:var(--t-600)]">doctors, nurses, clinics &amp; pharmacies.</span>
+              </h2>
+              <p className="text-sm sm:text-base text-slate-600 mt-2 font-medium max-w-2xl leading-relaxed">
+                We are humbled to support Malaysia’s dedicated healthcare professionals and community institutions with tools that make caring for patients simpler, safer, and more fulfilling.
+              </p>
+            </AnimatedSection>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {[
+                {
+                  badge: 'MMC Act 1971',
+                  title: 'Doctors & Specialists',
+                  desc: 'Provide thoughtful online tele-consultations, issue doctor-signed e-prescriptions, and accept verified hospital locum sessions.',
+                  cta: 'Explore Doctor Portal',
+                  href: '/for-doctors',
+                  icon: Stethoscope,
+                },
+                {
+                  badge: 'LJM Act 1950',
+                  title: 'Registered Nurses',
+                  desc: 'Verify your LJM Annual Practising Certificate, deliver compassionate home-nursing visits, and manage hospital rosters.',
+                  cta: 'Explore Nurse Portal',
+                  href: '/for-nurses',
+                  icon: UserCheck,
+                },
+                {
+                  badge: 'KKM Act 586',
+                  title: 'Clinics & Hospitals',
+                  desc: 'Rely on verified locum clinicians, welcome international medical tourism patients, and issue transparent itemised quotes.',
+                  cta: 'Explore Facility Network',
+                  href: '/for-clinics',
+                  icon: Hospital,
+                },
+                {
+                  badge: 'Poisons Act 1952',
+                  title: 'Community Pharmacies',
+                  desc: 'Dispense QR e-prescriptions at 0% platform commission, double-check patient allergy flags, and maintain secure Poisons Book entries.',
+                  cta: 'Explore Pharmacy Network',
+                  href: '/for-pharmacies',
+                  icon: Pill,
+                },
+              ].map((item, idx) => {
+                const ItemIcon = item.icon;
+                return (
+                  <StaggerItem key={item.title} index={idx} className="h-full">
+                    <a
+                      href={item.href}
+                      onClick={e => {
+                        e.preventDefault();
+                        navigate(item.href);
+                      }}
+                      className="group bg-white border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] p-6 flex flex-col justify-between h-full hover:border-[color:var(--t-600)] shadow-2xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer panel-edge corner-bracket"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between gap-2 mb-4">
+                          <span className="w-10 h-10 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] group-hover:bg-[color:var(--t-600)] group-hover:text-white transition-colors flex items-center justify-center shadow-2xs">
+                            <ItemIcon className="h-5 w-5" />
+                          </span>
+                          <span className="text-[10px] font-mono font-extrabold uppercase px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)]">
+                            {item.badge}
+                          </span>
+                        </div>
+                        <h3 className="font-display font-black text-lg text-[color:var(--ink)] group-hover:text-[color:var(--t-600)] transition-colors">
+                          {item.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed font-medium">
+                          {item.desc}
+                        </p>
+                      </div>
+                      <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs font-extrabold text-[color:var(--t-600)]">
+                        <span>{item.cta}</span>
+                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </a>
+                  </StaggerItem>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* ─── SECTION 06: PATIENT TESTIMONIALS (only real, approved ones are shown) ─── */}
         {testimonials.length > 0 && (
           <section id="feedback-section" aria-label="Patient testimonials" className="relative overflow-hidden bg-white border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10">
               <AnimatedSection className="max-w-3xl mb-10">
-                <div className="eyebrow mb-3">
-                  <span className="section-index-badge">05</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="section-index-badge">06</span>
                   <Cross className="h-3 w-3 text-[color:var(--t-600)]" />
-                  Verified Patient Feedback
+                  Heartfelt Patient Experiences
                 </div>
-                <h2 className="section-title">
-                  What patients <span className="text-[color:var(--t-600)]">say.</span>
+                <h2 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl text-[color:var(--ink)] tracking-tight leading-tight">
+                  Real stories of care, <span className="text-[color:var(--t-600)]">recovery and comfort.</span>
                 </h2>
-                <p className="section-lead mt-2">
-                  Shared by patients who paid for care on MedCred, with their permission, and approved by our team. Names are shortened.
+                <p className="text-sm sm:text-base text-slate-600 mt-2 font-medium max-w-2xl leading-relaxed">
+                  Every patient’s peace of mind and recovery inspires our team to serve with greater humility, warmth, and dedication.
                 </p>
               </AnimatedSection>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {testimonials.map((tm, idx) => (
                   <StaggerItem key={tm.id} index={idx} className="h-full">
-                    <article className="bg-white p-7 panel-edge flex flex-col justify-between corner-bracket h-full">
+                    <article className="bg-white p-7 border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] panel-edge flex flex-col justify-between corner-bracket h-full shadow-2xs hover:shadow-xs transition-all">
                       <div>
                         {tm.demo && <span className="inline-block mb-3 text-xs font-extrabold uppercase tracking-wider text-amber-900 bg-amber-50 border border-amber-300 px-2 py-0.5">Demo testimonial, not a real patient</span>}
                         {tm.rating && <div className="flex items-center gap-1 text-amber-500 mb-3" aria-label={`${tm.rating} out of 5`}>{Array.from({ length: tm.rating }).map((_, i) => <span key={i} className="text-sm">★</span>)}</div>}
                         <p className="text-sm text-slate-700 leading-relaxed font-medium mb-6">“{tm.text}”</p>
                       </div>
-                      <div className="pt-4 border-t border-[color:var(--t-100)]">
-                        <div className="font-display font-black text-sm text-[color:var(--ink)]">{tm.name}</div>
-                        {tm.location && <div className="text-xs font-semibold text-slate-500 mt-0.5">{tm.location}</div>}
+                      <div className="pt-4 border-t border-[color:var(--t-100)] flex items-center justify-between gap-2">
+                        <div>
+                          <div className="font-display font-black text-sm text-[color:var(--ink)]">{tm.name}</div>
+                          {tm.location && <div className="text-xs font-semibold text-slate-500 mt-0.5">{tm.location}</div>}
+                        </div>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 shrink-0">
+                          <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                          Verified
+                        </span>
                       </div>
                     </article>
                   </StaggerItem>

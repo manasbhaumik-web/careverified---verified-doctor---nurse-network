@@ -39,11 +39,9 @@ import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import PractitionerPage from './components/PractitionerPage';
 import ClinicHospitalPage from './components/ClinicHospitalPage';
+import PharmacyPage from './components/PharmacyPage';
 import AccountRecovery from './components/AccountRecovery';
 import PractitionerEarnings from './components/PractitionerEarnings';
-import AudiencePage from './components/AudiencePage';
-import { FOR_PHARMACIES } from './content/forPharmacies';
-import { FOR_CLINICS } from './content/forClinics';
 import { navigate, useLocation } from './nav';
 import Footer from './components/Footer';
 import LoadingImage from './components/LoadingImage';
@@ -299,7 +297,7 @@ export default function App() {
     if (route.path === '/for-nurses') return <PractitionerPage initialRole="nurse" />;
     if (route.path === '/forgot-password') return <AccountRecovery mode="forgot" />;
     if (route.path === '/reset-password') return <AccountRecovery mode="reset" />;
-    if (route.path === '/for-pharmacies') return <AudiencePage kind="pharmacy" signInRole="pharmacy" content={FOR_PHARMACIES} />;
+    if (route.path === '/for-pharmacies') return <PharmacyPage />;
     if (route.path === '/for-clinics' || route.path === '/for-hospitals') return <ClinicHospitalPage />;
     return <LandingPage professionals={professionals} />;
   }

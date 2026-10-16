@@ -483,20 +483,17 @@ footer button.bg-slate-800:hover,
   color: #BFD7FF;
 }
 
-/* Hero headline is black-with-white-glow over a photo in light themes; invert for navy */
+/* Hero headline is black over a photo in light themes; invert for navy */
 :root[data-theme="navy"] header#top h1.text-black,
 :root[data-theme="navy"] header#top h2.text-black,
-:root[data-theme="navy"] header#top h1 .text-black { color: #FFFFFF !important; text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
-:root[data-theme="navy"] header#top h2 .text-black { color: #FFFFFF !important; text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
-/* the hero letter outline is for the light themes only */
+:root[data-theme="navy"] header#top h1 .text-black { color: #FFFFFF !important; text-shadow: none !important; }
+:root[data-theme="navy"] header#top h2 .text-black { color: #FFFFFF !important; text-shadow: none !important; }
 :root[data-theme="navy"] header#top h1,
 :root[data-theme="navy"] header#top h2,
 :root[data-theme="navy"] header#top p.text-black,
 :root[data-theme="navy"] header#top h1 *,
 :root[data-theme="navy"] header#top h2 *,
-:root[data-theme="navy"] header#top p.text-black * { -webkit-text-stroke: 0 !important; }
-:root[data-theme="navy"] header#top h1 { text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
-:root[data-theme="navy"] header#top h2 { text-shadow: 0 2px 14px rgba(3, 8, 24, 0.85) !important; }
+:root[data-theme="navy"] header#top p.text-black * { -webkit-text-stroke: 0 !important; text-shadow: none !important; }
 :root[data-theme="navy"] header#top p.text-black { color: #E6EDF8 !important; text-shadow: none !important; }
 :root[data-theme="navy"] header#top p.text-black .text-black { color: #FFFFFF !important; }
 :root[data-theme="navy"] header#top p.text-black [class*="text-[color:var(--t-600)]"] { color: #7DB4FF; }
