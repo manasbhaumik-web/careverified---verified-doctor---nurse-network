@@ -399,7 +399,7 @@ export default function App() {
       )}
 
       {/* MedCred Elevated Primary Header */}
-      <header className="bg-[color:var(--header-bg)] border-b border-[color:var(--header-border)] sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-xs transition-colors duration-150">
+      <header className="bg-[color:var(--header-bg)] border-b border-[color:var(--header-border)] sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-2xs transition-colors duration-150">
         <div className="max-w-[1920px] mx-auto flex items-center justify-between h-16">
 
           {/* Brand Logo */}
@@ -413,14 +413,14 @@ export default function App() {
               setSelectedProfId(null);
             }}
           >
-            <div className="w-10 h-10 rounded-lg bg-white text-[color:var(--header-bg)] flex items-center justify-center shrink-0 shadow-xs group-hover:bg-white/90 transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-[color:var(--t-700)] text-white flex items-center justify-center shrink-0 shadow-xs group-hover:bg-[color:var(--t-800)] transition-colors">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
             </div>
             <div className="leading-none">
-              <span className="font-display font-bold text-[22px] text-white tracking-tight block">
-                MedCred<span className="text-white/80">.</span>
+              <span className="font-display font-bold text-[22px] text-[color:var(--ink)] tracking-tight block">
+                MedCred<span className="text-[color:var(--t-700)]">.</span>
               </span>
-              <span className="text-[10px] font-mono font-bold text-white/80 uppercase tracking-[0.14em] block mt-1">
+              <span className="text-[10px] font-mono font-bold text-slate-800 uppercase tracking-[0.14em] block mt-1">
                 {currentUser.role === 'admin' ? 'Board Console' : currentUser.role === 'practitioner' ? 'Practitioner Hub' : currentUser.role === 'pharmacy' ? 'Pharmacy Workspace' : 'Member Portal'}
               </span>
             </div>
@@ -428,15 +428,15 @@ export default function App() {
 
           {/* Right-Side Desktop Actions & User Session Details */}
           <div className="hidden lg:flex items-center gap-5">
-            <div className="flex items-center gap-2 bg-white/15 border border-white/25 px-3.5 py-1.5 rounded-full text-xs font-bold text-white shadow-2xs backdrop-blur-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span>
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-300" aria-hidden="true" />
+            <div className="flex items-center gap-2 bg-white/80 border border-black/10 px-3.5 py-1.5 rounded-full text-xs font-bold text-[color:var(--ink)] shadow-2xs backdrop-blur-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" aria-hidden="true"></span>
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" aria-hidden="true" />
               <span>Board-verified practitioners</span>
             </div>
 
-            <LocaleSwitcher tone="onColor" />
-            <ThemeSwitcher tone="onColor" />
-            <div className="flex items-center gap-3 border-l border-white/25 pl-5">
+            <LocaleSwitcher />
+            <ThemeSwitcher />
+            <div className="flex items-center gap-3 border-l border-black/15 pl-5">
               {currentUser.role === 'patient' && <SOSButton />}
               <NotificationBell />
 
@@ -445,18 +445,18 @@ export default function App() {
                 <img
                   src={currentUser.avatarUrl || '/assets/malaysian_female_doctor.jpg'}
                   alt={currentUser.name}
-                  className="w-10 h-10 rounded-full object-cover border-2 border-white/80"
+                  className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-2xs"
                   referrerPolicy="no-referrer"
                 />
                 <div className="text-left hidden xl:block leading-tight">
-                  <p className="text-[13px] font-extrabold text-white leading-none">{currentUser.name}</p>
-                  <p className="text-xs text-white/80 font-semibold mt-1">
+                  <p className="text-[13px] font-extrabold text-[color:var(--ink)] leading-none">{currentUser.name}</p>
+                  <p className="text-xs text-slate-800 font-semibold mt-1">
                     {currentUser.role === 'admin' ? 'Board Admin' : currentUser.role === 'practitioner' ? 'Practitioner Account' : currentUser.role === 'pharmacy' ? 'Pharmacy Account' : 'Member Account'}
                   </p>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="h-9 w-9 text-white/80 hover:text-white hover:bg-white/15 bg-transparent border-0 rounded-full transition-colors cursor-pointer ml-1 flex items-center justify-center"
+                  className="h-9 w-9 text-slate-700 hover:text-slate-900 hover:bg-black/10 bg-transparent border-0 rounded-full transition-colors cursor-pointer ml-1 flex items-center justify-center"
                   title="Close Session"
                   aria-label="Close session"
                 >
@@ -472,7 +472,7 @@ export default function App() {
             <NotificationBell />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="min-h-11 min-w-11 flex items-center justify-center rounded-lg border border-transparent text-white hover:bg-white/15 cursor-pointer"
+              className="min-h-11 min-w-11 flex items-center justify-center rounded-lg border border-transparent text-slate-900 hover:bg-black/10 cursor-pointer"
               aria-label="Toggle navigation"
               aria-expanded={mobileMenuOpen}
             >
