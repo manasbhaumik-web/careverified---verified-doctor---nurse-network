@@ -399,7 +399,7 @@ export default function App() {
       )}
 
       {/* MedCred Elevated Primary Header */}
-      <header className="bg-[color:var(--t-600)] border-b border-[color:var(--t-700)] sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-xs">
+      <header className="bg-white/95 backdrop-blur-md border-b border-[color:var(--t-200)] sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-2xs">
         <div className="max-w-[1920px] mx-auto flex items-center justify-between h-16">
 
           {/* Brand Logo */}
@@ -413,14 +413,14 @@ export default function App() {
               setSelectedProfId(null);
             }}
           >
-            <div className="w-10 h-10 rounded-lg bg-white text-[color:var(--t-600)] flex items-center justify-center shrink-0 shadow-xs group-hover:bg-[color:var(--t-100)] transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-[color:var(--t-600)] text-white flex items-center justify-center shrink-0 shadow-xs group-hover:bg-[color:var(--t-700)] transition-colors">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
             </div>
             <div className="leading-none">
-              <span className="font-display font-bold text-[22px] text-white tracking-tight block">
-                MedCred<span className="text-[color:var(--t-200)]">.</span>
+              <span className="font-display font-bold text-[22px] text-[color:var(--ink)] tracking-tight block">
+                MedCred<span className="text-[color:var(--t-600)]">.</span>
               </span>
-              <span className="text-[10px] font-semibold text-[color:var(--t-100)] uppercase tracking-[0.14em] block mt-1">
+              <span className="text-[10px] font-mono font-bold text-[color:var(--ink-2)] uppercase tracking-[0.14em] block mt-1">
                 {currentUser.role === 'admin' ? 'Board Console' : currentUser.role === 'practitioner' ? 'Practitioner Hub' : currentUser.role === 'pharmacy' ? 'Pharmacy Workspace' : 'Member Portal'}
               </span>
             </div>
@@ -428,34 +428,35 @@ export default function App() {
 
           {/* Right-Side Desktop Actions & User Session Details */}
           <div className="hidden lg:flex items-center gap-5">
-            <div className="flex items-center gap-2 bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-3.5 py-1.5 rounded-full text-xs font-semibold text-[color:var(--e-800)]">
+            <div className="flex items-center gap-2 bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-3.5 py-1.5 rounded-full text-xs font-bold text-[color:var(--e-800)] shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></span>
               <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--e-600)]" aria-hidden="true" />
               <span>Board-verified practitioners</span>
             </div>
 
-            <LocaleSwitcher tone="onColor" />
-            <ThemeSwitcher tone="onColor" />
-            <div className="flex items-center gap-3 border-l border-white/30 pl-5">
+            <LocaleSwitcher />
+            <ThemeSwitcher />
+            <div className="flex items-center gap-3 border-l border-slate-200 pl-5">
               {currentUser.role === 'patient' && <SOSButton />}
               <NotificationBell />
 
-              {/* Profile Badge embedded with Close Session Button (Transparent Background & No Border) */}
+              {/* Profile Badge embedded with Close Session Button */}
               <div className="flex items-center gap-2.5 bg-transparent border-0 p-1">
                 <img
                   src={currentUser.avatarUrl || '/assets/malaysian_female_doctor.jpg'}
                   alt={currentUser.name}
-                  className="w-10 h-10 rounded-full object-cover border-2 border-white"
+                  className="w-10 h-10 rounded-full object-cover border-2 border-[color:var(--t-200)]"
                   referrerPolicy="no-referrer"
                 />
                 <div className="text-left hidden xl:block leading-tight">
-                  <p className="text-[13px] font-semibold text-white leading-none">{currentUser.name}</p>
-                  <p className="text-xs text-[color:var(--t-100)] mt-1">
+                  <p className="text-[13px] font-extrabold text-[color:var(--ink)] leading-none">{currentUser.name}</p>
+                  <p className="text-xs text-[color:var(--ink-2)] font-semibold mt-1">
                     {currentUser.role === 'admin' ? 'Board Admin' : currentUser.role === 'practitioner' ? 'Practitioner Account' : currentUser.role === 'pharmacy' ? 'Pharmacy Account' : 'Member Account'}
                   </p>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="h-9 w-9 text-white hover:bg-white/15 bg-transparent border-0 rounded-full transition-colors cursor-pointer ml-1 flex items-center justify-center"
+                  className="h-9 w-9 text-slate-400 hover:text-slate-700 hover:bg-slate-100 bg-transparent border-0 rounded-full transition-colors cursor-pointer ml-1 flex items-center justify-center"
                   title="Close Session"
                   aria-label="Close session"
                 >
@@ -471,7 +472,7 @@ export default function App() {
             <NotificationBell />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="min-h-11 min-w-11 flex items-center justify-center rounded-lg border border-transparent text-white hover:bg-white/15 cursor-pointer"
+              className="min-h-11 min-w-11 flex items-center justify-center rounded-lg border border-transparent text-[color:var(--ink)] hover:bg-slate-100 cursor-pointer"
               aria-label="Toggle navigation"
               aria-expanded={mobileMenuOpen}
             >
@@ -562,12 +563,12 @@ export default function App() {
       </header>
 
       {/* Elevated Navigation Bar */}
-      <div className="hidden lg:block bg-[color:var(--t-100)]/95 backdrop-blur-md border-b border-[color:var(--t-200)] px-4 sm:px-6 lg:px-8 shrink-0 sticky top-16 z-30 shadow-xs">
+      <div className="hidden lg:block bg-slate-50/95 backdrop-blur-md border-b border-[color:var(--t-200)] px-4 sm:px-6 lg:px-8 shrink-0 sticky top-16 z-30 shadow-2xs">
         <div className="w-full max-w-[1920px] mx-auto flex items-stretch justify-between gap-4">
           <div className="flex items-stretch min-w-0 flex-1">
 
             {/* Navigation Tabs - Full Height & Width Coverage on Hover/Selection */}
-            <nav aria-label="Main" className="flex items-stretch gap-0 relative z-0 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <nav aria-label="Main" className="flex items-stretch gap-1 relative z-0 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeView === item.id;
@@ -576,32 +577,32 @@ export default function App() {
                     key={item.id}
                     data-active={isActive}
                     onClick={() => { setActiveView(item.id); setSelectedProfId(null); }}
-                    className={`relative flex items-center gap-2.5 px-4 xl:px-5 h-12 text-xs font-extrabold whitespace-nowrap shrink-0 transition-colors duration-150 cursor-pointer select-none rounded-none border-b-2 border-r border-r-[color:var(--t-200)]/60 first:border-l first:border-l-[color:var(--t-200)]/60 ${
+                    className={`relative flex items-center gap-2.5 px-4 xl:px-5 h-12 text-xs font-extrabold whitespace-nowrap shrink-0 transition-all duration-150 cursor-pointer select-none rounded-none ${
                       isActive
-                        ? 'text-[color:var(--t-600)] bg-white border-b-[color:var(--t-600)] shadow-2xs z-10'
-                        : 'text-[color:var(--ink-2)] border-b-transparent hover:text-[color:var(--t-600)] hover:bg-white/80 hover:border-b-[color:var(--t-400)]'
+                        ? 'text-[color:var(--t-700)] bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-x-[color:var(--t-200)] -mb-[1px] shadow-2xs z-10'
+                        : 'text-slate-600 border-t-2 border-t-transparent hover:text-[color:var(--t-700)] hover:bg-white/80'
                     }`}
                   >
                     <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? 'text-[color:var(--t-600)]' : 'text-slate-400 group-hover:text-[color:var(--t-600)]'}`} />
                     <span>{item.name}</span>
 
                     {item.id === 'messages' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-600)] text-white' : 'bg-[color:var(--t-100)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-slate-200/80 text-slate-700'}`}>
                         2 new
                       </span>
                     )}
                     {item.id === 'recruitment' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-600)] text-white' : 'bg-white text-[color:var(--ink)] border border-[color:var(--t-200)]'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-slate-200/80 text-slate-700'}`}>
                         9 Open
                       </span>
                     )}
                     {item.id === 'onboard' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-600)] text-white' : 'bg-white text-[color:var(--ink)] border border-[color:var(--t-200)]'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-slate-200/80 text-slate-700'}`}>
                         MMC
                       </span>
                     )}
                     {item.id === 'seo' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-600)] text-white' : 'bg-white text-[color:var(--ink)] border border-[color:var(--t-200)]'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-slate-200/80 text-slate-700'}`}>
                         98%
                       </span>
                     )}
@@ -609,7 +610,7 @@ export default function App() {
                     {isActive && (
                       <motion.div
                         layoutId="activeNavUnderline"
-                        className="absolute inset-x-0 bottom-[-2px] h-[3px] bg-[color:var(--t-600)]"
+                        className="absolute inset-x-0 bottom-[-1px] h-[2px] bg-[color:var(--t-600)]"
                         transition={{ type: "spring", stiffness: 400, damping: 32 }}
                       />
                     )}
@@ -620,8 +621,8 @@ export default function App() {
           </div>
 
           {/* Right: Registry telemetry indicator */}
-          <div className="hidden 2xl:flex items-center gap-2 self-center shrink-0 whitespace-nowrap bg-white border border-[color:var(--t-200)] px-3.5 py-1.5 rounded-full text-[11px] font-extrabold text-[color:var(--ink)] shadow-xs my-auto">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+          <div className="hidden 2xl:flex items-center gap-2 self-center shrink-0 whitespace-nowrap bg-white border border-[color:var(--t-200)] px-3.5 py-1.5 rounded-full text-[11px] font-extrabold text-[color:var(--ink)] shadow-2xs my-auto">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>Board-verified practitioners</span>
           </div>
 

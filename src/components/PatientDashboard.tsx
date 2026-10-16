@@ -314,21 +314,21 @@ export default function PatientDashboard({
       {activeConsult && (
         <aside 
           aria-label="Active consultation alert" 
-          className={`border-2 p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in ${
+          className={`border p-4 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in ${
             activeConsult.status === 'active'
-              ? 'bg-emerald-600 text-white border-emerald-700'
+              ? 'bg-emerald-50/90 text-emerald-950 border-emerald-300 border-l-4 border-l-emerald-600'
               : activeConsult.status === 'queued'
-              ? 'bg-[color:var(--t-50)] text-[color:var(--ink)] border-[color:var(--t-600)]'
-              : 'bg-amber-50 text-amber-950 border-amber-400'
+              ? 'bg-slate-50 text-[color:var(--ink)] border-[color:var(--t-200)] border-l-4 border-l-[color:var(--t-600)]'
+              : 'bg-amber-50 text-amber-950 border-amber-300 border-l-4 border-l-amber-500'
           }`}
         >
           <div className="flex items-center gap-3 min-w-0">
             <span className="relative flex h-3.5 w-3.5 shrink-0">
               <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                activeConsult.status === 'active' ? 'bg-white' : 'bg-[color:var(--t-600)]'
+                activeConsult.status === 'active' ? 'bg-emerald-500' : 'bg-[color:var(--t-600)]'
               }`} />
               <span className={`relative inline-flex rounded-full h-3.5 w-3.5 ${
-                activeConsult.status === 'active' ? 'bg-white' : 'bg-[color:var(--t-600)]'
+                activeConsult.status === 'active' ? 'bg-emerald-600' : 'bg-[color:var(--t-600)]'
               }`} />
             </span>
             <div className="min-w-0">
@@ -337,7 +337,7 @@ export default function PatientDashboard({
                 {activeConsult.status === 'queued' && 'ON-CALL DOCTOR QUEUE: MATCHING PRACTITIONER'}
                 {activeConsult.status === 'awaiting_payment' && 'CONSULTATION SLOT RESERVED · AWAITING PAYMENT'}
               </p>
-              <p className={`text-[11px] font-medium mt-0.5 ${activeConsult.status === 'active' ? 'text-emerald-100' : 'text-slate-600'}`}>
+              <p className={`text-[11px] font-medium mt-0.5 ${activeConsult.status === 'active' ? 'text-emerald-800' : 'text-slate-600'}`}>
                 {activeConsult.status === 'active' && 'A licensed physician is waiting in the encrypted WebRTC consultation room.'}
                 {activeConsult.status === 'queued' && 'Consultation payment confirmed. Keep window open. A doctor will connect within 10 min or refund automatically.'}
                 {activeConsult.status === 'awaiting_payment' && `Fee: ${formatMoney(activeConsult.fee || 50)} · Complete payment to be matched with on-call doctor.`}
@@ -351,7 +351,7 @@ export default function PatientDashboard({
               onClick={onConsultNow}
               className={`min-h-[38px] px-4 text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 w-full sm:w-auto ${
                 activeConsult.status === 'active'
-                  ? 'bg-white text-emerald-900 hover:bg-emerald-50 shadow-2xs'
+                  ? 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs'
                   : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white shadow-xs'
               }`}
             >
