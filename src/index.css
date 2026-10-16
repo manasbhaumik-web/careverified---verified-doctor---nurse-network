@@ -283,6 +283,10 @@ footer button.bg-slate-800:hover,
   /* Brand colour for small text and for fills behind white text in the content sections */
   --t-text: var(--t-600);
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
+  /* Header: 47.1% Lightness of Application Sky Blue */
+  --header-bg: #039ded;
+  --header-bg: hsl(from var(--t-600) h s 47.1%);
+  --header-border: hsl(from var(--t-600) h s 38%);
 }
 
 :root[data-theme="crimson"] {
@@ -290,6 +294,10 @@ footer button.bg-slate-800:hover,
   --t-500: #E0243F; --t-600: #C81E1E; --t-700: #B91C1C; --t-800: #86102A; --t-900: #6B0F24;
   --t-bg: #FFF8F9; --t-hue: 0deg;
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
+  /* Header: 47.1% Lightness of Crimson Red (#DC143C) */
+  --header-bg: #dc143c;
+  --header-bg: hsl(from var(--t-600) h s 47.1%);
+  --header-border: #b91c1c;
 }
 
 :root[data-theme="cyan"] {
@@ -300,6 +308,10 @@ footer button.bg-slate-800:hover,
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
   --t-text: var(--t-600);
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
+  /* Header: 47.1% Lightness of Cyan */
+  --header-bg: #15b0db;
+  --header-bg: hsl(from var(--t-600) h s 47.1%);
+  --header-border: #0e7490;
 }
 
 /* -------------------------------------------------------------
@@ -340,6 +352,11 @@ footer button.bg-slate-800:hover,
   --e-600: #10B981;
   --e-700: #34D399;
   --e-800: #6EE7B7;
+
+  /* Header: 47.1% Lightness of Brand Blue */
+  --header-bg: #0b5ee6;
+  --header-bg: hsl(from var(--t-600) h s 47.1%);
+  --header-border: #084bb8;
 
   /* Surface layers */
   --dark: #060E21;
