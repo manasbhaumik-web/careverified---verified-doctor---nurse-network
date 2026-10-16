@@ -563,7 +563,7 @@ export default function App() {
       </header>
 
       {/* Elevated Navigation Bar */}
-      <div className="hidden lg:block bg-slate-50/95 backdrop-blur-md border-b border-[color:var(--t-200)] px-4 sm:px-6 lg:px-8 shrink-0 sticky top-16 z-30 shadow-2xs">
+      <div className="hidden lg:block bg-[color:var(--header-bg)] backdrop-blur-md border-b border-[color:var(--header-border)] px-4 sm:px-6 lg:px-8 shrink-0 sticky top-16 z-30 shadow-2xs transition-colors duration-150">
         <div className="w-full max-w-[1920px] mx-auto flex items-stretch justify-between gap-4">
           <div className="flex items-stretch min-w-0 flex-1">
 
@@ -579,30 +579,30 @@ export default function App() {
                     onClick={() => { setActiveView(item.id); setSelectedProfId(null); }}
                     className={`relative flex items-center gap-2.5 px-4 xl:px-5 h-12 text-xs font-extrabold whitespace-nowrap shrink-0 transition-all duration-150 cursor-pointer select-none rounded-none ${
                       isActive
-                        ? 'text-[color:var(--t-700)] bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-x-[color:var(--t-200)] -mb-[1px] shadow-2xs z-10'
-                        : 'text-slate-600 border-t-2 border-t-transparent hover:text-[color:var(--t-700)] hover:bg-white/80'
+                        ? 'text-[color:var(--t-700)] bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-x-[color:var(--header-border)] -mb-[1px] shadow-2xs z-10'
+                        : 'text-slate-800 border-t-2 border-t-transparent hover:text-[color:var(--t-700)] hover:bg-white/70'
                     }`}
                   >
-                    <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? 'text-[color:var(--t-600)]' : 'text-slate-400 group-hover:text-[color:var(--t-600)]'}`} />
+                    <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? 'text-[color:var(--t-600)]' : 'text-slate-600 group-hover:text-[color:var(--t-600)]'}`} />
                     <span>{item.name}</span>
 
                     {item.id === 'messages' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-slate-200/80 text-slate-700'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-white/80 text-slate-800 border border-black/10'}`}>
                         2 new
                       </span>
                     )}
                     {item.id === 'recruitment' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-slate-200/80 text-slate-700'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-white/80 text-slate-800 border border-black/10'}`}>
                         9 Open
                       </span>
                     )}
                     {item.id === 'onboard' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-slate-200/80 text-slate-700'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-white/80 text-slate-800 border border-black/10'}`}>
                         MMC
                       </span>
                     )}
                     {item.id === 'seo' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-slate-200/80 text-slate-700'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-white/80 text-slate-800 border border-black/10'}`}>
                         98%
                       </span>
                     )}
@@ -621,8 +621,8 @@ export default function App() {
           </div>
 
           {/* Right: Registry telemetry indicator */}
-          <div className="hidden 2xl:flex items-center gap-2 self-center shrink-0 whitespace-nowrap bg-white border border-[color:var(--t-200)] px-3.5 py-1.5 rounded-full text-[11px] font-extrabold text-[color:var(--ink)] shadow-2xs my-auto">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <div className="hidden 2xl:flex items-center gap-2 self-center shrink-0 whitespace-nowrap bg-white/80 border border-black/10 px-3.5 py-1.5 rounded-full text-[11px] font-extrabold text-[color:var(--ink)] shadow-2xs my-auto">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
             <span>Board-verified practitioners</span>
           </div>
 
