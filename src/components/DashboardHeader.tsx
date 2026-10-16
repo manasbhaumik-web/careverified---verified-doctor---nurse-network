@@ -62,22 +62,23 @@ export default function DashboardHeader<T extends string>({
       id={id}
       className="relative bg-white border border-[color:var(--t-200)] shadow-xs overflow-hidden"
     >
-      {/* soft brand wash on the right edge */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-[color:var(--t-50)] to-transparent" />
+      {(title || children) && (
+        <div className="dh-brand relative bg-gradient-to-b from-[color:var(--t-600)] to-[color:var(--t-800)] text-white">
+          {title && (
+            <div className="relative px-4 sm:px-7 pt-4 pb-4 sm:pt-5 sm:pb-5">
+              <BannerRow
+                identity={<BannerIdentity as="h1" icon={icon ?? ShieldCheck} name={title} badges={eyebrow ? <BannerBadge>{eyebrow}</BannerBadge> : undefined} description={description} />}
+                aside={actions}
+              />
+            </div>
+          )}
 
-      {title && (
-        <div className="relative px-4 sm:px-7 pt-4 pb-4 sm:pt-5 sm:pb-5">
-          <BannerRow
-            identity={<BannerIdentity as="h1" icon={icon ?? ShieldCheck} name={title} badges={eyebrow ? <BannerBadge>{eyebrow}</BannerBadge> : undefined} description={description} />}
-            aside={actions}
-          />
+          {children && <div className="relative px-5 sm:px-7 py-5">{children}</div>}
         </div>
       )}
 
-      {children && <div className="relative px-5 sm:px-7 py-5">{children}</div>}
-
       {tabs && tabs.length > 0 && (
-        <div role="tablist" aria-label={tabsLabel} className="relative flex gap-1 overflow-x-auto overflow-y-hidden px-3 sm:px-5 border-t border-[color:var(--t-200)] bg-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div role="tablist" aria-label={tabsLabel} className="relative flex gap-1 overflow-x-auto overflow-y-hidden px-3 sm:px-5 border-t-[3px] border-t-[color:var(--t-600)] bg-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map(tab => {
             const selected = activeTab === tab.id;
             return (
@@ -118,6 +119,11 @@ export default function DashboardHeader<T extends string>({
 
 export const bannerPrimaryBtn =
   'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-4 h-11 rounded-xl shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
+/** Same two buttons for use on the brand-coloured banner: a white button and an outlined one. */
+export const bannerOnBrandPrimaryBtn =
+  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-800)] text-xs font-black px-4 h-11 rounded-none shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-white';
+export const bannerOnBrandSecondaryBtn =
+  'bg-transparent hover:bg-white/15 text-white border border-white/70 text-xs font-bold px-4 h-11 rounded-none transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
 export const bannerSecondaryBtn =
   'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] text-xs font-bold px-4 h-11 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none shadow-xs';
 
@@ -126,7 +132,7 @@ export function BannerRow({ identity, aside }: { identity: React.ReactNode; asid
   return (
     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
       {identity}
-      {aside && <div className="flex items-center gap-4 flex-wrap lg:justify-end border-t lg:border-t-0 border-[color:var(--t-200)]/80 pt-3 sm:pt-4 lg:pt-0 shrink-0">{aside}</div>}
+      {aside && <div className="flex items-center gap-4 flex-wrap lg:justify-end border-t lg:border-t-0 border-white/25 pt-3 sm:pt-4 lg:pt-0 shrink-0">{aside}</div>}
     </div>
   );
 }
@@ -154,9 +160,9 @@ export function BannerIdentity({ name, avatarUrl, icon: Icon, as: Heading = 'h2'
     <div className="flex items-center gap-3 sm:gap-5 min-w-0">
       <div className="relative shrink-0">
         {avatarUrl ? (
-          <img src={avatarUrl} alt={typeof name === 'string' ? name : ''} className="h-14 w-14 sm:h-20 sm:w-20 rounded-full object-cover border-2 sm:border-4 border-white shadow-md" referrerPolicy="no-referrer" />
+          <img src={avatarUrl} alt={typeof name === 'string' ? name : ''} className="h-14 w-14 sm:h-20 sm:w-20 rounded-none object-cover border-2 sm:border-4 border-white/50 shadow-md" referrerPolicy="no-referrer" />
         ) : (
-          <div aria-hidden="true" className="h-14 w-14 sm:h-20 sm:w-20 rounded-full border-2 sm:border-4 border-white shadow-md bg-[color:var(--t-100)] text-[color:var(--t-700)] flex items-center justify-center text-lg sm:text-2xl font-bold">
+          <div aria-hidden="true" className="h-14 w-14 sm:h-20 sm:w-20 rounded-none border-2 sm:border-4 border-white/50 shadow-md bg-white text-[color:var(--t-700)] flex items-center justify-center text-lg sm:text-2xl font-bold">
             {Icon ? <Icon className="h-6 w-6 sm:h-8 sm:w-8" /> : initials || '?'}
           </div>
         )}
@@ -164,11 +170,11 @@ export function BannerIdentity({ name, avatarUrl, icon: Icon, as: Heading = 'h2'
       </div>
       <div className="space-y-1.5 min-w-0">
         <div className="flex items-center gap-2.5 flex-wrap">
-          <Heading className="text-xl sm:text-2xl font-bold text-[color:var(--ink)] tracking-tight">{name}</Heading>
+          <Heading className="text-xl sm:text-3xl font-extrabold text-white tracking-tight">{name}</Heading>
           {badges}
         </div>
-        {description && <p className="text-sm text-[color:var(--ink-2)] leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
-        {meta && <div className="flex items-center gap-2.5 text-xs text-slate-700 font-semibold flex-wrap">{meta}</div>}
+        {description && <p className="text-sm text-white/90 leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
+        {meta && <div className="flex items-center gap-2.5 text-xs text-white/90 font-semibold flex-wrap">{meta}</div>}
       </div>
     </div>
   );
@@ -177,20 +183,20 @@ export function BannerIdentity({ name, avatarUrl, icon: Icon, as: Heading = 'h2'
 /** Pill used beside the name: neutral (brand) or success. */
 export function BannerBadge({ tone = 'brand', children }: { tone?: 'brand' | 'success'; children: React.ReactNode }) {
   return tone === 'success' ? (
-    <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">{children}</span>
+    <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none flex items-center gap-1 shadow-2xs">{children}</span>
   ) : (
-    <span className="bg-white text-[color:var(--t-600)] border border-[color:var(--t-200)] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-2xs">{children}</span>
+    <span className="bg-white/20 text-white border border-white/50 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none">{children}</span>
   );
 }
 
 /** KPI strip: one compact row, same height as the banner buttons (h-11). */
 export function BannerKpis({ items }: { items: { value: React.ReactNode; label: string }[] }) {
   return (
-    <div className="flex items-stretch w-full sm:w-auto sm:h-11 bg-white/90 border border-[color:var(--t-200)] rounded-xl shadow-xs">
+    <div className="flex items-stretch w-full sm:w-auto sm:h-11 bg-white/15 border border-white/40 rounded-none">
       {items.map((k, i) => (
-        <div key={k.label} className={`flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-0 min-w-0 ${i > 0 ? 'border-l border-slate-200' : ''}`}>
-          <span className="text-base font-bold text-[color:var(--t-600)] leading-none tabular-nums">{k.value}</span>
-          <span className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-tight text-center">{k.label}</span>
+        <div key={k.label} className={`flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-0 min-w-0 ${i > 0 ? 'border-l border-white/30' : ''}`}>
+          <span className="text-base font-extrabold text-white leading-none tabular-nums">{k.value}</span>
+          <span className="text-[9px] sm:text-[10px] font-bold text-white/85 uppercase tracking-wider leading-tight text-center">{k.label}</span>
         </div>
       ))}
     </div>

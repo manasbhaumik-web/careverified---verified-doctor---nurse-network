@@ -283,9 +283,6 @@ footer button.bg-slate-800:hover,
   /* Brand colour for small text and for fills behind white text in the content sections */
   --t-text: var(--t-600);
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
-  /* Header: Option A - 47.1% Tint of Application Color (mixed with white) */
-  --header-bg: color-mix(in srgb, var(--t-600) 47.1%, white);
-  --header-border: color-mix(in srgb, var(--t-600) 65%, white);
 }
 
 :root[data-theme="crimson"] {
@@ -293,9 +290,6 @@ footer button.bg-slate-800:hover,
   --t-500: #E0243F; --t-600: #C81E1E; --t-700: #B91C1C; --t-800: #86102A; --t-900: #6B0F24;
   --t-bg: #FFF8F9; --t-hue: 0deg;
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
-  /* Header: Option A - 47.1% Tint of Crimson Red (#EF90A3 / color-mix) */
-  --header-bg: color-mix(in srgb, #dc143c 47.1%, white);
-  --header-border: color-mix(in srgb, #dc143c 65%, white);
 }
 
 :root[data-theme="cyan"] {
@@ -306,9 +300,6 @@ footer button.bg-slate-800:hover,
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
   --t-text: var(--t-600);
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
-  /* Header: Option A - 47.1% Tint of Cyan */
-  --header-bg: color-mix(in srgb, var(--t-600) 47.1%, white);
-  --header-border: color-mix(in srgb, var(--t-600) 65%, white);
 }
 
 /* -------------------------------------------------------------
@@ -349,10 +340,6 @@ footer button.bg-slate-800:hover,
   --e-600: #10B981;
   --e-700: #34D399;
   --e-800: #6EE7B7;
-
-  /* Header: Option A - 47.1% Tint of Brand Blue in dark theme */
-  --header-bg: color-mix(in srgb, var(--t-600) 47.1%, #0A1128);
-  --header-border: color-mix(in srgb, var(--t-600) 65%, #0A1128);
 
   /* Surface layers */
   --dark: #060E21;
@@ -876,3 +863,12 @@ a, button, [role="button"], summary, label, select, input { touch-action: manipu
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* -------------------------------------------------------------
+ * Dashboard header: the identity banner is a block of the application colour.
+ * Custom content passed to a banner (chips, buttons) was written for a white banner, so
+ * keep it readable here: brand-coloured buttons get a white outline, light chips keep their own colours.
+ * ------------------------------------------------------------- */
+.dh-brand button.bg-\[color\:var\(--t-600\)\] { border: 1px solid #FFFFFF; }
+.dh-brand button.bg-\[color\:var\(--t-600\)\]:hover { background-color: #FFFFFF; color: var(--t-800); }
+.dh-brand :focus-visible { outline: 3px solid #FFFFFF; outline-offset: 2px; }

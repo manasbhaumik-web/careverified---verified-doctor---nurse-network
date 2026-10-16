@@ -14,7 +14,7 @@ import PractitionerBookingsTab from './practitioner/PractitionerBookingsTab';
 import PractitionerFeedbackTab from './practitioner/PractitionerFeedbackTab';
 import PractitionerAnalyticsTab from './practitioner/PractitionerAnalyticsTab';
 import PractitionerSettingsTab from './practitioner/PractitionerSettingsTab';
-import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
+import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from './DashboardHeader';
 import PageBanner from './PageBanner';
 
 interface VerificationTerminalProps {
@@ -396,19 +396,19 @@ export default function VerificationTerminal({
                   }
                   meta={
                     <>
-                      <span className="font-extrabold text-slate-900">{matchedProfile.specialization}</span>
-                      <span className="text-slate-300">&bull;</span>
-                      <span className="font-mono text-slate-700">{matchedProfile.experienceYears} Years Exp.</span>
-                      <span className="text-slate-300">&bull;</span>
+                      <span className="font-extrabold text-white">{matchedProfile.specialization}</span>
+                      <span className="text-white/50">&bull;</span>
+                      <span className="font-mono text-white/90">{matchedProfile.experienceYears} Years Exp.</span>
+                      <span className="text-white/50">&bull;</span>
                       <span className="font-mono font-bold text-slate-900 bg-white px-2 py-0.5 border border-[color:var(--t-200)] text-[10px] rounded-md shadow-2xs">
                         {matchedProfile.licenseNumber}
                       </span>
-                      <span className="text-slate-300">&bull;</span>
+                      <span className="text-white/50">&bull;</span>
                       <span className="font-mono text-slate-700 text-[10px] bg-white px-1.5 py-0.5 border border-slate-200 rounded-md">
                         ID: {matchedProfile.id}
                       </span>
-                      {isVerified && <span className="text-slate-300">&bull;</span>}
-                      {isVerified && <span className="text-emerald-700 font-extrabold flex items-center gap-1.5">
+                      {isVerified && <span className="text-white/50">&bull;</span>}
+                      {isVerified && <span className="text-emerald-200 font-extrabold flex items-center gap-1.5">
                         <span className="relative flex h-2 w-2">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -427,7 +427,7 @@ export default function VerificationTerminal({
                     { value: avgOverall ?? '5.0', label: 'Rating' },
                   ]} />
                   <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                    <button type="button" onClick={() => setShowPublicProfilePreview(true)} className={bannerPrimaryBtn}>
+                    <button type="button" onClick={() => setShowPublicProfilePreview(true)} className={bannerOnBrandPrimaryBtn}>
                       <Eye className="h-4 w-4" />
                       <span>View Public Profile</span>
                     </button>
@@ -437,7 +437,7 @@ export default function VerificationTerminal({
                         navigator.clipboard.writeText(`https://medicert.com/practitioner/${matchedProfile.id}`);
                         showToast("Profile link copied to clipboard!");
                       }}
-                      className={bannerSecondaryBtn}
+                      className={bannerOnBrandSecondaryBtn}
                     >
                       <Send className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                       <span>Share Link</span>

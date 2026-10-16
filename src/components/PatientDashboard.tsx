@@ -8,7 +8,7 @@ import {
   Send, X, Star, MapPin, Radio, AlertCircle
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking, PatientProfile, UserRole } from '../types';
-import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
+import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from './DashboardHeader';
 import PatientRecords, { RecordSubTab } from './PatientRecords';
 import SavedTab from './patient/SavedTab';
 import PaymentDialog from './PaymentDialog';
@@ -387,13 +387,13 @@ export default function PatientDashboard({
               badges={<BannerBadge>EHR Verified Patient</BannerBadge>}
               meta={
                 <>
-                  <span className="font-extrabold text-slate-900">{greeting}</span>
-                  <span className="text-slate-300">&bull;</span>
+                  <span className="font-extrabold text-white">{greeting}</span>
+                  <span className="text-white/50">&bull;</span>
                   <span>{upcoming[0] ? `Next Visit: ${upcoming[0].professionalName}, ${upcoming[0].date}` : 'No upcoming consultations'}</span>
                   {summary?.bp && (
                     <>
-                      <span className="text-slate-300">&bull;</span>
-                      <span className={summary.bp.flag?.level === 'urgent' ? 'text-rose-700 font-bold' : 'font-mono text-slate-700'}>
+                      <span className="text-white/50">&bull;</span>
+                      <span className={summary.bp.flag?.level === 'urgent' ? 'text-white font-bold bg-red-700 px-1.5' : 'font-mono text-white'}>
                         BP: {summary.bp.value1}/{summary.bp.value2} mmHg
                       </span>
                     </>
@@ -410,22 +410,22 @@ export default function PatientDashboard({
                 { value: careTeam.length, label: 'Care Team' },
               ]} />
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                <button type="button" onClick={onConsultNow} className={bannerPrimaryBtn}>
+                <button type="button" onClick={onConsultNow} className={bannerOnBrandPrimaryBtn}>
                   <Video className="h-4 w-4" />
                   <span>On-Call Doctor</span>
                 </button>
                 {onOpenTriage && (
-                  <button type="button" onClick={onOpenTriage} className={bannerSecondaryBtn}>
-                    <Sparkles className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                  <button type="button" onClick={onOpenTriage} className={bannerOnBrandSecondaryBtn}>
+                    <Sparkles className="h-3.5 w-3.5" />
                     <span>AI Triage</span>
                   </button>
                 )}
                 <button
                   type="button" 
                   onClick={() => { setRecordsSubTab('overview'); setActiveTab('records'); }} 
-                  className={bannerSecondaryBtn}
+                  className={bannerOnBrandSecondaryBtn}
                 >
-                  <FolderHeart className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                  <FolderHeart className="h-3.5 w-3.5" />
                   <span>Health Records</span>
                 </button>
               </div>
