@@ -188,6 +188,42 @@ CREATE TABLE IF NOT EXISTS facility_locum_evaluations (
 );
 CREATE INDEX IF NOT EXISTS idx_eval_user ON facility_locum_evaluations(applicant_user_id);
 CREATE INDEX IF NOT EXISTS idx_eval_facility ON facility_locum_evaluations(facility_id);
+
+-- Phase 5: Multi-Staff RBAC and Statutory Incident Governance (Act 586)
+CREATE TABLE IF NOT EXISTS facility_team_members (
+  id TEXT PRIMARY KEY,
+  facility_id TEXT NOT NULL,
+  user_id TEXT,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  role TEXT NOT NULL,
+  department TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active',
+  invited_by TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_team_fac ON facility_team_members(facility_id);
+
+CREATE TABLE IF NOT EXISTS facility_incidents (
+  id TEXT PRIMARY KEY,
+  facility_id TEXT NOT NULL,
+  job_id TEXT,
+  locum_name TEXT,
+  locum_role TEXT,
+  incident_type TEXT NOT NULL,
+  severity TEXT NOT NULL,
+  department TEXT NOT NULL,
+  incident_date TEXT NOT NULL,
+  description TEXT NOT NULL,
+  immediate_action TEXT,
+  root_cause_analysis TEXT,
+  kkm_notified INTEGER NOT NULL DEFAULT 0,
+  kkm_reference_no TEXT,
+  status TEXT NOT NULL DEFAULT 'investigating',
+  reported_by TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_incident_fac ON facility_incidents(facility_id);
 `);
 
 try { db.exec("ALTER TABLE job_applications ADD COLUMN payout_batch_id TEXT"); } catch { /* column already exists */ }

@@ -2213,6 +2213,249 @@ app.post("/api/facility/evaluations", requireRole("facility", "admin"), (req, re
 });
 
 // -------------------------------------------------------------
+// Phase 5: Multi-Staff RBAC (Team Management)
+// -------------------------------------------------------------
+app.get("/api/facility/team", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const members = db.prepare("SELECT * FROM facility_team_members WHERE facility_id = ? ORDER BY created_at ASC").all(facilityId) as any[];
+
+  if (members.length === 0 && facilityId === "fac-demo-1") {
+    const defaultTeam = [
+      {
+        id: "fteam-1",
+        facility_id: "fac-demo-1",
+        user_id: "usr-demo-fac-admin",
+        name: "Dr. Azman bin Kassim",
+        email: "azman.kassim@pantai.com.my",
+        role: "medical_director",
+        department: "Hospital Administration & Clinical Quality",
+        status: "active",
+        invited_by: "system",
+        created_at: new Date().toISOString()
+      },
+      {
+        id: "fteam-2",
+        facility_id: "fac-demo-1",
+        user_id: null,
+        name: "Sister Helen Wong",
+        email: "helen.wong@pantai.com.my",
+        role: "ward_supervisor",
+        department: "Nursing Administration (Emergency & ICU)",
+        status: "active",
+        invited_by: "usr-demo-fac-admin",
+        created_at: new Date().toISOString()
+      },
+      {
+        id: "fteam-3",
+        facility_id: "fac-demo-1",
+        user_id: null,
+        name: "Encik Farhan bin Razak",
+        email: "farhan.razak@pantai.com.my",
+        role: "hr_staffing",
+        department: "Human Resources & Clinical Credentialing",
+        status: "active",
+        invited_by: "usr-demo-fac-admin",
+        created_at: new Date().toISOString()
+      },
+      {
+        id: "fteam-4",
+        facility_id: "fac-demo-1",
+        user_id: null,
+        name: "Puan Linda Tan",
+        email: "linda.tan@pantai.com.my",
+        role: "finance_officer",
+        department: "Finance & Corporate Accounts",
+        status: "active",
+        invited_by: "usr-demo-fac-admin",
+        created_at: new Date().toISOString()
+      }
+    ];
+
+    const ins = db.prepare(`
+      INSERT OR IGNORE INTO facility_team_members (id, facility_id, user_id, name, email, role, department, status, invited_by, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    for (const m of defaultTeam) {
+      ins.run(m.id, m.facility_id, m.user_id, m.name, m.email, m.role, m.department, m.status, m.invited_by, m.created_at);
+    }
+    return res.json({ status: "success", data: defaultTeam });
+  }
+
+  res.json({
+    status: "success",
+    data: members.map(m => ({
+      id: m.id,
+      facilityId: m.facility_id,
+      userId: m.user_id,
+      name: m.name,
+      email: m.email,
+      role: m.role,
+      department: m.department,
+      status: m.status,
+      invitedBy: m.invited_by,
+      createdAt: m.created_at
+    }))
+  });
+});
+
+app.post("/api/facility/team", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const { name, email, role, department } = req.body;
+
+  if (!name || !email || !role) {
+    return fail(res, 400, "Name, email, and role are required.");
+  }
+
+  const memberId = generateId("fteam");
+  const now = new Date().toISOString();
+
+  db.prepare(`
+    INSERT INTO facility_team_members (id, facility_id, user_id, name, email, role, department, status, invited_by, created_at)
+    VALUES (?, ?, NULL, ?, ?, ?, ?, 'active', ?, ?)
+  `).run(memberId, facilityId, str(name, 100), str(email, 120), str(role, 40), str(department || "Clinical Operations", 100), req.user!.id, now);
+
+  audit(req, "facility.team.invite", { target: ["facility_team_member", memberId], details: { name, email, role } });
+
+  res.status(201).json({
+    status: "success",
+    message: `Staff member ${name} invited successfully with ${role} permissions.`,
+    data: { id: memberId, name, email, role, department }
+  });
+});
+
+app.delete("/api/facility/team/:id", requireRole("facility", "admin"), (req, res) => {
+  const { id } = req.params;
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+
+  db.prepare("DELETE FROM facility_team_members WHERE id = ? AND facility_id = ?").run(id, facilityId);
+  audit(req, "facility.team.remove", { target: ["facility_team_member", id] });
+
+  res.json({ status: "success", message: "Staff member access revoked." });
+});
+
+// -------------------------------------------------------------
+// Phase 5: Statutory Clinical Incident Governance (KKM Act 586)
+// -------------------------------------------------------------
+app.get("/api/facility/incidents", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const rows = db.prepare("SELECT * FROM facility_incidents WHERE facility_id = ? ORDER BY created_at DESC").all(facilityId) as any[];
+
+  if (rows.length === 0 && facilityId === "fac-demo-1") {
+    const sampleIncident = {
+      id: "finc-sample-1",
+      facility_id: "fac-demo-1",
+      job_id: "job-demo-ed-night",
+      locum_name: "Dr. Siti Aisyah binti Rahman",
+      locum_role: "doctor",
+      incident_type: "near_miss",
+      severity: "low",
+      department: "Emergency & Trauma Department",
+      incident_date: new Date(Date.now() - 3 * 86400000).toISOString().slice(0, 10),
+      description: "Visiting locum identified look-alike sound-alike (LASA) medication packaging discrepancy (Cefazolin vs Cefuroxime) prior to IV administration. Drug was withheld and verified with unit clinical pharmacist.",
+      immediate_action: "Prescription corrected with ward sister. Pharmacist logged LASA separation warning in ED satellite dispensary.",
+      root_cause_analysis: "Similar manufacturer ampoule color scheme in night emergency drug tray.",
+      kkm_notified: 1,
+      kkm_reference_no: "KKM/CKAPS/INC/2026/0412",
+      status: "closed",
+      reported_by: "Sister Helen Wong (Ward In-Charge)",
+      created_at: new Date(Date.now() - 3 * 86400000).toISOString()
+    };
+
+    db.prepare(`
+      INSERT OR IGNORE INTO facility_incidents (id, facility_id, job_id, locum_name, locum_role, incident_type, severity, department, incident_date, description, immediate_action, root_cause_analysis, kkm_notified, kkm_reference_no, status, reported_by, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      sampleIncident.id, sampleIncident.facility_id, sampleIncident.job_id, sampleIncident.locum_name, sampleIncident.locum_role,
+      sampleIncident.incident_type, sampleIncident.severity, sampleIncident.department, sampleIncident.incident_date,
+      sampleIncident.description, sampleIncident.immediate_action, sampleIncident.root_cause_analysis,
+      sampleIncident.kkm_notified, sampleIncident.kkm_reference_no, sampleIncident.status, sampleIncident.reported_by, sampleIncident.created_at
+    );
+    return res.json({ status: "success", data: [sampleIncident] });
+  }
+
+  res.json({
+    status: "success",
+    data: rows.map(r => ({
+      id: r.id,
+      facilityId: r.facility_id,
+      jobId: r.job_id,
+      locumName: r.locum_name,
+      locumRole: r.locum_role,
+      incidentType: r.incident_type,
+      severity: r.severity,
+      department: r.department,
+      incidentDate: r.incident_date,
+      description: r.description,
+      immediateAction: r.immediate_action,
+      rootCauseAnalysis: r.root_cause_analysis,
+      kkmNotified: Boolean(r.kkm_notified),
+      kkmReferenceNo: r.kkm_reference_no,
+      status: r.status,
+      reportedBy: r.reported_by,
+      createdAt: r.created_at
+    }))
+  });
+});
+
+app.post("/api/facility/incidents", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const {
+    jobId, locumName, locumRole, incidentType, severity,
+    department, incidentDate, description, immediateAction,
+    rootCauseAnalysis, kkmNotified, kkmReferenceNo
+  } = req.body;
+
+  if (!description || !department) {
+    return fail(res, 400, "Description and department are required for incident registration.");
+  }
+
+  const incidentId = generateId("finc");
+  const now = new Date().toISOString();
+
+  db.prepare(`
+    INSERT INTO facility_incidents (
+      id, facility_id, job_id, locum_name, locum_role,
+      incident_type, severity, department, incident_date,
+      description, immediate_action, root_cause_analysis,
+      kkm_notified, kkm_reference_no, status, reported_by, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'investigating', ?, ?)
+  `).run(
+    incidentId, facilityId, jobId || null, str(locumName || "Visiting Staff", 100), str(locumRole || "doctor", 40),
+    str(incidentType || "near_miss", 40), str(severity || "low", 20), str(department, 100),
+    incidentDate || now.slice(0, 10), str(description, 1000), str(immediateAction || "", 500),
+    str(rootCauseAnalysis || "", 500), kkmNotified ? 1 : 0, kkmReferenceNo ? str(kkmReferenceNo, 80) : null,
+    req.user!.name, now
+  );
+
+  audit(req, "facility.incident.log", { target: ["facility_incident", incidentId], details: { severity, department, kkmNotified } });
+
+  res.status(201).json({
+    status: "success",
+    message: "Incident logged into KKM Act 586 Statutory Register.",
+    data: { id: incidentId }
+  });
+});
+
+app.patch("/api/facility/incidents/:id", requireRole("facility", "admin"), (req, res) => {
+  const { id } = req.params;
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const { status, rootCauseAnalysis, kkmNotified, kkmReferenceNo } = req.body;
+
+  db.prepare(`
+    UPDATE facility_incidents
+    SET status = COALESCE(?, status),
+        root_cause_analysis = COALESCE(?, root_cause_analysis),
+        kkm_notified = COALESCE(?, kkm_notified),
+        kkm_reference_no = COALESCE(?, kkm_reference_no)
+    WHERE id = ? AND facility_id = ?
+  `).run(status || null, rootCauseAnalysis || null, kkmNotified !== undefined ? (kkmNotified ? 1 : 0) : null, kkmReferenceNo || null, id, facilityId);
+
+  audit(req, "facility.incident.update", { target: ["facility_incident", id], details: { status, kkmNotified } });
+
+  res.json({ status: "success", message: "Incident governance record updated." });
+});
+
+// -------------------------------------------------------------
 // Reviews
 // -------------------------------------------------------------
 app.get("/api/reviews", (req, res) => {

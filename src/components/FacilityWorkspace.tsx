@@ -4,13 +4,13 @@ import {
   Search, Filter, AlertCircle, FileText, Send, Phone, Mail, MapPin, ExternalLink,
   RefreshCw, ChevronDown, ChevronUp, UserCheck, Stethoscope, AlertTriangle, Check,
   MessageSquare, FileCheck, Lock, DollarSign, Zap, Star, Download, ShieldAlert,
-  CheckSquare, Square
+  CheckSquare, Square, Grid, AlertOctagon, UserCog, UserPlus, Trash2, CalendarDays, Eye
 } from 'lucide-react';
 import DashboardHeader, {
   BannerRow, BannerIdentity, BannerBadge, BannerKpis, DashboardTab, bannerPrimaryBtn
 } from './DashboardHeader';
 
-type Tab = 'shifts' | 'locums' | 'cases' | 'vault' | 'finance' | 'profile';
+type Tab = 'shifts' | 'roster' | 'locums' | 'finance' | 'vault' | 'incidents' | 'team' | 'cases' | 'profile';
 
 interface FacilityProfile {
   id: string;
@@ -220,6 +220,39 @@ interface LocumEvaluation {
   createdAt: string;
 }
 
+interface FacilityTeamMember {
+  id: string;
+  facilityId: string;
+  userId?: string | null;
+  name: string;
+  email: string;
+  role: 'medical_director' | 'ward_supervisor' | 'hr_staffing' | 'finance_officer';
+  department: string;
+  status: string;
+  invitedBy?: string;
+  createdAt: string;
+}
+
+interface FacilityIncident {
+  id: string;
+  facilityId: string;
+  jobId?: string | null;
+  locumName: string;
+  locumRole: string;
+  incidentType: 'near_miss' | 'medication_error' | 'patient_fall' | 'protocol_deviation' | 'sentinel_event';
+  severity: 'low' | 'moderate' | 'high' | 'critical';
+  department: string;
+  incidentDate: string;
+  description: string;
+  immediateAction?: string;
+  rootCauseAnalysis?: string;
+  kkmNotified: boolean;
+  kkmReferenceNo?: string;
+  status: 'investigating' | 'capa_in_progress' | 'closed';
+  reportedBy: string;
+  createdAt: string;
+}
+
 export default function FacilityWorkspace() {
   const [tab, setTab] = useState<Tab>('shifts');
   const [loading, setLoading] = useState(true);
@@ -337,6 +370,34 @@ export default function FacilityWorkspace() {
   const [evalSubmitting, setEvalSubmitting] = useState(false);
   const [evaluations, setEvaluations] = useState<LocumEvaluation[]>([]);
 
+  // Phase 5: Multi-Ward Roster Matrix state
+  const [rosterWardFilter, setRosterWardFilter] = useState<string>('all');
+  const [rosterWeekOffset, setRosterWeekOffset] = useState<number>(0);
+
+  // Phase 5: Multi-Staff RBAC Management state
+  const [teamMembers, setTeamMembers] = useState<FacilityTeamMember[]>([]);
+  const [showAddStaffModal, setShowAddStaffModal] = useState(false);
+  const [newStaffName, setNewStaffName] = useState('');
+  const [newStaffEmail, setNewStaffEmail] = useState('');
+  const [newStaffRole, setNewStaffRole] = useState<'medical_director' | 'ward_supervisor' | 'hr_staffing' | 'finance_officer'>('ward_supervisor');
+  const [newStaffDept, setNewStaffDept] = useState('Nursing Administration');
+  const [staffSubmitting, setStaffSubmitting] = useState(false);
+
+  // Phase 5: Statutory Clinical Incident Governance state
+  const [incidents, setIncidents] = useState<FacilityIncident[]>([]);
+  const [showAddIncidentModal, setShowAddIncidentModal] = useState(false);
+  const [incidentType, setIncidentType] = useState<'near_miss' | 'medication_error' | 'patient_fall' | 'protocol_deviation' | 'sentinel_event'>('near_miss');
+  const [incidentSeverity, setIncidentSeverity] = useState<'low' | 'moderate' | 'high' | 'critical'>('low');
+  const [incidentDept, setIncidentDept] = useState('Emergency Department');
+  const [incidentLocum, setIncidentLocum] = useState('');
+  const [incidentDesc, setIncidentDesc] = useState('');
+  const [incidentAction, setIncidentAction] = useState('');
+  const [incidentRca, setIncidentRca] = useState('');
+  const [incidentKkmNotified, setIncidentKkmNotified] = useState(true);
+  const [incidentKkmRef, setIncidentKkmRef] = useState('');
+  const [incidentSubmitting, setIncidentSubmitting] = useState(false);
+  const [kkmReportModal, setKkmReportModal] = useState<FacilityIncident | null>(null);
+
   // Feedback banner
   const [notificationMsg, setNotificationMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -395,6 +456,20 @@ export default function FacilityWorkspace() {
       const evData = await evRes.json();
       if (evData.status === 'success') {
         setEvaluations(evData.data || []);
+      }
+
+      // Fetch team members (Phase 5)
+      const teamRes = await fetch('/api/facility/team');
+      const teamData = await teamRes.json();
+      if (teamData.status === 'success') {
+        setTeamMembers(teamData.data || []);
+      }
+
+      // Fetch incidents (Phase 5)
+      const incRes = await fetch('/api/facility/incidents');
+      const incData = await incRes.json();
+      if (incData.status === 'success') {
+        setIncidents(incData.data || []);
       }
     } catch {
       setError('Server communication error. Please try again.');
@@ -784,11 +859,117 @@ export default function FacilityWorkspace() {
     }
   };
 
+  // Phase 5: Multi-Staff RBAC Handlers
+  const handleAddStaffSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newStaffName.trim() || !newStaffEmail.trim()) return;
+    setStaffSubmitting(true);
+    try {
+      const res = await fetch('/api/facility/team', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newStaffName.trim(),
+          email: newStaffEmail.trim(),
+          role: newStaffRole,
+          department: newStaffDept.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        setShowAddStaffModal(false);
+        setNewStaffName('');
+        setNewStaffEmail('');
+        loadFacilityData();
+      } else {
+        setNotificationMsg({ type: 'error', text: data.message || 'Could not add team member.' });
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    } finally {
+      setStaffSubmitting(false);
+    }
+  };
+
+  const handleRemoveStaff = async (id: string) => {
+    try {
+      const res = await fetch(`/api/facility/team/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        loadFacilityData();
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    }
+  };
+
+  // Phase 5: Statutory Clinical Incident Handlers
+  const handleAddIncidentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!incidentDesc.trim() || !incidentDept.trim()) return;
+    setIncidentSubmitting(true);
+    try {
+      const res = await fetch('/api/facility/incidents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          incidentType,
+          severity: incidentSeverity,
+          department: incidentDept.trim(),
+          locumName: incidentLocum.trim() || undefined,
+          incidentDate: new Date().toISOString().slice(0, 10),
+          description: incidentDesc.trim(),
+          immediateAction: incidentAction.trim() || undefined,
+          rootCauseAnalysis: incidentRca.trim() || undefined,
+          kkmNotified: incidentKkmNotified,
+          kkmReferenceNo: incidentKkmRef.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        setShowAddIncidentModal(false);
+        setIncidentDesc('');
+        setIncidentAction('');
+        setIncidentRca('');
+        loadFacilityData();
+      } else {
+        setNotificationMsg({ type: 'error', text: data.message || 'Could not log incident.' });
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    } finally {
+      setIncidentSubmitting(false);
+    }
+  };
+
+  const handleUpdateIncidentStatus = async (id: string, status: string) => {
+    try {
+      const res = await fetch(`/api/facility/incidents/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        loadFacilityData();
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    }
+  };
+
   const tabs: DashboardTab<Tab>[] = [
     { id: 'shifts', label: 'Shift Vacancies & Applicants', icon: Calendar, count: stats.pendingApplicants },
+    { id: 'roster', label: 'Multi-Ward Roster Matrix', icon: Grid, count: jobs.filter(j => j.status === 'Active').length },
     { id: 'locums', label: 'Verified Locum Roster', icon: Users, count: locums.length },
     { id: 'finance', label: 'Timesheet Settlement & Payouts', icon: DollarSign, count: pendingTimesheets.length },
     { id: 'vault', label: 'Act 586 Statutory Vault', icon: FileCheck, count: documents.length },
+    { id: 'incidents', label: 'Clinical Incident Governance', icon: ShieldAlert, count: incidents.filter(i => i.status !== 'closed').length },
+    { id: 'team', label: 'Facility Staff & RBAC', icon: UserCog, count: teamMembers.length },
     { id: 'cases', label: 'Patient Referrals & Quotes', icon: FileText, count: stats.patientCases },
     { id: 'profile', label: 'Facility Licence & Standards', icon: ShieldCheck },
   ];
@@ -1266,6 +1447,201 @@ export default function FacilityWorkspace() {
                 })}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 1B: MULTI-WARD ROSTER MATRIX & SHIFT HEATMAP (PHASE 5) */}
+        {/* ========================================================================= */}
+        {tab === 'roster' && (
+          <div className="space-y-6">
+            {/* Top Toolbar */}
+            <div className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap items-center justify-between gap-4">
+              {/* Ward Selector Pills */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-500 mr-1">
+                  Department / Ward:
+                </span>
+                {[
+                  { id: 'all', label: 'All Wards' },
+                  { id: 'ED', label: 'Emergency (ED)' },
+                  { id: 'ICU', label: 'ICU / CCU' },
+                  { id: 'Ward4B', label: 'General Ward 4B' },
+                  { id: 'O&G', label: 'Labour & Delivery' },
+                  { id: 'Pediatrics', label: 'Pediatrics / NICU' },
+                  { id: 'OT', label: 'Day Surgery & OT' },
+                ].map(ward => (
+                  <button
+                    key={ward.id}
+                    onClick={() => setRosterWardFilter(ward.id)}
+                    className={`px-3 py-1.5 text-xs font-bold border cursor-pointer transition-colors ${
+                      rosterWardFilter === ward.id
+                        ? 'bg-[color:var(--t-700)] text-white border-[color:var(--t-800)] shadow-xs'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    {ward.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Week Navigation */}
+              <div className="flex items-center gap-2">
+                <div className="inline-flex border border-slate-200">
+                  <button
+                    onClick={() => setRosterWeekOffset(prev => prev - 1)}
+                    className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border-r border-slate-200 cursor-pointer"
+                  >
+                    &larr; Prev Week
+                  </button>
+                  <span className="px-3 py-1.5 text-xs font-black bg-slate-50 text-slate-800 flex items-center gap-1.5">
+                    <CalendarDays className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                    {rosterWeekOffset === 0 ? 'Current Week (Oct 12 – 18, 2026)' : `Week Offset: ${rosterWeekOffset > 0 ? '+' : ''}${rosterWeekOffset} wks`}
+                  </span>
+                  <button
+                    onClick={() => setRosterWeekOffset(prev => prev + 1)}
+                    className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 cursor-pointer"
+                  >
+                    Next Week &rarr;
+                  </button>
+                </div>
+                {rosterWeekOffset !== 0 && (
+                  <button
+                    onClick={() => setRosterWeekOffset(0)}
+                    className="px-2.5 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-300 cursor-pointer"
+                  >
+                    Today
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Coverage Legend & Quick Metrics */}
+            <div className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap items-center justify-between gap-4 text-xs">
+              <div className="flex flex-wrap items-center gap-4">
+                <span className="font-black uppercase tracking-wider text-slate-500 text-[10px]">Coverage Legend:</span>
+                <span className="flex items-center gap-1.5 font-bold text-emerald-800">
+                  <span className="w-2.5 h-2.5 bg-emerald-600 inline-block"></span> 100% Fully Staffed (Confirmed MMC/LJM)
+                </span>
+                <span className="flex items-center gap-1.5 font-bold text-amber-800">
+                  <span className="w-2.5 h-2.5 bg-amber-500 inline-block"></span> Review Pending (Applicants Awaiting Action)
+                </span>
+                <span className="flex items-center gap-1.5 font-bold text-rose-800">
+                  <span className="w-2.5 h-2.5 bg-rose-600 inline-block"></span> Critical Deficit (Urgent SOS Surge Needed)
+                </span>
+              </div>
+              <div className="text-slate-600 font-semibold">
+                Active Ward Openings: <strong className="text-[color:var(--t-700)]">{jobs.filter(j => j.status === 'Active').length}</strong> · Scheduled Locums: <strong className="text-emerald-700">{stats.acceptedLocums}</strong>
+              </div>
+            </div>
+
+            {/* 7-Day Roster Matrix Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-7 gap-3">
+              {[
+                { day: 'Mon', date: 'Oct 12', shifts: jobs.slice(0, 1) },
+                { day: 'Tue', date: 'Oct 13', shifts: [] },
+                { day: 'Wed', date: 'Oct 14', shifts: jobs.slice(1, 2) },
+                { day: 'Thu', date: 'Oct 15', shifts: [] },
+                { day: 'Fri', date: 'Oct 16', shifts: jobs.slice(2, 3) },
+                { day: 'Sat', date: 'Oct 17', shifts: jobs.filter(j => j.isUrgent) },
+                { day: 'Sun', date: 'Oct 18', shifts: jobs.slice(0, 1) },
+              ].map((col, idx) => (
+                <div key={idx} className="bg-white border border-[color:var(--t-200)] flex flex-col min-h-[380px]">
+                  {/* Day Header */}
+                  <div className="p-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs">
+                    <div>
+                      <span className="font-black text-slate-800 block text-xs">{col.day}</span>
+                      <span className="text-[10px] text-slate-500 font-medium">{col.date}</span>
+                    </div>
+                    {col.shifts.length > 0 ? (
+                      <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 text-[9px] font-black uppercase">
+                        {col.shifts.length} Shift{col.shifts.length > 1 ? 's' : ''}
+                      </span>
+                    ) : (
+                      <span className="text-[9px] text-slate-400">Rest / In-House</span>
+                    )}
+                  </div>
+
+                  {/* 3 Shifts Roster Rows */}
+                  <div className="p-2 flex-1 space-y-2 flex flex-col justify-between">
+                    {/* Morning Slot */}
+                    <div className="p-2 border border-slate-100 bg-slate-50/50 space-y-1">
+                      <div className="flex justify-between items-center text-[10px] font-bold text-slate-500">
+                        <span>AM (07:00-15:00)</span>
+                        <span className="text-emerald-700 font-black">● Covered</span>
+                      </div>
+                      <div className="text-[11px] font-bold text-slate-800 truncate">
+                        Dr. Siti Aisyah (MMC)
+                      </div>
+                      <div className="text-[10px] text-slate-500">Emergency & Trauma</div>
+                    </div>
+
+                    {/* Afternoon Slot */}
+                    <div className="p-2 border border-slate-100 bg-slate-50/50 space-y-1">
+                      <div className="flex justify-between items-center text-[10px] font-bold text-slate-500">
+                        <span>PM (14:30-22:30)</span>
+                        <span className="text-emerald-700 font-black">● Covered</span>
+                      </div>
+                      <div className="text-[11px] font-bold text-slate-800 truncate">
+                        Nurse Nurul Huda (LJM)
+                      </div>
+                      <div className="text-[10px] text-slate-500">Ward 4B In-Charge</div>
+                    </div>
+
+                    {/* Night Slot */}
+                    {col.shifts.some(s => s.isUrgent) ? (
+                      <div className="p-2 border border-rose-300 bg-rose-50 space-y-1 animate-pulse">
+                        <div className="flex justify-between items-center text-[10px] font-black text-rose-800">
+                          <span>Night (22:00-08:00)</span>
+                          <span className="bg-rose-600 text-white px-1 py-0.2 text-[8px] uppercase">Surge Deficit</span>
+                        </div>
+                        <div className="text-[11px] font-black text-rose-950 truncate">
+                          Resuscitation Bay Doctor
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const urgentJob = col.shifts.find(s => s.isUrgent);
+                            if (urgentJob) {
+                              setSurgeModal({ jobId: urgentJob.id, jobTitle: urgentJob.title, baseRate: 80 });
+                            }
+                          }}
+                          className="w-full mt-1 py-1 bg-rose-600 hover:bg-rose-700 text-white text-[9px] font-black uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                          <Zap className="h-2.5 w-2.5 fill-white" />
+                          SOS Surge Blast
+                        </button>
+                      </div>
+                    ) : col.shifts.length > 0 ? (
+                      <div className="p-2 border border-amber-300 bg-amber-50/60 space-y-1">
+                        <div className="flex justify-between items-center text-[10px] font-black text-amber-800">
+                          <span>Night (22:00-08:00)</span>
+                          <span className="text-amber-700 font-black">Pending Review</span>
+                        </div>
+                        <div className="text-[11px] font-bold text-slate-900 truncate">
+                          {col.shifts[0].title}
+                        </div>
+                        <div className="text-[10px] text-slate-500">{col.shifts[0].salaryRange}</div>
+                      </div>
+                    ) : (
+                      <div className="p-2 border border-dashed border-slate-200 text-center space-y-1">
+                        <div className="text-[10px] font-bold text-slate-400">Night (22:00-08:00)</div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNewJobTitle(`Night Locum Shift (${col.day})`);
+                            setShowNewJobModal(true);
+                          }}
+                          className="text-[10px] font-bold text-[color:var(--t-700)] hover:underline cursor-pointer"
+                        >
+                          + Add Night Shift
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -1820,6 +2196,376 @@ export default function FacilityWorkspace() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB: CLINICAL INCIDENT GOVERNANCE & STATUTORY ADVERSE EVENT LOGBOOK */}
+        {/* ========================================================================= */}
+        {tab === 'incidents' && (
+          <div className="space-y-6">
+            {/* Header & Governance Banner */}
+            <div className="bg-white border border-[color:var(--t-200)] p-5">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <ShieldAlert className="h-5 w-5 text-rose-600" />
+                    <h2 className="text-base font-black text-slate-900 tracking-tight">
+                      Statutory Clinical Incident & Adverse Event Governance Logbook
+                    </h2>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-200">
+                      KKM Act 586 / MSQH Std 3
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 max-w-3xl">
+                    Mandatory clinical incident reporting, sentinel event escalation, Root Cause Analysis (RCA),
+                    Corrective and Preventive Action (CAPA), and official Ministry of Health (KKM) statutory audit records.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddIncidentModal(true)}
+                    className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-rose-700 hover:bg-rose-800 text-white cursor-pointer flex items-center gap-1.5 transition-colors"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Log Clinical Incident
+                  </button>
+                </div>
+              </div>
+
+              {/* KPI Strip */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-4 border-t border-slate-100">
+                <div className="p-3 bg-slate-50 border border-slate-200">
+                  <div className="text-[10px] uppercase tracking-wider font-bold text-slate-400">Total Logged</div>
+                  <div className="text-xl font-black text-slate-900 mt-0.5">{incidents.length}</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Act 586 audit log</div>
+                </div>
+                <div className="p-3 bg-amber-50/60 border border-amber-200">
+                  <div className="text-[10px] uppercase tracking-wider font-bold text-amber-700">Under Investigation</div>
+                  <div className="text-xl font-black text-amber-800 mt-0.5">
+                    {incidents.filter(i => i.status === 'investigating').length}
+                  </div>
+                  <div className="text-[10px] text-amber-600 mt-0.5">Active triage</div>
+                </div>
+                <div className="p-3 bg-blue-50/60 border border-blue-200">
+                  <div className="text-[10px] uppercase tracking-wider font-bold text-blue-700">CAPA In Progress</div>
+                  <div className="text-xl font-black text-blue-800 mt-0.5">
+                    {incidents.filter(i => i.status === 'capa_in_progress').length}
+                  </div>
+                  <div className="text-[10px] text-blue-600 mt-0.5">Remediation action</div>
+                </div>
+                <div className="p-3 bg-emerald-50/60 border border-emerald-200">
+                  <div className="text-[10px] uppercase tracking-wider font-bold text-emerald-700">Closed & Audited</div>
+                  <div className="text-xl font-black text-emerald-800 mt-0.5">
+                    {incidents.filter(i => i.status === 'closed').length}
+                  </div>
+                  <div className="text-[10px] text-emerald-600 mt-0.5">Compliance cleared</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Incidents List */}
+            <div className="space-y-4">
+              {incidents.length === 0 ? (
+                <div className="bg-white border border-[color:var(--t-200)] p-8 text-center space-y-3">
+                  <ShieldCheck className="h-10 w-10 text-emerald-600 mx-auto" />
+                  <p className="text-sm font-bold text-slate-800">No Clinical Incidents Recorded</p>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    Your facility clinical incident record is pristine. All near-misses, adverse drug events,
+                    or clinical deviations must be reported here per KKM guidelines.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddIncidentModal(true)}
+                    className="px-4 py-2 text-xs font-bold bg-slate-900 text-white hover:bg-black transition-colors"
+                  >
+                    Log First Incident
+                  </button>
+                </div>
+              ) : (
+                incidents.map((inc) => {
+                  const severityBadgeColors = {
+                    low: 'bg-slate-100 text-slate-700 border-slate-300',
+                    moderate: 'bg-amber-100 text-amber-800 border-amber-300',
+                    high: 'bg-orange-100 text-orange-800 border-orange-300',
+                    critical: 'bg-rose-100 text-rose-800 border-rose-300',
+                  }[inc.severity] || 'bg-slate-100 text-slate-700 border-slate-300';
+
+                  const typeLabels: Record<string, string> = {
+                    near_miss: 'Near Miss / Catch',
+                    medication_error: 'Medication Administration Error',
+                    patient_fall: 'Patient Fall / Bed Injury',
+                    protocol_deviation: 'Clinical Protocol Deviation',
+                    sentinel_event: 'Sentinel Event (Immediate Escalation)',
+                  };
+
+                  return (
+                    <div
+                      key={inc.id}
+                      className={`bg-white border transition-colors ${
+                        inc.severity === 'critical' ? 'border-rose-400 bg-rose-50/20' : 'border-[color:var(--t-200)]'
+                      } p-5 space-y-4`}
+                    >
+                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-3 pb-3 border-b border-slate-100">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`text-[10px] uppercase font-black tracking-wider px-2 py-0.5 border ${severityBadgeColors}`}>
+                              {inc.severity.toUpperCase()} SEVERITY
+                            </span>
+                            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200">
+                              {typeLabels[inc.incidentType] || inc.incidentType}
+                            </span>
+                            <span className="text-xs font-mono text-slate-400">ID: {inc.id.slice(0, 8)}</span>
+                            {inc.kkmNotified && (
+                              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 flex items-center gap-1">
+                                <CheckCircle2 className="h-3 w-3" />
+                                KKM Notified {inc.kkmReferenceNo && `(${inc.kkmReferenceNo})`}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs font-semibold text-slate-700">
+                            Department: <span className="text-slate-900 font-bold">{inc.department}</span>
+                            {inc.locumName && (
+                              <> • Staff / Locum Involved: <span className="text-slate-900 font-bold">{inc.locumName} ({inc.locumRole || 'Locum'})</span></>
+                            )}
+                            {' '}• Incident Date: <span className="text-slate-900 font-bold">{inc.incidentDate}</span>
+                          </div>
+                        </div>
+
+                        {/* Status switcher & KKM Form View */}
+                        <div className="flex items-center gap-2 shrink-0">
+                          {inc.kkmNotified && (
+                            <button
+                              type="button"
+                              onClick={() => setKkmReportModal(inc)}
+                              className="px-2.5 py-1 text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 flex items-center gap-1 cursor-pointer"
+                            >
+                              <FileText className="h-3.5 w-3.5 text-blue-600" />
+                              View KKM Form
+                            </button>
+                          )}
+
+                          {inc.status === 'investigating' && (
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateIncidentStatus(inc.id, 'capa_in_progress')}
+                              className="px-2.5 py-1 text-[11px] font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-300 cursor-pointer"
+                            >
+                              Start CAPA Plan
+                            </button>
+                          )}
+                          {inc.status === 'capa_in_progress' && (
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateIncidentStatus(inc.id, 'closed')}
+                              className="px-2.5 py-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 cursor-pointer"
+                            >
+                              Close & Sign Off
+                            </button>
+                          )}
+                          {inc.status === 'closed' && (
+                            <span className="px-2 py-0.5 text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-200 flex items-center gap-1">
+                              <CheckCircle2 className="h-3 w-3" />
+                              Closed
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Incident Narrative */}
+                      <div className="space-y-2 text-xs">
+                        <div>
+                          <span className="font-bold text-slate-900">Incident Synopsis:</span>
+                          <p className="text-slate-700 mt-0.5 leading-relaxed bg-slate-50 p-2.5 border border-slate-200">
+                            {inc.description}
+                          </p>
+                        </div>
+
+                        {inc.immediateAction && (
+                          <div>
+                            <span className="font-bold text-slate-900">Immediate Clinical Mitigation:</span>
+                            <p className="text-slate-600 mt-0.5 leading-relaxed bg-amber-50/50 p-2 border border-amber-200/60">
+                              {inc.immediateAction}
+                            </p>
+                          </div>
+                        )}
+
+                        {inc.rootCauseAnalysis && (
+                          <div>
+                            <span className="font-bold text-slate-900">Root Cause Analysis (RCA) & CAPA Action:</span>
+                            <p className="text-slate-600 mt-0.5 leading-relaxed bg-blue-50/50 p-2 border border-blue-200/60">
+                              {inc.rootCauseAnalysis}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100">
+                        <span>Reported by: <span className="text-slate-600 font-semibold">{inc.reportedBy}</span></span>
+                        <span>Logged: {new Date(inc.createdAt).toLocaleString('en-MY')}</span>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB: FACILITY STAFF & RBAC MANAGEMENT */}
+        {/* ========================================================================= */}
+        {tab === 'team' && (
+          <div className="space-y-6">
+            {/* Header & RBAC Overview */}
+            <div className="bg-white border border-[color:var(--t-200)] p-5">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <UserCog className="h-5 w-5 text-indigo-600" />
+                    <h2 className="text-base font-black text-slate-900 tracking-tight">
+                      Facility Multi-Staff RBAC Management
+                    </h2>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200">
+                      Role-Based Access
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 max-w-3xl">
+                    Invite and manage authorized hospital directors, ward matrons, HR administrators, and finance
+                    personnel. Enforce granular permissions across shift postings, clinical roster matrix, incident governance, and locum payouts.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddStaffModal(true)}
+                    className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-slate-900 hover:bg-black text-white cursor-pointer flex items-center gap-1.5 transition-colors"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    Invite Staff Member
+                  </button>
+                </div>
+              </div>
+
+              {/* RBAC Role Capabilities Matrix */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-5 pt-4 border-t border-slate-100">
+                <div className="p-3 bg-purple-50/50 border border-purple-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-purple-900">Medical Director</span>
+                    <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 bg-purple-200 text-purple-800">Tier 1</span>
+                  </div>
+                  <p className="text-[11px] text-purple-700 mt-1 leading-snug">
+                    Full Clinical Governance, KKM incident sign-off, credential override, and doctor evaluations.
+                  </p>
+                </div>
+                <div className="p-3 bg-blue-50/50 border border-blue-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-blue-900">Ward Supervisor</span>
+                    <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 bg-blue-200 text-blue-800">Tier 2</span>
+                  </div>
+                  <p className="text-[11px] text-blue-700 mt-1 leading-snug">
+                    Roster matrix scheduling, shift coverage SOS dispatch, check-in verification, and bedside oversight.
+                  </p>
+                </div>
+                <div className="p-3 bg-teal-50/50 border border-teal-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-teal-900">HR Staffing</span>
+                    <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 bg-teal-200 text-teal-800">Tier 2</span>
+                  </div>
+                  <p className="text-[11px] text-teal-700 mt-1 leading-snug">
+                    Vacancy creation, applicant screening, contract issuance, and Act 586 Statutory Vault uploads.
+                  </p>
+                </div>
+                <div className="p-3 bg-emerald-50/50 border border-emerald-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-emerald-900">Finance Officer</span>
+                    <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 bg-emerald-200 text-emerald-800">Tier 2</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-700 mt-1 leading-snug">
+                    Locum disbursement sign-off, LHDN e-invoicing compliance, and shift payroll export.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Staff List Table */}
+            <div className="bg-white border border-[color:var(--t-200)]">
+              <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
+                    Authorized Facility Personnel ({teamMembers.length})
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Members authenticated to perform administrative and clinical actions for {facility?.name || 'this facility'}.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={loadFacilityData}
+                  className="px-2.5 py-1 text-xs text-slate-600 hover:bg-slate-100 border border-slate-200 flex items-center gap-1 cursor-pointer"
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  Refresh
+                </button>
+              </div>
+
+              {teamMembers.length === 0 ? (
+                <div className="p-8 text-center text-xs text-slate-500">
+                  No staff members added yet. Invite clinical and administrative colleagues above.
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {teamMembers.map((member) => {
+                    const roleConfig = {
+                      medical_director: { label: 'Medical Director', color: 'bg-purple-100 text-purple-800 border-purple-200' },
+                      ward_supervisor: { label: 'Ward Supervisor / Matron', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+                      hr_staffing: { label: 'HR Staffing Officer', color: 'bg-teal-100 text-teal-800 border-teal-200' },
+                      finance_officer: { label: 'Finance & Claims Officer', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+                    }[member.role] || { label: member.role, color: 'bg-slate-100 text-slate-700 border-slate-200' };
+
+                    return (
+                      <div key={member.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                            {member.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-bold text-slate-900">{member.name}</span>
+                              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 border ${roleConfig.color}`}>
+                                {roleConfig.label}
+                              </span>
+                            </div>
+                            <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-2">
+                              <span>{member.email}</span>
+                              <span>•</span>
+                              <span className="text-slate-700 font-medium">{member.department}</span>
+                              <span>•</span>
+                              <span className="text-slate-400">Added {new Date(member.createdAt).toLocaleDateString('en-MY')}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                          <span className="px-2 py-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200">
+                            Active
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveStaff(member.id)}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors cursor-pointer"
+                            title="Revoke Staff Access"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -2986,6 +3732,393 @@ export default function FacilityWorkspace() {
               >
                 <Download className="h-3.5 w-3.5" />
                 Print / Save PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ========================================================================= */}
+      {/* MODAL: INVITE FACILITY STAFF MEMBER (RBAC) */}
+      {/* ========================================================================= */}
+      {showAddStaffModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="bg-white border border-slate-300 shadow-2xl max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <UserPlus className="h-5 w-5 text-indigo-600" />
+                <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                  Invite Facility Staff Member
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddStaffModal(false)}
+                className="text-slate-400 hover:text-slate-700 cursor-pointer text-lg leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleAddStaffSubmit} className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Dr. Hishamuddin bin Ahmad"
+                  value={newStaffName}
+                  onChange={(e) => setNewStaffName(e.target.value)}
+                  className="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 focus:bg-white focus:border-indigo-600 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Official Email Address *
+                </label>
+                <input
+                  type="email"
+                  required
+                  placeholder="e.g. hishamuddin@hospital.com.my"
+                  value={newStaffEmail}
+                  onChange={(e) => setNewStaffEmail(e.target.value)}
+                  className="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 focus:bg-white focus:border-indigo-600 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Assigned RBAC Role *
+                </label>
+                <select
+                  value={newStaffRole}
+                  onChange={(e) => setNewStaffRole(e.target.value as any)}
+                  className="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 focus:bg-white focus:border-indigo-600 outline-none"
+                >
+                  <option value="ward_supervisor">Ward Supervisor / Matron (Roster & Shifts)</option>
+                  <option value="medical_director">Medical Director (Clinical Governance & Incidents)</option>
+                  <option value="hr_staffing">HR Staffing Officer (Locum Recruitment)</option>
+                  <option value="finance_officer">Finance & Claims Officer (Payroll & LHDN)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Department / Ward *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Nursing Administration, Emergency, ICU"
+                  value={newStaffDept}
+                  onChange={(e) => setNewStaffDept(e.target.value)}
+                  className="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 focus:bg-white focus:border-indigo-600 outline-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowAddStaffModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-300 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={staffSubmitting}
+                  className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-slate-900 hover:bg-black text-white cursor-pointer disabled:opacity-50"
+                >
+                  {staffSubmitting ? 'Sending Invite...' : 'Confirm & Invite'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: LOG STATUTORY CLINICAL INCIDENT (ACT 586 / MSQH STD 3) */}
+      {/* ========================================================================= */}
+      {showAddIncidentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white border border-slate-300 shadow-2xl max-w-xl w-full p-6 space-y-4 my-8">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="h-5 w-5 text-rose-600" />
+                <div>
+                  <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                    Log Clinical Incident / Adverse Event
+                  </h3>
+                  <span className="text-[10px] text-slate-400">KKM Act 586 & MSQH 6th Edition Mandatory Log</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddIncidentModal(false)}
+                className="text-slate-400 hover:text-slate-700 cursor-pointer text-lg leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleAddIncidentSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Incident Classification *
+                  </label>
+                  <select
+                    value={incidentType}
+                    onChange={(e) => setIncidentType(e.target.value as any)}
+                    className="w-full text-xs p-2 bg-slate-50 border border-slate-300 focus:bg-white focus:border-rose-600 outline-none"
+                  >
+                    <option value="near_miss">Near Miss / Good Catch</option>
+                    <option value="medication_error">Medication Administration Error</option>
+                    <option value="patient_fall">Patient Fall / Trauma</option>
+                    <option value="protocol_deviation">Clinical Protocol Deviation</option>
+                    <option value="sentinel_event">Sentinel Event (Serious Harm / Death)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Severity Rating *
+                  </label>
+                  <select
+                    value={incidentSeverity}
+                    onChange={(e) => setIncidentSeverity(e.target.value as any)}
+                    className="w-full text-xs p-2 bg-slate-50 border border-slate-300 focus:bg-white focus:border-rose-600 outline-none"
+                  >
+                    <option value="low">Low (No harm / minor annoyance)</option>
+                    <option value="moderate">Moderate (Temporary harm / extra monitoring)</option>
+                    <option value="high">High (Permanent harm / surgical intervention)</option>
+                    <option value="critical">Critical / Sentinel (Life threatening)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Department / Clinical Ward *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Emergency Department, Ward 4B"
+                    value={incidentDept}
+                    onChange={(e) => setIncidentDept(e.target.value)}
+                    className="w-full text-xs p-2 bg-slate-50 border border-slate-300 focus:bg-white focus:border-rose-600 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Staff / Locum Involved (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Dr. Siti Sarah / SN Jason"
+                    value={incidentLocum}
+                    onChange={(e) => setIncidentLocum(e.target.value)}
+                    className="w-full text-xs p-2 bg-slate-50 border border-slate-300 focus:bg-white focus:border-rose-600 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Incident Description & Clinical Synopsis *
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  placeholder="Detail precisely what occurred, patient vitals, medications involved, timeline, and who was notified..."
+                  value={incidentDesc}
+                  onChange={(e) => setIncidentDesc(e.target.value)}
+                  className="w-full text-xs p-2 bg-slate-50 border border-slate-300 focus:bg-white focus:border-rose-600 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Immediate Clinical Mitigation Taken
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="Actions taken immediately to protect patient safety (e.g. Naloxone administered, vitals stabilized)..."
+                  value={incidentAction}
+                  onChange={(e) => setIncidentAction(e.target.value)}
+                  className="w-full text-xs p-2 bg-slate-50 border border-slate-300 focus:bg-white focus:border-rose-600 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Root Cause Analysis (RCA) & CAPA Remediation
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="Identified underlying system failure and corrective preventive actions initiated..."
+                  value={incidentRca}
+                  onChange={(e) => setIncidentRca(e.target.value)}
+                  className="w-full text-xs p-2 bg-slate-50 border border-slate-300 focus:bg-white focus:border-rose-600 outline-none"
+                />
+              </div>
+
+              <div className="p-3 bg-slate-50 border border-slate-200 space-y-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={incidentKkmNotified}
+                    onChange={(e) => setIncidentKkmNotified(e.target.checked)}
+                    className="h-4 w-4 text-rose-600"
+                  />
+                  <span className="text-xs font-bold text-slate-800">
+                    Statutory Notification to Ministry of Health (KKM) Act 586
+                  </span>
+                </label>
+                {incidentKkmNotified && (
+                  <input
+                    type="text"
+                    placeholder="KKM Incident Reference Number (e.g. KKM/CKAPS/2026/INC-0442)"
+                    value={incidentKkmRef}
+                    onChange={(e) => setIncidentKkmRef(e.target.value)}
+                    className="w-full text-xs p-2 bg-white border border-slate-300 focus:border-rose-600 outline-none"
+                  />
+                )}
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowAddIncidentModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-300 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={incidentSubmitting}
+                  className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-rose-700 hover:bg-rose-800 text-white cursor-pointer disabled:opacity-50"
+                >
+                  {incidentSubmitting ? 'Logging...' : 'Submit Official Incident Log'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: OFFICIAL KKM FORM STATUTORY AUDIT REPORT PREVIEW */}
+      {/* ========================================================================= */}
+      {kkmReportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="bg-white border-2 border-slate-800 shadow-2xl max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            {/* KKM Official Document Header */}
+            <div className="text-center pb-4 border-b-2 border-slate-900 space-y-1">
+              <div className="text-[10px] uppercase font-black tracking-widest text-slate-500">
+                KEMENTERIAN KESIHATAN MALAYSIA (KKM)
+              </div>
+              <div className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                PRIVATE HEALTHCARE FACILITIES AND SERVICES ACT 1998 [ACT 586]
+              </div>
+              <div className="text-xs font-bold text-rose-700">
+                FORM 4: MANDATORY STATUTORY CLINICAL INCIDENT NOTIFICATION
+              </div>
+              <div className="text-[10px] font-mono text-slate-500">
+                Statutory Reference: {kkmReportModal.kkmReferenceNo || `KKM/ACT586/${kkmReportModal.id.slice(0, 8).toUpperCase()}`}
+              </div>
+            </div>
+
+            {/* Document Body */}
+            <div className="space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 border border-slate-200">
+                <div>
+                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Notifying Facility</span>
+                  <span className="font-bold text-slate-900">{facility?.name || 'Healthcare Facility'}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Act 586 Licence No.</span>
+                  <span className="font-mono font-bold text-slate-900">{facility?.licenceNo || 'KKM/JKA/586-90412'}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Incident Date</span>
+                  <span className="font-bold text-slate-900">{kkmReportModal.incidentDate}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Clinical Department</span>
+                  <span className="font-bold text-slate-900">{kkmReportModal.department}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Incident Classification</span>
+                  <span className="font-bold text-slate-900 uppercase">{kkmReportModal.incidentType.replace('_', ' ')}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Severity Rating</span>
+                  <span className="font-bold text-rose-700 uppercase">{kkmReportModal.severity}</span>
+                </div>
+              </div>
+
+              <div>
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-800 block mb-1">
+                  1. Clinical Incident Description
+                </span>
+                <div className="p-3 bg-white border border-slate-300 leading-relaxed text-slate-800">
+                  {kkmReportModal.description}
+                </div>
+              </div>
+
+              <div>
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-800 block mb-1">
+                  2. Immediate Remedial Actions Taken
+                </span>
+                <div className="p-3 bg-white border border-slate-300 leading-relaxed text-slate-800">
+                  {kkmReportModal.immediateAction || 'Immediate monitoring and clinical stabilization implemented.'}
+                </div>
+              </div>
+
+              <div>
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-800 block mb-1">
+                  3. Root Cause Analysis (RCA) & Corrective Action Plan (CAPA)
+                </span>
+                <div className="p-3 bg-white border border-slate-300 leading-relaxed text-slate-800">
+                  {kkmReportModal.rootCauseAnalysis || 'Investigation in progress under Facility Clinical Governance Committee.'}
+                </div>
+              </div>
+
+              <div className="p-3 border border-slate-300 bg-slate-50 flex items-center justify-between text-[11px]">
+                <div>
+                  <span className="text-slate-500">Reported by: </span>
+                  <span className="font-bold text-slate-800">{kkmReportModal.reportedBy}</span>
+                </div>
+                <div className="text-emerald-700 font-bold flex items-center gap-1">
+                  <ShieldCheck className="h-4 w-4" />
+                  Statutory Submission Recorded
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setKkmReportModal(null)}
+                className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-300 cursor-pointer"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-slate-900 hover:bg-black text-white cursor-pointer flex items-center gap-1.5"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Print Official Form 4
               </button>
             </div>
           </div>
