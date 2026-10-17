@@ -663,14 +663,6 @@ export default function LandingPage({ professionals }: LandingPageProps) {
           <Cross className="h-2.5 w-2.5" /> Compassionate Care Standard
         </span>
         <span>Dedicated to Patient Well-Being, Verified Practitioners &amp; Gentle Medical Support Across Malaysia</span>
-        <a
-          href="/landing-preview"
-          onClick={e => { e.preventDefault(); navigate('/landing-preview'); }}
-          className="ml-3 inline-flex items-center gap-1 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] px-2.5 py-0.5 border border-[color:var(--t-300)] font-black text-[11px] shadow-2xs transition-colors cursor-pointer"
-        >
-          <span>🎨 View Visual Redesign Samples</span>
-          <ArrowRight className="h-3 w-3" />
-        </a>
       </div>
 
       {/* ═══════════ NAVBAR (LIGHT TONE PRIMARY BACKGROUND) ═══════════ */}
