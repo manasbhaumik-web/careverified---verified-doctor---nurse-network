@@ -1926,16 +1926,29 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
             {/* ONLY MEDICAL PACKAGES IN MALAYSIA */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-4 w-4 text-[color:var(--t-600)]" />
                   <h3 className="font-display font-black text-lg text-[color:var(--ink)]">
                     Indicative Malaysian Medical Packages
                   </h3>
                 </div>
-                <span className="text-xs font-mono font-bold text-slate-500">
-                  Official Billing: Malaysian Ringgit (MYR)
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-mono font-bold text-slate-500 hidden sm:inline">
+                    Official Billing: Malaysian Ringgit (MYR)
+                  </span>
+                  <a
+                    href="/packages"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate('/packages');
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer transition-colors shadow-2xs"
+                  >
+                    <span>Browse All Packages & Promos</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </a>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

@@ -3,13 +3,54 @@ import {
   Building2, Calendar, Users, ShieldCheck, CheckCircle2, XCircle, Plus,
   Search, FileText, Send, Phone, Mail, MapPin, ExternalLink,
   RefreshCw, ChevronDown, ChevronUp, Stethoscope, Check,
-  MessageSquare, Lock, DollarSign
+  MessageSquare, Lock, DollarSign, Tag, PackagePlus, Sparkles, Clock,
+  Trash2, Edit3, Copy, HeartPulse, AlertCircle
 } from 'lucide-react';
 import DashboardHeader, {
   BannerRow, BannerIdentity, BannerBadge, BannerKpis, DashboardTab, bannerPrimaryBtn
 } from './DashboardHeader';
 
-type Tab = 'shifts' | 'locums' | 'cases' | 'profile';
+type Tab = 'shifts' | 'locums' | 'cases' | 'packages' | 'profile';
+
+export interface MedicalPackage {
+  id: string;
+  facility_id: string;
+  code: string;
+  title: string;
+  category: string;
+  description: string;
+  duration: string;
+  priceMyr: number;
+  originalPriceMyr: number | null;
+  target_audience: 'all' | 'local' | 'international';
+  fastingRequired: boolean;
+  inclusions: string[];
+  exclusions?: string;
+  preparation_instructions?: string;
+  image_url?: string;
+  status: 'published' | 'draft' | 'archived';
+  featured: boolean;
+  created_at: string;
+}
+
+export interface MedicalPromotion {
+  id: string;
+  facility_id: string;
+  code: string;
+  title: string;
+  description: string;
+  discount_type: 'percentage' | 'fixed';
+  discount_value: number;
+  discountValueMyr?: number | null;
+  package_id?: string | null;
+  package_title?: string;
+  badge_text?: string;
+  valid_from: string;
+  valid_until: string;
+  terms?: string;
+  status: 'active' | 'paused' | 'expired';
+  created_at: string;
+}
 
 interface FacilityProfile {
   id: string;
@@ -210,6 +251,56 @@ export default function FacilityWorkspace() {
   const [quoteExclusions, setQuoteExclusions] = useState('Excludes extra ICU days, complications, international flights.');
   const [quoteSubmitting, setQuoteSubmitting] = useState(false);
 
+  // Medical Packages & Promotions state
+  const [packages, setPackages] = useState<MedicalPackage[]>([]);
+  const [promotions, setPromotions] = useState<MedicalPromotion[]>([]);
+  const [packageSubTab, setPackageSubTab] = useState<'packages' | 'promotions'>('packages');
+  const [packageCategoryFilter, setPackageCategoryFilter] = useState('All');
+  const [packageStatusFilter, setPackageStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
+  const [packageSearch, setPackageSearch] = useState('');
+
+  // Package Modal State (Publish / Edit)
+  const [packageModalOpen, setPackageModalOpen] = useState(false);
+  const [editingPackageId, setEditingPackageId] = useState<string | null>(null);
+  const [pkgCode, setPkgCode] = useState('');
+  const [pkgTitle, setPkgTitle] = useState('');
+  const [pkgCategory, setPkgCategory] = useState('Health Screening');
+  const [pkgDescription, setPkgDescription] = useState('');
+  const [pkgDuration, setPkgDuration] = useState('1 Day Outpatient');
+  const [pkgPrice, setPkgPrice] = useState('');
+  const [pkgOriginalPrice, setPkgOriginalPrice] = useState('');
+  const [pkgAudience, setPkgAudience] = useState<'all' | 'local' | 'international'>('all');
+  const [pkgFasting, setPkgFasting] = useState(false);
+  const [pkgInclusions, setPkgInclusions] = useState<string[]>([]);
+  const [pkgInclusionInput, setPkgInclusionInput] = useState('');
+  const [pkgExclusions, setPkgExclusions] = useState('');
+  const [pkgPreparation, setPkgPreparation] = useState('');
+  const [pkgImageUrl, setPkgImageUrl] = useState('/assets/clean_light_doctor_suite_full-C0TGKdC3.jpg');
+  const [pkgStatus, setPkgStatus] = useState<'published' | 'draft'>('published');
+  const [pkgSubmitting, setPkgSubmitting] = useState(false);
+
+  // Promotion Modal State (Create / Edit)
+  const [promoModalOpen, setPromoModalOpen] = useState(false);
+  const [editingPromoId, setEditingPromoId] = useState<string | null>(null);
+  const [promoCode, setPromoCode] = useState('');
+  const [promoTitle, setPromoTitle] = useState('');
+  const [promoDesc, setPromoDesc] = useState('');
+  const [promoType, setPromoType] = useState<'percentage' | 'fixed'>('percentage');
+  const [promoValue, setPromoValue] = useState('');
+  const [promoPkgId, setPromoPkgId] = useState('');
+  const [promoBadge, setPromoBadge] = useState('');
+  const [promoValidFrom, setPromoValidFrom] = useState('');
+  const [promoValidUntil, setPromoValidUntil] = useState('');
+  const [promoTerms, setPromoTerms] = useState('');
+  const [promoSubmitting, setPromoSubmitting] = useState(false);
+
+  // Facility Infrastructure State
+  const [equipmentList, setEquipmentList] = useState<string[]>([]);
+  const [amenitiesList, setAmenitiesList] = useState<string[]>([]);
+  const [newEquipmentInput, setNewEquipmentInput] = useState('');
+  const [newAmenityInput, setNewAmenityInput] = useState('');
+  const [infraSaving, setInfraSaving] = useState(false);
+
   // Notification feedback
   const [notificationMsg, setNotificationMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -246,6 +337,28 @@ export default function FacilityWorkspace() {
       const casesData = await casesRes.json();
       if (casesData.status === 'success') {
         setCases(casesData.data);
+      }
+
+      // Fetch facility packages
+      const pkgRes = await fetch('/api/packages?status=all');
+      const pkgData = await pkgRes.json();
+      if (pkgData.status === 'success') {
+        setPackages(pkgData.data);
+      }
+
+      // Fetch facility promotions
+      const promoRes = await fetch('/api/promotions');
+      const promoData = await promoRes.json();
+      if (promoData.status === 'success') {
+        setPromotions(promoData.data);
+      }
+
+      // Fetch facility infrastructure
+      const infraRes = await fetch('/api/facility/infrastructure');
+      const infraData = await infraRes.json();
+      if (infraData.status === 'success') {
+        setEquipmentList(infraData.data.equipment || []);
+        setAmenitiesList(infraData.data.amenities || []);
       }
     } catch {
       setError('Server communication error. Please try again.');
@@ -488,11 +601,257 @@ export default function FacilityWorkspace() {
     }
   };
 
+  // Handle Create or Update Package
+  const handleSavePackage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pkgTitle.trim() || !pkgPrice) return;
+    setPkgSubmitting(true);
+    try {
+      const payload = {
+        code: pkgCode.trim() || undefined,
+        title: pkgTitle.trim(),
+        category: pkgCategory,
+        description: pkgDescription.trim(),
+        duration: pkgDuration.trim(),
+        priceMyr: Number(pkgPrice),
+        originalPriceMyr: pkgOriginalPrice ? Number(pkgOriginalPrice) : null,
+        targetAudience: pkgAudience,
+        fastingRequired: pkgFasting,
+        inclusions: pkgInclusions,
+        exclusions: pkgExclusions.trim() || undefined,
+        preparationInstructions: pkgPreparation.trim() || undefined,
+        imageUrl: pkgImageUrl.trim() || undefined,
+        status: pkgStatus,
+      };
+
+      const url = editingPackageId ? `/api/packages/${editingPackageId}` : '/api/packages';
+      const method = editingPackageId ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        setPackageModalOpen(false);
+        setEditingPackageId(null);
+        resetPackageForm();
+        loadFacilityData();
+      } else {
+        setNotificationMsg({ type: 'error', text: data.message || 'Error saving package.' });
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    } finally {
+      setPkgSubmitting(false);
+    }
+  };
+
+  const resetPackageForm = () => {
+    setPkgCode('');
+    setPkgTitle('');
+    setPkgCategory('Health Screening');
+    setPkgDescription('');
+    setPkgDuration('1 Day Outpatient');
+    setPkgPrice('');
+    setPkgOriginalPrice('');
+    setPkgAudience('all');
+    setPkgFasting(false);
+    setPkgInclusions([]);
+    setPkgInclusionInput('');
+    setPkgExclusions('');
+    setPkgPreparation('');
+    setPkgImageUrl('/assets/clean_light_doctor_suite_full-C0TGKdC3.jpg');
+    setPkgStatus('published');
+  };
+
+  const handleEditPackage = (pkg: MedicalPackage) => {
+    setEditingPackageId(pkg.id);
+    setPkgCode(pkg.code);
+    setPkgTitle(pkg.title);
+    setPkgCategory(pkg.category);
+    setPkgDescription(pkg.description);
+    setPkgDuration(pkg.duration);
+    setPkgPrice(String(pkg.priceMyr));
+    setPkgOriginalPrice(pkg.originalPriceMyr ? String(pkg.originalPriceMyr) : '');
+    setPkgAudience(pkg.target_audience);
+    setPkgFasting(pkg.fastingRequired);
+    setPkgInclusions(pkg.inclusions || []);
+    setPkgExclusions(pkg.exclusions || '');
+    setPkgPreparation(pkg.preparation_instructions || '');
+    setPkgImageUrl(pkg.image_url || '/assets/clean_light_doctor_suite_full-C0TGKdC3.jpg');
+    setPkgStatus(pkg.status === 'published' ? 'published' : 'draft');
+    setPackageModalOpen(true);
+  };
+
+  const handleTogglePackageStatus = async (pkg: MedicalPackage) => {
+    const nextStatus = pkg.status === 'published' ? 'draft' : 'published';
+    try {
+      const res = await fetch(`/api/packages/${pkg.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: `Package marked as ${nextStatus}.` });
+        loadFacilityData();
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    }
+  };
+
+  const handleDeletePackage = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this medical package?')) return;
+    try {
+      const res = await fetch(`/api/packages/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        loadFacilityData();
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    }
+  };
+
+  // Handle Create or Update Promotion
+  const handleSavePromo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promoCode.trim() || !promoTitle.trim() || !promoValue) return;
+    setPromoSubmitting(true);
+    try {
+      const payload = {
+        code: promoCode.trim().toUpperCase(),
+        title: promoTitle.trim(),
+        description: promoDesc.trim(),
+        discountType: promoType,
+        discountValue: Number(promoValue),
+        packageId: promoPkgId || null,
+        badgeText: promoBadge.trim() || undefined,
+        validFrom: promoValidFrom || undefined,
+        validUntil: promoValidUntil || undefined,
+        terms: promoTerms.trim() || undefined,
+      };
+
+      const url = editingPromoId ? `/api/promotions/${editingPromoId}` : '/api/promotions';
+      const method = editingPromoId ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        setPromoModalOpen(false);
+        setEditingPromoId(null);
+        resetPromoForm();
+        loadFacilityData();
+      } else {
+        setNotificationMsg({ type: 'error', text: data.message || 'Error saving promotion.' });
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    } finally {
+      setPromoSubmitting(false);
+    }
+  };
+
+  const resetPromoForm = () => {
+    setPromoCode('');
+    setPromoTitle('');
+    setPromoDesc('');
+    setPromoType('percentage');
+    setPromoValue('');
+    setPromoPkgId('');
+    setPromoBadge('');
+    setPromoValidFrom('');
+    setPromoValidUntil('');
+    setPromoTerms('');
+  };
+
+  const handleEditPromo = (pr: MedicalPromotion) => {
+    setEditingPromoId(pr.id);
+    setPromoCode(pr.code);
+    setPromoTitle(pr.title);
+    setPromoDesc(pr.description);
+    setPromoType(pr.discount_type);
+    setPromoValue(String(pr.discount_type === 'fixed' ? (pr.discountValueMyr || pr.discount_value / 100) : pr.discount_value));
+    setPromoPkgId(pr.package_id || '');
+    setPromoBadge(pr.badge_text || '');
+    setPromoValidFrom(pr.valid_from);
+    setPromoValidUntil(pr.valid_until);
+    setPromoTerms(pr.terms || '');
+    setPromoModalOpen(true);
+  };
+
+  const handleTogglePromoStatus = async (pr: MedicalPromotion) => {
+    const nextStatus = pr.status === 'active' ? 'paused' : 'active';
+    try {
+      const res = await fetch(`/api/promotions/${pr.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: `Promotion marked as ${nextStatus}.` });
+        loadFacilityData();
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    }
+  };
+
+  const handleDeletePromo = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this promotion?')) return;
+    try {
+      const res = await fetch(`/api/promotions/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        loadFacilityData();
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    }
+  };
+
+  // Handle Save Facility Infrastructure
+  const handleSaveInfrastructure = async () => {
+    setInfraSaving(true);
+    try {
+      const res = await fetch('/api/facility/infrastructure', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          equipment: equipmentList,
+          amenities: amenitiesList,
+        }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        loadFacilityData();
+      } else {
+        setNotificationMsg({ type: 'error', text: data.message || 'Could not save infrastructure.' });
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    } finally {
+      setInfraSaving(false);
+    }
+  };
+
   const tabs: DashboardTab<Tab>[] = [
     { id: 'shifts', label: 'Job Postings & Vacancies', icon: Calendar, count: stats.activeVacancies },
     { id: 'locums', label: 'Practitioner Network', icon: Users, count: locums.length },
     { id: 'cases', label: 'Patient Referrals & Quotes', icon: FileText, count: stats.patientCases },
-    { id: 'profile', label: 'Facility Profile & Specialties', icon: Building2 },
+    { id: 'packages', label: 'Packages & Promotions', icon: Tag, count: packages.length },
+    { id: 'profile', label: 'Facility & Infrastructure', icon: Building2 },
   ];
 
   const filteredJobs = jobs.filter(j => {
@@ -1185,134 +1544,591 @@ export default function FacilityWorkspace() {
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 4: FACILITY PROFILE & CLINICAL SPECIALTIES */}
+        {/* TAB 4: PUBLISH & MANAGE MEDICAL PACKAGES & PROMOTIONS */}
         {/* ========================================================================= */}
-        {tab === 'profile' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Facility Identity & Licensing */}
-            <div className="bg-white border border-[color:var(--t-200)] p-5 space-y-4">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <ShieldCheck className="h-5 w-5 text-emerald-600" />
-                <h2 className="text-base font-black text-slate-900">
-                  KKM Act 586 Statutory Licence
-                </h2>
+        {tab === 'packages' && (
+          <div className="space-y-6">
+            {/* Packages / Promotions Header Controls */}
+            <div className="bg-white border border-[color:var(--t-200)] p-5 shadow-2xs space-y-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <PackagePlus className="h-5 w-5 text-[color:var(--t-600)]" />
+                    <h2 className="text-base font-black text-slate-900">
+                      Medical Packages & Promotional Offers
+                    </h2>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    Publish clinical health checkups, surgical packages, and seasonal promotional codes across the care network.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      resetPackageForm();
+                      setEditingPackageId(null);
+                      setPackageModalOpen(true);
+                    }}
+                    className="px-3.5 py-2 text-xs font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer shadow-xs flex items-center gap-1.5"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Publish Medical Package
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      resetPromoForm();
+                      setEditingPromoId(null);
+                      setPromoModalOpen(true);
+                    }}
+                    className="px-3.5 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 text-slate-800 cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Tag className="h-3.5 w-3.5 text-amber-600" />
+                    Create Promotion
+                  </button>
+                </div>
               </div>
 
-              <div className="space-y-3 text-xs text-slate-700">
-                <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 border border-slate-200">
-                  <div>
-                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Facility Name</span>
-                    <strong className="text-slate-900">{facility?.name || 'Healthcare Facility'}</strong>
+              {/* Sub-tab Switcher: Packages vs. Promotions */}
+              <div className="flex items-center gap-2 border-t border-slate-100 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setPackageSubTab('packages')}
+                  className={`px-3 py-1.5 text-xs font-extrabold cursor-pointer transition-colors ${
+                    packageSubTab === 'packages'
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  Medical Packages ({packages.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPackageSubTab('promotions')}
+                  className={`px-3 py-1.5 text-xs font-extrabold cursor-pointer transition-colors ${
+                    packageSubTab === 'promotions'
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  Promotions & Campaign Codes ({promotions.length})
+                </button>
+              </div>
+            </div>
+
+            {/* Sub-tab 1: Medical Packages */}
+            {packageSubTab === 'packages' && (
+              <div className="space-y-4">
+                {/* Search & Filter Bar */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white border border-[color:var(--t-200)] p-3">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                    <input
+                      type="text"
+                      value={packageSearch}
+                      onChange={e => setPackageSearch(e.target.value)}
+                      placeholder="Search packages by title or code…"
+                      className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                    />
                   </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Operating Category</span>
-                    <strong className="text-slate-900 uppercase">{facility?.kind || 'Medical Centre'}</strong>
+
+                  <select
+                    value={packageCategoryFilter}
+                    onChange={e => setPackageCategoryFilter(e.target.value)}
+                    className="p-1.5 text-xs border border-slate-200 bg-white"
+                  >
+                    {['All', 'Health Screening', 'Cardiology', 'Orthopaedics', 'Maternity', 'Fertility', 'Oncology', 'Ophthalmology', 'Dental', 'Surgery', 'Aesthetics'].map(c => (
+                      <option key={c} value={c}>{c === 'All' ? 'All Categories' : c}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={packageStatusFilter}
+                    onChange={e => setPackageStatusFilter(e.target.value as any)}
+                    className="p-1.5 text-xs border border-slate-200 bg-white"
+                  >
+                    <option value="all">All Publishing Statuses</option>
+                    <option value="published">Published (Live to Patients)</option>
+                    <option value="draft">Draft / Unpublished</option>
+                  </select>
+                </div>
+
+                {/* Package Cards Grid */}
+                {packages.length === 0 ? (
+                  <div className="p-12 text-center bg-white border border-dashed border-slate-300 space-y-3">
+                    <PackagePlus className="h-8 w-8 text-slate-300 mx-auto" />
+                    <p className="text-xs text-slate-500">No medical packages created yet. Click "Publish Medical Package" to get started.</p>
                   </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Statutory Licence No.</span>
-                    <strong className="font-mono text-slate-900">{facility?.licenceNo || 'KKM/JKA/586-90412'}</strong>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {packages
+                      .filter(pkg => {
+                        if (packageStatusFilter !== 'all' && pkg.status !== packageStatusFilter) return false;
+                        if (packageCategoryFilter !== 'All' && pkg.category !== packageCategoryFilter) return false;
+                        if (packageSearch.trim()) {
+                          const q = packageSearch.toLowerCase();
+                          return pkg.title.toLowerCase().includes(q) || pkg.code.toLowerCase().includes(q) || pkg.category.toLowerCase().includes(q);
+                        }
+                        return true;
+                      })
+                      .map(pkg => (
+                        <div
+                          key={pkg.id}
+                          className="bg-white border border-[color:var(--t-200)] shadow-2xs hover:shadow-md transition-shadow flex flex-col justify-between"
+                        >
+                          <div>
+                            {/* Card Header & Status */}
+                            <div className="relative aspect-16/9 bg-slate-100 overflow-hidden">
+                              <img
+                                src={pkg.image_url || '/assets/clean_light_doctor_suite_full-C0TGKdC3.jpg'}
+                                alt={pkg.title}
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 flex-wrap">
+                                <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 bg-slate-900/90 text-white">
+                                  {pkg.code}
+                                </span>
+                                <span className="text-[10px] font-bold uppercase px-2 py-0.5 bg-[color:var(--t-600)] text-white">
+                                  {pkg.category}
+                                </span>
+                              </div>
+                              <div className="absolute top-2.5 right-2.5">
+                                <span className={`text-[10px] font-black uppercase px-2 py-0.5 ${
+                                  pkg.status === 'published'
+                                    ? 'bg-emerald-500 text-white'
+                                    : 'bg-amber-400 text-amber-950'
+                                }`}>
+                                  {pkg.status}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="p-4 space-y-2.5">
+                              <h3 className="font-extrabold text-sm text-slate-900 leading-snug line-clamp-1">
+                                {pkg.title}
+                              </h3>
+                              <p className="text-xs text-slate-500 line-clamp-2">
+                                {pkg.description}
+                              </p>
+
+                              <div className="flex items-center gap-3 text-xs text-slate-600 pt-1">
+                                <span className="flex items-center gap-1 text-[11px]">
+                                  <Clock className="h-3.5 w-3.5 text-slate-400" />
+                                  {pkg.duration}
+                                </span>
+                                {pkg.fastingRequired && (
+                                  <span className="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.2">
+                                    Fasting Required
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="text-xs text-slate-600 border-t border-slate-100 pt-2 space-y-1">
+                                <div className="text-[10px] font-bold uppercase text-slate-400">
+                                  Includes ({pkg.inclusions.length} items):
+                                </div>
+                                {pkg.inclusions.slice(0, 2).map((inc, i) => (
+                                  <div key={i} className="flex items-center gap-1.5 text-[11px] text-slate-700 truncate">
+                                    <Check className="h-3 w-3 text-emerald-600 shrink-0" />
+                                    <span className="truncate">{inc}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Footer & Action Bar */}
+                          <div className="p-4 pt-2 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                            <div>
+                              {pkg.originalPriceMyr && (
+                                <span className="text-[10px] text-slate-400 line-through block">
+                                  RM {pkg.originalPriceMyr.toLocaleString()}
+                                </span>
+                              )}
+                              <span className="text-sm font-extrabold text-slate-900 tabular-nums">
+                                RM {pkg.priceMyr.toLocaleString()}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => handleTogglePackageStatus(pkg)}
+                                className="px-2 py-1 text-[11px] font-bold border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer"
+                                title="Toggle Live / Draft"
+                              >
+                                {pkg.status === 'published' ? 'Unpublish' : 'Publish'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleEditPackage(pkg)}
+                                className="p-1.5 text-slate-600 hover:text-slate-900 border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer"
+                                title="Edit Package"
+                              >
+                                <Edit3 className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeletePackage(pkg.id)}
+                                className="p-1.5 text-rose-600 hover:text-rose-800 border border-slate-200 bg-white hover:bg-rose-50 cursor-pointer"
+                                title="Delete Package"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                   </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Licence Expiry</span>
-                    <strong className="text-slate-900">{facility?.licenceExpiry || '2029-12-31'}</strong>
+                )}
+              </div>
+            )}
+
+            {/* Sub-tab 2: Promotions & Campaign Codes */}
+            {packageSubTab === 'promotions' && (
+              <div className="space-y-4">
+                {promotions.length === 0 ? (
+                  <div className="p-12 text-center bg-white border border-dashed border-slate-300 space-y-3">
+                    <Tag className="h-8 w-8 text-slate-300 mx-auto" />
+                    <p className="text-xs text-slate-500">No active promotions. Click "Create Promotion" to set up a discount code or seasonal offer.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {promotions.map(pr => (
+                      <div
+                        key={pr.id}
+                        className="bg-white border-2 border-amber-200 p-5 shadow-2xs space-y-3 flex flex-col justify-between"
+                      >
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">
+                              {pr.badge_text || (pr.discount_type === 'percentage' ? `${pr.discount_value}% OFF` : `RM ${pr.discountValueMyr} OFF`)}
+                            </span>
+                            <span className={`text-[10px] font-black uppercase px-1.5 py-0.2 ${
+                              pr.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'
+                            }`}>
+                              {pr.status}
+                            </span>
+                          </div>
+
+                          <h3 className="font-extrabold text-sm text-slate-900 leading-snug">
+                            {pr.title}
+                          </h3>
+
+                          <p className="text-xs text-slate-600">
+                            {pr.description}
+                          </p>
+
+                          <div className="text-[11px] text-slate-500 pt-1">
+                            Valid: <span className="font-mono text-slate-700">{pr.valid_from}</span> to <span className="font-mono text-slate-700">{pr.valid_until}</span>
+                          </div>
+                        </div>
+
+                        {/* Promo Code Box & Actions */}
+                        <div className="pt-3 border-t border-slate-100 space-y-2">
+                          <div className="flex items-center justify-between bg-slate-50 p-2 border border-dashed border-slate-300">
+                            <span className="font-mono font-black text-xs text-[color:var(--t-700)]">
+                              {pr.code}
+                            </span>
+                            <span className="text-[10px] text-slate-400 uppercase font-bold">
+                              {pr.discount_type === 'percentage' ? `${pr.discount_value}% Discount` : `RM ${pr.discountValueMyr || pr.discount_value / 100} Rebate`}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-end gap-1.5 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => handleTogglePromoStatus(pr)}
+                              className="px-2.5 py-1 text-[11px] font-bold border border-slate-200 hover:bg-slate-50 cursor-pointer"
+                            >
+                              {pr.status === 'active' ? 'Pause' : 'Activate'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleEditPromo(pr)}
+                              className="p-1 text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50 cursor-pointer"
+                            >
+                              <Edit3 className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeletePromo(pr.id)}
+                              className="p-1 text-rose-600 hover:text-rose-800 border border-slate-200 hover:bg-rose-50 cursor-pointer"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 5: FACILITY PROFILE & INFRASTRUCTURE MANAGEMENT */}
+        {/* ========================================================================= */}
+        {tab === 'profile' && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Facility Identity & Licensing */}
+              <div className="bg-white border border-[color:var(--t-200)] p-5 space-y-4">
+                <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                  <ShieldCheck className="h-5 w-5 text-emerald-600" />
+                  <h2 className="text-base font-black text-slate-900">
+                    KKM Act 586 Statutory Licence
+                  </h2>
+                </div>
+
+                <div className="space-y-3 text-xs text-slate-700">
+                  <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 border border-slate-200">
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase font-bold block">Facility Name</span>
+                      <strong className="text-slate-900">{facility?.name || 'Healthcare Facility'}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase font-bold block">Operating Category</span>
+                      <strong className="text-slate-900 uppercase">{facility?.kind || 'Medical Centre'}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase font-bold block">Statutory Licence No.</span>
+                      <strong className="font-mono text-slate-900">{facility?.licenceNo || 'KKM/JKA/586-90412'}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase font-bold block">Licence Expiry</span>
+                      <strong className="text-slate-900">{facility?.licenceExpiry || '2029-12-31'}</strong>
+                    </div>
+                  </div>
+
+                  <p className="text-slate-500 leading-relaxed">
+                    Registered under the Private Healthcare Facilities and Services Act 1998 (Act 586).
+                    Authorised for inpatient specialist medicine, daycare surgery, outpatient consultations, and verified locum practitioner staffing.
+                  </p>
+                </div>
+
+                {/* Accreditations */}
+                <div className="pt-3 border-t border-slate-100 space-y-2">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-800 block">
+                    Accreditation Credentials
+                  </span>
+                  <div className="space-y-2">
+                    <div className="p-3 bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                      <div>
+                        <strong className="text-slate-900 block">MSQH 6th Edition Hospital Accreditation</strong>
+                        <span className="text-slate-500 text-[11px]">Malaysian Society for Quality in Health</span>
+                      </div>
+                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase border border-emerald-300">
+                        Valid
+                      </span>
+                    </div>
+                    {facility?.mhtcMember && (
+                      <div className="p-3 bg-blue-50/50 border border-blue-200 flex items-center justify-between text-xs">
+                        <div>
+                          <strong className="text-blue-900 block">MHTC Elite Healthcare Member</strong>
+                          <span className="text-blue-700 text-[11px]">Malaysia Healthcare Travel Council</span>
+                        </div>
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-black uppercase border border-blue-300">
+                          Certified
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Clinical Specialties & Contact */}
+              <div className="bg-white border border-[color:var(--t-200)] p-5 space-y-4">
+                <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                  <Stethoscope className="h-5 w-5 text-[color:var(--t-600)]" />
+                  <h2 className="text-base font-black text-slate-900">
+                    Clinical Specialties & Network Contact
+                  </h2>
+                </div>
+
+                <div className="space-y-3">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-800 block">
+                    Offered Specialties
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(facility?.specialties || [
+                      'Emergency Medicine', 'General Medicine', 'Cardiology',
+                      'Orthopaedic Surgery', 'General Surgery', 'Paediatrics',
+                      'Obstetrics & Gynaecology', 'Anaesthesiology', 'Intensive Care Unit (ICU)'
+                    ]).map((sp, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2.5 py-1 bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200"
+                      >
+                        {sp}
+                      </span>
+                    ))}
                   </div>
                 </div>
 
-                <p className="text-slate-500 leading-relaxed">
-                  Registered under the Private Healthcare Facilities and Services Act 1998 (Act 586).
-                  Authorised for inpatient specialist medicine, daycare surgery, outpatient consultations, and verified locum practitioner staffing.
-                </p>
-              </div>
-
-              {/* Accreditations */}
-              <div className="pt-3 border-t border-slate-100 space-y-2">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-800 block">
-                  Accreditation Credentials
-                </span>
-                <div className="space-y-2">
-                  <div className="p-3 bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                    <div>
-                      <strong className="text-slate-900 block">MSQH 6th Edition Hospital Accreditation</strong>
-                      <span className="text-slate-500 text-[11px]">Malaysian Society for Quality in Health</span>
+                <div className="pt-4 border-t border-slate-100 space-y-3 text-xs text-slate-600">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-800 block">
+                    Facility Address & Liaison
+                  </span>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <MapPin className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
+                      <span>{facility?.address || '1, Jalan Bukit Pantai, Bangsar, 59100 Kuala Lumpur'}</span>
                     </div>
-                    <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase border border-emerald-300">
-                      Valid
-                    </span>
-                  </div>
-                  {facility?.mhtcMember && (
-                    <div className="p-3 bg-blue-50/50 border border-blue-200 flex items-center justify-between text-xs">
-                      <div>
-                        <strong className="text-blue-900 block">MHTC Elite Healthcare Member</strong>
-                        <span className="text-blue-700 text-[11px]">Malaysia Healthcare Travel Council</span>
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-slate-400 shrink-0" />
+                      <span>{facility?.phone || '+60 3-2296 0888'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-slate-400 shrink-0" />
+                      <span>{facility?.email || 'hr.locum@pantai.com.my'}</span>
+                    </div>
+                    {facility?.website && (
+                      <div className="flex items-center gap-2">
+                        <ExternalLink className="h-4 w-4 text-slate-400 shrink-0" />
+                        <a
+                          href={facility.website}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[color:var(--t-700)] underline font-bold"
+                        >
+                          {facility.website}
+                        </a>
                       </div>
-                      <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-black uppercase border border-blue-300">
-                        Certified
-                      </span>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Clinical Specialties & Contact */}
-            <div className="bg-white border border-[color:var(--t-200)] p-5 space-y-4">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <Stethoscope className="h-5 w-5 text-[color:var(--t-600)]" />
-                <h2 className="text-base font-black text-slate-900">
-                  Clinical Specialties & Network Contact
-                </h2>
+            {/* Diagnostic Equipment & Infrastructure Management Card */}
+            <div className="bg-white border border-[color:var(--t-200)] p-5 shadow-2xs space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <HeartPulse className="h-5 w-5 text-[color:var(--t-600)]" />
+                  <div>
+                    <h3 className="text-base font-black text-slate-900">
+                      Diagnostic Equipment & Medical Infrastructure
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Showcase high-precision clinical equipment (CT, MRI, Cath Lab, Robotic Surgery) to referring clinicians & patients.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSaveInfrastructure}
+                  disabled={infraSaving}
+                  className="px-4 py-2 bg-slate-900 hover:bg-black text-white text-xs font-extrabold cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shrink-0"
+                >
+                  <Check className="h-4 w-4 text-emerald-400" />
+                  {infraSaving ? 'Saving…' : 'Save Infrastructure'}
+                </button>
               </div>
 
+              {/* Equipment list */}
               <div className="space-y-3">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-800 block">
-                  Offered Specialties
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {(facility?.specialties || [
-                    'Emergency Medicine', 'General Medicine', 'Cardiology',
-                    'Orthopaedic Surgery', 'General Surgery', 'Paediatrics',
-                    'Obstetrics & Gynaecology', 'Anaesthesiology', 'Intensive Care Unit (ICU)'
-                  ]).map((sp, idx) => (
+                <label className="text-xs font-black uppercase text-slate-700 block">
+                  Active Clinical & Diagnostic Equipment:
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {equipmentList.map((eq, i) => (
                     <span
-                      key={idx}
-                      className="px-2.5 py-1 bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200"
+                      key={i}
+                      className="px-3 py-1.5 bg-slate-100 text-slate-800 text-xs font-bold border border-slate-300 flex items-center gap-2"
                     >
-                      {sp}
+                      <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                      <span>{eq}</span>
+                      <button
+                        type="button"
+                        onClick={() => setEquipmentList(equipmentList.filter((_, idx) => idx !== i))}
+                        className="text-slate-400 hover:text-rose-600 font-bold ml-1 cursor-pointer"
+                      >
+                        &times;
+                      </button>
                     </span>
                   ))}
+                  {equipmentList.length === 0 && (
+                    <span className="text-xs text-slate-400 italic">No equipment listed yet. Add items below.</span>
+                  )}
+                </div>
+
+                {/* Add Equipment Input */}
+                <div className="flex items-center gap-2 pt-1 max-w-md">
+                  <input
+                    type="text"
+                    value={newEquipmentInput}
+                    onChange={e => setNewEquipmentInput(e.target.value)}
+                    placeholder="e.g. 3T High-Field MRI Scanner"
+                    className="p-2 border border-slate-300 text-xs flex-1 bg-slate-50 focus:bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (newEquipmentInput.trim()) {
+                        setEquipmentList([...equipmentList, newEquipmentInput.trim()]);
+                        setNewEquipmentInput('');
+                      }
+                    }}
+                    className="px-3 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold cursor-pointer"
+                  >
+                    + Add Equipment
+                  </button>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 space-y-3 text-xs text-slate-600">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-800 block">
-                  Facility Address & Liaison
-                </span>
-                <div className="space-y-2">
-                  <div className="flex items-start gap-2">
-                    <MapPin className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
-                    <span>{facility?.address || '1, Jalan Bukit Pantai, Bangsar, 59100 Kuala Lumpur'}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-slate-400 shrink-0" />
-                    <span>{facility?.phone || '+60 3-2296 0888'}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-slate-400 shrink-0" />
-                    <span>{facility?.email || 'hr.locum@pantai.com.my'}</span>
-                  </div>
-                  {facility?.website && (
-                    <div className="flex items-center gap-2">
-                      <ExternalLink className="h-4 w-4 text-slate-400 shrink-0" />
-                      <a
-                        href={facility.website}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-[color:var(--t-700)] underline font-bold"
+              {/* Patient Amenities list */}
+              <div className="space-y-3 pt-4 border-t border-slate-100">
+                <label className="text-xs font-black uppercase text-slate-700 block">
+                  Patient Care Amenities & Specialized Services:
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {amenitiesList.map((am, i) => (
+                    <span
+                      key={i}
+                      className="px-3 py-1.5 bg-amber-50 text-amber-900 text-xs font-bold border border-amber-300 flex items-center gap-2"
+                    >
+                      <Sparkles className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+                      <span>{am}</span>
+                      <button
+                        type="button"
+                        onClick={() => setAmenitiesList(amenitiesList.filter((_, idx) => idx !== i))}
+                        className="text-amber-500 hover:text-rose-600 font-bold ml-1 cursor-pointer"
                       >
-                        {facility.website}
-                      </a>
-                    </div>
+                        &times;
+                      </button>
+                    </span>
+                  ))}
+                  {amenitiesList.length === 0 && (
+                    <span className="text-xs text-slate-400 italic">No amenities listed yet. Add items below.</span>
                   )}
+                </div>
+
+                {/* Add Amenity Input */}
+                <div className="flex items-center gap-2 pt-1 max-w-md">
+                  <input
+                    type="text"
+                    value={newAmenityInput}
+                    onChange={e => setNewAmenityInput(e.target.value)}
+                    placeholder="e.g. JAKIM Halal-Certified Dietary Kitchen"
+                    className="p-2 border border-slate-300 text-xs flex-1 bg-slate-50 focus:bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (newAmenityInput.trim()) {
+                        setAmenitiesList([...amenitiesList, newAmenityInput.trim()]);
+                        setNewAmenityInput('');
+                      }
+                    }}
+                    className="px-3 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold cursor-pointer"
+                  >
+                    + Add Amenity
+                  </button>
                 </div>
               </div>
             </div>
@@ -1853,6 +2669,447 @@ export default function FacilityWorkspace() {
                 >
                   <DollarSign className="h-3.5 w-3.5" />
                   {quoteSubmitting ? 'Dispatching…' : 'Dispatch Treatment Quote'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* PUBLISH / EDIT MEDICAL PACKAGE MODAL */}
+      {/* ========================================================================= */}
+      {packageModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-slate-300 max-w-2xl w-full p-6 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto my-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="text-base font-black text-slate-900">
+                  {editingPackageId ? 'Edit Medical Package' : 'Publish New Medical Package'}
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Configure procedure details, clinical inclusions, fasting rules, and pricing in Malaysian Ringgit.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPackageModalOpen(false)}
+                className="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form onSubmit={handleSavePackage} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                    Package Title *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Executive Full-Body Health Screening"
+                    value={pkgTitle}
+                    onChange={e => setPkgTitle(e.target.value)}
+                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                    Package Code
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. PKG-EXEC-01"
+                    value={pkgCode}
+                    onChange={e => setPkgCode(e.target.value.toUpperCase())}
+                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none font-mono focus:outline-none focus:border-[color:var(--t-600)]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                    Category *
+                  </label>
+                  <select
+                    value={pkgCategory}
+                    onChange={e => setPkgCategory(e.target.value)}
+                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  >
+                    {['Health Screening', 'Cardiology', 'Orthopaedics', 'Maternity', 'Fertility', 'Oncology', 'Ophthalmology', 'Dental', 'Surgery', 'Aesthetics'].map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                    Duration / Stay
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 1 Day Outpatient (4 hrs)"
+                    value={pkgDuration}
+                    onChange={e => setPkgDuration(e.target.value)}
+                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                    Target Audience
+                  </label>
+                  <select
+                    value={pkgAudience}
+                    onChange={e => setPkgAudience(e.target.value as any)}
+                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  >
+                    <option value="all">All Patients</option>
+                    <option value="local">Malaysian Residents Only</option>
+                    <option value="international">Medical Tourism (MHTC)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                    Package Price (MYR) *
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    required
+                    placeholder="e.g. 1280"
+                    value={pkgPrice}
+                    onChange={e => setPkgPrice(e.target.value)}
+                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)] font-bold text-slate-900"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                    Original Price (MYR)
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="e.g. 1600 (optional)"
+                    value={pkgOriginalPrice}
+                    onChange={e => setPkgOriginalPrice(e.target.value)}
+                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)] text-slate-500"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                    Publishing Status
+                  </label>
+                  <select
+                    value={pkgStatus}
+                    onChange={e => setPkgStatus(e.target.value as any)}
+                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  >
+                    <option value="published">Published (Live to public)</option>
+                    <option value="draft">Draft (Private)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="checkbox"
+                  id="fastingCheck"
+                  checked={pkgFasting}
+                  onChange={e => setPkgFasting(e.target.checked)}
+                  className="rounded-none cursor-pointer"
+                />
+                <label htmlFor="fastingCheck" className="text-xs font-bold text-slate-800 cursor-pointer">
+                  Requires Clinical Fasting (8–10 hours fasting prior to appointment)
+                </label>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  Package Overview & Clinical Rationale
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="Outline who this package is recommended for and primary clinical diagnostic objectives."
+                  value={pkgDescription}
+                  onChange={e => setPkgDescription(e.target.value)}
+                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                />
+              </div>
+
+              {/* Inclusions List Builder */}
+              <div className="space-y-2 border-t border-slate-100 pt-3">
+                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  Included Tests, Procedures & Consultations ({pkgInclusions.length}):
+                </label>
+                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-slate-50 border border-slate-200">
+                  {pkgInclusions.map((inc, i) => (
+                    <span
+                      key={i}
+                      className="px-2.5 py-1 bg-white text-slate-800 text-xs font-medium border border-slate-300 flex items-center gap-1.5"
+                    >
+                      <Check className="h-3 w-3 text-emerald-600 shrink-0" />
+                      <span>{inc}</span>
+                      <button
+                        type="button"
+                        onClick={() => setPkgInclusions(pkgInclusions.filter((_, idx) => idx !== i))}
+                        className="text-slate-400 hover:text-rose-600 font-bold ml-1 cursor-pointer"
+                      >
+                        &times;
+                      </button>
+                    </span>
+                  ))}
+                  {pkgInclusions.length === 0 && (
+                    <span className="text-xs text-slate-400 italic">No inclusion items added yet.</span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={pkgInclusionInput}
+                    onChange={e => setPkgInclusionInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (pkgInclusionInput.trim()) {
+                          setPkgInclusions([...pkgInclusions, pkgInclusionInput.trim()]);
+                          setPkgInclusionInput('');
+                        }
+                      }
+                    }}
+                    placeholder="e.g. Ultrasound Abdomen & Pelvis"
+                    className="p-2 border border-slate-300 text-xs flex-1 bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (pkgInclusionInput.trim()) {
+                        setPkgInclusions([...pkgInclusions, pkgInclusionInput.trim()]);
+                        setPkgInclusionInput('');
+                      }
+                    }}
+                    className="px-3 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold cursor-pointer"
+                  >
+                    + Add Item
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  Exclusions & Pre-Procedure Instructions
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="e.g. Strict 10-hour fasting. Medication adjustments. Additional pathology charged separately."
+                  value={pkgPreparation}
+                  onChange={e => setPkgPreparation(e.target.value)}
+                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setPackageModalOpen(false)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={pkgSubmitting}
+                  className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white border border-[color:var(--t-700)] cursor-pointer disabled:opacity-50"
+                >
+                  {pkgSubmitting ? 'Saving Package…' : editingPackageId ? 'Update Package' : 'Publish Package'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* CREATE / EDIT PROMOTION CAMPAIGN MODAL */}
+      {/* ========================================================================= */}
+      {promoModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-slate-300 max-w-lg w-full p-6 space-y-4 shadow-xl my-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="text-base font-black text-slate-900">
+                  {editingPromoId ? 'Edit Promotion Campaign' : 'Create Promotion Campaign'}
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Issue promo codes, percentage discounts, or fixed Malaysian Ringgit rebates.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPromoModalOpen(false)}
+                className="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form onSubmit={handleSavePromo} className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                    Promo Code *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. CAREMERDEKA"
+                    value={promoCode}
+                    onChange={e => setPromoCode(e.target.value.toUpperCase())}
+                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none font-mono font-bold focus:outline-none focus:border-[color:var(--t-600)] uppercase"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                    Badge Highlight
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 20% OFF National Special"
+                    value={promoBadge}
+                    onChange={e => setPromoBadge(e.target.value)}
+                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  Campaign Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Merdeka National Wellness Special 2026"
+                  value={promoTitle}
+                  onChange={e => setPromoTitle(e.target.value)}
+                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                    Discount Type *
+                  </label>
+                  <select
+                    value={promoType}
+                    onChange={e => setPromoType(e.target.value as any)}
+                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  >
+                    <option value="percentage">Percentage (%) Discount</option>
+                    <option value="fixed">Fixed Amount (RM) Rebate</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                    Discount Value *
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    required
+                    placeholder={promoType === 'percentage' ? 'e.g. 20 (for 20%)' : 'e.g. 250 (for RM 250)'}
+                    value={promoValue}
+                    onChange={e => setPromoValue(e.target.value)}
+                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)] font-bold"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  Applicable Package
+                </label>
+                <select
+                  value={promoPkgId}
+                  onChange={e => setPromoPkgId(e.target.value)}
+                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                >
+                  <option value="">All Facility Packages (Universal Promo)</option>
+                  {packages.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.code} - {p.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                    Valid From
+                  </label>
+                  <input
+                    type="date"
+                    value={promoValidFrom}
+                    onChange={e => setPromoValidFrom(e.target.value)}
+                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                    Valid Until *
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={promoValidUntil}
+                    onChange={e => setPromoValidUntil(e.target.value)}
+                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  Campaign Description & Terms
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="Terms and conditions, eligible age groups, or resident requirements."
+                  value={promoDesc}
+                  onChange={e => setPromoDesc(e.target.value)}
+                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setPromoModalOpen(false)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={promoSubmitting}
+                  className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-slate-900 hover:bg-black text-white cursor-pointer disabled:opacity-50"
+                >
+                  {promoSubmitting ? 'Saving Promo…' : editingPromoId ? 'Update Promotion' : 'Publish Promotion'}
                 </button>
               </div>
             </form>
