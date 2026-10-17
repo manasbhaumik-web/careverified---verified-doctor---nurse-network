@@ -69,20 +69,8 @@ export default function DashboardHeader<T extends string>({
         fullWidth ? 'w-full border-x-0' : 'border-x border-t-0'
       }`}
     >
-      {/* 3PX SOLID BRAND TELEMETRY RAIL */}
-      <div className="h-[3px] w-full bg-[color:var(--t-600)] shrink-0" />
-
       {(title || children) && (
-        <div className="dh-brand relative border-t-0 text-[color:var(--ink)] overflow-hidden bg-gradient-to-r from-[color:var(--t-50)] via-white to-[color:var(--t-50)] border-b border-[color:var(--t-200)]">
-          {/* Subtle architectural clinical micro-grid overlay */}
-          <div
-            className="absolute inset-0 opacity-[0.03] pointer-events-none"
-            style={{
-              backgroundImage: 'radial-gradient(var(--t-700) 1px, transparent 0)',
-              backgroundSize: '16px 16px',
-            }}
-          />
-
+        <div className="dh-brand relative border-t-0 text-white overflow-hidden bg-gradient-to-r from-[color:var(--t-800)] via-[color:var(--t-700)] to-[color:var(--t-600)] border-b border-[color:var(--t-900)] shadow-sm">
           {title && (
             <div className={`relative z-10 pt-5 pb-5 sm:pt-6 sm:pb-6 ${
               fullWidth ? 'max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8' : 'px-4 sm:px-7'
@@ -153,21 +141,21 @@ export default function DashboardHeader<T extends string>({
  * ---------------------------------------------------------------------------------------------- */
 
 export const bannerPrimaryBtn =
-  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-4 h-11 rounded-none shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
-/** Same two buttons for use on the banner: a solid brand button and a crisp bordered white one. */
+  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-800)] text-xs font-black px-4 h-11 rounded-none shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-white';
+/** Same two buttons for use on the banner: a solid white button and a frosted transparent one. */
 export const bannerOnBrandPrimaryBtn =
-  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-4 h-11 rounded-none shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
+  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-800)] text-xs font-black px-4 h-11 rounded-none shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-white';
 export const bannerOnBrandSecondaryBtn =
-  'bg-white hover:bg-[color:var(--t-50)] text-slate-800 border border-slate-300 text-xs font-bold px-4 h-11 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
+  'bg-black/20 hover:bg-black/30 text-white border border-white/40 text-xs font-bold px-4 h-11 rounded-none shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
 export const bannerSecondaryBtn =
-  'bg-white hover:bg-[color:var(--t-50)] text-slate-800 border border-slate-300 text-xs font-bold px-4 h-11 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
+  'bg-black/20 hover:bg-black/30 text-white border border-white/40 text-xs font-bold px-4 h-11 rounded-none shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
 
 /** Two-column row: identity on the left, KPIs and actions on the right. */
 export function BannerRow({ identity, aside }: { identity: React.ReactNode; aside?: React.ReactNode }) {
   return (
     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
       {identity}
-      {aside && <div className="flex items-center gap-4 flex-wrap lg:justify-end border-t lg:border-t-0 border-[color:var(--t-200)] pt-3 sm:pt-4 lg:pt-0 shrink-0">{aside}</div>}
+      {aside && <div className="flex items-center gap-4 flex-wrap lg:justify-end border-t lg:border-t-0 border-white/20 pt-3 sm:pt-4 lg:pt-0 shrink-0">{aside}</div>}
     </div>
   );
 }
@@ -195,21 +183,21 @@ export function BannerIdentity({ name, avatarUrl, icon: Icon, as: Heading = 'h2'
     <div className="flex items-center gap-3 sm:gap-5 min-w-0">
       <div className="relative shrink-0">
         {avatarUrl ? (
-          <img src={avatarUrl} alt={typeof name === 'string' ? name : ''} className="h-14 w-14 sm:h-20 sm:w-20 rounded-none object-cover border-2 border-[color:var(--t-600)] shadow-xs" referrerPolicy="no-referrer" />
+          <img src={avatarUrl} alt={typeof name === 'string' ? name : ''} className="h-14 w-14 sm:h-20 sm:w-20 rounded-none object-cover border-2 border-white/60 shadow-md" referrerPolicy="no-referrer" />
         ) : (
-          <div aria-hidden="true" className="h-14 w-14 sm:h-20 sm:w-20 rounded-none border-2 border-[color:var(--t-600)] shadow-xs bg-white text-[color:var(--t-700)] flex items-center justify-center text-lg sm:text-2xl font-black">
+          <div aria-hidden="true" className="h-14 w-14 sm:h-20 sm:w-20 rounded-none border-2 border-white/60 shadow-md bg-white text-[color:var(--t-800)] flex items-center justify-center text-lg sm:text-2xl font-black">
             {Icon ? <Icon className="h-6 w-6 sm:h-8 sm:w-8" /> : initials || '?'}
           </div>
         )}
         {avatarBadge}
       </div>
-      <div className="space-y-1.5 min-w-0">
+      <div className="space-y-1.5 min-w-0 text-white">
         <div className="flex items-center gap-2.5 flex-wrap">
-          <Heading className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight">{name}</Heading>
+          <Heading className="text-xl sm:text-3xl font-black text-white tracking-tight">{name}</Heading>
           {badges}
         </div>
-        {description && <p className="text-sm text-slate-600 font-medium leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
-        {meta && <div className="flex items-center gap-2.5 text-xs text-slate-600 font-semibold flex-wrap">{meta}</div>}
+        {description && <p className="text-sm text-white/90 font-medium leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
+        {meta && <div className="flex items-center gap-2.5 text-xs text-white/90 font-semibold flex-wrap">{meta}</div>}
       </div>
     </div>
   );
@@ -218,20 +206,20 @@ export function BannerIdentity({ name, avatarUrl, icon: Icon, as: Heading = 'h2'
 /** Pill used beside the name: neutral (brand) or success. */
 export function BannerBadge({ tone = 'brand', children }: { tone?: 'brand' | 'success'; children: React.ReactNode }) {
   return tone === 'success' ? (
-    <span className="bg-emerald-50 text-emerald-800 border border-emerald-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none flex items-center gap-1 shadow-3xs">{children}</span>
+    <span className="bg-emerald-500/25 text-emerald-100 border border-emerald-400/50 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none flex items-center gap-1 shadow-2xs backdrop-blur-xs">{children}</span>
   ) : (
-    <span className="bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none shadow-3xs">{children}</span>
+    <span className="bg-white/20 text-white border border-white/40 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none shadow-2xs backdrop-blur-xs">{children}</span>
   );
 }
 
-/** High-contrast Cockpit HUD Strip: solid slate cockpit block with glowing monospace telemetry. */
+/** High-contrast Floating Pure White Island: floating card block with colored brand numbers. */
 export function BannerKpis({ items }: { items: { value: React.ReactNode; label: string }[] }) {
   return (
-    <div className="flex items-stretch w-full sm:w-auto sm:h-11 bg-slate-900 border border-slate-950 rounded-none shadow-xs text-white">
+    <div className="flex items-stretch w-full sm:w-auto sm:h-11 bg-white border border-white rounded-none shadow-md text-slate-900">
       {items.map((k, i) => (
-        <div key={k.label} className={`flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-0 min-w-0 ${i > 0 ? 'border-l border-slate-800' : ''}`}>
-          <span className="text-base font-extrabold text-[color:var(--t-300)] font-mono leading-none tabular-nums">{k.value}</span>
-          <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest leading-tight text-center">{k.label}</span>
+        <div key={k.label} className={`flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-0 min-w-0 ${i > 0 ? 'border-l border-slate-200' : ''}`}>
+          <span className="text-base font-extrabold text-[color:var(--t-700)] font-mono leading-none tabular-nums">{k.value}</span>
+          <span className="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-wider leading-tight text-center">{k.label}</span>
         </div>
       ))}
     </div>
