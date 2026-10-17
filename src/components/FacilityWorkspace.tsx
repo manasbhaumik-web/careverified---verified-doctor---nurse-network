@@ -58,6 +58,15 @@ interface Application {
   decisionAt: string | null;
   decisionBy: string | null;
   decisionNotes: string | null;
+  clockInAt?: string | null;
+  clockOutAt?: string | null;
+  scheduledHours?: number;
+  actualHours?: number | null;
+  timesheetStatus?: 'unstarted' | 'on_duty' | 'submitted' | 'approved' | 'disputed';
+  supervisorNotes?: string | null;
+  approvedBy?: string | null;
+  approvedAt?: string | null;
+  totalPayoutMyr?: number | null;
 }
 
 interface FacilityJob {
@@ -145,6 +154,16 @@ export default function FacilityWorkspace() {
   } | null>(null);
   const [decisionNotes, setDecisionNotes] = useState('');
   const [actionSubmitting, setActionSubmitting] = useState(false);
+
+  // Timesheet Modal state
+  const [timesheetModal, setTimesheetModal] = useState<{
+    jobId: string;
+    jobTitle: string;
+    applicant: Application;
+  } | null>(null);
+  const [timesheetHours, setTimesheetHours] = useState('8.0');
+  const [timesheetNotes, setTimesheetNotes] = useState('Clinical shift completed. Hours verified against ward roster.');
+  const [timesheetSubmitting, setTimesheetSubmitting] = useState(false);
 
   // New Job Modal state
   const [showNewJobModal, setShowNewJobModal] = useState(false);
@@ -251,6 +270,34 @@ export default function FacilityWorkspace() {
       setNotificationMsg({ type: 'error', text: 'Network error. Please try again.' });
     } finally {
       setActionSubmitting(false);
+    }
+  };
+
+  // Handle Approve Timesheet
+  const handleApproveTimesheet = async () => {
+    if (!timesheetModal) return;
+    setTimesheetSubmitting(true);
+    try {
+      const res = await fetch(`/api/facility/jobs/${timesheetModal.jobId}/applicants/${timesheetModal.applicant.userId}/timesheet/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actualHours: Number(timesheetHours) || 8.0,
+          supervisorNotes: timesheetNotes.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        setTimesheetModal(null);
+        loadFacilityData();
+      } else {
+        setNotificationMsg({ type: 'error', text: data.message || 'Could not approve timesheet.' });
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error. Please try again.' });
+    } finally {
+      setTimesheetSubmitting(false);
     }
   };
 
@@ -722,12 +769,45 @@ export default function FacilityWorkspace() {
                                           </button>
                                         </div>
                                       ) : app.status === 'accepted' ? (
-                                        <div className="text-right">
-                                          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-600 text-white text-xs font-black uppercase tracking-wider">
-                                            <CheckCircle2 className="h-3.5 w-3.5" />
-                                            Application Accepted
-                                          </span>
-                                          <span className="block text-[10px] text-slate-500 mt-0.5">
+                                        <div className="flex flex-col items-end gap-1.5">
+                                          <div className="flex items-center gap-2">
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-600 text-white text-[11px] font-black uppercase tracking-wider">
+                                              <CheckCircle2 className="h-3 w-3" />
+                                              Accepted
+                                            </span>
+                                            {app.timesheetStatus === 'approved' ? (
+                                              <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[11px] font-black uppercase border border-emerald-300">
+                                                Timesheet Approved: {app.actualHours} hrs (RM {app.totalPayoutMyr?.toFixed(2)})
+                                              </span>
+                                            ) : app.timesheetStatus === 'submitted' ? (
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  setTimesheetModal({ jobId: job.id, jobTitle: job.title, applicant: app });
+                                                  setTimesheetHours(String(app.actualHours || app.scheduledHours || 8.0));
+                                                }}
+                                                className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-black uppercase tracking-wider border border-amber-600 cursor-pointer animate-pulse"
+                                              >
+                                                Verify Timesheet ({app.actualHours}h Submitted)
+                                              </button>
+                                            ) : app.timesheetStatus === 'on_duty' ? (
+                                              <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-[11px] font-black uppercase border border-blue-300">
+                                                ● On Duty (Clocked In)
+                                              </span>
+                                            ) : (
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  setTimesheetModal({ jobId: job.id, jobTitle: job.title, applicant: app });
+                                                  setTimesheetHours(String(app.scheduledHours || 8.0));
+                                                }}
+                                                className="px-2.5 py-1 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold cursor-pointer"
+                                              >
+                                                Verify Timesheet
+                                              </button>
+                                            )}
+                                          </div>
+                                          <span className="text-[10px] text-slate-500">
                                             Decided: {app.decisionAt ? new Date(app.decisionAt).toLocaleDateString('en-MY') : 'Scheduled'}
                                           </span>
                                         </div>
@@ -1371,6 +1451,94 @@ export default function FacilityWorkspace() {
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* VERIFY TIMESHEET MODAL */}
+      {/* ========================================================================= */}
+      {timesheetModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-300 max-w-lg w-full p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <span className="text-[10px] font-black uppercase text-[color:var(--t-600)] block tracking-wider">
+                  Ward Timesheet Audit & Sign-off
+                </span>
+                <h3 className="text-base font-black text-slate-900">
+                  {timesheetModal.applicant.applicantName} ({timesheetModal.applicant.applicantRole})
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setTimesheetModal(null)}
+                className="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="bg-slate-50 p-3 border border-slate-200 text-xs space-y-1">
+              <div>Shift Position: <strong className="text-slate-800">{timesheetModal.jobTitle}</strong></div>
+              <div>Registration No: <strong className="font-mono text-slate-800">{timesheetModal.applicant.applicantLicense || 'MMC/LJM'}</strong></div>
+              <div>Base Rate: <strong className="text-[color:var(--t-700)]">RM {timesheetModal.applicant.applicantRate || 80} / hour</strong></div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-slate-700 block">
+                  Actual Verified Shift Hours
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="1"
+                    max="24"
+                    value={timesheetHours}
+                    onChange={e => setTimesheetHours(e.target.value)}
+                    className="border border-[color:var(--t-200)] px-3 py-2 text-sm w-32 font-mono font-bold rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  />
+                  <span className="text-xs text-slate-500 font-semibold">hours worked</span>
+                </div>
+                <div className="text-xs text-emerald-700 font-bold mt-1">
+                  Calculated Payout: RM {((Number(timesheetHours) || 8) * (timesheetModal.applicant.applicantRate || 80)).toFixed(2)}
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-slate-700 block">
+                  Supervisor Sign-off Notes / Ward Verification
+                </label>
+                <textarea
+                  rows={3}
+                  value={timesheetNotes}
+                  onChange={e => setTimesheetNotes(e.target.value)}
+                  placeholder="Enter clinical ward sign-off notes (e.g., Completed emergency resuscitation shift; 1.5h OT approved)..."
+                  className="w-full border border-[color:var(--t-200)] p-3 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setTimesheetModal(null)}
+                className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleApproveTimesheet}
+                disabled={timesheetSubmitting}
+                className="px-5 py-2 text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-700 cursor-pointer shadow-xs flex items-center gap-1.5"
+              >
+                <CheckCircle2 className="h-4 w-4" />
+                {timesheetSubmitting ? 'Approving…' : 'Approve & Sign Off Timesheet'}
+              </button>
+            </div>
           </div>
         </div>
       )}

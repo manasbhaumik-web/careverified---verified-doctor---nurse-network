@@ -105,6 +105,19 @@ CREATE INDEX IF NOT EXISTS idx_job_app_user ON job_applications(applicant_user_i
 `);
 
 try { db.exec("ALTER TABLE job_applications ADD COLUMN decision_by TEXT"); } catch { /* column already exists */ }
+for (const col of [
+  "clock_in_at TEXT",
+  "clock_out_at TEXT",
+  "scheduled_hours REAL",
+  "actual_hours REAL",
+  "timesheet_status TEXT NOT NULL DEFAULT 'unstarted'",
+  "supervisor_notes TEXT",
+  "approved_by TEXT",
+  "approved_at TEXT",
+  "total_payout_myr REAL"
+]) {
+  try { db.exec(`ALTER TABLE job_applications ADD COLUMN ${col}`); } catch { /* column already exists */ }
+}
 
 // ---- Migration: allow the 'pharmacy' and 'facility' roles. ----
 {

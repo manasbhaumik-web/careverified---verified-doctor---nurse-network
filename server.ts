@@ -1465,6 +1465,15 @@ app.get("/api/facility/jobs", requireRole("facility", "admin"), (req, res) => {
         decisionAt: a.decision_at,
         decisionBy: a.decision_by,
         decisionNotes: a.decision_note,
+        clockInAt: a.clock_in_at,
+        clockOutAt: a.clock_out_at,
+        scheduledHours: a.scheduled_hours || 8.0,
+        actualHours: a.actual_hours,
+        timesheetStatus: a.timesheet_status || "unstarted",
+        supervisorNotes: a.supervisor_notes,
+        approvedBy: a.approved_by,
+        approvedAt: a.approved_at,
+        totalPayoutMyr: a.total_payout_myr,
       };
     });
 
@@ -1545,6 +1554,89 @@ app.post("/api/facility/jobs/:jobId/applicants/:applicantUserId/decision", requi
       : "Application declined.",
     data: { jobId, applicantUserId, status: decision, decisionAt: now }
   });
+});
+
+// Facility supervisor timesheet approval
+app.post("/api/facility/jobs/:jobId/applicants/:applicantUserId/timesheet/approve", requireRole("facility", "admin"), (req, res) => {
+  const { jobId, applicantUserId } = req.params;
+  const { actualHours, supervisorNotes } = req.body;
+
+  const job = jobs.find(j => j.id === jobId);
+  if (!job) return fail(res, 404, "Job post not found.");
+
+  if (req.user!.role !== "admin") {
+    const myFacId = req.user!.facilityId || req.user!.profileId;
+    if (job.facilityId && job.facilityId !== myFacId) {
+      return fail(res, 403, "You can only approve timesheets for your own facility.");
+    }
+  }
+
+  const appRow = db.prepare("SELECT * FROM job_applications WHERE job_id = ? AND applicant_user_id = ?").get(jobId, applicantUserId) as any;
+  if (!appRow) return fail(res, 404, "Applicant shift record not found.");
+
+  const hours = Number(actualHours) > 0 ? Number(actualHours) : (appRow.actual_hours || appRow.scheduled_hours || 8.0);
+  const rate = Number(appRow.hourly_rate) > 0 ? Number(appRow.hourly_rate) : 80.0;
+  const totalPayout = Math.round(hours * rate * 100) / 100;
+  const now = new Date().toISOString();
+
+  db.prepare(`
+    UPDATE job_applications
+    SET actual_hours = ?, timesheet_status = 'approved', supervisor_notes = ?, approved_by = ?, approved_at = ?, total_payout_myr = ?
+    WHERE id = ?
+  `).run(hours, supervisorNotes || "Clinical shift hours verified by ward supervisor.", req.user!.id, now, totalPayout, appRow.id);
+
+  notify(
+    applicantUserId,
+    "Timesheet Approved",
+    `Your timesheet for ${job.title} (${hours} hours @ RM ${rate}/hr) has been approved by ${job.hospitalName}. Payout: RM ${totalPayout.toFixed(2)}.`
+  );
+
+  audit(req, "facility.timesheet.approve", {
+    target: ["job_application", appRow.id],
+    details: { jobId, applicantUserId, hours, totalPayout }
+  });
+
+  res.json({
+    status: "success",
+    message: `Timesheet approved for ${hours} hours. Total payout calculated at RM ${totalPayout.toFixed(2)}.`,
+    data: {
+      id: appRow.id,
+      actualHours: hours,
+      timesheetStatus: "approved",
+      totalPayoutMyr: totalPayout,
+      approvedAt: now,
+    }
+  });
+});
+
+// Practitioner shift clock-in / clock-out
+app.post("/api/practitioner/shifts/:jobId/clock-in", requireRole("practitioner"), (req, res) => {
+  const { jobId } = req.params;
+  const userId = req.user!.id;
+  const appRow = db.prepare("SELECT * FROM job_applications WHERE job_id = ? AND applicant_user_id = ? AND status = 'accepted'").get(jobId, userId) as any;
+  if (!appRow) return fail(res, 404, "Active accepted shift not found for this practitioner.");
+
+  const now = new Date().toISOString();
+  db.prepare("UPDATE job_applications SET clock_in_at = ?, timesheet_status = 'on_duty' WHERE id = ?").run(now, appRow.id);
+  audit(req, "practitioner.shift.clock_in", { target: ["job_application", appRow.id], details: { jobId } });
+  res.json({ status: "success", message: "Clock-in recorded. Have a safe and focused shift!", data: { clockInAt: now, timesheetStatus: "on_duty" } });
+});
+
+app.post("/api/practitioner/shifts/:jobId/clock-out", requireRole("practitioner"), (req, res) => {
+  const { jobId } = req.params;
+  const userId = req.user!.id;
+  const appRow = db.prepare("SELECT * FROM job_applications WHERE job_id = ? AND applicant_user_id = ? AND status = 'accepted'").get(jobId, userId) as any;
+  if (!appRow) return fail(res, 404, "Active accepted shift not found.");
+
+  const now = new Date().toISOString();
+  let hours = 8.0;
+  if (appRow.clock_in_at) {
+    const diffMs = new Date(now).getTime() - new Date(appRow.clock_in_at).getTime();
+    hours = Math.max(1, Math.round((diffMs / 3600000) * 10) / 10);
+  }
+  db.prepare("UPDATE job_applications SET clock_out_at = ?, actual_hours = ?, timesheet_status = 'submitted' WHERE id = ?").run(now, hours, appRow.id);
+  audit(req, "practitioner.shift.clock_out", { target: ["job_application", appRow.id], details: { jobId, hours } });
+  res.json({ status: "success", message: `Shift ended. ${hours} hours submitted to facility supervisor for approval.`, data: { clockOutAt: now, actualHours: hours, timesheetStatus: "submitted" } });
 });
 
 app.patch("/api/facility/jobs/:jobId/status", requireRole("facility", "admin"), (req, res) => {
