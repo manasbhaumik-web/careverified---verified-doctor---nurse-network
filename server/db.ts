@@ -114,10 +114,41 @@ for (const col of [
   "supervisor_notes TEXT",
   "approved_by TEXT",
   "approved_at TEXT",
-  "total_payout_myr REAL"
+  "total_payout_myr REAL",
 ]) {
   try { db.exec(`ALTER TABLE job_applications ADD COLUMN ${col}`); } catch { /* column already exists */ }
 }
+
+// ---- Phase 3: Facility Coordination Messages & Statutory Documents Vault ----
+db.exec(`
+CREATE TABLE IF NOT EXISTS facility_messages (
+  id TEXT PRIMARY KEY,
+  job_id TEXT NOT NULL,
+  applicant_user_id TEXT NOT NULL,
+  sender_user_id TEXT NOT NULL,
+  sender_role TEXT NOT NULL,
+  sender_name TEXT NOT NULL,
+  message TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_fac_msg_thread ON facility_messages(job_id, applicant_user_id);
+
+CREATE TABLE IF NOT EXISTS facility_documents (
+  id TEXT PRIMARY KEY,
+  facility_id TEXT NOT NULL,
+  doc_type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  reference_no TEXT,
+  issuer TEXT,
+  valid_from TEXT,
+  valid_until TEXT,
+  file_url TEXT,
+  status TEXT NOT NULL DEFAULT 'verified',
+  verified_by TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_fac_doc_facility ON facility_documents(facility_id);
+`);
 
 // ---- Migration: allow the 'pharmacy' and 'facility' roles. ----
 {

@@ -1699,6 +1699,214 @@ app.get("/api/facility/cases", requireRole("facility", "admin"), (req, res) => {
 });
 
 // -------------------------------------------------------------
+// Phase 3: Facility Coordination Chat (Facility <-> Practitioner)
+// -------------------------------------------------------------
+app.get("/api/facility/jobs/:jobId/applicants/:applicantUserId/messages", requireRole("facility", "admin", "practitioner"), (req, res) => {
+  const { jobId, applicantUserId } = req.params;
+  const user = req.user!;
+
+  if (user.role === "practitioner" && user.id !== applicantUserId) {
+    return fail(res, 403, "You can only view your own coordination messages.");
+  }
+
+  const messages = db.prepare(
+    "SELECT * FROM facility_messages WHERE job_id = ? AND applicant_user_id = ? ORDER BY created_at ASC"
+  ).all(jobId, applicantUserId) as any[];
+
+  res.json({
+    status: "success",
+    data: messages.map(m => ({
+      id: m.id,
+      jobId: m.job_id,
+      applicantUserId: m.applicant_user_id,
+      senderUserId: m.sender_user_id,
+      senderRole: m.sender_role,
+      senderName: m.sender_name,
+      message: m.message,
+      createdAt: m.created_at,
+      mine: m.sender_user_id === user.id,
+    }))
+  });
+});
+
+app.post("/api/facility/jobs/:jobId/applicants/:applicantUserId/messages", requireRole("facility", "admin", "practitioner"), (req, res) => {
+  const { jobId, applicantUserId } = req.params;
+  const user = req.user!;
+  const message = str(req.body.message, 1000);
+
+  if (!message || message.length < 2) {
+    return fail(res, 400, "Please enter a valid message.");
+  }
+
+  if (user.role === "practitioner" && user.id !== applicantUserId) {
+    return fail(res, 403, "You can only message about your own shift application.");
+  }
+
+  const job = jobs.find(j => j.id === jobId);
+  if (!job) return fail(res, 404, "Shift not found.");
+
+  const msgId = generateId("fmsg");
+  const now = new Date().toISOString();
+
+  db.prepare(`
+    INSERT INTO facility_messages (id, job_id, applicant_user_id, sender_user_id, sender_role, sender_name, message, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(msgId, jobId, applicantUserId, user.id, user.role, user.name, message, now);
+
+  // Notify recipient
+  const recipientUserId = user.id === applicantUserId
+    ? (db.prepare("SELECT user_id FROM tourism_facility_staff WHERE facility_id = ?").get(job.facilityId || "fac-demo-1") as any)?.user_id
+    : applicantUserId;
+
+  if (recipientUserId) {
+    notify(
+      recipientUserId,
+      `Shift Coordination: ${job.title}`,
+      `${user.name}: ${message.slice(0, 100)}`
+    );
+  }
+
+  audit(req, "facility.message.send", { target: ["facility_message", msgId], details: { jobId, applicantUserId } });
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      id: msgId,
+      jobId,
+      applicantUserId,
+      senderUserId: user.id,
+      senderRole: user.role,
+      senderName: user.name,
+      message,
+      createdAt: now,
+      mine: true,
+    }
+  });
+});
+
+// -------------------------------------------------------------
+// Phase 3: Statutory Document Audit Vault (Act 586 / MSQH / Bomba)
+// -------------------------------------------------------------
+app.get("/api/facility/documents", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const docs = db.prepare("SELECT * FROM facility_documents WHERE facility_id = ? ORDER BY created_at DESC").all(facilityId) as any[];
+
+  // Seed default statutory licences if vault is empty for demo facility
+  if (docs.length === 0 && facilityId === "fac-demo-1") {
+    const defaultDocs = [
+      {
+        id: "fdoc-act586",
+        facility_id: "fac-demo-1",
+        doc_type: "act586_licence",
+        title: "KKM Private Hospital Licence (Form B)",
+        reference_no: "KKM-BPP/B/0042/1998",
+        issuer: "Ministry of Health Malaysia (CKAPS)",
+        valid_from: "2024-01-01",
+        valid_until: "2029-12-31",
+        file_url: "/docs/kkm_act586_form_b.pdf",
+        status: "verified",
+        verified_by: "usr-demo-admin",
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: "fdoc-msqh",
+        facility_id: "fac-demo-1",
+        doc_type: "accreditation",
+        title: "MSQH 6th Edition Hospital Accreditation",
+        reference_no: "MSQH-H-2024-089",
+        issuer: "Malaysian Society for Quality in Health",
+        valid_from: "2024-01-10",
+        valid_until: "2029-12-31",
+        file_url: "/docs/msqh_accreditation_cert.pdf",
+        status: "verified",
+        verified_by: "usr-demo-admin",
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: "fdoc-bomba",
+        facility_id: "fac-demo-1",
+        doc_type: "fire_safety",
+        title: "Jabatan Bomba dan Penyelamat Fire Safety Certificate",
+        reference_no: "JBPM/KL/FC-2024-5112",
+        issuer: "Jabatan Bomba dan Penyelamat Malaysia",
+        valid_from: "2024-06-01",
+        valid_until: "2027-05-31",
+        file_url: "/docs/bomba_fire_clearance.pdf",
+        status: "verified",
+        verified_by: "usr-demo-admin",
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: "fdoc-radiation",
+        facility_id: "fac-demo-1",
+        doc_type: "radiation_licence",
+        title: "Atomic Energy Licensing Board (AELB) Class L Licence",
+        reference_no: "AELB/MED/R-8812-2024",
+        issuer: "Jabatan Tenaga Atom / AELB",
+        valid_from: "2024-03-15",
+        valid_until: "2028-03-14",
+        file_url: "/docs/aelb_radiation_licence.pdf",
+        status: "verified",
+        verified_by: "usr-demo-admin",
+        created_at: new Date().toISOString(),
+      }
+    ];
+
+    const insDoc = db.prepare(`
+      INSERT OR IGNORE INTO facility_documents (id, facility_id, doc_type, title, reference_no, issuer, valid_from, valid_until, file_url, status, verified_by, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    for (const d of defaultDocs) {
+      insDoc.run(d.id, d.facility_id, d.doc_type, d.title, d.reference_no, d.issuer, d.valid_from, d.valid_until, d.file_url, d.status, d.verified_by, d.created_at);
+    }
+    return res.json({ status: "success", data: defaultDocs });
+  }
+
+  res.json({
+    status: "success",
+    data: docs.map(d => ({
+      id: d.id,
+      facilityId: d.facility_id,
+      docType: d.doc_type,
+      title: d.title,
+      referenceNo: d.reference_no,
+      issuer: d.issuer,
+      validFrom: d.valid_from,
+      validUntil: d.valid_until,
+      fileUrl: d.file_url,
+      status: d.status,
+      verifiedBy: d.verified_by,
+      createdAt: d.created_at,
+    }))
+  });
+});
+
+app.post("/api/facility/documents", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const { docType, title, referenceNo, issuer, validFrom, validUntil } = req.body;
+
+  if (!title || !docType) {
+    return fail(res, 400, "Document title and category are required.");
+  }
+
+  const docId = generateId("fdoc");
+  const now = new Date().toISOString();
+
+  db.prepare(`
+    INSERT INTO facility_documents (id, facility_id, doc_type, title, reference_no, issuer, valid_from, valid_until, file_url, status, verified_by, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'verified', ?, ?)
+  `).run(docId, facilityId, str(docType, 40), str(title, 120), str(referenceNo, 80) || null, str(issuer, 120) || null, validFrom || null, validUntil || null, null, req.user!.id, now);
+
+  audit(req, "facility.document.upload", { target: ["facility_document", docId], details: { title, referenceNo } });
+
+  res.status(201).json({
+    status: "success",
+    message: "Statutory document logged into the KKM Act 586 audit vault.",
+    data: { id: docId, title, referenceNo, docType }
+  });
+});
+
+// -------------------------------------------------------------
 // Reviews
 // -------------------------------------------------------------
 app.get("/api/reviews", (req, res) => {

@@ -2,13 +2,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   Building2, Calendar, Users, Award, ShieldCheck, CheckCircle2, XCircle, Clock, Plus,
   Search, Filter, AlertCircle, FileText, Send, Phone, Mail, MapPin, ExternalLink,
-  RefreshCw, ChevronDown, ChevronUp, UserCheck, Stethoscope, AlertTriangle, Check
+  RefreshCw, ChevronDown, ChevronUp, UserCheck, Stethoscope, AlertTriangle, Check,
+  MessageSquare, FileCheck, Lock
 } from 'lucide-react';
 import DashboardHeader, {
   BannerRow, BannerIdentity, BannerBadge, BannerKpis, DashboardTab, bannerPrimaryBtn
 } from './DashboardHeader';
 
-type Tab = 'shifts' | 'locums' | 'cases' | 'profile';
+type Tab = 'shifts' | 'locums' | 'cases' | 'vault' | 'profile';
 
 interface FacilityProfile {
   id: string;
@@ -134,6 +135,33 @@ interface PatientCase {
   createdAt?: string;
 }
 
+interface FacilityDocument {
+  id: string;
+  facilityId: string;
+  docType: string;
+  title: string;
+  referenceNo: string | null;
+  issuer: string | null;
+  validFrom: string | null;
+  validUntil: string | null;
+  fileUrl: string | null;
+  status: string;
+  verifiedBy: string | null;
+  createdAt: string;
+}
+
+interface FacilityMessage {
+  id: string;
+  jobId: string;
+  applicantUserId: string;
+  senderUserId: string;
+  senderRole: string;
+  senderName: string;
+  message: string;
+  createdAt: string;
+  mine: boolean;
+}
+
 export default function FacilityWorkspace() {
   const [tab, setTab] = useState<Tab>('shifts');
   const [loading, setLoading] = useState(true);
@@ -142,6 +170,29 @@ export default function FacilityWorkspace() {
   const [stats, setStats] = useState<FacilityStats>({
     activeVacancies: 0, pendingApplicants: 0, acceptedLocums: 0, patientCases: 0,
   });
+
+  // Statutory Documents Vault state
+  const [documents, setDocuments] = useState<FacilityDocument[]>([]);
+  const [showAddDocModal, setShowAddDocModal] = useState(false);
+  const [newDocTitle, setNewDocTitle] = useState('');
+  const [newDocType, setNewDocType] = useState('act586_licence');
+  const [newDocRef, setNewDocRef] = useState('');
+  const [newDocIssuer, setNewDocIssuer] = useState('Ministry of Health Malaysia (CKAPS)');
+  const [newDocValidUntil, setNewDocValidUntil] = useState('2029-12-31');
+  const [docSubmitting, setDocSubmitting] = useState(false);
+
+  // Coordination Chat Modal state
+  const [chatModal, setChatModal] = useState<{
+    jobId: string;
+    jobTitle: string;
+    applicantUserId: string;
+    applicantName: string;
+    applicantRole: string;
+  } | null>(null);
+  const [chatMessages, setChatMessages] = useState<FacilityMessage[]>([]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatSending, setChatSending] = useState(false);
 
   // Shifts state
   const [jobs, setJobs] = useState<FacilityJob[]>([]);
@@ -227,6 +278,13 @@ export default function FacilityWorkspace() {
       const casesData = await casesRes.json();
       if (casesData.status === 'success') {
         setCases(casesData.data);
+      }
+
+      // Fetch statutory documents vault
+      const docsRes = await fetch('/api/facility/documents');
+      const docsData = await docsRes.json();
+      if (docsData.status === 'success') {
+        setDocuments(docsData.data);
       }
     } catch {
       setError('Server communication error. Please try again.');
@@ -401,10 +459,90 @@ export default function FacilityWorkspace() {
     }
   };
 
+  // Handle Chat with Practitioner
+  const handleOpenChat = async (jobId: string, jobTitle: string, app: Application) => {
+    setChatModal({
+      jobId,
+      jobTitle,
+      applicantUserId: app.userId,
+      applicantName: app.applicantName,
+      applicantRole: app.applicantRole,
+    });
+    setChatLoading(true);
+    try {
+      const res = await fetch(`/api/facility/jobs/${jobId}/applicants/${app.userId}/messages`);
+      const data = await res.json();
+      if (data.status === 'success') {
+        setChatMessages(data.data);
+      }
+    } catch {
+      console.error('Failed to load messages');
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const handleSendChatMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatModal || !chatInput.trim()) return;
+    setChatSending(true);
+    try {
+      const res = await fetch(`/api/facility/jobs/${chatModal.jobId}/applicants/${chatModal.applicantUserId}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: chatInput.trim() }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setChatMessages(prev => [...prev, data.data]);
+        setChatInput('');
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Failed to send message.' });
+    } finally {
+      setChatSending(false);
+    }
+  };
+
+  // Handle Add Document to Vault
+  const handleAddDocument = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newDocTitle.trim()) return;
+    setDocSubmitting(true);
+    try {
+      const res = await fetch('/api/facility/documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          docType: newDocType,
+          title: newDocTitle.trim(),
+          referenceNo: newDocRef.trim() || undefined,
+          issuer: newDocIssuer.trim() || undefined,
+          validUntil: newDocValidUntil || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: `Statutory certificate "${newDocTitle}" successfully logged to audit vault!` });
+        setShowAddDocModal(false);
+        setNewDocTitle('');
+        setNewDocRef('');
+        loadFacilityData();
+      } else {
+        setNotificationMsg({ type: 'error', text: data.message || 'Could not log document.' });
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    } finally {
+      setDocSubmitting(false);
+    }
+  };
+
   const tabs: DashboardTab<Tab>[] = [
     { id: 'shifts', label: 'Shift Vacancies & Applicants', icon: Calendar, count: stats.pendingApplicants },
     { id: 'locums', label: 'Verified Locum Roster', icon: Users, count: locums.length },
     { id: 'cases', label: 'Patient Referrals & Quotes', icon: FileText, count: stats.patientCases },
+    { id: 'vault', label: 'Act 586 Statutory Vault', icon: FileCheck, count: documents.length },
     { id: 'profile', label: 'Facility Licence & Standards', icon: ShieldCheck },
   ];
 
@@ -807,9 +945,19 @@ export default function FacilityWorkspace() {
                                               </button>
                                             )}
                                           </div>
-                                          <span className="text-[10px] text-slate-500">
-                                            Decided: {app.decisionAt ? new Date(app.decisionAt).toLocaleDateString('en-MY') : 'Scheduled'}
-                                          </span>
+                                          <div className="flex items-center gap-2">
+                                            <button
+                                              type="button"
+                                              onClick={() => handleOpenChat(job.id, job.title, app)}
+                                              className="px-2 py-0.5 bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] text-[color:var(--t-700)] text-[11px] font-black uppercase border border-[color:var(--t-200)] flex items-center gap-1 cursor-pointer"
+                                            >
+                                              <MessageSquare className="h-3 w-3" />
+                                              Shift Chat
+                                            </button>
+                                            <span className="text-[10px] text-slate-500">
+                                              Decided: {app.decisionAt ? new Date(app.decisionAt).toLocaleDateString('en-MY') : 'Scheduled'}
+                                            </span>
+                                          </div>
                                         </div>
                                       ) : (
                                         <span className="px-2 py-0.5 bg-slate-200 text-slate-600 text-xs font-bold">
@@ -1031,7 +1179,85 @@ export default function FacilityWorkspace() {
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 4: FACILITY OPERATING LICENCE & ACCREDITATION STANDARDS */}
+        {/* TAB 4: ACT 586 STATUTORY AUDIT VAULT */}
+        {/* ========================================================================= */}
+        {tab === 'vault' && (
+          <div className="space-y-6">
+            <div className="bg-white border border-[color:var(--t-200)] p-5">
+              <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[color:var(--t-100)]">
+                <div>
+                  <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
+                    <FileCheck className="h-5 w-5 text-emerald-600" />
+                    KKM Act 586 Statutory Document & Audit Vault
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Verified digital repository for Form B/Form F licences, Bomba fire safety clearances, and radiation operating permits required under Malaysian law.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAddDocModal(true)}
+                  className="px-4 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <Plus className="h-4 w-4" />
+                  Log Statutory Certificate
+                </button>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {documents.map(doc => {
+                  const isExpired = doc.validUntil && doc.validUntil < new Date().toISOString().slice(0, 10);
+                  const isExpiringSoon = doc.validUntil && !isExpired && doc.validUntil <= new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10);
+
+                  return (
+                    <div
+                      key={doc.id}
+                      className="border border-[color:var(--t-200)] bg-slate-50/50 p-4 space-y-3 hover:border-[color:var(--t-400)] transition-all"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="space-y-1">
+                          <span className="px-2 py-0.5 bg-slate-200 text-slate-700 text-[10px] font-black uppercase tracking-wider">
+                            {doc.docType.replace('_', ' ')}
+                          </span>
+                          <h3 className="text-sm font-black text-slate-900 leading-snug">
+                            {doc.title}
+                          </h3>
+                        </div>
+                        <span className={`px-2 py-0.5 text-[10px] font-black uppercase border ${
+                          isExpired
+                            ? 'bg-rose-100 text-rose-800 border-rose-300'
+                            : isExpiringSoon
+                            ? 'bg-amber-100 text-amber-800 border-amber-300'
+                            : 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                        }`}>
+                          {isExpired ? 'Expired' : isExpiringSoon ? 'Expiring Soon' : 'Verified'}
+                        </span>
+                      </div>
+
+                      <div className="text-xs space-y-1 text-slate-600">
+                        {doc.referenceNo && <div>Ref File: <strong className="font-mono text-slate-800">{doc.referenceNo}</strong></div>}
+                        {doc.issuer && <div>Issuing Body: <span className="text-slate-800 font-semibold">{doc.issuer}</span></div>}
+                        {doc.validUntil && (
+                          <div>Validity: <strong className={isExpired ? 'text-rose-700 font-bold' : 'text-slate-800 font-bold'}>{doc.validUntil}</strong></div>
+                        )}
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+                        <span>Audited by: {doc.verifiedBy || 'KKM / CKAPS'}</span>
+                        <span className="text-[color:var(--t-700)] font-bold flex items-center gap-1 cursor-pointer hover:underline">
+                          <Lock className="h-3 w-3" /> Audit Sealed
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 5: FACILITY OPERATING LICENCE & ACCREDITATION STANDARDS */}
         {/* ========================================================================= */}
         {tab === 'profile' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1539,6 +1765,221 @@ export default function FacilityWorkspace() {
                 {timesheetSubmitting ? 'Approving…' : 'Approve & Sign Off Timesheet'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Coordination Chat Modal */}
+      {chatModal && (
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-[color:var(--t-300)] max-w-2xl w-full p-6 shadow-2xl rounded-none space-y-4 flex flex-col max-h-[90vh]">
+            <div className="flex items-start justify-between border-b border-slate-200 pb-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-[color:var(--t-600)]" />
+                  <h3 className="font-black text-slate-900 text-base">
+                    Shift Coordination & Logistics Chat
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500">
+                  Direct thread with <strong className="text-slate-800">{chatModal.applicantName}</strong> ({chatModal.applicantRole}) for <span className="font-semibold text-[color:var(--t-700)]">{chatModal.jobTitle}</span>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setChatModal(null)}
+                className="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="bg-sky-50 border border-sky-200 p-3 text-[11px] text-sky-900 flex items-start gap-2">
+              <Lock className="h-4 w-4 text-sky-600 shrink-0 mt-0.5" />
+              <div>
+                <strong>Act 586 Clinical Governance Notice:</strong> Use this operational channel for shift orientation, scrub sizes, reporting Sister/Ward In-Charge contact, and access security badges.
+              </div>
+            </div>
+
+            {/* Chat Thread Messages */}
+            <div className="flex-1 overflow-y-auto space-y-3 p-3 bg-slate-50 border border-slate-200 min-h-[260px] max-h-[380px]">
+              {chatLoading ? (
+                <div className="flex items-center justify-center py-12 text-slate-400 text-xs gap-2">
+                  <RefreshCw className="h-4 w-4 animate-spin text-[color:var(--t-600)]" />
+                  Loading operational messages…
+                </div>
+              ) : chatMessages.length === 0 ? (
+                <div className="text-center py-12 text-slate-400 text-xs space-y-1">
+                  <MessageSquare className="h-8 w-8 mx-auto text-slate-300 mb-2" />
+                  <div className="font-bold text-slate-600">No shift coordination messages yet</div>
+                  <p>Send reporting instructions, unit contact, or duty roster details below.</p>
+                </div>
+              ) : (
+                chatMessages.map(msg => (
+                  <div
+                    key={msg.id}
+                    className={`flex flex-col ${msg.mine ? 'items-end' : 'items-start'}`}
+                  >
+                    <div className="text-[10px] text-slate-500 mb-1 font-semibold flex items-center gap-1.5">
+                      <span>{msg.senderName}</span>
+                      <span className="text-[9px] text-slate-400">
+                        {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    <div
+                      className={`p-3 text-xs max-w-[85%] rounded-none shadow-xs leading-relaxed ${
+                        msg.mine
+                          ? 'bg-[color:var(--t-900)] text-white border border-[color:var(--t-950)]'
+                          : 'bg-white text-slate-800 border border-slate-300'
+                      }`}
+                    >
+                      {msg.message}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Send Message Form */}
+            <form onSubmit={handleSendChatMessage} className="flex gap-2 pt-2 border-t border-slate-100">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={e => setChatInput(e.target.value)}
+                placeholder="Type shift instruction, reporting unit, scrub size confirmation…"
+                className="flex-1 border border-[color:var(--t-200)] px-3 py-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+              />
+              <button
+                type="submit"
+                disabled={chatSending || !chatInput.trim()}
+                className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-[color:var(--t-700)] hover:bg-[color:var(--t-800)] text-white border border-[color:var(--t-800)] cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+              >
+                <Send className="h-3.5 w-3.5" />
+                {chatSending ? 'Sending…' : 'Send'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Statutory Document Modal */}
+      {showAddDocModal && (
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-[color:var(--t-300)] max-w-lg w-full p-6 shadow-2xl rounded-none space-y-4">
+            <div className="flex items-start justify-between border-b border-slate-200 pb-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <FileCheck className="h-5 w-5 text-emerald-600" />
+                  <h3 className="font-black text-slate-900 text-base">
+                    Log Statutory Compliance Certificate
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500">
+                  Act 586 Statutory Vault · Required for healthcare facility operating validity
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddDocModal(false)}
+                className="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form onSubmit={handleAddDocument} className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-slate-700 block">
+                  Document / Licence Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. KKM Form B Hospital Operating Licence 2026-2028"
+                  value={newDocTitle}
+                  onChange={e => setNewDocTitle(e.target.value)}
+                  className="w-full border border-[color:var(--t-200)] px-3 py-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-black uppercase text-slate-700 block">
+                    Statutory Category
+                  </label>
+                  <select
+                    value={newDocType}
+                    onChange={e => setNewDocType(e.target.value)}
+                    className="w-full border border-[color:var(--t-200)] px-3 py-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  >
+                    <option value="act586_licence">KKM Act 586 Licence (Form B/F)</option>
+                    <option value="bomba_clearance">Bomba Fire Safety Certificate</option>
+                    <option value="aelb_radiation">AELB Radiation Safety Permit</option>
+                    <option value="msqh_accreditation">MSQH Quality Accreditation</option>
+                    <option value="waste_management">Clinical Biohazard Waste MOA</option>
+                    <option value="other">Other Regulatory Document</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-black uppercase text-slate-700 block">
+                    Reference / Gazette No
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. KKM/CKAPS/B-1029"
+                    value={newDocRef}
+                    onChange={e => setNewDocRef(e.target.value)}
+                    className="w-full border border-[color:var(--t-200)] px-3 py-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)] font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-black uppercase text-slate-700 block">
+                    Issuing Authority
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Ministry of Health Malaysia (CKAPS)"
+                    value={newDocIssuer}
+                    onChange={e => setNewDocIssuer(e.target.value)}
+                    className="w-full border border-[color:var(--t-200)] px-3 py-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-black uppercase text-slate-700 block">
+                    Valid Until / Expiry Date
+                  </label>
+                  <input
+                    type="date"
+                    value={newDocValidUntil}
+                    onChange={e => setNewDocValidUntil(e.target.value)}
+                    className="w-full border border-[color:var(--t-200)] px-3 py-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)] font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowAddDocModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={docSubmitting || !newDocTitle.trim()}
+                  className="px-5 py-2 text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-700 cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  <FileCheck className="h-4 w-4" />
+                  {docSubmitting ? 'Logging…' : 'Log Document & Verify Compliance'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
