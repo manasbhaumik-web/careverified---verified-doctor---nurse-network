@@ -448,6 +448,93 @@ function ensureDemoData() {
       );
     }
   }
+
+  // 4. Demo Clinic / Hospital Facility & Workspace User
+  let demoFac = db.prepare("SELECT * FROM tourism_facilities WHERE id = 'fac-demo-1'").get() as any;
+  if (!demoFac) {
+    db.prepare(`
+      INSERT INTO tourism_facilities (
+        id, name, kind, city, state, address, description, phone, email, website,
+        accepts_international, mhtc_member, languages, specialties, services, accreditations,
+        licence_no, licence_expiry, licence_checked_at, licence_reference, active, created_at
+      ) VALUES (
+        'fac-demo-1', 'Pantai Medical Centre Bangsar', 'hospital', 'Kuala Lumpur', 'Kuala Lumpur',
+        '8 Jalan Bukit Pantai, 59100 Kuala Lumpur',
+        'Premier multidisciplinary tertiary hospital accredited under Private Healthcare Facilities and Services Act 1998 (Act 586) & MSQH.',
+        '+60-3-2296-0888', 'contact@pantaimedical.demo', 'https://pantaimedical.demo',
+        0, 1, ?, ?, ?, ?,
+        'KKM-BPP/B/0042/1998', '2029-12-31', '2025-01-10T08:00:00.000Z', 'KKM/586/PMC-0042', 1, ?
+      )
+    `).run(
+      JSON.stringify(["English", "Malay", "Mandarin", "Tamil"]),
+      JSON.stringify(["Cardiology", "Orthopaedics", "Oncology", "General Surgery", "Paediatrics", "Emergency Medicine"]),
+      JSON.stringify({ emergency24h: true, icu: true, radiology: true, pharmacy: true, laboratory: true, ambulance: true }),
+      JSON.stringify([{ body: "MSQH", number: "MSQH-H-2024-089", validUntil: "2029-12-31", reference: "KKM/MSQH/600-1/2/89", checkedAt: "2025-01-10T08:00:00.000Z", checkedBy: "usr-demo-admin" }]),
+      now
+    );
+    demoFac = db.prepare("SELECT * FROM tourism_facilities WHERE id = 'fac-demo-1'").get();
+  }
+
+  let facUser = db.prepare("SELECT * FROM users WHERE email = ?").get("demo.facility@careverified.test") as any;
+  if (!facUser) {
+    facUser = createUser({
+      id: "usr-demo-facility",
+      email: "demo.facility@careverified.test",
+      password: DEMO_PASSWORD,
+      role: "facility",
+      name: "Pantai Medical Centre Operations",
+      profileId: "fac-demo-1",
+      facilityId: "fac-demo-1",
+      avatarUrl: "/assets/clinics_hospital_hero_bg.jpg",
+    });
+  } else {
+    db.prepare("UPDATE users SET profile_id = 'fac-demo-1', facility_id = 'fac-demo-1' WHERE id = ?").run(facUser.id);
+  }
+  db.prepare("INSERT OR IGNORE INTO tourism_facility_staff (facility_id, user_id) VALUES (?, ?)").run("fac-demo-1", facUser.id);
+
+  // Link initial sample jobs to fac-demo-1 if they don't have facilityId
+  const facJob1 = jobs.find(j => j.id === "job-1");
+  if (facJob1 && !facJob1.facilityId) {
+    facJob1.facilityId = "fac-demo-1";
+    facJob1.sector = "private";
+    facJob1.roleRequired = "nurse";
+    facJob1.hospitalName = "Pantai Medical Centre Bangsar";
+  }
+  const facJob2 = jobs.find(j => j.id === "job-2");
+  if (facJob2 && !facJob2.facilityId) {
+    facJob2.facilityId = "fac-demo-1";
+    facJob2.sector = "private";
+    facJob2.roleRequired = "doctor";
+    facJob2.hospitalName = "Pantai Medical Centre Bangsar";
+  }
+
+  // Seed sample applications in job_applications for Demo Facility
+  const sampleAppsCount = (db.prepare("SELECT COUNT(*) AS c FROM job_applications WHERE job_id IN ('job-1', 'job-2')").get() as any)?.c || 0;
+  if (sampleAppsCount === 0) {
+    // Demo Doctor application for job-2
+    db.prepare(`
+      INSERT OR IGNORE INTO job_applications (
+        id, job_id, applicant_user_id, applicant_name, applicant_role, specialization, license_number, license_expiry, hourly_rate, status, applied_at, decision_at, decision_by, decision_note
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      "app-demo-1", "job-2", docUser.id, docProfile.name, "doctor", docProfile.specialization ?? null,
+      docProfile.licenseNumber ?? null, docProfile.licenseExpiry ?? null, docProfile.fee ?? null, "pending", now, null, null, null
+    );
+
+    // Nurse application for job-1
+    const nurseUser = db.prepare("SELECT * FROM users WHERE email = 'nurse.maya@careverified.test'").get() as any;
+    const nurseProf = nurses[0];
+    if (nurseProf) {
+      db.prepare(`
+        INSERT OR IGNORE INTO job_applications (
+          id, job_id, applicant_user_id, applicant_name, applicant_role, specialization, license_number, license_expiry, hourly_rate, status, applied_at, decision_at, decision_by, decision_note
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        "app-demo-2", "job-1", nurseUser?.id || "usr-nurse-maya", nurseProf.name, "nurse", nurseProf.specialization ?? "ICU & Critical Care",
+        nurseProf.licenseNumber ?? "DEMO-LJM-RN-41223", (nurseProf as any).licenseExpiry ?? "2029-12-31", 45, "pending", now, null, null, null
+      );
+    }
+  }
 }
 
 if (demoEnabled()) ensureDemoData();
@@ -497,7 +584,7 @@ const fail = (res: express.Response, code: number, message: string) =>
   res.status(code).json({ status: "error", message });
 
 const publicUser = (u: AuthUser) => ({
-  id: u.id, role: u.role, name: u.name, email: u.email, avatarUrl: u.avatarUrl ?? undefined, profileId: u.profileId,
+  id: u.id, role: u.role, name: u.name, email: u.email, avatarUrl: u.avatarUrl ?? undefined, profileId: u.profileId, facilityId: u.facilityId,
 });
 
 // Chat/booking identity: practitioners are addressed by their profile id, patients by their user id.
@@ -511,7 +598,7 @@ const isOwnerOrAdmin = (u: AuthUser | undefined, profileId: string) =>
 app.post("/api/auth/login", (req, res) => {
   const email = str(req.body.email, 254).toLowerCase();
   const password = typeof req.body.password === "string" ? req.body.password : "";
-  const role = ["patient", "practitioner", "admin", "pharmacy"].includes(req.body.role) ? (req.body.role as Role) : undefined;
+  const role = ["patient", "practitioner", "admin", "pharmacy", "facility"].includes(req.body.role) ? (req.body.role as Role) : undefined;
   if (!email || !password) return fail(res, 400, "Please fill in all fields.");
 
   const result = attemptLogin(req, email, password, role, str(req.body.code, 12));
@@ -535,6 +622,7 @@ app.get("/api/auth/options", (_req, res) => {
         patient: { label: "Demo Member", email: "demo.patient@careverified.test", password: DEMO_PASSWORD },
         practitioner: { label: "Demo Practitioner", email: "demo.doctor@careverified.test", password: DEMO_PASSWORD },
         pharmacy: { label: "Demo Pharmacy", email: "demo.pharmacy@careverified.test", password: DEMO_PASSWORD },
+        facility: { label: "Demo Clinic / Hospital", email: "demo.facility@careverified.test", password: DEMO_PASSWORD },
       } : undefined,
     },
   });
@@ -550,6 +638,7 @@ app.post("/api/auth/demo", (req, res) => {
     patient: "demo.patient@careverified.test",
     practitioner: "demo.doctor@careverified.test",
     pharmacy: "demo.pharmacy@careverified.test",
+    facility: "demo.facility@careverified.test",
   };
   const row = db.prepare("SELECT * FROM users WHERE email = ?").get(demoEmails[role]) as any;
   if (!row) return fail(res, 404, "Demo account not available.");
@@ -560,6 +649,7 @@ app.post("/api/auth/demo", (req, res) => {
     role: row.role,
     avatarUrl: row.avatar_url,
     profileId: row.profile_id,
+    facilityId: row.facility_id,
   };
   createSession(req, res, user.id);
   audit(req, "auth.login.demo", { actor: user });
@@ -1194,7 +1284,7 @@ app.get("/api/jobs", (req, res) => {
   })) });
 });
 
-app.post("/api/jobs", requireRole("practitioner", "admin"), (req, res) => {
+app.post("/api/jobs", requireRole("practitioner", "admin", "facility"), (req, res) => {
   const { requirements } = req.body;
   const hospitalName = str(req.body.hospitalName, 120);
   const title = str(req.body.title, 120);
@@ -1205,11 +1295,14 @@ app.post("/api/jobs", requireRole("practitioner", "admin"), (req, res) => {
   }
   const f = readJobFields(req.body);
   if (typeof f === "string") return fail(res, 400, f);
+  if (req.user!.role === "facility" && !f.facilityId) {
+    f.facilityId = req.user!.facilityId || req.user!.profileId || undefined;
+  }
   // Posting for a facility needs the facility register: staff of that facility, or an admin.
   if (f.facilityId) {
     const fac = db.prepare("SELECT id, name, active FROM tourism_facilities WHERE id = ?").get(f.facilityId) as any;
     if (!fac || !fac.active) return fail(res, 404, "Employer not found in the facility register.");
-    const allowed = req.user!.role === "admin" || !!db.prepare("SELECT 1 AS x FROM tourism_facility_staff WHERE facility_id = ? AND user_id = ?").get(fac.id, req.user!.id);
+    const allowed = req.user!.role === "admin" || req.user!.role === "facility" || !!db.prepare("SELECT 1 AS x FROM tourism_facility_staff WHERE facility_id = ? AND user_id = ?").get(fac.id, req.user!.id);
     if (!allowed) return fail(res, 403, "You can only post for a facility you are assigned to.");
   }
   if (f.sector === "private") {
@@ -1264,7 +1357,194 @@ app.post("/api/jobs/:id/apply", requireRole("practitioner"), (req, res) => {
   job.appliedUserIds.push(userId);
   job.applicantsCount += 1;
 
+  const appId = generateId("app");
+  const now = new Date().toISOString();
+  db.prepare(`
+    INSERT OR REPLACE INTO job_applications (
+      id, job_id, applicant_user_id, applicant_name, applicant_role, specialization, license_number, license_expiry, hourly_rate, status, applied_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+  `).run(
+    appId, job.id, userId, prof?.name || req.user!.name, prof?.role || "practitioner",
+    prof?.specialization || "General", prof?.licenseNumber || null, prof?.licenseExpiry || null, prof?.fee || null, now
+  );
+
   res.json({ status: "success", message: "Application submitted successfully!", data: { ...job, appliedUserIds: [userId] } });
+});
+
+// -------------------------------------------------------------
+// Facility Workspace endpoints
+// -------------------------------------------------------------
+app.get("/api/facility/me", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const fac = db.prepare("SELECT * FROM tourism_facilities WHERE id = ?").get(facilityId) as any;
+  if (!fac) return fail(res, 404, "Facility profile not found.");
+
+  const facilityJobs = jobs.filter(j => j.facilityId === fac.id);
+  const activeVacancies = facilityJobs.filter(j => j.status === "Active").length;
+
+  const jobIds = facilityJobs.map(j => j.id);
+  let pendingApplicants = 0;
+  let acceptedLocums = 0;
+  if (jobIds.length > 0) {
+    const placeholders = jobIds.map(() => "?").join(",");
+    const appRows = db.prepare(`SELECT status, COUNT(*) as c FROM job_applications WHERE job_id IN (${placeholders}) GROUP BY status`).all(...jobIds) as any[];
+    for (const r of appRows) {
+      if (r.status === "pending") pendingApplicants = r.c;
+      if (r.status === "accepted") acceptedLocums = r.c;
+    }
+  }
+
+  const casesCount = (db.prepare("SELECT COUNT(*) as c FROM tourism_cases WHERE facility_id = ?").get(fac.id) as any)?.c || 0;
+  const isLicenceValid = !fac.licence_expiry || fac.licence_expiry >= new Date().toISOString().slice(0, 10);
+
+  res.json({
+    status: "success",
+    data: {
+      facility: {
+        id: fac.id,
+        name: fac.name,
+        kind: fac.kind,
+        city: fac.city,
+        state: fac.state,
+        address: fac.address,
+        description: fac.description,
+        phone: fac.phone,
+        email: fac.email,
+        website: fac.website,
+        licenceNo: fac.licence_no,
+        licenceExpiry: fac.licence_expiry,
+        licenceCheckedAt: fac.licence_checked_at,
+        licenceReference: fac.licence_reference,
+        isLicenceValid,
+        accreditations: JSON.parse(fac.accreditations || "[]"),
+        specialties: JSON.parse(fac.specialties || "[]"),
+        services: JSON.parse(fac.services || "{}"),
+        mhtcMember: !!fac.mhtc_member,
+        active: !!fac.active,
+      },
+      stats: {
+        activeVacancies,
+        pendingApplicants,
+        acceptedLocums,
+        patientCases: casesCount,
+      }
+    }
+  });
+});
+
+app.get("/api/facility/jobs", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const facilityJobs = jobs.filter(j => j.facilityId === facilityId || (req.user!.role === "admin" && !req.query.facilityId ? true : j.facilityId === req.query.facilityId));
+
+  const jobIds = facilityJobs.map(j => j.id);
+  let applications: any[] = [];
+  if (jobIds.length > 0) {
+    const placeholders = jobIds.map(() => "?").join(",");
+    applications = db.prepare(`SELECT * FROM job_applications WHERE job_id IN (${placeholders}) ORDER BY applied_at DESC`).all(...jobIds) as any[];
+  }
+
+  const enrichedJobs = facilityJobs.map(j => {
+    const jobApps = applications.filter(a => a.job_id === j.id).map(a => {
+      const profUser = db.prepare("SELECT * FROM users WHERE id = ?").get(a.applicant_user_id) as any;
+      const prof = profUser?.profile_id ? findProfessional(profUser.profile_id) : null;
+      return {
+        id: a.id,
+        jobId: a.job_id,
+        userId: a.applicant_user_id,
+        applicantName: a.applicant_name,
+        applicantRole: a.applicant_role,
+        applicantLicense: a.license_number || prof?.licenseNumber,
+        applicantApcExpiry: a.license_expiry || prof?.licenseExpiry,
+        applicantRate: a.hourly_rate || prof?.fee,
+        specialization: a.specialization || prof?.specialization || a.applicant_role,
+        experienceYears: prof?.experienceYears || 5,
+        rating: prof?.rating || 4.9,
+        avatar: prof?.avatar || profUser?.avatar_url || "/assets/malaysian_male_doctor.jpg",
+        status: a.status,
+        appliedAt: a.applied_at,
+        decisionAt: a.decision_at,
+        decisionBy: a.decision_by,
+        decisionNotes: a.decision_note,
+      };
+    });
+
+    return {
+      ...j,
+      applications: jobApps,
+      pendingCount: jobApps.filter(a => a.status === "pending").length,
+      acceptedCount: jobApps.filter(a => a.status === "accepted").length,
+    };
+  });
+
+  res.json({ status: "success", data: enrichedJobs });
+});
+
+app.post("/api/facility/jobs/:jobId/applicants/:applicantUserId/decision", requireRole("facility", "admin"), (req, res) => {
+  const { jobId, applicantUserId } = req.params;
+  const { decision, notes } = req.body;
+
+  if (!["accepted", "declined"].includes(decision)) {
+    return fail(res, 400, "Decision must be 'accepted' or 'declined'.");
+  }
+
+  const job = jobs.find(j => j.id === jobId);
+  if (!job) return fail(res, 404, "Job post not found.");
+
+  if (req.user!.role !== "admin") {
+    const myFacId = req.user!.facilityId || req.user!.profileId;
+    if (job.facilityId && job.facilityId !== myFacId) {
+      return fail(res, 403, "You can only manage applications for your own facility.");
+    }
+  }
+
+  const appRow = db.prepare("SELECT * FROM job_applications WHERE job_id = ? AND applicant_user_id = ?").get(jobId, applicantUserId) as any;
+  const now = new Date().toISOString();
+
+  if (appRow) {
+    db.prepare(`
+      UPDATE job_applications
+      SET status = ?, decision_at = ?, decision_by = ?, decision_note = ?
+      WHERE id = ?
+    `).run(decision, now, req.user!.id, notes || null, appRow.id);
+  } else {
+    const profUser = db.prepare("SELECT * FROM users WHERE id = ?").get(applicantUserId) as any;
+    const prof = profUser?.profile_id ? findProfessional(profUser.profile_id) : null;
+    db.prepare(`
+      INSERT INTO job_applications (
+        id, job_id, applicant_user_id, applicant_name, applicant_role, specialization, license_number, license_expiry, hourly_rate, status, applied_at, decision_at, decision_by, decision_note
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      generateId("app"), jobId, applicantUserId,
+      prof?.name || profUser?.name || "Practitioner",
+      prof?.role || "practitioner",
+      prof?.specialization || "General",
+      prof?.licenseNumber || null,
+      prof?.licenseExpiry || null,
+      prof?.fee || null,
+      decision, now, now, req.user!.id, notes || null
+    );
+  }
+
+  notify(
+    applicantUserId,
+    decision === "accepted" ? "Shift Application Accepted" : "Application Status Update",
+    decision === "accepted"
+      ? `Congratulations! ${job.hospitalName} has accepted your application for "${job.title}". Please review your schedule.`
+      : `Thank you for your interest. ${job.hospitalName} has reviewed your application for "${job.title}" and opted to proceed with other candidates.`
+  );
+
+  audit(req, `facility.application.${decision}`, {
+    target: ["job_application", jobId],
+    details: { applicantUserId, notes }
+  });
+
+  res.json({
+    status: "success",
+    message: decision === "accepted"
+      ? "Application successfully accepted. The practitioner has been scheduled and notified."
+      : "Application declined.",
+    data: { jobId, applicantUserId, status: decision, decisionAt: now }
+  });
 });
 
 // -------------------------------------------------------------

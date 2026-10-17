@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS locum_profiles (
 
 export function registerJobsMy(app: Application, ctx: { findProfessional: (id: string) => any | undefined; allProfessionals: () => any[]; jobs: () => any[] }) {
   // Licensed employers a practitioner may post for: facilities they are staff of (admins: all active)
-  app.get("/api/jobs/employers", requireRole("practitioner", "admin"), (req, res) => {
+  app.get("/api/jobs/employers", requireRole("practitioner", "admin", "facility"), (req, res) => {
     const list = req.user!.role === "admin"
       ? rows("SELECT id, name, city, state, licence_expiry, licence_checked_at FROM tourism_facilities WHERE active = 1 ORDER BY name")
       : rows("SELECT f.id, f.name, f.city, f.state, f.licence_expiry, f.licence_checked_at FROM tourism_facilities f JOIN tourism_facility_staff s ON s.facility_id = f.id WHERE s.user_id = ? AND f.active = 1 ORDER BY f.name", req.user!.id);
@@ -181,8 +181,8 @@ export function registerJobsMy(app: Application, ctx: { findProfessional: (id: s
   });
 
   // Employers (facility staff, admins) browse available locums. Only verified practitioners with a current APC are listed.
-  const isEmployer = (req: Request) => req.user!.role === "admin" || !!row("SELECT 1 AS x FROM tourism_facility_staff WHERE user_id = ?", req.user!.id);
-  app.get("/api/locums", requireRole("practitioner", "admin"), (req, res) => {
+  const isEmployer = (req: Request) => req.user!.role === "admin" || req.user!.role === "facility" || !!row("SELECT 1 AS x FROM tourism_facility_staff WHERE user_id = ?", req.user!.id);
+  app.get("/api/locums", requireRole("practitioner", "admin", "facility"), (req, res) => {
     if (!isEmployer(req)) return fail(res, 403, "Only facility staff and admins can browse locums.");
     const state = str(req.query.state, 40), role = str(req.query.role, 10), specialty = str(req.query.specialty, 60).toLowerCase(), onDate = str(req.query.date, 10);
     const maxRate = req.query.maxRate ? Number(req.query.maxRate) : null;
@@ -195,7 +195,7 @@ export function registerJobsMy(app: Application, ctx: { findProfessional: (id: s
     res.json({ status: "success", data: list.map(({ l, p }) => view(l, p)) });
   });
 
-  app.post("/api/locums/:profileId/invite", requireRole("practitioner", "admin"), (req, res) => {
+  app.post("/api/locums/:profileId/invite", requireRole("practitioner", "admin", "facility"), (req, res) => {
     if (!isEmployer(req)) return fail(res, 403, "Only facility staff and admins can invite locums.");
     const l = row("SELECT * FROM locum_profiles WHERE profile_id = ? AND visible = 1", req.params.profileId);
     const p = l ? ctx.findProfessional(l.profile_id) : null;

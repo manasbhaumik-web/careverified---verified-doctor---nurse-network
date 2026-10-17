@@ -39,6 +39,10 @@ export default defineConfig(() => {
               return 'pharmacy-suite';
             }
 
+            if (id.includes('src/components/FacilityWorkspace') || id.includes('src/components/facility/')) {
+              return 'facility-suite';
+            }
+
             if (id.includes('src/components/PatientDashboard') || id.includes('src/components/patient/')) {
               return 'patient-suite';
             }

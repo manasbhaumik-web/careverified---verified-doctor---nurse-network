@@ -14,4 +14,4 @@ export function demoEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
 }
 
 /** Roles one-click demo sign-in may use. Admin is deliberately absent: it must sign in with its real password. */
-export const DEMO_ROLES = ["patient", "practitioner", "pharmacy"] as const;
+export const DEMO_ROLES = ["patient", "practitioner", "pharmacy", "facility"] as const;

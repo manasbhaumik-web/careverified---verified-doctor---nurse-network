@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { AlertCircle, ArrowLeft, ArrowRight, Building, Heart, PlusCircle, Pill, RefreshCw, Zap, ShieldCheck, Globe } from 'lucide-react';
+import { AlertCircle, ArrowLeft, ArrowRight, Building, Building2, Heart, PlusCircle, Pill, RefreshCw, Zap, ShieldCheck, Globe } from 'lucide-react';
 import ThemeSwitcher from './ThemeSwitcher';
 import LocaleSwitcher from './LocaleSwitcher';
 import Footer from './Footer';
@@ -19,6 +19,7 @@ const ROLE_ICONS: Record<PortalRole, React.ComponentType<{ className?: string }>
   patient: Heart,
   practitioner: PlusCircle,
   pharmacy: Pill,
+  facility: Building2,
   admin: Building,
 };
 
@@ -39,6 +40,7 @@ const COPY: Record<Lang, {
   signingIn: string;
   signInTo: (portal: string) => string;
   pharmacyNote: string;
+  facilityNote: string;
   needAccount: string;
   registerPatient: string;
   registerPractitioner: string;
@@ -57,6 +59,7 @@ const COPY: Record<Lang, {
       patient: { label: 'Patient / Member', desc: 'MyKad & Passport intake, consults & e-Rx', portal: 'Member Portal', who: 'a Patient / Member' },
       practitioner: { label: 'Practitioner', desc: 'MMC / LJM verification & clinical shifts', portal: 'Practitioner Hub', who: 'a Practitioner' },
       pharmacy: { label: 'Pharmacy', desc: 'QR e-prescription inbox & dispensing logs', portal: 'Pharmacy Workspace', who: 'a Pharmacy' },
+      facility: { label: 'Clinic / Hospital', desc: 'Act 586 facility, shifts, locums & quotes', portal: 'Facility Workspace', who: 'a Clinic or Hospital Staff' },
       admin: { label: 'Board Admin', desc: 'Licence audit & platform governance', portal: 'Board Admin Console', who: 'a Board Admin' },
     },
     signInAs: who => `Sign in as ${who}`,
@@ -68,6 +71,7 @@ const COPY: Record<Lang, {
     signingIn: 'Signing in…',
     signInTo: portal => `Sign in to ${portal}`,
     pharmacyNote: 'Pharmacy accounts are provisioned after LFM & Poison Licence verification. Visit /for-pharmacies or contact the board to onboard.',
+    facilityNote: 'Private healthcare facilities are verified under Private Healthcare Facilities and Services Act 1998 (Act 586). Contact the medical board to onboard your facility.',
     needAccount: 'Need a new account?',
     registerPatient: 'Register as a New Patient (MyKad or Passport)',
     registerPractitioner: 'Create a Practitioner Account (MMC / LJM)',
@@ -86,6 +90,7 @@ const COPY: Record<Lang, {
       patient: { label: 'Pesakit / Ahli', desc: 'Pendaftaran MyKad & Pasport, konsultasi & e-Rx', portal: 'Portal Ahli', who: 'Pesakit / Ahli' },
       practitioner: { label: 'Pengamal Perubatan', desc: 'Pengesahan MMC / LJM & syif klinikal', portal: 'Hab Pengamal', who: 'Pengamal Perubatan' },
       pharmacy: { label: 'Farmasi', desc: 'Peti masuk e-preskripsi QR & rekod dispens', portal: 'Ruang Kerja Farmasi', who: 'Farmasi' },
+      facility: { label: 'Klinik / Hospital', desc: 'Fasiliti Akta 586, syif, lokum & sebut harga', portal: 'Ruang Kerja Fasiliti', who: 'Staf Klinik / Hospital' },
       admin: { label: 'Pentadbir Lembaga', desc: 'Audit lesen & tadbir urus platform', portal: 'Konsol Pentadbir', who: 'Pentadbir Lembaga' },
     },
     signInAs: who => `Log masuk sebagai ${who}`,
@@ -97,6 +102,7 @@ const COPY: Record<Lang, {
     signingIn: 'Sedang log masuk…',
     signInTo: portal => `Log masuk ke ${portal}`,
     pharmacyNote: 'Akaun farmasi disediakan selepas semakan lesen LFM & Lesen Racun. Layari /for-pharmacies atau hubungi lembaga.',
+    facilityNote: 'Fasiliti penjagaan kesihatan swasta disahkan di bawah Akta Kemudahan dan Perkhidmatan Jagaan Kesihatan Swasta 1998 (Akta 586). Hubungi lembaga perubatan untuk menyertai.',
     needAccount: 'Perlukan akaun baharu?',
     registerPatient: 'Daftar sebagai Pesakit Baharu (MyKad atau Pasport)',
     registerPractitioner: 'Cipta Akaun Pengamal Perubatan (MMC / LJM)',
@@ -115,6 +121,7 @@ const COPY: Record<Lang, {
       patient: { label: '患者 / 会员', desc: '支持 MyKad 与国际护照、问诊及电子处方', portal: '患者会员中心', who: '患者 / 会员' },
       practitioner: { label: '执业医护人员', desc: 'MMC / LJM 执照核验与临床排班', portal: '医护工作台', who: '执业医护人员' },
       pharmacy: { label: '社区药房', desc: '二维码电子处方核验与调配记录', portal: '药房工作台', who: '认证药房' },
+      facility: { label: '诊所 / 医院机构', desc: '586法令合规、班次排班、临时医护与报价', portal: '医疗机构工作台', who: '诊所或医院管理人员' },
       admin: { label: '委员会管理员', desc: '法定执照审核与平台合规管理', portal: '管理控制台', who: '委员会管理员' },
     },
     signInAs: who => `以${who}身份登录`,
@@ -126,6 +133,7 @@ const COPY: Record<Lang, {
     signingIn: '正在登录…',
     signInTo: portal => `进入${portal}`,
     pharmacyNote: '药房账户需经委员会核实药剂师执照与毒药执照后开通。请访问 /for-pharmacies 或联系委员会。',
+    facilityNote: '私立医疗机构须根据《1998年私立医疗保健设施与服务法令》（第586号法令）核验。请联系委员会入驻。',
     needAccount: '还没有账户？',
     registerPatient: '注册新患者账户（支持 MyKad 或国际护照）',
     registerPractitioner: '创建执业医护账户（MMC / LJM）',
@@ -135,8 +143,8 @@ const COPY: Record<Lang, {
   },
 };
 
-const ROLE_KEYS: PortalRole[] = ['patient', 'practitioner', 'pharmacy', 'admin'];
-const isRole = (v: string | null): v is PortalRole => v === 'patient' || v === 'practitioner' || v === 'pharmacy' || v === 'admin';
+const ROLE_KEYS: PortalRole[] = ['patient', 'practitioner', 'pharmacy', 'facility', 'admin'];
+const isRole = (v: string | null): v is PortalRole => v === 'patient' || v === 'practitioner' || v === 'pharmacy' || v === 'facility' || v === 'admin';
 
 const inputCls = 'w-full bg-white border border-[color:var(--t-200)] rounded-none px-4 h-12 text-sm font-medium text-[color:var(--ink)] placeholder-slate-500 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all';
 
@@ -334,6 +342,7 @@ export default function LoginPage({ onLoginSuccess }: { onLoginSuccess: (user: S
                   </form>
 
                   {role === 'pharmacy' && <p className="pt-6 text-center text-sm text-slate-700">{tx.pharmacyNote}</p>}
+                  {role === 'facility' && <p className="pt-6 text-center text-sm text-slate-700">{tx.facilityNote}</p>}
                   {(role === 'patient' || role === 'practitioner') && (
                     <p className="pt-6 text-center text-sm text-slate-700">
                       {tx.needAccount}{' '}

@@ -6,7 +6,7 @@ import {
   Calendar, BookOpen, Globe, RefreshCw,
   Heart, MessageSquare, Menu, X, PlusCircle, UserCheck,
   Stethoscope, Puzzle, Settings, Activity,
-  CreditCard, TrendingUp, Video, Radio, LifeBuoy, Pill, Store, Lock, Plane, Wallet
+  CreditCard, TrendingUp, Video, Radio, LifeBuoy, Pill, Store, Lock, Plane, Wallet, Building2
 } from 'lucide-react';
 
 
@@ -35,6 +35,7 @@ import PharmacyFinder from './components/PharmacyFinder';
 import MedicalTourism from './components/MedicalTourism';
 import TourismDesk from './components/TourismDesk';
 import PharmacyWorkspace from './components/PharmacyWorkspace';
+import FacilityWorkspace from './components/FacilityWorkspace';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import PractitionerPage from './components/PractitionerPage';
@@ -71,7 +72,7 @@ export default function App() {
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
 
   // User Session State (server-side session cookie; nothing sensitive is kept in localStorage)
-  type SessionUser = { id: string; role: 'patient' | 'practitioner' | 'admin' | 'pharmacy'; name: string; email: string; avatarUrl?: string; profileId?: string | null };
+  type SessionUser = { id: string; role: 'patient' | 'practitioner' | 'admin' | 'pharmacy' | 'facility'; name: string; email: string; avatarUrl?: string; profileId?: string | null };
   const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
   const route = useLocation();
   // Emails to a signed-in person are sent in the language they use in the app
@@ -91,7 +92,17 @@ export default function App() {
   });
 
   const routeForRole = (role: SessionUser['role']) => {
-    setActiveView(role === 'patient' ? 'patient_dashboard' : role === 'practitioner' ? 'onboard' : role === 'pharmacy' ? 'pharmacy_workspace' : 'admin');
+    setActiveView(
+      role === 'patient'
+        ? 'patient_dashboard'
+        : role === 'practitioner'
+        ? 'onboard'
+        : role === 'pharmacy'
+        ? 'pharmacy_workspace'
+        : role === 'facility'
+        ? 'facility_workspace'
+        : 'admin'
+    );
     setSelectedProfId(null);
   };
 
@@ -361,6 +372,9 @@ export default function App() {
     if (isPackageEnabled('articles')) {
       navItems.push({ id: 'articles', name: 'Medical Library', icon: BookOpen });
     }
+  } else if (currentUser.role === 'facility') {
+    navItems.push({ id: 'facility_workspace', name: 'Facility Hub', icon: Building2 });
+    navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
   } else if (currentUser.role === 'pharmacy') {
     navItems.push({ id: 'pharmacy_workspace', name: 'Workspace', icon: Store });
     navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
@@ -377,7 +391,7 @@ export default function App() {
 
   // Append any active extensions that aren't standard
   const standardIds = ['patient_dashboard', 'registry', 'recruitment', 'articles', 'onboard', 'messages', 'seo', 'admin', 'consult', 'oncall', 'earnings', 'quality', 'help'];
-  const customPackages = currentUser.role === 'pharmacy' ? [] : packages.filter(p => !standardIds.includes(p.id) && p.isEnabled);
+  const customPackages = (currentUser.role === 'pharmacy' || currentUser.role === 'facility') ? [] : packages.filter(p => !standardIds.includes(p.id) && p.isEnabled);
   customPackages.forEach(p => {
     let icon = Puzzle;
     if (p.icon === 'Activity') icon = Activity;
@@ -399,11 +413,12 @@ export default function App() {
     patient: ['patient_dashboard', 'consult', 'pharmacies', 'messages'],
     practitioner: ['onboard', 'oncall', 'recruitment', 'messages'],
     pharmacy: ['pharmacy_workspace', 'help'],
+    facility: ['facility_workspace', 'help'],
     admin: ['admin', 'registry', 'tourism_desk', 'seo'],
   };
   const SHORT_LABEL: Record<string, string> = {
     patient_dashboard: 'Home', consult: 'Consult', pharmacies: 'Pharmacy', messages: 'Mailbox', registry: 'Doctors', oncall: 'On Call', earnings: 'Earnings', onboard: 'Portal',
-    recruitment: 'Shifts', admin: 'Admin', tourism_desk: 'Tourism', pharmacy_workspace: 'Workspace', help: 'Help', articles: 'Library', tourism: 'Tourism', quality: 'Quality', seo: 'SEO',
+    recruitment: 'Shifts', admin: 'Admin', tourism_desk: 'Tourism', pharmacy_workspace: 'Workspace', facility_workspace: 'Facility', help: 'Help', articles: 'Library', tourism: 'Tourism', quality: 'Quality', seo: 'SEO',
   };
   const mobileTabs = (() => {
     const wanted = (PRIORITY[currentUser.role] ?? []).map(id => navItems.find(n => n.id === id)).filter(Boolean) as typeof navItems;
@@ -431,6 +446,7 @@ export default function App() {
               if (currentUser.role === 'patient') setActiveView('patient_dashboard');
               else if (currentUser.role === 'practitioner') setActiveView('onboard');
               else if (currentUser.role === 'pharmacy') setActiveView('pharmacy_workspace');
+              else if (currentUser.role === 'facility') setActiveView('facility_workspace');
               else if (currentUser.role === 'admin') setActiveView('admin');
               setSelectedProfId(null);
             }}
@@ -746,6 +762,7 @@ export default function App() {
             {activeView === 'pharmacies' && currentUser.role === 'patient' && <PharmacyFinder />}
 
             {activeView === 'pharmacy_workspace' && currentUser.role === 'pharmacy' && <PharmacyWorkspace />}
+            {activeView === 'facility_workspace' && currentUser.role === 'facility' && <FacilityWorkspace />}
 
             {activeView === 'consult' && currentUser.role === 'patient' && (
               <ConsultNow myUserId={currentUser.id} />

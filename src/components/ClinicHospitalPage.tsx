@@ -456,7 +456,7 @@ export default function ClinicHospitalPage() {
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               type="button"
-              onClick={() => navigate(loginUrl('practitioner', false))}
+              onClick={() => navigate(loginUrl('facility', false))}
               className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-4 sm:px-5 text-xs sm:text-sm font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none shadow-xs transition-all cursor-pointer whitespace-nowrap"
             >
               <span>{tx.hero.ctaSignin}</span>
@@ -515,7 +515,7 @@ export default function ClinicHospitalPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => navigate(loginUrl('practitioner', false))}
+                    onClick={() => navigate(loginUrl('facility', false))}
                     className={btnSecondary}
                   >
                     {tx.hero.ctaSignin}

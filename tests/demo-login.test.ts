@@ -19,7 +19,7 @@ test('with demo mode on: demo sign-in works for members, but never for the admin
     const c = srv.client();
     const opts = (await c.call('GET', '/api/auth/options')).data.data;
     assert.equal(opts.demoLogin, true);
-    assert.deepEqual(Object.keys(opts.demoAccounts).sort(), ['patient', 'pharmacy', 'practitioner'], 'the admin is never offered');
+    assert.deepEqual(Object.keys(opts.demoAccounts).sort(), ['facility', 'patient', 'pharmacy', 'practitioner'], 'the admin is never offered');
 
     const admin = await c.call('POST', '/api/auth/demo', { role: 'admin' });
     assert.equal(admin.status, 403);

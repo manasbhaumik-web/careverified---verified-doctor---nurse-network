@@ -4,7 +4,7 @@ import { db } from "./db";
 import { audit } from "./audit";
 import { verifyTotp } from "./totp";
 
-export type Role = "patient" | "practitioner" | "admin" | "pharmacy";
+export type Role = "patient" | "practitioner" | "admin" | "pharmacy" | "facility";
 export interface AuthUser {
   id: string;
   email: string;
@@ -12,6 +12,7 @@ export interface AuthUser {
   role: Role;
   avatarUrl: string | null;
   profileId: string | null;
+  facilityId?: string | null;
 }
 
 declare global {
@@ -136,22 +137,22 @@ export function loadSession(req: Request, _res: Response, next: NextFunction) {
   const token = readCookie(req, COOKIE);
   if (token && !revokedTokens.has(sha(token))) {
     const row = db.prepare(
-      `SELECT u.id, u.email, u.name, u.role, u.avatar_url AS avatarUrl, u.profile_id AS profileId, u.status, s.expires_at AS expiresAt
+      `SELECT u.id, u.email, u.name, u.role, u.avatar_url AS avatarUrl, u.profile_id AS profileId, u.facility_id AS facilityId, u.status, s.expires_at AS expiresAt
        FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ?`
     ).get(sha(token)) as any;
     if (row && row.status === "active" && new Date(row.expiresAt) > new Date()) {
-      req.user = { id: row.id, email: row.email, name: row.name, role: row.role, avatarUrl: row.avatarUrl, profileId: row.profileId };
+      req.user = { id: row.id, email: row.email, name: row.name, role: row.role, avatarUrl: row.avatarUrl, profileId: row.profileId, facilityId: row.facilityId ?? null };
     } else {
       // Serverless fallback when request lands on a freshly started instance
       const signed = verifySignedToken(token);
       if (signed) {
         const uRow = db.prepare(
-          `SELECT id, email, name, role, avatar_url AS avatarUrl, profile_id AS profileId, status, sessions_valid_after AS validAfter FROM users WHERE id = ?`
+          `SELECT id, email, name, role, avatar_url AS avatarUrl, profile_id AS profileId, facility_id AS facilityId, status, sessions_valid_after AS validAfter FROM users WHERE id = ?`
         ).get(signed.userId) as any;
         // Deleting a person's session rows must really end their sessions: a token made before the last password change is refused.
         const revoked = uRow?.validAfter && signed.issuedAt < Date.parse(uRow.validAfter);
         if (uRow && uRow.status === "active" && !revoked) {
-          req.user = { id: uRow.id, email: uRow.email, name: uRow.name, role: uRow.role, avatarUrl: uRow.avatarUrl, profileId: uRow.profileId };
+          req.user = { id: uRow.id, email: uRow.email, name: uRow.name, role: uRow.role, avatarUrl: uRow.avatarUrl, profileId: uRow.profileId, facilityId: uRow.facilityId ?? null };
         }
       }
     }
@@ -191,7 +192,8 @@ export function attemptLogin(req: Request, email: string, password: string, role
   const ok = verifyPassword(password, row.password_hash);
   // A pharmacy login only works while the pharmacy is active and has been verified by the board.
   const pharmacyOff = row.role === "pharmacy" && !db.prepare("SELECT 1 AS x FROM pharmacies WHERE id = ? AND active = 1 AND verified_at IS NOT NULL").get(row.profile_id);
-  if (!ok || row.status !== "active" || pharmacyOff || (role && role !== row.role)) {
+  const facilityOff = row.role === "facility" && !db.prepare("SELECT 1 AS x FROM tourism_facilities WHERE id = ? AND active = 1").get(row.facility_id || row.profile_id);
+  if (!ok || row.status !== "active" || pharmacyOff || facilityOff || (role && role !== row.role)) {
     if (!ok) {
       const failed = row.failed_logins + 1;
       const lock = failed >= MAX_FAILED ? new Date(Date.now() + LOCK_MINUTES * 60_000).toISOString() : null;
@@ -212,23 +214,23 @@ export function attemptLogin(req: Request, email: string, password: string, role
     }
   }
   db.prepare("UPDATE users SET failed_logins = 0, locked_until = NULL WHERE id = ?").run(row.id);
-  return { id: row.id, email: row.email, name: row.name, role: row.role, avatarUrl: row.avatar_url, profileId: row.profile_id };
+  return { id: row.id, email: row.email, name: row.name, role: row.role, avatarUrl: row.avatar_url, profileId: row.profile_id, facilityId: row.facility_id ?? null };
 }
 
 // ---------- user creation ----------
 export function createUser(u: {
-  id?: string; email: string; password: string; role: Role; name: string; avatarUrl?: string; profileId?: string | null; consentVersion?: string; lang?: string;
+  id?: string; email: string; password: string; role: Role; name: string; avatarUrl?: string; profileId?: string | null; facilityId?: string | null; consentVersion?: string; lang?: string;
 }): AuthUser {
   const id = u.id || ("usr-" + crypto.randomBytes(8).toString("hex"));
   const now = new Date().toISOString();
   const email = u.email.trim().toLowerCase();
   db.prepare(
-    "INSERT INTO users (id,email,password_hash,role,name,avatar_url,profile_id,consent_version,consent_at,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)"
-  ).run(id, email, hashPassword(u.password), u.role, u.name, u.avatarUrl ?? null, u.profileId ?? null,
+    "INSERT INTO users (id,email,password_hash,role,name,avatar_url,profile_id,facility_id,consent_version,consent_at,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+  ).run(id, email, hashPassword(u.password), u.role, u.name, u.avatarUrl ?? null, u.profileId ?? null, u.facilityId ?? null,
     u.consentVersion ?? null, u.consentVersion ? now : null, now);
   // The language emails are sent in (set again whenever the person changes language in the app).
   if (u.lang === "ms" || u.lang === "zh" || u.lang === "en") { try { db.prepare("UPDATE users SET lang = ? WHERE id = ?").run(u.lang, id); } catch { /* column not created yet */ } }
-  return { id, email, name: u.name, role: u.role, avatarUrl: u.avatarUrl ?? null, profileId: u.profileId ?? null };
+  return { id, email, name: u.name, role: u.role, avatarUrl: u.avatarUrl ?? null, profileId: u.profileId ?? null, facilityId: u.facilityId ?? null };
 }
 
 export function emailTaken(email: string): boolean {
