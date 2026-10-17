@@ -1547,6 +1547,65 @@ app.post("/api/facility/jobs/:jobId/applicants/:applicantUserId/decision", requi
   });
 });
 
+app.patch("/api/facility/jobs/:jobId/status", requireRole("facility", "admin"), (req, res) => {
+  const { jobId } = req.params;
+  const status = str(req.body.status, 20);
+  if (!["Active", "Closed", "Filled", "Cancelled"].includes(status)) {
+    return fail(res, 400, "Status must be 'Active', 'Closed', 'Filled', or 'Cancelled'.");
+  }
+
+  const job = jobs.find(j => j.id === jobId);
+  if (!job) return fail(res, 404, "Job post not found.");
+
+  if (req.user!.role !== "admin") {
+    const myFacId = req.user!.facilityId || req.user!.profileId;
+    if (job.facilityId && job.facilityId !== myFacId) {
+      return fail(res, 403, "You can only manage vacancies for your own facility.");
+    }
+  }
+
+  job.status = status as any;
+  audit(req, "facility.job.status", { target: ["job", jobId], details: { status } });
+  res.json({ status: "success", message: `Shift opening marked as ${status}.`, data: { id: jobId, status } });
+});
+
+app.get("/api/facility/cases", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const status = str(req.query.status, 20);
+  const list = db.prepare(
+    `SELECT * FROM tourism_cases WHERE facility_id = ? ${status ? "AND status = ?" : ""} ORDER BY updated_at DESC LIMIT 200`
+  ).all(facilityId, ...(status ? [status] : [])) as any[];
+
+  const cases = list.map(c => {
+    const patUser = db.prepare("SELECT name, email FROM users WHERE id = ?").get(c.patient_user_id) as any;
+    const quotes = db.prepare("SELECT * FROM tourism_quotes WHERE case_id = ? ORDER BY version DESC").all(c.id) as any[];
+    return {
+      id: c.id,
+      status: c.status,
+      summary: c.summary,
+      patient: patUser?.name || "Patient Referral",
+      patientEmail: patUser?.email || null,
+      country: c.home_country || "Malaysia",
+      specialty: c.specialty,
+      preferredFrom: c.preferred_from,
+      preferredTo: c.preferred_to,
+      needs: c.needs ? JSON.parse(c.needs) : {},
+      quotesCount: quotes.length,
+      latestQuote: quotes[0] ? {
+        id: quotes[0].id,
+        version: quotes[0].version,
+        total: quotes[0].total_sen / 100,
+        status: quotes[0].status,
+        validUntil: quotes[0].valid_until,
+      } : null,
+      updatedAt: c.updated_at,
+      createdAt: c.created_at,
+    };
+  });
+
+  res.json({ status: "success", data: cases });
+});
+
 // -------------------------------------------------------------
 // Reviews
 // -------------------------------------------------------------

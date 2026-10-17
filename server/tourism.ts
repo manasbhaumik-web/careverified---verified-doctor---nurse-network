@@ -167,9 +167,11 @@ export function registerTourism(app: Application, ctx: { findProfessional: (id: 
 
   // ---------- helpers ----------
   const isStaffOf = (u: Request["user"], facilityId: string) =>
-    !!u && (u.role === "admin" || (u.role === "practitioner" && !!row("SELECT 1 AS x FROM tourism_facility_staff WHERE facility_id = ? AND user_id = ?", facilityId, u.id)));
+    !!u && (u.role === "admin" || (u.role === "facility" && (u.facilityId === facilityId || u.profileId === facilityId)) || (u.role === "practitioner" && !!row("SELECT 1 AS x FROM tourism_facility_staff WHERE facility_id = ? AND user_id = ?", facilityId, u.id)));
   const staffFacilityIds = (u: NonNullable<Request["user"]>) =>
-    u.role === "admin" ? rows("SELECT id FROM tourism_facilities").map(f => f.id as string) : rows("SELECT facility_id FROM tourism_facility_staff WHERE user_id = ?", u.id).map(r => r.facility_id as string);
+    u.role === "admin" ? rows("SELECT id FROM tourism_facilities").map(f => f.id as string)
+      : u.role === "facility" ? [u.facilityId || u.profileId || "fac-demo-1"]
+      : rows("SELECT facility_id FROM tourism_facility_staff WHERE user_id = ?", u.id).map(r => r.facility_id as string);
 
   const quoteView = (q: any) => ({
     id: q.id, version: q.version, items: parse(q.items, []), subtotal: q.subtotal_sen / 100, tax: q.tax_sen / 100, taxRatePct: q.tax_rate_pct, total: q.total_sen / 100,
@@ -411,12 +413,12 @@ export function registerTourism(app: Application, ctx: { findProfessional: (id: 
   });
 
   // ---------- staff desk ----------
-  app.get("/api/tourism/desk/me", requireRole("practitioner", "admin"), (req, res) => {
+  app.get("/api/tourism/desk/me", requireRole("practitioner", "admin", "facility"), (req, res) => {
     const ids = staffFacilityIds(req.user!);
     res.json({ status: "success", data: { facilities: ids.map(id => row("SELECT id, name FROM tourism_facilities WHERE id = ?", id)).filter(Boolean), isAdmin: req.user!.role === "admin" } });
   });
 
-  app.get("/api/tourism/desk/cases", requireRole("practitioner", "admin"), (req, res) => {
+  app.get("/api/tourism/desk/cases", requireRole("practitioner", "admin", "facility"), (req, res) => {
     const ids = staffFacilityIds(req.user!);
     if (!ids.length) return res.json({ status: "success", data: [] });
     const status = str(req.query.status, 20);
@@ -431,7 +433,7 @@ export function registerTourism(app: Application, ctx: { findProfessional: (id: 
     return c;
   };
 
-  app.post("/api/tourism/desk/cases/:id/quotes", requireRole("practitioner", "admin"), (req, res) => {
+  app.post("/api/tourism/desk/cases/:id/quotes", requireRole("practitioner", "admin", "facility"), (req, res) => {
     const c = staffCase(req, res); if (!c) return;
     if (!OPEN_STATUSES.includes(c.status) || c.status === "in_treatment") return fail(res, 409, "A quote can be sent while the case is an enquiry, quoted or accepted.");
     const raw = Array.isArray(req.body.items) ? req.body.items : [];

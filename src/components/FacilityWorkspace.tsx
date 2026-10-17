@@ -107,10 +107,22 @@ interface PatientCase {
   status: string;
   summary: string;
   patient: string;
+  patientEmail?: string | null;
   country: string;
   specialty?: string;
   preferredFrom?: string;
+  preferredTo?: string;
+  needs?: Record<string, any>;
+  quotesCount?: number;
+  latestQuote?: {
+    id: string;
+    version: number;
+    total: number;
+    status: string;
+    validUntil: string;
+  } | null;
   updatedAt: string;
+  createdAt?: string;
 }
 
 export default function FacilityWorkspace() {
@@ -192,7 +204,7 @@ export default function FacilityWorkspace() {
       }
 
       // Fetch facility cases
-      const casesRes = await fetch('/api/tourism/cases/mine');
+      const casesRes = await fetch('/api/facility/cases');
       const casesData = await casesRes.json();
       if (casesData.status === 'success') {
         setCases(casesData.data);
@@ -239,6 +251,26 @@ export default function FacilityWorkspace() {
       setNotificationMsg({ type: 'error', text: 'Network error. Please try again.' });
     } finally {
       setActionSubmitting(false);
+    }
+  };
+
+  // Handle Toggle Job Status (Close / Reopen / Fill)
+  const handleUpdateJobStatus = async (jobId: string, nextStatus: 'Active' | 'Closed' | 'Filled' | 'Cancelled') => {
+    try {
+      const res = await fetch(`/api/facility/jobs/${jobId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: `Shift status successfully updated to "${nextStatus}".` });
+        loadFacilityData();
+      } else {
+        setNotificationMsg({ type: 'error', text: data.message || 'Could not update shift status.' });
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error. Please try again.' });
     }
   };
 
@@ -576,14 +608,34 @@ export default function FacilityWorkspace() {
                             )}
                           </div>
 
-                          <button
-                            type="button"
-                            onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
-                            className="p-2 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-50)] text-slate-700 cursor-pointer flex items-center gap-1 text-xs font-bold"
-                          >
-                            <span>{isExpanded ? 'Hide' : 'Review'}</span>
-                            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={job.status}
+                              onChange={(e) => handleUpdateJobStatus(job.id, e.target.value as any)}
+                              className={`text-[11px] font-black uppercase px-2 py-1.5 border cursor-pointer outline-none ${
+                                job.status === 'Active'
+                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                  : job.status === 'Filled'
+                                  ? 'bg-sky-50 text-sky-800 border-sky-300'
+                                  : 'bg-slate-100 text-slate-700 border-slate-300'
+                              }`}
+                              title="Update Shift Vacancy Status"
+                            >
+                              <option value="Active">● Active</option>
+                              <option value="Filled">✔ Filled</option>
+                              <option value="Closed">✕ Closed</option>
+                              <option value="Cancelled">⊘ Cancelled</option>
+                            </select>
+
+                            <button
+                              type="button"
+                              onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
+                              className="p-2 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-50)] text-slate-700 cursor-pointer flex items-center gap-1 text-xs font-bold"
+                            >
+                              <span>{isExpanded ? 'Hide' : 'Review'}</span>
+                              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                            </button>
+                          </div>
                         </div>
                       </div>
 
@@ -841,27 +893,54 @@ export default function FacilityWorkspace() {
               </div>
 
               {cases.length === 0 ? (
-                <div className="p-8 bg-slate-50 text-center text-xs text-slate-500">
-                  No active patient referral cases currently recorded for this facility.
+                <div className="p-12 bg-slate-50 text-center text-xs text-slate-500 space-y-2 border border-dashed border-slate-200">
+                  <FileText className="h-8 w-8 text-slate-400 mx-auto" />
+                  <p className="font-bold text-slate-700">No active patient referral cases currently recorded for this facility.</p>
+                  <p className="text-[11px] text-slate-500">Inbound medical travel enquiries and cross-border consultations will appear here automatically.</p>
                 </div>
               ) : (
                 <div className="divide-y divide-slate-100 border border-slate-200">
                   {cases.map(c => (
-                    <div key={c.id} className="p-4 flex flex-wrap items-center justify-between gap-4 hover:bg-slate-50">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-black text-slate-900">{c.patient || 'Patient Referral'}</span>
-                          <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-[10px] font-bold uppercase">
-                            Origin: {c.country || 'Malaysia'}
+                    <div key={c.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/80 transition-colors">
+                      <div className="space-y-1.5 flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-black text-slate-900">{c.patient}</span>
+                          <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-[10px] font-extrabold uppercase">
+                            Origin: {c.country}
                           </span>
+                          {c.specialty && (
+                            <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] text-[10px] font-black uppercase border border-[color:var(--t-200)]">
+                              {c.specialty}
+                            </span>
+                          )}
                         </div>
-                        <p className="text-xs text-slate-600 line-clamp-1">{c.summary}</p>
-                        <span className="text-[11px] text-slate-400">Case ID: {c.id} · Updated: {new Date(c.updatedAt).toLocaleDateString('en-MY')}</span>
+                        <p className="text-xs text-slate-700 font-medium leading-relaxed">{c.summary}</p>
+                        <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
+                          <span>Case ID: <code className="font-mono text-slate-600 font-bold">{c.id}</code></span>
+                          {c.patientEmail && <span>Contact: <strong className="text-slate-600">{c.patientEmail}</strong></span>}
+                          {c.preferredFrom && <span>Requested: <strong className="text-slate-600">{c.preferredFrom}</strong></span>}
+                          <span>Updated: {new Date(c.updatedAt).toLocaleDateString('en-MY')}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className="px-2 py-1 bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200 uppercase">
-                          {c.status}
+
+                      <div className="flex flex-row md:flex-col items-end justify-between md:justify-center gap-2 shrink-0">
+                        <span className={`px-2.5 py-1 text-xs font-black uppercase border ${
+                          c.status === 'quoted'
+                            ? 'bg-sky-50 text-sky-800 border-sky-300'
+                            : c.status === 'accepted'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                            : c.status === 'in_treatment'
+                            ? 'bg-purple-50 text-purple-800 border-purple-300'
+                            : 'bg-amber-50 text-amber-800 border-amber-300'
+                        }`}>
+                          {c.status.replace('_', ' ')}
                         </span>
+
+                        {c.latestQuote && (
+                          <span className="text-xs font-mono font-extrabold text-[color:var(--t-700)]">
+                            RM {c.latestQuote.total.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}
