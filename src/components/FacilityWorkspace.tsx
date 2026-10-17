@@ -11,7 +11,45 @@ import DashboardHeader, {
   BannerRow, BannerIdentity, BannerBadge, BannerKpis, DashboardTab, bannerPrimaryBtn
 } from './DashboardHeader';
 
-type Tab = 'shifts' | 'locums' | 'cases' | 'packages' | 'profile';
+export type FacilityTab = 'shifts' | 'locums' | 'cases' | 'packages' | 'profile';
+export type FacilityTabGroup = 'staffing' | 'care' | 'profile';
+
+export const FACILITY_GROUPS: Record<FacilityTabGroup, {
+  name: string;
+  defaultTab: FacilityTab;
+  tabs: { id: FacilityTab; label: string; icon: any; count?: number }[];
+}> = {
+  staffing: {
+    name: 'Clinical Staffing & Shifts',
+    defaultTab: 'shifts',
+    tabs: [
+      { id: 'shifts', label: 'Job Postings & Vacancies', icon: Calendar },
+      { id: 'locums', label: 'Practitioner Network', icon: Users },
+    ],
+  },
+  care: {
+    name: 'Patient Referrals & Packages',
+    defaultTab: 'cases',
+    tabs: [
+      { id: 'cases', label: 'Patient Referrals & Quotes', icon: FileText },
+      { id: 'packages', label: 'Packages & Promotions', icon: Tag },
+    ],
+  },
+  profile: {
+    name: 'Facility & Infrastructure',
+    defaultTab: 'profile',
+    tabs: [
+      { id: 'profile', label: 'Facility Profile & Infrastructure', icon: Building2 },
+    ],
+  },
+};
+
+type Tab = FacilityTab;
+
+export interface FacilityWorkspaceProps {
+  activeGroup?: FacilityTabGroup;
+  initialTab?: FacilityTab;
+}
 
 export interface MedicalPackage {
   id: string;
@@ -265,8 +303,26 @@ interface FacilityMessage {
   mine: boolean;
 }
 
-export default function FacilityWorkspace() {
-  const [tab, setTab] = useState<Tab>('shifts');
+export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityWorkspaceProps = {}) {
+  const currentGroup: FacilityTabGroup = activeGroup || (
+    initialTab ? (
+      (['cases', 'packages'].includes(initialTab)) ? 'care' :
+      (initialTab === 'profile') ? 'profile' : 'staffing'
+    ) : 'staffing'
+  );
+
+  const [tab, setTab] = useState<FacilityTab>(initialTab || FACILITY_GROUPS[currentGroup].defaultTab);
+
+  useEffect(() => {
+    if (activeGroup) {
+      const allowed = FACILITY_GROUPS[activeGroup].tabs.map(t => t.id);
+      if (!allowed.includes(tab)) {
+        setTab(initialTab && allowed.includes(initialTab) ? initialTab : FACILITY_GROUPS[activeGroup].defaultTab);
+      }
+    } else if (initialTab) {
+      setTab(initialTab);
+    }
+  }, [activeGroup, initialTab]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [facility, setFacility] = useState<FacilityProfile | null>(null);
@@ -1013,13 +1069,13 @@ export default function FacilityWorkspace() {
     }
   };
 
-  const tabs: DashboardTab<Tab>[] = [
-    { id: 'shifts', label: 'Job Postings & Vacancies', icon: Calendar, count: stats.activeVacancies },
-    { id: 'locums', label: 'Practitioner Network', icon: Users, count: locums.length },
-    { id: 'cases', label: 'Patient Referrals & Quotes', icon: FileText, count: stats.patientCases },
-    { id: 'packages', label: 'Packages & Promotions', icon: Tag, count: packages.length },
-    { id: 'profile', label: 'Facility & Infrastructure', icon: Building2 },
-  ];
+  const displayedTabs: DashboardTab<Tab>[] = FACILITY_GROUPS[currentGroup].tabs.map(t => {
+    if (t.id === 'shifts') return { ...t, count: stats.activeVacancies };
+    if (t.id === 'locums') return { ...t, count: locums.length };
+    if (t.id === 'cases') return { ...t, count: stats.patientCases };
+    if (t.id === 'packages') return { ...t, count: packages.length };
+    return t;
+  });
 
   const filteredJobs = jobs.filter(j => {
     if (jobFilter === 'doctor' && j.roleRequired !== 'doctor') return false;
@@ -1079,10 +1135,10 @@ export default function FacilityWorkspace() {
       {/* Main Facility Banner */}
       <DashboardHeader
         fullWidth={true}
-        tabs={tabs}
+        tabs={displayedTabs}
         activeTab={tab}
         onTabChange={setTab}
-        tabsLabel="Facility workspace sections"
+        tabsLabel={`${FACILITY_GROUPS[currentGroup].name} sections`}
         tabsRight={facilityHelpTab}
       >
         <BannerRow
@@ -1093,6 +1149,7 @@ export default function FacilityWorkspace() {
               name={facility?.name || 'Healthcare Facility & Clinic'}
               badges={
                 <div className="flex flex-wrap items-center gap-1.5">
+                  <BannerBadge tone="brand">{FACILITY_GROUPS[currentGroup].name}</BannerBadge>
                   <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200">
                     {facility?.kind || 'Medical Centre'}
                   </span>

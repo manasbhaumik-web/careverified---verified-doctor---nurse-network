@@ -3,6 +3,7 @@ import { TestimonialForm } from './TestimonialPanels';
 import { AlertTriangle, LifeBuoy } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
 import PractitionerHeroBanner from './PractitionerHeroBanner';
+import PatientHeroBanner from './PatientHeroBanner';
 import { useLocale } from '../locale/store';
 
 const jpost = (url: string, body?: unknown) =>
@@ -84,6 +85,15 @@ export default function SupportDesk({
           reviews={reviews}
           bookings={bookings}
           groupName="Help & Support"
+        />
+      ) : currentUser?.role === 'patient' ? (
+        <PatientHeroBanner
+          userName={currentUser?.name || 'Verified Patient'}
+          userAvatar={currentUser?.avatarUrl}
+          groupName="Help & Support"
+          isHelpActive={true}
+          openTicketsCount={tickets.filter(t => t.status === 'open').length}
+          onOpenHelp={() => {}}
         />
       ) : (
         <DashboardHeader

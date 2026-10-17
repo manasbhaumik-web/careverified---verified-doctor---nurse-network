@@ -1,4 +1,4 @@
-import DashboardHeader, { BannerKpis } from './DashboardHeader';
+import DashboardHeader, { BannerKpis, BannerBadge } from './DashboardHeader';
 import { expiryLabel } from '../registries';
 import React, { useState, useEffect } from 'react';
 import { 
@@ -6,19 +6,89 @@ import {
   Loader, CheckCircle2, List, LayoutGrid, Eye,
   Puzzle, Plus, Trash2, Settings, Download, Activity, CreditCard, 
   TrendingUp, Heart, Search, Calendar, 
-  BookOpen, PlusCircle, MessageSquare, Globe, LifeBuoy
+  BookOpen, PlusCircle, MessageSquare, Globe, LifeBuoy, Building2, Plane
 } from 'lucide-react';
 import AdminTrustPanel, { ReviewActions } from './AdminTrustPanel';
 import AdminOps from './AdminOps';
 import AdminQuality from './AdminQuality';
 import AdminLiterature from './AdminLiterature';
-import { DoctorProfile, NurseProfile, UserRole, AppPackage, VerificationStatus } from '../types';
+import FacilityWorkspace from './FacilityWorkspace';
+import JobMarket from './JobMarket';
+import TourismDesk from './TourismDesk';
+import SEODashboard from './SEODashboard';
+import { DoctorProfile, NurseProfile, UserRole, AppPackage, VerificationStatus, JobPost, Review, Booking } from '../types';
 
-interface AdminDashboardProps {
+export type AdminDashboardTab = 
+  | 'approvals' 
+  | 'trust' 
+  | 'registry' 
+  | 'ops' 
+  | 'quality' 
+  | 'packages' 
+  | 'facilities' 
+  | 'shifts' 
+  | 'tourism' 
+  | 'literature' 
+  | 'seo';
+
+export type AdminTabGroup = 'registry' | 'ops' | 'facilities' | 'growth';
+
+export const ADMIN_GROUPS: Record<AdminTabGroup, {
+  name: string;
+  defaultTab: AdminDashboardTab;
+  tabs: { id: AdminDashboardTab; label: string; icon: any; count?: number }[];
+}> = {
+  registry: {
+    name: 'Registry & Licensing',
+    defaultTab: 'approvals',
+    tabs: [
+      { id: 'approvals', label: 'Practitioner Approvals', icon: ShieldCheck },
+      { id: 'trust', label: 'Trust & Complaints', icon: ShieldAlert },
+      { id: 'registry', label: 'Verified Directory', icon: UserCheck },
+    ],
+  },
+  ops: {
+    name: 'Operations & Governance',
+    defaultTab: 'ops',
+    tabs: [
+      { id: 'ops', label: 'Operations & Payments', icon: CreditCard },
+      { id: 'quality', label: 'Quality & Support', icon: CheckCircle2 },
+      { id: 'packages', label: 'Package Manager', icon: Puzzle },
+    ],
+  },
+  facilities: {
+    name: 'Facilities & Staffing',
+    defaultTab: 'facilities',
+    tabs: [
+      { id: 'facilities', label: 'Hospital & Facility Hub', icon: Building2 },
+      { id: 'shifts', label: 'Clinical Shifts', icon: Calendar },
+    ],
+  },
+  growth: {
+    name: 'Global Care & Strategy',
+    defaultTab: 'tourism',
+    tabs: [
+      { id: 'tourism', label: 'Global Patient Services', icon: Plane },
+      { id: 'literature', label: 'Medical Literature', icon: BookOpen },
+      { id: 'seo', label: 'SEO Compliance', icon: Globe },
+    ],
+  },
+};
+
+export interface AdminDashboardProps {
   onProfessionalApproved: (prof: DoctorProfile | NurseProfile) => void;
   professionals: (DoctorProfile | NurseProfile)[];
   packages: AppPackage[];
   onPackagesChanged: () => void;
+  activeGroup?: AdminTabGroup;
+  initialTab?: AdminDashboardTab;
+  jobs?: JobPost[];
+  onNewJobCreated?: (newJob: JobPost) => void;
+  onApplyJob?: (jobId: string, userId: string) => void;
+  onRefreshData?: () => void;
+  currentUser?: any;
+  reviews?: Review[];
+  bookings?: Booking[];
 }
 
 // Documents the practitioner uploaded for a verification request (fetched through the audited, admin-only API)
@@ -56,17 +126,55 @@ function RequestDocuments({ requestId }: { requestId: string }) {
   );
 }
 
-export default function AdminDashboard({ onProfessionalApproved, professionals, packages, onPackagesChanged }: AdminDashboardProps) {
+export default function AdminDashboard({ 
+  onProfessionalApproved, 
+  professionals, 
+  packages, 
+  onPackagesChanged,
+  activeGroup,
+  initialTab,
+  jobs = [],
+  onNewJobCreated,
+  onApplyJob,
+  onRefreshData,
+  currentUser,
+  reviews = [],
+  bookings = [],
+}: AdminDashboardProps) {
   const [pendingRequests, setPendingRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [votedId, setVotedId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [selectedModalRequest, setSelectedModalRequest] = useState<any | null>(null);
 
+  const currentGroup: AdminTabGroup = activeGroup || (
+    initialTab ? (
+      (['ops', 'quality', 'packages'].includes(initialTab)) ? 'ops' :
+      (['facilities', 'shifts'].includes(initialTab)) ? 'facilities' :
+      (['tourism', 'literature', 'seo'].includes(initialTab)) ? 'growth' : 'registry'
+    ) : 'registry'
+  );
+
   // --- Modular Packages Management State ---
-  const [activeTab, setActiveTab] = useState<'approvals' | 'trust' | 'ops' | 'quality' | 'literature' | 'packages'>('approvals');
+  const [activeTab, setActiveTab] = useState<AdminDashboardTab>(
+    initialTab || ADMIN_GROUPS[currentGroup].defaultTab
+  );
+
+  useEffect(() => {
+    if (activeGroup) {
+      const allowed = ADMIN_GROUPS[activeGroup].tabs.map(t => t.id);
+      if (!allowed.includes(activeTab)) {
+        setActiveTab(initialTab && allowed.includes(initialTab) ? initialTab : ADMIN_GROUPS[activeGroup].defaultTab);
+      }
+    } else if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [activeGroup, initialTab]);
+
   const [packageSearch, setPackageSearch] = useState('');
   const [packageCategoryFilter, setPackageCategoryFilter] = useState('All');
+  const [registrySearch, setRegistrySearch] = useState('');
+  const [registryRoleFilter, setRegistryRoleFilter] = useState<'all' | 'doctor' | 'nurse'>('all');
   
   // Custom package creation form state
   const [showCustomForm, setShowCustomForm] = useState(false);
@@ -278,9 +386,9 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
       {/* Standard dashboard header with attached tabs */}
       <DashboardHeader
         fullWidth={true}
-        eyebrow="National Medical Registry Audit Terminal"
+        eyebrow={`National Medical Registry · ${ADMIN_GROUPS[currentGroup]?.name || 'Audit Terminal'}`}
         title="Registry Administrative Control Desk"
-        description="Practitioner licence review, trust and complaints, operations, quality and support, and modular extension management."
+        description="Practitioner licence review, trust and complaints, operations, quality and governance, and modular extensions."
         actions={
           <BannerKpis
             items={[
@@ -290,17 +398,13 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
             ]}
           />
         }
-        tabs={[
-          { id: 'approvals' as const, label: 'Practitioner Approvals', icon: ShieldCheck, count: pendingRequests.length },
-          { id: 'trust' as const, label: 'Trust & Complaints', icon: ShieldAlert },
-          { id: 'ops' as const, label: 'Operations & Payments', icon: Activity },
-          { id: 'quality' as const, label: 'Quality & Support', icon: CheckCircle2 },
-          { id: 'literature' as const, label: 'Medical Literature', icon: BookOpen },
-          { id: 'packages' as const, label: 'Package Manager', icon: Puzzle, count: packages.length },
-        ]}
+        tabs={ADMIN_GROUPS[currentGroup]?.tabs.map(t => ({
+          ...t,
+          count: t.id === 'approvals' ? pendingRequests.length : t.id === 'packages' ? packages.length : undefined
+        })) || []}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
-        tabsLabel="Admin panel sections"
+        onTabChange={(id) => setActiveTab(id as AdminDashboardTab)}
+        tabsLabel={`${ADMIN_GROUPS[currentGroup]?.name || 'Admin'} sections`}
         tabsRight={adminHelpTab}
       />
 
@@ -1001,6 +1105,167 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {activeTab === 'registry' && (
+        <div id="panel-registry" role="tabpanel" tabIndex={0} className="space-y-6">
+          <div className="bg-white border border-[color:var(--t-200)] p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-base font-black text-slate-800">Accredited Practitioner Directory</h3>
+                <p className="text-xs text-slate-500 font-semibold">
+                  Official registry of doctors and registered nurses credentialed under MMC &amp; LJM regulatory bodies.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-500">Filter:</span>
+                {(['all', 'doctor', 'nurse'] as const).map(role => (
+                  <button
+                    key={role}
+                    type="button"
+                    onClick={() => setRegistryRoleFilter(role)}
+                    className={`px-3 py-1.5 text-xs font-bold capitalize border transition-colors cursor-pointer ${
+                      registryRoleFilter === role
+                        ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-600)]'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    {role === 'all' ? 'All Roles' : role === 'doctor' ? 'Doctors' : 'Nurses'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative">
+              <Search className="h-4 w-4 text-slate-400 absolute left-3 top-3.5" />
+              <input
+                type="text"
+                value={registrySearch}
+                onChange={(e) => setRegistrySearch(e.target.value)}
+                placeholder="Search by name, license number, council or specialization..."
+                className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus:border-[color:var(--t-600)] outline-none"
+              />
+            </div>
+
+            <div className="overflow-x-auto border border-slate-200">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[10px]">
+                    <th className="p-3">Practitioner</th>
+                    <th className="p-3">Council &amp; Licence</th>
+                    <th className="p-3">Specialization</th>
+                    <th className="p-3">Status</th>
+                    <th className="p-3">Licence Expiry</th>
+                    <th className="p-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-150">
+                  {professionals
+                    .filter(p => {
+                      if (registryRoleFilter !== 'all' && p.role !== (registryRoleFilter === 'doctor' ? UserRole.DOCTOR : UserRole.NURSE)) return false;
+                      if (!registrySearch) return true;
+                      const s = registrySearch.toLowerCase();
+                      return (
+                        p.name.toLowerCase().includes(s) ||
+                        p.licenseNumber.toLowerCase().includes(s) ||
+                        (p.specialization && p.specialization.toLowerCase().includes(s)) ||
+                        ((p as any).medicalCouncil && (p as any).medicalCouncil.toLowerCase().includes(s))
+                      );
+                    })
+                    .map(prof => (
+                      <tr key={prof.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="p-3">
+                          <div className="flex items-center gap-3">
+                            <img src={prof.avatar} alt={prof.name} className="h-8 w-8 rounded-full object-cover border border-slate-200 shrink-0" referrerPolicy="no-referrer" />
+                            <div>
+                              <p className="font-bold text-slate-900">{prof.name}</p>
+                              <span className="text-[10px] text-slate-500 uppercase font-bold">{prof.role}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-3">
+                          <code className="font-mono font-bold text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded-none border border-slate-200">
+                            {prof.licenseNumber}
+                          </code>
+                          <p className="text-[10px] text-slate-500 font-semibold mt-0.5">
+                            {(prof as any).medicalCouncil || (prof as any).nursingCouncil || 'National Board'}
+                          </p>
+                        </td>
+                        <td className="p-3 font-semibold text-slate-700">
+                          {prof.specialization || 'General Practice'}
+                        </td>
+                        <td className="p-3">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider border ${
+                            prof.verificationStatus === VerificationStatus.VERIFIED
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              : 'bg-amber-50 text-amber-800 border-amber-200'
+                          }`}>
+                            <span className="w-1.5 h-1.5 rounded-none bg-current" />
+                            {prof.verificationStatus}
+                          </span>
+                        </td>
+                        <td className="p-3 font-mono text-[11px] text-slate-600">
+                          {prof.licenseExpiry || 'N/A'}
+                        </td>
+                        <td className="p-3 text-right">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              window.dispatchEvent(new CustomEvent('medcred-view-profile', { detail: prof.id }));
+                            }}
+                            className="px-2.5 py-1 text-[11px] font-bold bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 transition-colors cursor-pointer"
+                          >
+                            Profile
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'facilities' && (
+        <div id="panel-facilities" role="tabpanel" tabIndex={0}>
+          <FacilityWorkspace activeGroup="staffing" />
+        </div>
+      )}
+
+      {activeTab === 'shifts' && (
+        <div id="panel-shifts" role="tabpanel" tabIndex={0}>
+          <JobMarket
+            jobs={jobs}
+            onNewJobCreated={onNewJobCreated}
+            onApplyJob={onApplyJob}
+            onRefreshData={onRefreshData}
+            role="admin"
+            currentUser={currentUser}
+            professionals={professionals}
+            reviews={reviews}
+            bookings={bookings}
+            onOpenHelp={() => window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }))}
+          />
+        </div>
+      )}
+
+      {activeTab === 'tourism' && (
+        <div id="panel-tourism" role="tabpanel" tabIndex={0}>
+          <TourismDesk
+            isAdmin={true}
+            currentUser={currentUser}
+            professionals={professionals}
+            reviews={reviews}
+            bookings={bookings}
+          />
+        </div>
+      )}
+
+      {activeTab === 'seo' && (
+        <div id="panel-seo" role="tabpanel" tabIndex={0}>
+          <SEODashboard professionals={professionals} />
         </div>
       )}
       </div>

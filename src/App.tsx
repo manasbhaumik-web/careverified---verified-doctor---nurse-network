@@ -93,17 +93,67 @@ export default function App() {
     return q === 'success' ? 'Payment received. It can take a few seconds to confirm.' : 'Payment was cancelled.';
   });
 
+  const getPatientGroup = (view: string): 'care' | 'records' | 'services' | 'discovery' => {
+    if (['patient_records', 'records', 'prescriptions', 'certs'].includes(view)) return 'records';
+    if (['patient_services', 'packages', 'assistance', 'tourism'].includes(view)) return 'services';
+    if (['patient_discovery', 'registry', 'pharmacies', 'articles'].includes(view)) return 'discovery';
+    return 'care';
+  };
+
+  const getPatientTab = (view: string): any => {
+    if (['consult', 'messages', 'saved', 'records', 'prescriptions', 'certs', 'packages', 'assistance', 'tourism', 'registry', 'pharmacies', 'articles'].includes(view)) {
+      return view;
+    }
+    return undefined;
+  };
+
+  const getFacilityGroup = (view: string): 'staffing' | 'care' | 'profile' => {
+    if (['facility_care', 'cases'].includes(view)) return 'care';
+    if (['facility_profile', 'profile'].includes(view)) return 'profile';
+    return 'staffing';
+  };
+
+  const getPharmacyGroup = (view: string): 'dispensing' | 'operations' => {
+    if (['pharmacy_operations', 'reports', 'team', 'profile'].includes(view)) return 'operations';
+    return 'dispensing';
+  };
+
+  const getAdminGroup = (view: string): 'registry' | 'ops' | 'facilities' | 'growth' => {
+    if (['admin_ops', 'ops', 'quality'].includes(view)) return 'ops';
+    if (['admin_facilities', 'facilities', 'shifts'].includes(view)) return 'facilities';
+    if (['admin_growth', 'tourism_desk', 'literature', 'seo'].includes(view)) return 'growth';
+    return 'registry';
+  };
+
+  const isNavItemActive = (itemId: string, currentView: string): boolean => {
+    if (currentView === itemId) return true;
+    if (itemId === 'patient_care') return ['patient_care', 'patient_dashboard', 'consult', 'messages', 'saved'].includes(currentView);
+    if (itemId === 'patient_records') return ['patient_records', 'records', 'prescriptions', 'certs'].includes(currentView);
+    if (itemId === 'patient_services') return ['patient_services', 'packages', 'assistance', 'tourism'].includes(currentView);
+    if (itemId === 'patient_discovery') return ['patient_discovery', 'registry', 'pharmacies', 'articles'].includes(currentView);
+    if (itemId === 'facility_staffing') return ['facility_staffing', 'facility_workspace', 'shifts', 'locums'].includes(currentView);
+    if (itemId === 'facility_care') return ['facility_care', 'cases'].includes(currentView);
+    if (itemId === 'facility_profile') return ['facility_profile', 'profile'].includes(currentView);
+    if (itemId === 'pharmacy_dispensing') return ['pharmacy_dispensing', 'pharmacy_workspace', 'inbox', 'activity'].includes(currentView);
+    if (itemId === 'pharmacy_operations') return ['pharmacy_operations', 'reports', 'team'].includes(currentView);
+    if (itemId === 'admin_registry') return ['admin_registry', 'admin', 'approvals', 'trust'].includes(currentView);
+    if (itemId === 'admin_ops') return ['admin_ops', 'ops', 'quality'].includes(currentView);
+    if (itemId === 'admin_facilities') return ['admin_facilities', 'facilities'].includes(currentView);
+    if (itemId === 'admin_growth') return ['admin_growth', 'tourism_desk', 'literature', 'seo'].includes(currentView);
+    return false;
+  };
+
   const routeForRole = (role: SessionUser['role']) => {
     setActiveView(
       role === 'patient'
-        ? 'patient_dashboard'
+        ? 'patient_care'
         : role === 'practitioner'
         ? 'onboard'
         : role === 'pharmacy'
-        ? 'pharmacy_workspace'
+        ? 'pharmacy_dispensing'
         : role === 'facility'
-        ? 'facility_workspace'
-        : 'admin'
+        ? 'facility_staffing'
+        : 'admin_registry'
     );
     setSelectedProfId(null);
   };
@@ -355,24 +405,10 @@ export default function App() {
   // Define Horizontal Menu Items based on logged-in perspective
   const navItems: { id: string; name: string; icon: React.ComponentType<any>; isExtension?: boolean }[] = [];
   if (currentUser.role === 'patient') {
-    if (isPackageEnabled('patient_dashboard')) {
-      navItems.push({ id: 'patient_dashboard', name: 'Member Hub', icon: Heart });
-    }
-    navItems.push({ id: 'consult', name: 'Consult Now', icon: Video });
-    navItems.push({ id: 'packages', name: 'Medical Packages & Promos', icon: PackagePlus });
-    navItems.push({ id: 'assistance', name: 'Assistance & Quotes', icon: HeartHandshake });
-    navItems.push({ id: 'pharmacies', name: 'Pharmacies', icon: Pill });
-    navItems.push({ id: 'tourism', name: 'Global Patient Services', icon: Plane });
-    navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
-    if (isPackageEnabled('registry')) {
-      navItems.push({ id: 'registry', name: 'Doctors & Nurses', icon: Search });
-    }
-    if (isPackageEnabled('articles')) {
-      navItems.push({ id: 'articles', name: 'Medical Library', icon: BookOpen });
-    }
-    if (isPackageEnabled('messages')) {
-      navItems.push({ id: 'messages', name: 'Secure Mailbox', icon: MessageSquare });
-    }
+    navItems.push({ id: 'patient_care', name: 'My Care', icon: Heart });
+    navItems.push({ id: 'patient_records', name: 'Clinical Records', icon: FileText });
+    navItems.push({ id: 'patient_services', name: 'Packages & Assistance', icon: PackagePlus });
+    navItems.push({ id: 'patient_discovery', name: 'Doctors & Library', icon: Search });
   } else if (currentUser.role === 'practitioner') {
     if (isPackageEnabled('onboard')) {
       navItems.push({ id: 'onboard', name: 'Clinical Care', icon: Stethoscope });
@@ -388,28 +424,21 @@ export default function App() {
       navItems.push({ id: 'articles', name: 'Medical Library', icon: BookOpen });
     }
   } else if (currentUser.role === 'facility') {
-    navItems.push({ id: 'facility_workspace', name: 'Facility Hub', icon: Building2 });
-    navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
+    navItems.push({ id: 'facility_staffing', name: 'Clinical Staffing', icon: Calendar });
+    navItems.push({ id: 'facility_care', name: 'Referrals & Packages', icon: PackagePlus });
+    navItems.push({ id: 'facility_profile', name: 'Facility & Infrastructure', icon: Building2 });
   } else if (currentUser.role === 'pharmacy') {
-    navItems.push({ id: 'pharmacy_workspace', name: 'Workspace', icon: Store });
-    navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
+    navItems.push({ id: 'pharmacy_dispensing', name: 'Prescription Dispensing', icon: Pill });
+    navItems.push({ id: 'pharmacy_operations', name: 'Operations & Team', icon: Store });
   } else if (currentUser.role === 'admin') {
-    navItems.push({ id: 'admin', name: 'Admin Panel', icon: ShieldCheck });
-    navItems.push({ id: 'facility_workspace', name: 'Facility Hub', icon: Building2 });
-    if (isPackageEnabled('recruitment')) {
-      navItems.push({ id: 'recruitment', name: 'Clinical Shifts', icon: Calendar });
-    }
-    navItems.push({ id: 'tourism_desk', name: 'Global Patient Services', icon: Plane });
-    if (isPackageEnabled('seo')) {
-      navItems.push({ id: 'seo', name: 'SEO Compliance', icon: Globe });
-    }
-    if (isPackageEnabled('registry')) {
-      navItems.push({ id: 'registry', name: 'Doctors & Nurses', icon: Search });
-    }
+    navItems.push({ id: 'admin_registry', name: 'Registry & Licensing', icon: ShieldCheck });
+    navItems.push({ id: 'admin_ops', name: 'Operations & Governance', icon: CreditCard });
+    navItems.push({ id: 'admin_facilities', name: 'Facilities & Staffing', icon: Building2 });
+    navItems.push({ id: 'admin_growth', name: 'Global Care & Strategy', icon: Plane });
   }
 
   // Append any active extensions that aren't standard
-  const standardIds = ['patient_dashboard', 'registry', 'recruitment', 'articles', 'onboard', 'practice_compliance', 'performance_profile', 'messages', 'seo', 'admin', 'consult', 'oncall', 'earnings', 'quality', 'help'];
+  const standardIds = ['patient_dashboard', 'patient_care', 'patient_records', 'patient_services', 'patient_discovery', 'registry', 'recruitment', 'articles', 'onboard', 'practice_compliance', 'performance_profile', 'messages', 'seo', 'admin', 'admin_registry', 'admin_ops', 'admin_facilities', 'admin_growth', 'consult', 'oncall', 'earnings', 'quality', 'help', 'facility_workspace', 'facility_staffing', 'facility_care', 'facility_profile', 'pharmacy_workspace', 'pharmacy_dispensing', 'pharmacy_operations'];
   const customPackages = (currentUser.role === 'pharmacy' || currentUser.role === 'facility') ? [] : packages.filter(p => !standardIds.includes(p.id) && p.isEnabled);
   customPackages.forEach(p => {
     let icon = Puzzle;
@@ -429,16 +458,20 @@ export default function App() {
 
   // The mobile bottom bar shows the places each role uses most (up to four); everything else is under "More".
   const PRIORITY: Record<string, string[]> = {
-    patient: ['patient_dashboard', 'consult', 'pharmacies', 'messages'],
-    practitioner: ['onboard', 'practice_compliance', 'performance_profile', 'recruitment'],
-    pharmacy: ['pharmacy_workspace', 'help'],
-    facility: ['facility_workspace', 'help'],
-    admin: ['admin', 'facility_workspace', 'recruitment', 'registry'],
+    patient: ['patient_care', 'patient_records', 'patient_services', 'patient_discovery'],
+    practitioner: ['onboard', 'recruitment', 'practice_compliance', 'performance_profile'],
+    pharmacy: ['pharmacy_dispensing', 'pharmacy_operations'],
+    facility: ['facility_staffing', 'facility_care', 'facility_profile'],
+    admin: ['admin_registry', 'admin_ops', 'admin_facilities', 'admin_growth'],
   };
   const SHORT_LABEL: Record<string, string> = {
+    patient_care: 'My Care', patient_records: 'Records', patient_services: 'Services', patient_discovery: 'Directory',
     patient_dashboard: 'Home', consult: 'Consult', packages: 'Packages', assistance: 'Assistance', pharmacies: 'Pharmacy', messages: 'Mailbox', registry: 'Doctors', oncall: 'On Call', earnings: 'Earnings',
     onboard: 'Clinical', practice_compliance: 'Practice', performance_profile: 'Profile',
     recruitment: 'Shifts', admin: 'Admin', tourism_desk: 'Global Care', pharmacy_workspace: 'Workspace', facility_workspace: 'Facility', help: 'Help', articles: 'Library', tourism: 'Global Care', quality: 'Quality', seo: 'SEO',
+    facility_staffing: 'Staffing', facility_care: 'Referrals', facility_profile: 'Profile',
+    pharmacy_dispensing: 'Dispensing', pharmacy_operations: 'Operations',
+    admin_registry: 'Registry', admin_ops: 'Operations', admin_facilities: 'Facilities', admin_growth: 'Growth',
   };
   const mobileTabs = (() => {
     const wanted = (PRIORITY[currentUser.role] ?? []).map(id => navItems.find(n => n.id === id)).filter(Boolean) as typeof navItems;
@@ -463,11 +496,11 @@ export default function App() {
           <div
             className="flex items-center gap-3.5 cursor-pointer group"
             onClick={() => {
-              if (currentUser.role === 'patient') setActiveView('patient_dashboard');
+              if (currentUser.role === 'patient') setActiveView('patient_care');
               else if (currentUser.role === 'practitioner') setActiveView('onboard');
-              else if (currentUser.role === 'pharmacy') setActiveView('pharmacy_workspace');
-              else if (currentUser.role === 'facility') setActiveView('facility_workspace');
-              else if (currentUser.role === 'admin') setActiveView('admin');
+              else if (currentUser.role === 'pharmacy') setActiveView('pharmacy_dispensing');
+              else if (currentUser.role === 'facility') setActiveView('facility_staffing');
+              else if (currentUser.role === 'admin') setActiveView('admin_registry');
               setSelectedProfId(null);
             }}
           >
@@ -554,7 +587,7 @@ export default function App() {
               <div className="py-3 space-y-1 text-sm font-bold text-[color:var(--ink)] pb-6">
                 {navItems.map((item) => {
                   const Icon = item.icon;
-                  const isActive = activeView === item.id;
+                  const isActive = isNavItemActive(item.id, activeView);
                   return (
                     <button
                       key={item.id}
@@ -569,6 +602,41 @@ export default function App() {
                         <span>{item.name}</span>
                       </div>
 
+                      {item.id === 'patient_care' && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                          Live Care
+                        </span>
+                      )}
+                      {item.id === 'patient_records' && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                          EHR
+                        </span>
+                      )}
+                      {item.id === 'patient_services' && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                          Packages
+                        </span>
+                      )}
+                      {item.id === 'facility_staffing' && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                          Shifts
+                        </span>
+                      )}
+                      {item.id === 'pharmacy_dispensing' && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                          Rx Live
+                        </span>
+                      )}
+                      {item.id === 'admin_registry' && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                          Audit
+                        </span>
+                      )}
+                      {item.id === 'admin_ops' && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                          Ops
+                        </span>
+                      )}
                       {item.id === 'messages' && (
                         <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-100)] text-[color:var(--t-600)]'}`}>
                           2 new
@@ -650,7 +718,7 @@ export default function App() {
             <nav aria-label="Main" className="flex items-stretch gap-1 relative z-0 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = activeView === item.id;
+                const isActive = isNavItemActive(item.id, activeView);
                 return (
                   <button
                     key={item.id}
@@ -665,6 +733,41 @@ export default function App() {
                     <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-white/70'}`} />
                     <span>{item.name}</span>
 
+                    {item.id === 'patient_care' && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                        Live Care
+                      </span>
+                    )}
+                    {item.id === 'patient_records' && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                        EHR
+                      </span>
+                    )}
+                    {item.id === 'patient_services' && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                        Packages
+                      </span>
+                    )}
+                    {item.id === 'facility_staffing' && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                        Shifts
+                      </span>
+                    )}
+                    {item.id === 'pharmacy_dispensing' && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                        Rx Live
+                      </span>
+                    )}
+                    {item.id === 'admin_registry' && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                        Audit
+                      </span>
+                    )}
+                    {item.id === 'admin_ops' && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                        Ops
+                      </span>
+                    )}
                     {item.id === 'messages' && (
                       <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         2 new
@@ -736,7 +839,7 @@ export default function App() {
           <div className="w-full animate-fade-in">
 
             {/* VIEW 1: REGISTRY & SYMPTOM MATCHER */}
-            {activeView === 'registry' && !selectedProfId && (
+            {activeView === 'registry' && !selectedProfId && currentUser.role !== 'patient' && (
               <div className="w-full space-y-0">
                 {/* Standard dashboard header with attached tabs */}
                 <DashboardHeader
@@ -850,20 +953,31 @@ export default function App() {
               />
             )}
 
-            {/* VIEW 5: SECURE MESSENGER */}
-            {activeView === 'pharmacies' && currentUser.role === 'patient' && <PharmacyFinder />}
+            {/* VIEW 5: PHARMACIES & WORKSPACES */}
+            {activeView === 'pharmacies' && currentUser.role !== 'patient' && <PharmacyFinder />}
 
-            {activeView === 'pharmacy_workspace' && currentUser.role === 'pharmacy' && <PharmacyWorkspace />}
-            {activeView === 'facility_workspace' && (currentUser.role === 'facility' || currentUser.role === 'admin') && <FacilityWorkspace />}
+            {/* VIEW: FACILITY WORKSPACE (Handles all facility groups) */}
+            {(currentUser.role === 'facility' || (currentUser.role === 'admin' && ['facility_workspace', 'facility_staffing', 'facility_care', 'facility_profile'].includes(activeView))) && [
+              'facility_workspace', 'facility_staffing', 'facility_care', 'facility_profile'
+            ].includes(activeView) && (
+              <FacilityWorkspace activeGroup={getFacilityGroup(activeView)} />
+            )}
 
-            {activeView === 'consult' && currentUser.role === 'patient' && (
+            {/* VIEW: PHARMACY WORKSPACE (Handles all pharmacy groups) */}
+            {currentUser.role === 'pharmacy' && [
+              'pharmacy_workspace', 'pharmacy_dispensing', 'pharmacy_operations'
+            ].includes(activeView) && (
+              <PharmacyWorkspace activeGroup={getPharmacyGroup(activeView)} />
+            )}
+
+            {activeView === 'consult' && currentUser.role !== 'patient' && (
               <ConsultNow myUserId={currentUser.id} />
             )}
 
-            {activeView === 'packages' && <MedicalPackagesModule />}
-            {activeView === 'assistance' && <MedicalAssistanceModule />}
+            {activeView === 'packages' && currentUser.role !== 'patient' && <MedicalPackagesModule />}
+            {activeView === 'assistance' && currentUser.role !== 'patient' && <MedicalAssistanceModule />}
 
-            {activeView === 'tourism' && currentUser.role === 'patient' && (
+            {activeView === 'tourism' && currentUser.role !== 'patient' && (
               <MedicalTourism onOpenProfessional={(id) => { setSelectedProfId(id); setActiveView('registry'); }} />
             )}
 
@@ -951,34 +1065,51 @@ export default function App() {
               />
             )}
 
-            {activeView === 'messages' && currentUser.role !== 'practitioner' && (
+            {activeView === 'messages' && currentUser.role !== 'practitioner' && currentUser.role !== 'patient' && (
               <SecureMessenger currentUserId={currentUser.profileId || currentUser.id} />
             )}
 
-            {/* VIEW 6: MEDICAL BOARD ADMIN */}
-            {activeView === 'admin' && (
+            {/* VIEW 6: MEDICAL BOARD ADMIN (Unified admin dashboard with parent groups) */}
+            {currentUser.role === 'admin' && [
+              'admin', 'admin_registry', 'admin_ops', 'admin_facilities', 'admin_growth'
+            ].includes(activeView) && (
               <>
                 <AdminDashboard
                   professionals={professionals}
                   onProfessionalApproved={handleProfessionalApprovedByAdmin}
                   packages={packages}
                   onPackagesChanged={handlePackagesChanged}
+                  activeGroup={getAdminGroup(activeView)}
+                  jobs={jobs}
+                  onNewJobCreated={handleNewJobCreated}
+                  onApplyJob={handleApplyJob}
+                  onRefreshData={loadData}
+                  currentUser={currentUser}
+                  reviews={reviews}
+                  bookings={bookings}
                 />
                 <TestimonialAdmin />
               </>
             )}
 
             {/* VIEW 7: SEO DASHBOARD */}
-            {activeView === 'seo' && (
+            {activeView === 'seo' && currentUser.role !== 'admin' && (
               <SEODashboard professionals={professionals} />
             )}
 
-            {/* VIEW 9: PATIENT PORTAL DASHBOARD */}
-            {activeView === 'patient_dashboard' && !selectedProfId && (
+            {/* VIEW 9: PATIENT PORTAL DASHBOARD (Unified PatientHeroBanner & 4 parent groups for all patient views) */}
+            {currentUser.role === 'patient' && [
+              'patient_dashboard', 'patient_care', 'patient_records', 'patient_services', 'patient_discovery',
+              'consult', 'packages', 'assistance', 'tourism', 'pharmacies', 'messages', 'articles', 'registry'
+            ].includes(activeView) && !selectedProfId && (
               <PatientDashboard
                 bookings={bookings}
                 setBookings={setBookings}
                 professionals={professionals}
+                currentUser={currentUser}
+                articles={articles}
+                activeGroup={getPatientGroup(activeView)}
+                initialTab={getPatientTab(activeView)}
                 onSelectProfessional={(id) => setSelectedProfId(id)}
                 onNavigateToMessages={() => setActiveView('messages')}
                 onConsultNow={() => setActiveView('consult')}
@@ -991,7 +1122,7 @@ export default function App() {
             )}
 
             {/* VIEW 8: HEALTH ARTICLES / EDUCATION */}
-            {activeView === 'articles' && (
+            {activeView === 'articles' && currentUser.role !== 'patient' && (
               <MedicalLibrary
                 articles={articles}
                 professionals={professionals}
@@ -1009,7 +1140,7 @@ export default function App() {
             )}
 
             {/* VIEW: DYNAMIC CUSTOM / MARKETPLACE MODULE VIEW */}
-            {!['registry', 'profile', 'onboard', 'practice_compliance', 'performance_profile', 'recruitment', 'messages', 'admin', 'seo', 'articles', 'patient_dashboard'].includes(activeView) && (
+            {!['registry', 'profile', 'onboard', 'practice_compliance', 'performance_profile', 'recruitment', 'messages', 'admin', 'seo', 'articles', 'patient_dashboard', 'patient_care', 'patient_records', 'patient_services', 'patient_discovery', 'facility_workspace', 'facility_staffing', 'facility_care', 'facility_profile', 'pharmacy_workspace', 'pharmacy_dispensing', 'pharmacy_operations', 'admin_registry', 'admin_ops', 'admin_facilities', 'admin_growth', 'consult', 'packages', 'assistance', 'tourism', 'pharmacies', 'help', 'quality', 'earnings', 'oncall', 'tourism_desk'].includes(activeView) && (
               (() => {
                 const activePkg = packages.find(p => p.id === activeView);
                 if (!activePkg) return null;

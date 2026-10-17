@@ -5,16 +5,87 @@ import {
   CheckCircle2, Search, MessageSquare, ShieldCheck, ArrowRight, User,
   AlertTriangle, Stethoscope, Sparkles, Pill, Activity, PhoneCall,
   HeartPulse, ShieldAlert, ChevronRight, ExternalLink, LifeBuoy,
-  Send, X, Star, MapPin, Radio, AlertCircle
+  Send, X, Star, MapPin, Radio, AlertCircle, FileText, PackagePlus,
+  HeartHandshake, Plane, Store, UserCheck, Tag
 } from 'lucide-react';
-import { DoctorProfile, NurseProfile, Booking, PatientProfile, UserRole } from '../types';
+import { DoctorProfile, NurseProfile, Booking, PatientProfile, UserRole, Article } from '../types';
+import { INITIAL_ARTICLES } from '../data';
 import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from './DashboardHeader';
 import PatientRecords, { RecordSubTab } from './PatientRecords';
 import SavedTab from './patient/SavedTab';
 import PaymentDialog from './PaymentDialog';
 import { formatMoney, formatDate } from '../locale';
+import ConsultNow from './ConsultNow';
+import SecureMessenger from './SecureMessenger';
+import MedicalPackagesModule from './MedicalPackagesModule';
+import MedicalAssistanceModule from './MedicalAssistanceModule';
+import MedicalTourism from './MedicalTourism';
+import PharmacyFinder from './PharmacyFinder';
+import MedicalLibrary from './MedicalLibrary';
+import PatientHeroBanner from './PatientHeroBanner';
 
-interface PatientDashboardProps {
+export type PatientDashboardTab = 
+  | 'appointments' 
+  | 'consult' 
+  | 'messages' 
+  | 'saved' 
+  | 'records' 
+  | 'prescriptions' 
+  | 'certs' 
+  | 'packages' 
+  | 'assistance' 
+  | 'tourism' 
+  | 'registry' 
+  | 'pharmacies' 
+  | 'articles';
+
+export type PatientTabGroup = 'care' | 'records' | 'services' | 'discovery';
+
+export const PATIENT_GROUPS: Record<PatientTabGroup, {
+  name: string;
+  defaultTab: PatientDashboardTab;
+  tabs: { id: PatientDashboardTab; label: string; icon: any; count?: number }[];
+}> = {
+  care: {
+    name: 'My Care & Consultations',
+    defaultTab: 'appointments',
+    tabs: [
+      { id: 'appointments', label: 'Appointments & Visits', icon: Calendar },
+      { id: 'consult', label: 'Consult Now', icon: Video },
+      { id: 'messages', label: 'Care Mailbox', icon: MessageSquare },
+      { id: 'saved', label: 'Care Team', icon: Heart },
+    ],
+  },
+  records: {
+    name: 'Clinical Records & Meds',
+    defaultTab: 'records',
+    tabs: [
+      { id: 'records', label: 'Health Records', icon: FolderHeart },
+      { id: 'prescriptions', label: 'Prescriptions', icon: Pill },
+      { id: 'certs', label: 'Medical Certificates', icon: FileText },
+    ],
+  },
+  services: {
+    name: 'Packages & Assistance',
+    defaultTab: 'packages',
+    tabs: [
+      { id: 'packages', label: 'Medical Packages', icon: PackagePlus },
+      { id: 'assistance', label: 'Assistance & Quotes', icon: HeartHandshake },
+      { id: 'tourism', label: 'Global Patient Care', icon: Plane },
+    ],
+  },
+  discovery: {
+    name: 'Medical Network & Library',
+    defaultTab: 'registry',
+    tabs: [
+      { id: 'registry', label: 'Doctors & Nurses', icon: Search },
+      { id: 'pharmacies', label: 'Pharmacies', icon: Store },
+      { id: 'articles', label: 'Medical Library', icon: BookOpen },
+    ],
+  },
+};
+
+export interface PatientDashboardProps {
   bookings: Booking[];
   setBookings: React.Dispatch<React.SetStateAction<Booking[]>>;
   professionals: (DoctorProfile | NurseProfile)[];
@@ -31,9 +102,13 @@ interface PatientDashboardProps {
   onOpenPharmacies?: () => void;
   /** Opens the Help & Support Desk */
   onOpenHelp?: () => void;
+  activeGroup?: PatientTabGroup;
+  initialTab?: PatientDashboardTab;
+  currentUser?: any;
+  articles?: Article[];
 }
 
-type Tab = 'appointments' | 'records' | 'saved';
+type Tab = PatientDashboardTab;
 
 interface Pharmacy {
   id: string;
@@ -70,9 +145,31 @@ const fmtDate = (iso?: string | null) => {
 };
 
 export default function PatientDashboard({
-  bookings, setBookings, professionals, onSelectProfessional, onNavigateToMessages, onConsultNow, onOpenArticle, onFindDoctors, onOpenTriage, onOpenPharmacies, onOpenHelp,
+  bookings, setBookings, professionals, onSelectProfessional, onNavigateToMessages, onConsultNow, onOpenArticle, onFindDoctors, onOpenTriage, onOpenPharmacies, onOpenHelp, activeGroup, initialTab, currentUser, articles,
 }: PatientDashboardProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('appointments');
+  const currentGroup: PatientTabGroup = activeGroup || (
+    initialTab ? (
+      (['records', 'prescriptions', 'certs'].includes(initialTab)) ? 'records' :
+      (['packages', 'assistance', 'tourism'].includes(initialTab)) ? 'services' :
+      (['registry', 'pharmacies', 'articles'].includes(initialTab)) ? 'discovery' : 'care'
+    ) : 'care'
+  );
+
+  const [activeTab, setActiveTab] = useState<PatientDashboardTab>(
+    initialTab || PATIENT_GROUPS[currentGroup].defaultTab
+  );
+
+  useEffect(() => {
+    if (activeGroup) {
+      const allowed = PATIENT_GROUPS[activeGroup].tabs.map(t => t.id);
+      if (!allowed.includes(activeTab)) {
+        setActiveTab(initialTab && allowed.includes(initialTab) ? initialTab : PATIENT_GROUPS[activeGroup].defaultTab);
+      }
+    } else if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [activeGroup, initialTab]);
+
   const [recordsSubTab, setRecordsSubTab] = useState<RecordSubTab>('overview');
   const [savedIds, setSavedIds] = useState<string[]>(readSaved);
   
@@ -327,148 +424,38 @@ export default function PatientDashboard({
     </div>
   );
 
-  const tabs: { id: Tab; label: string; icon: React.ComponentType<any>; count?: number }[] = [
-    { id: 'appointments', label: 'My Care & Appointments', icon: Calendar, count: upcoming.length },
-    { id: 'records', label: 'Clinical Health Record', icon: FolderHeart },
-    { id: 'saved', label: 'Saved Practitioners', icon: Heart, count: savedIds.length },
-  ];
-
   return (
     <div className="w-full space-y-0" id="patient-dashboard-root">
-      {/* 1. PERSISTENT ACTIVE CONSULTATION QUEUE RIBBON (IF LIVE) */}
-      {activeConsult && (
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
-          <aside 
-            aria-label="Active consultation alert" 
-            className={`border p-4 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in ${
-              activeConsult.status === 'active'
-                ? 'bg-emerald-50/90 text-emerald-950 border-emerald-300 border-l-4 border-l-emerald-600'
-                : activeConsult.status === 'queued'
-                ? 'bg-slate-50 text-[color:var(--ink)] border-[color:var(--t-200)] border-l-4 border-l-[color:var(--t-600)]'
-                : 'bg-amber-50 text-amber-950 border-amber-300 border-l-4 border-l-amber-500'
-            }`}
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <span className="relative flex h-3.5 w-3.5 shrink-0">
-                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                  activeConsult.status === 'active' ? 'bg-emerald-500' : 'bg-[color:var(--t-600)]'
-                }`} />
-                <span className={`relative inline-flex rounded-full h-3.5 w-3.5 ${
-                  activeConsult.status === 'active' ? 'bg-emerald-600' : 'bg-[color:var(--t-600)]'
-                }`} />
-              </span>
-              <div className="min-w-0">
-                <p className="font-display font-black text-xs sm:text-sm leading-tight">
-                  {activeConsult.status === 'active' && 'LIVE VIDEO CONSULTATION IN PROGRESS'}
-                  {activeConsult.status === 'queued' && 'ON-CALL DOCTOR QUEUE: MATCHING PRACTITIONER'}
-                  {activeConsult.status === 'awaiting_payment' && 'CONSULTATION SLOT RESERVED · AWAITING PAYMENT'}
-                </p>
-                <p className={`text-[11px] font-medium mt-0.5 ${activeConsult.status === 'active' ? 'text-emerald-800' : 'text-slate-600'}`}>
-                  {activeConsult.status === 'active' && 'A licensed physician is waiting in the encrypted WebRTC consultation room.'}
-                  {activeConsult.status === 'queued' && 'Consultation payment confirmed. Keep window open. A doctor will connect within 10 min or refund automatically.'}
-                  {activeConsult.status === 'awaiting_payment' && `Fee: ${formatMoney(activeConsult.fee || 50)} · Complete payment to be matched with on-call doctor.`}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={onConsultNow}
-                className={`min-h-[38px] px-4 text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 w-full sm:w-auto ${
-                  activeConsult.status === 'active'
-                    ? 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs'
-                    : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white shadow-xs'
-                }`}
-              >
-                <Video className="h-3.5 w-3.5" />
-                <span>{activeConsult.status === 'active' ? 'Enter Video Room' : 'View Live Room'}</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </button>
-              {activeConsult.status === 'queued' && (
-                <button
-                  type="button"
-                  onClick={() => cancelActiveConsult(activeConsult.id)}
-                  className="min-h-[38px] px-3 text-xs font-bold border border-slate-300 hover:border-rose-400 hover:bg-rose-50 hover:text-rose-700 transition-colors cursor-pointer bg-white"
-                >
-                  Cancel &amp; Refund
-                </button>
-              )}
-            </div>
-          </aside>
-        </div>
-      )}
-
-      {/* 2. INSTITUTIONAL PATIENT HEADER (HERO BANNER FULL WIDTH AS MAIN HEADER - SINGLE SOLID COLOR) */}
-      <DashboardHeader
-        fullWidth={true}
-        tabs={tabs}
+      {/* 2. INSTITUTIONAL PATIENT HEADER (HERO BANNER FULL WIDTH AS MAIN HEADER) */}
+      <PatientHeroBanner
+        userName={userName}
+        userAvatar={userAvatar}
+        greeting={greeting}
+        groupName={PATIENT_GROUPS[currentGroup].name}
+        upcomingCount={upcoming.length}
+        nextVisitText={upcoming[0] ? `Next Visit: ${upcoming[0].professionalName}, ${upcoming[0].date}` : 'No upcoming consultations'}
+        activeRxCount={summary?.activeRx ?? '–'}
+        careTeamCount={careTeam.length}
+        bpSummary={summary?.bp}
+        tabs={PATIENT_GROUPS[currentGroup].tabs.map(t => {
+          if (t.id === 'appointments') return { ...t, count: upcoming.length };
+          if (t.id === 'saved') return { ...t, count: savedIds.length };
+          return t;
+        })}
         activeTab={activeTab}
-        onTabChange={(t) => { setActiveTab(t); if (t === 'records') setRecordsSubTab('overview'); }}
-        tabsLabel="Patient care sections"
-        tabsRight={patientHelpTab}
-      >
-        <BannerRow
-          identity={
-            <BannerIdentity
-              name={userName}
-              avatarUrl={userAvatar}
-              badges={
-                <>
-                  <BannerBadge tone="brand">Patient Workspace</BannerBadge>
-                  <BannerBadge tone="success">
-                    <CheckCircle2 className="h-3 w-3 text-emerald-600 stroke-[3]" /> EHR Verified Patient
-                  </BannerBadge>
-                </>
-              }
-              meta={
-                <>
-                  <span className="font-extrabold text-[color:var(--ink)]">{greeting}</span>
-                  <span className="text-slate-400">&bull;</span>
-                  <span className="text-[color:var(--ink-2)]">{upcoming[0] ? `Next Visit: ${upcoming[0].professionalName}, ${upcoming[0].date}` : 'No upcoming consultations'}</span>
-                  {summary?.bp && (
-                    <>
-                      <span className="text-slate-400">&bull;</span>
-                      <span className={summary.bp.flag?.level === 'urgent' ? 'text-white font-bold bg-red-700 px-1.5' : 'font-mono font-bold text-[color:var(--t-700)] bg-white px-1.5 py-0.5 border border-[color:var(--t-200)] shadow-2xs'}>
-                        BP: {summary.bp.value1}/{summary.bp.value2} mmHg
-                      </span>
-                    </>
-                  )}
-                </>
-              }
-            />
-          }
-          aside={
-            <>
-              <BannerKpis items={[
-                { value: upcoming.length, label: 'Upcoming' },
-                { value: summary?.activeRx ?? '–', label: 'Prescriptions' },
-                { value: careTeam.length, label: 'Care Team' },
-              ]} />
-              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                <button type="button" onClick={onConsultNow} className={bannerOnBrandPrimaryBtn}>
-                  <Video className="h-4 w-4" />
-                  <span>On-Call Doctor</span>
-                </button>
-                {onOpenTriage && (
-                  <button type="button" onClick={onOpenTriage} className={bannerOnBrandSecondaryBtn}>
-                    <Sparkles className="h-3.5 w-3.5" />
-                    <span>AI Triage</span>
-                  </button>
-                )}
-                <button
-                  type="button" 
-                  onClick={() => { setRecordsSubTab('overview'); setActiveTab('records'); }} 
-                  className={bannerOnBrandSecondaryBtn}
-                >
-                  <FolderHeart className="h-3.5 w-3.5" />
-                  <span>Health Records</span>
-                </button>
-              </div>
-            </>
-          }
-        />
-      </DashboardHeader>
+        onTabChange={(t) => {
+          setActiveTab(t);
+          if (t === 'records') setRecordsSubTab('overview');
+          if (t === 'prescriptions') setRecordsSubTab('rx');
+          if (t === 'certs') setRecordsSubTab('docs');
+        }}
+        tabsLabel={`${PATIENT_GROUPS[currentGroup].name} sections`}
+        onOpenHelp={onOpenHelp}
+        openTicketsCount={openTickets.length}
+        onConsultNow={onConsultNow}
+        onOpenTriage={onOpenTriage}
+        onOpenRecords={() => { setActiveTab('records'); setRecordsSubTab('overview'); }}
+      />
 
       {/* 3. MAIN WORKSPACE CONTENT CONTAINER */}
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -1604,10 +1591,27 @@ export default function PatientDashboard({
         </div>
       )}
 
-      {/* HEALTH RECORD TAB */}
-      {activeTab === 'records' && (
+      {/* HEALTH RECORD TABS */}
+      {(activeTab === 'records' || activeTab === 'prescriptions' || activeTab === 'certs') && (
         <div id="panel-records" role="tabpanel" aria-labelledby="tab-records" tabIndex={0}>
-          <PatientRecords initialTab={recordsSubTab} />
+          <PatientRecords initialTab={activeTab === 'prescriptions' ? 'rx' : activeTab === 'certs' ? 'docs' : recordsSubTab} />
+        </div>
+      )}
+
+      {/* CONSULT NOW TAB */}
+      {activeTab === 'consult' && (
+        <div id="panel-consult" role="tabpanel" tabIndex={0}>
+          <ConsultNow myUserId={currentUser?.id} />
+        </div>
+      )}
+
+      {/* MESSAGES TAB */}
+      {activeTab === 'messages' && (
+        <div id="panel-messages" role="tabpanel" tabIndex={0}>
+          <SecureMessenger
+            currentUserId={currentUser?.profileId || currentUser?.id || 'patient-user'}
+            embedded={true}
+          />
         </div>
       )}
 
@@ -1621,6 +1625,94 @@ export default function PatientDashboard({
             onSelectProfessional={onSelectProfessional}
             onVerifyCredentials={p => onSelectProfessional(p.id)}
           />
+        </div>
+      )}
+
+      {/* PACKAGES TAB */}
+      {activeTab === 'packages' && (
+        <div id="panel-packages" role="tabpanel" tabIndex={0}>
+          <MedicalPackagesModule />
+        </div>
+      )}
+
+      {/* ASSISTANCE & QUOTES TAB */}
+      {activeTab === 'assistance' && (
+        <div id="panel-assistance" role="tabpanel" tabIndex={0}>
+          <MedicalAssistanceModule />
+        </div>
+      )}
+
+      {/* GLOBAL PATIENT SERVICES TAB */}
+      {activeTab === 'tourism' && (
+        <div id="panel-tourism" role="tabpanel" tabIndex={0}>
+          <MedicalTourism onOpenProfessional={onSelectProfessional} />
+        </div>
+      )}
+
+      {/* PHARMACIES TAB */}
+      {activeTab === 'pharmacies' && (
+        <div id="panel-pharmacies" role="tabpanel" tabIndex={0}>
+          <PharmacyFinder />
+        </div>
+      )}
+
+      {/* MEDICAL LIBRARY TAB */}
+      {activeTab === 'articles' && (
+        <div id="panel-articles" role="tabpanel" tabIndex={0}>
+          <MedicalLibrary
+            articles={articles || INITIAL_ARTICLES}
+            professionals={professionals}
+            onFindDoctor={() => {
+              setActiveTab('registry');
+            }}
+          />
+        </div>
+      )}
+
+      {/* REGISTRY / DOCTORS TAB */}
+      {activeTab === 'registry' && (
+        <div id="panel-registry" role="tabpanel" tabIndex={0} className="space-y-4">
+          <div className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
+            <div>
+              <h3 className="font-display font-black text-sm text-[color:var(--ink)]">Malaysian Medical Registry Directory</h3>
+              <p className="text-xs text-slate-500 font-medium">Browse pre-verified MMC &amp; LJM accredited doctors and nurses.</p>
+            </div>
+            {onFindDoctors && (
+              <button
+                type="button"
+                onClick={onFindDoctors}
+                className="px-4 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors cursor-pointer"
+              >
+                Open Full Interactive Directory
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {professionals.slice(0, 6).map(prof => (
+              <div key={prof.id} className="p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all bg-white flex flex-col justify-between shadow-2xs">
+                <div>
+                  <div className="flex items-start gap-3 mb-3">
+                    <img src={prof.avatar || '/assets/malaysian_male_doctor.jpg'} alt={prof.name} className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" />
+                    <div className="min-w-0">
+                      <button type="button" onClick={() => onSelectProfessional(prof.id)} className="font-display font-extrabold text-sm text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left truncate block w-full cursor-pointer">
+                        {prof.name}
+                      </button>
+                      <p className="text-xs text-[color:var(--t-700)] font-bold">{prof.specialization}</p>
+                      <span className="inline-block mt-1 text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200">
+                        MMC Verified · Active
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-[color:var(--t-100)] flex items-center justify-between">
+                  <span className="font-mono text-xs font-bold text-slate-700">RM {prof.fee}</span>
+                  <button type="button" onClick={() => onSelectProfessional(prof.id)} className="text-xs font-bold text-[color:var(--t-600)] hover:underline">
+                    Book Visit &rarr;
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

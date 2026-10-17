@@ -6,7 +6,40 @@ import { useLiveAlerts } from './pharmacy/useLiveAlerts';
 import SecurityCard from './pharmacy/SecurityCard';
 import TeamTab from './pharmacy/TeamTab';
 
-type Tab = 'inbox' | 'activity' | 'reports' | 'team' | 'profile';
+export type PharmacyTab = 'inbox' | 'activity' | 'reports' | 'team' | 'profile';
+export type PharmacyTabGroup = 'dispensing' | 'operations';
+
+export const PHARMACY_GROUPS: Record<PharmacyTabGroup, {
+  name: string;
+  defaultTab: PharmacyTab;
+  tabs: { id: PharmacyTab; label: string; icon: any; count?: number }[];
+}> = {
+  dispensing: {
+    name: 'Prescription Dispensing',
+    defaultTab: 'inbox',
+    tabs: [
+      { id: 'inbox', label: 'Inbox', icon: Inbox },
+      { id: 'activity', label: 'Activity', icon: Activity },
+    ],
+  },
+  operations: {
+    name: 'Operations & Management',
+    defaultTab: 'reports',
+    tabs: [
+      { id: 'reports', label: 'Reports', icon: BarChart3 },
+      { id: 'team', label: 'Team', icon: Users },
+      { id: 'profile', label: 'Pharmacy profile', icon: Store },
+    ],
+  },
+};
+
+type Tab = PharmacyTab;
+
+export interface PharmacyWorkspaceProps {
+  activeGroup?: PharmacyTabGroup;
+  initialTab?: PharmacyTab;
+}
+
 type Bucket = 'new' | 'in_progress' | 'ready' | 'cannot_fill' | 'dispensed' | 'closed';
 type Fill = 'received' | 'preparing' | 'ready' | 'cannot_fill';
 
@@ -54,11 +87,27 @@ const waiting = (iso: string) => {
   return m < 60 ? `${m} min` : m < 1440 ? `${Math.round(m / 60)} h` : `${Math.round(m / 1440)} d`;
 };
 
-/** Pharmacy: inbox of prescriptions sent by patients, fill-status workflow, activity log, reports, team and own listing. */
-export default function PharmacyWorkspace() {
-  const [tab, setTab] = useState<Tab>('inbox');
+export default function PharmacyWorkspace({ activeGroup, initialTab }: PharmacyWorkspaceProps = {}) {
+  const currentGroup: PharmacyTabGroup = activeGroup || (
+    initialTab ? (
+      (['reports', 'team', 'profile'].includes(initialTab)) ? 'operations' : 'dispensing'
+    ) : 'dispensing'
+  );
+
+  const [tab, setTab] = useState<Tab>(initialTab || PHARMACY_GROUPS[currentGroup].defaultTab);
   const [me, setMe] = useState<Me | null>(null);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (activeGroup) {
+      const allowed = PHARMACY_GROUPS[activeGroup].tabs.map(t => t.id);
+      if (!allowed.includes(tab)) {
+        setTab(initialTab && allowed.includes(initialTab) ? initialTab : PHARMACY_GROUPS[activeGroup].defaultTab);
+      }
+    } else if (initialTab) {
+      setTab(initialTab);
+    }
+  }, [activeGroup, initialTab]);
 
   const loadMe = useCallback(async () => {
     const d = await jfetch('/api/pharmacy/me');
@@ -71,13 +120,12 @@ export default function PharmacyWorkspace() {
   const gated = !!me && me.account.twoFactor.required && !me.account.twoFactor.enabled;
   const alerts = useLiveAlerts({ newCount: gated ? undefined : counts?.new, refresh: loadMe });
 
-  const tabs: DashboardTab<Tab>[] = [
-    { id: 'inbox', label: 'Inbox', icon: Inbox, count: counts ? counts.new : 0 },
-    { id: 'activity', label: 'Activity', icon: Activity },
-    { id: 'reports', label: 'Reports', icon: BarChart3 },
-    ...(me?.account.isOwner ? [{ id: 'team' as const, label: 'Team', icon: Users }] : []),
-    { id: 'profile', label: 'Pharmacy profile', icon: Store },
-  ];
+  const displayedTabs: DashboardTab<Tab>[] = PHARMACY_GROUPS[currentGroup].tabs
+    .filter(t => t.id !== 'team' || me?.account.isOwner)
+    .map(t => {
+      if (t.id === 'inbox') return { ...t, count: counts ? counts.new : 0 };
+      return t;
+    });
 
   if (error && !me) {
     return <div className="bg-white border border-rose-200 p-8 text-center text-sm font-semibold text-rose-700" role="alert">{error}</div>;
@@ -131,10 +179,10 @@ export default function PharmacyWorkspace() {
     <div className="w-full space-y-0">
       <DashboardHeader
         fullWidth={true}
-        tabs={tabs}
+        tabs={displayedTabs}
         activeTab={tab}
         onTabChange={setTab}
-        tabsLabel="Pharmacy workspace sections"
+        tabsLabel={`${PHARMACY_GROUPS[currentGroup].name} sections`}
         tabsRight={pharmacyHelpTab}
       >
         <BannerRow
@@ -145,6 +193,7 @@ export default function PharmacyWorkspace() {
               name={me?.pharmacy.name ?? 'Pharmacy workspace'}
               badges={
                 <div className="flex flex-wrap items-center gap-1.5">
+                  <BannerBadge tone="brand">{PHARMACY_GROUPS[currentGroup].name}</BannerBadge>
                   <BannerBadge>Type A Poison Licence</BannerBadge>
                   <BannerBadge tone="success">LFM Accredited</BannerBadge>
                 </div>
