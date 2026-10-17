@@ -11,10 +11,11 @@ interface JobMarketProps {
   jobs: JobPost[];
   onNewJobCreated: (job: JobPost) => void;
   onApplyJob: (id: string, userId: string) => void;
+  onRefreshData?: () => void;
   role?: string;
 }
 
-export default function JobMarket({ jobs, onNewJobCreated, onApplyJob, role = 'practitioner' }: JobMarketProps) {
+export default function JobMarket({ jobs, onNewJobCreated, onApplyJob, onRefreshData, role = 'practitioner' }: JobMarketProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedCity, setSelectedCity] = useState<string>('all');
@@ -122,6 +123,144 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob, role = 'p
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const [shiftActionLoading, setShiftActionLoading] = useState<string | null>(null);
+
+  const handleClockIn = async (jobId: string) => {
+    setShiftActionLoading(jobId);
+    try {
+      const response = await fetch(`/api/practitioner/shifts/${jobId}/clock-in`, { method: 'POST' });
+      const data = await response.json();
+      if (data.status === 'success') {
+        if (onRefreshData) onRefreshData();
+      } else {
+        alert(data.message || 'Could not clock in.');
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setShiftActionLoading(null);
+    }
+  };
+
+  const handleClockOut = async (jobId: string) => {
+    const hoursStr = window.prompt('Confirm actual hours worked on shift:', '8.0');
+    if (!hoursStr) return;
+    const hours = parseFloat(hoursStr);
+    if (isNaN(hours) || hours <= 0) {
+      alert('Please enter a valid number of hours.');
+      return;
+    }
+    setShiftActionLoading(jobId);
+    try {
+      const response = await fetch(`/api/practitioner/shifts/${jobId}/clock-out`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ actualHours: hours })
+      });
+      const data = await response.json();
+      if (data.status === 'success') {
+        if (onRefreshData) onRefreshData();
+      } else {
+        alert(data.message || 'Could not clock out.');
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setShiftActionLoading(null);
+    }
+  };
+
+  const renderApplicationStatus = (job: JobPost) => {
+    const app = job.myApplication;
+    if (!app && !appliedJobs.includes(job.id) && activeTab !== 'applied') return null;
+
+    const status = app?.status || 'pending';
+    const isAccepted = status === 'accepted';
+    const isDeclined = status === 'declined';
+    const isPending = status === 'pending';
+
+    const clockInAt = app?.clockInAt;
+    const clockOutAt = app?.clockOutAt;
+    const timesheetStatus = app?.timesheetStatus || 'unstarted';
+    const totalPayout = app?.totalPayoutMyr;
+
+    return (
+      <div className="border border-[color:var(--t-200)] bg-[color:var(--t-bg)] p-3 text-xs space-y-2 mt-2">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-bold text-[color:var(--ink)]">Application:</span>
+          {isAccepted && (
+            <span className="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5">
+              <CheckCircle2 className="h-3 w-3 text-emerald-600" /> Accepted & Escrow Secured
+            </span>
+          )}
+          {isDeclined && (
+            <span className="inline-flex items-center gap-1 font-bold text-rose-800 bg-rose-100 border border-rose-300 px-2 py-0.5">
+              <X className="h-3 w-3 text-rose-600" /> Declined
+            </span>
+          )}
+          {isPending && (
+            <span className="inline-flex items-center gap-1 font-bold text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5">
+              <Clock className="h-3 w-3 text-amber-600" /> Under Hospital Review
+            </span>
+          )}
+        </div>
+
+        {app?.paymentRef && (
+          <div className="text-[11px] text-slate-600 flex items-center justify-between">
+            <span>Security Reference:</span>
+            <span className="font-mono font-bold text-[color:var(--ink)]">{app.paymentRef}</span>
+          </div>
+        )}
+
+        {app?.decisionNote && (
+          <p className="text-[11px] text-slate-600 italic bg-white p-2 border border-slate-200">
+            "{app.decisionNote}"
+          </p>
+        )}
+
+        {isAccepted && (
+          <div className="pt-2 border-t border-[color:var(--t-200)] flex flex-wrap items-center justify-between gap-2">
+            {!clockInAt ? (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); handleClockIn(job.id); }}
+                disabled={shiftActionLoading === job.id}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                {shiftActionLoading === job.id ? <Loader className="h-3 w-3 animate-spin" /> : <Clock className="h-3 w-3" />}
+                Clock In for Shift
+              </button>
+            ) : !clockOutAt ? (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-1 flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  On Duty ({new Date(clockInAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); handleClockOut(job.id); }}
+                  disabled={shiftActionLoading === job.id}
+                  className="bg-slate-800 hover:bg-slate-900 text-white font-bold px-3 py-1.5 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {shiftActionLoading === job.id ? <Loader className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3" />}
+                  Clock Out & Submit Hours
+                </button>
+              </div>
+            ) : timesheetStatus === 'submitted' ? (
+              <span className="font-bold text-amber-800 bg-amber-50 border border-amber-300 px-2 py-1">
+                ⏱️ Timesheet Submitted ({app.actualHours || 8} hrs) &bull; Pending Supervisor Sign-off
+              </span>
+            ) : timesheetStatus === 'approved' ? (
+              <span className="font-bold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-1">
+                💰 RM {totalPayout?.toFixed(2) || '---'} Released to Earnings
+              </span>
+            ) : null}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -459,6 +598,11 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob, role = 'p
                       {applyButton}
                     </div>
                   </div>
+                  {activeTab === 'applied' && (
+                    <div className="w-full mt-2">
+                      {renderApplicationStatus(job)}
+                    </div>
+                  )}
                 </article>
               );
             }
@@ -489,6 +633,8 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob, role = 'p
                     <JobBadges job={job} />
                   <span className="text-xs text-slate-600 inline-flex items-center gap-1.5"><Users className="h-3.5 w-3.5" /><span className="tabular-nums">{job.applicantsCount}</span> applicants</span>
                 </div>
+
+                {renderApplicationStatus(job)}
 
                 <div className="grid grid-cols-2 gap-2.5 mt-auto">
                   <button

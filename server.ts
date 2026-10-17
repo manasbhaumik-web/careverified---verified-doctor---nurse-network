@@ -1280,13 +1280,38 @@ app.get("/api/jobs", (req, res) => {
   // Applicant identities stay private: callers only ever see their own application.
   const me = req.user?.id;
   const prof: any = req.user?.role === "practitioner" && req.user.profileId ? findProfessional(req.user.profileId) : null;
-  res.json({ status: "success", data: jobs.map(j => ({
-    ...j, appliedUserIds: me && j.appliedUserIds.includes(me) ? [me] : [],
-    state: (j as any).state ?? inferState(j.city) ?? null,
-    employer: employerInfo(j),
-    // Why the signed-in practitioner cannot apply (null = can apply)
-    applyBlockedReason: prof ? applyProblem(j, prof) : null,
-  })) });
+  res.json({ status: "success", data: jobs.map(j => {
+    let myApplication: any = null;
+    if (me && (req.user?.role === "practitioner" || j.appliedUserIds.includes(me))) {
+      const appRow = db.prepare("SELECT * FROM job_applications WHERE job_id = ? AND applicant_user_id = ?").get(j.id, me) as any;
+      if (appRow) {
+        myApplication = {
+          id: appRow.id,
+          status: appRow.status,
+          appliedAt: appRow.applied_at,
+          decisionAt: appRow.decision_at,
+          decisionNote: appRow.decision_note,
+          billingMode: appRow.billing_mode,
+          paymentStatus: appRow.payment_status,
+          timesheetStatus: appRow.timesheet_status,
+          clockInAt: appRow.clock_in_at,
+          clockOutAt: appRow.clock_out_at,
+          scheduledHours: appRow.scheduled_hours,
+          actualHours: appRow.actual_hours,
+          totalPayoutMyr: appRow.total_payout_myr,
+          paymentRef: appRow.payment_ref,
+        };
+      }
+    }
+    return {
+      ...j, appliedUserIds: me && j.appliedUserIds.includes(me) ? [me] : [],
+      state: (j as any).state ?? inferState(j.city) ?? null,
+      employer: employerInfo(j),
+      // Why the signed-in practitioner cannot apply (null = can apply)
+      applyBlockedReason: prof ? applyProblem(j, prof) : null,
+      myApplication,
+    };
+  }) });
 });
 
 app.post("/api/jobs", requireRole("practitioner", "admin", "facility"), (req, res) => {

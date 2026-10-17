@@ -191,6 +191,23 @@ export interface JobPost {
   employer?: { verified: boolean; licenceChecked: boolean; licenceExpiry: string | null; licenceOk: boolean; problem: string | null };
   /** Why the signed-in practitioner cannot apply, or null. */
   applyBlockedReason?: string | null;
+  /** Current applicant's own application status, escrow reference, and timesheet */
+  myApplication?: {
+    id: string;
+    status: 'pending' | 'accepted' | 'declined';
+    appliedAt: string;
+    decisionAt?: string | null;
+    decisionNote?: string | null;
+    billingMode?: 'escrow' | 'invoice';
+    paymentStatus?: 'unbilled' | 'escrow_held' | 'released' | 'invoiced';
+    timesheetStatus?: 'unstarted' | 'on_duty' | 'submitted' | 'approved';
+    clockInAt?: string | null;
+    clockOutAt?: string | null;
+    scheduledHours?: number;
+    actualHours?: number | null;
+    totalPayoutMyr?: number | null;
+    paymentRef?: string | null;
+  } | null;
 }
 
 export interface ChatMessage {
