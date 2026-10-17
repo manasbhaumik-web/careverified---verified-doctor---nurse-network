@@ -45,7 +45,7 @@ export default function PractitionerEarnings() {
   const bankStatus = d.bank?.status;
 
   return (
-    <div className="w-full space-y-5">
+    <div className="w-full space-y-0">
       <DashboardHeader
         icon={Wallet}
         eyebrow="Earnings"
@@ -53,10 +53,11 @@ export default function PractitionerEarnings() {
         description={`You are paid by ${t.method}, ${t.schedule}. Earnings become payable ${t.holdDays} days after a visit is completed. Balances under ${formatMoney(t.minimumPayout)} roll over to the next payout.`}
       />
 
-      {!s && <p className="text-sm bg-amber-50 border border-amber-200 text-amber-900 p-3 font-semibold">Finish your practitioner registration to see earnings.</p>}
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {!s && <p className="text-sm bg-amber-50 border border-amber-200 text-amber-900 p-3 font-semibold">Finish your practitioner registration to see earnings.</p>}
 
-      {s && (
-        <section aria-label="Balances" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {s && (
+          <section aria-label="Balances" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             ['Waiting', s.waiting, 'Visit not completed yet, or still inside the ' + t.holdDays + '-day hold'],
             ['Ready for the next payout', s.available, s.belowMinimum ? `Under the ${formatMoney(t.minimumPayout)} minimum, so it rolls over` : 'Included in the next run'],
@@ -168,6 +169,7 @@ export default function PractitionerEarnings() {
           </div>
         )}
       </section>
+      </div>
     </div>
   );
 }

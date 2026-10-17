@@ -42,7 +42,13 @@ import ClinicHospitalPage from './components/ClinicHospitalPage';
 import PharmacyPage from './components/PharmacyPage';
 import AccountRecovery from './components/AccountRecovery';
 import PractitionerEarnings from './components/PractitionerEarnings';
-import { navigate, useLocation } from './nav';
+import DashboardDesignPreview from './components/DashboardDesignPreview';
+import LandingDesignPreview from './components/LandingDesignPreview';
+import HeaderColorSamples from './components/HeaderColorSamples';
+import VerifyPractitionersPage from './components/VerifyPractitionersPage';
+import MalaysiaPatientsPage from './components/MalaysiaPatientsPage';
+import InternationalPatientsPage from './components/InternationalPatientsPage';
+import { navigate, useLocation, loginUrl } from './nav';
 import Footer from './components/Footer';
 import LoadingImage from './components/LoadingImage';
 
@@ -289,6 +295,22 @@ export default function App() {
     );
   }
 
+  // Design Samples Preview routes (accessible both logged in and out)
+  if (route.path === '/dashboard-preview') return <DashboardDesignPreview />;
+  if (route.path === '/header-samples') return <HeaderColorSamples />;
+  if (route.path === '/landing-preview' || route.path === '/design-preview') return <LandingDesignPreview />;
+
+  // Dedicated Target Audience and Verification Routes (Accessible by patients and observers)
+  if (route.path === '/verify' || route.path === '/verify-practitioners') {
+    return <VerifyPractitionersPage professionals={professionals} onSignUp={() => navigate(loginUrl('patient', true))} />;
+  }
+  if (route.path === '/for-patients' || route.path === '/malaysia-patients') {
+    return <MalaysiaPatientsPage onSignUp={() => navigate(loginUrl('patient', true))} />;
+  }
+  if (route.path === '/medical-tourism' || route.path === '/international-patients') {
+    return <InternationalPatientsPage onSignUp={() => navigate(loginUrl('patient', true))} />;
+  }
+
   // If not logged in, render landing page
   if (!currentUser) {
     if (route.path === '/login') return <LoginPage onLoginSuccess={handleLoginSuccess} />;
@@ -399,12 +421,12 @@ export default function App() {
       )}
 
       {/* MedCred Elevated Primary Header */}
-      <header className="bg-[color:var(--t-600)] text-white border-b border-white/20 sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0">
+      <header className="bg-[color:var(--t-600)] text-white border-0 sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-[0_2px_6px_-1px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.06)]">
         <div className="max-w-[1920px] mx-auto flex items-center justify-between h-16">
 
           {/* Brand Logo */}
           <div
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-3.5 cursor-pointer group"
             onClick={() => {
               if (currentUser.role === 'patient') setActiveView('patient_dashboard');
               else if (currentUser.role === 'practitioner') setActiveView('onboard');
@@ -418,49 +440,49 @@ export default function App() {
             </div>
             <div className="leading-none">
               <span className="font-display font-extrabold text-[22px] text-white tracking-tight block">
-                MedCred<span className="text-white/70">.</span>
+                MedCred<span className="text-white/80">.</span>
               </span>
-              <span className="text-[10px] font-mono font-bold text-white/80 uppercase tracking-[0.14em] block mt-1">
+              <span className="text-[10px] font-mono font-bold text-white/90 uppercase tracking-[0.14em] block mt-1">
                 {currentUser.role === 'admin' ? 'Board Console' : currentUser.role === 'practitioner' ? 'Practitioner Hub' : currentUser.role === 'pharmacy' ? 'Pharmacy Workspace' : 'Member Portal'}
               </span>
             </div>
           </div>
 
           {/* Right-Side Desktop Actions & User Session Details */}
-          <div className="hidden lg:flex items-center gap-5">
-            <div className="flex items-center gap-2 bg-white/15 border border-white/40 px-3.5 py-1.5 rounded-none text-xs font-bold text-white">
+          <div className="hidden lg:flex items-center gap-4">
+            <div className="flex items-center gap-2 bg-white/15 border-0 shadow-none px-3 py-1.5 rounded-none text-xs font-bold text-white">
               <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true"></span>
               <ShieldCheck className="h-3.5 w-3.5 text-white" aria-hidden="true" />
-              <span>Board-verified practitioners</span>
+              <span>Council-Verified Network (Act 586)</span>
             </div>
 
             <LocaleSwitcher tone="onColor" />
             <ThemeSwitcher tone="onColor" />
-            <div className="flex items-center gap-3 border-l border-white/30 pl-5">
+            <div className="flex items-center gap-3 pl-4">
               {currentUser.role === 'patient' && <SOSButton />}
               <NotificationBell />
 
               {/* Profile Badge embedded with Close Session Button */}
-              <div className="flex items-center gap-2.5 bg-transparent border-0 p-1">
+              <div className="flex items-center gap-2.5 bg-white/15 border-0 shadow-none px-2.5 py-1">
                 <img
                   src={currentUser.avatarUrl || '/assets/malaysian_female_doctor.jpg'}
                   alt={currentUser.name}
-                  className="w-10 h-10 rounded-none object-cover border-2 border-white/60"
+                  className="w-8 h-8 rounded-none object-cover border-0 shrink-0"
                   referrerPolicy="no-referrer"
                 />
                 <div className="text-left hidden xl:block leading-tight">
-                  <p className="text-[13px] font-extrabold text-white leading-none">{currentUser.name}</p>
-                  <p className="text-xs text-white/80 font-semibold mt-1">
-                    {currentUser.role === 'admin' ? 'Board Admin' : currentUser.role === 'practitioner' ? 'Practitioner Account' : currentUser.role === 'pharmacy' ? 'Pharmacy Account' : 'Member Account'}
+                  <p className="text-xs font-black text-white leading-none truncate max-w-[140px]">{currentUser.name}</p>
+                  <p className="text-[10px] text-white/80 font-bold uppercase tracking-wider mt-0.5">
+                    {currentUser.role === 'admin' ? 'Board Admin' : currentUser.role === 'practitioner' ? 'Practitioner' : currentUser.role === 'pharmacy' ? 'Pharmacy' : 'Member'}
                   </p>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="h-9 w-9 text-white/80 hover:text-white hover:bg-white/15 bg-transparent border-0 rounded-none transition-colors cursor-pointer ml-1 flex items-center justify-center"
+                  className="h-7 w-7 text-white/80 hover:text-white hover:bg-white/20 bg-transparent border-0 rounded-none transition-colors cursor-pointer ml-1 flex items-center justify-center"
                   title="Close Session"
                   aria-label="Close session"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
@@ -563,7 +585,8 @@ export default function App() {
       </header>
 
       {/* Elevated Navigation Bar */}
-      <div className="hidden lg:block bg-[color:var(--t-800)] text-white border-b-[3px] border-b-[color:var(--t-600)] px-4 sm:px-6 lg:px-8 shrink-0 sticky top-16 z-30">
+      {/* Elevated Navigation Bar in Application Secondary Color */}
+      <div className="hidden lg:block bg-[color:var(--t-800)] text-white border-0 px-4 sm:px-6 lg:px-8 shrink-0 sticky top-16 z-30">
         <div className="w-full max-w-[1920px] mx-auto flex items-stretch justify-between gap-4">
           <div className="flex items-stretch min-w-0 flex-1">
 
@@ -579,51 +602,50 @@ export default function App() {
                     onClick={() => { setActiveView(item.id); setSelectedProfId(null); }}
                     className={`relative flex items-center gap-2.5 px-4 xl:px-5 h-12 text-xs font-extrabold whitespace-nowrap shrink-0 transition-colors duration-150 cursor-pointer select-none rounded-none ${
                       isActive
-                        ? 'text-[color:var(--t-800)] bg-white'
-                        : 'text-white/90 hover:text-white hover:bg-white/10'
+                        ? 'text-white bg-white/15 font-black'
+                        : 'text-white/75 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? 'text-[color:var(--t-600)]' : 'text-white/80'}`} />
+                    <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-white/70'}`} />
                     <span>{item.name}</span>
 
                     {item.id === 'messages' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-white/20 text-white'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         2 new
                       </span>
                     )}
                     {item.id === 'recruitment' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-white/20 text-white'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         9 Open
                       </span>
                     )}
                     {item.id === 'onboard' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-white/20 text-white'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         MMC
                       </span>
                     )}
                     {item.id === 'seo' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]' : 'bg-white/20 text-white'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         98%
                       </span>
                     )}
-
                   </button>
                 );
               })}
             </nav>
           </div>
 
-          {/* Right: Registry telemetry indicator */}
-          <div className="hidden 2xl:flex items-center gap-2 self-center shrink-0 whitespace-nowrap bg-white/10 border border-white/30 px-3.5 py-1.5 rounded-none text-[11px] font-extrabold text-white my-auto">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Board-verified practitioners</span>
+          {/* Right: Registry live doctor telemetry indicator */}
+          <div className="hidden xl:flex items-center gap-2.5 self-center shrink-0 whitespace-nowrap bg-white/15 border-0 px-3.5 py-1.5 rounded-none text-[11px] font-extrabold text-white my-auto">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>24/7 MMC Doctors On-Call</span>
           </div>
 
         </div>
       </div>
 
       {/* Primary Screen Area */}
-      <main id="main-content" className="flex-grow py-4 sm:py-8 px-4 sm:px-6 lg:px-8 w-full max-w-[1920px] mx-auto">
+      <main id="main-content" className="flex-grow mt-0 pt-0 pb-4 sm:pb-8 w-full px-0 max-w-none">
         {loading ? (
           <div role="status" aria-live="polite" className="text-center min-h-[60vh] space-y-4 animate-fade-in flex flex-col items-center justify-center">
             <div className="relative flex items-center justify-center">
@@ -635,11 +657,11 @@ export default function App() {
             </div>
           </div>
         ) : (
-          <div className="space-y-8 animate-fade-in">
+          <div className="w-full animate-fade-in">
 
             {/* VIEW 1: REGISTRY & SYMPTOM MATCHER */}
             {activeView === 'registry' && !selectedProfId && (
-              <div className="space-y-8">
+              <div className="w-full space-y-0">
                 {/* Standard dashboard header with attached tabs */}
                 <DashboardHeader
                   icon={UserCheck}
@@ -655,44 +677,48 @@ export default function App() {
                   tabsLabel="Directory sections"
                 />
 
-                {/* TAB CONTENT 1: Symptom Triage Search Panel */}
-                {registryTab === 'triage' && (
-                  <div className="max-w-3xl mx-auto animate-fade-in">
-                    <AISymptomMatcher
-                      onSelectSpecialty={(spec) => {
-                        setSelectedSpecialtyFilter(spec);
-                        setRegistryTab('directory');
-                      }}
-                    />
-                  </div>
-                )}
+                <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+                  {/* TAB CONTENT 1: Symptom Triage Search Panel */}
+                  {registryTab === 'triage' && (
+                    <div className="max-w-3xl mx-auto animate-fade-in">
+                      <AISymptomMatcher
+                        onSelectSpecialty={(spec) => {
+                          setSelectedSpecialtyFilter(spec);
+                          setRegistryTab('directory');
+                        }}
+                      />
+                    </div>
+                  )}
 
-                {/* TAB CONTENT 2: National Directory List */}
-                {registryTab === 'directory' && (
-                  <div className="animate-fade-in">
-                    <SearchHub
-                      professionals={professionals}
-                      reviews={reviews}
-                      onSelectProfessional={(id) => setSelectedProfId(id)}
-                      selectedSpecialtyFilter={selectedSpecialtyFilter}
-                      onSelectSpecialtyFilter={(spec) => setSelectedSpecialtyFilter(spec)}
-                      onClearSpecialtyFilter={() => setSelectedSpecialtyFilter('')}
-                    />
-                  </div>
-                )}
+                  {/* TAB CONTENT 2: National Directory List */}
+                  {registryTab === 'directory' && (
+                    <div className="animate-fade-in">
+                      <SearchHub
+                        professionals={professionals}
+                        reviews={reviews}
+                        onSelectProfessional={(id) => setSelectedProfId(id)}
+                        selectedSpecialtyFilter={selectedSpecialtyFilter}
+                        onSelectSpecialtyFilter={(spec) => setSelectedSpecialtyFilter(spec)}
+                        onClearSpecialtyFilter={() => setSelectedSpecialtyFilter('')}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
             {/* VIEW 2: PROFILE VIEW WITH APPOINTMENT BOOKING */}
             {selectedProfId && (
-              <ProfessionalProfile
-                professionalId={selectedProfId}
-                onBack={() => setSelectedProfId(null)}
-                onNewBookingCreated={handleNewBookingCreated}
-                reviews={reviews}
-                onNewReviewPosted={handleNewReviewPosted}
-                currentUser={currentUser}
-              />
+              <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+                <ProfessionalProfile
+                  professionalId={selectedProfId}
+                  onBack={() => setSelectedProfId(null)}
+                  onNewBookingCreated={handleNewBookingCreated}
+                  reviews={reviews}
+                  onNewReviewPosted={handleNewReviewPosted}
+                  currentUser={currentUser}
+                />
+              </div>
             )}
 
             {/* VIEW 3: MULTI-STEP ONBOARDING */}
@@ -802,7 +828,7 @@ export default function App() {
                 const activePkg = packages.find(p => p.id === activeView);
                 if (!activePkg) return null;
                 return (
-                  <div className="space-y-8 animate-fade-in text-slate-800">
+                  <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 animate-fade-in text-slate-800">
                     <div className="bg-white border-2 border-slate-200/85 p-8 rounded-2xl shadow-sm space-y-6">
                       <PageBanner
                         eyebrow="Marketplace Module"

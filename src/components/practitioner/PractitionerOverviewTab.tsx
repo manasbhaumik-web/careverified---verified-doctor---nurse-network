@@ -4,6 +4,7 @@ import { DoctorProfile, NurseProfile, Booking } from '../../types';
 
 interface PractitionerOverviewTabProps {
   matchedProfile: DoctorProfile | NurseProfile;
+  isDoc?: boolean;
   isVerified: boolean;
   isPending: boolean;
   nextUpcomingBooking?: Booking;
@@ -17,6 +18,7 @@ interface PractitionerOverviewTabProps {
 
 export default function PractitionerOverviewTab({
   matchedProfile,
+  isDoc = true,
   isVerified,
   nextUpcomingBooking,
   pendingDispatchesCount,
@@ -73,29 +75,53 @@ export default function PractitionerOverviewTab({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">Response SLA Speed</span>
+            <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">
+              {isDoc ? "Response SLA Speed" : "Home Care Arrival SLA"}
+            </span>
             <Clock className="h-4 w-4 text-[color:var(--t-600)]" />
           </div>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">&lt; 2.5 Mins</span>
-          <p className="text-xs text-[color:var(--e-700)] font-semibold">Fastest 5% response time among {matchedProfile.specialization} specialists.</p>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">
+            {isDoc ? "< 2.5 Mins" : "< 20 Mins"}
+          </span>
+          <p className="text-xs text-[color:var(--e-700)] font-semibold">
+            {isDoc
+              ? `Fastest 5% response time among ${matchedProfile.specialization} specialists.`
+              : `Fastest dispatch response time for licensed home nursing in ${matchedProfile.city}.`}
+          </p>
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">E-Prescription Compliance</span>
+            <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">
+              {isDoc ? "E-Prescription Compliance" : "Aseptic Procedure Protocol"}
+            </span>
             <FileText className="h-4 w-4 text-emerald-600" />
           </div>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">100% Certified</span>
-          <p className="text-xs text-slate-600">Digitally signed via MMC/LJM verified encryption keys.</p>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">
+            100% Certified
+          </span>
+          <p className="text-xs text-slate-600">
+            {isDoc
+              ? "Digitally signed via MMC verified encryption keys & NPRA checks."
+              : "Sterile dressing, catheter & IV protocols verified under LJM Act 1950."}
+          </p>
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">Diagnostic Accuracy</span>
+            <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">
+              {isDoc ? "Diagnostic Accuracy" : "Patient Comfort & Care"}
+            </span>
             <ShieldCheck className="h-4 w-4 text-[color:var(--t-600)]" />
           </div>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">99.4% Rated</span>
-          <p className="text-xs text-slate-600">Validated across patient follow-ups and peer clinical reviews.</p>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">
+            {isDoc ? "99.4% Rated" : "99.8% Rated"}
+          </span>
+          <p className="text-xs text-slate-600">
+            {isDoc
+              ? "Validated across patient follow-ups and peer clinical reviews."
+              : "Validated across post-op home visits and bedside bedside reviews."}
+          </p>
         </div>
       </div>
 
@@ -103,7 +129,7 @@ export default function PractitionerOverviewTab({
       <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-xs space-y-4">
         <h4 className="text-base font-bold text-[color:var(--ink)] border-b border-[color:var(--t-200)] pb-3 flex items-center gap-2">
           <Zap className="h-4 w-4 text-[color:var(--t-600)]" />
-          Direct Clinical Operations Shortcuts
+          {isDoc ? "Doctor Clinical Operations Shortcuts" : "Nursing Operations & Care Shortcuts"}
         </h4>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-bold">
@@ -112,8 +138,14 @@ export default function PractitionerOverviewTab({
             onClick={onViewBookings}
             className="p-4 bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] border border-[color:var(--t-200)] text-[color:var(--t-600)] text-left transition-colors cursor-pointer flex flex-col justify-between gap-3"
           >
-            <span className="font-black text-sm">Issue E-Prescription</span>
-            <span className="text-[11px] font-semibold text-slate-600">Draft & sign digital prescriptions for active consultations.</span>
+            <span className="font-black text-sm">
+              {isDoc ? "Issue E-Prescription" : "Complete Nursing Care Log"}
+            </span>
+            <span className="text-[11px] font-semibold text-slate-600">
+              {isDoc
+                ? "Draft & sign digital prescriptions for active consultations."
+                : "Log sterile wound dressing, vitals telemetry & clinical care notes."}
+            </span>
           </button>
 
           <button
@@ -121,8 +153,14 @@ export default function PractitionerOverviewTab({
             onClick={onViewBookings}
             className="p-4 bg-white hover:bg-slate-50 border border-[color:var(--t-200)] text-slate-900 text-left transition-colors cursor-pointer flex flex-col justify-between gap-3"
           >
-            <span className="font-black text-sm">Review Patient Records</span>
-            <span className="text-[11px] font-semibold text-slate-600">Access verified lab reports, X-rays, and vital histories.</span>
+            <span className="font-black text-sm">
+              {isDoc ? "Review Patient Records" : "Patient Vitals & Care History"}
+            </span>
+            <span className="text-[11px] font-semibold text-slate-600">
+              {isDoc
+                ? "Access verified lab reports, X-rays, and medical history."
+                : "Review patient baseline BP, blood glucose, and recovery trend."}
+            </span>
           </button>
 
           <button
@@ -130,7 +168,9 @@ export default function PractitionerOverviewTab({
             onClick={onViewBookings}
             className="p-4 bg-white hover:bg-slate-50 border border-[color:var(--t-200)] text-slate-900 text-left transition-colors cursor-pointer flex flex-col justify-between gap-3"
           >
-            <span className="font-black text-sm">Emergency Dispatch Log</span>
+            <span className="font-black text-sm">
+              {isDoc ? "Emergency Dispatch Log" : "Home Nursing Transit Radar"}
+            </span>
             <span className="text-[11px] font-semibold text-slate-600">
               {pendingDispatchesCount > 0 ? `${pendingDispatchesCount} active dispatches awaiting response.` : 'All emergency dispatches up-to-date.'}
             </span>

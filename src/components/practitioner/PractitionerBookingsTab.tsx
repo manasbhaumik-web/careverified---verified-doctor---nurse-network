@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  FileSignature, X, ShieldCheck, Loader, Ambulance, MapPin, CheckCircle2, Calendar, Clock, Check
+  FileSignature, X, ShieldCheck, Loader, Ambulance, MapPin, CheckCircle2, Calendar, Clock, Check,
+  ClipboardList, HeartPulse, Activity, Bandage, Stethoscope
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking, OnCallDispatch } from '../../types';
 
 interface PractitionerBookingsTabProps {
   matchedProfile: DoctorProfile | NurseProfile;
+  isDoc?: boolean;
   myBookings: Booking[];
   dispatches: OnCallDispatch[];
   selectedBookingForPrescribe: Booking | null;
@@ -24,6 +26,7 @@ interface PractitionerBookingsTabProps {
 
 export default function PractitionerBookingsTab({
   matchedProfile,
+  isDoc = true,
   myBookings,
   dispatches,
   selectedBookingForPrescribe,
@@ -41,15 +44,62 @@ export default function PractitionerBookingsTab({
 }: PractitionerBookingsTabProps) {
   const activeDispatches = dispatches.filter(d => d.dispatchStatus !== 'Completed');
 
+  // Nurse Care Log Form States
+  const [nursingProcedure, setNursingProcedure] = useState('Sterile Wound Dressing (Stage II)');
+  const [nursingBp, setNursingBp] = useState('120/80');
+  const [nursingHr, setNursingHr] = useState('76');
+  const [nursingSpo2, setNursingSpo2] = useState('98');
+  const [nursingTemp, setNursingTemp] = useState('36.8');
+  const [nursingNotes, setNursingNotes] = useState('Wound clean with healthy granulation margins. Aseptic dressing change completed. Patient alert, comfortable, and stable.');
+  const [savingNurseLog, setSavingNurseLog] = useState(false);
+
+  const handleNurseCareLogSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedBookingForPrescribe) return;
+    setSavingNurseLog(true);
+    setTimeout(() => {
+      selectedBookingForPrescribe.nursingCareLog = {
+        procedurePerformed: nursingProcedure,
+        vitals: {
+          bloodPressure: nursingBp,
+          heartRate: nursingHr,
+          spO2: nursingSpo2,
+          temperature: nursingTemp,
+        },
+        clinicalNotes: nursingNotes,
+        completedAt: new Date().toISOString(),
+        digitalSignature: `LJM-RN-SIG-${Date.now().toString(36).toUpperCase()}`
+      };
+      selectedBookingForPrescribe.status = 'Completed';
+      setSavingNurseLog(false);
+      onCancelPrescription();
+    }, 500);
+  };
+
   return (
     <div id="panel-bookings" role="tabpanel" aria-labelledby="tab-bookings" tabIndex={0} className="space-y-6 animate-fade-in">
-      {/* E-Prescription Floating Form / Modal */}
+      {/* Dynamic Modal: Doctor E-Prescription VS Nurse Procedure & Care Log */}
       {selectedBookingForPrescribe && (
         <div className="bg-[color:var(--t-50)]/70 border-2 border-[color:var(--t-200)] rounded-none p-6 space-y-4 shadow-sm max-w-2xl mx-auto">
           <div className="flex justify-between items-center border-b border-[color:var(--t-200)] pb-3">
             <div className="flex items-center gap-2">
-              <FileSignature className="h-5 w-5 text-[color:var(--t-600)]" />
-              <h4 className="text-sm font-black text-slate-900">Issue Official Digitally Signed E-Prescription</h4>
+              {isDoc ? (
+                <>
+                  <FileSignature className="h-5 w-5 text-[color:var(--t-600)]" />
+                  <div>
+                    <h4 className="text-sm font-black text-slate-900">Issue Doctor-Signed E-Prescription</h4>
+                    <p className="text-[10px] text-slate-500 font-medium">Medical Act 1971 &bull; Poisons Act 1952 Compliant</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <ClipboardList className="h-5 w-5 text-emerald-600" />
+                  <div>
+                    <h4 className="text-sm font-black text-slate-900">Official Clinical Nursing Care & Procedure Log</h4>
+                    <p className="text-[10px] text-slate-500 font-medium">Lembaga Jururawat Malaysia (LJM) &bull; Nurses Act 1950</p>
+                  </div>
+                </>
+              )}
             </div>
             <button
               type="button"
@@ -60,99 +110,232 @@ export default function PractitionerBookingsTab({
             </button>
           </div>
 
-          <form onSubmit={onSubmitPrescription} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
-                <span className="text-[10px] text-slate-400 font-bold block uppercase">Patient Identity</span>
-                <strong className="text-slate-800 text-sm font-extrabold">{selectedBookingForPrescribe.patientName}</strong>
-                <p className="text-slate-500 font-semibold mt-0.5">ID Ref: {selectedBookingForPrescribe.patientId}</p>
+          {/* DOCTOR WORKFLOW: E-PRESCRIPTION */}
+          {isDoc ? (
+            <form onSubmit={onSubmitPrescription} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Patient Identity</span>
+                  <strong className="text-slate-800 text-sm font-extrabold">{selectedBookingForPrescribe.patientName}</strong>
+                  <p className="text-slate-500 font-semibold mt-0.5">ID Ref: {selectedBookingForPrescribe.patientId}</p>
+                </div>
+                <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Consultation Mode</span>
+                  <strong className="text-slate-800 font-extrabold">{selectedBookingForPrescribe.mode}</strong>
+                  <p className="text-slate-500 font-semibold mt-0.5">Date: {selectedBookingForPrescribe.date} &bull; {selectedBookingForPrescribe.timeSlot}</p>
+                </div>
               </div>
-              <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
-                <span className="text-[10px] text-slate-400 font-bold block uppercase">Consultation Mode</span>
-                <strong className="text-slate-800 font-extrabold">{selectedBookingForPrescribe.mode}</strong>
-                <p className="text-slate-500 font-semibold mt-0.5">Date: {selectedBookingForPrescribe.date} &bull; {selectedBookingForPrescribe.timeSlot}</p>
-              </div>
-            </div>
 
-            {selectedBookingForPrescribe.symptoms && (
-              <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]/50 text-xs text-slate-600">
-                <span className="text-[10px] text-slate-400 font-bold block uppercase mb-1">Stated Symptoms at Booking</span>
-                "{selectedBookingForPrescribe.symptoms}"
-              </div>
-            )}
+              {selectedBookingForPrescribe.symptoms && (
+                <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]/50 text-xs text-slate-600">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase mb-1">Stated Symptoms at Booking</span>
+                  "{selectedBookingForPrescribe.symptoms}"
+                </div>
+              )}
 
-            <div className="space-y-3">
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Clinical Diagnosis & Findings</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Acute Upper Respiratory Tract Infection (URTI)"
+                    value={prescribeDiagnosis}
+                    onChange={(e) => setPrescribeDiagnosis(e.target.value)}
+                    className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Prescribed Pharmacotherapy (Medicines & Dosage)</label>
+                  <textarea
+                    rows={3}
+                    placeholder="e.g. 1. Tab Paracetamol 500mg - 2 tabs QDS (PRN Fever)&#10;2. Syrup Diphenhydramine 10ml - TDS (Cough)"
+                    value={prescribeMeds}
+                    onChange={(e) => setPrescribeMeds(e.target.value)}
+                    className="w-full text-xs border border-[color:var(--t-200)] rounded-none p-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Specific Care & Lifestyle Instructions</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Plenty of oral fluids. Avoid cold food items. Strict rest for 3 days."
+                    value={prescribeInstructions}
+                    onChange={(e) => setPrescribeInstructions(e.target.value)}
+                    className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="bg-slate-100 p-3 rounded-none border border-[color:var(--t-200)] flex gap-2.5 items-start">
+                <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+                <div className="text-[10px] text-slate-500 leading-relaxed font-semibold">
+                  By signing this e-prescription, you certify that you have reviewed the patient's record, performed clinical validation, and your digital MMC registration credentials will be embedded into the PDF slip.
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={onCancelPrescription}
+                  className="border border-[color:var(--t-200)] text-slate-600 text-xs font-bold px-5 py-2 rounded-none hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={issuingPrescription}
+                  className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-black px-6 py-2 rounded-none transition-all flex items-center gap-1.5 cursor-pointer shadow-3xs"
+                >
+                  {issuingPrescription ? (
+                    <>
+                      <Loader className="h-3.5 w-3.5 animate-spin" />
+                      <span>Generating Encrypted Prescription...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FileSignature className="h-3.5 w-3.5" />
+                      <span>Generate & Sign E-Prescription</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          ) : (
+            /* NURSE WORKFLOW: CLINICAL NURSING PROCEDURE & CARE LOG */
+            <form onSubmit={handleNurseCareLogSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Patient Identity</span>
+                  <strong className="text-slate-800 text-sm font-extrabold">{selectedBookingForPrescribe.patientName}</strong>
+                  <p className="text-slate-500 font-semibold mt-0.5">ID Ref: {selectedBookingForPrescribe.patientId}</p>
+                </div>
+                <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Nursing Duty Mode</span>
+                  <strong className="text-slate-800 font-extrabold">{selectedBookingForPrescribe.mode}</strong>
+                  <p className="text-slate-500 font-semibold mt-0.5">Date: {selectedBookingForPrescribe.date} &bull; {selectedBookingForPrescribe.timeSlot}</p>
+                </div>
+              </div>
+
+              {/* Procedure Performed */}
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-slate-700">Clinical Nursing Procedure Performed</label>
+                <select
+                  value={nursingProcedure}
+                  onChange={(e) => setNursingProcedure(e.target.value)}
+                  className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-emerald-600 font-semibold text-slate-800 bg-white"
+                >
+                  <option value="Sterile Wound Dressing (Stage II / Post-Op)">Sterile Wound Dressing (Stage II / Post-Op)</option>
+                  <option value="Intramuscular / Subcutaneous Medication Administration">Intramuscular / Subcutaneous Medication Administration</option>
+                  <option value="Foley Catheter Maintenance & Replacement">Foley Catheter Maintenance & Replacement</option>
+                  <option value="Post-Surgical Vital Signs Telemetry & Monitoring">Post-Surgical Vital Signs Telemetry & Monitoring</option>
+                  <option value="Ostomy / Stoma Care & Cleansing">Ostomy / Stoma Care & Cleansing</option>
+                  <option value="General Bedside Care & Elder Hygiene Assistance">General Bedside Care & Elder Hygiene Assistance</option>
+                </select>
+              </div>
+
+              {/* Vitals Telemetry Grid */}
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <HeartPulse className="h-3.5 w-3.5 text-rose-500" />
+                  <span>Vital Signs Recorded on Duty</span>
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div className="bg-white p-2 border border-slate-200">
+                    <span className="text-[9px] font-mono text-slate-400 uppercase block font-bold">Blood Pressure</span>
+                    <input
+                      type="text"
+                      value={nursingBp}
+                      onChange={(e) => setNursingBp(e.target.value)}
+                      placeholder="e.g. 120/80"
+                      className="w-full text-xs font-bold text-slate-800 outline-none mt-0.5"
+                    />
+                  </div>
+                  <div className="bg-white p-2 border border-slate-200">
+                    <span className="text-[9px] font-mono text-slate-400 uppercase block font-bold">Heart Rate (bpm)</span>
+                    <input
+                      type="text"
+                      value={nursingHr}
+                      onChange={(e) => setNursingHr(e.target.value)}
+                      placeholder="e.g. 76"
+                      className="w-full text-xs font-bold text-slate-800 outline-none mt-0.5"
+                    />
+                  </div>
+                  <div className="bg-white p-2 border border-slate-200">
+                    <span className="text-[9px] font-mono text-slate-400 uppercase block font-bold">SpO2 Oxygen (%)</span>
+                    <input
+                      type="text"
+                      value={nursingSpo2}
+                      onChange={(e) => setNursingSpo2(e.target.value)}
+                      placeholder="e.g. 98"
+                      className="w-full text-xs font-bold text-slate-800 outline-none mt-0.5"
+                    />
+                  </div>
+                  <div className="bg-white p-2 border border-slate-200">
+                    <span className="text-[9px] font-mono text-slate-400 uppercase block font-bold">Temperature (°C)</span>
+                    <input
+                      type="text"
+                      value={nursingTemp}
+                      onChange={(e) => setNursingTemp(e.target.value)}
+                      placeholder="e.g. 36.8"
+                      className="w-full text-xs font-bold text-slate-800 outline-none mt-0.5"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Nursing Observations */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Clinical Diagnosis & Findings</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Acute Upper Respiratory Tract Infection (URTI)"
-                  value={prescribeDiagnosis}
-                  onChange={(e) => setPrescribeDiagnosis(e.target.value)}
-                  className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Prescribed Pharmacotherapy (Medicines & Dosage)</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Nursing Observations & Recovery Notes</label>
                 <textarea
                   rows={3}
-                  placeholder="e.g. 1. Tab Paracetamol 500mg - 2 tabs QDS (PRN Fever)&#10;2. Syrup Diphenhydramine 10ml - TDS (Cough)"
-                  value={prescribeMeds}
-                  onChange={(e) => setPrescribeMeds(e.target.value)}
-                  className="w-full text-xs border border-[color:var(--t-200)] rounded-none p-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
+                  value={nursingNotes}
+                  onChange={(e) => setNursingNotes(e.target.value)}
+                  placeholder="Record patient comfort, wound margin condition, pain score, or medical instructions given to caregiver..."
+                  className="w-full text-xs border border-[color:var(--t-200)] rounded-none p-3 outline-none focus:ring-1 focus:ring-emerald-600 font-semibold text-slate-800 bg-white"
                   required
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Specific Care & Lifestyle Instructions</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Plenty of oral fluids. Avoid cold food items. Strict rest for 3 days."
-                  value={prescribeInstructions}
-                  onChange={(e) => setPrescribeInstructions(e.target.value)}
-                  className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
-                  required
-                />
+              <div className="bg-emerald-50/60 p-3 rounded-none border border-emerald-200 flex gap-2.5 items-start">
+                <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+                <div className="text-[10px] text-emerald-900 leading-relaxed font-semibold">
+                  By certifying this nursing care log, you verify under the <strong>Nurses Act 1950</strong> that all recorded vital signs and procedures were conducted in adherence with Malaysian Nursing Board (LJM) clinical standards.
+                </div>
               </div>
-            </div>
 
-            <div className="bg-slate-100 p-3 rounded-none border border-[color:var(--t-200)] flex gap-2.5 items-start">
-              <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-              <div className="text-[10px] text-slate-500 leading-relaxed font-semibold">
-                By signing this e-prescription, you certify that you have reviewed the patient's record, performed clinical validation, and your digital MMC/LJM registration credentials will be embedded into the PDF slip.
+              <div className="flex justify-end gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={onCancelPrescription}
+                  className="border border-[color:var(--t-200)] text-slate-600 text-xs font-bold px-5 py-2 rounded-none hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingNurseLog}
+                  className="bg-emerald-600 hover:bg-emerald-700 border border-emerald-700 disabled:bg-slate-300 text-white text-xs font-black px-6 py-2 rounded-none transition-all flex items-center gap-1.5 cursor-pointer shadow-3xs"
+                >
+                  {savingNurseLog ? (
+                    <>
+                      <Loader className="h-3.5 w-3.5 animate-spin" />
+                      <span>Recording Nursing Log...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      <span>Certify & Sign Nursing Log</span>
+                    </>
+                  )}
+                </button>
               </div>
-            </div>
-
-            <div className="flex justify-end gap-2.5 pt-2">
-              <button
-                type="button"
-                onClick={onCancelPrescription}
-                className="border border-[color:var(--t-200)] text-slate-600 text-xs font-bold px-5 py-2 rounded-none hover:bg-slate-50 cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={issuingPrescription}
-                className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-black px-6 py-2 rounded-none transition-all flex items-center gap-1.5 cursor-pointer shadow-3xs"
-              >
-                {issuingPrescription ? (
-                  <>
-                    <Loader className="h-3.5 w-3.5 animate-spin" />
-                    <span>Generating Encrypted Prescription...</span>
-                  </>
-                ) : (
-                  <>
-                    <FileSignature className="h-3.5 w-3.5" />
-                    <span>Generate & Sign E-Prescription</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+            </form>
+          )}
         </div>
       )}
 
@@ -256,14 +439,18 @@ export default function PractitionerBookingsTab({
         )}
       </div>
 
-      {/* Scheduled Clinical Consultations List */}
+      {/* Scheduled Clinical Consultations / Nursing Visits List */}
       <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-3xs space-y-4">
         <div className="border-b border-[color:var(--t-200)] pb-3">
           <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
             <Calendar className="h-4.5 w-4.5 text-[color:var(--t-600)]" />
-            Scheduled Consultations ({myBookings.length})
+            {isDoc ? `Scheduled Doctor Consultations (${myBookings.length})` : `Scheduled Home Nursing Duties (${myBookings.length})`}
           </h3>
-          <p className="text-[11px] text-slate-500 font-medium mt-0.5">Review appointments booked by patients and generate e-prescriptions upon consultation completion.</p>
+          <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+            {isDoc
+              ? "Review appointments booked by patients and generate doctor-signed e-prescriptions upon consultation completion."
+              : "Review patient home nursing bookings, post-op visits, and record certified clinical nursing care logs."}
+          </p>
         </div>
 
         {myBookings.length === 0 ? (
@@ -313,18 +500,44 @@ export default function PractitionerBookingsTab({
                       <div className="bg-emerald-50/30 border border-emerald-150 p-3 rounded-none text-xs space-y-1.5 max-w-xl">
                         <div className="flex items-center gap-1.5 text-emerald-800 font-black text-[10px] uppercase tracking-wider">
                           <Check className="h-4 w-4 text-emerald-600" />
-                          Issued E-Prescription
+                          Issued Doctor E-Prescription
                         </div>
                         <p><strong className="text-slate-800 font-bold">Diagnosis:</strong> {booking.prescription.diagnosis}</p>
                         <p><strong className="text-slate-800 font-bold">Medicines:</strong> {booking.prescription.medicines}</p>
                         <p><strong className="text-slate-800 font-bold">Instructions:</strong> {booking.prescription.instructions}</p>
                       </div>
                     )}
+
+                    {booking.nursingCareLog && (
+                      <div className="bg-emerald-50/40 border border-emerald-200 p-3 rounded-none text-xs space-y-2 max-w-xl">
+                        <div className="flex items-center justify-between text-emerald-900 font-black text-[10px] uppercase tracking-wider">
+                          <span className="flex items-center gap-1.5">
+                            <Check className="h-4 w-4 text-emerald-600" />
+                            Completed Nursing Care Log
+                          </span>
+                          <span className="font-mono text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 border border-emerald-300">
+                            LJM Certified
+                          </span>
+                        </div>
+                        <p><strong className="text-slate-800 font-bold">Procedure:</strong> {booking.nursingCareLog.procedurePerformed}</p>
+                        {booking.nursingCareLog.vitals && (
+                          <div className="flex flex-wrap gap-2 text-[10px] font-mono">
+                            <span className="bg-white px-2 py-0.5 border border-emerald-200 text-slate-700 font-bold">BP: {booking.nursingCareLog.vitals.bloodPressure || 'N/A'}</span>
+                            <span className="bg-white px-2 py-0.5 border border-emerald-200 text-slate-700 font-bold">HR: {booking.nursingCareLog.vitals.heartRate ? `${booking.nursingCareLog.vitals.heartRate} bpm` : 'N/A'}</span>
+                            <span className="bg-white px-2 py-0.5 border border-emerald-200 text-slate-700 font-bold">SpO2: {booking.nursingCareLog.vitals.spO2 ? `${booking.nursingCareLog.vitals.spO2}%` : 'N/A'}</span>
+                            <span className="bg-white px-2 py-0.5 border border-emerald-200 text-slate-700 font-bold">Temp: {booking.nursingCareLog.vitals.temperature ? `${booking.nursingCareLog.vitals.temperature} °C` : 'N/A'}</span>
+                          </div>
+                        )}
+                        <p className="text-slate-600"><strong className="text-slate-800 font-bold">Notes:</strong> {booking.nursingCareLog.clinicalNotes}</p>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col items-start sm:items-end justify-between shrink-0 gap-3">
                     <div className="space-y-1 sm:text-right">
-                      <span className="text-[10px] text-slate-400 font-bold block uppercase">Consultation Fee</span>
+                      <span className="text-[10px] text-slate-400 font-bold block uppercase">
+                        {isDoc ? "Consultation Fee" : "Nursing Fee"}
+                      </span>
                       <span className="text-sm font-black text-slate-900">RM {booking.fee}</span>
                       <span className={`block text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-none text-center border mt-1 ${
                         isUpcoming
@@ -338,10 +551,23 @@ export default function PractitionerBookingsTab({
                     {isUpcoming && (
                       <button
                         onClick={() => onStartPrescription(booking)}
-                        className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-[10px] font-black py-2 px-4 rounded-none transition-all cursor-pointer flex items-center gap-1 shadow-3xs"
+                        className={`text-white text-[10px] font-black py-2 px-4 rounded-none transition-all cursor-pointer flex items-center gap-1 shadow-3xs ${
+                          isDoc
+                            ? 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)]'
+                            : 'bg-emerald-600 hover:bg-emerald-700 border border-emerald-700'
+                        }`}
                       >
-                        <FileSignature className="h-3.5 w-3.5" />
-                        <span>Diagnose & Prescribe</span>
+                        {isDoc ? (
+                          <>
+                            <FileSignature className="h-3.5 w-3.5" />
+                            <span>Diagnose & Prescribe</span>
+                          </>
+                        ) : (
+                          <>
+                            <ClipboardList className="h-3.5 w-3.5" />
+                            <span>Record Nursing Care Log</span>
+                          </>
+                        )}
                       </button>
                     )}
                   </div>

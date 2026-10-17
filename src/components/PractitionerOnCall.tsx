@@ -93,7 +93,7 @@ export default function PractitionerOnCall({ myUserId }: { myUserId: string }) {
   const fmtRM = (v?: number) => formatMoney(v ?? 0);
 
   return (
-    <div className="space-y-5 w-full">
+    <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full">
       {/* Status bar with at-a-glance numbers */}
       <section className={`border p-4 sm:p-6 grid gap-4 sm:gap-6 lg:grid-cols-[1fr_auto] items-center shadow-xs transition-colors ${me?.online ? 'bg-emerald-50/70 border-emerald-300' : 'bg-white border-[color:var(--t-200)]'}`}>
         <div className="flex flex-wrap items-center gap-x-10 gap-y-4 min-w-0">

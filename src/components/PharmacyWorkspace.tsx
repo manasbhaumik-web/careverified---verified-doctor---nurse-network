@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Activity, AlertTriangle, BarChart3, CheckCircle2, Clock, Download, Inbox, KeyRound, Pill, Search, ShieldAlert, StickyNote, Store, UserRound, Users } from 'lucide-react';
-import DashboardHeader, { BannerKpis, FilterSelect, DashboardTab, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
+import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, FilterSelect, DashboardTab, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
 import { btnDanger, btnPlain, btnPrimary, fmtDate, fmtTime, jfetch } from './pharmacy/shared';
 import { useLiveAlerts } from './pharmacy/useLiveAlerts';
 import SecurityCard from './pharmacy/SecurityCard';
@@ -86,62 +86,97 @@ export default function PharmacyWorkspace() {
   if (gated && me) {
     return (
       <div className="w-full space-y-5">
-        <DashboardHeader icon={Store} eyebrow="Pharmacy workspace" title={me.pharmacy.name} description="One more step before you can open your inbox." />
-        <div role="alert" className="bg-amber-50 border border-amber-200 text-amber-900 p-4 flex items-center gap-3 text-sm font-semibold">
-          <ShieldAlert className="h-5 w-5 shrink-0" />
-          Pharmacy accounts handle patients' health information, so two-factor sign-in is required. Set it up below to continue.
+        <DashboardHeader fullWidth={true}>
+          <BannerRow
+            identity={
+              <BannerIdentity
+                as="h1"
+                icon={Store}
+                name={me.pharmacy.name}
+                badges={<BannerBadge>Pharmacy workspace</BannerBadge>}
+                description="One more step before you can open your inbox."
+              />
+            }
+          />
+        </DashboardHeader>
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
+          <div role="alert" className="bg-amber-50 border border-amber-200 text-amber-900 p-4 flex items-center gap-3 text-sm font-semibold">
+            <ShieldAlert className="h-5 w-5 shrink-0" />
+            Pharmacy accounts handle patients' health information, so two-factor sign-in is required. Set it up below to continue.
+          </div>
+          <SecurityCard twoFactor={me.account.twoFactor} email={me.account.email} onChanged={loadMe} />
         </div>
-        <SecurityCard twoFactor={me.account.twoFactor} email={me.account.email} onChanged={loadMe} />
       </div>
     );
   }
 
   return (
-    <div className="w-full space-y-5">
+    <div className="w-full space-y-0">
       <DashboardHeader
-        icon={Store}
-        eyebrow="Pharmacy workspace"
-        title={me?.pharmacy.name ?? 'Pharmacy workspace'}
-        description={me ? `${me.pharmacy.address}${me.pharmacy.city && !me.pharmacy.address.toLowerCase().includes(me.pharmacy.city.toLowerCase()) ? `, ${me.pharmacy.city}` : ''}. Signed in as ${me.account.email}.` : 'Loading…'}
-        actions={
-          <BannerKpis items={[
-            { value: counts ? counts.new : '—', label: 'New' },
-            { value: counts ? counts.in_progress : '—', label: 'In progress' },
-            { value: counts ? counts.ready : '—', label: 'Ready' },
-            { value: counts ? counts.dispensed : '—', label: 'Dispensed' },
-          ]} />
-        }
+        fullWidth={true}
         tabs={tabs}
         activeTab={tab}
         onTabChange={setTab}
         tabsLabel="Pharmacy workspace sections"
-      />
+      >
+        <BannerRow
+          identity={
+            <BannerIdentity
+              as="h1"
+              icon={Store}
+              name={me?.pharmacy.name ?? 'Pharmacy workspace'}
+              badges={
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <BannerBadge>Type A Poison Licence</BannerBadge>
+                  <BannerBadge tone="success">LFM Accredited</BannerBadge>
+                </div>
+              }
+              description={
+                me
+                  ? `${me.pharmacy.address}${me.pharmacy.city && !me.pharmacy.address.toLowerCase().includes(me.pharmacy.city.toLowerCase()) ? `, ${me.pharmacy.city}` : ''} · Signed in as ${me.account.email}`
+                  : 'Loading…'
+              }
+            />
+          }
+          aside={
+            <BannerKpis
+              items={[
+                { value: counts ? counts.new : '—', label: 'New' },
+                { value: counts ? counts.in_progress : '—', label: 'In progress' },
+                { value: counts ? counts.ready : '—', label: 'Ready' },
+                { value: counts ? counts.dispensed : '—', label: 'Dispensed' },
+              ]}
+            />
+          }
+        />
+      </DashboardHeader>
 
-      {me?.account.mustChangePassword && (
-        <div role="alert" className="bg-amber-50 border border-amber-200 text-amber-900 p-4 flex flex-wrap items-center gap-3 text-sm">
-          <KeyRound className="h-5 w-5 shrink-0" />
-          <span className="flex-1 min-w-[220px] font-semibold">You are using a temporary password. Please set your own password now.</span>
-          <button type="button" onClick={() => setTab('profile')} className={btnPlain}>Change password</button>
-        </div>
-      )}
-      {counts && counts.waitingOver24h > 0 && (
-        <div role="status" className="bg-rose-50 border border-rose-200 text-rose-800 p-4 flex items-center gap-3 text-sm font-semibold">
-          <AlertTriangle className="h-5 w-5 shrink-0" />
-          {counts.waitingOver24h} prescription{counts.waitingOver24h === 1 ? ' has' : 's have'} been waiting over 24 hours without a response.
-        </div>
-      )}
-
-      <div className="bg-white border border-[color:var(--t-200)] px-4 py-2.5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-slate-600">
-        <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />Live: new prescriptions appear automatically · updated {new Date(alerts.updatedAt).toLocaleTimeString()}</span>
-        <label className="inline-flex items-center gap-1.5 cursor-pointer font-semibold">
-          <input type="checkbox" checked={alerts.sound} onChange={alerts.toggleSound} className="h-4 w-4 accent-[color:var(--t-600)]" /> Sound alert
-        </label>
-        {alerts.desktopSupported && (
-          <label className="inline-flex items-center gap-1.5 cursor-pointer font-semibold">
-            <input type="checkbox" checked={alerts.desktop} onChange={alerts.toggleDesktop} className="h-4 w-4 accent-[color:var(--t-600)]" /> Desktop alerts
-          </label>
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {me?.account.mustChangePassword && (
+          <div role="alert" className="bg-amber-50 border border-amber-200 text-amber-900 p-4 flex flex-wrap items-center gap-3 text-sm">
+            <KeyRound className="h-5 w-5 shrink-0" />
+            <span className="flex-1 min-w-[220px] font-semibold">You are using a temporary password. Please set your own password now.</span>
+            <button type="button" onClick={() => setTab('profile')} className={btnPlain}>Change password</button>
+          </div>
         )}
-      </div>
+        {counts && counts.waitingOver24h > 0 && (
+          <div role="status" className="bg-rose-50 border border-rose-200 text-rose-800 p-4 flex items-center gap-3 text-sm font-semibold">
+            <AlertTriangle className="h-5 w-5 shrink-0" />
+            {counts.waitingOver24h} prescription{counts.waitingOver24h === 1 ? ' has' : 's have'} been waiting over 24 hours without a response.
+          </div>
+        )}
+
+        <div className="bg-white border border-[color:var(--t-200)] px-4 py-2.5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-slate-600">
+          <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />Live: new prescriptions appear automatically · updated {new Date(alerts.updatedAt).toLocaleTimeString()}</span>
+          <label className="inline-flex items-center gap-1.5 cursor-pointer font-semibold">
+            <input type="checkbox" checked={alerts.sound} onChange={alerts.toggleSound} className="h-4 w-4 accent-[color:var(--t-600)]" /> Sound alert
+          </label>
+          {alerts.desktopSupported && (
+            <label className="inline-flex items-center gap-1.5 cursor-pointer font-semibold">
+              <input type="checkbox" checked={alerts.desktop} onChange={alerts.toggleDesktop} className="h-4 w-4 accent-[color:var(--t-600)]" /> Desktop alerts
+            </label>
+          )}
+        </div>
 
       <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
         {tab === 'inbox' && <InboxTab counts={counts} onChanged={loadMe} tick={alerts.tick} />}
@@ -149,6 +184,7 @@ export default function PharmacyWorkspace() {
         {tab === 'reports' && <ReportsTab />}
         {tab === 'team' && me?.account.isOwner && <TeamTab />}
         {tab === 'profile' && me && <ProfileTab me={me} onSaved={loadMe} />}
+      </div>
       </div>
     </div>
   );

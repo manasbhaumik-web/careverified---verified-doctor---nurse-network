@@ -146,6 +146,18 @@ export interface Booking {
     issuedAt: string;
     digitalSignature: string;
   };
+  nursingCareLog?: {
+    procedurePerformed: string;
+    vitals: {
+      bloodPressure?: string;
+      heartRate?: string;
+      spO2?: string;
+      temperature?: string;
+    };
+    clinicalNotes: string;
+    completedAt: string;
+    digitalSignature: string;
+  };
 }
 
 export interface JobPost {

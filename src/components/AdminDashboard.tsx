@@ -257,7 +257,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
   };
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto space-y-6" id="national-registry-admin-panel">
+    <div className="w-full space-y-0" id="national-registry-admin-panel">
       {/* Standard dashboard header with attached tabs */}
       <DashboardHeader
         eyebrow="National Medical Registry Audit Terminal"
@@ -292,7 +292,8 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
         tabsLabel="Admin panel sections"
       />
 
-      {activeTab === 'approvals' && (
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {activeTab === 'approvals' && (
         <div id="panel-approvals" role="tabpanel" aria-labelledby="tab-approvals" tabIndex={0} className="space-y-6">
           {/* Overview stats cards with high visual distinction */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -990,6 +991,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

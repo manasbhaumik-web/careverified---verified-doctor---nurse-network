@@ -42,7 +42,29 @@
   --font-weight-extrabold: 700;
   --font-weight-black: 700;
 
-  /* Unified App-Wide Color System: MedCred Crimson + Modern Slate Theme */
+  /* Unified App-Wide Color System: Dynamic Theme Mappings (brand, sky, rose) */
+  --color-brand-50: var(--t-50);
+  --color-brand-100: var(--t-100);
+  --color-brand-200: var(--t-200);
+  --color-brand-300: var(--t-300);
+  --color-brand-400: var(--t-400);
+  --color-brand-500: var(--t-500);
+  --color-brand-600: var(--t-600);
+  --color-brand-700: var(--t-700);
+  --color-brand-800: var(--t-800);
+  --color-brand-900: var(--t-900);
+
+  --color-sky-50: var(--t-50);
+  --color-sky-100: var(--t-100);
+  --color-sky-200: var(--t-200);
+  --color-sky-300: var(--t-300);
+  --color-sky-400: var(--t-400);
+  --color-sky-500: var(--t-500);
+  --color-sky-600: var(--t-600);
+  --color-sky-700: var(--t-700);
+  --color-sky-800: var(--t-800);
+  --color-sky-900: var(--t-900);
+
   --color-rose-50: var(--t-50);
   --color-rose-100: var(--t-100);
   --color-rose-200: var(--t-200);
@@ -113,24 +135,20 @@ body {
 
 /* -------------------------------------------------------------
  * GEOMETRY RULES:
- * 1. Profile Pictures, Notification Badges & Active Status Signals:
- *    Circular round corner effect (border-radius: 9999px)
- * 2. ALL OTHER CONTAINERS, CARDS, BUTTONS, INPUTS, BADGES, TABS, MODALS:
+ * 1. Explicitly Circular Badges, Status Dots & Signal Pulses (border-radius: 9999px)
+ * 2. ALL IMAGES, CONTAINERS, CARDS, BUTTONS, INPUTS, BADGES, TABS, MODALS:
  *    Strictly rectangular sharp geometry (border-radius: 0px)
+ *    NO capsular / oval / pill overlays or clipping on images anywhere in the application.
  * ------------------------------------------------------------- */
 
-/* Profile Pictures, Notification Badges, & Active Green Signal Status Dots */
-img, 
-.avatar, 
-.profile-pic, 
-.avatar-img,
-.rounded-full,
-[class*="rounded-full"],
+/* Explicit Circular Elements: Status dots, live telemetry pulses, and explicit .rounded-full badges */
 .status-dot,
 .live-dot,
 .pulse-dot,
 .notification-icon,
-.active-signal {
+.active-signal,
+.rounded-full:not(.rounded-none):not(.sharp),
+[class*="rounded-full"]:not(.rounded-none):not(.sharp) {
   border-radius: 9999px !important;
 }
 
@@ -142,7 +160,17 @@ img,
   border-radius: 9999px !important;
 }
 
-/* ALL OTHER UI ELEMENTS: RECTANGULAR SHARP GEOMETRY */
+/* Explicit Sharp & Rectangular Overrides */
+.sharp,
+.rounded-none,
+[class*="rounded-none"] {
+  border-radius: 0px !important;
+}
+
+/* ALL IMAGES & UI ELEMENTS: STRICTLY RECTANGULAR SHARP GEOMETRY */
+/* Completely eliminates capsular, pill, or elliptical clipping on all application images */
+img,
+img:not(.rounded-full):not([class*="rounded-full"]),
 button:not(.rounded-full):not([class*="rounded-full"]),
 input:not(.rounded-full):not([class*="rounded-full"]),
 select,
@@ -175,7 +203,11 @@ main {
 [class*="border-slate-50"],
 [class*="border-slate-100"],
 [class*="border-gray-50"],
-[class*="border-gray-100"] {
+[class*="border-gray-100"],
+[class*="border-sky-50"],
+[class*="border-sky-100"],
+[class*="border-rose-50"],
+[class*="border-rose-100"] {
   border-color: var(--t-100) !important;
 }
 
@@ -184,21 +216,33 @@ main {
 [class*="border-gray-200"],
 [class*="border-gray-300"],
 [class*="border-zinc-200"],
-[class*="border-zinc-300"] {
+[class*="border-zinc-300"],
+[class*="border-sky-200"],
+[class*="border-sky-300"],
+[class*="border-rose-200"],
+[class*="border-rose-300"] {
   border-color: var(--t-200) !important;
 }
 
 [class*="border-slate-400"],
 [class*="border-slate-500"],
 [class*="border-gray-400"],
-[class*="border-gray-500"] {
+[class*="border-gray-500"],
+[class*="border-sky-400"],
+[class*="border-sky-500"],
+[class*="border-rose-400"],
+[class*="border-rose-500"] {
   border-color: var(--t-300) !important;
 }
 
 [class*="border-slate-600"],
 [class*="border-slate-700"],
 [class*="border-gray-600"],
-[class*="border-gray-700"] {
+[class*="border-gray-700"],
+[class*="border-sky-600"],
+[class*="border-sky-700"],
+[class*="border-rose-600"],
+[class*="border-rose-700"] {
   border-color: var(--t-700) !important;
 }
 
@@ -206,6 +250,10 @@ main {
 [class*="border-slate-900"],
 [class*="border-gray-800"],
 [class*="border-gray-900"],
+[class*="border-sky-800"],
+[class*="border-sky-900"],
+[class*="border-rose-800"],
+[class*="border-rose-900"],
 [class*="border-black"] {
   border-color: var(--t-800) !important;
 }
@@ -269,9 +317,22 @@ footer button.bg-slate-800:hover,
 }
 /* -------------------------------------------------------------
  * APPLICATION THEMES - switched via <html data-theme="...">
- * Default: sky. See components/ThemeSwitcher.tsx
+ * Default: light-cyan (clinical mint-cyan palette). See components/ThemeSwitcher.tsx
  * ------------------------------------------------------------- */
 :root,
+:root[data-theme="light-cyan"],
+:root[data-theme="cyan"] {
+  --ink: #1E293B; --ink-2: #334155; --t-bright: 1; --page: #F8FAFC;
+  --e-50: #ECFDF5; --e-200: #A7F3D0; --e-600: #059669; --e-700: #047857; --e-800: #065F46;
+  --dark: #0F172A;
+  --t-50: #ECFEFF; --t-100: #CFFAFE; --t-200: #A5F3FC; --t-300: #67E8F9; --t-400: #22D3EE;
+  --t-500: #06B6D4; --t-600: #0891B2; --t-700: #0E7490; --t-800: #155E75; --t-900: #164E63;
+  --t-bg: #F2FDFF; --t-hue: 188deg;
+  --band-a: color-mix(in srgb, var(--t-50) 50%, white);
+  --t-text: var(--t-600);
+  --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
+}
+
 :root[data-theme="sky"] {
   --ink: #1E293B; --ink-2: #334155; --t-bright: 1; --page: #F8FAFC;
   --e-50: #ECFDF5; --e-200: #A7F3D0; --e-600: #059669; --e-700: #047857; --e-800: #065F46;
@@ -280,248 +341,20 @@ footer button.bg-slate-800:hover,
   --t-500: #0EA5E9; --t-600: #0270A9; --t-700: #0369A1; --t-800: #075985; --t-900: #0C4A6E;
   --t-bg: #F5FAFF; --t-hue: 205deg;
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
-  /* Brand colour for small text and for fills behind white text in the content sections */
   --t-text: var(--t-600);
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
 }
 
 :root[data-theme="crimson"] {
+  --ink: #1E293B; --ink-2: #334155; --t-bright: 1; --page: #F8FAFC;
+  --e-50: #ECFDF5; --e-200: #A7F3D0; --e-600: #059669; --e-700: #047857; --e-800: #065F46;
+  --dark: #0F172A;
   --t-50: #FFF0F2; --t-100: #FFE4E6; --t-200: #FECDD3; --t-300: #FDA4AF; --t-400: #FF8A98;
   --t-500: #E0243F; --t-600: #C81E1E; --t-700: #B91C1C; --t-800: #86102A; --t-900: #6B0F24;
   --t-bg: #FFF8F9; --t-hue: 0deg;
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
-}
-
-:root[data-theme="cyan"] {
-  /* Bright cyan #00E5FF is the signature colour (400); 600 and up are darker so white text and small text stay readable */
-  --t-50: #ECFEFF; --t-100: #CFFAFE; --t-200: #A5F3FC; --t-300: #67E8F9; --t-400: #00E5FF;
-  --t-500: #06B6D4; --t-600: #0E7490; --t-700: #155E75; --t-800: #164E63; --t-900: #083344;
-  --t-bg: #F4FEFF; --t-hue: 190deg;
-  --band-a: color-mix(in srgb, var(--t-50) 50%, white);
   --t-text: var(--t-600);
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
-}
-
-/* -------------------------------------------------------------
- * DARK NAVY BLUE THEME
- * Sophisticated deep navy palette (#0A1128) with electric/royal blue accents (#3B82F6 / #60A5FA),
- * luminous mint signals (#34D399), layered dark glassmorphic surfaces, and crisp high-contrast typography.
- * ------------------------------------------------------------- */
-:root[data-theme="navy"] {
-  color-scheme: dark;
-
-  /* Brand Blue Palette: 50 is deep dark tint, 600 is electric accent, 800-900 are deepest midnight */
-  --t-50: #0F1D3A;
-  --t-100: #15274E;
-  --t-200: #223F7A;
-  --t-300: #3258A6;
-  --t-400: #60A5FA;
-  --t-500: #4F8EF7;
-  --t-600: #3B82F6;
-  --t-700: #2563EB;
-  --t-800: #0E1A33;
-  --t-900: #060E21;
-
-  --t-bg: #0A1128;
-  --t-hue: 205deg;
-  --t-bright: 0.6;
-  --band-a: #0C1730;
-
-  /* Text & Primary Actions */
-  --t-text: #60A5FA;
-  --t-btn: #2563EB;
-  --t-btn-hover: #1D4ED8;
-  --ink: #F1F5FB;
-  --ink-2: #CBD5E6;
-
-  /* Luminous Mint/Emerald Status */
-  --e-50: #0B2B26;
-  --e-200: #14574A;
-  --e-600: #10B981;
-  --e-700: #34D399;
-  --e-800: #6EE7B7;
-
-  /* Surface layers */
-  --dark: #060E21;
-  --page: #0A1128;
-  --surface: #101C38;
-  --surface-2: #0B162C;
-
-  /* Inverted Slate Scale for automatic dark mode harmony */
-  --color-slate-50: #0F1D3A;
-  --color-slate-100: #15274E;
-  --color-slate-200: #223F7A;
-  --color-slate-300: #3258A6;
-  --color-slate-400: #8899BA;
-  --color-slate-500: #9EB0CE;
-  --color-slate-600: #CBD5E6;
-  --color-slate-700: #E2E8F4;
-  --color-slate-800: #F1F5FB;
-  --color-slate-900: #FFFFFF;
-  --color-slate-950: #FFFFFF;
-
-  /* Luminous Emerald / Success Scale */
-  --color-emerald-50: #0B2B26;
-  --color-emerald-100: #0F3A32;
-  --color-emerald-200: #14574A;
-  --color-emerald-500: #10B981;
-  --color-emerald-600: #34D399;
-  --color-emerald-700: #6EE7B7;
-  --color-emerald-800: #A7F3D0;
-
-  /* Luminous Amber / Warning Scale */
-  --color-amber-50: #33270B;
-  --color-amber-100: #3F2F0B;
-  --color-amber-200: #6B4E10;
-  --color-amber-500: #F59E0B;
-  --color-amber-600: #FBBF24;
-  --color-amber-700: #FCD34D;
-  --color-amber-800: #FEF08A;
-
-  /* Rose / Red Danger Scale */
-  --color-red-50: #3A1216;
-  --color-red-100: #4A171C;
-  --color-red-200: #7A2A31;
-  --color-red-500: #EF4444;
-  --color-red-600: #F87171;
-  --color-red-700: #FCA5A5;
-  --color-red-800: #FECACA;
-}
-
-:root[data-theme="navy"] html,
-:root[data-theme="navy"] body {
-  background-color: var(--t-bg);
-  color: var(--ink);
-}
-
-/* Alternating Section Backgrounds: deep navy canvas */
-:root[data-theme="navy"] main > div.bg-white,
-:root[data-theme="navy"] main > section.bg-white {
-  background-color: var(--t-bg) !important;
-}
-
-/* White card surfaces flip to rich navy surface */
-:root[data-theme="navy"] .bg-white,
-:root[data-theme="navy"] .bg-white\/95,
-:root[data-theme="navy"] .bg-white\/90,
-:root[data-theme="navy"] .bg-white\/80,
-:root[data-theme="navy"] .bg-white\/70,
-:root[data-theme="navy"] .bg-white\/60 {
-  background-color: var(--surface);
-}
-
-/* Elements that are dark in every theme */
-:root[data-theme="navy"] .bg-slate-900 {
-  background-color: var(--dark);
-}
-:root[data-theme="navy"] .bg-slate-800 {
-  background-color: #0E1A33;
-}
-
-/* Gradients that used white in light mode */
-:root[data-theme="navy"] [class*="from-white"] {
-  --tw-gradient-from: var(--surface) !important;
-}
-:root[data-theme="navy"] [class*="to-white"] {
-  --tw-gradient-to: var(--surface) !important;
-}
-:root[data-theme="navy"] [class*="via-white"] {
-  --tw-gradient-via: var(--t-50) !important;
-}
-:root[data-theme="navy"] #login-page {
-  background-image: linear-gradient(to bottom right, var(--t-50), var(--surface), var(--t-50)) !important;
-}
-
-/* Sticky Navbar & Header */
-:root[data-theme="navy"] nav.sticky,
-:root[data-theme="navy"] header.sticky {
-  background-color: rgba(11, 27, 61, 0.95) !important;
-  border-color: #1E3A6B !important;
-}
-
-/* Footer: deep midnight navy */
-:root[data-theme="navy"] footer,
-:root[data-theme="navy"] footer.app-dark-footer,
-:root[data-theme="navy"] .app-dark-footer {
-  background-color: #060E21 !important;
-  border-top-color: #15274E !important;
-}
-:root[data-theme="navy"] footer *,
-:root[data-theme="navy"] .app-dark-footer * {
-  border-color: #15274E !important;
-}
-:root[data-theme="navy"] footer a,
-:root[data-theme="navy"] .app-dark-footer a {
-  color: #CBD5E6 !important;
-}
-:root[data-theme="navy"] footer a:hover,
-:root[data-theme="navy"] .app-dark-footer a:hover {
-  color: #FFFFFF !important;
-}
-
-/* Form controls & Inputs */
-:root[data-theme="navy"] input,
-:root[data-theme="navy"] textarea,
-:root[data-theme="navy"] select {
-  background-color: var(--surface-2) !important;
-  color: var(--ink) !important;
-  border-color: var(--t-200) !important;
-}
-:root[data-theme="navy"] input:focus,
-:root[data-theme="navy"] textarea:focus,
-:root[data-theme="navy"] select:focus {
-  border-color: var(--t-600) !important;
-  box-shadow: 0 0 0 1px var(--t-600) !important;
-}
-:root[data-theme="navy"] ::placeholder {
-  color: #7A8CAB !important;
-}
-
-/* Light-tinted text on app header */
-:root[data-theme="navy"] header.sticky [class*="text-[color:var(--t-1"],
-:root[data-theme="navy"] header.sticky [class*="text-[color:var(--t-2"] {
-  color: #BFD7FF;
-}
-
-/* Hero headline is black over a photo in light themes; invert for navy */
-:root[data-theme="navy"] header#top h1.text-black,
-:root[data-theme="navy"] header#top h2.text-black,
-:root[data-theme="navy"] header#top h1 .text-black { color: #FFFFFF !important; text-shadow: none !important; }
-:root[data-theme="navy"] header#top h2 .text-black { color: #FFFFFF !important; text-shadow: none !important; }
-:root[data-theme="navy"] header#top h1,
-:root[data-theme="navy"] header#top h2,
-:root[data-theme="navy"] header#top p.text-black,
-:root[data-theme="navy"] header#top h1 *,
-:root[data-theme="navy"] header#top h2 *,
-:root[data-theme="navy"] header#top p.text-black * { -webkit-text-stroke: 0 !important; text-shadow: none !important; }
-:root[data-theme="navy"] header#top p.text-black { color: #E6EDF8 !important; text-shadow: none !important; }
-:root[data-theme="navy"] header#top p.text-black .text-black { color: #FFFFFF !important; }
-:root[data-theme="navy"] header#top p.text-black [class*="text-[color:var(--t-600)]"] { color: #7DB4FF; }
-
-/* Emerald Badges, tags & pills */
-:root[data-theme="navy"] .bg-emerald-50 {
-  background-color: #0B2B26 !important;
-  color: #34D399 !important;
-  border-color: #14574A !important;
-}
-:root[data-theme="navy"] .text-emerald-800,
-:root[data-theme="navy"] .text-emerald-700 {
-  color: #34D399 !important;
-}
-:root[data-theme="navy"] .text-emerald-600 {
-  color: #34D399 !important;
-}
-
-/* ThemeSwitcher popup dropdown in Dark Navy */
-:root[data-theme="navy"] [role="listbox"] {
-  background-color: var(--surface) !important;
-  border-color: var(--t-200) !important;
-}
-:root[data-theme="navy"] [role="listbox"] button {
-  color: var(--ink) !important;
-}
-:root[data-theme="navy"] [role="listbox"] button:hover {
-  background-color: var(--t-100) !important;
 }
 
 /* Registration form controls (light panel, matches the sign-in inputs) */

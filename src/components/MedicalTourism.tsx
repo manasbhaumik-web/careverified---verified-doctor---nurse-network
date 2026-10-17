@@ -20,7 +20,7 @@ export default function MedicalTourism({ onOpenProfessional }: { onOpenProfessio
   const [tab, setTab] = useState<Tab>('find');
   const [openCase, setOpenCase] = useState<string | null>(null);
   return (
-    <div className="w-full space-y-5">
+    <div className="w-full space-y-0">
       <DashboardHeader
         icon={Plane}
         eyebrow="International patients"
@@ -30,9 +30,11 @@ export default function MedicalTourism({ onOpenProfessional }: { onOpenProfessio
         activeTab={tab}
         onTabChange={t => { setTab(t as Tab); setOpenCase(null); }}
       />
-      {tab === 'find' && <Facilities onSent={id => { setOpenCase(id); setTab('cases'); }} />}
-      {tab === 'cases' && (openCase ? <CaseDetail id={openCase} onBack={() => setOpenCase(null)} onOpenProfessional={onOpenProfessional} /> : <CaseList onOpen={setOpenCase} />)}
-      {tab === 'info' && <TravelInfo />}
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+        {tab === 'find' && <Facilities onSent={id => { setOpenCase(id); setTab('cases'); }} />}
+        {tab === 'cases' && (openCase ? <CaseDetail id={openCase} onBack={() => setOpenCase(null)} onOpenProfessional={onOpenProfessional} /> : <CaseList onOpen={setOpenCase} />)}
+        {tab === 'info' && <TravelInfo />}
+      </div>
     </div>
   );
 }

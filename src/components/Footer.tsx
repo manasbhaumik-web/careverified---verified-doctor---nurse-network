@@ -37,6 +37,66 @@ export default function Footer({
 }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
+  // ─── STREAMLINED COMPACT FOOTER FOR USER DASHBOARDS ───
+  if (variant === 'app') {
+    return (
+      <footer className="app-dark-footer bg-[color:var(--dark)] text-slate-400 border-t border-[color:var(--t-800)]/60 shrink-0 mt-auto py-3.5 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1920px] mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+          
+          {/* Left: Brand Emblem, Act 586 Status & Copyright */}
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-slate-400 text-center md:text-left justify-center md:justify-start">
+            <div className="flex items-center gap-2">
+              <span className="w-5 h-5 bg-[color:var(--t-600)] flex items-center justify-center text-white shrink-0 shadow-2xs">
+                <Cross className="h-3 w-3" />
+              </span>
+              <span className="font-display font-extrabold text-sm text-white tracking-tight">MedCred</span>
+            </div>
+            <span className="text-slate-600 hidden sm:inline">&bull;</span>
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-emerald-400 animate-pulse shrink-0" />
+              Act 586 Verified
+            </span>
+            <span className="text-slate-600 hidden sm:inline">&bull;</span>
+            <span className="text-[11px] text-slate-400">&copy; {currentYear} MedCred Healthcare Network Sdn Bhd</span>
+          </div>
+
+          {/* Right: Essential Legal Links, Emergency Dispatch & Sign Out */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-slate-400 justify-center">
+            <button type="button" onClick={() => openLegal('notice')} className="hover:text-white transition-colors cursor-pointer">
+              Privacy Policy
+            </button>
+            <span className="text-slate-700">&bull;</span>
+            <button type="button" onClick={() => openLegal('terms')} className="hover:text-white transition-colors cursor-pointer">
+              Terms of Care
+            </button>
+            <span className="text-slate-700">&bull;</span>
+            <span className="hover:text-white transition-colors cursor-pointer">
+              Clinical Governance
+            </span>
+            <span className="text-slate-700">&bull;</span>
+            <span className="text-slate-400">
+              Emergency: <strong className="text-white font-bold">Call 999</strong>
+            </span>
+            {onLogout && (
+              <>
+                <span className="text-slate-700">&bull;</span>
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  className="text-slate-400 hover:text-rose-400 transition-colors cursor-pointer font-bold inline-flex items-center gap-1"
+                >
+                  <LogOut className="h-3 w-3" />
+                  <span>Sign Out</span>
+                </button>
+              </>
+            )}
+          </div>
+
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="app-dark-footer bg-[color:var(--dark)] text-slate-300 border-t border-[color:var(--t-800)] shrink-0 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-8 pb-8 md:pt-12 md:pb-10 space-y-5 md:space-y-6">
@@ -52,7 +112,7 @@ export default function Footer({
               </span>
               <span className="font-display font-black text-xl text-white tracking-tight">MedCred</span>
               <span className="text-[9px] font-black uppercase tracking-widest bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 px-2 py-0.5">
-                {variant === 'app' ? 'Portal v2.4' : 'Registry v2.4'}
+                Registry v2.4
               </span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
@@ -63,32 +123,10 @@ export default function Footer({
           {/* Column 2: Portals & Navigation (2 Cols) */}
           <div className="hidden md:block lg:col-span-2 space-y-3">
             <h4 className="text-[11px] font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
-              {variant === 'app' ? 'Portal Sitemap' : 'Portal Lounges'}
+              Portal Lounges
             </h4>
             
-            {variant === 'app' && navItems.length > 0 ? (
-              <ul className="space-y-1.5 font-semibold">
-                {navItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeView === item.id;
-                  return (
-                    <li key={item.id}>
-                      <button
-                        type="button"
-                        onClick={() => onNavigateView?.(item.id)}
-                        className={`flex items-center gap-2 text-xs transition-colors hover:text-white cursor-pointer w-full text-left py-1 group ${
-                          isActive ? 'text-[color:var(--t-600)] font-extrabold' : 'text-slate-400'
-                        }`}
-                      >
-                        <Icon className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-[color:var(--t-600)]' : 'text-slate-500 group-hover:text-slate-300'}`} />
-                        <span>{item.name}</span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <ul className="space-y-2 text-xs">
+            <ul className="space-y-2 text-xs">
                 <li>
                   <button type="button" onClick={() => onLoginRole?.('patient')} className="text-slate-400 hover:text-white transition-colors cursor-pointer text-left flex items-center justify-between w-full group">
                     <span>Patient Lounge</span>
@@ -125,7 +163,6 @@ export default function Footer({
                   </button>
                 </li>
               </ul>
-            )}
           </div>
 
           {/* Column 3: Verification & Registers (2 Cols) */}
@@ -135,6 +172,26 @@ export default function Footer({
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
               <li>
+                <a href="/verify-practitioners" onClick={e => { e.preventDefault(); navigate('/verify-practitioners'); }} className="hover:text-white transition-colors cursor-pointer block">
+                  Practitioner Licence Verification
+                </a>
+              </li>
+              <li>
+                <a href="/for-patients" onClick={e => { e.preventDefault(); navigate('/for-patients'); }} className="hover:text-white transition-colors cursor-pointer block">
+                  Malaysian Patients (MyKad)
+                </a>
+              </li>
+              <li>
+                <a href="/medical-tourism" onClick={e => { e.preventDefault(); navigate('/medical-tourism'); }} className="hover:text-white transition-colors cursor-pointer block">
+                  International Medical Tourism
+                </a>
+              </li>
+              <li>
+                <a href="/for-clinics" onClick={e => { e.preventDefault(); navigate('/for-clinics'); }} className="hover:text-white transition-colors cursor-pointer block">
+                  Clinics & Hospitals Hub
+                </a>
+              </li>
+              <li>
                 <a href="/for-doctors" onClick={e => { e.preventDefault(); navigate('/for-doctors'); }} className="hover:text-white transition-colors cursor-pointer block">
                   MMC Doctor Portal
                 </a>
@@ -143,28 +200,6 @@ export default function Footer({
                 <a href="/for-nurses" onClick={e => { e.preventDefault(); navigate('/for-nurses'); }} className="hover:text-white transition-colors cursor-pointer block">
                   LJM Nurse Portal
                 </a>
-              </li>
-              <li>
-                <a href="#verify-section" className="hover:text-white transition-colors cursor-pointer block">
-                  APC Validity Search
-                </a>
-              </li>
-              <li>
-                <a href="#verify-section" className="hover:text-white transition-colors cursor-pointer block">
-                  QR Prescription Audit
-                </a>
-              </li>
-              <li>
-                <span className="text-slate-500 flex items-center justify-between">
-                  <span>NSR Specialists</span>
-                  <span className="text-[9px] bg-slate-800 text-slate-400 px-1 py-0.5">Live</span>
-                </span>
-              </li>
-              <li>
-                <span className="text-slate-500 flex items-center justify-between">
-                  <span>Disciplinary Log</span>
-                  <span className="text-[9px] bg-emerald-950 text-emerald-400 px-1 py-0.5">Clean</span>
-                </span>
               </li>
             </ul>
           </div>
@@ -187,7 +222,7 @@ export default function Footer({
           {/* Column 5: Headquarters & Session Desk (2 Cols) */}
           <div className="hidden md:block lg:col-span-2 space-y-3">
             <h4 className="text-[11px] font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
-              {variant === 'app' ? 'Session & HQ' : 'Operational HQ'}
+              Operational HQ
             </h4>
             <div className="text-xs text-slate-400 space-y-2.5">
               <div>
@@ -204,19 +239,6 @@ export default function Footer({
                 <span className="block text-[10px] uppercase font-bold text-slate-500">Audit Hours</span>
                 <p className="text-slate-300 text-[11px]">Mon-Sun: 08:00 - 22:00 MYT</p>
               </div>
-
-              {variant === 'app' && onLogout && (
-                <div className="pt-2 border-t border-slate-800">
-                  <button
-                    type="button"
-                    onClick={onLogout}
-                    className="w-full px-3 py-2 bg-slate-900 hover:bg-rose-900/60 hover:border-rose-700 text-white text-[11px] font-bold border border-slate-700 transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5"
-                  >
-                    <LogOut className="h-3 w-3" />
-                    <span>Sign Out of Session</span>
-                  </button>
-                </div>
-              )}
             </div>
           </div>
 

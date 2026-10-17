@@ -125,7 +125,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob, role = 'p
   };
 
   return (
-    <div className="space-y-8" id="job-market-section">
+    <div className="w-full space-y-0" id="job-market-section">
       {/* Standard dashboard header with attached tabs */}
       <DashboardHeader
         eyebrow="B2B Shift & Staff Recruitment"
@@ -151,8 +151,9 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob, role = 'p
         tabsLabel="Shift sections"
       />
 
-      {/* Summary metrics */}
-      <section aria-label="Marketplace summary" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* Summary metrics */}
+        <section aria-label="Marketplace summary" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {[
           { label: 'Open listings', value: jobs.length, caption: 'Across all contract types', icon: Briefcase, tone: 'crimson' },
           { label: 'Shift-based roles', value: shiftBasedCount, caption: 'Temporary cover, nights & weekends', icon: Clock, tone: 'emerald' },
@@ -651,6 +652,7 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob, role = 'p
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

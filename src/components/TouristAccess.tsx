@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { BadgeCheck, Building2, Car, FileText, Languages, Plane, Search, Utensils, HeartHandshake, ShieldCheck, ArrowRight, Globe } from 'lucide-react';
+import { BadgeCheck, Building2, Car, FileText, Languages, Plane, Search, Utensils, HeartHandshake, ShieldCheck, ArrowRight, Globe, Check } from 'lucide-react';
 import { useLocale } from '../locale/store';
 import type { LangCode } from '../locale/config';
+import hospitalHeroBg from '../../assets/clinics_hospital_hero_bg.jpg';
+import clinicalSuiteFull from '../../assets/clean_light_doctor_suite_full.jpg';
+import acuteCareHeroBg from '../../assets/landing_hero_treatment_nursing_pharmacy_2.jpg';
+import practitionersHeroBg from '../../assets/practitioners_hero_bg.jpg';
 
 /**
  * International Patient & Medical Tourism Access.
@@ -28,10 +32,50 @@ function formatFx(myrAmount: number, currency: FxCurrency): string {
 }
 
 const SAMPLE_PACKAGES = [
-  { id: 'exec-screen', myr: 1280, hub: 'Kuala Lumpur · Penang · JB', code: 'PKG-EXEC-01' },
-  { id: 'cardio-workup', myr: 3200, hub: 'Kuala Lumpur · Penang', code: 'PKG-CARD-02' },
-  { id: 'ortho-knee', myr: 28500, hub: 'Kuala Lumpur · Penang · Melaka', code: 'PKG-ORTH-03' },
-  { id: 'ivf-cycle', myr: 18500, hub: 'Kuala Lumpur · Penang · JB', code: 'PKG-FERT-04' },
+  {
+    id: 'exec-screen',
+    myr: 1280,
+    hub: 'Kuala Lumpur · Penang · JB',
+    code: 'PKG-EXEC-01',
+    image: clinicalSuiteFull,
+    accreditation: 'JCI & MSQH Accredited',
+    badgeClass: 'bg-emerald-700/90 text-white border-emerald-500/50',
+    specialty: 'Executive Wellness & Screening',
+    highlights: ['60+ Blood & Marker Panels', 'Ultrasound & Chest X-Ray', 'Physician Medical Review']
+  },
+  {
+    id: 'cardio-workup',
+    myr: 3200,
+    hub: 'Kuala Lumpur · Penang',
+    code: 'PKG-CARD-02',
+    image: hospitalHeroBg,
+    accreditation: 'JCI Cardiac Specialty',
+    badgeClass: 'bg-rose-700/90 text-white border-rose-500/50',
+    specialty: 'Cardiovascular Assessment',
+    highlights: ['Coronary CT Angiogram', '2D Echocardiogram', 'Senior Cardiologist Review']
+  },
+  {
+    id: 'ortho-knee',
+    myr: 28500,
+    hub: 'Kuala Lumpur · Penang · Melaka',
+    code: 'PKG-ORTH-03',
+    image: acuteCareHeroBg,
+    accreditation: 'MSQH Certified Surgical Hospital',
+    badgeClass: 'bg-sky-700/90 text-white border-sky-500/50',
+    specialty: 'Orthopedic Reconstruction',
+    highlights: ['Surgeon & Anaesthetist Fees', 'Titanium Joint Implant', 'Private Room & Physiotherapy']
+  },
+  {
+    id: 'ivf-cycle',
+    myr: 18500,
+    hub: 'Kuala Lumpur · Penang · JB',
+    code: 'PKG-FERT-04',
+    image: practitionersHeroBg,
+    accreditation: 'MHTC Recognized Fertility Hub',
+    badgeClass: 'bg-purple-700/90 text-white border-purple-500/50',
+    specialty: 'Reproductive & Fertility Suite',
+    highlights: ['Oocyte Retrieval Procedure', 'Embryo Culture & Transfer', 'Personalized Nursing Protocol']
+  },
 ];
 
 const T: Record<Lang, {
@@ -315,9 +359,13 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
         </div>
 
         {/* Multi-Currency Indicative Package Benchmark Estimator */}
-        <div className="mt-8 border border-[color:var(--t-200)] bg-white p-5 sm:p-6 shadow-2xs">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[color:var(--t-100)]">
+        <div className="mt-8 border border-[color:var(--t-200)] bg-white p-5 sm:p-7 shadow-xs">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-[color:var(--t-100)]">
             <div>
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[10px] font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)] mb-1.5">
+                <Building2 className="h-3 w-3 text-[color:var(--t-600)]" />
+                Verified Hospital Packages · Multi-Currency Benchmarks
+              </div>
               <h3 className="font-display font-black text-lg sm:text-xl text-[color:var(--ink)]">{tx.fxTitle}</h3>
               <p className="text-xs sm:text-sm text-slate-600 font-medium mt-0.5">{tx.fxSubtitle}</p>
             </div>
@@ -330,7 +378,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
                   aria-pressed={fx === curr}
                   className={`px-3 py-1.5 text-xs font-mono font-extrabold border transition-colors cursor-pointer ${
                     fx === curr
-                      ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]'
+                      ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)] shadow-2xs'
                       : 'bg-[color:var(--t-50)] text-[color:var(--ink)] border-[color:var(--t-200)] hover:bg-[color:var(--t-100)]'
                   }`}
                 >
@@ -340,40 +388,108 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {SAMPLE_PACKAGES.map((pkg, idx) => {
               const copy = tx.packages[idx];
               return (
-                <div key={pkg.id} className="bg-[color:var(--t-50)]/60 border border-[color:var(--t-200)] p-4 flex flex-col justify-between">
+                <div
+                  key={pkg.id}
+                  className="group bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-400)] transition-all duration-300 shadow-2xs hover:shadow-md flex flex-col justify-between overflow-hidden"
+                >
                   <div>
-                    <div className="flex items-center justify-between gap-2 text-[10px] font-mono font-bold text-slate-500 mb-1.5">
-                      <span>{pkg.code}</span>
-                      <span className="text-[color:var(--t-700)]">{copy.duration}</span>
-                    </div>
-                    <h4 className="font-display font-extrabold text-sm text-[color:var(--ink)] leading-snug">{copy.title}</h4>
-                    <p className="text-xs text-slate-600 mt-1.5 leading-relaxed font-medium">{copy.includes}</p>
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-[color:var(--t-200)]">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <span className="font-mono font-black text-base text-[color:var(--ink)]">
-                        RM {pkg.myr.toLocaleString('en-US')}
-                      </span>
-                      {fx !== 'MYR' && (
-                        <span className="font-mono font-bold text-xs text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)]">
-                          ~{formatFx(pkg.myr, fx)}
+                    {/* Visual Photographic Header */}
+                    <div className="relative aspect-16/10 overflow-hidden bg-slate-100">
+                      <img
+                        src={pkg.image}
+                        alt={copy.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+
+                      {/* Accreditation Pill Overlay */}
+                      <div className="absolute top-2.5 left-2.5">
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-mono font-extrabold tracking-wide uppercase border backdrop-blur-md ${pkg.badgeClass}`}>
+                          <ShieldCheck className="h-3 w-3 shrink-0" />
+                          {pkg.accreditation}
                         </span>
-                      )}
+                      </div>
+
+                      {/* Duration Tag */}
+                      <div className="absolute bottom-2.5 right-2.5 bg-black/80 backdrop-blur-md text-white text-[10px] font-mono font-bold px-2 py-0.5 border border-white/20">
+                        {copy.duration}
+                      </div>
                     </div>
-                    <p className="text-[11px] text-slate-500 font-medium mt-1 flex items-center gap-1">
-                      <Globe className="h-3 w-3 text-[color:var(--t-600)] shrink-0" />
-                      <span className="truncate">{pkg.hub}</span>
-                    </p>
+
+                    {/* Card Body */}
+                    <div className="p-4 sm:p-5">
+                      <div className="flex items-center justify-between gap-2 text-[10px] font-mono font-bold text-slate-500 mb-1.5">
+                        <span>{pkg.code}</span>
+                        <span className="text-[color:var(--t-700)] font-semibold truncate">{pkg.specialty}</span>
+                      </div>
+                      <h4 className="font-display font-black text-sm sm:text-base text-[color:var(--ink)] leading-snug group-hover:text-[color:var(--t-600)] transition-colors line-clamp-2">
+                        {copy.title}
+                      </h4>
+                      <p className="text-xs text-slate-600 mt-2 leading-relaxed font-medium line-clamp-2">
+                        {copy.includes}
+                      </p>
+
+                      {/* Itemised Highlights */}
+                      <div className="mt-3.5 pt-3 border-t border-[color:var(--t-100)] space-y-1.5">
+                        {pkg.highlights.map((h, i) => (
+                          <div key={i} className="flex items-center gap-2 text-[11px] text-slate-700 font-medium">
+                            <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                            <span className="truncate">{h}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Pricing & Action CTA */}
+                  <div className="p-4 sm:p-5 pt-0">
+                    <div className="pt-3 border-t border-[color:var(--t-200)]">
+                      <div className="flex items-baseline justify-between gap-1 mb-1">
+                        <div>
+                          <div className="text-[9px] font-mono uppercase tracking-wider text-slate-400 font-bold">Indicative Tariff</div>
+                          <span className="font-mono font-black text-lg text-[color:var(--ink)]">
+                            RM {pkg.myr.toLocaleString('en-US')}
+                          </span>
+                        </div>
+                        {fx !== 'MYR' && (
+                          <span className="font-mono font-bold text-xs text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)] shadow-2xs">
+                            ~{formatFx(pkg.myr, fx)}
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1 mb-3.5">
+                        <Globe className="h-3 w-3 text-[color:var(--t-600)] shrink-0" />
+                        <span className="truncate">{pkg.hub}</span>
+                      </p>
+
+                      <button
+                        type="button"
+                        onClick={onSignUp}
+                        className="w-full py-2.5 px-3 text-xs font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs group-hover:shadow-xs"
+                      >
+                        <span>{tx.browse.cta || 'Request Hospital Quote'}</span>
+                        <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
             })}
           </div>
-          <p className="mt-3 text-[11px] text-slate-500 font-medium">{tx.fxDisclaimer}</p>
+
+          <div className="mt-5 pt-3.5 border-t border-[color:var(--t-100)] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-slate-500 font-medium">
+            <p>{tx.fxDisclaimer}</p>
+            <span className="shrink-0 text-[color:var(--t-700)] font-bold flex items-center gap-1">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+              Direct hospital settlement · 0% intermediary markup
+            </span>
+          </div>
         </div>
 
         <ul className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

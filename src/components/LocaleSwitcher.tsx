@@ -24,7 +24,7 @@ export default function LocaleSwitcher({ className = '', tone = 'light' }: Props
   }, [open]);
 
   const buttonTone = tone === 'onColor'
-    ? 'text-white border-transparent hover:bg-white/15'
+    ? 'text-white border-transparent bg-white/15 hover:bg-white/25'
     : 'text-[color:var(--t-600)] border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)]';
 
   return (

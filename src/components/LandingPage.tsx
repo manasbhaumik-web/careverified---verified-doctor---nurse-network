@@ -12,12 +12,121 @@ import {
   AlertTriangle, ArrowRight, Lock, AlertCircle, PlusCircle,
   Building, ChevronRight, Zap, Globe, Award, FileText,
   Stethoscope, Activity, Check,
-  Clock, PhoneCall, Pill, Hospital, ChevronLeft, ChevronDown, UserCheck, Users
+  Clock, PhoneCall, Pill, Hospital, ChevronLeft, ChevronDown, UserCheck, Users, Video, X,
+  CreditCard, Receipt, Plane, Heart, Sparkles, Building2
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile } from '../types';
 import { loginUrl, navigate } from '../nav';
 import Footer from './Footer';
-import heroBgImage from '../../assets/medical_hero_bg.jpg';
+import heroBgImage from '../../assets/landing_hero_treatment_nursing_pharmacy_2.jpg';
+import malaysianFemaleDoctor from '../../assets/malaysian_female_doctor.jpg';
+import malaysianFemaleNurse from '../../assets/malaysian_female_nurse.jpg';
+import pharmacyHeroBg from '../../assets/pharmacies_hero_bg.jpg';
+import hospitalHeroBg from '../../assets/clinics_hospital_hero_bg.jpg';
+import clinicalSuiteFull from '../../assets/clean_light_doctor_suite_full.jpg';
+import practitionersHeroBg from '../../assets/practitioners_hero_bg.jpg';
+import malaysianMalePatient from '../../assets/malaysian_male_patient.jpg';
+
+type FxCurrency = 'MYR' | 'USD' | 'SGD' | 'IDR' | 'AUD' | 'SAR';
+const FX_RATES: Record<FxCurrency, { rate: number; symbol: string; label: string }> = {
+  MYR: { rate: 1, symbol: 'RM ', label: 'MYR' },
+  USD: { rate: 0.228, symbol: 'US$', label: 'USD' },
+  SGD: { rate: 0.305, symbol: 'S$', label: 'SGD' },
+  IDR: { rate: 3580, symbol: 'Rp ', label: 'IDR' },
+  AUD: { rate: 0.348, symbol: 'A$', label: 'AUD' },
+  SAR: { rate: 0.855, symbol: 'SAR ', label: 'SAR' },
+};
+function formatFx(myrAmount: number, currency: FxCurrency): string {
+  const { rate, symbol } = FX_RATES[currency];
+  const converted = Math.round(myrAmount * rate);
+  return `${symbol}${converted.toLocaleString('en-US')}`;
+}
+
+const INTL_PACKAGES = [
+  {
+    id: 'exec-screen',
+    myr: 1280,
+    hub: 'Kuala Lumpur · Penang · JB',
+    code: 'PKG-EXEC-01',
+    image: clinicalSuiteFull,
+    accreditation: 'JCI & MSQH Accredited',
+    badgeClass: 'bg-emerald-700/90 text-white border-emerald-500/50',
+    title: 'Executive Full-Body & Tumour Marker Screening',
+    duration: '1 Day Outpatient',
+    highlights: ['60+ Blood & Marker Panels', 'Ultrasound & Chest X-Ray', 'Physician Medical Review']
+  },
+  {
+    id: 'cardio-workup',
+    myr: 3200,
+    hub: 'Kuala Lumpur · Penang',
+    code: 'PKG-CARD-02',
+    image: hospitalHeroBg,
+    accreditation: 'JCI Cardiac Specialty',
+    badgeClass: 'bg-rose-700/90 text-white border-rose-500/50',
+    title: 'Comprehensive Cardiac CT Angiogram & Echo Suite',
+    duration: '1–2 Days Outpatient',
+    highlights: ['Coronary CT Angiogram', '2D Echocardiogram', 'Senior Cardiologist Review']
+  },
+  {
+    id: 'ortho-knee',
+    myr: 28500,
+    hub: 'Kuala Lumpur · Penang · Melaka',
+    code: 'PKG-ORTH-03',
+    image: heroBgImage,
+    accreditation: 'MSQH Certified Surgical Hospital',
+    badgeClass: 'bg-sky-700/90 text-white border-sky-500/50',
+    title: 'Robotic / Total Knee Replacement Package',
+    duration: '4–5 Days Inpatient',
+    highlights: ['Surgeon & Anaesthetist Fees', 'Titanium Joint Implant', 'Private Room & Physiotherapy']
+  },
+  {
+    id: 'ivf-cycle',
+    myr: 18500,
+    hub: 'Kuala Lumpur · Penang · JB',
+    code: 'PKG-FERT-04',
+    image: practitionersHeroBg,
+    accreditation: 'MHTC Recognized Fertility Hub',
+    badgeClass: 'bg-purple-700/90 text-white border-purple-500/50',
+    title: 'IVF & Fertility Assessment + Cycle Package',
+    duration: '2–3 Weeks Outpatient',
+    highlights: ['Oocyte Retrieval Procedure', 'Embryo Culture & Transfer', 'Personalized Nursing Protocol']
+  },
+];
+
+const INTL_FACILITIES = [
+  {
+    id: 'prince-court',
+    name: 'Prince Court Medical Centre',
+    city: 'Kuala Lumpur',
+    badge: 'JCI & MSQH Accredited',
+    specialties: ['Cardiology', 'Oncology', 'IVF & Fertility', 'Orthopaedics'],
+    image: hospitalHeroBg,
+  },
+  {
+    id: 'gleneagles-kl',
+    name: 'Gleneagles Hospital Kuala Lumpur',
+    city: 'Ampang, Kuala Lumpur',
+    badge: 'JCI Accredited · KKM Act 586',
+    specialties: ['Cardiac Catheterisation', 'Robotic Surgery', 'Neurosciences'],
+    image: clinicalSuiteFull,
+  },
+  {
+    id: 'island-penang',
+    name: 'Island Hospital Penang',
+    city: 'Penang',
+    badge: 'JCI & MSQH Accredited',
+    specialties: ['Orthopaedics & Spine', 'Digestive Health', 'Ophthalmology'],
+    image: heroBgImage,
+  },
+  {
+    id: 'sunway-medical',
+    name: 'Sunway Medical Centre',
+    city: 'Bandar Sunway, Selangor',
+    badge: 'ACHS & MSQH Accredited',
+    specialties: ['Cancer Care (PET-CT)', 'Bone Marrow Transplant', 'Paediatrics'],
+    image: practitionersHeroBg,
+  },
+];
 
 // ─────────────────────────────────────────────
 // Props
@@ -409,19 +518,17 @@ export default function LandingPage({ professionals }: LandingPageProps) {
   // Sign-in and sign-up live on their own page (/login)
   const goLogin = (role: PortalRole, register = false) => navigate(loginUrl(role, register));
 
-  // Active Assistance Module State (Split Layout)
-
-  const [activeModuleId, setActiveModuleId] = useState<string>('telehealth');
-
   // Instant Verification Lookup State
   const [searchQuery, setSearchQuery] = useState('');
   const [lookupResult, setLookupResult] = useState<(DoctorProfile | NurseProfile)[] | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [registryCouncilFilter, setRegistryCouncilFilter] = useState<'all' | 'doctor' | 'nurse'>('all');
+  const [touristFx, setTouristFx] = useState<FxCurrency>('MYR');
 
   // Navmenu Dropdown States (Quick Views & Join Us)
   const [quickViewsOpen, setQuickViewsOpen] = useState(false);
   const [joinUsOpen, setJoinUsOpen] = useState(false);
+  const [showOnCallPill, setShowOnCallPill] = useState(true);
   const quickViewsRef = useRef<HTMLDivElement>(null);
   const joinUsRef = useRef<HTMLDivElement>(null);
 
@@ -474,11 +581,76 @@ export default function LandingPage({ professionals }: LandingPageProps) {
     setHasSearched(true);
   };
 
-  // Animated counters
+  // Live Quick-Search Dropdown State & Click-Outside Handling
+  const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
+  const searchBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!searchDropdownOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (searchBarRef.current && !searchBarRef.current.contains(e.target as Node)) {
+        setSearchDropdownOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSearchDropdownOpen(false);
+    };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [searchDropdownOpen]);
+
+  // Live matching practitioners for the instant typeahead dropdown
+  const liveMatches = searchQuery.trim().length >= 2
+    ? professionals.filter(p => {
+        const q = searchQuery.toLowerCase().trim();
+        return p.name.toLowerCase().includes(q) ||
+          p.licenseNumber.toLowerCase().includes(q) ||
+          p.specialization.toLowerCase().includes(q) ||
+          (p.city && p.city.toLowerCase().includes(q));
+      }).slice(0, 5)
+    : [];
+
+  // Intelligent Quick-Search Submission Router
+  const handleQuickSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchDropdownOpen(false);
+    const q = searchQuery.trim();
+    if (!q) {
+      navigate('/verify-practitioners');
+      return;
+    }
+    const lower = q.toLowerCase();
+    if (lower.includes('hospital') || lower.includes('touris') || lower.includes('overseas') || lower.includes('abroad')) {
+      navigate('/medical-tourism');
+    } else if (lower.includes('prescription') || lower.includes('pharmacy') || lower.includes('medication') || lower.includes('drug')) {
+      navigate('/for-patients');
+    } else if (lower.includes('nurse') || lower.includes('wound') || lower.includes('dressing') || lower.includes('home care')) {
+      navigate(`/verify-practitioners?council=nurse&q=${encodeURIComponent(q)}`);
+    } else {
+      navigate(`/verify-practitioners?q=${encodeURIComponent(q)}`);
+    }
+  };
+
+  // Category-Intelligent Tag Click Handler
+  const handleQuickTagClick = (tagKey: string, queryParam: string) => {
+    setSearchQuery(queryParam);
+    setSearchDropdownOpen(false);
+    if (tagKey === 'hospitals') {
+      navigate('/medical-tourism');
+    } else if (tagKey === 'prescriptions') {
+      navigate('/for-patients');
+    } else if (tagKey === 'nursing') {
+      navigate('/verify-practitioners?council=nurse&q=Nurse');
+    } else {
+      navigate(`/verify-practitioners?q=${encodeURIComponent(queryParam)}`);
+    }
+  };
 
 
-
-  const activeModule = PROFESSIONAL_ASSISTANCE_MODULES.find(m => m.id === activeModuleId) || PROFESSIONAL_ASSISTANCE_MODULES[0];
 
   return (
     <div className="min-h-dvh bg-[color:var(--t-bg)] text-[color:var(--ink)] font-body flex flex-col antialiased selection:bg-[color:var(--t-100)] selection:text-[color:var(--t-600)] pb-[calc(4.5rem+env(safe-area-inset-bottom))] sm:pb-0">
@@ -491,6 +663,14 @@ export default function LandingPage({ professionals }: LandingPageProps) {
           <Cross className="h-2.5 w-2.5" /> Compassionate Care Standard
         </span>
         <span>Dedicated to Patient Well-Being, Verified Practitioners &amp; Gentle Medical Support Across Malaysia</span>
+        <a
+          href="/landing-preview"
+          onClick={e => { e.preventDefault(); navigate('/landing-preview'); }}
+          className="ml-3 inline-flex items-center gap-1 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] px-2.5 py-0.5 border border-[color:var(--t-300)] font-black text-[11px] shadow-2xs transition-colors cursor-pointer"
+        >
+          <span>🎨 View Visual Redesign Samples</span>
+          <ArrowRight className="h-3 w-3" />
+        </a>
       </div>
 
       {/* ═══════════ NAVBAR (LIGHT TONE PRIMARY BACKGROUND) ═══════════ */}
@@ -800,18 +980,15 @@ export default function LandingPage({ professionals }: LandingPageProps) {
         onKeyDown={stopAutoplay}
         className="relative text-[color:var(--ink)] border-b border-[color:var(--t-200)] overflow-hidden bg-[color:var(--t-50)] h-[660px] sm:h-[640px] lg:h-[620px] flex items-center"
       >
-        {/* Clinical Background Image (Restored natural orientation with 70% opacity) */}
+        {/* Clinical Background Image representing Treatment, Nursing and Pharmacy */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <div
-            className="hero-bg-animated absolute -inset-6 bg-cover bg-center bg-no-repeat pointer-events-none"
+            className="hero-bg-animated absolute -inset-6 bg-cover bg-center sm:bg-[position:82%_center] bg-no-repeat pointer-events-none"
             style={{
               backgroundImage: `url(${heroBgImage})`,
-              opacity: 0.7,
-              filter: "hue-rotate(var(--t-hue)) brightness(var(--t-bright))",
             }}
           />
         </div>
-        <Cross className="absolute -right-24 -bottom-36 h-[520px] w-[520px] text-[color:var(--t-600)] opacity-5 pointer-events-none z-0" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full z-10 py-4 sm:py-6">
           {/* All slides share one grid cell, so the hero is as tall as the tallest slide on every slide. Screen readers hear slide changes only once autoplay has stopped. */}
@@ -1056,6 +1233,171 @@ export default function LandingPage({ professionals }: LandingPageProps) {
         </div>
       </section>
 
+      {/* ═══════════ "FIND CARE IN 1 CLICK" QUICK-SEARCH BAR WITH LIVE AUTOCOMPLETE ═══════════ */}
+      <section aria-label="Quick Care Intake Search" className="relative z-30 bg-white border-b border-[color:var(--t-200)] py-4 sm:py-4.5 shadow-2xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 sm:gap-4">
+
+            {/* Left: Search Input with Live Autocomplete Dropdown */}
+            <div ref={searchBarRef} className="relative flex-1 min-w-[280px] sm:min-w-[360px] max-w-2xl">
+              <form onSubmit={handleQuickSearchSubmit} className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[color:var(--t-600)] pointer-events-none" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setSearchDropdownOpen(true);
+                    }}
+                    onFocus={() => {
+                      if (searchQuery.trim().length >= 2) setSearchDropdownOpen(true);
+                    }}
+                    placeholder="Search doctor, specialty (e.g. Pediatric, Cardio), or clinical need..."
+                    className="w-full pl-10 pr-9 py-2.5 bg-[color:var(--t-50)]/60 border border-[color:var(--t-200)] focus:border-[color:var(--t-600)] focus:bg-white text-xs sm:text-sm text-[color:var(--ink)] placeholder:text-slate-400 font-medium focus:outline-none transition-all shadow-inner"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSearchDropdownOpen(false);
+                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-slate-700 cursor-pointer"
+                      title="Clear search"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black transition-colors cursor-pointer shrink-0 shadow-xs flex items-center gap-1.5 border border-[color:var(--t-700)]"
+                >
+                  <span>Find Care</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </form>
+
+              {/* Instant Typeahead Suggestion Dropdown */}
+              {searchDropdownOpen && searchQuery.trim().length >= 2 && (
+                <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-[color:var(--t-200)] shadow-2xl z-50 overflow-hidden divide-y divide-[color:var(--t-100)] animate-fade-in">
+                  <div className="px-3.5 py-2 bg-[color:var(--t-50)] flex items-center justify-between text-[11px] font-mono font-bold text-[color:var(--t-700)]">
+                    <span className="flex items-center gap-1.5">
+                      <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                      Verified Council Matches for "{searchQuery}"
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-normal">
+                      Press Enter to search all
+                    </span>
+                  </div>
+
+                  {liveMatches.length > 0 ? (
+                    <div className="max-h-64 overflow-y-auto divide-y divide-slate-100">
+                      {liveMatches.map((prof) => (
+                        <div
+                          key={prof.id}
+                          onClick={() => {
+                            setSearchDropdownOpen(false);
+                            navigate(`/verify-practitioners?q=${encodeURIComponent(prof.name)}`);
+                          }}
+                          className="px-3.5 py-2.5 hover:bg-[color:var(--t-50)] cursor-pointer transition-colors flex items-center justify-between gap-3 group"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className="w-8 h-8 rounded-none bg-[color:var(--t-100)] text-[color:var(--t-700)] flex items-center justify-center font-bold text-xs shrink-0 border border-[color:var(--t-200)]">
+                              {'medicalCouncil' in prof ? 'MD' : 'RN'}
+                            </span>
+                            <div className="min-w-0">
+                              <p className="text-xs font-extrabold text-[color:var(--ink)] truncate group-hover:text-[color:var(--t-600)] transition-colors">
+                                {prof.name}
+                              </p>
+                              <p className="text-[11px] text-slate-500 font-medium truncate">
+                                {prof.specialization} &bull; {prof.city}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5">
+                              APC 2026 Valid
+                            </span>
+                            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-4 text-center text-xs text-slate-500 space-y-2">
+                      <p>No exact practitioner name matches found in quick preview.</p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchDropdownOpen(false);
+                          navigate(`/verify-practitioners?q=${encodeURIComponent(searchQuery)}`);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[color:var(--t-600)] text-white text-xs font-bold shadow-2xs hover:bg-[color:var(--t-700)] cursor-pointer"
+                      >
+                        <Search className="h-3.5 w-3.5" />
+                        <span>Search "{searchQuery}" in Full National Register &rarr;</span>
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="p-2.5 bg-slate-50 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchDropdownOpen(false);
+                        navigate(`/verify-practitioners?q=${encodeURIComponent(searchQuery)}`);
+                      }}
+                      className="text-[11px] font-bold text-[color:var(--t-700)] hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>Open Full Practitioner Register</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchDropdownOpen(false);
+                        navigate('/medical-tourism');
+                      }}
+                      className="text-[11px] font-bold text-slate-600 hover:text-[color:var(--t-700)] hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>Specialist Hospital Packages</span>
+                      <ChevronRight className="h-3 w-3" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right: Quick-Tap Popular Care Pills */}
+            <div className="flex flex-wrap items-center gap-1.5 xl:justify-end">
+              <span className="text-[10px] font-mono font-extrabold uppercase tracking-wider text-slate-500 mr-1 hidden sm:inline-block">
+                POPULAR:
+              </span>
+              {[
+                { label: '🩺 General Practitioner', key: 'gp', q: 'General' },
+                { label: '👶 Pediatrician', key: 'peds', q: 'Pediatric' },
+                { label: '🩹 Home Nursing', key: 'nursing', q: 'Nurse' },
+                { label: '💊 E-Prescriptions', key: 'prescriptions', q: 'Pharmacy' },
+                { label: '🏥 Specialist Hospitals', key: 'hospitals', q: 'Hospital' },
+                { label: '❤️ Cardiology', key: 'cardio', q: 'Cardio' },
+              ].map((pill) => (
+                <button
+                  key={pill.label}
+                  type="button"
+                  onClick={() => handleQuickTagClick(pill.key, pill.q)}
+                  className="px-2.5 py-1 text-xs font-bold bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] text-[color:var(--t-700)] hover:text-white border border-[color:var(--t-200)] hover:border-[color:var(--t-700)] transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
+                >
+                  {pill.label}
+                </button>
+              ))}
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* ═══════════ COMPACT CLINICAL EMERGENCY ADVISORY BAR ═══════════ */}
       <section aria-label="Emergency Hotline Protocol" className="relative bg-rose-50/80 border-b border-rose-200 py-3.5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -1107,391 +1449,673 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-px bg-[color:var(--t-200)] border border-[color:var(--t-200)]">
-                {TRUST_PARTNERS.map((tp, idx) => {
-                  const TpIcon = tp.icon;
-                  return (
-                    <StaggerItem
-                      key={tp.title}
-                      index={idx}
-                      className="group bg-white p-5 border-t-2 border-t-[color:var(--t-600)] hover:bg-[color:var(--t-50)]/60 transition-all duration-300 flex flex-col justify-between h-full"
-                    >
-                      <div>
-                        <div className="flex items-center justify-between gap-2 mb-3.5">
-                          <span className="w-9 h-9 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center group-hover:bg-[color:var(--t-600)] group-hover:text-white group-hover:border-[color:var(--t-700)] transition-colors shadow-2xs">
-                            <TpIcon className="h-4.5 w-4.5" />
-                          </span>
-                          <span className="text-xs font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-600)] bg-[color:var(--t-50)] px-2 py-0.5 border border-[color:var(--t-200)]">
-                            {tp.category}
-                          </span>
-                        </div>
-                        <h4 className="font-display font-extrabold text-sm leading-snug text-[color:var(--ink)] group-hover:text-[color:var(--t-600)] transition-colors">
-                          {tp.title}
-                        </h4>
-                      </div>
-                      <div className="mt-4 pt-3 border-t border-[color:var(--t-100)] flex items-center gap-1.5 text-xs font-bold text-emerald-700">
-                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
-                        <span className="truncate">{tp.status}</span>
-                      </div>
-                    </StaggerItem>
-                  );
-                })}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                {/* STEP 1 */}
+                <div className="bg-[color:var(--t-50)]/40 border border-[color:var(--t-200)] p-6 space-y-4 relative group hover:border-[color:var(--t-600)] transition-colors shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="w-9 h-9 bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
+                      01
+                    </span>
+                    <span className="text-[10px] font-mono font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2.5 py-0.5 border border-[color:var(--t-200)]">
+                      Official Audit
+                    </span>
+                  </div>
+                  <div className="h-36 bg-slate-100 overflow-hidden border border-[color:var(--t-200)] shadow-2xs">
+                    <img
+                      src={clinicalSuiteFull}
+                      alt="Direct Council Audit"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div>
+                    <h4 className="font-display font-black text-base text-[color:var(--ink)]">Direct MMC &amp; LJM Audit</h4>
+                    <p className="text-xs text-slate-600 mt-1.5 leading-relaxed font-medium">
+                      Every doctor and nurse is checked by hand against official council databases before a profile is activated.
+                    </p>
+                  </div>
+                </div>
+
+                {/* STEP 2 */}
+                <div className="bg-[color:var(--t-50)]/40 border border-[color:var(--t-200)] p-6 space-y-4 relative group hover:border-[color:var(--t-600)] transition-colors shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="w-9 h-9 bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
+                      02
+                    </span>
+                    <span className="text-[10px] font-mono font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2.5 py-0.5 border border-[color:var(--t-200)]">
+                      Hourly Sync
+                    </span>
+                  </div>
+                  <div className="h-36 bg-slate-100 overflow-hidden border border-[color:var(--t-200)] shadow-2xs">
+                    <img
+                      src={practitionersHeroBg}
+                      alt="Continuous APC Oversight"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div>
+                    <h4 className="font-display font-black text-base text-[color:var(--ink)]">Continuous APC Oversight</h4>
+                    <p className="text-xs text-slate-600 mt-1.5 leading-relaxed font-medium">
+                      Annual Practising Certificates are tracked continuously. Expired certificates are automatically locked out from consultation.
+                    </p>
+                  </div>
+                </div>
+
+                {/* STEP 3 */}
+                <div className="bg-[color:var(--t-50)]/40 border border-[color:var(--t-200)] p-6 space-y-4 relative group hover:border-[color:var(--t-600)] transition-colors shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="w-9 h-9 bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
+                      03
+                    </span>
+                    <span className="text-[10px] font-mono font-extrabold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-0.5 border border-emerald-200">
+                      Patient Safe
+                    </span>
+                  </div>
+                  <div className="h-36 bg-slate-100 overflow-hidden border border-[color:var(--t-200)] shadow-2xs">
+                    <img
+                      src={malaysianMalePatient}
+                      alt="Complete Peace of Mind"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div>
+                    <h4 className="font-display font-black text-base text-[color:var(--ink)]">Complete Peace of Mind</h4>
+                    <p className="text-xs text-slate-600 mt-1.5 leading-relaxed font-medium">
+                      You consult with total confidence knowing your health is managed by bona fide, licensed medical practitioners.
+                    </p>
+                  </div>
+                </div>
+
               </div>
             </div>
 
-            <AnimatedSection>
-              <div aria-labelledby="verify-heading">
-                <div className="relative overflow-hidden bg-white panel-edge corner-bracket p-6 sm:p-10 lg:p-12">
-                  <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.95fr)] gap-10 lg:gap-14 items-start">
-                    {/* Left: heading, council filter tabs, search, results */}
-                    <div className="min-w-0">
-                      <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <Cross className="h-3 w-3 text-[color:var(--t-600)]" />
-                        Public Statutory Practitioner Register
-                      </div>
-                      <h2 id="verify-heading" className="font-display font-black text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-tight text-[color:var(--ink)] mb-2">
-                        Practitioner Licence <span className="text-[color:var(--t-600)]">Verification.</span>
-                      </h2>
-                      <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium mb-6 max-w-lg">
-                        Check active medical and nursing licences against statutory council registers with complete transparency before booking care.
-                      </p>
-
-                      {/* Council Selector Tabs */}
-                      <div className="flex flex-wrap items-center gap-2 mb-4">
-                        {[
-                          { key: 'all' as const, label: 'All Practitioners', icon: Users },
-                          { key: 'doctor' as const, label: 'MMC Doctors (Act 1971)', icon: Stethoscope },
-                          { key: 'nurse' as const, label: 'LJM Nurses (Act 1950)', icon: UserCheck },
-                        ].map(c => {
-                          const isSel = registryCouncilFilter === c.key;
-                          const TabIcon = c.icon;
-                          return (
-                            <button
-                              key={c.key}
-                              type="button"
-                              onClick={() => {
-                                setRegistryCouncilFilter(c.key);
-                                setTimeout(() => handleInstantLookup(), 0);
-                              }}
-                              className={`px-3.5 py-2 text-xs font-extrabold border transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
-                                isSel
-                                  ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)] shadow-xs ring-1 ring-[color:var(--t-600)]/20'
-                                  : 'bg-white text-slate-700 border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] hover:border-[color:var(--t-300)]'
-                              }`}
-                            >
-                              <TabIcon className={`h-3.5 w-3.5 ${isSel ? 'text-white' : 'text-[color:var(--t-600)]'}`} />
-                              <span>{c.label}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      <form onSubmit={handleInstantLookup} role="search" className="flex flex-col sm:flex-row gap-3">
-                        <div className="relative flex-grow">
-                          <label htmlFor="licence-search" className="sr-only">Doctor or nurse name, licence number or specialty</label>
-                          <Search aria-hidden="true" className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
-                          <input
-                            id="licence-search"
-                            type="text"
-                            placeholder="e.g. DEMO-MMC-32109, Dr. Tan, or Cardiology"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full h-12 pl-10 pr-4 bg-white border border-[color:var(--t-200)] rounded-none text-[color:var(--ink)] placeholder-slate-400 font-medium focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all text-sm"
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          className="h-12 min-h-[48px] px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white font-extrabold text-sm rounded-none transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0 border border-[color:var(--t-700)] shadow-xs"
-                        >
-                          <ShieldCheck className="h-4 w-4" />
-                          Verify Now
-                        </button>
-                      </form>
-
-                      {/* Quick-Search Sample Tags */}
-                      <div className="flex flex-wrap items-center gap-2 mt-4 text-xs">
-                        <span className="text-slate-500 font-bold text-xs uppercase tracking-wider">Quick Search:</span>
-                        {['DEMO-MMC-32109', 'Cardiology', 'Dr. Tan Seng Hock', 'DEMO-LJM-88412'].map((sample) => (
-                          <button
-                            key={sample}
-                            type="button"
-                            onClick={() => {
-                              setSearchQuery(sample);
-                              const query = sample.toLowerCase();
-                              const results = professionals.filter(p =>
-                                p.name.toLowerCase().includes(query) ||
-                                p.licenseNumber.toLowerCase().includes(query) ||
-                                p.specialization.toLowerCase().includes(query)
-                              );
-                              setLookupResult(results);
-                              setHasSearched(true);
-                            }}
-                            className="px-3 py-1 bg-white hover:bg-[color:var(--t-100)] text-[color:var(--t-600)] font-mono text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-colors cursor-pointer"
-                          >
-                            {sample}
-                          </button>
-                        ))}
-                      </div>
-
-                      <div className="mt-6" aria-live="polite">
-                        <AnimatePresence mode="wait">
-                          {hasSearched && (
-                            <motion.div
-                              key="results"
-                              initial={{ opacity: 0, y: 12 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -8 }}
-                              className="space-y-3.5"
-                            >
-                              {lookupResult && lookupResult.length > 0 ? (
-                                lookupResult.map((p) => {
-                                  const council = 'medicalCouncil' in p ? p.medicalCouncil : p.nursingCouncil;
-                                  return (
-                                    <article key={p.id} className="bg-white border-l-4 border-l-emerald-600 border-t border-r border-b border-[color:var(--t-200)] shadow-xs p-5">
-                                      <div className="flex flex-wrap items-center justify-between gap-4">
-                                        <div className="flex items-center gap-4 min-w-0">
-                                          <div className="photo-clinical-frame corner-bracket w-14 h-14 shrink-0 shadow-2xs">
-                                            <img
-                                              src={p.avatar}
-                                              alt=""
-                                              referrerPolicy="no-referrer"
-                                            />
-                                          </div>
-                                          <div className="min-w-0">
-                                            <div className="flex items-center gap-2">
-                                              <h3 className="font-display font-black text-lg text-[color:var(--ink)] leading-tight">{p.name}</h3>
-                                              <span className="text-xs font-mono font-extrabold uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
-                                                Active APC 2026
-                                              </span>
-                                            </div>
-                                            <p className="text-sm text-slate-600 font-medium mt-0.5">{p.specialization} · {p.city}</p>
-                                          </div>
-                                        </div>
-                                        <div className="flex flex-col items-end gap-1 shrink-0">
-                                          <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold px-3 py-1.5 shadow-2xs">
-                                            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                                            Council Verified
-                                          </span>
-                                          <span className="text-xs font-mono text-slate-500">Audit Stamp #MC-2026-OK</span>
-                                        </div>
-                                      </div>
-                                      <dl className="mt-4 pt-4 border-t border-[color:var(--t-100)] grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-3 text-sm">
-                                        <div>
-                                          <dt className="text-xs font-bold uppercase tracking-wider text-slate-500">Licence / Reg No.</dt>
-                                          <dd className="mt-0.5 font-mono font-bold text-[color:var(--t-600)]">{p.licenseNumber}</dd>
-                                        </div>
-                                        <div className="min-w-0">
-                                          <dt className="text-xs font-bold uppercase tracking-wider text-slate-500">Statutory Council</dt>
-                                          <dd className="mt-0.5 font-bold text-[color:var(--ink)] break-words">{council}<VerificationScopeBadge prof={p as any} className="ml-2 align-middle" /></dd>
-                                        </div>
-                                        <div>
-                                          <dt className="text-xs font-bold uppercase tracking-wider text-slate-500">Practice Clearance</dt>
-                                          <dd className="mt-0.5 font-bold text-emerald-700 flex items-center gap-1">
-                                            <Check className="h-3.5 w-3.5" /> Full Independent Practice
-                                          </dd>
-                                        </div>
-                                      </dl>
-                                    </article>
-                                  );
-                                })
-                              ) : (
-                                <div className="bg-red-50 border border-red-200 p-4 flex items-start gap-3 text-red-900 text-sm">
-                                  <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
-                                  <span><span className="font-bold">No matching record found.</span> Check the licence number or spelling. Practitioners who are suspended, lapsed, or pending board verification are omitted from this public register.</span>
-                                </div>
-                              )}
-                              <button
-                                type="button"
-                                onClick={() => { setSearchQuery(''); setHasSearched(false); setLookupResult(null); setRegistryCouncilFilter('all'); }}
-                                className="min-h-[44px] px-1 text-sm font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
-                              >
-                                Clear search filters
-                              </button>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    </div>
-
-                    {/* Right: three clinical trust notes with verification telemetry card */}
-                    <aside className="min-w-0 bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] p-6 sm:p-7 shadow-xs">
-                      <div className="flex items-center justify-between gap-2 mb-5 pb-4 border-b border-[color:var(--t-100)]">
-                        <div className="flex items-center gap-2">
-                          <ShieldCheck className="h-4.5 w-4.5 text-[color:var(--t-600)]" />
-                          <h3 className="font-display font-black text-lg text-[color:var(--ink)]">Verification Standard</h3>
-                        </div>
-                        <span className="text-xs font-mono font-bold text-slate-500 bg-[color:var(--t-50)] px-2 py-0.5 border border-[color:var(--t-200)]">
-                          Manual check
-                        </span>
-                      </div>
-                      <ul className="space-y-5">
-                        {[
-                          { icon: ShieldCheck, title: 'Checked against the council register', text: 'Doctors are checked against the MMC register and nurses are confirmed with the Nursing Board before a profile goes public. Our team records how and when, and whether the practitioner is registered in Malaysia.' },
-                          { icon: Clock, title: 'Annual Practising Certificate (APC)', text: 'Expiry dates are tracked. A practitioner whose certificate expires is suspended automatically (checked hourly) until they renew.' },
-                          { icon: Award, title: 'Board review is logged', text: 'Each approval is recorded in an audit log with who did it and when.' },
-                        ].map((n) => {
-                          const NoteIcon = n.icon;
-                          return (
-                            <li key={n.title} className="flex gap-4">
-                              <span className="w-10 h-10 shrink-0 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shadow-2xs">
-                                <NoteIcon className="h-5 w-5" />
-                              </span>
-                              <div className="min-w-0">
-                                <p className="font-display font-black text-sm text-[color:var(--ink)] leading-snug">{n.title}</p>
-                                <p className="text-xs text-slate-600 leading-relaxed mt-1 font-medium">{n.text}</p>
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
-
-                    </aside>
+            {/* VIEW MORE PRACTITIONER LICENCE VERIFICATION ACTION CARD */}
+            <div className="bg-[color:var(--t-50)]/70 border border-[color:var(--t-200)] p-6 sm:p-8 shadow-xs">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="max-w-2xl space-y-2">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-white border border-[color:var(--t-200)] text-[10px] font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">
+                    <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                    Public Statutory Practitioner Register
+                  </div>
+                  <h3 className="font-display font-black text-xl sm:text-2xl text-[color:var(--ink)]">
+                    Practitioner Licence Verification
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                    Search active MMC &amp; LJM doctor and nurse registration numbers, inspect 2026 Annual Practising Certificates (APC), and review official council audit stamps in real-time.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+                    <span className="text-[11px] font-mono text-slate-500 font-bold uppercase tracking-wider">Audit Samples:</span>
+                    {['DEMO-MMC-32109', 'Cardiology', 'Dr. Tan Seng Hock', 'DEMO-LJM-88412'].map((tag) => (
+                      <span key={tag} className="px-2 py-0.5 bg-white border border-[color:var(--t-200)] font-mono text-[11px] text-[color:var(--t-700)] font-bold">
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/verify-practitioners')}
+                    className="px-5 py-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 border border-[color:var(--t-700)]"
+                  >
+                    <span>View More: Licence Verification</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => goLogin('patient', true)}
+                    className="px-4 py-3 bg-white hover:bg-[color:var(--t-100)] text-[color:var(--t-700)] text-xs font-black border border-[color:var(--t-200)] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Heart className="h-3.5 w-3.5 text-rose-500" />
+                    <span>Join as Member</span>
+                  </button>
+                </div>
               </div>
-            </AnimatedSection>
+            </div>
           </div>
         </section>
 
-        {/* ─── SECTION 02: INTEGRATED CLINICAL SERVICES SUITE ─── */}
-        <div id="services-section" className="relative overflow-hidden bg-[color:var(--t-50)]/30 border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10">
-            <section aria-label="Integrated clinical services">
-              <AnimatedSection className="max-w-3xl mb-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="section-index-badge">02</span>
-                  <Stethoscope className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                  Compassionate Outpatient Care
-                </div>
-                <h2 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl text-[color:var(--ink)] tracking-tight leading-tight">
-                  Thoughtful clinical services <span className="text-[color:var(--t-600)]">designed around your well-being.</span>
-                </h2>
-                <p className="text-sm sm:text-base text-slate-600 mt-2 font-medium max-w-2xl leading-relaxed">
-                  Healthcare should feel gentle, attentive, and dependable. From unhurried video visits when you need rest, to doctor-signed prescriptions and confidential health vaults, we are here to support your health journey.
-                </p>
-              </AnimatedSection>
+        {/* ─── SECTION 02: GENTLE CARE FOR PATIENTS IN MALAYSIA (MYKAD) ─── */}
+        <section id="services-section" aria-label="Gentle care for patients in Malaysia" className="relative overflow-hidden bg-[color:var(--t-50)]/30 border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10 space-y-10">
+            <AnimatedSection className="max-w-3xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="section-index-badge">02</span>
+                <Heart className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                Gentle Care for Patients in Malaysia (MyKad)
+              </div>
+              <h2 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl text-[color:var(--ink)] tracking-tight leading-tight">
+                Warm, Accessible &amp; Dignified Healthcare <span className="text-[color:var(--t-600)]">Across Malaysia.</span>
+              </h2>
+              <p className="text-sm sm:text-base text-slate-600 mt-2 font-medium max-w-2xl leading-relaxed">
+                Healthcare should feel gentle, attentive, and dependable. From unhurried video visits when you need rest, to doctor-signed prescriptions and confidential health vaults, we are here to support your health journey with transparent pricing.
+              </p>
+            </AnimatedSection>
 
-              {/* SPLIT LAYOUT: LEFT NAV + RIGHT STAGE (ELEVATED CLINICAL SUITE) */}
-              <AnimatedSection>
-                <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-0 bg-white panel-edge corner-bracket">
-
-                  {/* Left Selector Panel */}
-                  <div className="p-6 sm:p-7 bg-[color:var(--t-50)]/90 border-b lg:border-b-0 lg:border-r border-[color:var(--t-200)] flex flex-col justify-between">
-                    <div>
-                      <div className="text-xs font-mono font-extrabold uppercase tracking-widest text-[color:var(--t-600)] mb-4 px-1 flex items-center justify-between">
-                        <span>Clinical Modules</span>
-                        <span className="text-xs text-slate-500 font-bold bg-white px-2 py-0.5 border border-[color:var(--t-200)]">4 Active Systems</span>
+            {/* HIGHLIGHTED SERVICES GRID (TO ATTRACT AUDIENCE) */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-display font-black text-lg text-[color:var(--ink)]">
+                  Highlighted Clinical Services
+                </h3>
+                <span className="text-xs font-mono font-bold text-slate-500">
+                  Fixed Pricing · Zero Hidden Charges
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {/* SERVICE 1 */}
+                <div className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all shadow-xs hover:shadow-md flex flex-col justify-between group">
+                  <div>
+                    <div className="relative h-44 bg-slate-100 overflow-hidden">
+                      <img
+                        src={malaysianFemaleDoctor}
+                        alt="Doctor Video Consultations"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-2.5 left-2.5 bg-[color:var(--t-600)] text-white text-[10px] font-mono font-extrabold px-2 py-0.5 shadow-xs">
+                        01 · TREATMENT
                       </div>
-                      <div className="flex lg:flex-col gap-2.5 overflow-x-auto lg:overflow-x-visible pb-2.5 lg:pb-0 scrollbar-none snap-x snap-mandatory">
-                        {PROFESSIONAL_ASSISTANCE_MODULES.map((m) => {
-                          const isActive = m.id === activeModuleId;
-                          const IconComp = m.icon;
-                          return (
-                            <button
-                              key={m.id}
-                              type="button"
-                              onClick={() => setActiveModuleId(m.id)}
-                              className={`group w-full min-w-[270px] lg:min-w-0 snap-start p-4 text-left transition-all cursor-pointer flex items-center justify-between border min-h-[52px] ${
-                                isActive
-                                  ? 'bg-white border-l-4 border-l-[color:var(--t-600)] border-t-[color:var(--t-200)] border-r-[color:var(--t-200)] border-b-[color:var(--t-200)] text-[color:var(--ink)] shadow-xs'
-                                  : 'bg-white/80 border-[color:var(--t-200)] text-slate-700 hover:bg-white hover:border-[color:var(--t-600)]'
-                              }`}
-                            >
-                              <div className="flex items-center gap-3.5 min-w-0">
-                                <span className={`w-10 h-10 flex items-center justify-center shrink-0 border transition-all ${
-                                  isActive
-                                    ? 'bg-[color:var(--t-600)] border-[color:var(--t-700)] text-white shadow-2xs'
-                                    : 'bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-600)] group-hover:bg-[color:var(--t-600)] group-hover:text-white'
-                                }`}>
-                                  <IconComp className="h-4.5 w-4.5" />
-                                </span>
-                                <div className="min-w-0">
-                                  <span className={`block font-display font-black text-sm leading-snug transition-colors ${isActive ? 'text-[color:var(--t-600)]' : 'text-[color:var(--ink)] group-hover:text-[color:var(--t-600)]'}`}>
-                                    {m.title}
-                                  </span>
-                                  <span className="block text-xs text-slate-500 font-medium mt-0.5">{m.tagline}</span>
-                                </div>
-                              </div>
-                              <ChevronRight className={`h-4 w-4 shrink-0 transition-transform ${isActive ? 'text-[color:var(--t-600)] translate-x-1' : 'text-slate-500 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5'}`} />
-                            </button>
-                          );
-                        })}
+                      <div className="absolute top-2.5 right-2.5 bg-white/95 text-[color:var(--t-700)] text-[10px] font-mono font-extrabold px-2 py-0.5 border border-slate-200 shadow-2xs">
+                        RM 35 GP
                       </div>
                     </div>
-
-                    <div className="mt-8 pt-5 border-t border-[color:var(--t-200)] space-y-2">
-                      <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-                        <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
-                        <span>Built around MMC telemedicine guidance</span>
-                      </div>
-                      <div className="text-xs font-mono text-slate-500">
-                        Audit trail: every decision is logged
-                      </div>
+                    <div className="p-4 space-y-2">
+                      <h4 className="font-display font-black text-base text-[color:var(--ink)] group-hover:text-[color:var(--t-600)] transition-colors">
+                        Doctor Video Consultations
+                      </h4>
+                      <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                        Unhurried video consultations with board-certified MMC doctors in Malaysia directly in your browser.
+                      </p>
+                      <ul className="text-xs text-slate-700 font-semibold space-y-1.5 pt-2 border-t border-slate-100">
+                        <li className="flex items-center gap-1.5 text-emerald-700">
+                          <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                          <span>10-min wait refund guarantee</span>
+                        </li>
+                        <li className="flex items-center gap-1.5 text-emerald-700">
+                          <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                          <span>Doctor-signed digital medical summary</span>
+                        </li>
+                      </ul>
                     </div>
                   </div>
+                  <div className="p-4 pt-0">
+                    <button
+                      type="button"
+                      onClick={() => goLogin('patient', true)}
+                      className="w-full py-2 bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] hover:text-white text-xs font-extrabold border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] text-[color:var(--t-700)] transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>Consult a Doctor</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
+                  </div>
+                </div>
 
-                  {/* Right Hero Stage for Selected Module */}
-                  <div className="p-8 sm:p-10 lg:p-12 flex flex-col justify-between bg-white">
+                {/* SERVICE 2 */}
+                <div className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all shadow-xs hover:shadow-md flex flex-col justify-between group">
+                  <div>
+                    <div className="relative h-44 bg-slate-100 overflow-hidden">
+                      <img
+                        src={malaysianFemaleNurse}
+                        alt="Home Nursing Care"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-2.5 left-2.5 bg-emerald-600 text-white text-[10px] font-mono font-extrabold px-2 py-0.5 shadow-xs">
+                        02 · NURSING
+                      </div>
+                      <div className="absolute top-2.5 right-2.5 bg-white/95 text-emerald-800 text-[10px] font-mono font-extrabold px-2 py-0.5 border border-slate-200 shadow-2xs">
+                        From RM 120
+                      </div>
+                    </div>
+                    <div className="p-4 space-y-2">
+                      <h4 className="font-display font-black text-base text-[color:var(--ink)] group-hover:text-[color:var(--t-600)] transition-colors">
+                        Home &amp; Bedside Nursing
+                      </h4>
+                      <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                        LJM-verified registered nurses visiting your doorstep for post-op, wound care &amp; vitals.
+                      </p>
+                      <ul className="text-xs text-slate-700 font-semibold space-y-1.5 pt-2 border-t border-slate-100">
+                        <li className="flex items-center gap-1.5 text-emerald-700">
+                          <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                          <span>Certified wound dressing &amp; vitals</span>
+                        </li>
+                        <li className="flex items-center gap-1.5 text-emerald-700">
+                          <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                          <span>Pre-scheduled home doorstep care</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="p-4 pt-0">
+                    <button
+                      type="button"
+                      onClick={() => navigate('/for-nurses')}
+                      className="w-full py-2 bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] hover:text-white text-xs font-extrabold border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] text-[color:var(--t-700)] transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>Request Home Nurse</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* SERVICE 3 */}
+                <div className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all shadow-xs hover:shadow-md flex flex-col justify-between group">
+                  <div>
+                    <div className="relative h-44 bg-slate-100 overflow-hidden">
+                      <img
+                        src={pharmacyHeroBg}
+                        alt="QR E-Prescriptions"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-2.5 left-2.5 bg-amber-600 text-white text-[10px] font-mono font-extrabold px-2 py-0.5 shadow-xs">
+                        03 · PHARMACY
+                      </div>
+                      <div className="absolute top-2.5 right-2.5 bg-white/95 text-amber-800 text-[10px] font-mono font-extrabold px-2 py-0.5 border border-slate-200 shadow-2xs">
+                        0% Commission
+                      </div>
+                    </div>
+                    <div className="p-4 space-y-2">
+                      <h4 className="font-display font-black text-base text-[color:var(--ink)] group-hover:text-[color:var(--t-600)] transition-colors">
+                        QR E-Prescriptions
+                      </h4>
+                      <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                        Doctor-signed digital prescriptions with safety allergy checks fulfilled at verified community pharmacies.
+                      </p>
+                      <ul className="text-xs text-slate-700 font-semibold space-y-1.5 pt-2 border-t border-slate-100">
+                        <li className="flex items-center gap-1.5 text-emerald-700">
+                          <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                          <span>Community pharmacy pickup</span>
+                        </li>
+                        <li className="flex items-center gap-1.5 text-emerald-700">
+                          <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                          <span>Poisons Act 1952 compliance</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="p-4 pt-0">
+                    <button
+                      type="button"
+                      onClick={() => navigate('/for-pharmacies')}
+                      className="w-full py-2 bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] hover:text-white text-xs font-extrabold border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] text-[color:var(--t-700)] transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>Nearby Pharmacies</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* SERVICE 4 */}
+                <div className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all shadow-xs hover:shadow-md flex flex-col justify-between group">
+                  <div>
+                    <div className="relative h-44 bg-slate-100 overflow-hidden">
+                      <img
+                        src={clinicalSuiteFull}
+                        alt="Specialist Consultations"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-2.5 left-2.5 bg-indigo-600 text-white text-[10px] font-mono font-extrabold px-2 py-0.5 shadow-xs">
+                        04 · SPECIALIST
+                      </div>
+                      <div className="absolute top-2.5 right-2.5 bg-white/95 text-indigo-800 text-[10px] font-mono font-extrabold px-2 py-0.5 border border-slate-200 shadow-2xs">
+                        From RM 80
+                      </div>
+                    </div>
+                    <div className="p-4 space-y-2">
+                      <h4 className="font-display font-black text-base text-[color:var(--ink)] group-hover:text-[color:var(--t-600)] transition-colors">
+                        Specialist Outpatient
+                      </h4>
+                      <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                        Board-certified NSR specialist physicians in Cardiology, Paediatrics, and Endocrinology.
+                      </p>
+                      <ul className="text-xs text-slate-700 font-semibold space-y-1.5 pt-2 border-t border-slate-100">
+                        <li className="flex items-center gap-1.5 text-emerald-700">
+                          <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                          <span>Detailed diagnostic review</span>
+                        </li>
+                        <li className="flex items-center gap-1.5 text-emerald-700">
+                          <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                          <span>Hospital admission letters</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="p-4 pt-0">
+                    <button
+                      type="button"
+                      onClick={() => goLogin('patient', true)}
+                      className="w-full py-2 bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] hover:text-white text-xs font-extrabold border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] text-[color:var(--t-700)] transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>Consult Specialist</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* HIGHLIGHTED FACILITIES & LOCAL CONVENIENCES (TO ATTRACT AUDIENCE) */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-display font-black text-lg text-[color:var(--ink)]">
+                  Highlighted Facilities &amp; Local Conveniences
+                </h3>
+                <span className="text-xs font-mono font-bold text-slate-500">
+                  Built for Malaysian Residents
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div className="bg-white border border-[color:var(--t-200)] p-5 shadow-2xs space-y-2.5">
+                  <div className="flex items-center gap-3">
+                    <span className="w-10 h-10 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center font-mono font-black text-xs shrink-0">
+                      FPX
+                    </span>
                     <div>
-                      <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-[color:var(--t-100)]">
-                        <span className="text-xs font-mono font-extrabold uppercase tracking-widest text-[color:var(--t-600)] bg-[color:var(--t-50)] px-3 py-1 border border-[color:var(--t-200)] shadow-2xs">
-                          {activeModule.badge}
-                        </span>
-                        <div className="flex items-center gap-2 text-xs font-mono font-bold text-slate-500">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                          <span>CLINICAL PROTOCOL: VERIFIED ACTIVE</span>
+                      <h4 className="font-display font-black text-sm text-[color:var(--ink)]">Malaysian Payment Rails</h4>
+                      <p className="text-[11px] text-slate-500 font-medium">FPX · DuitNow QR · TNG eWallet</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                    Pay securely in MYR via Maybank2u, CIMB, Public Bank, GrabPay, or Touch ’n Go eWallet with zero foreign transaction fees.
+                  </p>
+                </div>
+
+                <div className="bg-white border border-[color:var(--t-200)] p-5 shadow-2xs space-y-2.5">
+                  <div className="flex items-center gap-3">
+                    <span className="w-10 h-10 bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center shrink-0">
+                      <Receipt className="h-5 w-5" />
+                    </span>
+                    <div>
+                      <h4 className="font-display font-black text-sm text-[color:var(--ink)]">LHDN Tax Relief Ready</h4>
+                      <p className="text-[11px] text-slate-500 font-medium">Claim up to RM 10,000</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                    Download official medical receipts with doctor MMC numbers and ICD-10 diagnosis codes for individual tax relief.
+                  </p>
+                </div>
+
+                <div className="bg-white border border-[color:var(--t-200)] p-5 shadow-2xs space-y-2.5">
+                  <div className="flex items-center gap-3">
+                    <span className="w-10 h-10 bg-sky-50 border border-sky-200 text-sky-600 flex items-center justify-center shrink-0">
+                      <Building2 className="h-5 w-5" />
+                    </span>
+                    <div>
+                      <h4 className="font-display font-black text-sm text-[color:var(--ink)]">TPA &amp; Panel Insurers</h4>
+                      <p className="text-[11px] text-slate-500 font-medium">Corporate Reimbursement</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                    Standardized claim documentation formatted for direct submission to PMCare, MiCare, AIA, Prudential, and Great Eastern.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* VIEW MORE PATIENT DETAILS ACTION CARD */}
+            <div className="bg-white border border-[color:var(--t-200)] p-6 sm:p-8 shadow-xs">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="max-w-2xl space-y-1.5">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[10px] font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">
+                    <Heart className="h-3 w-3 text-[color:var(--t-600)]" />
+                    Comprehensive Patient Guide
+                  </div>
+                  <h3 className="font-display font-black text-xl text-[color:var(--ink)]">
+                    Explore Full Patient Services, Fee Schedules &amp; Insurance Details
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                    Learn more about step-by-step FPX checkout, patient care desk operating hours, WCAG 2.1 AA accessibility standards, and telemedicine ethics.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/for-patients')}
+                    className="px-5 py-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 border border-[color:var(--t-700)]"
+                  >
+                    <span>View More: Malaysia Patient Details</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => goLogin('patient', true)}
+                    className="px-4 py-3 bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] text-[color:var(--t-700)] text-xs font-black border border-[color:var(--t-200)] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Heart className="h-3.5 w-3.5" />
+                    <span>Join with MyKad</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ─── SECTION 03: WELCOMING YOU TO MALAYSIA · INTERNATIONAL PATIENTS & MEDICAL TRAVELLERS ─── */}
+        <section id="tourism-section" aria-label="International patients and medical travel" className="relative overflow-hidden bg-white border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10 space-y-10">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[color:var(--t-200)]">
+              <div className="max-w-3xl space-y-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="section-index-badge">03</span>
+                  <Globe className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                  Welcoming You to Malaysia · International Patients &amp; Medical Travellers
+                </div>
+                <h2 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl text-[color:var(--ink)] tracking-tight leading-tight">
+                  World-Class Medical Facilities &amp; <span className="text-[color:var(--t-600)]">Transparent Packages in Malaysia.</span>
+                </h2>
+                <p className="text-sm sm:text-base text-slate-600 font-medium max-w-2xl leading-relaxed">
+                  All Malaysian hospitals bill officially in Malaysian Ringgit (MYR). Select your home currency below for an indicative comparison across accredited facilities:
+                </p>
+              </div>
+
+              {/* Currency Selector Pill */}
+              <div className="flex items-center gap-2 bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-1.5 shadow-2xs shrink-0">
+                <span className="text-[11px] font-mono font-bold text-slate-500 px-2 uppercase">Currency:</span>
+                {(['MYR', 'USD', 'SGD', 'IDR', 'AUD', 'SAR'] as const).map(curr => (
+                  <button
+                    key={curr}
+                    type="button"
+                    onClick={() => setTouristFx(curr)}
+                    className={`px-2.5 py-1 text-xs font-mono font-black transition-all cursor-pointer ${
+                      touristFx === curr
+                        ? 'bg-[color:var(--t-600)] text-white shadow-xs'
+                        : 'text-slate-700 hover:text-[color:var(--ink)] hover:bg-white'
+                    }`}
+                  >
+                    {curr}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* ONLY MEDICAL PACKAGES IN MALAYSIA */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-[color:var(--t-600)]" />
+                  <h3 className="font-display font-black text-lg text-[color:var(--ink)]">
+                    Indicative Malaysian Medical Packages
+                  </h3>
+                </div>
+                <span className="text-xs font-mono font-bold text-slate-500">
+                  Official Billing: Malaysian Ringgit (MYR)
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {INTL_PACKAGES.map(pkg => (
+                  <div
+                    key={pkg.id}
+                    className="group bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-400)] transition-all duration-300 shadow-2xs hover:shadow-md flex flex-col justify-between overflow-hidden"
+                  >
+                    <div>
+                      {/* Photo Header */}
+                      <div className="relative aspect-16/10 overflow-hidden bg-slate-100">
+                        <img
+                          src={pkg.image}
+                          alt={pkg.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-2.5 left-2.5">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-mono font-extrabold tracking-wide uppercase border backdrop-blur-md ${pkg.badgeClass}`}>
+                            <ShieldCheck className="h-3 w-3 shrink-0" />
+                            {pkg.accreditation}
+                          </span>
                         </div>
                       </div>
 
-                      <h3 className="font-display font-black text-2xl sm:text-3xl text-[color:var(--ink)] tracking-tight leading-tight mb-3">
-                        {activeModule.title}
-                      </h3>
-
-                      <p className="text-base sm:text-lg text-slate-600 font-medium leading-relaxed mb-7 max-w-2xl">
-                        {activeModule.summary}
-                      </p>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-8">
-                        {activeModule.highlights.map((item) => (
-                          <div key={item} className="card-feature flex items-start gap-3 p-3.5 bg-[color:var(--t-50)]/50 border border-[color:var(--t-200)]">
-                            <CheckCircle2 className="h-4.5 w-4.5 text-emerald-600 shrink-0 mt-0.5" />
-                            <span className="text-xs sm:text-sm font-semibold text-slate-800 leading-snug">{item}</span>
-                          </div>
-                        ))}
+                      <div className="p-4 space-y-2">
+                        <div className="text-[10px] font-mono font-bold text-slate-500 uppercase">
+                          {pkg.duration} · {pkg.code}
+                        </div>
+                        <h4 className="font-display font-black text-sm text-[color:var(--ink)] group-hover:text-[color:var(--t-600)] transition-colors leading-snug">
+                          {pkg.title}
+                        </h4>
+                        <div className="pt-2 border-t border-slate-100 space-y-1">
+                          {pkg.highlights.map((h, i) => (
+                            <div key={i} className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
+                              <Check className="h-3 w-3 text-emerald-600 shrink-0" />
+                              <span className="truncate">{h}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
 
-                    {/* Bottom Stage Footer */}
-                    <div className="pt-6 border-t border-[color:var(--t-200)] flex flex-wrap items-center justify-between gap-6 bg-slate-50/50 p-5 -mx-8 sm:-mx-10 lg:-mx-12 -mb-8 sm:-mb-10 lg:-mb-12">
-                      <div>
-                        <span className="block stat-display text-3xl sm:text-4xl text-[color:var(--t-600)] leading-none tracking-tight">
-                          {activeModule.metricValue}
-                        </span>
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-1.5 block">
-                          {activeModule.metricLabel}
-                        </span>
+                    <div className="p-4 pt-0">
+                      <div className="pt-3 border-t border-[color:var(--t-200)] space-y-2">
+                        <div className="flex items-baseline justify-between gap-1">
+                          <div>
+                            <span className="text-[9px] font-mono uppercase text-slate-400 font-bold block">Indicative Tariff</span>
+                            <span className="font-mono font-black text-base text-[color:var(--ink)]">
+                              RM {pkg.myr.toLocaleString('en-US')}
+                            </span>
+                          </div>
+                          {touristFx !== 'MYR' && (
+                            <span className="font-mono font-bold text-xs text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2 py-0.5 border border-[color:var(--t-200)] shadow-2xs">
+                              ~{formatFx(pkg.myr, touristFx)}
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => goLogin('patient', true)}
+                          className="w-full py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1"
+                        >
+                          <span>Inquire as Member</span>
+                          <ArrowRight className="h-3 w-3" />
+                        </button>
                       </div>
-
-                      <a
-                        href={activeModule.href}
-                        onClick={e => { if (activeModule.href.startsWith('/')) { e.preventDefault(); navigate(activeModule.href); } }}
-                        className="inline-flex items-center gap-2.5 min-h-[48px] px-8 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer"
-                      >
-                        {activeModule.ctaText}
-                        <ArrowRight className="h-4 w-4" />
-                      </a>
                     </div>
                   </div>
+                ))}
+              </div>
+            </div>
 
+            {/* ONLY MEDICAL FACILITIES IN MALAYSIA */}
+            <div className="space-y-4 pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Hospital className="h-4 w-4 text-[color:var(--t-600)]" />
+                  <h3 className="font-display font-black text-lg text-[color:var(--ink)]">
+                    Premier Accredited Medical Facilities
+                  </h3>
                 </div>
-              </AnimatedSection>
-            </section>
-          </div>
-        </div>
+                <span className="text-xs font-mono font-bold text-slate-500">
+                  JCI &amp; MSQH Certified Facilities
+                </span>
+              </div>
 
-        {/* ─── SECTION 03: 3-STEP CARE PATHWAY ("HOW IT WORKS") ─── */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {INTL_FACILITIES.map(fac => (
+                  <div
+                    key={fac.id}
+                    className="bg-white border border-[color:var(--t-200)] p-4 shadow-2xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-3 group"
+                  >
+                    <div className="space-y-2.5">
+                      <div className="relative h-32 bg-slate-100 overflow-hidden border border-[color:var(--t-200)]">
+                        <img
+                          src={fac.image}
+                          alt={fac.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-2 left-2 bg-emerald-50 text-emerald-800 text-[9px] font-mono font-extrabold px-1.5 py-0.5 border border-emerald-200">
+                          {fac.badge}
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="font-display font-black text-sm text-[color:var(--ink)] leading-snug group-hover:text-[color:var(--t-600)] transition-colors">
+                          {fac.name}
+                        </h4>
+                        <p className="text-[11px] text-slate-500 font-semibold mt-0.5 flex items-center gap-1">
+                          <Globe className="h-3 w-3 text-[color:var(--t-600)]" />
+                          <span>{fac.city}</span>
+                        </p>
+                      </div>
+                      <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-600 space-y-1">
+                        <div className="font-bold text-slate-700">Specialties:</div>
+                        <p className="text-[10px] leading-relaxed line-clamp-1">{fac.specialties.join(' · ')}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => goLogin('patient', true)}
+                      className="w-full py-1.5 bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] hover:text-white text-[color:var(--t-700)] text-xs font-bold border border-[color:var(--t-200)] transition-colors cursor-pointer flex items-center justify-center gap-1"
+                    >
+                      <span>Connect with Facility</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* VIEW MORE CROSS-BORDER & TOURISM DETAILS ACTION CARD */}
+            <div className="bg-[color:var(--t-50)]/70 border border-[color:var(--t-200)] p-6 sm:p-8 shadow-xs">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="max-w-2xl space-y-1.5">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-white border border-[color:var(--t-200)] text-[10px] font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">
+                    <Plane className="h-3 w-3 text-[color:var(--t-600)]" />
+                    International Travel Logistics &amp; Concierge Guide
+                  </div>
+                  <h3 className="font-display font-black text-xl text-[color:var(--ink)]">
+                    Explore Full Cross-Border Care Journey &amp; Travel Logistics
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                    Learn about the 3-Stage Cross-Border Care Pathway (Pre-Travel, In-Malaysia, Post-Return), Medical Visa / eVisa facilitation, airport concierge, and multilingual interpreter services.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/medical-tourism')}
+                    className="px-5 py-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 border border-[color:var(--t-700)]"
+                  >
+                    <span>View More: Travel Guide &amp; Logistics</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => goLogin('patient', true)}
+                    className="px-4 py-3 bg-white hover:bg-[color:var(--t-100)] text-[color:var(--t-700)] text-xs font-black border border-[color:var(--t-200)] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Plane className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                    <span>Register with Passport</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ─── SECTION 04: 3-STEP CARE PATHWAY ("HOW IT WORKS") ─── */}
         <div id="pathway-section" className="relative overflow-hidden bg-white border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10">
             <section aria-label="Get started">
@@ -1502,7 +2126,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     <div className="max-w-xl">
                       <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="section-index-badge">03</span>
+                        <span className="section-index-badge">04</span>
                         <Cross className="h-3 w-3 text-[color:var(--t-600)]" />
                         Your Gentle Care Pathway
                       </div>
@@ -1538,10 +2162,60 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                               <p className="font-display font-black text-base sm:text-lg leading-snug text-[color:var(--ink)] group-hover:text-[color:var(--t-600)] transition-colors">{st.title}</p>
                             </div>
                             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mt-1 font-medium">{st.text}</p>
-                            <div className="mt-3 flex items-center gap-1.5 text-xs font-mono font-bold text-slate-500">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                              <span>{i === 0 ? 'MyKad or passport accepted' : i === 1 ? 'Chat or video in your browser' : 'Prescription code and QR'}</span>
-                            </div>
+
+                            {/* UI Snapshot Badges (Suggestion 3) */}
+                            {i === 0 && (
+                              <div className="mt-3.5 p-3 bg-[color:var(--t-50)]/60 border border-[color:var(--t-200)] text-xs space-y-1.5 shadow-2xs">
+                                <div className="flex items-center justify-between font-mono text-[10px] text-slate-500 font-bold">
+                                  <span>INTAKE SNAPSHOT</span>
+                                  <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200 font-extrabold">NO APP NEEDED</span>
+                                </div>
+                                <div className="flex items-center gap-2 font-bold text-slate-800 text-xs">
+                                  <ShieldCheck className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
+                                  <span>MyKad or Passport Verification</span>
+                                </div>
+                                <div className="text-[11px] text-slate-500 flex justify-between pt-1 border-t border-[color:var(--t-200)] font-mono">
+                                  <span>Outpatient Fee</span>
+                                  <span className="font-extrabold text-[color:var(--t-700)]">RM 35 Fixed</span>
+                                </div>
+                              </div>
+                            )}
+
+                            {i === 1 && (
+                              <div className="mt-3.5 p-3 bg-[color:var(--t-50)]/60 border border-[color:var(--t-200)] text-xs space-y-1.5 shadow-2xs">
+                                <div className="flex items-center justify-between font-mono text-[10px] text-slate-500 font-bold">
+                                  <span>BROWSER TELE-VISIT</span>
+                                  <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200 font-extrabold flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>ACTIVE
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2 font-bold text-slate-800 text-xs">
+                                  <Video className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
+                                  <span>100% In-Browser HD Call</span>
+                                </div>
+                                <div className="text-[11px] text-slate-500 flex justify-between pt-1 border-t border-[color:var(--t-200)] font-mono">
+                                  <span>Wait Guarantee</span>
+                                  <span className="font-extrabold text-emerald-700">&lt; 10 Mins or Refund</span>
+                                </div>
+                              </div>
+                            )}
+
+                            {i === 2 && (
+                              <div className="mt-3.5 p-3 bg-[color:var(--t-50)]/60 border border-[color:var(--t-200)] text-xs space-y-1.5 shadow-2xs">
+                                <div className="flex items-center justify-between font-mono text-[10px] text-slate-500 font-bold">
+                                  <span>DIGITAL DISPENSING</span>
+                                  <span className="text-cyan-700 bg-cyan-50 px-1.5 py-0.2 border border-cyan-200 font-extrabold">VERIFIED QR</span>
+                                </div>
+                                <div className="flex items-center gap-2 font-bold text-slate-800 text-xs">
+                                  <Pill className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
+                                  <span>Doctor-Signed E-Prescription</span>
+                                </div>
+                                <div className="text-[11px] text-slate-500 flex justify-between pt-1 border-t border-[color:var(--t-200)] font-mono">
+                                  <span>Fulfilment</span>
+                                  <span className="font-extrabold text-slate-700">Community Pharmacy</span>
+                                </div>
+                              </div>
+                            )}
                           </div>
                           {i < HOW_STEPS.length - 1 && (
                             <ArrowRight aria-hidden="true" className="hidden md:block absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[color:var(--t-400)]" />
@@ -1555,56 +2229,6 @@ export default function LandingPage({ professionals }: LandingPageProps) {
             </section>
           </div>
         </div>
-
-        {/* ─── SECTION 04 (04A / 04B): MALAYSIA PATIENT ACCESS & INTERNATIONAL MEDICAL TOURISM ─── */}
-        <div className="bg-gradient-to-r from-white via-[color:var(--t-50)]/50 to-white border-b border-[color:var(--t-200)] py-4.5">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
-            <div className="flex items-center gap-3 text-xs sm:text-sm font-extrabold text-[color:var(--ink)]">
-              <span className="w-8 h-8 bg-white border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shadow-2xs shrink-0">
-                <Globe className="h-4 w-4" />
-              </span>
-              <div>
-                <span className="font-display font-black text-sm text-[color:var(--ink)] block">
-                  Select Your Care Pathway
-                </span>
-                <span className="text-xs font-medium text-slate-500 hidden sm:inline">
-                  Personalises services for Malaysian citizens (MyKad) or cross-border medical travel (Passport)
-                </span>
-              </div>
-            </div>
-            <div role="group" aria-label="Patient audience mode" className="grid grid-cols-2 sm:inline-flex bg-white border border-[color:var(--t-200)] p-1 shadow-2xs">
-              <button
-                type="button"
-                onClick={() => setLocale({ region: 'MY' })}
-                aria-pressed={region === 'MY'}
-                className={`px-4 py-2 text-xs font-extrabold transition-all cursor-pointer flex items-center justify-center gap-2 ${
-                  region === 'MY'
-                    ? 'bg-[color:var(--t-600)] text-white shadow-xs'
-                    : 'text-slate-700 hover:text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'
-                }`}
-              >
-                <span className="font-mono text-[10px] px-1.5 py-0.5 bg-black/10 border border-current/20">MY</span>
-                <span>Malaysia Resident (MyKad)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setLocale({ region: 'INTL' })}
-                aria-pressed={region === 'INTL'}
-                className={`px-4 py-2 text-xs font-extrabold transition-all cursor-pointer flex items-center justify-center gap-2 ${
-                  region === 'INTL'
-                    ? 'bg-[color:var(--t-600)] text-white shadow-xs'
-                    : 'text-slate-700 hover:text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'
-                }`}
-              >
-                <span className="font-mono text-[10px] px-1.5 py-0.5 bg-black/10 border border-current/20">INTL</span>
-                <span>International Patient (Passport)</span>
-              </button>
-            </div>
-          </div>
-        </div>
-        {region === 'INTL'
-          ? <><TouristAccess onSignUp={() => goLogin('patient', true)} /><PatientAccess /></>
-          : <><PatientAccess /><TouristAccess onSignUp={() => goLogin('patient', true)} /></>}
 
         {/* ─── SECTION 05: PARTNER & PRACTITIONER NETWORK ECOSYSTEM ─── */}
         <section id="ecosystem-section" aria-label="Practitioner and partner network" className="relative overflow-hidden bg-[color:var(--t-50)]/60 border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
@@ -1633,6 +2257,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                   cta: 'Explore Doctor Portal',
                   href: '/for-doctors',
                   icon: Stethoscope,
+                  img: clinicalSuiteFull,
                 },
                 {
                   badge: 'LJM Act 1950',
@@ -1641,6 +2266,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                   cta: 'Explore Nurse Portal',
                   href: '/for-nurses',
                   icon: UserCheck,
+                  img: malaysianFemaleNurse,
                 },
                 {
                   badge: 'KKM Act 586',
@@ -1649,6 +2275,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                   cta: 'Explore Facility Network',
                   href: '/for-clinics',
                   icon: Hospital,
+                  img: hospitalHeroBg,
                 },
                 {
                   badge: 'Poisons Act 1952',
@@ -1657,6 +2284,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                   cta: 'Explore Pharmacy Network',
                   href: '/for-pharmacies',
                   icon: Pill,
+                  img: pharmacyHeroBg,
                 },
               ].map((item, idx) => {
                 const ItemIcon = item.icon;
@@ -1668,27 +2296,36 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                         e.preventDefault();
                         navigate(item.href);
                       }}
-                      className="group bg-white border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] p-6 flex flex-col justify-between h-full hover:border-[color:var(--t-600)] shadow-2xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer panel-edge corner-bracket"
+                      className="group bg-white border border-[color:var(--t-200)] flex flex-col justify-between h-full hover:border-[color:var(--t-600)] shadow-2xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden"
                     >
                       <div>
-                        <div className="flex items-center justify-between gap-2 mb-4">
-                          <span className="w-10 h-10 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] group-hover:bg-[color:var(--t-600)] group-hover:text-white transition-colors flex items-center justify-center shadow-2xs">
-                            <ItemIcon className="h-5 w-5" />
-                          </span>
-                          <span className="text-[10px] font-mono font-extrabold uppercase px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)]">
+                        {/* 16:9 Photographic Card Header */}
+                        <div className="relative h-44 bg-slate-100 overflow-hidden border-b border-[color:var(--t-200)]">
+                          <img
+                            src={item.img}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur-md px-2.5 py-0.5 border border-slate-200 text-[10px] font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)] shadow-2xs">
                             {item.badge}
-                          </span>
+                          </div>
                         </div>
-                        <h3 className="font-display font-black text-lg text-[color:var(--ink)] group-hover:text-[color:var(--t-600)] transition-colors">
-                          {item.title}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed font-medium">
-                          {item.desc}
-                        </p>
+
+                        <div className="p-5">
+                          <h3 className="font-display font-black text-lg text-[color:var(--ink)] group-hover:text-[color:var(--t-600)] transition-colors">
+                            {item.title}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed font-medium">
+                            {item.desc}
+                          </p>
+                        </div>
                       </div>
-                      <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs font-extrabold text-[color:var(--t-600)]">
-                        <span>{item.cta}</span>
-                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+
+                      <div className="p-5 pt-0">
+                        <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs font-extrabold text-[color:var(--t-600)]">
+                          <span>{item.cta}</span>
+                          <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        </div>
                       </div>
                     </a>
                   </StaggerItem>
@@ -1751,6 +2388,59 @@ export default function LandingPage({ professionals }: LandingPageProps) {
         variant="landing"
         onLoginRole={goLogin}
       />
+
+      {/* ═══════════ FLOATING ON-CALL DOCTOR ACTION PILL (BOTTOM-RIGHT) ═══════════ */}
+      {showOnCallPill && (
+        <aside
+          role="complementary"
+          aria-label="Live on-call doctor tele-consultation availability"
+          className="fixed bottom-5 right-4 sm:right-6 z-40 max-w-sm animate-in fade-in slide-in-from-bottom-3 duration-300"
+        >
+          <div className="bg-white/95 backdrop-blur-md border border-[color:var(--t-300)] shadow-xl hover:shadow-2xl transition-all duration-200 p-2 sm:p-2.5 pl-3.5 sm:pl-4 flex items-center gap-3 border-l-4 border-l-emerald-500">
+            <div className="flex items-center gap-2.5">
+              <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 shrink-0">
+                <Stethoscope className="h-4 w-4" />
+                <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+              </div>
+              <div className="text-left">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] sm:text-xs font-black font-display text-[color:var(--ink)] leading-none">
+                    On-Call Doctor Online
+                  </span>
+                  <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 text-[9px] font-mono font-black uppercase">
+                    Live
+                  </span>
+                </div>
+                <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium mt-0.5">
+                  Connect in &lt; 10 Mins · <span className="font-bold text-[color:var(--t-700)]">RM 35</span> fixed rate
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => goLogin('patient', true)}
+                className="px-3 py-1.5 sm:px-3.5 sm:py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              >
+                <span>Consult</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowOnCallPill(false)}
+                aria-label="Dismiss on-call doctor notification"
+                className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        </aside>
+      )}
 
     </div>
   );

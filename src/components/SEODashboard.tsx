@@ -91,7 +91,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
   };
 
   return (
-    <div className="space-y-8 w-full max-w-[1920px] mx-auto" id="seo-dashboard-panel">
+    <div className="w-full space-y-0" id="seo-dashboard-panel">
       {/* Standard dashboard header with attached tabs */}
       <DashboardHeader
         eyebrow="SEO & Schema Engine"
@@ -108,7 +108,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
         tabsLabel="SEO engine sections"
       />
 
-      <div className="p-6">
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* TAB 1: SCHEMA GENERATOR */}
         {activeTab === 'schema' && (
           <div className="space-y-6">

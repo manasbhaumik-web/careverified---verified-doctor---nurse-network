@@ -350,7 +350,7 @@ export default function VerificationTerminal({
     };
 
     return (
-      <div className="space-y-8 w-full max-w-[1920px] mx-auto" id="practitioner-dashboard-root">
+      <div className="w-full space-y-0" id="practitioner-dashboard-root">
         {/* Absolute Toast Alert */}
         {toastMessage && (
           <div className="fixed bottom-6 right-6 bg-[color:var(--dark)] text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-lg border border-slate-850 flex items-center gap-2 animate-bounce z-50">
@@ -358,9 +358,6 @@ export default function VerificationTerminal({
             <span>{toastMessage}</span>
           </div>
         )}
-
-
-
 
           <DashboardHeader
             tabs={[
@@ -396,19 +393,19 @@ export default function VerificationTerminal({
                   }
                   meta={
                     <>
-                      <span className="font-extrabold text-white">{matchedProfile.specialization}</span>
-                      <span className="text-white/50">&bull;</span>
-                      <span className="font-mono text-white/90">{matchedProfile.experienceYears} Years Exp.</span>
-                      <span className="text-white/50">&bull;</span>
-                      <span className="font-mono font-bold text-slate-900 bg-white px-2 py-0.5 border border-[color:var(--t-200)] text-[10px] rounded-md shadow-2xs">
+                      <span className="font-extrabold text-[color:var(--ink)]">{matchedProfile.specialization}</span>
+                      <span className="text-slate-400">&bull;</span>
+                      <span className="font-mono text-[color:var(--ink-2)]">{matchedProfile.experienceYears} Years Exp.</span>
+                      <span className="text-slate-400">&bull;</span>
+                      <span className="font-mono font-bold text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)] text-[10px] rounded-none shadow-2xs">
                         {matchedProfile.licenseNumber}
                       </span>
-                      <span className="text-white/50">&bull;</span>
-                      <span className="font-mono text-slate-700 text-[10px] bg-white px-1.5 py-0.5 border border-slate-200 rounded-md">
+                      <span className="text-slate-400">&bull;</span>
+                      <span className="font-mono text-slate-700 text-[10px] bg-white px-1.5 py-0.5 border border-slate-200 rounded-none">
                         ID: {matchedProfile.id}
                       </span>
-                      {isVerified && <span className="text-white/50">&bull;</span>}
-                      {isVerified && <span className="text-emerald-200 font-extrabold flex items-center gap-1.5">
+                      {isVerified && <span className="text-slate-400">&bull;</span>}
+                      {isVerified && <span className="text-emerald-700 font-extrabold flex items-center gap-1.5">
                         <span className="relative flex h-2 w-2">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -448,7 +445,7 @@ export default function VerificationTerminal({
             />
           </DashboardHeader>
 
-          <div className="w-full space-y-6">
+          <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
             
 
 
@@ -472,6 +469,7 @@ export default function VerificationTerminal({
               {activeDashboardTab === 'home' && (
                 <PractitionerOverviewTab
                   matchedProfile={matchedProfile}
+                  isDoc={isDoc}
                   isVerified={isVerified}
                   isPending={isPending}
                   nextUpcomingBooking={nextUpcomingBooking}
@@ -553,9 +551,10 @@ export default function VerificationTerminal({
         {activeDashboardTab === 'bookings' && (
           <PractitionerBookingsTab
             matchedProfile={matchedProfile}
+            isDoc={isDoc}
             myBookings={myBookings}
             dispatches={dispatches}
-            selectedBookingForPrescribe={null}
+            selectedBookingForPrescribe={selectedBookingForPrescribe}
             onStartPrescription={(booking) => {
               setSelectedBookingForPrescribe(booking);
               setPrescribeDiagnosis('');
@@ -569,22 +568,28 @@ export default function VerificationTerminal({
             setPrescribeMeds={setPrescribeMeds}
             prescribeInstructions={prescribeInstructions}
             setPrescribeInstructions={setPrescribeInstructions}
-            issuingPrescription={false}
-            onSubmitPrescription={() => {}}
+            issuingPrescription={issuingPrescription}
+            onSubmitPrescription={(e) => {
+              e.preventDefault();
+              if (!selectedBookingForPrescribe) return;
+              setIssuingPrescription(true);
+              setTimeout(() => {
+                selectedBookingForPrescribe.prescription = {
+                  diagnosis: prescribeDiagnosis,
+                  medicines: prescribeMeds,
+                  instructions: prescribeInstructions,
+                  issuedAt: new Date().toISOString(),
+                  digitalSignature: `MMC-SIG-${Date.now().toString(36).toUpperCase()}`
+                };
+                selectedBookingForPrescribe.status = 'Completed';
+                setIssuingPrescription(false);
+                setSelectedBookingForPrescribe(null);
+                showToast("Doctor E-Prescription issued and digitally signed!");
+                if (onRefreshData) onRefreshData();
+              }, 400);
+            }}
             onUpdateDispatchStatus={handleUpdateDispatchStatus}
           />
-        )}
-
-        {selectedBookingForPrescribe && (
-          <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-start justify-center p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-label="Clinical workspace">
-            <div className="bg-white border border-[color:var(--t-200)] shadow-2xl w-full max-w-3xl p-5 my-6">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-base font-black">Clinical workspace</h3>
-                <button onClick={() => setSelectedBookingForPrescribe(null)} className="text-xs font-bold border border-slate-200 px-3 py-1.5 cursor-pointer">Close</button>
-              </div>
-              <ClinicalWorkspace kind="booking" refId={selectedBookingForPrescribe.id} />
-            </div>
-          </div>
         )}
 
         {/* TAB CONTENT: PERFORMANCE & REVENUE */}

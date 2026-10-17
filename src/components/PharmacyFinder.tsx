@@ -56,7 +56,7 @@ export default function PharmacyFinder() {
   };
 
   return (
-    <div className="w-full space-y-5">
+    <div className="w-full space-y-0">
       <DashboardHeader
         icon={Pill}
         eyebrow="Partner pharmacies"
@@ -71,7 +71,8 @@ export default function PharmacyFinder() {
         }
       />
 
-      <section aria-label="Find pharmacies" className="bg-white border border-[color:var(--t-200)] rounded-none p-5 space-y-4">
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+        <section aria-label="Find pharmacies" className="bg-white border border-[color:var(--t-200)] rounded-none p-5 space-y-4">
         <label htmlFor="pharmacy-search" className="sr-only">Search pharmacies</label>
         <div className="flex items-center gap-3 border border-slate-300 bg-white px-4 h-12 focus-within:border-[color:var(--t-600)] transition-colors">
           <Search className="h-4 w-4 text-slate-400 shrink-0" />
@@ -184,6 +185,7 @@ export default function PharmacyFinder() {
           })}
         </section>
       )}
+      </div>
     </div>
   );
 }

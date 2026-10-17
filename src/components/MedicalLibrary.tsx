@@ -260,7 +260,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
   const rest = filtered.slice(1);
 
   return (
-    <div className="w-full space-y-6" id="medical-library-section">
+    <div className="w-full space-y-0" id="medical-library-section">
       <DashboardHeader
         icon={BookOpen}
         eyebrow="Verified Medical Library"
@@ -275,8 +275,9 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
         }
       />
 
-      {/* Search + categories */}
-      <section aria-label="Find articles" className="bg-white border border-[color:var(--t-200)] shadow-xs px-5 py-4 space-y-3">
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* Search + categories */}
+        <section aria-label="Find articles" className="bg-white border border-[color:var(--t-200)] shadow-xs px-5 py-4 space-y-3">
         {/* Row 1: search + saved */}
         <div className="flex flex-wrap items-center gap-3">
           <label htmlFor="library-search" className="sr-only">Search articles</label>
@@ -656,6 +657,7 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

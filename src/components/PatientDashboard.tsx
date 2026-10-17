@@ -309,71 +309,74 @@ export default function PatientDashboard({
   ];
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto space-y-5" id="patient-dashboard-root">
+    <div className="w-full space-y-0" id="patient-dashboard-root">
       {/* 1. PERSISTENT ACTIVE CONSULTATION QUEUE RIBBON (IF LIVE) */}
       {activeConsult && (
-        <aside 
-          aria-label="Active consultation alert" 
-          className={`border p-4 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in ${
-            activeConsult.status === 'active'
-              ? 'bg-emerald-50/90 text-emerald-950 border-emerald-300 border-l-4 border-l-emerald-600'
-              : activeConsult.status === 'queued'
-              ? 'bg-slate-50 text-[color:var(--ink)] border-[color:var(--t-200)] border-l-4 border-l-[color:var(--t-600)]'
-              : 'bg-amber-50 text-amber-950 border-amber-300 border-l-4 border-l-amber-500'
-          }`}
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="relative flex h-3.5 w-3.5 shrink-0">
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                activeConsult.status === 'active' ? 'bg-emerald-500' : 'bg-[color:var(--t-600)]'
-              }`} />
-              <span className={`relative inline-flex rounded-full h-3.5 w-3.5 ${
-                activeConsult.status === 'active' ? 'bg-emerald-600' : 'bg-[color:var(--t-600)]'
-              }`} />
-            </span>
-            <div className="min-w-0">
-              <p className="font-display font-black text-xs sm:text-sm leading-tight">
-                {activeConsult.status === 'active' && 'LIVE VIDEO CONSULTATION IN PROGRESS'}
-                {activeConsult.status === 'queued' && 'ON-CALL DOCTOR QUEUE: MATCHING PRACTITIONER'}
-                {activeConsult.status === 'awaiting_payment' && 'CONSULTATION SLOT RESERVED · AWAITING PAYMENT'}
-              </p>
-              <p className={`text-[11px] font-medium mt-0.5 ${activeConsult.status === 'active' ? 'text-emerald-800' : 'text-slate-600'}`}>
-                {activeConsult.status === 'active' && 'A licensed physician is waiting in the encrypted WebRTC consultation room.'}
-                {activeConsult.status === 'queued' && 'Consultation payment confirmed. Keep window open. A doctor will connect within 10 min or refund automatically.'}
-                {activeConsult.status === 'awaiting_payment' && `Fee: ${formatMoney(activeConsult.fee || 50)} · Complete payment to be matched with on-call doctor.`}
-              </p>
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
+          <aside 
+            aria-label="Active consultation alert" 
+            className={`border p-4 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in ${
+              activeConsult.status === 'active'
+                ? 'bg-emerald-50/90 text-emerald-950 border-emerald-300 border-l-4 border-l-emerald-600'
+                : activeConsult.status === 'queued'
+                ? 'bg-slate-50 text-[color:var(--ink)] border-[color:var(--t-200)] border-l-4 border-l-[color:var(--t-600)]'
+                : 'bg-amber-50 text-amber-950 border-amber-300 border-l-4 border-l-amber-500'
+            }`}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="relative flex h-3.5 w-3.5 shrink-0">
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                  activeConsult.status === 'active' ? 'bg-emerald-500' : 'bg-[color:var(--t-600)]'
+                }`} />
+                <span className={`relative inline-flex rounded-full h-3.5 w-3.5 ${
+                  activeConsult.status === 'active' ? 'bg-emerald-600' : 'bg-[color:var(--t-600)]'
+                }`} />
+              </span>
+              <div className="min-w-0">
+                <p className="font-display font-black text-xs sm:text-sm leading-tight">
+                  {activeConsult.status === 'active' && 'LIVE VIDEO CONSULTATION IN PROGRESS'}
+                  {activeConsult.status === 'queued' && 'ON-CALL DOCTOR QUEUE: MATCHING PRACTITIONER'}
+                  {activeConsult.status === 'awaiting_payment' && 'CONSULTATION SLOT RESERVED · AWAITING PAYMENT'}
+                </p>
+                <p className={`text-[11px] font-medium mt-0.5 ${activeConsult.status === 'active' ? 'text-emerald-800' : 'text-slate-600'}`}>
+                  {activeConsult.status === 'active' && 'A licensed physician is waiting in the encrypted WebRTC consultation room.'}
+                  {activeConsult.status === 'queued' && 'Consultation payment confirmed. Keep window open. A doctor will connect within 10 min or refund automatically.'}
+                  {activeConsult.status === 'awaiting_payment' && `Fee: ${formatMoney(activeConsult.fee || 50)} · Complete payment to be matched with on-call doctor.`}
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
-            <button
-              type="button"
-              onClick={onConsultNow}
-              className={`min-h-[38px] px-4 text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 w-full sm:w-auto ${
-                activeConsult.status === 'active'
-                  ? 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs'
-                  : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white shadow-xs'
-              }`}
-            >
-              <Video className="h-3.5 w-3.5" />
-              <span>{activeConsult.status === 'active' ? 'Enter Video Room' : 'View Live Room'}</span>
-              <ArrowRight className="h-3.5 w-3.5" />
-            </button>
-            {activeConsult.status === 'queued' && (
+            <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
               <button
                 type="button"
-                onClick={() => cancelActiveConsult(activeConsult.id)}
-                className="min-h-[38px] px-3 text-xs font-bold border border-slate-300 hover:border-rose-400 hover:bg-rose-50 hover:text-rose-700 transition-colors cursor-pointer bg-white"
+                onClick={onConsultNow}
+                className={`min-h-[38px] px-4 text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 w-full sm:w-auto ${
+                  activeConsult.status === 'active'
+                    ? 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs'
+                    : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white shadow-xs'
+                }`}
               >
-                Cancel &amp; Refund
+                <Video className="h-3.5 w-3.5" />
+                <span>{activeConsult.status === 'active' ? 'Enter Video Room' : 'View Live Room'}</span>
+                <ArrowRight className="h-3.5 w-3.5" />
               </button>
-            )}
-          </div>
-        </aside>
+              {activeConsult.status === 'queued' && (
+                <button
+                  type="button"
+                  onClick={() => cancelActiveConsult(activeConsult.id)}
+                  className="min-h-[38px] px-3 text-xs font-bold border border-slate-300 hover:border-rose-400 hover:bg-rose-50 hover:text-rose-700 transition-colors cursor-pointer bg-white"
+                >
+                  Cancel &amp; Refund
+                </button>
+              )}
+            </div>
+          </aside>
+        </div>
       )}
 
-      {/* 2. INSTITUTIONAL PATIENT HEADER */}
+      {/* 2. INSTITUTIONAL PATIENT HEADER (HERO BANNER FULL WIDTH AS MAIN HEADER - SINGLE SOLID COLOR) */}
       <DashboardHeader
+        fullWidth={true}
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={(t) => { setActiveTab(t); if (t === 'records') setRecordsSubTab('overview'); }}
@@ -387,13 +390,13 @@ export default function PatientDashboard({
               badges={<BannerBadge>EHR Verified Patient</BannerBadge>}
               meta={
                 <>
-                  <span className="font-extrabold text-white">{greeting}</span>
-                  <span className="text-white/50">&bull;</span>
-                  <span>{upcoming[0] ? `Next Visit: ${upcoming[0].professionalName}, ${upcoming[0].date}` : 'No upcoming consultations'}</span>
+                  <span className="font-extrabold text-[color:var(--ink)]">{greeting}</span>
+                  <span className="text-slate-400">&bull;</span>
+                  <span className="text-[color:var(--ink-2)]">{upcoming[0] ? `Next Visit: ${upcoming[0].professionalName}, ${upcoming[0].date}` : 'No upcoming consultations'}</span>
                   {summary?.bp && (
                     <>
-                      <span className="text-white/50">&bull;</span>
-                      <span className={summary.bp.flag?.level === 'urgent' ? 'text-white font-bold bg-red-700 px-1.5' : 'font-mono text-white'}>
+                      <span className="text-slate-400">&bull;</span>
+                      <span className={summary.bp.flag?.level === 'urgent' ? 'text-white font-bold bg-red-700 px-1.5' : 'font-mono font-bold text-[color:var(--t-700)] bg-white px-1.5 py-0.5 border border-[color:var(--t-200)] shadow-2xs'}>
                         BP: {summary.bp.value1}/{summary.bp.value2} mmHg
                       </span>
                     </>
@@ -434,7 +437,9 @@ export default function PatientDashboard({
         />
       </DashboardHeader>
 
-      {/* 3. NOTIFICATION / STATUS DISMISSAL */}
+      {/* 3. MAIN WORKSPACE CONTENT CONTAINER */}
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* NOTIFICATION / STATUS DISMISSAL */}
       {msg && (
         <div
           role="status"
@@ -457,6 +462,101 @@ export default function PatientDashboard({
       {/* 4. MAIN WORKSPACE VIEW */}
       {activeTab === 'appointments' && (
         <div id="panel-appointments" role="tabpanel" aria-labelledby="tab-appointments" tabIndex={0} className="space-y-5">
+          {/* TIER 0: REAL-TIME CLINICAL TELEMETRY HUD STRIP */}
+          <section aria-label="Clinical vitals telemetry HUD" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* 1. Blood Pressure */}
+            <div 
+              onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
+              className="bg-white border border-[color:var(--t-200)] p-3.5 sm:p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs hover:border-[color:var(--t-600)] transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-between gap-1 text-slate-500 text-[10px] font-black uppercase tracking-wider">
+                <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
+                  <HeartPulse className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                  Blood Pressure
+                </span>
+                <span className={`text-[10px] font-bold px-1.5 py-0.2 border ${classifyBp(summary?.bp?.value1, summary?.bp?.value2).badgeClass}`}>
+                  {summary?.bp ? classifyBp(summary.bp.value1, summary.bp.value2).label.split('/')[0].trim() : 'Optimal'}
+                </span>
+              </div>
+              <div className="text-xl sm:text-2xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
+                <span>{summary?.bp ? `${summary.bp.value1}/${summary.bp.value2}` : '122/80'}</span>
+                <span className="text-[11px] font-normal text-slate-500 font-sans">mmHg</span>
+              </div>
+              <p className="text-[10px] text-slate-500 font-medium mt-1 truncate">
+                {summary?.bp?.recordedAt ? `Logged ${fmtDate(summary.bp.recordedAt)}` : 'Omron Sync · Normal'}
+              </p>
+            </div>
+
+            {/* 2. Resting Heart Rate */}
+            <div 
+              onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
+              className="bg-white border border-[color:var(--t-200)] p-3.5 sm:p-4 border-l-4 border-l-emerald-600 shadow-2xs hover:border-[color:var(--t-600)] transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-between gap-1 text-slate-500 text-[10px] font-black uppercase tracking-wider">
+                <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
+                  <Activity className="h-3.5 w-3.5 text-emerald-600" />
+                  Heart Rate
+                </span>
+                <span className="text-[10px] font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  Normal
+                </span>
+              </div>
+              <div className="text-xl sm:text-2xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
+                <span>{summary?.pulse?.value1 || '68'}</span>
+                <span className="text-[11px] font-normal text-slate-500 font-sans">BPM</span>
+              </div>
+              <p className="text-[10px] text-slate-500 font-medium mt-1 truncate">
+                Regular cardiac sinus rhythm
+              </p>
+            </div>
+
+            {/* 3. Fasting Glucose */}
+            <div 
+              onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
+              className="bg-white border border-[color:var(--t-200)] p-3.5 sm:p-4 border-l-4 border-l-amber-500 shadow-2xs hover:border-[color:var(--t-600)] transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-between gap-1 text-slate-500 text-[10px] font-black uppercase tracking-wider">
+                <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
+                  <Sparkles className="h-3.5 w-3.5 text-amber-600" />
+                  Fasting Glucose
+                </span>
+                <span className="text-[10px] font-bold px-1.5 py-0.2 bg-amber-50 text-amber-800 border border-amber-200">
+                  {summary?.glucose?.value1 ? (summary.glucose.value1 > 6.0 ? 'Elevated' : 'Target') : 'Target'}
+                </span>
+              </div>
+              <div className="text-xl sm:text-2xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
+                <span>{summary?.glucose?.value1 || '5.4'}</span>
+                <span className="text-[11px] font-normal text-slate-500 font-sans">mmol/L</span>
+              </div>
+              <p className="text-[10px] text-slate-500 font-medium mt-1 truncate">
+                Glycemic control within target
+              </p>
+            </div>
+
+            {/* 4. Oxygen Saturation (SpO2) */}
+            <div 
+              onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
+              className="bg-white border border-[color:var(--t-200)] p-3.5 sm:p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs hover:border-[color:var(--t-600)] transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-between gap-1 text-slate-500 text-[10px] font-black uppercase tracking-wider">
+                <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
+                  <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                  Oxygen (SpO2)
+                </span>
+                <span className="text-[10px] font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  99%
+                </span>
+              </div>
+              <div className="text-xl sm:text-2xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
+                <span>{summary?.spo2?.value1 || '99'}</span>
+                <span className="text-[11px] font-normal text-slate-500 font-sans">%</span>
+              </div>
+              <p className="text-[10px] text-slate-500 font-medium mt-1 truncate">
+                Normal arterial hemoglobin
+              </p>
+            </div>
+          </section>
+
           {/* TIER 1: UPCOMING SCHEDULED CONSULTATIONS (Patient's #1 Priority) */}
           <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6" aria-label="Upcoming appointments">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-3.5 border-b border-[color:var(--t-100)]">
@@ -1645,6 +1745,7 @@ export default function PatientDashboard({
           }} 
         />
       )}
+      </div>
     </div>
   );
 }

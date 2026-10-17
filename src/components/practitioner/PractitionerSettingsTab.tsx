@@ -361,6 +361,22 @@ export default function PractitionerSettingsTab({
                 )}
               </div>
             </div>
+
+            {!isDoc && (
+              <div className="pt-3 border-t border-[color:var(--t-200)]/60">
+                <label className="block text-xs font-black text-slate-700 mb-1.5">
+                  Clinical Nursing Duty Shift Coverage
+                </label>
+                <div className="flex flex-wrap gap-2 text-xs">
+                  {['Morning Shift (07:00 - 15:00)', 'Evening Shift (14:00 - 22:00)', 'Night Shift (21:00 - 07:00)', '24-Hour In-Home Nursing'].map((shift) => (
+                    <span key={shift} className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
+                      {shift}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[10px] text-slate-500 font-medium mt-1">Available shift types are broadcasted to private hospitals, clinics, and home care patients across your registered city.</p>
+              </div>
+            )}
           </div>
 
           {settingsSuccess && (

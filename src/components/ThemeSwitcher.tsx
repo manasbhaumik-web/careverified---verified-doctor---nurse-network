@@ -1,30 +1,28 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Settings, Check } from 'lucide-react';
 
-export type ThemeName = 'crimson' | 'sky' | 'cyan' | 'navy';
+export type ThemeName = 'light-cyan' | 'sky' | 'crimson';
 
 const THEMES: { id: ThemeName; label: string; swatch: string }[] = [
-  { id: 'crimson', label: 'Crimson Red', swatch: '#C81E1E' },
+  { id: 'light-cyan', label: 'Light Cyan', swatch: '#06B6D4' },
   { id: 'sky', label: 'Sky Blue', swatch: '#0270A9' },
-  { id: 'cyan', label: 'Bright Cyan', swatch: '#00E5FF' },
-  { id: 'navy', label: 'Dark Navy Blue', swatch: '#0A1128' },
+  { id: 'crimson', label: 'Crimson Red', swatch: '#C81E1E' },
 ];
 
-const STORAGE_KEY = 'medcred-theme';
+const STORAGE_KEY = 'medcred-theme-v2';
 
 function readTheme(): ThemeName {
   try {
     const t = localStorage.getItem(STORAGE_KEY);
-    if (t === 'green') return 'sky'; // removed themes fall back to the default
-    if (t === 'crimson' || t === 'sky' || t === 'cyan' || t === 'navy') return t;
+    if (t === 'light-cyan' || t === 'sky' || t === 'crimson') return t;
   } catch { /* storage unavailable */ }
-  return 'sky';
+  return 'light-cyan';
 }
 
 function applyTheme(theme: ThemeName) {
   document.documentElement.setAttribute('data-theme', theme);
   const color = THEMES.find(t => t.id === theme)?.swatch;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color || '#0270A9');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color || '#06B6D4');
 }
 
 interface Props {
@@ -72,7 +70,7 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
   };
 
   const buttonTone = tone === 'onColor'
-    ? 'text-white border-transparent hover:bg-white/15'
+    ? 'text-white border-transparent bg-white/15 hover:bg-white/25'
     : 'text-[color:var(--t-600)] border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)]';
 
   return (
@@ -84,13 +82,13 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
         aria-expanded={open}
         aria-label="Settings: application theme"
         title="Settings"
-        className={`h-11 w-11 flex items-center justify-center border rounded-lg transition-colors cursor-pointer ${buttonTone}`}
+        className={`h-11 w-11 flex items-center justify-center border rounded-none transition-colors cursor-pointer ${buttonTone}`}
       >
         <Settings className="h-[18px] w-[18px]" />
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white border border-[color:var(--t-200)] shadow-lg text-slate-800 rounded-lg overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white border border-[color:var(--t-200)] shadow-xl text-slate-800 rounded-none overflow-hidden panel-edge">
           <p className="px-3 pt-3 pb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
             Application theme
           </p>

@@ -95,7 +95,7 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
   ];
 
   return (
-    <div className="w-full space-y-5">
+    <div className="w-full space-y-0">
       {/* Header with live availability */}
       <DashboardHeader
         icon={Video}
@@ -111,7 +111,8 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
         }
       />
 
-      <p className="bg-rose-50 border border-rose-200 text-rose-900 text-xs font-semibold p-3 flex items-center gap-2" role="note">
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+        <p className="bg-rose-50 border border-rose-200 text-rose-900 text-xs font-semibold p-3 flex items-center gap-2" role="note">
         <AlertTriangle className="h-4 w-4 shrink-0" />
         Online consultations are not for emergencies. In an emergency call {emergencyNumbers} first.
       </p>
@@ -244,6 +245,7 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
         <PaymentDialog kind="consult" refId={paying} description="Instant online consultation"
           onCancel={() => setPaying(null)} onPaid={() => { setPaying(null); load(); }} />
       )}
+      </div>
     </div>
   );
 }

@@ -64,9 +64,9 @@
     </div>
     <script>
       try {
-        var t = localStorage.getItem('medcred-theme');
-        if (t === 'green' || t === 'teal') t = 'sky';
-        if (t) document.documentElement.setAttribute('data-theme', t);
+        var t = localStorage.getItem('medcred-theme-v2');
+        if (t !== 'light-cyan' && t !== 'sky' && t !== 'crimson') t = 'light-cyan';
+        document.documentElement.setAttribute('data-theme', t);
       } catch (e) {}
     </script>
     <script type="module" src="/src/main.tsx"></script>

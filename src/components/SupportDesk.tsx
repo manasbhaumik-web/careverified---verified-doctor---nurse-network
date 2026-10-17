@@ -63,7 +63,7 @@ export default function SupportDesk() {
   const chosen = cats.find(c => c.name === form.category);
 
   return (
-    <div className="w-full space-y-5">
+    <div className="w-full space-y-0">
       <DashboardHeader
         icon={LifeBuoy}
         eyebrow="Support"
@@ -74,14 +74,15 @@ export default function SupportDesk() {
         }
       />
 
-      {hours && (
-        <p role="status" className={`text-xs font-semibold border p-3 ${hours.open ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
-          {hours.open ? 'Our team is online now.' : `Our team is away. We will reply from ${new Date(hours.nextChange).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur', weekday: 'short', hour: '2-digit', minute: '2-digit' })} Malaysia time.`}
-          {' '}Support hours: {hours.text[lang] ?? hours.text.en}. Replies to urgent safety concerns are prioritised.
-        </p>
-      )}
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+        {hours && (
+          <p role="status" className={`text-xs font-semibold border p-3 ${hours.open ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
+            {hours.open ? 'Our team is online now.' : `Our team is away. We will reply from ${new Date(hours.nextChange).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur', weekday: 'short', hour: '2-digit', minute: '2-digit' })} Malaysia time.`}
+            {' '}Support hours: {hours.text[lang] ?? hours.text.en}. Replies to urgent safety concerns are prioritised.
+          </p>
+        )}
 
-      <div className="grid gap-6 xl:grid-cols-[440px_minmax(0,1fr)] items-start">
+        <div className="grid gap-6 xl:grid-cols-[440px_minmax(0,1fr)] items-start">
       <div className="space-y-5 min-w-0">
 
       <form onSubmit={create} className="bg-white border border-[color:var(--t-200)] p-6 space-y-4 shadow-xs">
@@ -148,6 +149,7 @@ export default function SupportDesk() {
       </div>
       </div>
       <TestimonialForm />
+      </div>
     </div>
   );
 }

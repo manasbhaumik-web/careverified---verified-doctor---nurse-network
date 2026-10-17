@@ -36,7 +36,7 @@ export default function PractitionerQuality({ profileId }: { profileId: string |
 
   const tabs = [['reviews', 'Ratings & reviews', Star], ['cpd', 'CPD & certificates', GraduationCap], ['peer', 'Peer review', ClipboardCheck], ['incidents', 'Report an incident', ShieldAlert]] as const;
   return (
-    <div className="space-y-4 w-full">
+    <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full">
       <div role="tablist" className="flex flex-wrap gap-2 border-b border-[color:var(--t-200)] pb-2">
         {tabs.map(([id, text, Icon]) => (
           <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setMsg(null); }}
