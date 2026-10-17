@@ -4,7 +4,8 @@ import {
   Search, FileText, Send, Phone, Mail, MapPin, ExternalLink,
   RefreshCw, ChevronDown, ChevronUp, Stethoscope, Check,
   MessageSquare, Lock, DollarSign, Tag, PackagePlus, Sparkles, Clock,
-  Trash2, Edit3, Copy, HeartPulse, AlertCircle
+  Trash2, Edit3, Copy, HeartPulse, AlertCircle, BadgeCheck, Receipt,
+  Printer, Download, CreditCard
 } from 'lucide-react';
 import DashboardHeader, {
   BannerRow, BannerIdentity, BannerBadge, BannerKpis, DashboardTab, bannerPrimaryBtn
@@ -189,8 +190,67 @@ interface PatientCase {
     status: string;
     validUntil: string;
   } | null;
+  referralCommissionMyr?: number | null;
+  commissionRatePct?: number | null;
+  commissionStatus?: string | null;
+  commissionInvoiceNo?: string | null;
+  commissionInvoicedAt?: string | null;
+  commissionSettledAt?: string | null;
+  dischargeSummary?: string | null;
   updatedAt: string;
   createdAt?: string;
+}
+
+interface ReferralLedgerCase {
+  id: string;
+  patient: string;
+  country: string;
+  specialty: string;
+  status: string;
+  updatedAt: string;
+  finalQuotationMyr: number;
+  referralCommissionMyr: number;
+  commissionRatePct: number;
+  commissionStatus: 'pending' | 'invoiced' | 'settled';
+  commissionInvoiceNo: string | null;
+  commissionInvoicedAt: string | null;
+  commissionSettledAt: string | null;
+}
+
+interface ReferralLedgerData {
+  cases: ReferralLedgerCase[];
+  summary: {
+    totalInvoicedMyr: number;
+    totalSettledMyr: number;
+    totalPendingMyr: number;
+    commissionRatePct: number;
+  };
+}
+
+interface PackageOrder {
+  id: string;
+  package_id: string;
+  package_title: string;
+  package_code: string;
+  package_category: string;
+  facility_id: string;
+  patient_name: string;
+  patient_email: string;
+  patient_phone: string;
+  patient_country: string;
+  preferred_date: string | null;
+  total_price_myr: number;
+  deposit_pct: number;
+  deposit_amount_myr: number;
+  remaining_payable_myr: number;
+  promo_code: string | null;
+  discount_amount_myr: number;
+  payment_method: string;
+  payment_status: string;
+  deposit_payment_ref: string;
+  hospital_confirmation_status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  notes: string | null;
+  created_at: string;
 }
 
 interface FacilityMessage {
@@ -266,9 +326,13 @@ export default function FacilityWorkspace() {
   const [chatLoading, setChatLoading] = useState(false);
   const [chatSending, setChatSending] = useState(false);
 
-  // Patient Referral Cases state
+  // Patient Referral Cases & Commission Ledger state
   const [cases, setCases] = useState<PatientCase[]>([]);
+  const [casesSubTab, setCasesSubTab] = useState<'referrals' | 'ledger'>('referrals');
   const [caseStatusFilter, setCaseStatusFilter] = useState<string>('all');
+  const [referralLedger, setReferralLedger] = useState<ReferralLedgerData | null>(null);
+  const [ledgerLoading, setLedgerLoading] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<ReferralLedgerCase | null>(null);
   const [quoteModal, setQuoteModal] = useState<PatientCase | null>(null);
   const [quoteProcedure, setQuoteProcedure] = useState('');
   const [quoteAmount, setQuoteAmount] = useState('');
@@ -277,10 +341,12 @@ export default function FacilityWorkspace() {
   const [quoteExclusions, setQuoteExclusions] = useState('Excludes extra ICU days, complications, international flights.');
   const [quoteSubmitting, setQuoteSubmitting] = useState(false);
 
-  // Medical Packages & Promotions state
+  // Medical Packages, Promotions & Orders state
   const [packages, setPackages] = useState<MedicalPackage[]>([]);
   const [promotions, setPromotions] = useState<MedicalPromotion[]>([]);
-  const [packageSubTab, setPackageSubTab] = useState<'packages' | 'promotions'>('packages');
+  const [packageOrders, setPackageOrders] = useState<PackageOrder[]>([]);
+  const [packageSubTab, setPackageSubTab] = useState<'packages' | 'promotions' | 'orders'>('packages');
+  const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | 'pending' | 'confirmed' | 'completed'>('all');
   const [packageCategoryFilter, setPackageCategoryFilter] = useState('All');
   const [packageStatusFilter, setPackageStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
   const [packageSearch, setPackageSearch] = useState('');
@@ -373,11 +439,24 @@ export default function FacilityWorkspace() {
         setLocums(locData.data);
       }
 
-      // Fetch facility referral cases
+      // Fetch facility referral cases & commission ledger
       const casesRes = await fetch('/api/facility/cases');
       const casesData = await casesRes.json();
       if (casesData.status === 'success') {
         setCases(casesData.data);
+      }
+
+      const ledgerRes = await fetch('/api/facility/referral-ledger');
+      const ledgerData = await ledgerRes.json();
+      if (ledgerData.status === 'success') {
+        setReferralLedger(ledgerData.data);
+      }
+
+      // Fetch facility package orders
+      const ordersRes = await fetch('/api/facility/package-orders');
+      const ordersData = await ordersRes.json();
+      if (ordersData.status === 'success') {
+        setPackageOrders(ordersData.data);
       }
 
       // Fetch facility packages
@@ -639,6 +718,26 @@ export default function FacilityWorkspace() {
       }
     } catch {
       setNotificationMsg({ type: 'error', text: 'Network error.' });
+    }
+  };
+
+  // Handle Confirm Package Order / Deposit Reservation
+  const handleConfirmPackageOrder = async (orderId: string, status = 'confirmed') => {
+    try {
+      const res = await fetch(`/api/facility/package-orders/${orderId}/confirm`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message || `Package reservation updated to ${status}.` });
+        loadFacilityData();
+      } else {
+        setNotificationMsg({ type: 'error', text: data.message || 'Could not update package reservation.' });
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error updating package order.' });
     }
   };
 
@@ -1523,167 +1622,397 @@ export default function FacilityWorkspace() {
         {tab === 'cases' && (
           <div className="space-y-4">
             <div className="bg-white border border-[color:var(--t-200)] p-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              
+              {/* Header Title & Sub-tabs */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-100">
                 <div>
-                  <h2 className="text-base font-black text-slate-900 tracking-tight">
-                    Patient Referrals & Treatment Quotation Desk
+                  <h2 className="text-base font-black text-slate-900 tracking-tight flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-[color:var(--t-600)]" />
+                    Patient Referrals, Quotations & Facilitator Ledger
                   </h2>
-                  <p className="text-xs text-slate-500">
-                    Inbound medical referrals, cross-clinic second opinions, MHTC medical tourism, and official treatment quotation generation.
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Manage cross-border medical referrals, issue formal treatment quotes, and track automated 8% institutional facilitator success fees.
                   </p>
                 </div>
-                <div className="flex items-center gap-1 flex-wrap">
-                  {['all', 'enquiry', 'quoted', 'accepted', 'in_treatment', 'completed'].map(st => (
-                    <button
-                      key={st}
-                      type="button"
-                      onClick={() => setCaseStatusFilter(st)}
-                      className={`px-2.5 py-1 text-xs font-bold uppercase cursor-pointer ${
-                        caseStatusFilter === st
-                          ? 'bg-slate-900 text-white'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                      }`}
-                    >
-                      {st.replace('_', ' ')}
-                    </button>
-                  ))}
+
+                {/* Sub-tab Switcher */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCasesSubTab('referrals')}
+                    className={`px-3 py-1.5 text-xs font-black cursor-pointer transition-all ${
+                      casesSubTab === 'referrals'
+                        ? 'bg-slate-900 text-white'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    Inbound Referrals ({cases.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCasesSubTab('ledger')}
+                    className={`px-3 py-1.5 text-xs font-black cursor-pointer transition-all flex items-center gap-1.5 ${
+                      casesSubTab === 'ledger'
+                        ? 'bg-slate-900 text-white'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    <Receipt className="h-3.5 w-3.5 text-emerald-500" />
+                    Commission Ledger ({referralLedger?.cases.length || 0})
+                    <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1 py-0.2 font-mono font-bold">
+                      8% Success Fee
+                    </span>
+                  </button>
                 </div>
               </div>
 
-              {filteredCases.length === 0 ? (
-                <div className="p-12 bg-slate-50 text-center text-xs text-slate-500 space-y-2 border border-dashed border-slate-200">
-                  <FileText className="h-8 w-8 text-slate-400 mx-auto" />
-                  <p className="font-bold text-slate-700">No active patient referral cases found.</p>
-                  <p className="text-[11px] text-slate-500">Inbound clinical referral inquiries and cross-border consultations will appear here automatically.</p>
-                </div>
-              ) : (
-                <div className="divide-y divide-slate-100 border border-slate-200">
-                  {filteredCases.map(c => (
-                    <div key={c.id} className="p-4 flex flex-col md:flex-row md:items-start justify-between gap-4 hover:bg-slate-50/80 transition-colors">
-                      <div className="space-y-1.5 flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-sm font-black text-slate-900">{c.patient}</span>
-                          {c.trackingCode && (
-                            <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5">
-                              {c.trackingCode}
-                            </span>
-                          )}
-                          <span className={`px-2 py-0.5 text-[10px] font-extrabold uppercase border ${
-                            c.patientType === 'international_traveler'
-                              ? 'bg-sky-50 text-sky-800 border-sky-300'
-                              : c.patientType === 'expat_resident'
-                              ? 'bg-purple-50 text-purple-800 border-purple-300'
-                              : 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                          }`}>
-                            {c.patientType === 'international_traveler' ? '✈️ Int’l Traveler' : c.patientType === 'expat_resident' ? '🌏 Expat Resident' : '🇲🇾 Local Citizen'}
-                          </span>
-                          <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-[10px] font-extrabold uppercase">
-                            Origin: {c.country}
-                          </span>
-                          {c.urgency && c.urgency !== 'routine' && (
-                            <span className="px-2 py-0.5 bg-red-50 text-red-700 border border-red-300 text-[10px] font-black uppercase">
-                              {c.urgency === 'urgent' ? '🚨 Urgent' : '⚡ Priority'}
-                            </span>
-                          )}
-                          {c.guaranteeLetter && (
-                            <span className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 text-[10px] font-black uppercase">
-                              LOG / Direct Billing
-                            </span>
-                          )}
-                          {c.specialty && (
-                            <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] text-[10px] font-black uppercase border border-[color:var(--t-200)]">
-                              {c.specialty}
-                            </span>
-                          )}
-                          <span className={`px-2 py-0.5 text-[10px] font-black uppercase border ${
-                            c.status === 'quoted'
-                              ? 'bg-sky-50 text-sky-800 border-sky-300'
-                              : c.status === 'accepted'
-                              ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                              : c.status === 'in_treatment'
-                              ? 'bg-purple-50 text-purple-800 border-purple-300'
-                              : 'bg-amber-50 text-amber-800 border-amber-300'
-                          }`}>
-                            {c.status.replace('_', ' ')}
-                          </span>
-                        </div>
-
-                        <p className="text-xs text-slate-700 font-medium leading-relaxed bg-slate-50 p-2.5 border border-slate-200">
-                          {c.summary}
-                        </p>
-
-                        {c.revisionNotes && (
-                          <div className="p-2 bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold flex items-center gap-1.5">
-                            <span className="font-black text-amber-800 uppercase text-[10px]">⚠️ Patient Requested Revision:</span>
-                            <span>"{c.revisionNotes}"</span>
-                          </div>
-                        )}
-
-                        <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
-                          <span>Case ID: <code className="font-mono text-slate-600 font-bold">{c.id}</code></span>
-                          {c.patientEmail && <span>Contact: <strong className="text-slate-600">{c.patientEmail}</strong></span>}
-                          {c.insuranceCarrier && <span>Insurance: <strong className="text-slate-600">{c.insuranceCarrier}</strong></span>}
-                          {c.preferredFrom && <span>Requested: <strong className="text-slate-600">{c.preferredFrom}</strong></span>}
-                          <span>Updated: {new Date(c.updatedAt).toLocaleDateString('en-MY')}</span>
-                        </div>
-
-                        {c.latestQuote && (
-                          <div className="p-2.5 bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs">
-                            <span className="font-bold text-emerald-900">Current Treatment Quotation (v{c.latestQuote.version}):</span>
-                            <span className="font-mono font-black text-emerald-800 text-sm">
-                              RM {c.latestQuote.total.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Quotation & Status Actions */}
-                      <div className="flex flex-col items-end gap-2 shrink-0">
+              {/* ------------------------------------------------------------------- */}
+              {/* SUB-TAB 1: INBOUND REFERRALS & TREATMENT QUOTES */}
+              {/* ------------------------------------------------------------------- */}
+              {casesSubTab === 'referrals' && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs font-extrabold uppercase text-slate-400">Filter Status:</span>
+                    <div className="flex items-center gap-1 flex-wrap">
+                      {['all', 'enquiry', 'quoted', 'accepted', 'in_treatment', 'completed'].map(st => (
                         <button
+                          key={st}
                           type="button"
-                          onClick={() => {
-                            setQuoteModal(c);
-                            setQuoteProcedure(c.specialty ? `${c.specialty} Treatment Package` : 'Clinical Procedure Package');
-                            setQuoteAmount(c.latestQuote ? String(c.latestQuote.total) : '5500');
-                          }}
-                          className="px-3 py-1.5 bg-slate-900 hover:bg-black text-white text-xs font-black uppercase tracking-wider cursor-pointer flex items-center gap-1.5"
+                          onClick={() => setCaseStatusFilter(st)}
+                          className={`px-2.5 py-1 text-xs font-bold uppercase cursor-pointer ${
+                            caseStatusFilter === st
+                              ? 'bg-slate-900 text-white'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
                         >
-                          <DollarSign className="h-3.5 w-3.5" />
-                          {c.latestQuote ? 'Update Quote' : 'Issue Treatment Quote'}
+                          {st.replace('_', ' ')}
                         </button>
-
-                        <div className="flex items-center gap-1">
-                          {c.status === 'quoted' && (
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateCaseStatus(c.id, 'accepted')}
-                              className="px-2 py-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 cursor-pointer"
-                            >
-                              Mark Accepted
-                            </button>
-                          )}
-                          {c.status === 'accepted' && (
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateCaseStatus(c.id, 'in_treatment')}
-                              className="px-2 py-1 text-[11px] font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-300 cursor-pointer"
-                            >
-                              Admit / In Treatment
-                            </button>
-                          )}
-                          {c.status === 'in_treatment' && (
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateCaseStatus(c.id, 'completed')}
-                              className="px-2 py-1 text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 cursor-pointer"
-                            >
-                              Complete & Discharge
-                            </button>
-                          )}
-                        </div>
-                      </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+
+                  {filteredCases.length === 0 ? (
+                    <div className="p-12 bg-slate-50 text-center text-xs text-slate-500 space-y-2 border border-dashed border-slate-200">
+                      <FileText className="h-8 w-8 text-slate-400 mx-auto" />
+                      <p className="font-bold text-slate-700">No active patient referral cases found.</p>
+                      <p className="text-[11px] text-slate-500">Inbound clinical referral inquiries and cross-border consultations will appear here automatically.</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-slate-100 border border-slate-200">
+                      {filteredCases.map(c => (
+                        <div key={c.id} className="p-4 flex flex-col md:flex-row md:items-start justify-between gap-4 hover:bg-slate-50/80 transition-colors">
+                          <div className="space-y-2 flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="text-sm font-black text-slate-900">{c.patient}</span>
+                              {c.trackingCode && (
+                                <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5">
+                                  {c.trackingCode}
+                                </span>
+                              )}
+                              <span className={`px-2 py-0.5 text-[10px] font-extrabold uppercase border ${
+                                c.patientType === 'international_traveler'
+                                  ? 'bg-sky-50 text-sky-800 border-sky-300'
+                                  : c.patientType === 'expat_resident'
+                                  ? 'bg-purple-50 text-purple-800 border-purple-300'
+                                  : 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                              }`}>
+                                {c.patientType === 'international_traveler' ? '✈️ Int’l Traveler' : c.patientType === 'expat_resident' ? '🌏 Expat Resident' : '🇲🇾 Local Citizen'}
+                              </span>
+                              <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-[10px] font-extrabold uppercase">
+                                Origin: {c.country}
+                              </span>
+                              {c.urgency && c.urgency !== 'routine' && (
+                                <span className="px-2 py-0.5 bg-red-50 text-red-700 border border-red-300 text-[10px] font-black uppercase">
+                                  {c.urgency === 'urgent' ? '🚨 Urgent' : '⚡ Priority'}
+                                </span>
+                              )}
+                              {c.guaranteeLetter && (
+                                <span className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 text-[10px] font-black uppercase">
+                                  LOG / Direct Billing
+                                </span>
+                              )}
+                              {c.specialty && (
+                                <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] text-[10px] font-black uppercase border border-[color:var(--t-200)]">
+                                  {c.specialty}
+                                </span>
+                              )}
+                              <span className={`px-2 py-0.5 text-[10px] font-black uppercase border ${
+                                c.status === 'quoted'
+                                  ? 'bg-sky-50 text-sky-800 border-sky-300'
+                                  : c.status === 'accepted'
+                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                  : c.status === 'in_treatment'
+                                  ? 'bg-purple-50 text-purple-800 border-purple-300'
+                                  : c.status === 'completed'
+                                  ? 'bg-slate-900 text-white border-slate-900'
+                                  : 'bg-amber-50 text-amber-800 border-amber-300'
+                              }`}>
+                                {c.status.replace('_', ' ')}
+                              </span>
+                            </div>
+
+                            <p className="text-xs text-slate-700 font-medium leading-relaxed bg-slate-50 p-2.5 border border-slate-200">
+                              {c.summary}
+                            </p>
+
+                            {c.revisionNotes && (
+                              <div className="p-2 bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold flex items-center gap-1.5">
+                                <span className="font-black text-amber-800 uppercase text-[10px]">⚠️ Patient Requested Revision:</span>
+                                <span>"{c.revisionNotes}"</span>
+                              </div>
+                            )}
+
+                            <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
+                              <span>Case ID: <code className="font-mono text-slate-600 font-bold">{c.id}</code></span>
+                              {c.patientEmail && <span>Contact: <strong className="text-slate-600">{c.patientEmail}</strong></span>}
+                              {c.insuranceCarrier && <span>Insurance: <strong className="text-slate-600">{c.insuranceCarrier}</strong></span>}
+                              {c.preferredFrom && <span>Requested: <strong className="text-slate-600">{c.preferredFrom}</strong></span>}
+                              <span>Updated: {new Date(c.updatedAt).toLocaleDateString('en-MY')}</span>
+                            </div>
+
+                            {c.latestQuote && (
+                              <div className="p-2.5 bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs">
+                                <span className="font-bold text-emerald-900">Current Treatment Quotation (v{c.latestQuote.version}):</span>
+                                <span className="font-mono font-black text-emerald-800 text-sm">
+                                  RM {c.latestQuote.total.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
+                                </span>
+                              </div>
+                            )}
+
+                            {/* Completed Case: Facilitator Success-Fee Invoice Callout */}
+                            {c.status === 'completed' && c.commissionInvoiceNo && (
+                              <div className="p-2.5 bg-slate-900 text-white flex items-center justify-between text-xs">
+                                <div className="flex items-center gap-2">
+                                  <BadgeCheck className="h-4 w-4 text-emerald-400" />
+                                  <span>Hospital Facilitator Invoice: <strong className="font-mono text-emerald-300">{c.commissionInvoiceNo}</strong></span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <span className="text-[11px] text-slate-300">
+                                    Success Fee (8%): <strong>RM {c.referralCommissionMyr?.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</strong>
+                                  </span>
+                                  <span className={`text-[10px] font-black uppercase px-2 py-0.5 ${
+                                    c.commissionStatus === 'settled' ? 'bg-emerald-500 text-white' : 'bg-amber-400 text-slate-950'
+                                  }`}>
+                                    {c.commissionStatus || 'Invoiced'}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Quotation & Status Actions */}
+                          <div className="flex flex-col items-end gap-2 shrink-0">
+                            {c.status !== 'completed' && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setQuoteModal(c);
+                                  setQuoteProcedure(c.specialty ? `${c.specialty} Treatment Package` : 'Clinical Procedure Package');
+                                  setQuoteAmount(c.latestQuote ? String(c.latestQuote.total) : '5500');
+                                }}
+                                className="px-3 py-1.5 bg-slate-900 hover:bg-black text-white text-xs font-black uppercase tracking-wider cursor-pointer flex items-center gap-1.5"
+                              >
+                                <DollarSign className="h-3.5 w-3.5" />
+                                {c.latestQuote ? 'Update Quote' : 'Issue Treatment Quote'}
+                              </button>
+                            )}
+
+                            <div className="flex items-center gap-1">
+                              {c.status === 'quoted' && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateCaseStatus(c.id, 'accepted')}
+                                  className="px-2 py-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 cursor-pointer"
+                                >
+                                  Mark Accepted
+                                </button>
+                              )}
+                              {c.status === 'accepted' && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateCaseStatus(c.id, 'in_treatment')}
+                                  className="px-2 py-1 text-[11px] font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-300 cursor-pointer"
+                                >
+                                  Admit / In Treatment
+                                </button>
+                              )}
+                              {c.status === 'in_treatment' && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateCaseStatus(c.id, 'completed')}
+                                  className="px-2 py-1 text-[11px] font-bold text-white bg-emerald-700 hover:bg-emerald-800 cursor-pointer flex items-center gap-1 shadow-xs"
+                                >
+                                  <CheckCircle2 className="h-3.5 w-3.5" />
+                                  Discharge & Invoice Fee
+                                </button>
+                              )}
+                              {c.status === 'completed' && c.commissionInvoiceNo && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const ledgerItem = referralLedger?.cases.find(lc => lc.id === c.id);
+                                    if (ledgerItem) setSelectedInvoice(ledgerItem);
+                                  }}
+                                  className="px-2 py-1 text-[11px] font-bold text-slate-800 bg-white hover:bg-slate-100 border border-slate-300 cursor-pointer flex items-center gap-1"
+                                >
+                                  <Receipt className="h-3.5 w-3.5 text-emerald-600" />
+                                  View Invoice
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ------------------------------------------------------------------- */}
+              {/* SUB-TAB 2: AUTOMATED REFERRAL COMMISSION LEDGER */}
+              {/* ------------------------------------------------------------------- */}
+              {casesSubTab === 'ledger' && (
+                <div className="space-y-5">
+                  
+                  {/* Healthcare Regulatory Compliance Banner */}
+                  <div className="p-4 bg-slate-900 text-white space-y-1.5 shadow-2xs">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="h-5 w-5 text-emerald-400 shrink-0" />
+                      <h4 className="font-black text-xs uppercase tracking-wider text-emerald-300">
+                        Malaysian Medical Act 1971 & MMC Ethical Code Compliance Notice
+                      </h4>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      All success fees recorded below are <strong>strictly institutional facilitation fees</strong> payable by the healthcare facility to CareVerified for patient coordination, cross-border second opinions, and medical logistics. <strong>Doctor professional consultation fees are never discounted, split, or shared</strong>, fully compliant with Section 28 of the Malaysian Medical Act 1971.
+                    </p>
+                  </div>
+
+                  {/* Financial KPI Summary Cards */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="p-4 bg-slate-50 border border-slate-200">
+                      <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">Total Discharged Referrals</span>
+                      <div className="text-2xl font-black text-slate-900 mt-1">
+                        {referralLedger?.cases.length || 0}
+                      </div>
+                      <span className="text-[10px] text-slate-500 mt-0.5 block">Admitted & successfully treated</span>
+                    </div>
+
+                    <div className="p-4 bg-emerald-50 border border-emerald-200">
+                      <span className="text-[10px] font-mono font-bold uppercase text-emerald-700 block">Institutional Success Fee Rate</span>
+                      <div className="text-2xl font-black text-emerald-900 mt-1">
+                        {referralLedger?.summary.commissionRatePct || 8.0}%
+                      </div>
+                      <span className="text-[10px] text-emerald-700 mt-0.5 block">Fixed Act 586 institutional rate</span>
+                    </div>
+
+                    <div className="p-4 bg-white border-2 border-slate-900">
+                      <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">Total Invoiced Fees (MYR)</span>
+                      <div className="text-2xl font-black text-slate-900 mt-1 tabular-nums">
+                        RM {referralLedger?.summary.totalInvoicedMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 }) || '0.00'}
+                      </div>
+                      <span className="text-[10px] text-slate-500 mt-0.5 block">Generated upon patient discharge</span>
+                    </div>
+
+                    <div className="p-4 bg-amber-50 border border-amber-200">
+                      <span className="text-[10px] font-mono font-bold uppercase text-amber-800 block">Pending Settlement (MYR)</span>
+                      <div className="text-2xl font-black text-amber-900 mt-1 tabular-nums">
+                        RM {referralLedger?.summary.totalPendingMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 }) || '0.00'}
+                      </div>
+                      <span className="text-[10px] text-amber-700 mt-0.5 block">Awaiting monthly facility remittance</span>
+                    </div>
+                  </div>
+
+                  {/* Discharged Cases Ledger Table */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-extrabold text-sm text-slate-900">
+                        Discharged Patient Referral & Commission Register
+                      </h3>
+                      <button
+                        type="button"
+                        onClick={loadFacilityData}
+                        className="text-xs font-bold text-[color:var(--t-600)] hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <RefreshCw className="h-3 w-3" />
+                        Refresh Ledger
+                      </button>
+                    </div>
+
+                    {!referralLedger || referralLedger.cases.length === 0 ? (
+                      <div className="p-12 bg-slate-50 text-center text-xs text-slate-500 border border-dashed border-slate-200 space-y-2">
+                        <Receipt className="h-8 w-8 text-slate-400 mx-auto" />
+                        <p className="font-bold text-slate-700">No discharged patient referral records in the ledger yet.</p>
+                        <p className="text-[11px] text-slate-500">
+                          When a patient completes treatment and the facility admissions desk clicks "Complete & Discharge", the 8% facilitator commission and official invoice number will be generated here automatically.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto border border-slate-200">
+                        <table className="w-full text-left text-xs border-collapse">
+                          <thead>
+                            <tr className="bg-slate-100 text-slate-600 border-b border-slate-200 font-extrabold text-[10px] uppercase tracking-wider">
+                              <th className="p-3">Patient & Origin</th>
+                              <th className="p-3">Clinical Specialty</th>
+                              <th className="p-3">Discharge Date</th>
+                              <th className="p-3 text-right">Hospital Quotation (MYR)</th>
+                              <th className="p-3 text-right">8% Success Fee (MYR)</th>
+                              <th className="p-3">Invoice Number</th>
+                              <th className="p-3">Settlement</th>
+                              <th className="p-3 text-right">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {referralLedger.cases.map(lc => (
+                              <tr key={lc.id} className="hover:bg-slate-50/80 transition-colors">
+                                <td className="p-3">
+                                  <strong className="text-slate-900 block font-bold">{lc.patient}</strong>
+                                  <span className="text-[10px] text-slate-500">{lc.country}</span>
+                                </td>
+                                <td className="p-3">
+                                  <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] text-[10px] font-black uppercase border border-[color:var(--t-200)]">
+                                    {lc.specialty || 'General Care'}
+                                  </span>
+                                </td>
+                                <td className="p-3 text-slate-600 font-mono text-[11px]">
+                                  {new Date(lc.updatedAt).toLocaleDateString('en-MY')}
+                                </td>
+                                <td className="p-3 text-right font-mono font-bold text-slate-900 tabular-nums">
+                                  RM {lc.finalQuotationMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
+                                </td>
+                                <td className="p-3 text-right font-mono font-black text-emerald-800 tabular-nums">
+                                  RM {lc.referralCommissionMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
+                                </td>
+                                <td className="p-3">
+                                  <code className="font-mono text-xs font-black text-[color:var(--t-700)] bg-slate-100 px-1.5 py-0.5">
+                                    {lc.commissionInvoiceNo || 'Pending'}
+                                  </code>
+                                </td>
+                                <td className="p-3">
+                                  <span className={`px-2 py-0.5 text-[10px] font-black uppercase ${
+                                    lc.commissionStatus === 'settled'
+                                      ? 'bg-emerald-100 text-emerald-800'
+                                      : 'bg-amber-100 text-amber-900'
+                                  }`}>
+                                    {lc.commissionStatus}
+                                  </span>
+                                </td>
+                                <td className="p-3 text-right">
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedInvoice(lc)}
+                                    className="px-2.5 py-1 text-[11px] font-bold border border-slate-300 hover:bg-slate-100 text-slate-800 cursor-pointer flex items-center gap-1 ml-auto"
+                                  >
+                                    <FileText className="h-3 w-3 text-slate-500" />
+                                    Invoice Details
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -1738,8 +2067,8 @@ export default function FacilityWorkspace() {
                 </div>
               </div>
 
-              {/* Sub-tab Switcher: Packages vs. Promotions */}
-              <div className="flex items-center gap-2 border-t border-slate-100 pt-3">
+              {/* Sub-tab Switcher: Packages vs. Promotions vs. Orders */}
+              <div className="flex items-center gap-2 border-t border-slate-100 pt-3 flex-wrap">
                 <button
                   type="button"
                   onClick={() => setPackageSubTab('packages')}
@@ -1761,6 +2090,21 @@ export default function FacilityWorkspace() {
                   }`}
                 >
                   Promotions & Campaign Codes ({promotions.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPackageSubTab('orders')}
+                  className={`px-3 py-1.5 text-xs font-extrabold cursor-pointer transition-colors flex items-center gap-1.5 ${
+                    packageSubTab === 'orders'
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  <CreditCard className="h-3.5 w-3.5 text-emerald-500" />
+                  Deposit Reservations ({packageOrders.length})
+                  <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1 py-0.2 font-mono font-bold">
+                    10% Pre-Auth
+                  </span>
                 </button>
               </div>
             </div>
@@ -2012,6 +2356,171 @@ export default function FacilityWorkspace() {
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Sub-tab 3: Package Orders & Deposit Reservations */}
+            {packageSubTab === 'orders' && (
+              <div className="space-y-4">
+                {/* Orders Financial Summary Cards */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="p-4 bg-slate-50 border border-slate-200">
+                    <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">Total Package Reservations</span>
+                    <div className="text-2xl font-black text-slate-900 mt-1">
+                      {packageOrders.length}
+                    </div>
+                    <span className="text-[10px] text-slate-500 mt-0.5 block">Patients reserved online</span>
+                  </div>
+
+                  <div className="p-4 bg-emerald-50 border border-emerald-200">
+                    <span className="text-[10px] font-mono font-bold uppercase text-emerald-700 block">Total Advance Deposits Secured</span>
+                    <div className="text-2xl font-black text-emerald-900 mt-1 tabular-nums">
+                      RM {packageOrders.reduce((sum, o) => sum + (o.deposit_amount_myr || 0), 0).toLocaleString('en-MY', { minimumFractionDigits: 2 })}
+                    </div>
+                    <span className="text-[10px] text-emerald-700 mt-0.5 block">10% pre-authorized deposit held</span>
+                  </div>
+
+                  <div className="p-4 bg-white border-2 border-slate-900">
+                    <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">Balance Payable at Check-in</span>
+                    <div className="text-2xl font-black text-slate-900 mt-1 tabular-nums">
+                      RM {packageOrders.reduce((sum, o) => sum + (o.remaining_payable_myr || 0), 0).toLocaleString('en-MY', { minimumFractionDigits: 2 })}
+                    </div>
+                    <span className="text-[10px] text-slate-500 mt-0.5 block">Receivable at admission counter</span>
+                  </div>
+
+                  <div className="p-4 bg-sky-50 border border-sky-200">
+                    <span className="text-[10px] font-mono font-bold uppercase text-sky-800 block">Deposit Guarantee Policy</span>
+                    <div className="text-base font-black text-sky-950 mt-1">
+                      10% Advance Deposit
+                    </div>
+                    <span className="text-[10px] text-sky-700 mt-0.5 block">Pre-authorized hospital voucher</span>
+                  </div>
+                </div>
+
+                {/* Orders Filter & Table */}
+                <div className="bg-white border border-[color:var(--t-200)] p-4 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4 text-[color:var(--t-600)]" />
+                      <h3 className="font-extrabold text-sm text-slate-900">
+                        Inbound Package Reservations & Pre-Auth Deposits
+                      </h3>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs text-slate-400 font-bold uppercase mr-1">Status:</span>
+                      {['all', 'pending', 'confirmed', 'completed'].map(st => (
+                        <button
+                          key={st}
+                          type="button"
+                          onClick={() => setOrderStatusFilter(st as any)}
+                          className={`px-2.5 py-1 text-xs font-bold uppercase cursor-pointer ${
+                            orderStatusFilter === st
+                              ? 'bg-slate-900 text-white'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          {st}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {packageOrders.length === 0 ? (
+                    <div className="p-12 text-center text-xs text-slate-500 border border-dashed border-slate-200 space-y-2">
+                      <CreditCard className="h-8 w-8 text-slate-300 mx-auto" />
+                      <p className="font-bold text-slate-700">No package reservation orders received yet.</p>
+                      <p className="text-[11px] text-slate-500">
+                        When local or international patients reserve your published packages and pay the 10% advance deposit, their booking vouchers will appear here.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto border border-slate-200">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-slate-100 text-slate-600 border-b border-slate-200 font-extrabold text-[10px] uppercase tracking-wider">
+                            <th className="p-3">Patient & Country</th>
+                            <th className="p-3">Package Title & Code</th>
+                            <th className="p-3">Preferred Date</th>
+                            <th className="p-3 text-right">Total (MYR)</th>
+                            <th className="p-3 text-right">10% Deposit (MYR)</th>
+                            <th className="p-3 text-right">Balance Due (MYR)</th>
+                            <th className="p-3">Deposit Ref</th>
+                            <th className="p-3">Admission Status</th>
+                            <th className="p-3 text-right">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {packageOrders
+                            .filter(o => orderStatusFilter === 'all' || o.hospital_confirmation_status === orderStatusFilter)
+                            .map(ord => (
+                              <tr key={ord.id} className="hover:bg-slate-50/80 transition-colors">
+                                <td className="p-3">
+                                  <strong className="text-slate-900 block font-bold">{ord.patient_name}</strong>
+                                  <span className="text-[10px] text-slate-500 flex items-center gap-1">
+                                    <span>{ord.patient_country}</span> · <span>{ord.patient_phone}</span>
+                                  </span>
+                                </td>
+                                <td className="p-3">
+                                  <div className="font-bold text-slate-800 line-clamp-1">{ord.package_title}</div>
+                                  <code className="text-[10px] font-mono text-slate-500">{ord.package_code}</code>
+                                </td>
+                                <td className="p-3 font-mono text-slate-600 text-[11px]">
+                                  {ord.preferred_date || 'Flexible'}
+                                </td>
+                                <td className="p-3 text-right font-mono font-bold text-slate-900 tabular-nums">
+                                  RM {ord.total_price_myr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
+                                </td>
+                                <td className="p-3 text-right font-mono font-black text-emerald-800 tabular-nums">
+                                  RM {ord.deposit_amount_myr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
+                                </td>
+                                <td className="p-3 text-right font-mono font-bold text-slate-700 tabular-nums">
+                                  RM {ord.remaining_payable_myr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
+                                </td>
+                                <td className="p-3">
+                                  <code className="font-mono text-xs font-black text-[color:var(--t-700)] bg-slate-100 px-1.5 py-0.5">
+                                    {ord.deposit_payment_ref}
+                                  </code>
+                                </td>
+                                <td className="p-3">
+                                  <span className={`px-2 py-0.5 text-[10px] font-black uppercase ${
+                                    ord.hospital_confirmation_status === 'confirmed'
+                                      ? 'bg-emerald-100 text-emerald-800'
+                                      : ord.hospital_confirmation_status === 'completed'
+                                      ? 'bg-sky-100 text-sky-800'
+                                      : 'bg-amber-100 text-amber-900'
+                                  }`}>
+                                    {ord.hospital_confirmation_status}
+                                  </span>
+                                </td>
+                                <td className="p-3 text-right">
+                                  {ord.hospital_confirmation_status === 'pending' ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleConfirmPackageOrder(ord.id, 'confirmed')}
+                                      className="px-2.5 py-1 text-[11px] font-bold bg-emerald-700 hover:bg-emerald-800 text-white cursor-pointer shadow-xs"
+                                    >
+                                      Confirm Slot
+                                    </button>
+                                  ) : ord.hospital_confirmation_status === 'confirmed' ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleConfirmPackageOrder(ord.id, 'completed')}
+                                      className="px-2.5 py-1 text-[11px] font-bold bg-slate-800 hover:bg-slate-900 text-white cursor-pointer"
+                                    >
+                                      Check In
+                                    </button>
+                                  ) : (
+                                    <span className="text-[11px] font-bold text-slate-400">Checked In</span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -3438,6 +3947,128 @@ export default function FacilityWorkspace() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* INSTITUTIONAL REFERRAL SUCCESS-FEE INVOICE MODAL */}
+      {/* ========================================================================= */}
+      {selectedInvoice && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-slate-300 max-w-xl w-full p-6 space-y-5 shadow-2xl my-auto">
+            {/* Invoice Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase text-slate-400">Institutional Facilitator Invoice</span>
+                <h3 className="text-lg font-black text-slate-900 mt-0.5">
+                  Invoice {selectedInvoice.commissionInvoiceNo || 'DRAFT'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedInvoice(null)}
+                className="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Invoice Meta Grid */}
+            <div className="grid grid-cols-2 gap-4 text-xs bg-slate-50 p-4 border border-slate-200">
+              <div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Billed Hospital Facility</span>
+                <strong className="text-slate-900">{facility?.name || 'Accredited Healthcare Facility'}</strong>
+                <span className="text-[10px] text-slate-500 block">Licence: {facility?.licenceNo || 'Act 586 Verified'}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Facilitator / Billing Entity</span>
+                <strong className="text-slate-900">CareVerified Healthcare Network</strong>
+                <span className="text-[10px] text-slate-500 block">Kuala Lumpur, Malaysia · Act 586 Compliant</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Admitted Referral Patient</span>
+                <strong className="text-slate-900">{selectedInvoice.patient}</strong>
+                <span className="text-[10px] text-slate-500 block">Origin: {selectedInvoice.country}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Invoiced / Discharge Date</span>
+                <strong className="text-slate-900">
+                  {selectedInvoice.commissionInvoicedAt ? new Date(selectedInvoice.commissionInvoicedAt).toLocaleDateString('en-MY') : new Date().toLocaleDateString('en-MY')}
+                </strong>
+                <span className={`text-[10px] font-black uppercase px-1.5 py-0.2 inline-block mt-0.5 ${
+                  selectedInvoice.commissionStatus === 'settled' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'
+                }`}>
+                  Status: {selectedInvoice.commissionStatus}
+                </span>
+              </div>
+            </div>
+
+            {/* Financial Line Items */}
+            <div className="border border-slate-200 divide-y divide-slate-100 text-xs">
+              <div className="p-3 bg-slate-100 font-bold text-slate-700 flex justify-between">
+                <span>Description</span>
+                <span>Amount (MYR)</span>
+              </div>
+              <div className="p-3 flex justify-between text-slate-800">
+                <div>
+                  <div className="font-bold">Total Patient Treatment Billing</div>
+                  <div className="text-[11px] text-slate-500">{selectedInvoice.specialty || 'Clinical Treatment Package'}</div>
+                </div>
+                <div className="font-mono font-bold tabular-nums">
+                  RM {selectedInvoice.finalQuotationMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
+                </div>
+              </div>
+              <div className="p-3 flex justify-between text-emerald-900 bg-emerald-50/50">
+                <div>
+                  <div className="font-black">Institutional Facilitator Success Fee (8.0%)</div>
+                  <div className="text-[10px] text-emerald-700">Non-doctor splitting institutional coordination fee</div>
+                </div>
+                <div className="font-mono font-black tabular-nums">
+                  RM {selectedInvoice.referralCommissionMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
+                </div>
+              </div>
+              <div className="p-3 flex justify-between text-slate-600">
+                <span>Malaysian Service Tax (SST 8.0%)</span>
+                <span className="font-mono tabular-nums">
+                  RM {(selectedInvoice.referralCommissionMyr * 0.08).toLocaleString('en-MY', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="p-3 flex justify-between text-base font-black text-slate-900 bg-slate-50">
+                <span>Total Payable Facilitator Invoice:</span>
+                <span className="font-mono tabular-nums text-[color:var(--t-700)]">
+                  RM {(selectedInvoice.referralCommissionMyr * 1.08).toLocaleString('en-MY', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+            </div>
+
+            {/* Remittance & Compliance */}
+            <div className="p-3 bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-1">
+              <strong className="text-slate-800 block">Bank Remittance & Regulatory Assurance:</strong>
+              <div>Bank: Maybank Berhad · Acc No: 5140-8891-2300 · Acc Name: CareVerified Network Sdn Bhd</div>
+              <div className="text-[10px] text-slate-500 pt-1">
+                Issued in full compliance with Malaysian Medical Council (MMC) Guidelines on Medical Tourism & Referrals.
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="px-4 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 text-slate-800 cursor-pointer flex items-center gap-1.5"
+              >
+                <Printer className="h-4 w-4" />
+                Print Invoice
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedInvoice(null)}
+                className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-slate-900 hover:bg-black text-white cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

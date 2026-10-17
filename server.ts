@@ -1949,18 +1949,19 @@ app.post("/api/facility/cases/:id/quote", requireRole("facility", "admin"), (req
   db.prepare(`
     INSERT INTO tourism_quotes (
       id, case_id, version, items, subtotal_sen, tax_sen, tax_rate_pct, total_sen,
-      inclusions, exclusions, valid_until, created_by, created_at
-    ) VALUES (?, ?, 1, ?, ?, 0, 0, ?, ?, ?, ?, ?, ?)
+      inclusions, exclusions, cancellation_terms, valid_until, created_by, created_at
+    ) VALUES (?, ?, 1, ?, ?, 0, 0, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     qId, id, JSON.stringify(items), totalSen, totalSen,
     inclusions || `Includes ${procedureName}, specialist consultation, and ${estimatedStayDays || 1} day(s) clinical stay.`,
     exclusions || "Excludes emergency complications, additional ICU care, and international travel.",
+    req.body.cancellationTerms || "Full refund up to 7 days before scheduled admission; 50% thereafter.",
     validityDate, req.user!.id, now
   );
 
   db.prepare("UPDATE tourism_cases SET status = 'quoted', updated_at = ? WHERE id = ?").run(now, id);
 
-  res.json({
+  res.status(201).json({
     status: "success",
     message: "Treatment quotation generated and sent to patient referral desk.",
     data: { quoteId: qId, totalAmountMyr: Number(totalAmountMyr) }
@@ -1969,14 +1970,133 @@ app.post("/api/facility/cases/:id/quote", requireRole("facility", "admin"), (req
 
 app.patch("/api/facility/cases/:id/status", requireRole("facility", "admin"), (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const { status, dischargeSummary } = req.body;
   const allowed = ["enquiry", "quoted", "accepted", "in_treatment", "completed", "cancelled"];
   if (!allowed.includes(status)) {
     return fail(res, 400, `Invalid status. Must be one of: ${allowed.join(", ")}`);
   }
   const now = new Date().toISOString();
-  db.prepare("UPDATE tourism_cases SET status = ?, updated_at = ? WHERE id = ?").run(status, now, id);
-  res.json({ status: "success", message: `Referral case status updated to "${status}".` });
+
+  // Load existing case & latest quote
+  const caseRow = db.prepare("SELECT * FROM tourism_cases WHERE id = ?").get(id) as any;
+  if (!caseRow) return fail(res, 404, "Referral case not found.");
+
+  const facRow = db.prepare("SELECT * FROM tourism_facilities WHERE id = ?").get(caseRow.facility_id) as any;
+  const commissionRatePct = Number(facRow?.referral_commission_rate_pct || 8.0); // 8% standard
+
+  let commissionInvoiceNo = caseRow.commission_invoice_no;
+  let referralCommissionMyr = caseRow.referral_commission_myr;
+  let commissionStatus = caseRow.commission_status || "pending";
+  let commissionInvoicedAt = caseRow.commission_invoiced_at;
+
+  // When patient is completed / discharged, compute hospital facilitator success fee invoice
+  if (status === "completed" && !commissionInvoiceNo) {
+    const latestQuote = db.prepare("SELECT total_sen FROM tourism_quotes WHERE case_id = ? ORDER BY version DESC LIMIT 1").get(id) as any;
+    const procedureValueMyr = latestQuote ? (latestQuote.total_sen / 100) : 5500.0;
+    referralCommissionMyr = Math.round((procedureValueMyr * (commissionRatePct / 100)) * 100) / 100;
+    commissionInvoiceNo = `FAC-INV-${now.slice(0, 10).replace(/-/g, "")}-${id.slice(-4).toUpperCase()}`;
+    commissionStatus = "invoiced";
+    commissionInvoicedAt = now;
+  }
+
+  db.prepare(`
+    UPDATE tourism_cases
+    SET status = ?,
+        discharge_summary = COALESCE(?, discharge_summary),
+        referral_commission_myr = COALESCE(?, referral_commission_myr),
+        commission_rate_pct = COALESCE(?, commission_rate_pct),
+        commission_status = COALESCE(?, commission_status),
+        commission_invoice_no = COALESCE(?, commission_invoice_no),
+        commission_invoiced_at = COALESCE(?, commission_invoiced_at),
+        updated_at = ?
+    WHERE id = ?
+  `).run(
+    status, dischargeSummary || null, referralCommissionMyr || null, commissionRatePct,
+    commissionStatus, commissionInvoiceNo || null, commissionInvoicedAt || null, now, id
+  );
+
+  audit(req, `facility.case.status.${status}`, {
+    target: ["tourism_case", id],
+    details: { status, referralCommissionMyr, commissionInvoiceNo, commissionStatus }
+  });
+
+  res.json({
+    status: "success",
+    message: status === "completed"
+      ? `Patient discharge recorded! Facilitator Success Invoice ${commissionInvoiceNo} generated for RM ${referralCommissionMyr?.toFixed(2)} (${commissionRatePct}% commission).`
+      : `Referral case status updated to "${status}".`,
+    data: {
+      id,
+      status,
+      commissionInvoiceNo,
+      referralCommissionMyr,
+      commissionStatus,
+      commissionInvoicedAt
+    }
+  });
+});
+
+// Facility / Admin: Get Referral Commission Ledger & Invoices
+app.get("/api/facility/referral-ledger", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const rows = db.prepare(`
+    SELECT c.id, c.tracking_code, c.patient_name, c.patient_type, c.home_country,
+           c.specialty, c.status, c.updated_at, c.referral_commission_myr,
+           c.commission_rate_pct, c.commission_status, c.commission_invoice_no,
+           c.commission_invoiced_at, c.commission_settled_at,
+           (SELECT total_sen FROM tourism_quotes q WHERE q.case_id = c.id ORDER BY version DESC LIMIT 1) AS quote_total_sen
+    FROM tourism_cases c
+    WHERE (c.facility_id = ? OR ? = 'admin')
+      AND (c.referral_commission_myr IS NOT NULL OR c.status IN ('completed', 'in_treatment', 'accepted'))
+    ORDER BY c.updated_at DESC
+  `).all(facilityId, req.user!.role) as any[];
+
+  const cases = rows.map(r => {
+    const finalQuotationMyr = r.quote_total_sen ? r.quote_total_sen / 100 : 0;
+    const ratePct = r.commission_rate_pct || 8.0;
+    const commissionMyr = r.referral_commission_myr ?? (finalQuotationMyr ? Math.round((finalQuotationMyr * (ratePct / 100)) * 100) / 100 : 0);
+    return {
+      id: r.id,
+      patient: r.patient_name || "Patient Referral",
+      patientName: r.patient_name || "Patient Referral",
+      country: r.home_country || "Malaysia",
+      specialty: r.specialty || "General Medicine",
+      status: r.status,
+      updatedAt: r.updated_at,
+      finalQuotationMyr,
+      referralCommissionMyr: commissionMyr,
+      commissionRatePct: ratePct,
+      commissionStatus: r.commission_status || "pending",
+      commissionInvoiceNo: r.commission_invoice_no || null,
+      commissionInvoicedAt: r.commission_invoiced_at || null,
+      commissionSettledAt: r.commission_settled_at || null,
+    };
+  });
+
+  const totalInvoicedMyr = cases
+    .filter(c => c.commissionStatus === 'invoiced' || c.commissionStatus === 'settled')
+    .reduce((sum, c) => sum + c.referralCommissionMyr, 0);
+
+  const totalSettledMyr = cases
+    .filter(c => c.commissionStatus === 'settled')
+    .reduce((sum, c) => sum + c.referralCommissionMyr, 0);
+
+  const totalPendingMyr = cases
+    .filter(c => c.commissionStatus === 'pending')
+    .reduce((sum, c) => sum + c.referralCommissionMyr, 0);
+
+  res.json({
+    status: "success",
+    data: {
+      cases,
+      summary: {
+        totalInvoicedMyr,
+        totalSettledMyr,
+        totalPendingMyr,
+        commissionRatePct: 8.0,
+      }
+    }
+  });
 });
 
 

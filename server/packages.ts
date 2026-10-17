@@ -338,7 +338,7 @@ export function registerPackagesRoutes(app: Application) {
   app.get("/api/packages", (req: Request, res: Response) => {
     const { facility_id, category, audience, q, status } = req.query;
     let sql = `
-      SELECT p.*, f.name AS facility_name, f.city AS facility_city, f.state AS facility_state, f.licence_no, f.mhtc_member
+      SELECT p.*, f.name AS facility_name, f.city AS facility_city, f.state AS facility_state, f.licence_no, f.mhtc_member, f.verified_facilitator
       FROM medical_packages p
       JOIN tourism_facilities f ON f.id = p.facility_id
       WHERE 1=1
@@ -393,7 +393,7 @@ export function registerPackagesRoutes(app: Application) {
   app.get("/api/packages/:id", (req: Request, res: Response) => {
     const pkg = db.prepare(`
       SELECT p.*, f.name AS facility_name, f.city AS facility_city, f.state AS facility_state, f.address AS facility_address,
-             f.phone AS facility_phone, f.email AS facility_email, f.licence_no, f.mhtc_member
+             f.phone AS facility_phone, f.email AS facility_email, f.licence_no, f.mhtc_member, f.verified_facilitator
       FROM medical_packages p
       JOIN tourism_facilities f ON f.id = p.facility_id
       WHERE p.id = ?
@@ -691,6 +691,129 @@ export function registerPackagesRoutes(app: Application) {
   });
 
   // -----------------------------------------------------------
+  // PACKAGE DEPOSIT CHECKOUT & RESERVATIONS API
+  // -----------------------------------------------------------
+  // Reserve package with pre-authorized deposit
+  app.post("/api/packages/:id/reserve-deposit", (req: Request, res: Response) => {
+    const pkg = db.prepare("SELECT * FROM medical_packages WHERE id = ? AND status = 'published'").get(req.params.id) as any;
+    if (!pkg) return fail(res, 404, "Medical package not found or no longer available.");
+
+    const patientName = str(req.body.patientName, 120);
+    const patientEmail = str(req.body.patientEmail, 120);
+    const patientPhone = str(req.body.patientPhone, 40);
+    const patientCountry = str(req.body.patientCountry, 80) || "Malaysia";
+    const preferredDate = str(req.body.preferredDate, 10);
+    const promoCode = str(req.body.promoCode, 30).toUpperCase();
+    const paymentMethod = ["credit_card", "fpx", "intl_transfer"].includes(req.body.paymentMethod) ? req.body.paymentMethod : "credit_card";
+    const notes = str(req.body.notes, 500);
+
+    if (!patientName || !patientEmail || !patientPhone) {
+      return fail(res, 400, "Please provide full patient name, contact email, and phone number.");
+    }
+
+    const basePriceMyr = pkg.price_sen / 100;
+    let discountMyr = 0;
+
+    // Apply promo if valid
+    if (promoCode) {
+      const today = new Date().toISOString().slice(0, 10);
+      const promo = db.prepare(`
+        SELECT * FROM medical_promotions
+        WHERE code = ? AND status = 'active' AND valid_from <= ? AND valid_until >= ?
+      `).get(promoCode, today, today) as any;
+      if (promo) {
+        if (!promo.package_id || promo.package_id === pkg.id) {
+          if (promo.discount_type === "percentage") {
+            discountMyr = Math.round((basePriceMyr * promo.discount_value / 100) * 100) / 100;
+          } else {
+            discountMyr = promo.discount_value / 100;
+          }
+        }
+      }
+    }
+
+    const finalPriceMyr = Math.max(0, Math.round((basePriceMyr - discountMyr) * 100) / 100);
+    const depositPct = 10.0; // 10% advance reservation deposit
+    const depositAmountMyr = Math.max(50.0, Math.round((finalPriceMyr * (depositPct / 100)) * 100) / 100);
+    const remainingPayableMyr = Math.round((finalPriceMyr - depositAmountMyr) * 100) / 100;
+
+    const orderId = newId("pord");
+    const now = iso();
+    const depositPaymentRef = `DEP-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+
+    db.prepare(`
+      INSERT INTO package_orders (
+        id, package_id, facility_id, patient_user_id, patient_name, patient_email, patient_phone,
+        patient_country, preferred_date, total_price_myr, deposit_pct, deposit_amount_myr,
+        remaining_payable_myr, promo_code, discount_amount_myr, payment_method, payment_status,
+        deposit_payment_ref, hospital_confirmation_status, notes, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      orderId, pkg.id, pkg.facility_id, req.user?.id || null, patientName, patientEmail, patientPhone,
+      patientCountry, preferredDate || null, finalPriceMyr, depositPct, depositAmountMyr,
+      remainingPayableMyr, promoCode || null, discountMyr, paymentMethod, "deposit_paid",
+      depositPaymentRef, "pending", notes || null, now, now
+    );
+
+    audit(req, "package.order.deposit", {
+      target: ["package_order", orderId],
+      details: { packageId: pkg.id, facilityId: pkg.facility_id, depositAmountMyr, depositPaymentRef }
+    });
+
+    res.status(201).json({
+      status: "success",
+      message: `Package reserved successfully! 10% advance deposit of RM ${depositAmountMyr.toFixed(2)} has been secured (Ref: ${depositPaymentRef}).`,
+      data: {
+        orderId,
+        depositPaymentRef,
+        packageTitle: pkg.title,
+        packageCode: pkg.code,
+        patientName,
+        totalPriceMyr: finalPriceMyr,
+        depositAmountMyr,
+        remainingPayableMyr,
+        preferredDate,
+        hospitalConfirmationStatus: "pending"
+      }
+    });
+  });
+
+  // Facility / Admin: List Package Orders
+  app.get("/api/facility/package-orders", requireRole("facility", "admin"), (req: Request, res: Response) => {
+    const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+    const orders = db.prepare(`
+      SELECT o.*, p.title AS package_title, p.code AS package_code, p.category AS package_category
+      FROM package_orders o
+      JOIN medical_packages p ON p.id = o.package_id
+      WHERE o.facility_id = ? OR ? = 'admin'
+      ORDER BY o.created_at DESC
+    `).all(facilityId, req.user!.role) as any[];
+
+    res.json({
+      status: "success",
+      data: orders
+    });
+  });
+
+  // Facility / Admin: Confirm Package Order
+  app.patch("/api/facility/package-orders/:id/confirm", requireRole("facility", "admin"), (req: Request, res: Response) => {
+    const order = db.prepare("SELECT * FROM package_orders WHERE id = ?").get(req.params.id) as any;
+    if (!order) return fail(res, 404, "Order not found.");
+
+    const status = ["confirmed", "completed", "cancelled"].includes(req.body.status) ? req.body.status : "confirmed";
+    const now = iso();
+
+    db.prepare("UPDATE package_orders SET hospital_confirmation_status = ?, updated_at = ? WHERE id = ?").run(status, now, order.id);
+    audit(req, "package.order.confirm", { target: ["package_order", order.id], details: { status } });
+
+    res.json({
+      status: "success",
+      message: `Package reservation status updated to "${status}".`,
+      data: { id: order.id, status }
+    });
+  });
+
+  // -----------------------------------------------------------
   // FACILITIES & INFRASTRUCTURE MANAGEMENT API
   // -----------------------------------------------------------
   // Public directory of facilities with infrastructure & packages count
@@ -718,6 +841,7 @@ export function registerPackagesRoutes(app: Application) {
         email: f.email,
         website: f.website,
         mhtcMember: !!f.mhtc_member,
+        verifiedFacilitator: !!f.verified_facilitator,
         licenceNo: f.licence_no,
         licenceExpiry: f.licence_expiry,
         isLicenceValid: !f.licence_expiry || f.licence_expiry >= new Date().toISOString().slice(0, 10),

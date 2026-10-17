@@ -39,6 +39,10 @@ CREATE TABLE IF NOT EXISTS tourism_facilities (
   id TEXT PRIMARY KEY, name TEXT NOT NULL, kind TEXT NOT NULL DEFAULT 'hospital', city TEXT, state TEXT, address TEXT,
   description TEXT, phone TEXT, email TEXT, website TEXT,
   accepts_international INTEGER NOT NULL DEFAULT 1, mhtc_member INTEGER NOT NULL DEFAULT 0,
+  verified_facilitator INTEGER NOT NULL DEFAULT 1, referral_commission_rate_pct REAL NOT NULL DEFAULT 8.0,
+  billing_preference TEXT DEFAULT 'escrow', corporate_credit_limit_myr REAL DEFAULT 0,
+  corporate_credit_approved INTEGER DEFAULT 0, billing_contact_email TEXT, sst_registration_no TEXT,
+  equipment TEXT, amenities TEXT, cover_image TEXT,
   languages TEXT, specialties TEXT, services TEXT, accreditations TEXT,
   licence_no TEXT, licence_expiry TEXT, licence_checked_at TEXT, licence_reference TEXT,
   active INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL
@@ -48,6 +52,8 @@ CREATE TABLE IF NOT EXISTS tourism_cases (
   id TEXT PRIMARY KEY, patient_user_id TEXT NOT NULL, facility_id TEXT NOT NULL, practitioner_id TEXT,
   specialty TEXT, summary TEXT NOT NULL, home_country TEXT, preferred_from TEXT, preferred_to TEXT,
   needs TEXT, share_documents INTEGER NOT NULL DEFAULT 0, status TEXT NOT NULL DEFAULT 'enquiry',
+  referral_commission_myr REAL, commission_rate_pct REAL DEFAULT 8.0, commission_status TEXT DEFAULT 'pending',
+  commission_invoice_no TEXT, commission_invoiced_at TEXT, commission_settled_at TEXT,
   discharge_summary TEXT, follow_up_plan TEXT, discharged_at TEXT, closed_reason TEXT,
   created_at TEXT NOT NULL, updated_at TEXT NOT NULL
 );
@@ -71,6 +77,33 @@ CREATE TABLE IF NOT EXISTS tourism_shares (
   token_hash TEXT PRIMARY KEY, case_id TEXT NOT NULL, recipient_label TEXT, created_at TEXT NOT NULL, expires_at TEXT NOT NULL, revoked_at TEXT, views INTEGER NOT NULL DEFAULT 0
 );
 `);
+
+for (const col of [
+  "billing_preference TEXT DEFAULT 'escrow'",
+  "corporate_credit_limit_myr REAL DEFAULT 0",
+  "corporate_credit_approved INTEGER DEFAULT 0",
+  "billing_contact_email TEXT",
+  "sst_registration_no TEXT",
+  "verified_facilitator INTEGER DEFAULT 1",
+  "referral_commission_rate_pct REAL DEFAULT 8.0",
+  "equipment TEXT",
+  "amenities TEXT",
+  "cover_image TEXT",
+]) {
+  try { db.exec(`ALTER TABLE tourism_facilities ADD COLUMN ${col}`); } catch { /* exists */ }
+}
+
+for (const col of [
+  "referral_commission_myr REAL",
+  "commission_rate_pct REAL DEFAULT 8.0",
+  "commission_status TEXT DEFAULT 'pending'",
+  "commission_invoice_no TEXT",
+  "commission_invoiced_at TEXT",
+  "commission_settled_at TEXT",
+  "discharge_summary TEXT",
+]) {
+  try { db.exec(`ALTER TABLE tourism_cases ADD COLUMN ${col}`); } catch { /* exists */ }
+}
 
 // ---------- constants ----------
 export const ACCREDITATION_BODIES = ["JCI", "MSQH", "other"] as const;

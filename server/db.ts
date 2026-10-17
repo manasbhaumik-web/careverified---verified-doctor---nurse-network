@@ -135,9 +135,53 @@ for (const col of [
   "corporate_credit_approved INTEGER DEFAULT 0",
   "billing_contact_email TEXT",
   "sst_registration_no TEXT",
+  "verified_facilitator INTEGER DEFAULT 1", // MHTC verified facilitator partner
+  "referral_commission_rate_pct REAL DEFAULT 8.0", // standard 8% facilitator commission
 ]) {
   try { db.exec(`ALTER TABLE tourism_facilities ADD COLUMN ${col}`); } catch { /* column already exists */ }
 }
+
+for (const col of [
+  "referral_commission_myr REAL",
+  "commission_rate_pct REAL DEFAULT 8.0",
+  "commission_status TEXT DEFAULT 'pending'", // 'pending' | 'invoiced' | 'settled'
+  "commission_invoice_no TEXT",
+  "commission_invoiced_at TEXT",
+  "commission_settled_at TEXT",
+  "discharge_summary TEXT",
+]) {
+  try { db.exec(`ALTER TABLE tourism_cases ADD COLUMN ${col}`); } catch { /* column already exists */ }
+}
+
+// ---- Medical Package Orders & Deposit Checkout Table ----
+db.exec(`
+CREATE TABLE IF NOT EXISTS package_orders (
+  id TEXT PRIMARY KEY,
+  package_id TEXT NOT NULL,
+  facility_id TEXT NOT NULL,
+  patient_user_id TEXT,
+  patient_name TEXT NOT NULL,
+  patient_email TEXT NOT NULL,
+  patient_phone TEXT NOT NULL,
+  patient_country TEXT NOT NULL DEFAULT 'Malaysia',
+  preferred_date TEXT,
+  total_price_myr REAL NOT NULL,
+  deposit_pct REAL NOT NULL DEFAULT 10.0,
+  deposit_amount_myr REAL NOT NULL,
+  remaining_payable_myr REAL NOT NULL,
+  promo_code TEXT,
+  discount_amount_myr REAL DEFAULT 0,
+  payment_method TEXT NOT NULL DEFAULT 'credit_card',
+  payment_status TEXT NOT NULL DEFAULT 'deposit_paid',
+  deposit_payment_ref TEXT NOT NULL,
+  hospital_confirmation_status TEXT NOT NULL DEFAULT 'pending',
+  notes TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_pkg_ord_fac ON package_orders(facility_id, payment_status);
+CREATE INDEX IF NOT EXISTS idx_pkg_ord_pkg ON package_orders(package_id);
+`);
 
 // ---- Facility Coordination Messages (Facility <-> Practitioner Applicants) ----
 db.exec(`

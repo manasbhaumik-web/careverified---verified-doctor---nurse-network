@@ -3,7 +3,7 @@ import {
   PackagePlus, Search, Tag, Building2, Check, Clock, ShieldCheck,
   AlertCircle, ChevronRight, X, Calendar, Phone, Mail, Globe, MapPin,
   Sparkles, Gift, Filter, ArrowRight, Copy, CheckCircle2, FileText,
-  BadgeCheck, HeartPulse
+  BadgeCheck, HeartPulse, CreditCard, Lock, Receipt, Download, Printer
 } from 'lucide-react';
 import DashboardHeader, { bannerPrimaryBtn } from './DashboardHeader';
 
@@ -15,6 +15,7 @@ export interface MedicalPackage {
   facility_state: string;
   licence_no?: string;
   mhtc_member?: number;
+  verified_facilitator?: number;
   code: string;
   title: string;
   category: string;
@@ -64,6 +65,7 @@ export interface FacilityDirectoryItem {
   email: string;
   website: string;
   mhtcMember: boolean;
+  verifiedFacilitator?: boolean;
   licenceNo: string;
   licenceExpiry: string;
   isLicenceValid: boolean;
@@ -123,13 +125,31 @@ export default function MedicalPackagesModule({
 
   // Booking / Enquiry Form Modal state
   const [bookingModal, setBookingModal] = useState<MedicalPackage | null>(null);
+  const [bookingMode, setBookingMode] = useState<'deposit' | 'enquiry'>('deposit');
   const [bookName, setBookName] = useState('');
   const [bookEmail, setBookEmail] = useState('');
   const [bookPhone, setBookPhone] = useState('');
+  const [bookCountry, setBookCountry] = useState('Malaysia');
   const [bookDate, setBookDate] = useState('');
   const [bookNotes, setBookNotes] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'credit_card' | 'fpx' | 'intl_transfer'>('credit_card');
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExp, setCardExp] = useState('');
+  const [cardCvc, setCardCvc] = useState('');
   const [bookSubmitting, setBookSubmitting] = useState(false);
   const [bookFeedback, setBookFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [depositReceipt, setDepositReceipt] = useState<{
+    orderId: string;
+    depositPaymentRef: string;
+    packageTitle: string;
+    packageCode: string;
+    patientName: string;
+    totalPriceMyr: number;
+    depositAmountMyr: number;
+    remainingPayableMyr: number;
+    preferredDate?: string;
+    hospitalConfirmationStatus: string;
+  } | null>(null);
 
   // Load packages
   const loadPackages = useCallback(async () => {
@@ -233,7 +253,7 @@ export default function MedicalPackagesModule({
     setTimeout(() => setCopiedCode(null), 2500);
   };
 
-  // Submit booking / enquiry
+  // Submit booking / enquiry or pre-authorized deposit
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!bookingModal) return;
@@ -241,40 +261,72 @@ export default function MedicalPackagesModule({
     setBookFeedback(null);
 
     try {
-      const summaryText = `[Package Booking] ${bookingModal.title} (${bookingModal.code}) - Indicative Price: RM ${bookingModal.priceMyr.toLocaleString()} MYR. Preferred Date: ${bookDate || 'Flexible'}. Notes: ${bookNotes || 'None'}`;
-      const res = await fetch('/api/tourism/cases', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          facilityId: bookingModal.facility_id,
-          specialty: bookingModal.category,
-          summary: summaryText,
-          homeCountry: selectedAudience === 'international' ? 'International Patient' : 'Malaysia',
-          preferredFrom: bookDate || undefined,
-          patientName: bookName,
-          patientPhone: bookPhone,
-          patientEmail: bookEmail,
-        }),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setBookFeedback({
-          type: 'success',
-          message: 'Your booking enquiry has been submitted directly to the facility. Their admissions desk will contact you with formal confirmation.',
+      if (bookingMode === 'deposit') {
+        // 10% Pre-Authorized Reservation Deposit
+        const res = await fetch(`/api/packages/${bookingModal.id}/reserve-deposit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            patientName: bookName,
+            patientPhone: bookPhone,
+            patientEmail: bookEmail,
+            patientCountry: bookCountry,
+            preferredDate: bookDate || undefined,
+            promoCode: appliedPromo?.code || undefined,
+            paymentMethod,
+            notes: bookNotes,
+          }),
         });
-        setTimeout(() => {
-          setBookingModal(null);
-          setBookFeedback(null);
-          setBookName('');
-          setBookPhone('');
-          setBookEmail('');
-          setBookNotes('');
-        }, 3000);
+        const data = await res.json();
+        if (data.status === 'success') {
+          setDepositReceipt(data.data);
+          setBookFeedback({
+            type: 'success',
+            message: data.message || '10% Advance Deposit secured successfully! Your hospital booking voucher is generated below.',
+          });
+        } else {
+          setBookFeedback({
+            type: 'error',
+            message: data.message || 'Failed to complete deposit checkout. Please verify your details.',
+          });
+        }
       } else {
-        setBookFeedback({
-          type: 'error',
-          message: data.message || 'Failed to submit booking enquiry. Please try again.',
+        // General enquiry mode
+        const summaryText = `[Package Booking Enquiry] ${bookingModal.title} (${bookingModal.code}) - Indicative Price: RM ${bookingModal.priceMyr.toLocaleString()} MYR. Preferred Date: ${bookDate || 'Flexible'}. Country: ${bookCountry}. Notes: ${bookNotes || 'None'}`;
+        const res = await fetch('/api/tourism/cases', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            facilityId: bookingModal.facility_id,
+            specialty: bookingModal.category,
+            summary: summaryText,
+            homeCountry: bookCountry || (selectedAudience === 'international' ? 'International Patient' : 'Malaysia'),
+            preferredFrom: bookDate || undefined,
+            patientName: bookName,
+            patientPhone: bookPhone,
+            patientEmail: bookEmail,
+          }),
         });
+        const data = await res.json();
+        if (data.status === 'success') {
+          setBookFeedback({
+            type: 'success',
+            message: 'Your booking enquiry has been submitted directly to the facility admissions desk.',
+          });
+          setTimeout(() => {
+            setBookingModal(null);
+            setBookFeedback(null);
+            setBookName('');
+            setBookPhone('');
+            setBookEmail('');
+            setBookNotes('');
+          }, 3000);
+        } else {
+          setBookFeedback({
+            type: 'error',
+            message: data.message || 'Failed to submit booking enquiry. Please try again.',
+          });
+        }
       }
     } catch {
       setBookFeedback({
@@ -482,23 +534,49 @@ export default function MedicalPackagesModule({
                             {pkg.category}
                           </span>
                         </div>
-                        {pkg.target_audience === 'international' && (
-                          <div className="absolute top-2.5 right-2.5">
+                        <div className="absolute top-2.5 right-2.5 flex flex-col items-end gap-1">
+                          {Boolean(pkg.mhtc_member) && (
+                            <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-sky-800/95 text-white border border-sky-400/60 backdrop-blur-xs shadow-xs flex items-center gap-1">
+                              🇲🇾 MHTC Member
+                            </span>
+                          )}
+                          {pkg.verified_facilitator !== 0 && (
+                            <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-emerald-800/95 text-white border border-emerald-400/60 backdrop-blur-xs shadow-xs flex items-center gap-1">
+                              <ShieldCheck className="h-3 w-3" />
+                              Verified Facilitator
+                            </span>
+                          )}
+                          {pkg.target_audience === 'international' && !pkg.mhtc_member && (
                             <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 bg-blue-700/90 text-white border border-blue-400/50 backdrop-blur-xs">
                               MHTC Travel
                             </span>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
 
                       {/* Content Body */}
                       <div className="p-5 space-y-3">
-                        <div className="flex items-center justify-between text-xs text-slate-500">
-                          <span className="flex items-center gap-1 font-semibold text-slate-700">
-                            <Building2 className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                            {pkg.facility_name}
-                          </span>
-                          <span>{pkg.facility_city}</span>
+                        <div>
+                          <div className="flex items-center justify-between text-xs text-slate-500">
+                            <span className="flex items-center gap-1 font-semibold text-slate-700">
+                              <Building2 className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                              {pkg.facility_name}
+                            </span>
+                            <span>{pkg.facility_city}</span>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
+                            {pkg.verified_facilitator !== 0 && (
+                              <span className="text-[10px] font-black uppercase text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 flex items-center gap-1">
+                                <BadgeCheck className="h-3 w-3 text-emerald-600" />
+                                Verified Facilitator
+                              </span>
+                            )}
+                            {Boolean(pkg.mhtc_member) && (
+                              <span className="text-[10px] font-black uppercase text-sky-800 bg-sky-50 border border-sky-200 px-1.5 py-0.2">
+                                🇲🇾 MHTC Hospital
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         <h3 className="font-extrabold text-base text-[color:var(--ink)] leading-snug group-hover:text-[color:var(--t-600)] transition-colors">
@@ -560,6 +638,10 @@ export default function MedicalPackagesModule({
                             {pkg.priceMyr.toLocaleString()}
                           </span>
                         </div>
+                        <div className="text-[10px] font-bold text-emerald-700 flex items-center gap-1 mt-0.5">
+                          <ShieldCheck className="h-3 w-3" />
+                          10% Deposit: RM {(pkg.priceMyr * 0.1).toFixed(0)} to reserve
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-2">
@@ -579,11 +661,14 @@ export default function MedicalPackagesModule({
                           type="button"
                           onClick={() => {
                             setBookingModal(pkg);
+                            setBookingMode('deposit');
+                            setDepositReceipt(null);
                             setBookFeedback(null);
                           }}
-                          className="px-4 py-2 text-xs font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer shadow-xs"
+                          className="px-4 py-2 text-xs font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer shadow-xs flex items-center gap-1.5"
                         >
-                          Book Now
+                          <CreditCard className="h-3.5 w-3.5" />
+                          Reserve Now
                         </button>
                       </div>
                     </div>
@@ -687,13 +772,19 @@ export default function MedicalPackagesModule({
                         alt={fac.name}
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute top-3 left-3 flex items-center gap-2">
+                      <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2">
                         <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-slate-900/90 text-white backdrop-blur-xs">
                           {fac.kind.replace('_', ' ').toUpperCase()}
                         </span>
                         {fac.mhtcMember && (
-                          <span className="text-[10px] font-black uppercase px-2 py-1 bg-sky-700/90 text-white backdrop-blur-xs">
-                            MHTC Accredited
+                          <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-sky-800/95 text-white border border-sky-400/60 backdrop-blur-xs flex items-center gap-1">
+                            🇲🇾 MHTC Member Hospital
+                          </span>
+                        )}
+                        {(fac.verifiedFacilitator ?? true) && (
+                          <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-emerald-800/95 text-white border border-emerald-400/60 backdrop-blur-xs flex items-center gap-1">
+                            <ShieldCheck className="h-3 w-3" />
+                            Verified Facilitator Partner
                           </span>
                         )}
                       </div>
@@ -717,9 +808,20 @@ export default function MedicalPackagesModule({
 
                       {/* Licence & Accreditations Badge Row */}
                       <div className="flex flex-wrap items-center gap-2 text-xs">
+                        {(fac.verifiedFacilitator ?? true) && (
+                          <span className="px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 text-[10px] font-black uppercase flex items-center gap-1">
+                            <BadgeCheck className="h-3 w-3 text-emerald-600" />
+                            Verified Facilitator Network (Deposit-Protected & MMC Compliant)
+                          </span>
+                        )}
+                        {fac.mhtcMember && (
+                          <span className="px-2.5 py-1 bg-sky-50 text-sky-800 border border-sky-300 text-[10px] font-black uppercase flex items-center gap-1">
+                            🇲🇾 MHTC Affiliated
+                          </span>
+                        )}
                         {fac.isLicenceValid && (
-                          <span className="px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-black uppercase flex items-center gap-1">
-                            <ShieldCheck className="h-3 w-3" />
+                          <span className="px-2.5 py-1 bg-slate-100 text-slate-800 border border-slate-300 text-[10px] font-black uppercase flex items-center gap-1">
+                            <ShieldCheck className="h-3 w-3 text-slate-600" />
                             Act 586 Licensed ({fac.licenceNo || 'Verified'})
                           </span>
                         )}
@@ -976,122 +1078,406 @@ export default function MedicalPackagesModule({
         {/* ------------------------------------------------------------------- */}
         {bookingModal && (
           <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white border border-slate-300 w-full max-w-lg shadow-xl my-auto">
+            <div className="bg-white border border-slate-300 w-full max-w-xl shadow-xl my-auto">
+              
+              {/* Modal Header */}
               <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                 <div>
-                  <h3 className="font-extrabold text-base text-[color:var(--ink)]">
-                    Enquire / Book Package
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono font-black uppercase px-2 py-0.5 bg-slate-900 text-white">
+                      {bookingModal.code}
+                    </span>
+                    <span className="text-xs font-extrabold text-[color:var(--t-700)]">
+                      {bookingModal.facility_name}
+                    </span>
+                  </div>
+                  <h3 className="font-extrabold text-base text-[color:var(--ink)] mt-1">
+                    {depositReceipt ? 'Official Package Reservation Voucher' : 'Reserve Medical Package'}
                   </h3>
-                  <p className="text-xs text-slate-500">{bookingModal.title}</p>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setBookingModal(null)}
+                  onClick={() => {
+                    setBookingModal(null);
+                    setDepositReceipt(null);
+                  }}
                   className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
-              <form onSubmit={handleBookingSubmit} className="p-6 space-y-4">
-                {bookFeedback && (
-                  <div
-                    className={`p-3 text-xs flex items-start gap-2 ${
-                      bookFeedback.type === 'success'
-                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
-                        : 'bg-red-50 text-red-800 border border-red-300'
-                    }`}
-                  >
-                    {bookFeedback.type === 'success' ? (
-                      <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
-                    ) : (
-                      <AlertCircle className="h-4 w-4 shrink-0 text-red-600 mt-0.5" />
-                    )}
-                    <span>{bookFeedback.message}</span>
+              {depositReceipt ? (
+                /* ============================================================ */
+                /* OFFICIAL BOOKING VOUCHER RECEIPT */
+                /* ============================================================ */
+                <div className="p-6 space-y-5">
+                  <div className="p-4 bg-emerald-50 border border-emerald-300 flex items-start gap-3">
+                    <CheckCircle2 className="h-6 w-6 text-emerald-600 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                      <h4 className="font-black text-sm text-emerald-950">
+                        10% Pre-Authorized Deposit Secured!
+                      </h4>
+                      <p className="text-xs text-emerald-900/90 leading-relaxed">
+                        Your hospital slot has been pre-booked directly with {bookingModal.facility_name}. An official booking voucher has been issued and sent to <strong className="font-mono">{bookEmail}</strong>.
+                      </p>
+                    </div>
                   </div>
-                )}
 
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700 block">Full Name (as in NRIC / Passport) *</label>
-                  <input
-                    type="text"
-                    required
-                    value={bookName}
-                    onChange={(e) => setBookName(e.target.value)}
-                    placeholder="e.g. Dr. Siti Aminah or John Tan"
-                    className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
-                  />
+                  {/* Printable Voucher Card */}
+                  <div className="p-5 bg-slate-50 border-2 border-dashed border-slate-300 space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                      <div>
+                        <div className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider">
+                          Voucher Reference No.
+                        </div>
+                        <div className="text-lg font-mono font-black text-[color:var(--t-700)] tracking-wide">
+                          {depositReceipt.depositPaymentRef}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black uppercase">
+                          Deposit Secured
+                        </span>
+                        <div className="text-[10px] text-slate-500 mt-1">
+                          Order ID: <code className="font-mono">{depositReceipt.orderId}</code>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Patient Name</span>
+                        <strong className="text-slate-900">{depositReceipt.patientName}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Target Hospital</span>
+                        <strong className="text-slate-900">{bookingModal.facility_name}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Package</span>
+                        <strong className="text-slate-900">{depositReceipt.packageTitle}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Preferred Admission Date</span>
+                        <strong className="text-slate-900">{depositReceipt.preferredDate || 'Flexible / As Arranged'}</strong>
+                      </div>
+                    </div>
+
+                    {/* Financial Summary */}
+                    <div className="p-3 bg-white border border-slate-200 space-y-2 text-xs">
+                      <div className="flex items-center justify-between text-slate-600">
+                        <span>Total Package Value:</span>
+                        <span className="font-bold tabular-nums">RM {depositReceipt.totalPriceMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-emerald-800 font-bold border-t border-slate-100 pt-1.5">
+                        <span className="flex items-center gap-1">
+                          <Check className="h-3.5 w-3.5 text-emerald-600" />
+                          10% Pre-Auth Deposit Paid:
+                        </span>
+                        <span className="tabular-nums">- RM {depositReceipt.depositAmountMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-slate-900 font-black border-t border-slate-200 pt-2 text-sm">
+                        <span>Remaining Balance at Hospital Check-in:</span>
+                        <span className="tabular-nums text-[color:var(--t-700)]">RM {depositReceipt.remainingPayableMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    </div>
+
+                    <div className="text-[11px] text-slate-500 leading-normal">
+                      <strong>Check-in Instructions:</strong> Please show this confirmation reference at {bookingModal.facility_name}'s Executive Health / International Patient Lounge. The remaining balance will be settled at hospital admission.
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
+                    <button
+                      type="button"
+                      onClick={() => window.print()}
+                      className="px-4 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Printer className="h-4 w-4" />
+                      Print Voucher
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBookingModal(null);
+                        setDepositReceipt(null);
+                      }}
+                      className={bannerPrimaryBtn}
+                    >
+                      Done & Close
+                    </button>
+                  </div>
                 </div>
+              ) : (
+                /* ============================================================ */
+                /* BOOKING / DEPOSIT FORM */
+                /* ============================================================ */
+                <form onSubmit={handleBookingSubmit} className="p-6 space-y-4">
+                  
+                  {/* Mode Selector Tabs */}
+                  <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 border border-slate-200">
+                    <button
+                      type="button"
+                      onClick={() => setBookingMode('deposit')}
+                      className={`py-2 px-3 text-xs font-black cursor-pointer flex items-center justify-center gap-1.5 transition-all ${
+                        bookingMode === 'deposit'
+                          ? 'bg-white text-[color:var(--t-700)] shadow-xs border border-slate-200'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <CreditCard className="h-3.5 w-3.5" />
+                      10% Deposit Checkout
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBookingMode('enquiry')}
+                      className={`py-2 px-3 text-xs font-black cursor-pointer flex items-center justify-center gap-1.5 transition-all ${
+                        bookingMode === 'enquiry'
+                          ? 'bg-white text-[color:var(--t-700)] shadow-xs border border-slate-200'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Mail className="h-3.5 w-3.5" />
+                      General Inquiry Only
+                    </button>
+                  </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                  {/* Feedback Message */}
+                  {bookFeedback && (
+                    <div
+                      className={`p-3 text-xs flex items-start gap-2 ${
+                        bookFeedback.type === 'success'
+                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+                          : 'bg-red-50 text-red-800 border border-red-300'
+                      }`}
+                    >
+                      {bookFeedback.type === 'success' ? (
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
+                      ) : (
+                        <AlertCircle className="h-4 w-4 shrink-0 text-red-600 mt-0.5" />
+                      )}
+                      <span>{bookFeedback.message}</span>
+                    </div>
+                  )}
+
+                  {/* Deposit Pricing Callout */}
+                  {bookingMode === 'deposit' && (
+                    <div className="p-3.5 bg-emerald-50/70 border border-emerald-300 space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-600">Published Package Price:</span>
+                        <span className="font-semibold tabular-nums">RM {bookingModal.priceMyr.toLocaleString()}</span>
+                      </div>
+                      {appliedPromo && (
+                        <div className="flex items-center justify-between text-xs text-emerald-700 font-bold">
+                          <span>Promo Discount ({appliedPromo.code}):</span>
+                          <span className="tabular-nums">- RM {appliedPromo.discountMyr.toLocaleString()}</span>
+                        </div>
+                      )}
+                      <div className="pt-2 border-t border-emerald-200 flex items-center justify-between">
+                        <div>
+                          <span className="text-xs font-black text-emerald-950 block">10% Advance Deposit:</span>
+                          <span className="text-[10px] text-emerald-700">Pre-authorizes & confirms your hospital appointment</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-lg font-black text-emerald-900 tabular-nums">
+                            RM {Math.max(50, Math.round((bookingModal.priceMyr - (appliedPromo?.discountMyr || 0)) * 0.1)).toFixed(2)}
+                          </span>
+                          <div className="text-[10px] text-slate-500">
+                            Balance RM {Math.round((bookingModal.priceMyr - (appliedPromo?.discountMyr || 0)) * 0.9).toLocaleString()} at admission
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Patient Info Fields */}
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-700 block">Phone Number *</label>
+                    <label className="text-xs font-bold text-slate-700 block">Full Patient Name (as in Passport / NRIC) *</label>
                     <input
-                      type="tel"
+                      type="text"
                       required
-                      value={bookPhone}
-                      onChange={(e) => setBookPhone(e.target.value)}
-                      placeholder="+60 12-345 6789"
+                      value={bookName}
+                      onChange={(e) => setBookName(e.target.value)}
+                      placeholder="e.g. Siti Sarah binti Ahmad or Dr. James Tan"
                       className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
                     />
                   </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-700 block">Mobile Phone (WhatsApp) *</label>
+                      <input
+                        type="tel"
+                        required
+                        value={bookPhone}
+                        onChange={(e) => setBookPhone(e.target.value)}
+                        placeholder="+60 12-345 6789"
+                        className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-700 block">Email Address *</label>
+                      <input
+                        type="email"
+                        required
+                        value={bookEmail}
+                        onChange={(e) => setBookEmail(e.target.value)}
+                        placeholder="patient@example.com"
+                        className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-700 block">Country of Residence</label>
+                      <select
+                        value={bookCountry}
+                        onChange={(e) => setBookCountry(e.target.value)}
+                        className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                      >
+                        <option value="Malaysia">🇲🇾 Malaysia</option>
+                        <option value="Indonesia">🇮🇩 Indonesia</option>
+                        <option value="Singapore">🇸🇬 Singapore</option>
+                        <option value="China">🇨🇳 China</option>
+                        <option value="Australia">🇦🇺 Australia</option>
+                        <option value="United Kingdom">🇬🇧 United Kingdom</option>
+                        <option value="Other">🌍 Other International</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-700 block">Preferred Date of Visit</label>
+                      <input
+                        type="date"
+                        value={bookDate}
+                        onChange={(e) => setBookDate(e.target.value)}
+                        min={new Date().toISOString().slice(0, 10)}
+                        className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Payment Method Selector (Only for Deposit mode) */}
+                  {bookingMode === 'deposit' && (
+                    <div className="space-y-3 pt-2 border-t border-slate-200">
+                      <label className="text-xs font-bold text-slate-700 block">Select Deposit Payment Channel</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { id: 'credit_card', label: 'Credit Card', icon: CreditCard, sub: 'Visa / MC' },
+                          { id: 'fpx', label: 'FPX Online', icon: Building2, sub: 'Malaysian Banks' },
+                          { id: 'intl_transfer', label: 'Telegraphic', icon: Globe, sub: 'Wire / TT' },
+                        ].map(pm => (
+                          <button
+                            key={pm.id}
+                            type="button"
+                            onClick={() => setPaymentMethod(pm.id as any)}
+                            className={`p-2.5 text-center border cursor-pointer transition-all ${
+                              paymentMethod === pm.id
+                                ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)] text-[color:var(--t-700)]'
+                                : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
+                            }`}
+                          >
+                            <pm.icon className="h-4 w-4 mx-auto mb-1 text-[color:var(--t-600)]" />
+                            <div className="text-[11px] font-bold">{pm.label}</div>
+                            <div className="text-[9px] text-slate-400">{pm.sub}</div>
+                          </button>
+                        ))}
+                      </div>
+
+                      {paymentMethod === 'credit_card' && (
+                        <div className="p-3 bg-slate-50 border border-slate-200 space-y-2">
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold text-slate-600 block uppercase">Card Number</label>
+                            <input
+                              type="text"
+                              value={cardNumber}
+                              onChange={(e) => setCardNumber(e.target.value)}
+                              placeholder="4111 •••• •••• 4242"
+                              className="w-full p-2 border border-slate-300 text-xs font-mono bg-white rounded-none"
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="text-[10px] font-bold text-slate-600 block uppercase">Expiry Date</label>
+                              <input
+                                type="text"
+                                value={cardExp}
+                                onChange={(e) => setCardExp(e.target.value)}
+                                placeholder="MM / YY"
+                                className="w-full p-2 border border-slate-300 text-xs font-mono bg-white rounded-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-bold text-slate-600 block uppercase">Security CVC</label>
+                              <input
+                                type="password"
+                                maxLength={4}
+                                value={cardCvc}
+                                onChange={(e) => setCardCvc(e.target.value)}
+                                placeholder="CVC"
+                                className="w-full p-2 border border-slate-300 text-xs font-mono bg-white rounded-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Notes */}
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-700 block">Email Address *</label>
-                    <input
-                      type="email"
-                      required
-                      value={bookEmail}
-                      onChange={(e) => setBookEmail(e.target.value)}
-                      placeholder="patient@example.com"
+                    <label className="text-xs font-bold text-slate-700 block">Clinical Remarks / Requirements</label>
+                    <textarea
+                      rows={2}
+                      value={bookNotes}
+                      onChange={(e) => setBookNotes(e.target.value)}
+                      placeholder="Any pre-existing conditions, mobility assistance, wheelchair needs, or dietary preferences..."
                       className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
                     />
                   </div>
-                </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700 block">Preferred Date of Visit</label>
-                  <input
-                    type="date"
-                    value={bookDate}
-                    onChange={(e) => setBookDate(e.target.value)}
-                    min={new Date().toISOString().slice(0, 10)}
-                    className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
-                  />
-                </div>
+                  {/* Regulatory Compliance & Assurance */}
+                  <div className="p-3 bg-slate-50 border border-slate-200 text-[11px] text-slate-500 space-y-1">
+                    <div className="font-bold text-slate-700 flex items-center gap-1.5">
+                      <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+                      Act 586 & MMC 1971 Compliant Institutional Booking:
+                    </div>
+                    <span>
+                      {bookingMode === 'deposit'
+                        ? `Your 10% advance deposit pre-authorizes and locks in your package with ${bookingModal.facility_name}. Zero doctor fee-splitting: platform facilitator fees are purely institutional and comply with MMC ethical guidelines.`
+                        : `Your inquiry will be routed to ${bookingModal.facility_name}'s admissions coordinator who will respond within 24 business hours.`}
+                    </span>
+                  </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700 block">Clinical Inquiries / Remarks</label>
-                  <textarea
-                    rows={3}
-                    value={bookNotes}
-                    onChange={(e) => setBookNotes(e.target.value)}
-                    placeholder="Any symptoms, prior medical history, mobility needs, or questions regarding this package..."
-                    className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
-                  />
-                </div>
-
-                <div className="p-3 bg-slate-50 border border-slate-200 text-[11px] text-slate-500 space-y-1">
-                  <span className="font-bold text-slate-700 block">Privacy & Act 586 Assurance:</span>
-                  Your booking request is transmitted securely to {bookingModal.facility_name}'s verified admissions and scheduling department. No advance payment is charged until confirmed by hospital staff.
-                </div>
-
-                <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
-                  <button
-                    type="button"
-                    onClick={() => setBookingModal(null)}
-                    className="px-4 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={bookSubmitting}
-                    className={`${bannerPrimaryBtn} disabled:opacity-50`}
-                  >
-                    {bookSubmitting ? 'Submitting Enquiry…' : 'Confirm & Send Enquiry'}
-                  </button>
-                </div>
-              </form>
+                  {/* Modal Action Buttons */}
+                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
+                    <button
+                      type="button"
+                      onClick={() => setBookingModal(null)}
+                      className="px-4 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={bookSubmitting}
+                      className={`${bannerPrimaryBtn} disabled:opacity-50 flex items-center gap-1.5`}
+                    >
+                      {bookSubmitting ? (
+                        'Processing…'
+                      ) : bookingMode === 'deposit' ? (
+                        <>
+                          <Lock className="h-3.5 w-3.5" />
+                          Pay RM {Math.max(50, Math.round((bookingModal.priceMyr - (appliedPromo?.discountMyr || 0)) * 0.1)).toFixed(2)} Deposit & Reserve
+                        </>
+                      ) : (
+                        'Submit Free Enquiry'
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         )}
