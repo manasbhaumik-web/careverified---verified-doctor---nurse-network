@@ -20,6 +20,7 @@ interface TourismDeskProps {
   professionals?: any[];
   reviews?: any[];
   bookings?: any[];
+  embedded?: boolean;
 }
 
 /** Facility staff (practitioners assigned to a facility) work cases; admins also manage facilities. */
@@ -29,6 +30,7 @@ export default function TourismDesk({
   professionals = [],
   reviews = [],
   bookings = [],
+  embedded = false,
 }: TourismDeskProps) {
   const [tab, setTab] = useState<'cases' | 'facilities'>('cases');
   const [me, setMe] = useState<any>(null);
@@ -36,6 +38,36 @@ export default function TourismDesk({
   useEffect(() => { jget('/api/tourism/desk/me').then(d => d.status === 'success' && setMe(d.data)).catch(() => {}); }, []);
 
   const isPractitioner = currentUser?.role === 'practitioner' || (!isAdmin && currentUser);
+
+  if (embedded) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--t-200)] pb-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { setTab('cases'); setOpen(null); }}
+              className={`px-3.5 py-1.5 text-xs font-bold cursor-pointer transition-colors ${tab === 'cases' ? 'bg-[color:var(--t-600)] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+            >
+              Cross-Border Patient Cases
+            </button>
+            {isAdmin && (
+              <button
+                onClick={() => { setTab('facilities'); setOpen(null); }}
+                className={`px-3.5 py-1.5 text-xs font-bold cursor-pointer transition-colors ${tab === 'facilities' ? 'bg-[color:var(--t-600)] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+              >
+                Facilities Management
+              </button>
+            )}
+          </div>
+          <span className="text-xs text-slate-500 font-semibold">International Patient Dossiers & Treatment Quotes</span>
+        </div>
+        {tab === 'cases' && (me && me.facilities.length === 0
+          ? <p className="text-sm bg-white border border-dashed border-slate-300 p-6 text-center text-slate-600">You are not assigned to a facility yet. An admin adds you from Global Patient Services &gt; Facilities.</p>
+          : open ? <StaffCase id={open} onBack={() => setOpen(null)} /> : <CaseQueue onOpen={setOpen} />)}
+        {tab === 'facilities' && isAdmin && <FacilityAdmin />}
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-0">

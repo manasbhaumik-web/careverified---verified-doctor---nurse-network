@@ -5,7 +5,7 @@ import {
   Award, FileText, Loader, 
   CheckCircle2, AlertCircle, Edit, Shield, ShieldCheck, MessageSquare, 
   X, Send, Check, Calendar, TrendingUp, Eye, LayoutGrid, Wallet, Radio,
-  Star, SlidersHorizontal
+  Star, SlidersHorizontal, Globe
 } from 'lucide-react';
 import { UserRole, DoctorProfile, NurseProfile, Review, VerificationStatus, Booking, OnCallDispatch } from '../types';
 import PractitionerOverviewTab from './practitioner/PractitionerOverviewTab';
@@ -18,11 +18,12 @@ import PractitionerEarnings from './PractitionerEarnings';
 import PractitionerOnCall from './PractitionerOnCall';
 import PractitionerQuality from './PractitionerQuality';
 import SecureMessenger from './SecureMessenger';
+import TourismDesk from './TourismDesk';
 import PractitionerHeroBanner from './PractitionerHeroBanner';
 import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from './DashboardHeader';
 import PageBanner from './PageBanner';
 
-export type PractitionerDashboardTab = 'home' | 'bookings' | 'oncall' | 'messages' | 'earnings' | 'quality' | 'accreditation' | 'reviews' | 'analytics' | 'settings';
+export type PractitionerDashboardTab = 'home' | 'bookings' | 'oncall' | 'messages' | 'global' | 'earnings' | 'quality' | 'accreditation' | 'reviews' | 'analytics' | 'settings';
 export type PractitionerTabGroup = 'clinical' | 'practice' | 'performance';
 
 export const PRACTITIONER_GROUPS: Record<PractitionerTabGroup, {
@@ -38,6 +39,7 @@ export const PRACTITIONER_GROUPS: Record<PractitionerTabGroup, {
       { id: 'bookings', label: 'Bookings', icon: Calendar },
       { id: 'oncall', label: 'On Call', icon: Radio },
       { id: 'messages', label: 'Mailbox', icon: MessageSquare },
+      { id: 'global', label: 'Global Patients', icon: Globe },
     ],
   },
   practice: {
@@ -601,6 +603,20 @@ export default function VerificationTerminal({
         {activeDashboardTab === 'messages' && (
           <div id="panel-messages" role="tabpanel" aria-labelledby="tab-messages" tabIndex={0} className="space-y-6 animate-fade-in">
             <SecureMessenger currentUserId={currentUser?.profileId || currentUser?.id || matchedProfile.id} embedded={true} />
+          </div>
+        )}
+
+        {/* TAB CONTENT: GLOBAL PATIENTS & CROSS-BORDER SERVICES */}
+        {activeDashboardTab === 'global' && (
+          <div id="panel-global" role="tabpanel" aria-labelledby="tab-global" tabIndex={0} className="space-y-6 animate-fade-in">
+            <TourismDesk
+              isAdmin={currentUser?.role === 'admin'}
+              embedded={true}
+              currentUser={currentUser}
+              professionals={professionals}
+              reviews={reviews}
+              bookings={bookings}
+            />
           </div>
         )}
 

@@ -374,7 +374,6 @@ export default function App() {
     if (isPackageEnabled('articles')) {
       navItems.push({ id: 'articles', name: 'Medical Library', icon: BookOpen });
     }
-    navItems.push({ id: 'tourism_desk', name: 'Global Patient Services', icon: Plane });
     navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
   } else if (currentUser.role === 'facility') {
     navItems.push({ id: 'facility_workspace', name: 'Facility Hub', icon: Building2 });
@@ -852,9 +851,21 @@ export default function App() {
               <MedicalTourism onOpenProfessional={(id) => { setSelectedProfId(id); setActiveView('registry'); }} />
             )}
 
-            {activeView === 'tourism_desk' && (currentUser.role === 'practitioner' || currentUser.role === 'admin') && (
+            {activeView === 'tourism_desk' && currentUser.role === 'practitioner' && (
+              <VerificationTerminal
+                currentUser={currentUser}
+                professionals={professionals}
+                reviews={reviews}
+                bookings={bookings}
+                onRefreshData={loadData}
+                activeGroup="clinical"
+                initialTab="global"
+              />
+            )}
+
+            {activeView === 'tourism_desk' && currentUser.role === 'admin' && (
               <TourismDesk
-                isAdmin={currentUser.role === 'admin'}
+                isAdmin={true}
                 currentUser={currentUser}
                 professionals={professionals}
                 reviews={reviews}
