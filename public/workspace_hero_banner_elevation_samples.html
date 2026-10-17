@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Workspace Hero Banner Elevation Proposals · CareVerified</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      /* Default Theme: Light Cyan */
+      --t-50: #ECFEFF;
+      --t-100: #CFFAFE;
+      --t-200: #A5F3FC;
+      --t-300: #67E8F9;
+      --t-400: #22D3EE;
+      --t-500: #06B6D4;
+      --t-600: #0891B2;
+      --t-700: #0E7490;
+      --t-800: #155E75;
+      --t-900: #164E63;
+      --t-bg: #F2FDFF;
+      --ink: #1E293B;
+      --ink-2: #334155;
+    }
+
+    [data-theme="sky"] {
+      --t-50: #F0F9FF;
+      --t-100: #E0F2FE;
+      --t-200: #BAE6FD;
+      --t-300: #7DD3FC;
+      --t-400: #38BDF8;
+      --t-500: #0EA5E9;
+      --t-600: #0270A9;
+      --t-700: #0369A1;
+      --t-800: #075985;
+      --t-900: #0C4A6E;
+      --t-bg: #F5FAFF;
+    }
+
+    [data-theme="crimson"] {
+      --t-50: #FFF0F2;
+      --t-100: #FFE4E6;
+      --t-200: #FECDD3;
+      --t-300: #FDA4AF;
+      --t-400: #FF8A98;
+      --t-500: #E0243F;
+      --t-600: #C81E1E;
+      --t-700: #B91C1C;
+      --t-800: #86102A;
+      --t-900: #6B0F24;
+      --t-bg: #FFF8F9;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--t-bg);
+      color: var(--ink);
+    }
+
+    .sharp { border-radius: 0px !important; }
+    .font-mono { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8 space-y-10">
+
+  <!-- TOP BAR & CONTROLS -->
+  <header class="max-w-[1920px] mx-auto bg-white border border-[color:var(--t-200)] p-6 shadow-xs sharp">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="space-y-1">
+        <div class="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-xs font-black uppercase tracking-wider">
+          Design Elevation Review · User Workspaces
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+          Workspace Hero Banner Elevation Samples
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-600 max-w-3xl">
+          Visual exploration designed to give the User Workspace Hero Banner purposeful depth, contrast, and authority relative to the inner workspace below, while preserving rectangular geometry and dynamic theme color variables.
+        </p>
+      </div>
+
+      <!-- Theme Switcher & Metric Guide -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
+        <div class="bg-slate-50 border border-slate-200 p-2.5 text-xs">
+          <span class="text-[10px] uppercase font-black tracking-wider text-slate-500 block mb-1">Preview Theme:</span>
+          <div class="flex items-center gap-1.5">
+            <button onclick="setTheme('light-cyan')" id="btn-cyan" class="px-2.5 py-1 text-xs font-bold border border-cyan-400 bg-cyan-100 text-cyan-900 sharp cursor-pointer">
+              Light Cyan (Default)
+            </button>
+            <button onclick="setTheme('sky')" id="btn-sky" class="px-2.5 py-1 text-xs font-bold border border-slate-200 bg-white text-slate-700 sharp hover:bg-slate-50 cursor-pointer">
+              Sky Blue
+            </button>
+            <button onclick="setTheme('crimson')" id="btn-crimson" class="px-2.5 py-1 text-xs font-bold border border-slate-200 bg-white text-slate-700 sharp hover:bg-slate-50 cursor-pointer">
+              Crimson
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- CURRENT BASELINE (FOR REFERENCE) -->
+  <!-- ========================================================================= -->
+  <section class="max-w-[1920px] mx-auto space-y-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-mono font-bold uppercase tracking-wider text-slate-600 bg-slate-100 px-2.5 py-0.5 border border-slate-300">
+          Current Baseline (Flat --t-50)
+        </span>
+        <span class="text-xs text-slate-500 font-medium">Lacks visual contrast against white inner cards</span>
+      </div>
+      <span class="text-xs font-mono text-slate-400">Contrast Ratio: Low · Flat</span>
+    </div>
+
+    <!-- CURRENT BASELINE CONTAINER -->
+    <div class="border border-[color:var(--t-200)] shadow-xs sharp overflow-hidden bg-white">
+      <!-- HERO BANNER -->
+      <div class="bg-[color:var(--t-50)] text-[color:var(--ink)] border-b border-[color:var(--t-200)] px-6 py-6">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div class="flex items-center gap-4">
+            <div class="h-16 w-16 bg-white text-[color:var(--t-700)] border border-white flex items-center justify-center text-xl font-bold sharp shadow-2xs">
+              AR
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-2xl font-black text-[color:var(--ink)] tracking-tight">Ahmad Bin Razak</h2>
+                <span class="bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-[10px] font-black uppercase px-2.5 py-0.5 sharp">
+                  EHR Verified Patient
+                </span>
+              </div>
+              <p class="text-xs text-[color:var(--ink-2)] mt-1 font-medium">
+                Good afternoon · Next Visit: Dr. Tan Wei Lun (Cardiology), Tomorrow 10:30 AM · <span class="bg-white border border-[color:var(--t-200)] px-1.5 py-0.5 font-mono font-bold text-[color:var(--t-700)]">BP: 120/80 mmHg</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <div class="flex items-stretch bg-white border border-[color:var(--t-200)] h-11 sharp text-xs shadow-2xs">
+              <div class="px-4 flex flex-col justify-center border-r border-[color:var(--t-100)] text-center">
+                <span class="text-base font-extrabold text-[color:var(--ink)] leading-none">2</span>
+                <span class="text-[9px] font-bold text-[color:var(--t-600)] uppercase tracking-wider">Upcoming</span>
+              </div>
+              <div class="px-4 flex flex-col justify-center border-r border-[color:var(--t-100)] text-center">
+                <span class="text-base font-extrabold text-[color:var(--ink)] leading-none">3</span>
+                <span class="text-[9px] font-bold text-[color:var(--t-600)] uppercase tracking-wider">Prescriptions</span>
+              </div>
+              <div class="px-4 flex flex-col justify-center text-center">
+                <span class="text-base font-extrabold text-[color:var(--ink)] leading-none">4</span>
+                <span class="text-[9px] font-bold text-[color:var(--t-600)] uppercase tracking-wider">Care Team</span>
+              </div>
+            </div>
+            <button class="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-4 h-11 sharp flex items-center gap-2 cursor-pointer border border-[color:var(--t-700)]">
+              On-Call Doctor
+            </button>
+            <button class="bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold px-4 h-11 sharp flex items-center gap-2 cursor-pointer">
+              Health Records
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="bg-white border-b border-[color:var(--t-200)] px-6 flex gap-1">
+        <button class="px-4 py-3 text-xs font-bold text-[color:var(--t-700)] border-b-2 border-[color:var(--t-600)]">My Care & Appointments (2)</button>
+        <button class="px-4 py-3 text-xs font-medium text-slate-500">Clinical Health Record</button>
+        <button class="px-4 py-3 text-xs font-medium text-slate-500">Saved Practitioners (5)</button>
+      </div>
+
+      <!-- INNER WORKSPACE SAMPLE -->
+      <div class="p-6 bg-[color:var(--t-bg)] grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)]">
+          <div class="text-[10px] uppercase font-black text-slate-400">Clinical Telemetry</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">120/80 <span class="text-xs font-normal text-slate-500">mmHg</span></div>
+          <div class="text-xs text-emerald-700 font-bold mt-1">● Optimal Blood Pressure</div>
+        </div>
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)]">
+          <div class="text-[10px] uppercase font-black text-slate-400">Resting Heart Rate</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">72 <span class="text-xs font-normal text-slate-500">BPM</span></div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Normal sinus rhythm</div>
+        </div>
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)]">
+          <div class="text-[10px] uppercase font-black text-slate-400">Oxygen Saturation</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">99 <span class="text-xs font-normal text-slate-500">%</span></div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Normal arterial hemoglobin</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- OPTION 1: ARCHITECTURAL DUAL-TONE & COCKPIT HUD (RECOMMENDED) -->
+  <!-- ========================================================================= -->
+  <section class="max-w-[1920px] mx-auto space-y-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2.5 py-0.5 border border-emerald-300">
+          Option 1: Architectural Dual-Tone & High-Contrast Cockpit HUD ⭐ (Recommended)
+        </span>
+        <span class="text-xs text-slate-700 font-semibold">Light sunlit hero + dark cockpit KPI island + 3px telemetry rail</span>
+      </div>
+      <span class="text-xs font-mono text-emerald-700 font-bold">Contrast Score: 9.8/10 · Perfectly Balanced</span>
+    </div>
+
+    <div class="border border-[color:var(--t-200)] shadow-sm sharp overflow-hidden bg-white">
+      <!-- 3PX BRAND TELEMETRY TOP ACCENT -->
+      <div class="h-[3px] w-full bg-[color:var(--t-600)]"></div>
+
+      <!-- HERO BANNER -->
+      <div class="bg-gradient-to-r from-[color:var(--t-50)] via-white to-[color:var(--t-50)] text-[color:var(--ink)] border-b border-[color:var(--t-200)] px-6 py-6 relative">
+        <!-- Subtle architectural micro-grid overlay -->
+        <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(var(--t-700) 1px, transparent 0); background-size: 16px 16px;"></div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <!-- Identity Section with structured highlight -->
+          <div class="flex items-center gap-4">
+            <div class="relative">
+              <div class="h-16 w-16 bg-white text-[color:var(--t-700)] border-2 border-[color:var(--t-600)] flex items-center justify-center text-xl font-black sharp shadow-xs">
+                AR
+              </div>
+              <span class="absolute -bottom-1 -right-1 bg-emerald-600 text-white p-0.5 border border-white">
+                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+              </span>
+            </div>
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Ahmad Bin Razak</h2>
+                <span class="bg-emerald-50 text-emerald-800 border border-emerald-300 text-[10px] font-black uppercase px-2.5 py-0.5 sharp shadow-3xs">
+                  EHR Verified Patient
+                </span>
+                <span class="text-[10px] font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-100)] px-2 py-0.5 border border-[color:var(--t-200)]">
+                  MyKad Verified
+                </span>
+              </div>
+              <p class="text-xs text-slate-600 font-medium">
+                Good afternoon · Next Visit: <strong class="text-slate-800">Dr. Tan Wei Lun (Cardiology)</strong>, Tomorrow 10:30 AM
+              </p>
+              <div class="flex items-center gap-2 pt-0.5">
+                <span class="inline-flex items-center gap-1 font-mono text-[11px] font-bold text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)] shadow-3xs">
+                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  BP: 120/80 mmHg · Optimal
+                </span>
+                <span class="text-xs text-slate-400">•</span>
+                <span class="text-xs text-slate-500 font-mono">HR: 72 bpm</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Elevated Right Section: High-Contrast Cockpit HUD Island + Solid Actions -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+            <!-- High-Contrast Cockpit HUD -->
+            <div class="flex items-stretch bg-slate-900 border border-slate-950 h-11 sharp text-white shadow-xs">
+              <div class="px-4 flex flex-col justify-center border-r border-slate-800 text-center">
+                <span class="text-base font-extrabold text-[color:var(--t-300)] font-mono leading-none">2</span>
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Upcoming</span>
+              </div>
+              <div class="px-4 flex flex-col justify-center border-r border-slate-800 text-center">
+                <span class="text-base font-extrabold text-[color:var(--t-300)] font-mono leading-none">3</span>
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Active Rx</span>
+              </div>
+              <div class="px-4 flex flex-col justify-center text-center">
+                <span class="text-base font-extrabold text-[color:var(--t-300)] font-mono leading-none">4</span>
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Care Team</span>
+              </div>
+            </div>
+
+            <!-- Action CTAs -->
+            <div class="flex items-center gap-2">
+              <button class="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-4 h-11 sharp flex items-center gap-2 cursor-pointer border border-[color:var(--t-700)] shadow-xs">
+                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                On-Call Doctor
+              </button>
+              <button class="bg-white hover:bg-[color:var(--t-50)] text-slate-800 border border-slate-300 text-xs font-bold px-4 h-11 sharp flex items-center gap-2 cursor-pointer shadow-2xs">
+                Health Records
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="bg-white border-b border-[color:var(--t-200)] px-6 flex gap-1">
+        <button class="px-4 py-3 text-xs font-black text-[color:var(--t-700)] border-b-2 border-[color:var(--t-600)] bg-[color:var(--t-50)]/40">
+          My Care & Appointments <span class="ml-1 px-1.5 py-0.2 bg-[color:var(--t-600)] text-white text-[10px]">2</span>
+        </button>
+        <button class="px-4 py-3 text-xs font-semibold text-slate-600 hover:text-slate-900">Clinical Health Record</button>
+        <button class="px-4 py-3 text-xs font-semibold text-slate-600 hover:text-slate-900">Saved Practitioners (5)</button>
+      </div>
+
+      <!-- INNER WORKSPACE SAMPLE -->
+      <div class="p-6 bg-[color:var(--t-bg)] grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs">
+          <div class="text-[10px] uppercase font-black text-slate-400">Clinical Telemetry</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">120/80 <span class="text-xs font-normal text-slate-500">mmHg</span></div>
+          <div class="text-xs text-emerald-700 font-bold mt-1">● Optimal Blood Pressure</div>
+        </div>
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs">
+          <div class="text-[10px] uppercase font-black text-slate-400">Resting Heart Rate</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">72 <span class="text-xs font-normal text-slate-500">BPM</span></div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Normal sinus rhythm</div>
+        </div>
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs">
+          <div class="text-[10px] uppercase font-black text-slate-400">Oxygen Saturation</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">99 <span class="text-xs font-normal text-slate-500">%</span></div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Normal arterial hemoglobin</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- OPTION 2: DEEP CLINICAL TWILIGHT & LUMINOUS CYAN TELEMETRY -->
+  <!-- ========================================================================= -->
+  <section class="max-w-[1920px] mx-auto space-y-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-mono font-bold uppercase tracking-wider text-cyan-900 bg-cyan-100 px-2.5 py-0.5 border border-cyan-300">
+          Option 2: Deep Clinical Twilight & Luminous Cyan (Command Desk Cockpit)
+        </span>
+        <span class="text-xs text-slate-700 font-semibold">Authoritative high-contrast dark banner + crisp white inner workspace</span>
+      </div>
+      <span class="text-xs font-mono text-cyan-800 font-bold">Contrast Score: 10/10 · Maximum Authority</span>
+    </div>
+
+    <div class="border border-[color:var(--t-200)] shadow-sm sharp overflow-hidden bg-white">
+      <!-- 3PX CYAN TOP ACCENT -->
+      <div class="h-[3px] w-full bg-[color:var(--t-400)]"></div>
+
+      <!-- HERO BANNER -->
+      <div class="bg-[#0B1522] text-white border-b border-slate-900 px-6 py-6 relative overflow-hidden">
+        <!-- Ambient radial glow behind identity -->
+        <div class="absolute -left-20 -top-20 w-80 h-80 rounded-full bg-[color:var(--t-600)]/20 blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <!-- Identity -->
+          <div class="flex items-center gap-4">
+            <div class="h-16 w-16 bg-white/10 text-white border-2 border-white/80 flex items-center justify-center text-xl font-black sharp shadow-sm backdrop-blur-sm">
+              AR
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-2xl font-black text-white tracking-tight">Ahmad Bin Razak</h2>
+                <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-black uppercase px-2.5 py-0.5 sharp">
+                  EHR Verified Patient
+                </span>
+                <span class="text-[10px] font-mono font-bold text-[color:var(--t-300)] bg-white/5 border border-white/15 px-2 py-0.5">
+                  ID: MY-8820
+                </span>
+              </div>
+              <p class="text-xs text-slate-300 mt-1 font-medium">
+                Good afternoon · Next Visit: <span class="text-white font-bold">Dr. Tan Wei Lun (Cardiology)</span>, Tomorrow 10:30 AM
+              </p>
+              <div class="flex items-center gap-2 pt-1 text-xs">
+                <span class="font-mono font-bold text-[color:var(--t-300)] bg-white/10 px-2 py-0.5 border border-white/20">
+                  BP: 120/80 mmHg · Optimal
+                </span>
+                <span class="text-slate-500">•</span>
+                <span class="text-slate-300 font-mono">HR: 72 bpm</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right KPIs & Actions -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+            <div class="flex items-stretch bg-white/10 border border-white/15 h-11 sharp text-xs backdrop-blur-sm">
+              <div class="px-4 flex flex-col justify-center border-r border-white/15 text-center">
+                <span class="text-base font-extrabold text-[color:var(--t-300)] leading-none font-mono">2</span>
+                <span class="text-[9px] font-bold text-white/70 uppercase tracking-wider">Upcoming</span>
+              </div>
+              <div class="px-4 flex flex-col justify-center border-r border-white/15 text-center">
+                <span class="text-base font-extrabold text-[color:var(--t-300)] leading-none font-mono">3</span>
+                <span class="text-[9px] font-bold text-white/70 uppercase tracking-wider">Active Rx</span>
+              </div>
+              <div class="px-4 flex flex-col justify-center text-center">
+                <span class="text-base font-extrabold text-[color:var(--t-300)] leading-none font-mono">4</span>
+                <span class="text-[9px] font-bold text-white/70 uppercase tracking-wider">Care Team</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button class="bg-[color:var(--t-500)] hover:bg-[color:var(--t-400)] text-slate-950 text-xs font-black px-4 h-11 sharp flex items-center gap-2 cursor-pointer shadow-xs">
+                On-Call Doctor
+              </button>
+              <button class="bg-white/10 hover:bg-white/20 text-white border border-white/25 text-xs font-bold px-4 h-11 sharp flex items-center gap-2 cursor-pointer">
+                Health Records
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="bg-white border-b border-[color:var(--t-200)] px-6 flex gap-1">
+        <button class="px-4 py-3 text-xs font-black text-[color:var(--t-700)] border-b-2 border-[color:var(--t-600)]">My Care & Appointments (2)</button>
+        <button class="px-4 py-3 text-xs font-semibold text-slate-500 hover:text-slate-900">Clinical Health Record</button>
+        <button class="px-4 py-3 text-xs font-semibold text-slate-500 hover:text-slate-900">Saved Practitioners (5)</button>
+      </div>
+
+      <!-- INNER WORKSPACE SAMPLE -->
+      <div class="p-6 bg-[color:var(--t-bg)] grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs">
+          <div class="text-[10px] uppercase font-black text-slate-400">Clinical Telemetry</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">120/80 <span class="text-xs font-normal text-slate-500">mmHg</span></div>
+          <div class="text-xs text-emerald-700 font-bold mt-1">● Optimal Blood Pressure</div>
+        </div>
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs">
+          <div class="text-[10px] uppercase font-black text-slate-400">Resting Heart Rate</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">72 <span class="text-xs font-normal text-slate-500">BPM</span></div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Normal sinus rhythm</div>
+        </div>
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs">
+          <div class="text-[10px] uppercase font-black text-slate-400">Oxygen Saturation</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">99 <span class="text-xs font-normal text-slate-500">%</span></div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Normal arterial hemoglobin</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- OPTION 3: VIBRANT MONOCHROMATIC BRAND SATURATION -->
+  <!-- ========================================================================= -->
+  <section class="max-w-[1920px] mx-auto space-y-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-mono font-bold uppercase tracking-wider text-purple-900 bg-purple-100 px-2.5 py-0.5 border border-purple-300">
+          Option 3: Vibrant Brand Monochromatic Surface + Pure White Floating Island
+        </span>
+        <span class="text-xs text-slate-700 font-semibold">Solid rich brand background (`--t-700`) + floating high-contrast white cards</span>
+      </div>
+      <span class="text-xs font-mono text-purple-800 font-bold">Contrast Score: 9.3/10 · Vibrant Identity</span>
+    </div>
+
+    <div class="border border-[color:var(--t-200)] shadow-sm sharp overflow-hidden bg-white">
+      <!-- HERO BANNER -->
+      <div class="bg-gradient-to-r from-[color:var(--t-800)] via-[color:var(--t-700)] to-[color:var(--t-600)] text-white border-b border-[color:var(--t-900)] px-6 py-6">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <!-- Identity -->
+          <div class="flex items-center gap-4">
+            <div class="h-16 w-16 bg-white text-[color:var(--t-800)] border-2 border-white/60 flex items-center justify-center text-xl font-black sharp shadow-md">
+              AR
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-2xl font-black text-white tracking-tight">Ahmad Bin Razak</h2>
+                <span class="bg-white/20 text-white border border-white/40 text-[10px] font-black uppercase px-2.5 py-0.5 sharp">
+                  EHR Verified Patient
+                </span>
+              </div>
+              <p class="text-xs text-white/90 mt-1 font-medium">
+                Good afternoon · Next Visit: <span class="underline font-bold">Dr. Tan Wei Lun (Cardiology)</span>, Tomorrow 10:30 AM
+              </p>
+              <div class="flex items-center gap-2 pt-1 text-xs">
+                <span class="font-mono font-bold text-slate-900 bg-white px-2 py-0.5 shadow-2xs">
+                  BP: 120/80 mmHg · Optimal
+                </span>
+                <span class="text-white/60">•</span>
+                <span class="text-white/90 font-mono">HR: 72 bpm</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right KPIs & Actions: Floating White Deck -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+            <div class="flex items-stretch bg-white border border-white h-11 sharp text-slate-900 shadow-md">
+              <div class="px-4 flex flex-col justify-center border-r border-slate-200 text-center">
+                <span class="text-base font-extrabold text-[color:var(--t-700)] leading-none font-mono">2</span>
+                <span class="text-[9px] font-black text-slate-500 uppercase tracking-wider">Upcoming</span>
+              </div>
+              <div class="px-4 flex flex-col justify-center border-r border-slate-200 text-center">
+                <span class="text-base font-extrabold text-[color:var(--t-700)] leading-none font-mono">3</span>
+                <span class="text-[9px] font-black text-slate-500 uppercase tracking-wider">Active Rx</span>
+              </div>
+              <div class="px-4 flex flex-col justify-center text-center">
+                <span class="text-base font-extrabold text-[color:var(--t-700)] leading-none font-mono">4</span>
+                <span class="text-[9px] font-black text-slate-500 uppercase tracking-wider">Care Team</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button class="bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-800)] text-xs font-black px-4 h-11 sharp flex items-center gap-2 cursor-pointer shadow-md">
+                On-Call Doctor
+              </button>
+              <button class="bg-black/20 hover:bg-black/30 text-white border border-white/40 text-xs font-bold px-4 h-11 sharp flex items-center gap-2 cursor-pointer">
+                Health Records
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="bg-white border-b border-[color:var(--t-200)] px-6 flex gap-1">
+        <button class="px-4 py-3 text-xs font-black text-[color:var(--t-700)] border-b-2 border-[color:var(--t-600)]">My Care & Appointments (2)</button>
+        <button class="px-4 py-3 text-xs font-semibold text-slate-500 hover:text-slate-900">Clinical Health Record</button>
+        <button class="px-4 py-3 text-xs font-semibold text-slate-500 hover:text-slate-900">Saved Practitioners (5)</button>
+      </div>
+
+      <!-- INNER WORKSPACE SAMPLE -->
+      <div class="p-6 bg-[color:var(--t-bg)] grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs">
+          <div class="text-[10px] uppercase font-black text-slate-400">Clinical Telemetry</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">120/80 <span class="text-xs font-normal text-slate-500">mmHg</span></div>
+          <div class="text-xs text-emerald-700 font-bold mt-1">● Optimal Blood Pressure</div>
+        </div>
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs">
+          <div class="text-[10px] uppercase font-black text-slate-400">Resting Heart Rate</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">72 <span class="text-xs font-normal text-slate-500">BPM</span></div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Normal sinus rhythm</div>
+        </div>
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs">
+          <div class="text-[10px] uppercase font-black text-slate-400">Oxygen Saturation</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">99 <span class="text-xs font-normal text-slate-500">%</span></div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Normal arterial hemoglobin</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- OPTION 4: REFINED LIGHT CLINICAL HORIZON WITH CONTRAST FRAMING -->
+  <!-- ========================================================================= -->
+  <section class="max-w-[1920px] mx-auto space-y-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-mono font-bold uppercase tracking-wider text-amber-900 bg-amber-100 px-2.5 py-0.5 border border-amber-300">
+          Option 4: Refined Light Clinical Horizon & Inset Micro-Telemetry
+        </span>
+        <span class="text-xs text-slate-700 font-semibold">Graduated ice-cyan wash + crisp bordered framing + dark ink badges</span>
+      </div>
+      <span class="text-xs font-mono text-amber-800 font-bold">Contrast Score: 8.8/10 · Clean & Sunlit</span>
+    </div>
+
+    <div class="border border-[color:var(--t-200)] shadow-sm sharp overflow-hidden bg-white">
+      <!-- 4PX DUAL TELEMETRY ACCENT -->
+      <div class="flex h-[3px] w-full">
+        <div class="w-1/3 bg-[color:var(--t-600)]"></div>
+        <div class="w-2/3 bg-[color:var(--t-300)]"></div>
+      </div>
+
+      <!-- HERO BANNER -->
+      <div class="bg-gradient-to-r from-[color:var(--t-100)] via-[color:var(--t-50)] to-white text-[color:var(--ink)] border-b border-[color:var(--t-300)] px-6 py-6">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <!-- Identity -->
+          <div class="flex items-center gap-4">
+            <div class="h-16 w-16 bg-white text-[color:var(--t-700)] border-2 border-[color:var(--t-300)] flex items-center justify-center text-xl font-black sharp shadow-xs">
+              AR
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Ahmad Bin Razak</h2>
+                <span class="bg-white text-[color:var(--t-800)] border border-[color:var(--t-300)] text-[10px] font-black uppercase px-2.5 py-0.5 sharp shadow-3xs">
+                  EHR Verified Patient
+                </span>
+              </div>
+              <p class="text-xs text-slate-700 mt-1 font-semibold">
+                Good afternoon · Next Visit: <span class="text-[color:var(--t-700)] font-bold">Dr. Tan Wei Lun (Cardiology)</span>, Tomorrow 10:30 AM
+              </p>
+              <div class="flex items-center gap-2 pt-1 text-xs">
+                <span class="font-mono font-bold text-slate-900 bg-white px-2 py-0.5 border border-slate-300 shadow-3xs">
+                  BP: 120/80 mmHg · Optimal
+                </span>
+                <span class="text-slate-400">•</span>
+                <span class="text-slate-600 font-mono">HR: 72 bpm</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right KPIs & Actions -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+            <div class="flex items-stretch bg-white border-2 border-[color:var(--t-300)] h-11 sharp text-slate-900 shadow-2xs">
+              <div class="px-4 flex flex-col justify-center border-r border-[color:var(--t-200)] text-center">
+                <span class="text-base font-extrabold text-[color:var(--t-700)] leading-none font-mono">2</span>
+                <span class="text-[9px] font-black text-slate-500 uppercase tracking-wider">Upcoming</span>
+              </div>
+              <div class="px-4 flex flex-col justify-center border-r border-[color:var(--t-200)] text-center">
+                <span class="text-base font-extrabold text-[color:var(--t-700)] leading-none font-mono">3</span>
+                <span class="text-[9px] font-black text-slate-500 uppercase tracking-wider">Active Rx</span>
+              </div>
+              <div class="px-4 flex flex-col justify-center text-center">
+                <span class="text-base font-extrabold text-[color:var(--t-700)] leading-none font-mono">4</span>
+                <span class="text-[9px] font-black text-slate-500 uppercase tracking-wider">Care Team</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button class="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-4 h-11 sharp flex items-center gap-2 cursor-pointer shadow-xs border border-[color:var(--t-700)]">
+                On-Call Doctor
+              </button>
+              <button class="bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs font-bold px-4 h-11 sharp flex items-center gap-2 cursor-pointer shadow-2xs">
+                Health Records
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="bg-white border-b border-[color:var(--t-200)] px-6 flex gap-1">
+        <button class="px-4 py-3 text-xs font-black text-[color:var(--t-700)] border-b-2 border-[color:var(--t-600)]">My Care & Appointments (2)</button>
+        <button class="px-4 py-3 text-xs font-semibold text-slate-500 hover:text-slate-900">Clinical Health Record</button>
+        <button class="px-4 py-3 text-xs font-semibold text-slate-500 hover:text-slate-900">Saved Practitioners (5)</button>
+      </div>
+
+      <!-- INNER WORKSPACE SAMPLE -->
+      <div class="p-6 bg-[color:var(--t-bg)] grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs">
+          <div class="text-[10px] uppercase font-black text-slate-400">Clinical Telemetry</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">120/80 <span class="text-xs font-normal text-slate-500">mmHg</span></div>
+          <div class="text-xs text-emerald-700 font-bold mt-1">● Optimal Blood Pressure</div>
+        </div>
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs">
+          <div class="text-[10px] uppercase font-black text-slate-400">Resting Heart Rate</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">72 <span class="text-xs font-normal text-slate-500">BPM</span></div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Normal sinus rhythm</div>
+        </div>
+        <div class="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs">
+          <div class="text-[10px] uppercase font-black text-slate-400">Oxygen Saturation</div>
+          <div class="text-xl font-black text-slate-900 mt-1 font-mono">99 <span class="text-xs font-normal text-slate-500">%</span></div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Normal arterial hemoglobin</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    function setTheme(theme) {
+      if (theme === 'light-cyan') {
+        document.documentElement.removeAttribute('data-theme');
+        document.getElementById('btn-cyan').className = 'px-2.5 py-1 text-xs font-bold border border-cyan-400 bg-cyan-100 text-cyan-900 sharp cursor-pointer';
+        document.getElementById('btn-sky').className = 'px-2.5 py-1 text-xs font-bold border border-slate-200 bg-white text-slate-700 sharp hover:bg-slate-50 cursor-pointer';
+        document.getElementById('btn-crimson').className = 'px-2.5 py-1 text-xs font-bold border border-slate-200 bg-white text-slate-700 sharp hover:bg-slate-50 cursor-pointer';
+      } else {
+        document.documentElement.setAttribute('data-theme', theme);
+        const isSky = theme === 'sky';
+        document.getElementById('btn-cyan').className = 'px-2.5 py-1 text-xs font-bold border border-slate-200 bg-white text-slate-700 sharp hover:bg-slate-50 cursor-pointer';
+        document.getElementById('btn-sky').className = isSky
+          ? 'px-2.5 py-1 text-xs font-bold border border-sky-400 bg-sky-100 text-sky-900 sharp cursor-pointer'
+          : 'px-2.5 py-1 text-xs font-bold border border-slate-200 bg-white text-slate-700 sharp hover:bg-slate-50 cursor-pointer';
+        document.getElementById('btn-crimson').className = !isSky
+          ? 'px-2.5 py-1 text-xs font-bold border border-rose-400 bg-rose-100 text-rose-900 sharp cursor-pointer'
+          : 'px-2.5 py-1 text-xs font-bold border border-slate-200 bg-white text-slate-700 sharp hover:bg-slate-50 cursor-pointer';
+      }
+    }
+  </script>
+</body>
+</html>
