@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Award, FileText, Loader, 
   CheckCircle2, AlertCircle, Edit, Shield, MessageSquare, 
-  X, Send, Check, Calendar, TrendingUp, Eye, LayoutGrid
+  X, Send, Check, Calendar, TrendingUp, Eye, LayoutGrid, Wallet
 } from 'lucide-react';
 import { UserRole, DoctorProfile, NurseProfile, Review, VerificationStatus, Booking, OnCallDispatch } from '../types';
 import PractitionerOverviewTab from './practitioner/PractitionerOverviewTab';
@@ -14,8 +14,11 @@ import PractitionerBookingsTab from './practitioner/PractitionerBookingsTab';
 import PractitionerFeedbackTab from './practitioner/PractitionerFeedbackTab';
 import PractitionerAnalyticsTab from './practitioner/PractitionerAnalyticsTab';
 import PractitionerSettingsTab from './practitioner/PractitionerSettingsTab';
+import PractitionerEarnings from './PractitionerEarnings';
 import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from './DashboardHeader';
 import PageBanner from './PageBanner';
+
+export type PractitionerDashboardTab = 'home' | 'bookings' | 'earnings' | 'accreditation' | 'reviews' | 'analytics' | 'settings';
 
 interface VerificationTerminalProps {
   currentUser?: { role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; avatarUrl?: string; profileId?: string | null } | null;
@@ -23,6 +26,7 @@ interface VerificationTerminalProps {
   reviews?: Review[];
   bookings?: Booking[];
   onRefreshData?: () => void;
+  initialTab?: PractitionerDashboardTab;
 }
 
 export default function VerificationTerminal({ 
@@ -30,7 +34,8 @@ export default function VerificationTerminal({
   professionals = [], 
   reviews = [], 
   bookings = [], 
-  onRefreshData 
+  onRefreshData,
+  initialTab
 }: VerificationTerminalProps) {
   // Try to match logged in practitioner with an existing registry profile
   const matchedProfile = professionals.find(p => 
@@ -38,7 +43,14 @@ export default function VerificationTerminal({
   );
 
   // Dashboard state variables (for registered practitioner)
-  const [activeDashboardTab, setActiveDashboardTab] = useState<'home' | 'accreditation' | 'bookings' | 'reviews' | 'analytics' | 'settings'>('home');
+  const [activeDashboardTab, setActiveDashboardTab] = useState<PractitionerDashboardTab>(initialTab || 'home');
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveDashboardTab(initialTab);
+    }
+  }, [initialTab]);
+
   const [editBio, setEditBio] = useState('');
   const [editFee, setEditFee] = useState(0);
   const [editAddress, setEditAddress] = useState('');
@@ -335,8 +347,8 @@ export default function VerificationTerminal({
       .filter(b => b.status === 'Upcoming')
       .sort((a, b) => new Date(`${a.date} ${a.timeSlot}`).getTime() - new Date(`${b.date} ${b.timeSlot}`).getTime())[0];
 
-    const dashboardTabOrder: Array<'home' | 'bookings' | 'accreditation' | 'reviews' | 'analytics' | 'settings'> =
-      ['home', 'bookings', 'accreditation', 'reviews', 'analytics', 'settings'];
+    const dashboardTabOrder: PractitionerDashboardTab[] =
+      ['home', 'bookings', 'earnings', 'accreditation', 'reviews', 'analytics', 'settings'];
     const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
       const currentIndex = dashboardTabOrder.indexOf(activeDashboardTab);
       let nextIndex = currentIndex;
@@ -363,6 +375,7 @@ export default function VerificationTerminal({
             tabs={[
               { id: 'home' as const, label: 'Overview', icon: LayoutGrid },
               { id: 'bookings' as const, label: 'Bookings', icon: Calendar, count: upcomingBookingsCount },
+              { id: 'earnings' as const, label: 'Earnings', icon: Wallet },
               { id: 'accreditation' as const, label: 'Accreditation', icon: Award },
               { id: 'reviews' as const, label: 'Feedback', icon: MessageSquare },
               { id: 'analytics' as const, label: 'Analytics', icon: TrendingUp },
@@ -590,6 +603,13 @@ export default function VerificationTerminal({
             }}
             onUpdateDispatchStatus={handleUpdateDispatchStatus}
           />
+        )}
+
+        {/* TAB CONTENT: PRACTITIONER EARNINGS & DIRECT BANK PAYOUTS */}
+        {activeDashboardTab === 'earnings' && (
+          <div id="panel-earnings" role="tabpanel" aria-labelledby="tab-earnings" tabIndex={0} className="space-y-6 animate-fade-in">
+            <PractitionerEarnings embedded={true} />
+          </div>
         )}
 
         {/* TAB CONTENT: PERFORMANCE & REVENUE */}

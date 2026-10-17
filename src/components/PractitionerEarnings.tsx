@@ -20,7 +20,7 @@ interface Data {
 }
 
 /** A practitioner's earnings, what is waiting to be paid, the bank account payouts go to, and past payouts with statements. */
-export default function PractitionerEarnings() {
+export default function PractitionerEarnings({ embedded = false }: { embedded?: boolean }) {
   const [d, setD] = useState<Data | null>(null);
   const [error, setError] = useState('');
   const [form, setForm] = useState({ bankName: '', accountName: '', accountNumber: '', password: '' });
@@ -45,15 +45,37 @@ export default function PractitionerEarnings() {
   const bankStatus = d.bank?.status;
 
   return (
-    <div className="w-full space-y-0">
-      <DashboardHeader
-        icon={Wallet}
-        eyebrow="Earnings"
-        title="Earnings and payouts"
-        description={`You are paid by ${t.method}, ${t.schedule}. Earnings become payable ${t.holdDays} days after a visit is completed. Balances under ${formatMoney(t.minimumPayout)} roll over to the next payout.`}
-      />
+    <div className={embedded ? "space-y-6" : "w-full space-y-0"}>
+      {!embedded && (
+        <DashboardHeader
+          icon={Wallet}
+          eyebrow="Earnings"
+          title="Earnings and payouts"
+          description={`You are paid by ${t.method}, ${t.schedule}. Earnings become payable ${t.holdDays} days after a visit is completed. Balances under ${formatMoney(t.minimumPayout)} roll over to the next payout.`}
+        />
+      )}
 
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className={embedded ? "space-y-6" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
+        {embedded && (
+          <div className="bg-white border border-[color:var(--t-200)] p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-3">
+              <span className="w-9 h-9 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shrink-0">
+                <Wallet className="h-5 w-5" />
+              </span>
+              <div>
+                <h2 className="font-display font-black text-sm sm:text-base text-[color:var(--ink)] leading-tight">
+                  Practitioner Earnings & Payout Ledger
+                </h2>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">
+                  Paid by {t.method}, {t.schedule} • Earnings payable {t.holdDays} days post-visit • Balances under {formatMoney(t.minimumPayout)} roll over
+                </p>
+              </div>
+            </div>
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-1 bg-slate-50 text-slate-700 border border-slate-200 self-start sm:self-auto">
+              Direct Bank Remittance
+            </span>
+          </div>
+        )}
         {!s && <p className="text-sm bg-amber-50 border border-amber-200 text-amber-900 p-3 font-semibold">Finish your practitioner registration to see earnings.</p>}
 
         {s && (

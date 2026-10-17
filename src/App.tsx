@@ -365,7 +365,6 @@ export default function App() {
       navItems.push({ id: 'onboard', name: 'Practitioner Portal', icon: PlusCircle });
     }
     navItems.push({ id: 'oncall', name: 'On Call', icon: Radio });
-    navItems.push({ id: 'earnings', name: 'Earnings', icon: Wallet });
     navItems.push({ id: 'tourism_desk', name: 'Global Patient Services', icon: Plane });
     navItems.push({ id: 'quality', name: 'Quality & CPD', icon: Award });
     navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
@@ -794,7 +793,16 @@ export default function App() {
               <PractitionerQuality profileId={currentUser.profileId ?? null} />
             )}
 
-            {activeView === 'earnings' && currentUser.role === 'practitioner' && <PractitionerEarnings />}
+            {activeView === 'earnings' && currentUser.role === 'practitioner' && (
+              <VerificationTerminal
+                currentUser={currentUser}
+                professionals={professionals}
+                reviews={reviews}
+                bookings={bookings}
+                onRefreshData={loadData}
+                initialTab="earnings"
+              />
+            )}
 
             {activeView === 'oncall' && currentUser.role === 'practitioner' && (
               <PractitionerOnCall myUserId={currentUser.id} />
