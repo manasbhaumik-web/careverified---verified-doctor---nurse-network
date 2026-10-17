@@ -119,7 +119,7 @@ for (const col of [
   try { db.exec(`ALTER TABLE job_applications ADD COLUMN ${col}`); } catch { /* column already exists */ }
 }
 
-// ---- Phase 3: Facility Coordination Messages & Statutory Documents Vault ----
+// ---- Facility Coordination Messages (Facility <-> Practitioner Applicants) ----
 db.exec(`
 CREATE TABLE IF NOT EXISTS facility_messages (
   id TEXT PRIMARY KEY,
@@ -132,101 +132,7 @@ CREATE TABLE IF NOT EXISTS facility_messages (
   created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_fac_msg_thread ON facility_messages(job_id, applicant_user_id);
-
-CREATE TABLE IF NOT EXISTS facility_documents (
-  id TEXT PRIMARY KEY,
-  facility_id TEXT NOT NULL,
-  doc_type TEXT NOT NULL,
-  title TEXT NOT NULL,
-  reference_no TEXT,
-  issuer TEXT,
-  valid_from TEXT,
-  valid_until TEXT,
-  file_url TEXT,
-  status TEXT NOT NULL DEFAULT 'verified',
-  verified_by TEXT,
-  created_at TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_fac_doc_facility ON facility_documents(facility_id);
-
--- Phase 4: Batch Financial Reconciliation & Locum Performance Scorecards
-CREATE TABLE IF NOT EXISTS facility_payout_batches (
-  id TEXT PRIMARY KEY,
-  facility_id TEXT NOT NULL,
-  batch_reference TEXT NOT NULL,
-  period_start TEXT,
-  period_end TEXT,
-  total_amount_myr REAL NOT NULL,
-  total_shifts INTEGER NOT NULL,
-  status TEXT NOT NULL DEFAULT 'draft',
-  bank_name TEXT,
-  disbursed_at TEXT,
-  disbursed_by TEXT,
-  created_at TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_payout_fac ON facility_payout_batches(facility_id);
-
-CREATE TABLE IF NOT EXISTS facility_locum_evaluations (
-  id TEXT PRIMARY KEY,
-  facility_id TEXT NOT NULL,
-  job_id TEXT NOT NULL,
-  applicant_user_id TEXT NOT NULL,
-  applicant_name TEXT NOT NULL,
-  applicant_role TEXT NOT NULL,
-  punctuality_rating INTEGER NOT NULL DEFAULT 5,
-  clinical_skill_rating INTEGER NOT NULL DEFAULT 5,
-  documentation_rating INTEGER NOT NULL DEFAULT 5,
-  teamwork_rating INTEGER NOT NULL DEFAULT 5,
-  overall_score REAL NOT NULL DEFAULT 5.0,
-  notes TEXT,
-  is_preferred INTEGER NOT NULL DEFAULT 0,
-  is_blacklisted INTEGER NOT NULL DEFAULT 0,
-  incident_reported INTEGER NOT NULL DEFAULT 0,
-  incident_summary TEXT,
-  evaluated_by TEXT NOT NULL,
-  created_at TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_eval_user ON facility_locum_evaluations(applicant_user_id);
-CREATE INDEX IF NOT EXISTS idx_eval_facility ON facility_locum_evaluations(facility_id);
-
--- Phase 5: Multi-Staff RBAC and Statutory Incident Governance (Act 586)
-CREATE TABLE IF NOT EXISTS facility_team_members (
-  id TEXT PRIMARY KEY,
-  facility_id TEXT NOT NULL,
-  user_id TEXT,
-  name TEXT NOT NULL,
-  email TEXT NOT NULL,
-  role TEXT NOT NULL,
-  department TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'active',
-  invited_by TEXT,
-  created_at TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_team_fac ON facility_team_members(facility_id);
-
-CREATE TABLE IF NOT EXISTS facility_incidents (
-  id TEXT PRIMARY KEY,
-  facility_id TEXT NOT NULL,
-  job_id TEXT,
-  locum_name TEXT,
-  locum_role TEXT,
-  incident_type TEXT NOT NULL,
-  severity TEXT NOT NULL,
-  department TEXT NOT NULL,
-  incident_date TEXT NOT NULL,
-  description TEXT NOT NULL,
-  immediate_action TEXT,
-  root_cause_analysis TEXT,
-  kkm_notified INTEGER NOT NULL DEFAULT 0,
-  kkm_reference_no TEXT,
-  status TEXT NOT NULL DEFAULT 'investigating',
-  reported_by TEXT NOT NULL,
-  created_at TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_incident_fac ON facility_incidents(facility_id);
 `);
-
-try { db.exec("ALTER TABLE job_applications ADD COLUMN payout_batch_id TEXT"); } catch { /* column already exists */ }
 
 // ---- Migration: allow the 'pharmacy' and 'facility' roles. ----
 {
