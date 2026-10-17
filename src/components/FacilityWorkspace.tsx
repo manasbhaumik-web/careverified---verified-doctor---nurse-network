@@ -146,11 +146,19 @@ interface LocumProfile {
 
 interface PatientCase {
   id: string;
+  trackingCode?: string;
   status: string;
   summary: string;
   patient: string;
   patientEmail?: string | null;
+  patientPhone?: string | null;
+  patientType?: 'local_malaysian' | 'expat_resident' | 'international_traveler';
+  assistanceType?: string;
+  urgency?: 'routine' | 'priority' | 'urgent';
   country: string;
+  insuranceCarrier?: string | null;
+  guaranteeLetter?: boolean;
+  revisionNotes?: string | null;
   specialty?: string;
   preferredFrom?: string;
   preferredTo?: string;
@@ -1448,9 +1456,33 @@ export default function FacilityWorkspace() {
                       <div className="space-y-1.5 flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-sm font-black text-slate-900">{c.patient}</span>
+                          {c.trackingCode && (
+                            <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5">
+                              {c.trackingCode}
+                            </span>
+                          )}
+                          <span className={`px-2 py-0.5 text-[10px] font-extrabold uppercase border ${
+                            c.patientType === 'international_traveler'
+                              ? 'bg-sky-50 text-sky-800 border-sky-300'
+                              : c.patientType === 'expat_resident'
+                              ? 'bg-purple-50 text-purple-800 border-purple-300'
+                              : 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                          }`}>
+                            {c.patientType === 'international_traveler' ? '✈️ Int’l Traveler' : c.patientType === 'expat_resident' ? '🌏 Expat Resident' : '🇲🇾 Local Citizen'}
+                          </span>
                           <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-[10px] font-extrabold uppercase">
                             Origin: {c.country}
                           </span>
+                          {c.urgency && c.urgency !== 'routine' && (
+                            <span className="px-2 py-0.5 bg-red-50 text-red-700 border border-red-300 text-[10px] font-black uppercase">
+                              {c.urgency === 'urgent' ? '🚨 Urgent' : '⚡ Priority'}
+                            </span>
+                          )}
+                          {c.guaranteeLetter && (
+                            <span className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 text-[10px] font-black uppercase">
+                              LOG / Direct Billing
+                            </span>
+                          )}
                           {c.specialty && (
                             <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] text-[10px] font-black uppercase border border-[color:var(--t-200)]">
                               {c.specialty}
@@ -1473,9 +1505,17 @@ export default function FacilityWorkspace() {
                           {c.summary}
                         </p>
 
+                        {c.revisionNotes && (
+                          <div className="p-2 bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold flex items-center gap-1.5">
+                            <span className="font-black text-amber-800 uppercase text-[10px]">⚠️ Patient Requested Revision:</span>
+                            <span>"{c.revisionNotes}"</span>
+                          </div>
+                        )}
+
                         <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
                           <span>Case ID: <code className="font-mono text-slate-600 font-bold">{c.id}</code></span>
                           {c.patientEmail && <span>Contact: <strong className="text-slate-600">{c.patientEmail}</strong></span>}
+                          {c.insuranceCarrier && <span>Insurance: <strong className="text-slate-600">{c.insuranceCarrier}</strong></span>}
                           {c.preferredFrom && <span>Requested: <strong className="text-slate-600">{c.preferredFrom}</strong></span>}
                           <span>Updated: {new Date(c.updatedAt).toLocaleDateString('en-MY')}</span>
                         </div>

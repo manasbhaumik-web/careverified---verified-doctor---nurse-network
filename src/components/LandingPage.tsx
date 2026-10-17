@@ -1938,6 +1938,17 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     Official Billing: Malaysian Ringgit (MYR)
                   </span>
                   <a
+                    href="/assistance"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate('/assistance');
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-black text-white text-xs font-bold cursor-pointer transition-colors shadow-2xs"
+                  >
+                    <span>Request Medical Quotation</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </a>
+                  <a
                     href="/packages"
                     onClick={(e) => {
                       e.preventDefault();

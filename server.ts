@@ -2,6 +2,7 @@ import express from "express";
 import { registerTestimonials } from "./server/testimonials";
 import { registerJobsMy, readJobFields, salaryText, employerInfo, applyProblem, inferState } from "./server/jobsMy";
 import { registerTourism } from "./server/tourism";
+import { registerAssistanceRoutes } from "./server/assistance";
 import { registerPackagesRoutes } from "./server/packages";
 import { registerPharmacyMy } from "./server/pharmacyMy";
 import { parseNric, isPassportNumber, normalisePassport, toE164, addressProblem, RELATIONSHIPS, PREFERRED_LANGUAGES } from "./src/identity";
@@ -805,6 +806,7 @@ registerPharmacyMy(app);
 registerTestimonials(app);
 registerJobsMy(app, { findProfessional, allProfessionals, jobs: () => jobs });
 registerTourism(app, { findProfessional, allProfessionals });
+registerAssistanceRoutes(app, { findProfessional, allProfessionals });
 registerPackagesRoutes(app);
 registerMail(app);
 registerRecovery(app);
@@ -1675,11 +1677,19 @@ app.get("/api/facility/cases", requireRole("facility", "admin"), (req, res) => {
     const quotes = db.prepare("SELECT * FROM tourism_quotes WHERE case_id = ? ORDER BY version DESC").all(c.id) as any[];
     return {
       id: c.id,
+      trackingCode: c.tracking_code || `MED-${c.id.slice(-6).toUpperCase()}`,
       status: c.status,
       summary: c.summary,
-      patient: patUser?.name || "Patient Referral",
-      patientEmail: patUser?.email || null,
+      patient: c.patient_name || patUser?.name || "Patient Referral",
+      patientEmail: c.patient_email || patUser?.email || null,
+      patientPhone: c.patient_phone || null,
+      patientType: c.patient_type || "local_malaysian",
+      assistanceType: c.assistance_type || "elective_surgery",
+      urgency: c.urgency || "routine",
       country: c.home_country || "Malaysia",
+      insuranceCarrier: c.insurance_carrier || null,
+      guaranteeLetter: !!c.guarantee_letter,
+      revisionNotes: c.revision_notes || null,
       specialty: c.specialty,
       preferredFrom: c.preferred_from,
       preferredTo: c.preferred_to,

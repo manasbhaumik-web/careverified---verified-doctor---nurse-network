@@ -6,7 +6,7 @@ import {
   Calendar, BookOpen, Globe, RefreshCw,
   Heart, MessageSquare, Menu, X, PlusCircle, UserCheck,
   Stethoscope, Puzzle, Settings, Activity,
-  CreditCard, TrendingUp, Video, Radio, LifeBuoy, Pill, Store, Lock, Plane, Wallet, Building2, PackagePlus
+  CreditCard, TrendingUp, Video, Radio, LifeBuoy, Pill, Store, Lock, Plane, Wallet, Building2, PackagePlus, HeartHandshake
 } from 'lucide-react';
 
 
@@ -37,6 +37,7 @@ import TourismDesk from './components/TourismDesk';
 import PharmacyWorkspace from './components/PharmacyWorkspace';
 import FacilityWorkspace from './components/FacilityWorkspace';
 import MedicalPackagesModule from './components/MedicalPackagesModule';
+import MedicalAssistanceModule from './components/MedicalAssistanceModule';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import PractitionerPage from './components/PractitionerPage';
@@ -334,6 +335,7 @@ export default function App() {
     if (route.path === '/for-pharmacies') return <PharmacyPage />;
     if (route.path === '/for-clinics' || route.path === '/for-hospitals') return <ClinicHospitalPage />;
     if (route.path === '/packages' || route.path === '/medical-packages') return <MedicalPackagesModule />;
+    if (route.path === '/assistance' || route.path === '/medical-assistance' || route.path === '/enquiries-quotes') return <MedicalAssistanceModule />;
     return <LandingPage professionals={professionals} />;
   }
 
@@ -345,6 +347,7 @@ export default function App() {
     }
     navItems.push({ id: 'consult', name: 'Consult Now', icon: Video });
     navItems.push({ id: 'packages', name: 'Medical Packages & Promos', icon: PackagePlus });
+    navItems.push({ id: 'assistance', name: 'Assistance & Quotes', icon: HeartHandshake });
     navItems.push({ id: 'pharmacies', name: 'Pharmacies', icon: Pill });
     navItems.push({ id: 'tourism', name: 'Medical Tourism', icon: Plane });
     navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
@@ -420,7 +423,7 @@ export default function App() {
     admin: ['admin', 'registry', 'tourism_desk', 'seo'],
   };
   const SHORT_LABEL: Record<string, string> = {
-    patient_dashboard: 'Home', consult: 'Consult', packages: 'Packages', pharmacies: 'Pharmacy', messages: 'Mailbox', registry: 'Doctors', oncall: 'On Call', earnings: 'Earnings', onboard: 'Portal',
+    patient_dashboard: 'Home', consult: 'Consult', packages: 'Packages', assistance: 'Assistance', pharmacies: 'Pharmacy', messages: 'Mailbox', registry: 'Doctors', oncall: 'On Call', earnings: 'Earnings', onboard: 'Portal',
     recruitment: 'Shifts', admin: 'Admin', tourism_desk: 'Tourism', pharmacy_workspace: 'Workspace', facility_workspace: 'Facility', help: 'Help', articles: 'Library', tourism: 'Tourism', quality: 'Quality', seo: 'SEO',
   };
   const mobileTabs = (() => {
@@ -772,6 +775,7 @@ export default function App() {
             )}
 
             {activeView === 'packages' && <MedicalPackagesModule />}
+            {activeView === 'assistance' && <MedicalAssistanceModule />}
 
             {activeView === 'tourism' && currentUser.role === 'patient' && (
               <MedicalTourism onOpenProfessional={(id) => { setSelectedProfId(id); setActiveView('registry'); }} />
