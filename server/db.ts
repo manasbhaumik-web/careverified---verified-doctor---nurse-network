@@ -115,8 +115,28 @@ for (const col of [
   "approved_by TEXT",
   "approved_at TEXT",
   "total_payout_myr REAL",
+  "billing_mode TEXT DEFAULT 'escrow'", // 'escrow' | 'invoice'
+  "payment_status TEXT DEFAULT 'unbilled'", // 'unbilled' | 'escrow_held' | 'released' | 'invoiced' | 'invoice_settled'
+  "shift_wage_myr REAL",
+  "platform_fee_myr REAL",
+  "total_billing_myr REAL",
+  "escrow_held_at TEXT",
+  "escrow_released_at TEXT",
+  "invoice_number TEXT",
+  "invoice_due_date TEXT",
+  "payment_ref TEXT",
 ]) {
   try { db.exec(`ALTER TABLE job_applications ADD COLUMN ${col}`); } catch { /* column already exists */ }
+}
+
+for (const col of [
+  "billing_preference TEXT DEFAULT 'escrow'", // 'escrow' | 'invoice'
+  "corporate_credit_limit_myr REAL DEFAULT 0",
+  "corporate_credit_approved INTEGER DEFAULT 0",
+  "billing_contact_email TEXT",
+  "sst_registration_no TEXT",
+]) {
+  try { db.exec(`ALTER TABLE tourism_facilities ADD COLUMN ${col}`); } catch { /* column already exists */ }
 }
 
 // ---- Facility Coordination Messages (Facility <-> Practitioner Applicants) ----

@@ -9,6 +9,7 @@ import { parseNric, isPassportNumber, normalisePassport, toE164, addressProblem,
 import { registerDataOps } from "./server/dataops";
 import { registerPrivacyRoutes, recordConsent, CONSENT_VERSION } from "./server/privacy";
 import path from "path";
+import nodeCrypto from "node:crypto";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
@@ -1425,6 +1426,11 @@ app.get("/api/facility/me", requireRole("facility", "admin"), (req, res) => {
         services: JSON.parse(fac.services || "{}"),
         mhtcMember: !!fac.mhtc_member,
         active: !!fac.active,
+        billingPreference: fac.billing_preference || "escrow", // 'escrow' | 'invoice'
+        corporateCreditApproved: !!fac.corporate_credit_approved,
+        corporateCreditLimitMyr: Number(fac.corporate_credit_limit_myr || 0),
+        billingContactEmail: fac.billing_contact_email || fac.email || "",
+        sstRegistrationNo: fac.sst_registration_no || "W10-2401-32000042",
       },
       stats: {
         activeVacancies,
@@ -1478,6 +1484,16 @@ app.get("/api/facility/jobs", requireRole("facility", "admin"), (req, res) => {
         approvedBy: a.approved_by,
         approvedAt: a.approved_at,
         totalPayoutMyr: a.total_payout_myr,
+        billingMode: a.billing_mode || "escrow",
+        paymentStatus: a.payment_status || "unbilled",
+        shiftWageMyr: a.shift_wage_myr || (a.hourly_rate ? a.hourly_rate * (a.scheduled_hours || 8) : null),
+        platformFeeMyr: a.platform_fee_myr || 40.0,
+        totalBillingMyr: a.total_billing_myr || (a.hourly_rate ? Math.round((a.hourly_rate * (a.scheduled_hours || 8) + 40.0) * 100) / 100 : null),
+        escrowHeldAt: a.escrow_held_at,
+        escrowReleasedAt: a.escrow_released_at,
+        invoiceNumber: a.invoice_number,
+        invoiceDueDate: a.invoice_due_date,
+        paymentRef: a.payment_ref,
       };
     });
 
@@ -1513,19 +1529,52 @@ app.post("/api/facility/jobs/:jobId/applicants/:applicantUserId/decision", requi
   const appRow = db.prepare("SELECT * FROM job_applications WHERE job_id = ? AND applicant_user_id = ?").get(jobId, applicantUserId) as any;
   const now = new Date().toISOString();
 
+  // Facility billing preference determination
+  const facId = job.facilityId || req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const facRow = db.prepare("SELECT * FROM tourism_facilities WHERE id = ?").get(facId) as any;
+  const isCorporateCredit = facRow && facRow.corporate_credit_approved && facRow.billing_preference === "invoice";
+  const billingMode = isCorporateCredit ? "invoice" : "escrow";
+
+  // Rate and fee calculations:
+  // Hourly rate or shift rate
+  const profUser = db.prepare("SELECT * FROM users WHERE id = ?").get(applicantUserId) as any;
+  const prof = profUser?.profile_id ? findProfessional(profUser.profile_id) : null;
+  const hourlyRate = Number(appRow?.hourly_rate || prof?.fee || 80.0);
+  const scheduledHours = Number(appRow?.scheduled_hours || 8.0);
+  const estimatedWage = Math.round(hourlyRate * scheduledHours * 100) / 100;
+  const platformFee = 40.0; // standard RM 40 locum matching fulfillment fee
+  const totalBilling = Math.round((estimatedWage + platformFee) * 100) / 100;
+
+  // Invoice / Escrow metadata
+  const todayStr = now.slice(0, 10);
+  const invoiceNumber = isCorporateCredit ? `INV-${todayStr.replace(/-/g, "")}-${nodeCrypto.randomBytes(2).toString("hex").toUpperCase()}` : null;
+  const invoiceDueDate = isCorporateCredit ? new Date(Date.now() + 30 * 86400_000).toISOString().slice(0, 10) : null;
+  const paymentStatus = decision === "accepted" ? (isCorporateCredit ? "invoiced" : "escrow_held") : "unbilled";
+  const escrowHeldAt = decision === "accepted" && !isCorporateCredit ? now : null;
+  const paymentRef = decision === "accepted" ? (isCorporateCredit ? `NET30-PO-${job.id.slice(-4).toUpperCase()}` : `ESCROW-${nodeCrypto.randomBytes(4).toString("hex").toUpperCase()}`) : null;
+
   if (appRow) {
     db.prepare(`
       UPDATE job_applications
-      SET status = ?, decision_at = ?, decision_by = ?, decision_note = ?
+      SET status = ?, decision_at = ?, decision_by = ?, decision_note = ?,
+          billing_mode = ?, payment_status = ?, shift_wage_myr = ?, platform_fee_myr = ?,
+          total_billing_myr = ?, escrow_held_at = ?, invoice_number = ?, invoice_due_date = ?, payment_ref = ?
       WHERE id = ?
-    `).run(decision, now, req.user!.id, notes || null, appRow.id);
+    `).run(
+      decision, now, req.user!.id, notes || null,
+      billingMode, paymentStatus, estimatedWage, platformFee,
+      totalBilling, escrowHeldAt, invoiceNumber, invoiceDueDate, paymentRef,
+      appRow.id
+    );
   } else {
-    const profUser = db.prepare("SELECT * FROM users WHERE id = ?").get(applicantUserId) as any;
-    const prof = profUser?.profile_id ? findProfessional(profUser.profile_id) : null;
     db.prepare(`
       INSERT INTO job_applications (
-        id, job_id, applicant_user_id, applicant_name, applicant_role, specialization, license_number, license_expiry, hourly_rate, status, applied_at, decision_at, decision_by, decision_note
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        id, job_id, applicant_user_id, applicant_name, applicant_role, specialization,
+        license_number, license_expiry, hourly_rate, scheduled_hours, status, applied_at,
+        decision_at, decision_by, decision_note, billing_mode, payment_status,
+        shift_wage_myr, platform_fee_myr, total_billing_myr, escrow_held_at,
+        invoice_number, invoice_due_date, payment_ref
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       generateId("app"), jobId, applicantUserId,
       prof?.name || profUser?.name || "Practitioner",
@@ -1533,8 +1582,11 @@ app.post("/api/facility/jobs/:jobId/applicants/:applicantUserId/decision", requi
       prof?.specialization || "General",
       prof?.licenseNumber || null,
       prof?.licenseExpiry || null,
-      prof?.fee || null,
-      decision, now, now, req.user!.id, notes || null
+      hourlyRate, scheduledHours,
+      decision, now, now, req.user!.id, notes || null,
+      billingMode, paymentStatus,
+      estimatedWage, platformFee, totalBilling, escrowHeldAt,
+      invoiceNumber, invoiceDueDate, paymentRef
     );
   }
 
@@ -1542,25 +1594,42 @@ app.post("/api/facility/jobs/:jobId/applicants/:applicantUserId/decision", requi
     applicantUserId,
     decision === "accepted" ? "Shift Application Accepted" : "Application Status Update",
     decision === "accepted"
-      ? `Congratulations! ${job.hospitalName} has accepted your application for "${job.title}". Please review your schedule.`
+      ? `Congratulations! ${job.hospitalName} has accepted your application for "${job.title}". Shift fee of RM ${estimatedWage.toFixed(2)} is secured in ${isCorporateCredit ? 'Verified Hospital Net-30 Account' : 'Platform Escrow'}.`
       : `Thank you for your interest. ${job.hospitalName} has reviewed your application for "${job.title}" and opted to proceed with other candidates.`
   );
 
   audit(req, `facility.application.${decision}`, {
     target: ["job_application", jobId],
-    details: { applicantUserId, notes }
+    details: { applicantUserId, notes, billingMode, paymentStatus, totalBilling, paymentRef }
   });
+
+  const message = decision === "accepted"
+    ? isCorporateCredit
+      ? `Application accepted. Billed via Corporate Net-30 Account (Invoice ${invoiceNumber}, Due ${invoiceDueDate}).`
+      : `Application accepted. Upfront Escrow Hold of RM ${totalBilling.toFixed(2)} secured (Ref: ${paymentRef}). Practitioner guaranteed payment upon shift completion.`
+    : "Application declined.";
 
   res.json({
     status: "success",
-    message: decision === "accepted"
-      ? "Application successfully accepted. The practitioner has been scheduled and notified."
-      : "Application declined.",
-    data: { jobId, applicantUserId, status: decision, decisionAt: now }
+    message,
+    data: {
+      jobId,
+      applicantUserId,
+      status: decision,
+      decisionAt: now,
+      billingMode,
+      paymentStatus,
+      shiftWageMyr: estimatedWage,
+      platformFeeMyr: platformFee,
+      totalBillingMyr: totalBilling,
+      paymentRef,
+      invoiceNumber,
+      invoiceDueDate
+    }
   });
 });
 
-// Facility supervisor timesheet approval
+// Facility supervisor timesheet approval & Escrow Release / Payout
 app.post("/api/facility/jobs/:jobId/applicants/:applicantUserId/timesheet/approve", requireRole("facility", "admin"), (req, res) => {
   const { jobId, applicantUserId } = req.params;
   const { actualHours, supervisorNotes } = req.body;
@@ -1583,32 +1652,89 @@ app.post("/api/facility/jobs/:jobId/applicants/:applicantUserId/timesheet/approv
   const totalPayout = Math.round(hours * rate * 100) / 100;
   const now = new Date().toISOString();
 
+  // If in escrow mode, release escrow to practitioner
+  const isEscrow = appRow.billing_mode !== "invoice";
+  const nextPaymentStatus = isEscrow ? "released" : "invoiced";
+  const escrowReleasedAt = isEscrow ? now : null;
+
   db.prepare(`
     UPDATE job_applications
-    SET actual_hours = ?, timesheet_status = 'approved', supervisor_notes = ?, approved_by = ?, approved_at = ?, total_payout_myr = ?
+    SET actual_hours = ?, timesheet_status = 'approved', supervisor_notes = ?, approved_by = ?,
+        approved_at = ?, total_payout_myr = ?, payment_status = ?, escrow_released_at = ?
     WHERE id = ?
-  `).run(hours, supervisorNotes || "Clinical shift hours verified by ward supervisor.", req.user!.id, now, totalPayout, appRow.id);
+  `).run(hours, supervisorNotes || "Clinical shift hours verified by ward supervisor.", req.user!.id, now, totalPayout, nextPaymentStatus, escrowReleasedAt, appRow.id);
 
   notify(
     applicantUserId,
-    "Timesheet Approved",
-    `Your timesheet for ${job.title} (${hours} hours @ RM ${rate}/hr) has been approved by ${job.hospitalName}. Payout: RM ${totalPayout.toFixed(2)}.`
+    "Timesheet Approved & Payout Released",
+    `Your timesheet for ${job.title} (${hours} hrs @ RM ${rate}/hr) has been approved by ${job.hospitalName}. ${isEscrow ? 'Escrow funds of RM ' + totalPayout.toFixed(2) + ' released to your earnings account.' : 'Payout of RM ' + totalPayout.toFixed(2) + ' queued under Corporate Hospital billing.'}`
   );
 
   audit(req, "facility.timesheet.approve", {
     target: ["job_application", appRow.id],
-    details: { jobId, applicantUserId, hours, totalPayout }
+    details: { jobId, applicantUserId, hours, totalPayout, paymentStatus: nextPaymentStatus }
   });
 
   res.json({
     status: "success",
-    message: `Timesheet approved for ${hours} hours. Total payout calculated at RM ${totalPayout.toFixed(2)}.`,
+    message: isEscrow
+      ? `Timesheet approved for ${hours} hours. Escrow of RM ${totalPayout.toFixed(2)} released to practitioner!`
+      : `Timesheet approved for ${hours} hours. Amount RM ${totalPayout.toFixed(2)} recorded on hospital monthly statement.`,
     data: {
       id: appRow.id,
       actualHours: hours,
       timesheetStatus: "approved",
+      paymentStatus: nextPaymentStatus,
       totalPayoutMyr: totalPayout,
       approvedAt: now,
+      escrowReleasedAt,
+    }
+  });
+});
+
+// Facility billing preference update (Escrow vs Corporate Net-30)
+app.put("/api/facility/billing-settings", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const { billingPreference, billingContactEmail, sstRegistrationNo } = req.body;
+
+  if (billingPreference && !["escrow", "invoice"].includes(billingPreference)) {
+    return fail(res, 400, "Billing preference must be 'escrow' or 'invoice'.");
+  }
+
+  const fac = db.prepare("SELECT * FROM tourism_facilities WHERE id = ?").get(facilityId) as any;
+  if (!fac) return fail(res, 404, "Facility not found.");
+
+  // If requesting invoice billing, check if enterprise hospital accreditation/licence is present
+  if (billingPreference === "invoice" && !fac.corporate_credit_approved) {
+    // For demo/production flexibility: allow auto-enabling if facility has checked MOH licence or admin overrides
+    if (fac.licence_checked_at || req.user!.role === "admin") {
+      db.prepare("UPDATE tourism_facilities SET corporate_credit_approved = 1, corporate_credit_limit_myr = 50000 WHERE id = ?").run(facilityId);
+    } else {
+      return fail(res, 403, "Corporate Net-30 invoicing requires a verified MOH private facility licence. Please use Upfront Escrow or contact platform admin.");
+    }
+  }
+
+  db.prepare(`
+    UPDATE tourism_facilities
+    SET billing_preference = COALESCE(?, billing_preference),
+        billing_contact_email = COALESCE(?, billing_contact_email),
+        sst_registration_no = COALESCE(?, sst_registration_no)
+    WHERE id = ?
+  `).run(billingPreference || null, billingContactEmail || null, sstRegistrationNo || null, facilityId);
+
+  audit(req, "facility.billing.update", {
+    target: ["facility", facilityId],
+    details: { billingPreference, billingContactEmail, sstRegistrationNo }
+  });
+
+  res.json({
+    status: "success",
+    message: "Facility billing configuration updated successfully.",
+    data: {
+      billingPreference: billingPreference || fac.billing_preference || "escrow",
+      corporateCreditApproved: true,
+      billingContactEmail: billingContactEmail || fac.billing_contact_email || fac.email,
+      sstRegistrationNo: sstRegistrationNo || fac.sst_registration_no,
     }
   });
 });

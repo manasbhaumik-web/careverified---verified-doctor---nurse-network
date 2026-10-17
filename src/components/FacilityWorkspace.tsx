@@ -73,6 +73,11 @@ interface FacilityProfile {
   services: Record<string, boolean>;
   mhtcMember: boolean;
   active: boolean;
+  billingPreference?: 'escrow' | 'invoice';
+  corporateCreditApproved?: boolean;
+  corporateCreditLimitMyr?: number;
+  billingContactEmail?: string;
+  sstRegistrationNo?: string;
 }
 
 interface FacilityStats {
@@ -100,6 +105,19 @@ interface Application {
   decisionAt: string | null;
   decisionBy: string | null;
   decisionNotes: string | null;
+  billingMode?: 'escrow' | 'invoice';
+  paymentStatus?: 'unbilled' | 'escrow_held' | 'released' | 'invoiced' | 'invoice_settled';
+  shiftWageMyr?: number | null;
+  platformFeeMyr?: number | null;
+  totalBillingMyr?: number | null;
+  escrowHeldAt?: string | null;
+  escrowReleasedAt?: string | null;
+  invoiceNumber?: string | null;
+  invoiceDueDate?: string | null;
+  paymentRef?: string | null;
+  scheduledHours?: number;
+  actualHours?: number | null;
+  timesheetStatus?: string;
 }
 
 interface FacilityJob {
@@ -309,6 +327,12 @@ export default function FacilityWorkspace() {
   const [newAmenityInput, setNewAmenityInput] = useState('');
   const [infraSaving, setInfraSaving] = useState(false);
 
+  // Facility Billing Preference & Escrow State
+  const [billingPref, setBillingPref] = useState<'escrow' | 'invoice'>('escrow');
+  const [billingEmail, setBillingEmail] = useState('');
+  const [sstNo, setSstNo] = useState('');
+  const [billingSaving, setBillingSaving] = useState(false);
+
   // Notification feedback
   const [notificationMsg, setNotificationMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -320,6 +344,15 @@ export default function FacilityWorkspace() {
       if (data.status === 'success') {
         setFacility(data.data.facility);
         setStats(data.data.stats);
+        if (data.data.facility?.billingPreference) {
+          setBillingPref(data.data.facility.billingPreference);
+        }
+        if (data.data.facility?.billingContactEmail) {
+          setBillingEmail(data.data.facility.billingContactEmail);
+        }
+        if (data.data.facility?.sstRegistrationNo) {
+          setSstNo(data.data.facility.sstRegistrationNo);
+        }
       } else {
         setError(data.message || 'Unable to load facility profile');
       }
@@ -854,6 +887,33 @@ export default function FacilityWorkspace() {
     }
   };
 
+  // Handle Save Facility Billing & Settlement Settings
+  const handleSaveBillingSettings = async () => {
+    setBillingSaving(true);
+    try {
+      const res = await fetch('/api/facility/billing-settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          billingPreference: billingPref,
+          billingContactEmail: billingEmail.trim() || undefined,
+          sstRegistrationNo: sstNo.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        loadFacilityData();
+      } else {
+        setNotificationMsg({ type: 'error', text: data.message || 'Could not update billing settings.' });
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error. Please try again.' });
+    } finally {
+      setBillingSaving(false);
+    }
+  };
+
   const tabs: DashboardTab<Tab>[] = [
     { id: 'shifts', label: 'Job Postings & Vacancies', icon: Calendar, count: stats.activeVacancies },
     { id: 'locums', label: 'Practitioner Network', icon: Users, count: locums.length },
@@ -1230,56 +1290,103 @@ export default function FacilityWorkspace() {
                                       </div>
                                     </div>
 
-                                    {/* Action Buttons */}
-                                    <div className="flex items-center gap-2 shrink-0">
-                                      {app.status === 'pending' ? (
-                                        <div className="flex items-center gap-2">
-                                          <button
-                                            type="button"
-                                            onClick={() => setDecisionModal({ jobId: job.id, applicant: app, action: 'accepted' })}
-                                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer"
-                                          >
-                                            <Check className="h-3.5 w-3.5" />
-                                            Accept
-                                          </button>
-                                          <button
-                                            type="button"
-                                            onClick={() => setDecisionModal({ jobId: job.id, applicant: app, action: 'declined' })}
-                                            className="px-3 py-1.5 bg-white hover:bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200 cursor-pointer"
-                                          >
-                                            <XCircle className="h-3.5 w-3.5" />
-                                            Decline
-                                          </button>
-                                        </div>
-                                      ) : app.status === 'accepted' ? (
-                                        <div className="flex items-center gap-2">
-                                          <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black uppercase border border-emerald-300 flex items-center gap-1">
-                                            <CheckCircle2 className="h-3.5 w-3.5" />
-                                            Accepted & Confirmed
+                                      {/* Action Buttons & Payment Status */}
+                                      <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 shrink-0">
+                                        {app.status === 'pending' ? (
+                                          <div className="flex items-center gap-2">
+                                            <button
+                                              type="button"
+                                              onClick={() => setDecisionModal({ jobId: job.id, applicant: app, action: 'accepted' })}
+                                              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer"
+                                            >
+                                              <Check className="h-3.5 w-3.5" />
+                                              Accept
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => setDecisionModal({ jobId: job.id, applicant: app, action: 'declined' })}
+                                              className="px-3 py-1.5 bg-white hover:bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200 cursor-pointer"
+                                            >
+                                              <XCircle className="h-3.5 w-3.5" />
+                                              Decline
+                                            </button>
+                                          </div>
+                                        ) : app.status === 'accepted' ? (
+                                          <div className="flex flex-wrap items-center gap-2">
+                                            <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black uppercase border border-emerald-300 flex items-center gap-1">
+                                              <CheckCircle2 className="h-3.5 w-3.5" />
+                                              Accepted & Confirmed
+                                            </span>
+                                            {app.paymentStatus === 'escrow_held' ? (
+                                              <span className="px-2 py-0.5 bg-blue-50 text-blue-800 text-[11px] font-bold border border-blue-300 flex items-center gap-1">
+                                                <Lock className="h-3 w-3 text-blue-600" />
+                                                Escrow Held: RM {app.totalBillingMyr ? app.totalBillingMyr.toFixed(2) : '---'}
+                                              </span>
+                                            ) : app.paymentStatus === 'released' ? (
+                                              <span className="px-2 py-0.5 bg-emerald-50 text-emerald-900 text-[11px] font-bold border border-emerald-300 flex items-center gap-1">
+                                                <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                                                Escrow Released (Paid)
+                                              </span>
+                                            ) : app.paymentStatus === 'invoiced' ? (
+                                              <span className="px-2 py-0.5 bg-purple-50 text-purple-900 text-[11px] font-bold border border-purple-300 flex items-center gap-1">
+                                                <FileText className="h-3 w-3 text-purple-600" />
+                                                Net-30 Invoiced ({app.invoiceNumber || 'Pending'})
+                                              </span>
+                                            ) : null}
+                                            <button
+                                              type="button"
+                                              onClick={() => handleOpenChat(job.id, job.title, app)}
+                                              className="px-3 py-1 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 flex items-center gap-1 cursor-pointer"
+                                            >
+                                              <MessageSquare className="h-3.5 w-3.5 text-blue-600" />
+                                              Direct Message
+                                            </button>
+                                          </div>
+                                        ) : (
+                                          <span className="px-2.5 py-1 bg-slate-100 text-slate-500 text-xs font-bold">
+                                            Declined
                                           </span>
-                                          <button
-                                            type="button"
-                                            onClick={() => handleOpenChat(job.id, job.title, app)}
-                                            className="px-3 py-1 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 flex items-center gap-1 cursor-pointer"
-                                          >
-                                            <MessageSquare className="h-3.5 w-3.5 text-blue-600" />
-                                            Direct Message
-                                          </button>
-                                        </div>
-                                      ) : (
-                                        <span className="px-2.5 py-1 bg-slate-100 text-slate-500 text-xs font-bold">
-                                          Declined
-                                        </span>
-                                      )}
+                                        )}
+                                      </div>
                                     </div>
-                                  </div>
 
-                                  {app.decisionNotes && (
-                                    <div className="text-xs text-slate-600 bg-slate-50 p-2 border border-slate-200 font-mono">
-                                      Decision Note: {app.decisionNotes}
-                                    </div>
-                                  )}
-                                </div>
+                                    {/* Financial & Settlement Breakdown for Accepted Shifts */}
+                                    {app.status === 'accepted' && (
+                                      <div className="bg-slate-50 border border-slate-200 p-2.5 flex flex-wrap items-center justify-between text-xs gap-3">
+                                        <div className="flex flex-wrap items-center gap-4 text-slate-700">
+                                          <div>
+                                            <span className="text-slate-500 font-medium">Billing Mode: </span>
+                                            <strong className="text-slate-900 uppercase font-black">{app.billingMode === 'invoice' ? 'Corporate Net-30 Invoice' : 'Upfront Escrow Deposit'}</strong>
+                                          </div>
+                                          <div>
+                                            <span className="text-slate-500 font-medium">Practitioner Wage: </span>
+                                            <strong className="text-emerald-700 font-mono font-bold">RM {app.shiftWageMyr ? app.shiftWageMyr.toFixed(2) : ((app.applicantRate || 80) * (app.scheduledHours || 8)).toFixed(2)}</strong>
+                                          </div>
+                                          <div>
+                                            <span className="text-slate-500 font-medium">Platform Fee: </span>
+                                            <strong className="text-slate-800 font-mono font-bold">RM {app.platformFeeMyr ? app.platformFeeMyr.toFixed(2) : '40.00'}</strong>
+                                          </div>
+                                          {app.paymentRef && (
+                                            <div>
+                                              <span className="text-slate-500 font-medium">Payment Ref: </span>
+                                              <span className="font-mono text-slate-700">{app.paymentRef}</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                        {app.invoiceDueDate && (
+                                          <div className="text-[11px] text-purple-700 font-semibold">
+                                            Net-30 Due Date: {app.invoiceDueDate}
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+
+                                    {app.decisionNotes && (
+                                      <div className="text-xs text-slate-600 bg-slate-50 p-2 border border-slate-200 font-mono">
+                                        Decision Note: {app.decisionNotes}
+                                      </div>
+                                    )}
+                                  </div>
                               ))}
                             </div>
                           )}
@@ -2172,6 +2279,146 @@ export default function FacilityWorkspace() {
                 </div>
               </div>
             </div>
+
+            {/* Billing, Escrow & Invoicing Management Card */}
+            <div className="bg-white border border-[color:var(--t-200)] p-5 shadow-2xs space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-[color:var(--t-600)]" />
+                  <div>
+                    <h3 className="text-base font-black text-slate-900">
+                      Settlement & Billing Protocol (Escrow vs. Corporate Invoicing)
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Configure how clinical shifts and locum wages are settled between your facility, practitioners, and the platform.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSaveBillingSettings}
+                  disabled={billingSaving}
+                  className="px-4 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shrink-0"
+                >
+                  <Check className="h-4 w-4" />
+                  {billingSaving ? 'Saving…' : 'Save Billing Settings'}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Mode Selection */}
+                <div className="space-y-3">
+                  <label className="text-xs font-black uppercase text-slate-700 block">
+                    Default Payment Settlement Mode:
+                  </label>
+                  
+                  <div
+                    onClick={() => setBillingPref('escrow')}
+                    className={`p-4 border cursor-pointer transition-all ${
+                      billingPref === 'escrow'
+                        ? 'border-blue-600 bg-blue-50/50 ring-1 ring-blue-600'
+                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2 font-bold text-sm text-slate-900">
+                        <Lock className="h-4 w-4 text-blue-600" />
+                        <span>Upfront Escrow Deposit (Recommended for Clinics)</span>
+                      </div>
+                      <input
+                        type="radio"
+                        name="billingPref"
+                        checked={billingPref === 'escrow'}
+                        onChange={() => setBillingPref('escrow')}
+                        className="mt-1"
+                      />
+                    </div>
+                    <p className="text-xs text-slate-600 mt-2">
+                      Funds for accepted shifts (Wage + RM 40 platform fee) are pre-authorized upon application acceptance and held in escrow. Payout is released to the practitioner after verified timesheet completion. Zero bad debt.
+                    </p>
+                  </div>
+
+                  <div
+                    onClick={() => {
+                      if (facility?.corporateCreditApproved) {
+                        setBillingPref('invoice');
+                      } else {
+                        setNotificationMsg({
+                          type: 'error',
+                          text: 'Corporate Net-30 Invoicing requires a verified MOH private hospital licence and credit review.'
+                        });
+                      }
+                    }}
+                    className={`p-4 border cursor-pointer transition-all ${
+                      billingPref === 'invoice'
+                        ? 'border-purple-600 bg-purple-50/50 ring-1 ring-purple-600'
+                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2 font-bold text-sm text-slate-900">
+                        <FileText className="h-4 w-4 text-purple-600" />
+                        <span>Corporate Net-30 Invoicing (Tertiary Hospitals)</span>
+                      </div>
+                      <input
+                        type="radio"
+                        name="billingPref"
+                        checked={billingPref === 'invoice'}
+                        onChange={() => setBillingPref('invoice')}
+                        disabled={!facility?.corporateCreditApproved}
+                        className="mt-1"
+                      />
+                    </div>
+                    <p className="text-xs text-slate-600 mt-2">
+                      No upfront charges at booking. All completed shifts are consolidated onto a monthly corporate tax invoice payable via Corporate GIRO/PO within 30 days.
+                    </p>
+                    <div className="mt-2 text-[11px] flex items-center gap-2">
+                      <span className="font-semibold text-purple-800">Status:</span>
+                      {facility?.corporateCreditApproved ? (
+                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold">Approved (Limit: RM {facility.corporateCreditLimitMyr?.toLocaleString() || '50,000'})</span>
+                      ) : (
+                        <span className="px-2 py-0.5 bg-amber-100 text-amber-800 font-bold">Requires MOH Hospital Licence Review</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Billing Details & Tax Info */}
+                <div className="space-y-4">
+                  <label className="text-xs font-black uppercase text-slate-700 block">
+                    Accounting & Tax Credentials:
+                  </label>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-slate-600">Accounts Payable Billing Email</label>
+                    <input
+                      type="email"
+                      value={billingEmail}
+                      onChange={e => setBillingEmail(e.target.value)}
+                      placeholder="finance.locum@hospital.com.my"
+                      className="w-full p-2 border border-slate-300 text-xs focus:outline-none focus:border-[color:var(--t-600)]"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-slate-600">SST / Tax Registration Number</label>
+                    <input
+                      type="text"
+                      value={sstNo}
+                      onChange={e => setSstNo(e.target.value)}
+                      placeholder="W10-2401-32000042"
+                      className="w-full p-2 border border-slate-300 text-xs focus:outline-none focus:border-[color:var(--t-600)]"
+                    />
+                  </div>
+
+                  <div className="p-3 bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
+                    <div className="font-black text-slate-800 uppercase tracking-wide">Regulatory & Compliance Policy:</div>
+                    <p>• Medical practitioners (doctors/nurses) are <strong>never charged</strong> recruitment fees on this platform (Act 586 & MMC compliant).</p>
+                    <p>• Platform fees (RM 40/shift) and clinical wages are exclusively invoiced or escrowed through the hiring healthcare facility.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -2203,12 +2450,50 @@ export default function FacilityWorkspace() {
                 Credential Verification: <strong className="text-slate-800">{decisionModal.applicant.applicantLicense}</strong> (APC Valid)
               </p>
               {decisionModal.action === 'accepted' ? (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900">
-                  Accepting this application will lock in this position and notify the practitioner immediately.
+                <div className="space-y-3">
+                  <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900">
+                    <p className="font-bold">Accepting this application locks in this clinical position and notifies the practitioner immediately.</p>
+                  </div>
+
+                  {/* Payment Mode Notice */}
+                  {facility?.corporateCreditApproved && facility?.billingPreference === 'invoice' ? (
+                    <div className="p-3 bg-purple-50 border border-purple-200 text-purple-950 space-y-1.5">
+                      <div className="flex items-center gap-1.5 font-black text-xs uppercase tracking-wider text-purple-900">
+                        <FileText className="h-4 w-4 text-purple-700" />
+                        <span>Corporate Net-30 Invoicing (Enterprise Hospital)</span>
+                      </div>
+                      <p className="text-[11px] text-purple-800">
+                        Shift fee of <strong>RM {((decisionModal.applicant.applicantRate || 80) * 8).toFixed(2)}</strong> + platform fulfillment fee (RM 40.00) will be consolidated onto your hospital's monthly corporate invoice (Credit Limit: RM {facility.corporateCreditLimitMyr?.toLocaleString() || '50,000'}).
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-blue-50 border border-blue-200 text-blue-950 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 font-black text-xs uppercase tracking-wider text-blue-900">
+                          <Lock className="h-4 w-4 text-blue-700" />
+                          <span>Upfront Escrow Deposit (Protected Shift)</span>
+                        </div>
+                        <span className="px-2 py-0.5 bg-blue-200/60 text-blue-900 font-mono font-bold text-[11px]">
+                          Pre-Authorization Hold
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-blue-800">
+                        Total shift value + platform fee of <strong>RM {(((decisionModal.applicant.applicantRate || 80) * 8) + 40).toFixed(2)}</strong> is held safely in escrow. Funds are only released to the practitioner after verified timesheet completion.
+                      </p>
+                      <div className="bg-white/80 p-2 border border-blue-100 flex items-center justify-between text-[11px]">
+                        <span>Practitioner Shift Wage (8 hrs @ RM {decisionModal.applicant.applicantRate || 80}/hr):</span>
+                        <strong className="font-mono text-emerald-700">RM {((decisionModal.applicant.applicantRate || 80) * 8).toFixed(2)}</strong>
+                      </div>
+                      <div className="bg-white/80 p-2 border border-blue-100 flex items-center justify-between text-[11px]">
+                        <span>Platform Match & Credentialing Fee:</span>
+                        <strong className="font-mono text-slate-800">RM 40.00</strong>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="p-3 bg-rose-50 border border-rose-200 text-rose-900">
-                  Declining this application will notify the applicant that the vacancy is proceeding with other candidates.
+                  Declining this application will notify the applicant that the vacancy is proceeding with other candidates. No charges or escrow holds will occur.
                 </div>
               )}
             </div>
