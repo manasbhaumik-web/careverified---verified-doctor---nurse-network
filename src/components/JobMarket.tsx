@@ -330,26 +330,48 @@ export default function JobMarket({
       )}
 
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Summary metrics */}
-        <section aria-label="Marketplace summary" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {[
-          { label: 'Open listings', value: jobs.length, caption: 'Across all contract types', icon: Briefcase, tone: 'crimson' },
-          { label: 'Shift-based roles', value: shiftBasedCount, caption: 'Temporary cover, nights & weekends', icon: Clock, tone: 'emerald' },
-          { label: 'Applications sent', value: myApplications.length, caption: 'Awaiting hospital response', icon: CheckCircle2, tone: 'crimson' },
-          { label: 'Licensed employers', value: licensedEmployers, caption: 'Facility licence checked by us', icon: ShieldCheck, tone: 'emerald' },
-        ].map(card => (
-          <div key={card.label} className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">{card.label}</span>
-              <span className={`h-8 w-8 flex items-center justify-center border ${card.tone === 'emerald' ? 'bg-[color:var(--e-50)] border-[color:var(--e-200)] text-[color:var(--e-600)]' : 'bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-600)]'}`}>
+        {/* Compact Summary Metrics Bar */}
+        <section
+          aria-label="Marketplace summary"
+          className="bg-white border border-[color:var(--t-200)] shadow-2xs grid grid-cols-2 lg:grid-cols-4"
+        >
+          {[
+            { label: 'Open listings', value: jobs.length, caption: 'Across all contract types', icon: Briefcase, tone: 'brand' },
+            { label: 'Shift-based roles', value: shiftBasedCount, caption: 'Temporary cover, nights & weekends', icon: Clock, tone: 'emerald' },
+            { label: 'Applications sent', value: myApplications.length, caption: 'Awaiting hospital response', icon: CheckCircle2, tone: 'brand' },
+            { label: 'Licensed employers', value: licensedEmployers, caption: 'Facility licence checked by us', icon: ShieldCheck, tone: 'emerald' },
+          ].map((card, idx) => (
+            <div
+              key={card.label}
+              className={`p-3 sm:px-4 sm:py-3 flex items-center justify-between gap-3 min-w-0 border-[color:var(--t-200)] ${
+                idx !== 0 ? 'lg:border-l' : ''
+              } ${idx % 2 === 1 ? 'border-l lg:border-l-0' : ''} ${
+                idx < 2 ? 'border-b lg:border-b-0' : ''
+              }`}
+            >
+              <div className="min-w-0">
+                <p className="text-[11px] font-bold text-[color:var(--ink-2)] uppercase tracking-wider truncate">{card.label}</p>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-xl sm:text-2xl font-black font-mono text-[color:var(--ink)] tabular-nums leading-none">
+                    {card.value}
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-medium truncate hidden xl:inline">
+                    {card.caption}
+                  </span>
+                </div>
+              </div>
+              <span
+                className={`h-8 w-8 shrink-0 flex items-center justify-center border ${
+                  card.tone === 'emerald'
+                    ? 'bg-[color:var(--e-50)] border-[color:var(--e-200)] text-[color:var(--e-600)]'
+                    : 'bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-600)]'
+                }`}
+              >
                 <card.icon className="h-4 w-4" />
               </span>
             </div>
-            <span className="text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{card.value}</span>
-            <span className="text-xs text-slate-600">{card.caption}</span>
-          </div>
-        ))}
-      </section>
+          ))}
+        </section>
 
       {/* JOB POSTING FORM */}
       {showForm && (
