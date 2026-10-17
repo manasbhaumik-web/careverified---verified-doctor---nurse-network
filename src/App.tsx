@@ -490,7 +490,7 @@ export default function App() {
                 <img
                   src={currentUser.avatarUrl || '/assets/malaysian_female_doctor.jpg'}
                   alt={currentUser.name}
-                  className="w-8 h-8 rounded-none object-cover border-0 shrink-0"
+                  className="w-8 h-8 rounded-full object-cover border border-white/40 shrink-0"
                   referrerPolicy="no-referrer"
                 />
                 <div className="text-left hidden xl:block leading-tight">

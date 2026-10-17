@@ -272,7 +272,7 @@ export default function ProfessionalProfile({
                 <img 
                   src={prof.avatar} 
                   alt={prof.name}
-                  className="h-20 w-20 object-cover border border-[color:var(--t-200)] shadow-xs"
+                  className="h-20 w-20 rounded-full object-cover border border-[color:var(--t-200)] shadow-xs"
                   referrerPolicy="no-referrer"
                 />
                 <div className="space-y-1.5">

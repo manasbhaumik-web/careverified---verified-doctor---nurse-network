@@ -406,7 +406,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                       <img 
                         src={reqAvatar} 
                         alt={reqName}
-                        className="h-12 w-12 rounded-none object-cover border border-slate-300 shrink-0"
+                        className="h-12 w-12 rounded-full object-cover border border-slate-300 shrink-0"
                         referrerPolicy="no-referrer"
                       />
                       <div className="min-w-0">
@@ -462,7 +462,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                       <img 
                         src={reqAvatar} 
                         alt={reqName}
-                        className="h-14 w-14 rounded-none object-cover border border-slate-300 shrink-0"
+                        className="h-14 w-14 rounded-full object-cover border border-slate-300 shrink-0"
                         referrerPolicy="no-referrer"
                       />
                       <div>
@@ -543,7 +543,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
                 <img 
                   src={selectedModalRequest.avatar || (selectedModalRequest.userType === UserRole.DOCTOR || selectedModalRequest.role === UserRole.DOCTOR ? "/assets/malaysian_female_doctor.jpg" : "/assets/malaysian_female_nurse.jpg")} 
                   alt={selectedModalRequest.userName || selectedModalRequest.name}
-                  className="h-16 w-16 rounded-none object-cover border border-slate-300"
+                  className="h-16 w-16 rounded-full object-cover border border-slate-300"
                   referrerPolicy="no-referrer"
                 />
                 <div className="space-y-1">

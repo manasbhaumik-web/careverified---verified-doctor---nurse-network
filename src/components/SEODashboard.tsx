@@ -171,7 +171,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                           <img
                             src={p.avatar}
                             alt={p.name}
-                            className="h-10 w-10 rounded-none object-cover shrink-0 border border-slate-300"
+                            className="h-10 w-10 rounded-full object-cover shrink-0 border border-slate-300"
                             referrerPolicy="no-referrer"
                           />
                           <div className="min-w-0">
@@ -434,7 +434,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
                 <img 
                   src={selectedSchemaProf.avatar} 
                   alt={selectedSchemaProf.name}
-                  className="h-10 w-10 rounded-none object-cover border border-slate-300"
+                  className="h-10 w-10 rounded-full object-cover border border-slate-300"
                   referrerPolicy="no-referrer"
                 />
                 <div>

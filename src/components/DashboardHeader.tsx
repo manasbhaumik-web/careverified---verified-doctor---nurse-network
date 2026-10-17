@@ -69,14 +69,8 @@ export default function DashboardHeader<T extends string>({
         fullWidth ? 'w-full border-x-0' : 'border-x border-t-0'
       }`}
     >
-      {/* DUAL TELEMETRY ACCENT RAIL */}
-      <div className="flex h-[3px] w-full shrink-0">
-        <div className="w-1/3 bg-[color:var(--t-600)]" />
-        <div className="w-2/3 bg-[color:var(--t-300)]" />
-      </div>
-
       {(title || children) && (
-        <div className="dh-brand relative border-t-0 text-[color:var(--ink)] overflow-hidden bg-gradient-to-r from-[color:var(--t-100)] via-[color:var(--t-50)] to-white border-b border-[color:var(--t-300)] shadow-xs">
+        <div className="dh-brand relative border-t-0 text-[color:var(--ink)] overflow-hidden bg-[color:var(--t-50)] border-b border-[color:var(--t-200)]">
           {title && (
             <div className={`relative z-10 pt-5 pb-5 sm:pt-6 sm:pb-6 ${
               fullWidth ? 'max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8' : 'px-4 sm:px-7'
@@ -119,16 +113,16 @@ export default function DashboardHeader<T extends string>({
                   tabIndex={selected ? 0 : -1}
                   onClick={() => onTabChange?.(tab.id)}
                   onKeyDown={handleKeyDown}
-                  className={`shrink-0 min-h-[48px] px-4 text-[13px] flex items-center gap-2 cursor-pointer border-b-2 transition-colors ${
+                  className={`shrink-0 min-h-[48px] px-4 text-[13px] flex items-center gap-2 cursor-pointer border-b transition-colors ${
                     selected
-                      ? 'font-black text-[color:var(--t-700)] border-[color:var(--t-600)] bg-[color:var(--t-50)]/40'
-                      : 'font-semibold text-slate-600 border-transparent hover:text-slate-900 hover:bg-[color:var(--t-50)]/50'
+                      ? 'font-semibold text-[color:var(--t-700)] border-[color:var(--t-600)]'
+                      : 'font-medium text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
                   }`}
                 >
                   <tab.icon className={`h-4 w-4 ${selected ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
                   <span className="whitespace-nowrap">{tab.label}</span>
                   {tab.count !== undefined && tab.count > 0 && (
-                    <span className="tabular-nums text-[10px] min-w-[18px] text-center px-1.5 py-0.5 rounded-none font-bold bg-[color:var(--t-600)] text-white leading-none">
+                    <span className="tabular-nums text-[11px] min-w-[20px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
                       {tab.count}
                     </span>
                   )}
@@ -147,14 +141,14 @@ export default function DashboardHeader<T extends string>({
  * ---------------------------------------------------------------------------------------------- */
 
 export const bannerPrimaryBtn =
-  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-4 h-11 rounded-none shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
+  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-4 h-11 rounded-none shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
 /** Same two buttons for use on the banner: a solid brand button and a crisp bordered white one. */
 export const bannerOnBrandPrimaryBtn =
   'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-4 h-11 rounded-none shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
 export const bannerOnBrandSecondaryBtn =
-  'bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs font-bold px-4 h-11 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
+  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold px-4 h-11 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
 export const bannerSecondaryBtn =
-  'bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs font-bold px-4 h-11 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
+  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold px-4 h-11 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
 
 /** Two-column row: identity on the left, KPIs and actions on the right. */
 export function BannerRow({ identity, aside }: { identity: React.ReactNode; aside?: React.ReactNode }) {
@@ -189,9 +183,9 @@ export function BannerIdentity({ name, avatarUrl, icon: Icon, as: Heading = 'h2'
     <div className="flex items-center gap-3 sm:gap-5 min-w-0">
       <div className="relative shrink-0">
         {avatarUrl ? (
-          <img src={avatarUrl} alt={typeof name === 'string' ? name : ''} className="h-14 w-14 sm:h-20 sm:w-20 rounded-none object-cover border-2 border-[color:var(--t-300)] shadow-xs" referrerPolicy="no-referrer" />
+          <img src={avatarUrl} alt={typeof name === 'string' ? name : ''} className="h-14 w-14 sm:h-20 sm:w-20 rounded-full object-cover border-2 border-white shadow-xs" referrerPolicy="no-referrer" />
         ) : (
-          <div aria-hidden="true" className="h-14 w-14 sm:h-20 sm:w-20 rounded-none border-2 border-[color:var(--t-300)] shadow-xs bg-white text-[color:var(--t-700)] flex items-center justify-center text-lg sm:text-2xl font-black">
+          <div aria-hidden="true" className="h-14 w-14 sm:h-20 sm:w-20 rounded-2xl border-2 border-white shadow-xs bg-white text-[color:var(--t-700)] flex items-center justify-center text-lg sm:text-2xl font-bold">
             {Icon ? <Icon className="h-6 w-6 sm:h-8 sm:w-8" /> : initials || '?'}
           </div>
         )}
@@ -199,11 +193,11 @@ export function BannerIdentity({ name, avatarUrl, icon: Icon, as: Heading = 'h2'
       </div>
       <div className="space-y-1.5 min-w-0">
         <div className="flex items-center gap-2.5 flex-wrap">
-          <Heading className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight">{name}</Heading>
+          <Heading className="text-xl sm:text-3xl font-extrabold text-[color:var(--ink)] tracking-tight">{name}</Heading>
           {badges}
         </div>
-        {description && <p className="text-sm text-slate-700 font-semibold leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
-        {meta && <div className="flex items-center gap-2.5 text-xs text-slate-700 font-semibold flex-wrap">{meta}</div>}
+        {description && <p className="text-sm text-[color:var(--ink-2)] leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
+        {meta && <div className="flex items-center gap-2.5 text-xs text-[color:var(--ink-2)] font-semibold flex-wrap">{meta}</div>}
       </div>
     </div>
   );
@@ -212,20 +206,20 @@ export function BannerIdentity({ name, avatarUrl, icon: Icon, as: Heading = 'h2'
 /** Pill used beside the name: neutral (brand) or success. */
 export function BannerBadge({ tone = 'brand', children }: { tone?: 'brand' | 'success'; children: React.ReactNode }) {
   return tone === 'success' ? (
-    <span className="bg-emerald-50 text-emerald-800 border border-emerald-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none flex items-center gap-1 shadow-3xs">{children}</span>
+    <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none flex items-center gap-1 shadow-2xs">{children}</span>
   ) : (
-    <span className="bg-white text-[color:var(--t-800)] border border-[color:var(--t-300)] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none shadow-3xs">{children}</span>
+    <span className="bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none shadow-2xs">{children}</span>
   );
 }
 
-/** High-contrast Inset KPI Island: structured white tiles with 2px brand border. */
+/** KPI strip: one compact row, same height as the banner buttons (h-11). */
 export function BannerKpis({ items }: { items: { value: React.ReactNode; label: string }[] }) {
   return (
-    <div className="flex items-stretch w-full sm:w-auto sm:h-11 bg-white border-2 border-[color:var(--t-300)] rounded-none shadow-2xs text-slate-900">
+    <div className="flex items-stretch w-full sm:w-auto sm:h-11 bg-white border border-[color:var(--t-200)] rounded-none shadow-2xs">
       {items.map((k, i) => (
-        <div key={k.label} className={`flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-0 min-w-0 ${i > 0 ? 'border-l border-[color:var(--t-200)]' : ''}`}>
-          <span className="text-base font-extrabold text-[color:var(--t-700)] font-mono leading-none tabular-nums">{k.value}</span>
-          <span className="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-wider leading-tight text-center">{k.label}</span>
+        <div key={k.label} className={`flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-0 min-w-0 ${i > 0 ? 'border-l border-[color:var(--t-100)]' : ''}`}>
+          <span className="text-base font-extrabold text-[color:var(--ink)] leading-none tabular-nums">{k.value}</span>
+          <span className="text-[9px] sm:text-[10px] font-bold text-[color:var(--t-600)] uppercase tracking-wider leading-tight text-center">{k.label}</span>
         </div>
       ))}
     </div>

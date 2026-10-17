@@ -362,7 +362,7 @@ export default function VerifyPractitionersPage({
                       {/* Top Row: Avatar & Identity */}
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-3.5 min-w-0">
-                          <div className="w-14 h-14 bg-slate-100 border border-[color:var(--t-200)] shrink-0 overflow-hidden shadow-3xs">
+                          <div className="w-14 h-14 bg-slate-100 border border-[color:var(--t-200)] shrink-0 overflow-hidden shadow-3xs rounded-full">
                             <img
                               src={p.avatar}
                               alt={p.name}

@@ -1,25 +1,31 @@
-﻿import React from 'react';
+import React from 'react';
 import { Award, CheckCircle2, Loader, AlertCircle, MapPin, DollarSign } from 'lucide-react';
 import { DoctorProfile, NurseProfile } from '../../types';
 import { formatMoney } from '../../locale';
+import VerificationStatusCard from '../VerificationStatusCard';
 
 interface PractitionerAccreditationTabProps {
   matchedProfile: DoctorProfile | NurseProfile;
   isVerified: boolean;
   isPending: boolean;
   isDoc: boolean;
+  onRefreshData?: () => void;
 }
 
 export default function PractitionerAccreditationTab({
   matchedProfile,
   isVerified,
   isPending,
-  isDoc
+  isDoc,
+  onRefreshData
 }: PractitionerAccreditationTabProps) {
   return (
-    <div id="panel-accreditation" role="tabpanel" aria-labelledby="tab-accreditation" tabIndex={0} className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
-      {/* Certificate of Accreditation Widget */}
-      <div className="lg:col-span-2 bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-3xs space-y-6">
+    <div id="panel-accreditation" role="tabpanel" aria-labelledby="tab-accreditation" tabIndex={0} className="space-y-6 animate-fade-in">
+      <VerificationStatusCard onChanged={onRefreshData} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Certificate of Accreditation Widget */}
+        <div className="lg:col-span-2 bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-3xs space-y-6">
         <div className="border-b border-[color:var(--t-200)] pb-3">
           <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
             <Award className="h-4.5 w-4.5 text-[color:var(--t-600)]" />
@@ -158,5 +164,6 @@ export default function PractitionerAccreditationTab({
         </div>
       </div>
     </div>
+  </div>
   );
 }

@@ -1,4 +1,3 @@
-import VerificationStatusCard from './VerificationStatusCard';
 import { expiryLabel } from '../registries';
 import ClinicalWorkspace from './ClinicalWorkspace';
 import React, { useState, useEffect } from 'react';
@@ -429,6 +428,14 @@ export default function VerificationTerminal({
                         </span>
                         Verified by the medical board
                       </span>}
+                      {((matchedProfile as any).apcExpiry || (matchedProfile as any).licenseExpiry) && (
+                        <>
+                          <span className="text-slate-400">&bull;</span>
+                          <span className="font-mono text-[color:var(--ink-2)] text-[11px] font-semibold">
+                            APC: {new Date((matchedProfile as any).apcExpiry || (matchedProfile as any).licenseExpiry).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </span>
+                        </>
+                      )}
                     </>
                   }
                 />
@@ -481,8 +488,6 @@ export default function VerificationTerminal({
                 </span>
               </div>
 
-              <VerificationStatusCard onChanged={onRefreshData} />
-
               {activeDashboardTab === 'home' && (
                 <PractitionerOverviewTab
                   matchedProfile={matchedProfile}
@@ -506,6 +511,7 @@ export default function VerificationTerminal({
             isVerified={isVerified}
             isPending={isPending}
             isDoc={isDoc}
+            onRefreshData={onRefreshData}
           />
         )}
 
