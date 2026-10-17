@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Activity, AlertTriangle, BarChart3, CheckCircle2, Clock, Download, Inbox, KeyRound, Pill, Search, ShieldAlert, StickyNote, Store, UserRound, Users } from 'lucide-react';
+import { Activity, AlertTriangle, BarChart3, CheckCircle2, Clock, Download, Inbox, KeyRound, LifeBuoy, Pill, Search, ShieldAlert, StickyNote, Store, UserRound, Users } from 'lucide-react';
 import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, FilterSelect, DashboardTab, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
 import { btnDanger, btnPlain, btnPrimary, fmtDate, fmtTime, jfetch } from './pharmacy/shared';
 import { useLiveAlerts } from './pharmacy/useLiveAlerts';
@@ -110,6 +110,23 @@ export default function PharmacyWorkspace() {
     );
   }
 
+  const pharmacyHelpTab = (
+    <div className="flex items-center pl-2 ml-auto">
+      <div className="h-5 w-px bg-slate-200 mr-2 hidden sm:block" aria-hidden="true" />
+      <button
+        type="button"
+        onClick={() => {
+          window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
+        }}
+        className="inline-flex items-center gap-1.5 px-3 py-3 text-xs sm:text-sm font-semibold text-slate-600 hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)] transition-colors border-b-2 border-transparent"
+        title="Open Support Desk & Help Center"
+      >
+        <LifeBuoy className="h-4 w-4 text-slate-500" />
+        <span>Help &amp; Support</span>
+      </button>
+    </div>
+  );
+
   return (
     <div className="w-full space-y-0">
       <DashboardHeader
@@ -118,6 +135,7 @@ export default function PharmacyWorkspace() {
         activeTab={tab}
         onTabChange={setTab}
         tabsLabel="Pharmacy workspace sections"
+        tabsRight={pharmacyHelpTab}
       >
         <BannerRow
           identity={

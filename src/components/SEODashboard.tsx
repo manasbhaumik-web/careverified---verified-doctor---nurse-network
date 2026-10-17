@@ -1,6 +1,6 @@
 import DashboardHeader from './DashboardHeader';
 import React, { useState } from 'react';
-import { Search, Code, Zap, FileSpreadsheet, Eye, Copy, CheckCircle, List, LayoutGrid, X } from 'lucide-react';
+import { Search, Code, Zap, FileSpreadsheet, Eye, Copy, CheckCircle, List, LayoutGrid, X, Globe } from 'lucide-react';
 import { DoctorProfile, NurseProfile } from '../types';
 
 interface SEODashboardProps {
@@ -94,6 +94,8 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
     <div className="w-full space-y-0" id="seo-dashboard-panel">
       {/* Standard dashboard header with attached tabs */}
       <DashboardHeader
+        fullWidth={true}
+        icon={Globe}
         eyebrow="SEO & Schema Engine"
         title="Active SEO Strategy & Schema Engine"
         description="Programmatic landing page generators and YMYL E-E-A-T compliant meta engines."

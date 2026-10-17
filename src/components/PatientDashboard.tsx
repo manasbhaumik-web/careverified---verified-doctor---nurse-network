@@ -302,6 +302,31 @@ export default function PatientDashboard({
 
   const openTickets = supportTickets.filter(t => t.status !== 'resolved');
 
+  const patientHelpTab = (
+    <div className="flex items-center h-full">
+      <span className="w-px h-5 bg-[color:var(--t-200)] mr-2 self-center hidden sm:inline-block" aria-hidden="true" />
+      <button
+        type="button"
+        role="tab"
+        id="tab-patient-help"
+        onClick={() => {
+          if (onOpenHelp) onOpenHelp();
+          else window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
+        }}
+        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-[13px] flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
+        title="Patient Help & Concierge Support Desk"
+      >
+        <LifeBuoy className="h-4 w-4 text-slate-500" />
+        <span className="whitespace-nowrap font-medium sm:font-semibold">Help & Support</span>
+        {openTickets.length > 0 && (
+          <span className="tabular-nums text-[10px] min-w-[18px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
+            {openTickets.length}
+          </span>
+        )}
+      </button>
+    </div>
+  );
+
   const tabs: { id: Tab; label: string; icon: React.ComponentType<any>; count?: number }[] = [
     { id: 'appointments', label: 'My Care & Appointments', icon: Calendar, count: upcoming.length },
     { id: 'records', label: 'Clinical Health Record', icon: FolderHeart },
@@ -381,13 +406,21 @@ export default function PatientDashboard({
         activeTab={activeTab}
         onTabChange={(t) => { setActiveTab(t); if (t === 'records') setRecordsSubTab('overview'); }}
         tabsLabel="Patient care sections"
+        tabsRight={patientHelpTab}
       >
         <BannerRow
           identity={
             <BannerIdentity
               name={userName}
               avatarUrl={userAvatar}
-              badges={<BannerBadge>EHR Verified Patient</BannerBadge>}
+              badges={
+                <>
+                  <BannerBadge tone="brand">Patient Workspace</BannerBadge>
+                  <BannerBadge tone="success">
+                    <CheckCircle2 className="h-3 w-3 text-emerald-600 stroke-[3]" /> EHR Verified Patient
+                  </BannerBadge>
+                </>
+              }
               meta={
                 <>
                   <span className="font-extrabold text-[color:var(--ink)]">{greeting}</span>

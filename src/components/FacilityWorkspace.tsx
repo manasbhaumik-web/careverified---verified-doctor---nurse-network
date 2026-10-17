@@ -5,7 +5,7 @@ import {
   RefreshCw, ChevronDown, ChevronUp, Stethoscope, Check,
   MessageSquare, Lock, DollarSign, Tag, PackagePlus, Sparkles, Clock,
   Trash2, Edit3, Copy, HeartPulse, AlertCircle, BadgeCheck, Receipt,
-  Printer, Download, CreditCard
+  Printer, Download, CreditCard, LifeBuoy
 } from 'lucide-react';
 import DashboardHeader, {
   BannerRow, BannerIdentity, BannerBadge, BannerKpis, DashboardTab, bannerPrimaryBtn
@@ -1055,6 +1055,25 @@ export default function FacilityWorkspace() {
     return c.status === caseStatusFilter;
   });
 
+  const facilityHelpTab = (
+    <div className="flex items-center h-full">
+      <span className="w-px h-5 bg-[color:var(--t-200)] mr-2 self-center hidden sm:inline-block" aria-hidden="true" />
+      <button
+        type="button"
+        role="tab"
+        id="tab-facility-help"
+        onClick={() => {
+          window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
+        }}
+        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-[13px] flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
+        title="Facility Help & Support Desk"
+      >
+        <LifeBuoy className="h-4 w-4 text-slate-500" />
+        <span className="whitespace-nowrap font-medium sm:font-semibold">Help & Support</span>
+      </button>
+    </div>
+  );
+
   return (
     <div className="w-full space-y-0" id="facility-workspace-root">
       {/* Main Facility Banner */}
@@ -1064,6 +1083,7 @@ export default function FacilityWorkspace() {
         activeTab={tab}
         onTabChange={setTab}
         tabsLabel="Facility workspace sections"
+        tabsRight={facilityHelpTab}
       >
         <BannerRow
           identity={

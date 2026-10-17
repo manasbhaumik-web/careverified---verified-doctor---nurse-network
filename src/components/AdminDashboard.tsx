@@ -1,4 +1,4 @@
-import DashboardHeader from './DashboardHeader';
+import DashboardHeader, { BannerKpis } from './DashboardHeader';
 import { expiryLabel } from '../registries';
 import React, { useState, useEffect } from 'react';
 import { 
@@ -6,7 +6,7 @@ import {
   Loader, CheckCircle2, List, LayoutGrid, Eye,
   Puzzle, Plus, Trash2, Settings, Download, Activity, CreditCard, 
   TrendingUp, Heart, Search, Calendar, 
-  BookOpen, PlusCircle, MessageSquare, Globe
+  BookOpen, PlusCircle, MessageSquare, Globe, LifeBuoy
 } from 'lucide-react';
 import AdminTrustPanel, { ReviewActions } from './AdminTrustPanel';
 import AdminOps from './AdminOps';
@@ -256,28 +256,39 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
     fetchPending();
   };
 
+  const adminHelpTab = (
+    <div className="flex items-center pl-2 ml-auto">
+      <div className="h-5 w-px bg-slate-200 mr-2 hidden sm:block" aria-hidden="true" />
+      <button
+        type="button"
+        onClick={() => {
+          window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
+        }}
+        className="inline-flex items-center gap-1.5 px-3 py-3 text-xs sm:text-sm font-semibold text-slate-600 hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)] transition-colors border-b-2 border-transparent"
+        title="Open Support Desk & Help Center"
+      >
+        <LifeBuoy className="h-4 w-4 text-slate-500" />
+        <span>Help &amp; Support</span>
+      </button>
+    </div>
+  );
+
   return (
     <div className="w-full space-y-0" id="national-registry-admin-panel">
       {/* Standard dashboard header with attached tabs */}
       <DashboardHeader
+        fullWidth={true}
         eyebrow="National Medical Registry Audit Terminal"
         title="Registry Administrative Control Desk"
         description="Practitioner licence review, trust and complaints, operations, quality and support, and modular extension management."
         actions={
-        <div className="grid grid-cols-3 gap-3 bg-white p-3 border border-[color:var(--t-200)] rounded-none text-center min-w-[300px]">
-          <div>
-            <span className="font-mono text-xl font-black text-[color:var(--t-600)] block leading-tight">{pendingRequests.length}</span>
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Pending</span>
-          </div>
-          <div className="border-x border-slate-200">
-            <span className="font-mono text-xl font-black text-[color:var(--t-600)] block leading-tight">{professionals.filter(p => p.verificationStatus === VerificationStatus.VERIFIED).length}</span>
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Verified</span>
-          </div>
-          <div>
-            <span className="font-mono text-xl font-black text-[color:var(--t-600)] block leading-tight">{packages.filter(p => (p as any).installed).length || 3}</span>
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Modules</span>
-          </div>
-        </div>
+          <BannerKpis
+            items={[
+              { value: pendingRequests.length, label: 'Pending' },
+              { value: professionals.filter(p => p.verificationStatus === VerificationStatus.VERIFIED).length, label: 'Verified' },
+              { value: packages.filter(p => (p as any).installed).length || 3, label: 'Modules' },
+            ]}
+          />
         }
         tabs={[
           { id: 'approvals' as const, label: 'Practitioner Approvals', icon: ShieldCheck, count: pendingRequests.length },
@@ -290,6 +301,7 @@ export default function AdminDashboard({ onProfessionalApproved, professionals, 
         activeTab={activeTab}
         onTabChange={setActiveTab}
         tabsLabel="Admin panel sections"
+        tabsRight={adminHelpTab}
       />
 
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
