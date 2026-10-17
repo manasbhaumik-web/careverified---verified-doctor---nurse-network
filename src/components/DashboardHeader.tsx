@@ -29,6 +29,8 @@ interface DashboardHeaderProps<T extends string> {
   bgImage?: string;
   /** When true, expands the hero banner across 100% full width of the screen. */
   fullWidth?: boolean;
+  /** Optional element rendered on the far right of the tab group strip (e.g. Help tab). */
+  tabsRight?: React.ReactNode;
 }
 
 /**
@@ -48,6 +50,7 @@ export default function DashboardHeader<T extends string>({
   tabsLabel = 'Dashboard sections',
   id,
   fullWidth = true,
+  tabsRight,
 }: DashboardHeaderProps<T>) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     if (!tabs || !onTabChange || activeTab === undefined) return;
@@ -93,16 +96,16 @@ export default function DashboardHeader<T extends string>({
         </div>
       )}
 
-      {tabs && tabs.length > 0 && (
+      {((tabs && tabs.length > 0) || tabsRight) && (
         <div className="w-full bg-white border-b border-[color:var(--t-200)] shadow-2xs">
           <div
             role="tablist"
             aria-label={tabsLabel}
-            className={`relative flex gap-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+            className={`relative flex items-center gap-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
               fullWidth ? 'max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8' : 'px-3 sm:px-5'
             }`}
           >
-            {tabs.map((tab, idx) => {
+            {tabs?.map((tab, idx) => {
               const selected = activeTab === tab.id;
               const prevTab = idx > 0 ? tabs[idx - 1] : null;
               const isNewGroup = prevTab && tab.group && tab.group !== prevTab.group;
@@ -144,6 +147,11 @@ export default function DashboardHeader<T extends string>({
                 </React.Fragment>
               );
             })}
+            {tabsRight && (
+              <div className="ml-auto shrink-0 flex items-center self-stretch pl-2">
+                {tabsRight}
+              </div>
+            )}
           </div>
         </div>
       )}

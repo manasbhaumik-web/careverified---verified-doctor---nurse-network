@@ -17,6 +17,7 @@ interface MedicalLibraryProps {
   currentUser?: any;
   reviews?: Review[];
   bookings?: Booking[];
+  onOpenHelp?: () => void;
 }
 
 const ALL = 'All articles';
@@ -184,6 +185,7 @@ export default function MedicalLibrary({
   currentUser,
   reviews = [],
   bookings = [],
+  onOpenHelp,
 }: MedicalLibraryProps) {
   const isPractitioner = canRecommend || currentUser?.role === 'practitioner';
   const [query, setQuery] = useState('');
@@ -302,6 +304,7 @@ export default function MedicalLibrary({
           activeTab={activeLibraryTab}
           onTabChange={handleLibraryTabChange}
           tabsLabel="Medical Library sections"
+          onOpenHelp={onOpenHelp}
         />
       ) : (
         <DashboardHeader

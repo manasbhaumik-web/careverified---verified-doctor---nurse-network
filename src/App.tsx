@@ -220,6 +220,19 @@ export default function App() {
     loadData();
   }, []);
 
+  useEffect(() => {
+    const handleNavigate = (e: Event) => {
+      const customEvent = e as CustomEvent<string>;
+      if (customEvent.detail) {
+        setActiveView(customEvent.detail);
+        setSelectedProfId(null);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+    window.addEventListener('medcred-navigate', handleNavigate);
+    return () => window.removeEventListener('medcred-navigate', handleNavigate);
+  }, []);
+
   // Check if a modular package is enabled in the runtime state
   const isPackageEnabled = (id: string) => {
     const pkg = packages.find(p => p.id === id);
@@ -374,7 +387,6 @@ export default function App() {
     if (isPackageEnabled('articles')) {
       navItems.push({ id: 'articles', name: 'Medical Library', icon: BookOpen });
     }
-    navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
   } else if (currentUser.role === 'facility') {
     navItems.push({ id: 'facility_workspace', name: 'Facility Hub', icon: Building2 });
     navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
@@ -794,6 +806,7 @@ export default function App() {
                 bookings={bookings}
                 onRefreshData={loadData}
                 activeGroup="clinical"
+                onOpenHelp={() => setActiveView('help')}
               />
             )}
 
@@ -805,6 +818,7 @@ export default function App() {
                 bookings={bookings}
                 onRefreshData={loadData}
                 activeGroup="practice"
+                onOpenHelp={() => setActiveView('help')}
               />
             )}
 
@@ -816,6 +830,7 @@ export default function App() {
                 bookings={bookings}
                 onRefreshData={loadData}
                 activeGroup="performance"
+                onOpenHelp={() => setActiveView('help')}
               />
             )}
 
@@ -831,6 +846,7 @@ export default function App() {
                 professionals={professionals}
                 reviews={reviews}
                 bookings={bookings}
+                onOpenHelp={() => setActiveView('help')}
               />
             )}
 
@@ -860,6 +876,7 @@ export default function App() {
                 onRefreshData={loadData}
                 activeGroup="clinical"
                 initialTab="global"
+                onOpenHelp={() => setActiveView('help')}
               />
             )}
 
@@ -891,6 +908,7 @@ export default function App() {
                 onRefreshData={loadData}
                 activeGroup="practice"
                 initialTab="quality"
+                onOpenHelp={() => setActiveView('help')}
               />
             )}
 
@@ -903,6 +921,7 @@ export default function App() {
                 onRefreshData={loadData}
                 activeGroup="practice"
                 initialTab="earnings"
+                onOpenHelp={() => setActiveView('help')}
               />
             )}
 
@@ -915,6 +934,7 @@ export default function App() {
                 onRefreshData={loadData}
                 activeGroup="clinical"
                 initialTab="oncall"
+                onOpenHelp={() => setActiveView('help')}
               />
             )}
 
@@ -927,6 +947,7 @@ export default function App() {
                 onRefreshData={loadData}
                 activeGroup="clinical"
                 initialTab="messages"
+                onOpenHelp={() => setActiveView('help')}
               />
             )}
 
@@ -978,6 +999,7 @@ export default function App() {
                 currentUser={currentUser}
                 reviews={reviews}
                 bookings={bookings}
+                onOpenHelp={() => setActiveView('help')}
                 onReportProblem={(a) => {
                   try { sessionStorage.setItem('support_prefill', JSON.stringify({ category: 'Feedback', subject: `Problem with article: ${a.title}`.slice(0, 120) })); } catch { /* ignore */ }
                   setActiveView('help');

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Check, Eye, Send, CheckCircle2, X } from 'lucide-react';
+import { Shield, Check, Eye, Send, CheckCircle2, X, LifeBuoy } from 'lucide-react';
 import { Professional, Review, Booking, UserRole, VerificationStatus, ConsultationMode } from '../types';
 import DashboardHeader, {
   BannerRow,
@@ -28,6 +28,8 @@ export interface PractitionerHeroBannerProps<T extends string = string> {
   activeTab?: T;
   onTabChange?: (tab: T) => void;
   tabsLabel?: string;
+  onOpenHelp?: () => void;
+  isHelpActive?: boolean;
 }
 
 /**
@@ -44,6 +46,8 @@ export default function PractitionerHeroBanner<T extends string = string>({
   activeTab,
   onTabChange,
   tabsLabel,
+  onOpenHelp,
+  isHelpActive,
 }: PractitionerHeroBannerProps<T>) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showPublicProfilePreview, setShowPublicProfilePreview] = useState(false);
@@ -52,6 +56,37 @@ export default function PractitionerHeroBanner<T extends string = string>({
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
+
+  const helpActive = isHelpActive ?? (groupName === 'Help & Support');
+
+  const handleHelpClick = () => {
+    if (onOpenHelp) {
+      onOpenHelp();
+    }
+    window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
+  };
+
+  const helpRightNode = (
+    <div className="flex items-center h-full">
+      <span className="w-px h-5 bg-[color:var(--t-200)] mr-2 self-center hidden sm:inline-block" aria-hidden="true" />
+      <button
+        type="button"
+        role="tab"
+        id="tab-practitioner-help"
+        aria-selected={helpActive}
+        onClick={handleHelpClick}
+        className={`shrink-0 min-h-[48px] px-3.5 sm:px-4 text-[13px] flex items-center gap-2 cursor-pointer border-b transition-colors ${
+          helpActive
+            ? 'font-semibold text-[color:var(--t-700)] border-[color:var(--t-600)] bg-[color:var(--t-50)]/60'
+            : 'font-medium text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
+        }`}
+        title="Practitioner Help & Support Desk"
+      >
+        <LifeBuoy className={`h-4 w-4 ${helpActive ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
+        <span className="whitespace-nowrap font-medium sm:font-semibold">Help & Support</span>
+      </button>
+    </div>
+  );
 
   // Match profile from professionals by name or profileId
   const matchedProfile = professionals.find(p =>
@@ -113,6 +148,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
         activeTab={activeTab}
         onTabChange={onTabChange}
         tabsLabel={tabsLabel || `${groupName} sections`}
+        tabsRight={helpRightNode}
       >
         <BannerRow
           identity={

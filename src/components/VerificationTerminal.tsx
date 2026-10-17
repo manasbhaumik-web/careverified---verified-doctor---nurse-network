@@ -70,6 +70,7 @@ interface VerificationTerminalProps {
   onRefreshData?: () => void;
   initialTab?: PractitionerDashboardTab;
   activeGroup?: PractitionerTabGroup;
+  onOpenHelp?: () => void;
 }
 
 export default function VerificationTerminal({ 
@@ -79,7 +80,8 @@ export default function VerificationTerminal({
   bookings = [], 
   onRefreshData,
   initialTab,
-  activeGroup
+  activeGroup,
+  onOpenHelp,
 }: VerificationTerminalProps) {
   // Try to match logged in practitioner with an existing registry profile
   const matchedProfile = professionals.find(p => 
@@ -444,6 +446,7 @@ export default function VerificationTerminal({
           activeTab={activeDashboardTab}
           onTabChange={setActiveDashboardTab}
           tabsLabel={`${PRACTITIONER_GROUPS[currentGroup].name} sections`}
+          onOpenHelp={onOpenHelp}
         />
 
           <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">

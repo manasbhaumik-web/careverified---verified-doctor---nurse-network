@@ -18,6 +18,7 @@ interface JobMarketProps {
   professionals?: Professional[];
   reviews?: Review[];
   bookings?: Booking[];
+  onOpenHelp?: () => void;
 }
 
 export default function JobMarket({
@@ -30,6 +31,7 @@ export default function JobMarket({
   professionals = [],
   reviews = [],
   bookings = [],
+  onOpenHelp,
 }: JobMarketProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
@@ -297,6 +299,7 @@ export default function JobMarket({
           activeTab={activeTab}
           onTabChange={setActiveTab}
           tabsLabel="Shift sections"
+          onOpenHelp={onOpenHelp}
         />
       ) : (
         <DashboardHeader
