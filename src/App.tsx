@@ -386,6 +386,10 @@ export default function App() {
     navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
   } else if (currentUser.role === 'admin') {
     navItems.push({ id: 'admin', name: 'Admin Panel', icon: ShieldCheck });
+    navItems.push({ id: 'facility_workspace', name: 'Facility Hub', icon: Building2 });
+    if (isPackageEnabled('recruitment')) {
+      navItems.push({ id: 'recruitment', name: 'Clinical Shifts', icon: Calendar });
+    }
     navItems.push({ id: 'tourism_desk', name: 'Medical Tourism', icon: Plane });
     if (isPackageEnabled('seo')) {
       navItems.push({ id: 'seo', name: 'SEO Compliance', icon: Globe });
@@ -420,7 +424,7 @@ export default function App() {
     practitioner: ['onboard', 'oncall', 'recruitment', 'messages'],
     pharmacy: ['pharmacy_workspace', 'help'],
     facility: ['facility_workspace', 'help'],
-    admin: ['admin', 'registry', 'tourism_desk', 'seo'],
+    admin: ['admin', 'facility_workspace', 'recruitment', 'registry'],
   };
   const SHORT_LABEL: Record<string, string> = {
     patient_dashboard: 'Home', consult: 'Consult', packages: 'Packages', assistance: 'Assistance', pharmacies: 'Pharmacy', messages: 'Mailbox', registry: 'Doctors', oncall: 'On Call', earnings: 'Earnings', onboard: 'Portal',
@@ -769,7 +773,7 @@ export default function App() {
             {activeView === 'pharmacies' && currentUser.role === 'patient' && <PharmacyFinder />}
 
             {activeView === 'pharmacy_workspace' && currentUser.role === 'pharmacy' && <PharmacyWorkspace />}
-            {activeView === 'facility_workspace' && currentUser.role === 'facility' && <FacilityWorkspace />}
+            {activeView === 'facility_workspace' && (currentUser.role === 'facility' || currentUser.role === 'admin') && <FacilityWorkspace />}
 
             {activeView === 'consult' && currentUser.role === 'patient' && (
               <ConsultNow myUserId={currentUser.id} />
