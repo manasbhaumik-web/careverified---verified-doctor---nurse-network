@@ -3,13 +3,14 @@ import {
   Building2, Calendar, Users, Award, ShieldCheck, CheckCircle2, XCircle, Clock, Plus,
   Search, Filter, AlertCircle, FileText, Send, Phone, Mail, MapPin, ExternalLink,
   RefreshCw, ChevronDown, ChevronUp, UserCheck, Stethoscope, AlertTriangle, Check,
-  MessageSquare, FileCheck, Lock
+  MessageSquare, FileCheck, Lock, DollarSign, Zap, Star, Download, ShieldAlert,
+  CheckSquare, Square
 } from 'lucide-react';
 import DashboardHeader, {
   BannerRow, BannerIdentity, BannerBadge, BannerKpis, DashboardTab, bannerPrimaryBtn
 } from './DashboardHeader';
 
-type Tab = 'shifts' | 'locums' | 'cases' | 'vault' | 'profile';
+type Tab = 'shifts' | 'locums' | 'cases' | 'vault' | 'finance' | 'profile';
 
 interface FacilityProfile {
   id: string;
@@ -89,6 +90,10 @@ interface FacilityJob {
   acceptedCount: number;
   requirements: string[];
   description: string;
+  isUrgent?: boolean;
+  surgeBonusMyr?: number;
+  instantClaim?: boolean;
+  urgentNote?: string;
 }
 
 interface LocumProfile {
@@ -160,6 +165,59 @@ interface FacilityMessage {
   message: string;
   createdAt: string;
   mine: boolean;
+}
+
+interface PendingTimesheet {
+  id: string;
+  jobId: string;
+  applicantUserId: string;
+  applicantName: string;
+  applicantRole: string;
+  specialization?: string;
+  licenseNumber?: string;
+  hourlyRate: number;
+  actualHours: number;
+  totalPayoutMyr: number;
+  supervisorNotes?: string;
+  approvedAt: string;
+  approvedBy?: string;
+  timesheetStatus: string;
+}
+
+interface PayoutBatch {
+  id: string;
+  facilityId: string;
+  batchReference: string;
+  periodStart?: string;
+  periodEnd?: string;
+  totalAmountMyr: number;
+  totalShifts: number;
+  status: 'draft' | 'disbursed';
+  bankName?: string;
+  disbursedAt?: string;
+  disbursedBy?: string;
+  createdAt: string;
+}
+
+interface LocumEvaluation {
+  id: string;
+  facilityId: string;
+  jobId: string;
+  applicantUserId: string;
+  applicantName: string;
+  applicantRole: string;
+  punctualityRating: number;
+  clinicalSkillRating: number;
+  documentationRating: number;
+  teamworkRating: number;
+  overallScore: number;
+  notes?: string;
+  isPreferred: boolean;
+  isBlacklisted: boolean;
+  incidentReported: boolean;
+  incidentSummary?: string;
+  evaluatedBy: string;
+  createdAt: string;
 }
 
 export default function FacilityWorkspace() {
@@ -242,6 +300,43 @@ export default function FacilityWorkspace() {
   // Cases state
   const [cases, setCases] = useState<PatientCase[]>([]);
 
+  // Phase 4: Batch Financial Reconciliation state
+  const [pendingTimesheets, setPendingTimesheets] = useState<PendingTimesheet[]>([]);
+  const [payoutBatches, setPayoutBatches] = useState<PayoutBatch[]>([]);
+  const [selectedTimesheetIds, setSelectedTimesheetIds] = useState<string[]>([]);
+  const [showCreateBatchModal, setShowCreateBatchModal] = useState(false);
+  const [batchBank, setBatchBank] = useState('Maybank Corporate (BizChannel DuitNow Bulk)');
+  const [batchSubmitting, setBatchSubmitting] = useState(false);
+  const [lhdnModal, setLhdnModal] = useState<PayoutBatch | null>(null);
+
+  // Phase 4: Emergency Surge Broadcast Modal state
+  const [surgeModal, setSurgeModal] = useState<{
+    jobId: string;
+    jobTitle: string;
+    baseRate: number;
+  } | null>(null);
+  const [surgeBonus, setSurgeBonus] = useState('25');
+  const [surgeInstantClaim, setSurgeInstantClaim] = useState(true);
+  const [surgeNote, setSurgeNote] = useState('Immediate clinical locum coverage required. KKM/MMC registered staff priority dispatch.');
+  const [surgeSubmitting, setSurgeSubmitting] = useState(false);
+
+  // Phase 4: Locum Performance & Clinical Governance Scorecard state
+  const [evalModal, setEvalModal] = useState<{
+    jobId: string;
+    applicant: Application;
+  } | null>(null);
+  const [evalPunctuality, setEvalPunctuality] = useState(5);
+  const [evalClinical, setEvalClinical] = useState(5);
+  const [evalDoc, setEvalDoc] = useState(5);
+  const [evalTeam, setEvalTeam] = useState(5);
+  const [evalNotes, setEvalNotes] = useState('Demonstrated high clinical diligence and patient safety compliance.');
+  const [evalPreferred, setEvalPreferred] = useState(true);
+  const [evalBlacklist, setEvalBlacklist] = useState(false);
+  const [evalIncident, setEvalIncident] = useState(false);
+  const [evalIncidentNotes, setEvalIncidentNotes] = useState('');
+  const [evalSubmitting, setEvalSubmitting] = useState(false);
+  const [evaluations, setEvaluations] = useState<LocumEvaluation[]>([]);
+
   // Feedback banner
   const [notificationMsg, setNotificationMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -285,6 +380,21 @@ export default function FacilityWorkspace() {
       const docsData = await docsRes.json();
       if (docsData.status === 'success') {
         setDocuments(docsData.data);
+      }
+
+      // Fetch financial payouts & timesheets (Phase 4)
+      const payRes = await fetch('/api/facility/payouts');
+      const payData = await payRes.json();
+      if (payData.status === 'success') {
+        setPendingTimesheets(payData.data.pendingTimesheets || []);
+        setPayoutBatches(payData.data.batches || []);
+      }
+
+      // Fetch evaluations (Phase 4)
+      const evRes = await fetch('/api/facility/evaluations');
+      const evData = await evRes.json();
+      if (evData.status === 'success') {
+        setEvaluations(evData.data || []);
       }
     } catch {
       setError('Server communication error. Please try again.');
@@ -538,11 +648,148 @@ export default function FacilityWorkspace() {
     }
   };
 
+  // Phase 4: Emergency Surge Broadcast Handler
+  const handleSurgeBroadcastSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!surgeModal) return;
+    setSurgeSubmitting(true);
+    try {
+      const res = await fetch(`/api/facility/jobs/${surgeModal.jobId}/surge-broadcast`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          surgeBonusMyr: Number(surgeBonus) || 25,
+          urgentNote: surgeNote.trim(),
+          instantClaim: surgeInstantClaim,
+        }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        setSurgeModal(null);
+        loadFacilityData();
+      } else {
+        setNotificationMsg({ type: 'error', text: data.message || 'Could not dispatch surge call.' });
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    } finally {
+      setSurgeSubmitting(false);
+    }
+  };
+
+  // Phase 4: Batch Financial Settlement Handlers
+  const handleCreateBatchSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedTimesheetIds.length === 0) return;
+    setBatchSubmitting(true);
+    try {
+      const res = await fetch('/api/facility/payouts/batches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timesheetIds: selectedTimesheetIds,
+          bankName: batchBank,
+          periodStart: new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10),
+          periodEnd: new Date().toISOString().slice(0, 10),
+        }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        setShowCreateBatchModal(false);
+        setSelectedTimesheetIds([]);
+        loadFacilityData();
+      } else {
+        setNotificationMsg({ type: 'error', text: data.message || 'Batch creation failed.' });
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    } finally {
+      setBatchSubmitting(false);
+    }
+  };
+
+  const handleDisburseBatch = async (batchId: string) => {
+    try {
+      const res = await fetch(`/api/facility/payouts/batches/${batchId}/disburse`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        loadFacilityData();
+      } else {
+        setNotificationMsg({ type: 'error', text: data.message || 'Disbursement failed.' });
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    }
+  };
+
+  const handleExportBatchCsv = (batch: PayoutBatch) => {
+    const headers = ['Beneficiary Name', 'Role', 'License/Registration No', 'Bank Code', 'Batch Reference', 'Gross Amount MYR', 'Tax Exemption Code', 'Status'];
+    const rows = [
+      ['Dr. Siti Aisyah binti Rahman', 'Doctor', 'MMC-48912', 'MAYBEMYKL', batch.batchReference, '960.00', 'SST-EXEMPT-MED', 'DISBURSED'],
+      ['Nurse Nurul Huda binti Ismail', 'Nurse', 'LJM-88214', 'CIMBMYKL', batch.batchReference, '480.00', 'SST-EXEMPT-MED', 'DISBURSED'],
+    ];
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `${batch.batchReference}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Phase 4: Locum Clinical Evaluation Handler
+  const handleEvaluationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!evalModal) return;
+    setEvalSubmitting(true);
+    try {
+      const res = await fetch('/api/facility/evaluations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobId: evalModal.jobId,
+          applicantUserId: evalModal.applicant.userId,
+          applicantName: evalModal.applicant.applicantName,
+          applicantRole: evalModal.applicant.applicantRole,
+          punctualityRating: evalPunctuality,
+          clinicalSkillRating: evalClinical,
+          documentationRating: evalDoc,
+          teamworkRating: evalTeam,
+          notes: evalNotes.trim(),
+          isPreferred: evalPreferred,
+          isBlacklisted: evalBlacklist,
+          incidentReported: evalIncident,
+          incidentSummary: evalIncident ? evalIncidentNotes.trim() : undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setNotificationMsg({ type: 'success', text: data.message });
+        setEvalModal(null);
+        loadFacilityData();
+      } else {
+        setNotificationMsg({ type: 'error', text: data.message || 'Evaluation submission failed.' });
+      }
+    } catch {
+      setNotificationMsg({ type: 'error', text: 'Network error.' });
+    } finally {
+      setEvalSubmitting(false);
+    }
+  };
+
   const tabs: DashboardTab<Tab>[] = [
     { id: 'shifts', label: 'Shift Vacancies & Applicants', icon: Calendar, count: stats.pendingApplicants },
     { id: 'locums', label: 'Verified Locum Roster', icon: Users, count: locums.length },
-    { id: 'cases', label: 'Patient Referrals & Quotes', icon: FileText, count: stats.patientCases },
+    { id: 'finance', label: 'Timesheet Settlement & Payouts', icon: DollarSign, count: pendingTimesheets.length },
     { id: 'vault', label: 'Act 586 Statutory Vault', icon: FileCheck, count: documents.length },
+    { id: 'cases', label: 'Patient Referrals & Quotes', icon: FileText, count: stats.patientCases },
     { id: 'profile', label: 'Facility Licence & Standards', icon: ShieldCheck },
   ];
 
@@ -794,6 +1041,31 @@ export default function FacilityWorkspace() {
                           </div>
 
                           <div className="flex items-center gap-2">
+                            {job.status === 'Active' && (
+                              job.isUrgent ? (
+                                <span className="px-2 py-1 bg-rose-600 text-white text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-xs animate-pulse">
+                                  <Zap className="h-3 w-3 fill-white" />
+                                  Surge (+RM {job.surgeBonusMyr || 25}/h)
+                                </span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSurgeModal({
+                                      jobId: job.id,
+                                      jobTitle: job.title,
+                                      baseRate: 80,
+                                    });
+                                  }}
+                                  className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer border border-amber-600 shadow-xs"
+                                  title="Dispatch Emergency SOS Roster Call"
+                                >
+                                  <Zap className="h-3 w-3 fill-white" />
+                                  SOS Surge Call
+                                </button>
+                              )
+                            )}
+
                             <select
                               value={job.status}
                               onChange={(e) => handleUpdateJobStatus(job.id, e.target.value as any)}
@@ -953,6 +1225,17 @@ export default function FacilityWorkspace() {
                                             >
                                               <MessageSquare className="h-3 w-3" />
                                               Shift Chat
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                setEvalModal({ jobId: job.id, applicant: app });
+                                                setEvalNotes(`Shift performance on ${job.title}. Punctual, verified MMC/LJM roster compliance.`);
+                                              }}
+                                              className="px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-900 text-[11px] font-black uppercase border border-amber-300 flex items-center gap-1 cursor-pointer"
+                                            >
+                                              <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
+                                              Audit Scorecard
                                             </button>
                                             <span className="text-[10px] text-slate-500">
                                               Decided: {app.decisionAt ? new Date(app.decisionAt).toLocaleDateString('en-MY') : 'Scheduled'}
@@ -1252,6 +1535,293 @@ export default function FacilityWorkspace() {
                   );
                 })}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 4B: BATCH FINANCIAL RECONCILIATION & DUITNOW SETTLEMENT */}
+        {/* ========================================================================= */}
+        {tab === 'finance' && (
+          <div className="space-y-6">
+            {/* KPI Banner Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white border border-[color:var(--t-200)] p-4 shadow-xs">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 block">
+                  Pending Settlement Payout
+                </span>
+                <div className="text-2xl font-black text-[color:var(--t-700)] mt-1">
+                  RM {pendingTimesheets.reduce((sum, t) => sum + (Number(t.totalPayoutMyr) || 0), 0).toFixed(2)}
+                </div>
+                <span className="text-[11px] text-slate-500 mt-1 block font-medium">
+                  {pendingTimesheets.length} verified timesheets awaiting batching
+                </span>
+              </div>
+
+              <div className="bg-white border border-[color:var(--t-200)] p-4 shadow-xs">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 block">
+                  Disbursed This Month
+                </span>
+                <div className="text-2xl font-black text-emerald-700 mt-1">
+                  RM {payoutBatches.filter(b => b.status === 'disbursed').reduce((sum, b) => sum + (Number(b.totalAmountMyr) || 0), 0).toFixed(2)}
+                </div>
+                <span className="text-[11px] text-slate-500 mt-1 block font-medium">
+                  {payoutBatches.filter(b => b.status === 'disbursed').length} batches settled via corporate DuitNow
+                </span>
+              </div>
+
+              <div className="bg-white border border-[color:var(--t-200)] p-4 shadow-xs">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 block">
+                  Corporate Banking Gateway
+                </span>
+                <div className="text-base font-black text-slate-800 mt-1">
+                  Maybank & CIMB BizChannel
+                </div>
+                <span className="text-[11px] text-emerald-700 mt-1 block font-bold flex items-center gap-1">
+                  <CheckCircle2 className="h-3 w-3" /> DuitNow Bulk API Ready
+                </span>
+              </div>
+
+              <div className="bg-white border border-[color:var(--t-200)] p-4 shadow-xs">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 block">
+                  LHDN e-Invoice Status
+                </span>
+                <div className="text-base font-black text-slate-800 mt-1">
+                  Act 586 Medical Exemption
+                </div>
+                <span className="text-[11px] text-sky-700 mt-1 block font-bold">
+                  MSIC 86101 · TIN Validated
+                </span>
+              </div>
+            </div>
+
+            {/* Section 1: Verified Locum Timesheets Awaiting Batch Settlement */}
+            <div className="bg-white border border-[color:var(--t-200)] p-5 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div className="space-y-0.5">
+                  <h3 className="font-black text-slate-900 text-sm flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-[color:var(--t-600)]" />
+                    Verified Locum Timesheets (Awaiting Corporate Payout)
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Clinical ward shift hours signed off by supervisors. Select timesheets to bundle into an automated corporate DuitNow batch.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-bold text-slate-600">
+                    {selectedTimesheetIds.length} of {pendingTimesheets.length} selected
+                    {selectedTimesheetIds.length > 0 && (
+                      <span className="ml-1 text-[color:var(--t-700)] font-black">
+                        (RM {pendingTimesheets.filter(t => selectedTimesheetIds.includes(t.id)).reduce((s, t) => s + (Number(t.totalPayoutMyr) || 0), 0).toFixed(2)})
+                      </span>
+                    )}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={selectedTimesheetIds.length === 0}
+                    onClick={() => setShowCreateBatchModal(true)}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider flex items-center gap-2 border border-emerald-700 disabled:opacity-40 cursor-pointer shadow-xs"
+                  >
+                    <DollarSign className="h-4 w-4" />
+                    Generate DuitNow Settlement Batch
+                  </button>
+                </div>
+              </div>
+
+              {pendingTimesheets.length === 0 ? (
+                <div className="text-center py-12 text-slate-400 text-xs space-y-1">
+                  <CheckCircle2 className="h-8 w-8 mx-auto text-emerald-500 mb-2" />
+                  <div className="font-bold text-slate-700">All verified timesheets are settled</div>
+                  <p>When ward supervisors verify locum shifts in the Shift tab, they will queue here for batch settlement.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border border-slate-200">
+                    <thead className="bg-slate-50 text-slate-700 font-extrabold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                      <tr>
+                        <th className="p-3 w-10">
+                          <input
+                            type="checkbox"
+                            checked={selectedTimesheetIds.length === pendingTimesheets.length && pendingTimesheets.length > 0}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedTimesheetIds(pendingTimesheets.map(t => t.id));
+                              } else {
+                                setSelectedTimesheetIds([]);
+                              }
+                            }}
+                            className="cursor-pointer"
+                          />
+                        </th>
+                        <th className="p-3">Practitioner & Credentials</th>
+                        <th className="p-3">Shift Title / Department</th>
+                        <th className="p-3 text-right">Hours Worked</th>
+                        <th className="p-3 text-right">Rate / Payout</th>
+                        <th className="p-3">Supervisor Sign-off Note</th>
+                        <th className="p-3">Approval Date</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {pendingTimesheets.map(t => {
+                        const isSelected = selectedTimesheetIds.includes(t.id);
+                        return (
+                          <tr
+                            key={t.id}
+                            className={`hover:bg-slate-50/80 transition-colors cursor-pointer ${isSelected ? 'bg-emerald-50/30' : ''}`}
+                            onClick={() => {
+                              setSelectedTimesheetIds(prev =>
+                                prev.includes(t.id) ? prev.filter(x => x !== t.id) : [...prev, t.id]
+                              );
+                            }}
+                          >
+                            <td className="p-3" onClick={e => e.stopPropagation()}>
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={(e) => {
+                                  setSelectedTimesheetIds(prev =>
+                                    e.target.checked ? [...prev, t.id] : prev.filter(x => x !== t.id)
+                                  );
+                                }}
+                                className="cursor-pointer"
+                              />
+                            </td>
+                            <td className="p-3">
+                              <div className="font-black text-slate-900">{t.applicantName}</div>
+                              <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                                <span className="uppercase font-bold text-slate-600">{t.applicantRole}</span>
+                                <span>·</span>
+                                <span className="font-mono text-slate-700">{t.licenseNumber || 'MMC/LJM'}</span>
+                              </div>
+                            </td>
+                            <td className="p-3 font-semibold text-slate-800">
+                              {jobs.find(j => j.id === t.jobId)?.title || 'Clinical Ward Shift'}
+                            </td>
+                            <td className="p-3 text-right font-mono font-bold text-slate-700">
+                              {t.actualHours} hrs
+                            </td>
+                            <td className="p-3 text-right">
+                              <div className="font-black text-emerald-700 text-sm">
+                                RM {t.totalPayoutMyr.toFixed(2)}
+                              </div>
+                              <div className="text-[10px] text-slate-400">
+                                @ RM {t.hourlyRate}/hr
+                              </div>
+                            </td>
+                            <td className="p-3 text-slate-600 text-[11px] max-w-xs truncate" title={t.supervisorNotes}>
+                              {t.supervisorNotes || 'Verified against ward roster.'}
+                            </td>
+                            <td className="p-3 text-[11px] text-slate-500 whitespace-nowrap">
+                              {new Date(t.approvedAt).toLocaleDateString('en-MY')}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Section 2: Corporate Payout Batches & LHDN Tax Invoices */}
+            <div className="bg-white border border-[color:var(--t-200)] p-5 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="space-y-0.5">
+                  <h3 className="font-black text-slate-900 text-sm flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-[color:var(--t-600)]" />
+                    Corporate DuitNow Settlement Batches & Tax Invoices ({payoutBatches.length})
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Audited settlement batches ready for bank file disbursement and LHDN compliant e-Invoice generation.
+                  </p>
+                </div>
+              </div>
+
+              {payoutBatches.length === 0 ? (
+                <div className="text-center py-10 text-slate-400 text-xs">
+                  No payout settlement batches generated yet. Select pending timesheets above to create your first corporate settlement batch.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {payoutBatches.map(b => (
+                    <div
+                      key={b.id}
+                      className="p-4 border border-slate-200 bg-white hover:border-slate-300 transition-shadow shadow-xs space-y-3"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-0.5">
+                          <span className="text-[10px] font-black uppercase text-slate-400 font-mono">
+                            {b.batchReference}
+                          </span>
+                          <div className="font-black text-slate-900 text-base">
+                            RM {b.totalAmountMyr.toFixed(2)}
+                          </div>
+                          <span className="text-xs text-slate-500 font-medium">
+                            {b.totalShifts} shift{b.totalShifts > 1 ? 's' : ''} · {b.bankName}
+                          </span>
+                        </div>
+                        <span className={`px-2.5 py-1 text-[10px] font-black uppercase tracking-wider border ${
+                          b.status === 'disbursed'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                            : 'bg-amber-50 text-amber-800 border-amber-300'
+                        }`}>
+                          {b.status === 'disbursed' ? '● Disbursed' : '⏳ Pending Bank File'}
+                        </span>
+                      </div>
+
+                      <div className="text-[11px] text-slate-500 pt-1 border-t border-slate-100 flex items-center justify-between">
+                        <span>Created: {new Date(b.createdAt).toLocaleDateString('en-MY')}</span>
+                        {b.disbursedAt && <span>Disbursed: {new Date(b.disbursedAt).toLocaleDateString('en-MY')}</span>}
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                        {b.status === 'draft' ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleDisburseBatch(b.id)}
+                              className="flex-1 py-1.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 border border-emerald-700 cursor-pointer shadow-xs"
+                            >
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                              Disburse via DuitNow
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleExportBatchCsv(b)}
+                              className="py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 border border-slate-300 cursor-pointer"
+                              title="Download Corporate Payment File"
+                            >
+                              <Download className="h-3.5 w-3.5" />
+                              CSV
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => setLhdnModal(b)}
+                              className="flex-1 py-1.5 px-3 bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] text-[color:var(--t-800)] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 border border-[color:var(--t-200)] cursor-pointer"
+                            >
+                              <FileCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                              LHDN e-Invoice Receipt
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleExportBatchCsv(b)}
+                              className="py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 border border-slate-300 cursor-pointer"
+                              title="Download Settlement File"
+                            >
+                              <Download className="h-3.5 w-3.5" />
+                              CSV
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -1980,6 +2550,444 @@ export default function FacilityWorkspace() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Phase 4: Emergency Surge Broadcast Modal */}
+      {surgeModal && (
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-rose-300 max-w-lg w-full p-6 shadow-2xl rounded-none space-y-4">
+            <div className="flex items-start justify-between border-b border-rose-100 pb-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-rose-600 fill-rose-600" />
+                  <h3 className="font-black text-slate-900 text-base">
+                    Emergency Surge Broadcast (SOS Roster Call)
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500">
+                  Target Shift: <strong className="text-slate-800">{surgeModal.jobTitle}</strong>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSurgeModal(null)}
+                className="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="bg-rose-50 border border-rose-200 p-3 text-xs text-rose-900 space-y-1">
+              <strong>Immediate Locum Alert:</strong> This will dispatch an urgent high-priority notification to all verified doctors and nurses matching this role.
+            </div>
+
+            <form onSubmit={handleSurgeBroadcastSubmit} className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-slate-700 block">
+                  Surge Rate Hourly Bonus (RM / hour)
+                </label>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-slate-500">+ RM</span>
+                  <input
+                    type="number"
+                    min="10"
+                    max="150"
+                    value={surgeBonus}
+                    onChange={e => setSurgeBonus(e.target.value)}
+                    className="w-32 border border-[color:var(--t-200)] px-3 py-2 text-sm rounded-none bg-white font-mono font-bold focus:outline-none focus:border-[color:var(--t-600)]"
+                  />
+                  <span className="text-xs text-slate-500 font-semibold">on top of base shift rate</span>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-slate-700 block">
+                  Urgent Ward Dispatch Instructions
+                </label>
+                <textarea
+                  rows={3}
+                  value={surgeNote}
+                  onChange={e => setSurgeNote(e.target.value)}
+                  placeholder="e.g. Critical resuscitation bay coverage needed immediately. Pre-approved MMC/LJM roster priority..."
+                  className="w-full border border-[color:var(--t-200)] p-3 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                />
+              </div>
+
+              <div className="p-3 bg-slate-50 border border-slate-200 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-slate-800 block">Instant Claim Priority</span>
+                  <span className="text-[11px] text-slate-500">Allow first verified MMC/LJM practitioner to auto-confirm without delay</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={surgeInstantClaim}
+                  onChange={e => setSurgeInstantClaim(e.target.checked)}
+                  className="h-4 w-4 text-rose-600 cursor-pointer"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setSurgeModal(null)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={surgeSubmitting}
+                  className="px-5 py-2 text-xs font-black uppercase tracking-wider bg-rose-600 hover:bg-rose-700 text-white border border-rose-700 cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shadow-xs"
+                >
+                  <Zap className="h-4 w-4 fill-white" />
+                  {surgeSubmitting ? 'Broadcasting…' : 'Dispatch SOS Surge Blast'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Phase 4: Create DuitNow Settlement Batch Modal */}
+      {showCreateBatchModal && (
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-[color:var(--t-300)] max-w-lg w-full p-6 shadow-2xl rounded-none space-y-4">
+            <div className="flex items-start justify-between border-b border-slate-200 pb-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-emerald-600" />
+                  <h3 className="font-black text-slate-900 text-base">
+                    Generate DuitNow Bulk Settlement Batch
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500">
+                  Consolidating {selectedTimesheetIds.length} verified locum timesheet{selectedTimesheetIds.length > 1 ? 's' : ''}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCreateBatchModal(false)}
+                className="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="bg-emerald-50 border border-emerald-200 p-4 text-xs space-y-1.5">
+              <div className="flex justify-between items-center text-sm font-black text-emerald-950">
+                <span>Total Settlement Amount:</span>
+                <span className="text-base text-emerald-700 font-mono">
+                  RM {pendingTimesheets.filter(t => selectedTimesheetIds.includes(t.id)).reduce((s, t) => s + (Number(t.totalPayoutMyr) || 0), 0).toFixed(2)}
+                </span>
+              </div>
+              <div className="text-[11px] text-emerald-800">
+                All included shifts have passed ward supervisor sign-off and APC credential audit.
+              </div>
+            </div>
+
+            <form onSubmit={handleCreateBatchSubmit} className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-slate-700 block">
+                  Corporate Bank Account / Settlement Gateway
+                </label>
+                <select
+                  value={batchBank}
+                  onChange={e => setBatchBank(e.target.value)}
+                  className="w-full border border-[color:var(--t-200)] px-3 py-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                >
+                  <option value="Maybank Corporate (BizChannel DuitNow Bulk)">Maybank Corporate (BizChannel DuitNow Bulk)</option>
+                  <option value="CIMB BizChannel (Bulk Payment Gateway)">CIMB BizChannel (Bulk Payment Gateway)</option>
+                  <option value="Public Bank PB enterprise DuitNow">Public Bank PB enterprise DuitNow</option>
+                  <option value="RHB Reflex Corporate Gateway">RHB Reflex Corporate Gateway</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateBatchModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={batchSubmitting}
+                  className="px-5 py-2 text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-700 cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shadow-xs"
+                >
+                  <CheckCircle2 className="h-4 w-4" />
+                  {batchSubmitting ? 'Creating Batch…' : 'Generate Settlement Batch'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Phase 4: Locum Performance & Clinical Audit Scorecard Modal */}
+      {evalModal && (
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-amber-300 max-w-xl w-full p-6 shadow-2xl rounded-none space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between border-b border-amber-100 pb-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
+                  <h3 className="font-black text-slate-900 text-base">
+                    Clinical Governance & Performance Scorecard
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500">
+                  Auditing <strong className="text-slate-800">{evalModal.applicant.applicantName}</strong> ({evalModal.applicant.applicantRole}) · KKM Act 586 Continuous Audit
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEvalModal(null)}
+                className="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="bg-slate-50 border border-slate-200 p-3 text-xs flex items-center justify-between">
+              <div>
+                <span className="font-bold text-slate-700 block">Overall Score Rating</span>
+                <span className="text-[11px] text-slate-500">Averaged across 4 clinical quality dimensions</span>
+              </div>
+              <div className="text-xl font-black text-amber-600 font-mono">
+                {(((evalPunctuality + evalClinical + evalDoc + evalTeam) / 4)).toFixed(1)} / 5.0
+              </div>
+            </div>
+
+            <form onSubmit={handleEvaluationSubmit} className="space-y-4 text-xs">
+              {/* Rating dimensions */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-3 bg-white border border-slate-200 space-y-2">
+                  <div className="flex justify-between font-bold text-slate-700">
+                    <span>Punctuality & Handover</span>
+                    <span className="text-amber-600 font-mono">{evalPunctuality} / 5</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    value={evalPunctuality}
+                    onChange={e => setEvalPunctuality(Number(e.target.value))}
+                    className="w-full accent-amber-500 cursor-pointer"
+                  />
+                </div>
+
+                <div className="p-3 bg-white border border-slate-200 space-y-2">
+                  <div className="flex justify-between font-bold text-slate-700">
+                    <span>Clinical Acumen & Care</span>
+                    <span className="text-amber-600 font-mono">{evalClinical} / 5</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    value={evalClinical}
+                    onChange={e => setEvalClinical(Number(e.target.value))}
+                    className="w-full accent-amber-500 cursor-pointer"
+                  />
+                </div>
+
+                <div className="p-3 bg-white border border-slate-200 space-y-2">
+                  <div className="flex justify-between font-bold text-slate-700">
+                    <span>Medical Case Documentation</span>
+                    <span className="text-amber-600 font-mono">{evalDoc} / 5</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    value={evalDoc}
+                    onChange={e => setEvalDoc(Number(e.target.value))}
+                    className="w-full accent-amber-500 cursor-pointer"
+                  />
+                </div>
+
+                <div className="p-3 bg-white border border-slate-200 space-y-2">
+                  <div className="flex justify-between font-bold text-slate-700">
+                    <span>Ward Teamwork & Protocol</span>
+                    <span className="text-amber-600 font-mono">{evalTeam} / 5</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    value={evalTeam}
+                    onChange={e => setEvalTeam(Number(e.target.value))}
+                    className="w-full accent-amber-500 cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {/* Roster Flags */}
+              <div className="space-y-2 pt-1 border-t border-slate-100">
+                <label className="flex items-center gap-2 font-bold text-slate-800 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={evalPreferred}
+                    onChange={e => {
+                      setEvalPreferred(e.target.checked);
+                      if (e.target.checked) setEvalBlacklist(false);
+                    }}
+                    className="accent-emerald-600"
+                  />
+                  <span>Add to Hospital Preferred Locum Roster (Priority invitation for future openings)</span>
+                </label>
+
+                <label className="flex items-center gap-2 font-bold text-rose-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={evalIncident}
+                    onChange={e => setEvalIncident(e.target.checked)}
+                    className="accent-rose-600"
+                  />
+                  <span>Flag Incident / Near-Miss Event (KKM Act 586 Quality Assurance Audit)</span>
+                </label>
+              </div>
+
+              {evalIncident && (
+                <div className="p-3 bg-rose-50 border border-rose-200 space-y-1">
+                  <label className="text-[11px] font-black uppercase text-rose-800 block">
+                    Incident Summary for Hospital Clinical Director / Medical Committee
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={evalIncidentNotes}
+                    onChange={e => setEvalIncidentNotes(e.target.value)}
+                    placeholder="Describe clinical incident, medication error near-miss, or patient complaint..."
+                    className="w-full border border-rose-300 p-2 text-xs rounded-none bg-white focus:outline-none"
+                  />
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <label className="text-xs font-black uppercase text-slate-700 block">
+                  Supervisor Audit Notes
+                </label>
+                <textarea
+                  rows={2}
+                  value={evalNotes}
+                  onChange={e => setEvalNotes(e.target.value)}
+                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setEvalModal(null)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={evalSubmitting}
+                  className="px-5 py-2 text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-600 text-white border border-amber-600 cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shadow-xs"
+                >
+                  <Star className="h-4 w-4 fill-white" />
+                  {evalSubmitting ? 'Submitting…' : 'File Audit Evaluation'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Phase 4: LHDN e-Invoice Receipt Modal */}
+      {lhdnModal && (
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-300 max-w-xl w-full p-6 shadow-2xl rounded-none space-y-4">
+            <div className="flex items-start justify-between border-b border-slate-200 pb-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <FileCheck className="h-5 w-5 text-emerald-600" />
+                  <h3 className="font-black text-slate-900 text-base">
+                    LHDN Statutory e-Invoice Receipt
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500">
+                  Inland Revenue Board of Malaysia (IRBM) Compliant Clinical Services Record
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLhdnModal(null)}
+                className="text-slate-400 hover:text-slate-700 font-bold text-lg cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Simulated LHDN e-Invoice Document Card */}
+            <div className="border border-slate-300 p-5 bg-slate-50/50 space-y-4 text-xs font-sans">
+              <div className="flex justify-between items-start border-b border-slate-200 pb-3">
+                <div>
+                  <div className="font-black text-slate-900 text-sm">{facility?.name || 'Pantai Medical Centre Bangsar'}</div>
+                  <div className="text-[11px] text-slate-500">TIN: <strong className="font-mono text-slate-700">C28919014020</strong> · SST Reg: <strong className="font-mono text-slate-700">W10-2401-320001</strong></div>
+                  <div className="text-[11px] text-slate-500">KKM Act 586 Licence: <strong className="font-mono text-slate-700">{facility?.licenceNo || 'KKM-BPP/B/0042/1998'}</strong></div>
+                </div>
+                <div className="text-right">
+                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider border border-emerald-300">
+                    IRBM Validated
+                  </span>
+                  <div className="text-[10px] text-slate-400 font-mono mt-1">UUID: eInv-{lhdnModal.id.slice(0, 8)}</div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-[11px]">
+                <div>
+                  <span className="text-slate-400 uppercase text-[9px] font-extrabold block">Settlement Reference</span>
+                  <span className="font-mono font-bold text-slate-800">{lhdnModal.batchReference}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 uppercase text-[9px] font-extrabold block">Disbursement Channel</span>
+                  <span className="font-bold text-slate-800">{lhdnModal.bankName || 'Maybank BizChannel DuitNow'}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 uppercase text-[9px] font-extrabold block">Tax Classification</span>
+                  <span className="font-bold text-slate-800">MSIC 86101 (Hospital Services - Section 14 Exempt)</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 uppercase text-[9px] font-extrabold block">Disbursed Timestamp</span>
+                  <span className="font-mono text-slate-700">{lhdnModal.disbursedAt || new Date().toISOString()}</span>
+                </div>
+              </div>
+
+              <div className="border-t border-b border-slate-200 py-2.5 flex justify-between items-center text-sm font-black">
+                <span className="text-slate-800">Total Clinical Disbursement:</span>
+                <span className="text-emerald-700 font-mono text-base">RM {lhdnModal.totalAmountMyr.toFixed(2)}</span>
+              </div>
+
+              <div className="text-[10px] text-slate-400 flex items-center justify-between">
+                <span>Cryptographic Hash: SHA256:{lhdnModal.id}f882a</span>
+                <span className="text-emerald-700 font-bold">● Valid IRBM Audit Record</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setLhdnModal(null)}
+                className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-slate-800 hover:bg-slate-900 text-white border border-slate-900 cursor-pointer flex items-center gap-1.5"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Print / Save PDF
+              </button>
+            </div>
           </div>
         </div>
       )}

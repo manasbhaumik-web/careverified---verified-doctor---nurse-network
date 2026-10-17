@@ -1907,6 +1907,312 @@ app.post("/api/facility/documents", requireRole("facility", "admin"), (req, res)
 });
 
 // -------------------------------------------------------------
+// Phase 4: Emergency Surge Broadcast (SOS Roster Call)
+// -------------------------------------------------------------
+app.post("/api/facility/jobs/:jobId/surge-broadcast", requireRole("facility", "admin"), (req, res) => {
+  const { jobId } = req.params;
+  const { surgeBonusMyr, urgentNote, instantClaim } = req.body;
+
+  const jobIndex = jobs.findIndex(j => j.id === jobId);
+  if (jobIndex === -1) return fail(res, 404, "Shift vacancy not found.");
+
+  const job = jobs[jobIndex];
+  if (req.user!.role !== "admin") {
+    const myFacId = req.user!.facilityId || req.user!.profileId;
+    if (job.facilityId && job.facilityId !== myFacId) {
+      return fail(res, 403, "You can only broadcast surge calls for your own facility.");
+    }
+  }
+
+  const bonus = Number(surgeBonusMyr) >= 0 ? Number(surgeBonusMyr) : 25;
+  const updatedJob = {
+    ...job,
+    isUrgent: true,
+    surgeBonusMyr: bonus,
+    instantClaim: instantClaim === true,
+    urgentNote: urgentNote ? str(urgentNote, 300) : "Immediate clinical coverage needed. KKM verified roster priority.",
+    updatedAt: new Date().toISOString()
+  };
+
+  jobs[jobIndex] = updatedJob;
+  db.prepare("INSERT OR REPLACE INTO records (collection, id, data) VALUES (?, ?, ?)").run("jobs", jobId, JSON.stringify(updatedJob));
+
+  // Broadcast notification to active practitioners
+  const practitioners = db.prepare("SELECT id, name FROM users WHERE role = 'practitioner'").all() as any[];
+
+  for (const doc of practitioners) {
+    notify(
+      doc.id,
+      `🚨 URGENT SURGE SHIFT: ${job.hospitalName}`,
+      `Immediate coverage needed: ${job.title} (+RM ${bonus}/hr surge bonus). ${instantClaim ? '⚡ Instant Claim Enabled.' : 'Apply now.'}`
+    );
+  }
+
+  audit(req, "facility.job.surge_broadcast", { target: ["job", jobId], details: { bonus, instantClaim, notifiedCount: practitioners.length } });
+
+  res.json({
+    status: "success",
+    message: `Emergency surge broadcast dispatched to ${practitioners.length} registered clinical practitioners with +RM ${bonus}/hr surge rate!`,
+    data: updatedJob
+  });
+});
+
+// -------------------------------------------------------------
+// Phase 4: Batch Financial Reconciliation (DuitNow Bulk & LHDN Compliance)
+// -------------------------------------------------------------
+app.get("/api/facility/payouts", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+
+  const allJobs = jobs.filter(j => !j.facilityId || j.facilityId === facilityId);
+  const jobIds = allJobs.map(j => j.id);
+
+  let pendingTimesheets: any[] = [];
+  if (jobIds.length > 0) {
+    const placeholders = jobIds.map(() => "?").join(",");
+    pendingTimesheets = db.prepare(`
+      SELECT ja.*, u.email as practitioner_email
+      FROM job_applications ja
+      LEFT JOIN users u ON u.id = ja.applicant_user_id
+      WHERE ja.job_id IN (${placeholders})
+        AND ja.timesheet_status = 'approved'
+        AND (ja.payout_batch_id IS NULL OR ja.payout_batch_id = '')
+      ORDER BY ja.approved_at DESC
+    `).all(...jobIds) as any[];
+  }
+
+  const batches = db.prepare(`
+    SELECT * FROM facility_payout_batches
+    WHERE facility_id = ?
+    ORDER BY created_at DESC
+  `).all(facilityId) as any[];
+
+  res.json({
+    status: "success",
+    data: {
+      pendingTimesheets: pendingTimesheets.map(t => ({
+        id: t.id,
+        jobId: t.job_id,
+        applicantUserId: t.applicant_user_id,
+        applicantName: t.applicant_name,
+        applicantRole: t.applicant_role,
+        specialization: t.specialization,
+        licenseNumber: t.license_number,
+        hourlyRate: t.hourly_rate,
+        actualHours: t.actual_hours,
+        totalPayoutMyr: t.total_payout_myr || ((Number(t.actual_hours) || 8) * (Number(t.hourly_rate) || 80)),
+        supervisorNotes: t.supervisor_notes,
+        approvedAt: t.approved_at,
+        approvedBy: t.approved_by,
+        timesheetStatus: t.timesheet_status
+      })),
+      batches: batches.map(b => ({
+        id: b.id,
+        facilityId: b.facility_id,
+        batchReference: b.batch_reference,
+        periodStart: b.period_start,
+        periodEnd: b.period_end,
+        totalAmountMyr: b.total_amount_myr,
+        totalShifts: b.total_shifts,
+        status: b.status,
+        bankName: b.bank_name,
+        disbursedAt: b.disbursed_at,
+        disbursedBy: b.disbursed_by,
+        createdAt: b.created_at
+      }))
+    }
+  });
+});
+
+app.post("/api/facility/payouts/batches", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const { timesheetIds, bankName, periodStart, periodEnd } = req.body;
+
+  if (!Array.isArray(timesheetIds) || timesheetIds.length === 0) {
+    return fail(res, 400, "Please select at least one approved timesheet to batch for settlement.");
+  }
+
+  const placeholders = timesheetIds.map(() => "?").join(",");
+  const timesheets = db.prepare(`
+    SELECT * FROM job_applications
+    WHERE id IN (${placeholders}) AND timesheet_status = 'approved' AND (payout_batch_id IS NULL OR payout_batch_id = '')
+  `).all(...timesheetIds) as any[];
+
+  if (timesheets.length === 0) {
+    return fail(res, 400, "No eligible approved timesheets found.");
+  }
+
+  const totalAmount = timesheets.reduce((sum, t) => sum + (Number(t.total_payout_myr) || (Number(t.actual_hours) * Number(t.hourly_rate)) || 0), 0);
+  const totalAmountRounded = Math.round(totalAmount * 100) / 100;
+
+  const batchId = generateId("fpay");
+  const now = new Date();
+  const dateStr = now.toISOString().slice(0, 10).replace(/-/g, "");
+  const randSeq = Math.floor(100 + Math.random() * 900);
+  const batchRef = `MY-DUITNOW-FAC-${dateStr}-${randSeq}`;
+
+  db.prepare(`
+    INSERT INTO facility_payout_batches (id, facility_id, batch_reference, period_start, period_end, total_amount_myr, total_shifts, status, bank_name, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'draft', ?, ?)
+  `).run(batchId, facilityId, batchRef, periodStart || null, periodEnd || null, totalAmountRounded, timesheets.length, bankName || "Maybank Corporate (BizChannel DuitNow Bulk)", now.toISOString());
+
+  // Link timesheets to batch
+  db.prepare(`
+    UPDATE job_applications
+    SET payout_batch_id = ?
+    WHERE id IN (${placeholders})
+  `).run(batchId, ...timesheets.map(t => t.id));
+
+  audit(req, "facility.payout.batch_create", { target: ["facility_payout_batch", batchId], details: { batchRef, totalAmount: totalAmountRounded, count: timesheets.length } });
+
+  res.status(201).json({
+    status: "success",
+    message: `Settlement batch ${batchRef} created for RM ${totalAmountRounded.toFixed(2)} (${timesheets.length} verified shifts). Ready for corporate disbursement.`,
+    data: {
+      id: batchId,
+      batchReference: batchRef,
+      totalAmountMyr: totalAmountRounded,
+      totalShifts: timesheets.length,
+      status: "draft"
+    }
+  });
+});
+
+app.post("/api/facility/payouts/batches/:batchId/disburse", requireRole("facility", "admin"), (req, res) => {
+  const { batchId } = req.params;
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+
+  const batch = db.prepare("SELECT * FROM facility_payout_batches WHERE id = ?").get(batchId) as any;
+  if (!batch) return fail(res, 404, "Payout batch not found.");
+
+  if (req.user!.role !== "admin" && batch.facility_id !== facilityId) {
+    return fail(res, 403, "You can only disburse batches for your own facility.");
+  }
+
+  const now = new Date().toISOString();
+  db.prepare(`
+    UPDATE facility_payout_batches
+    SET status = 'disbursed', disbursed_at = ?, disbursed_by = ?
+    WHERE id = ?
+  `).run(now, req.user!.id, batchId);
+
+  // Update all timesheets in batch to 'paid'
+  db.prepare(`
+    UPDATE job_applications
+    SET timesheet_status = 'paid'
+    WHERE payout_batch_id = ?
+  `).run(batchId);
+
+  // Notify each practitioner
+  const timesheets = db.prepare("SELECT * FROM job_applications WHERE payout_batch_id = ?").all(batchId) as any[];
+  for (const t of timesheets) {
+    const amt = Number(t.total_payout_myr) || (Number(t.actual_hours) * Number(t.hourly_rate));
+    notify(
+      t.applicant_user_id,
+      "💰 Locum Shift Payout Disbursed",
+      `Your shift payout of RM ${amt.toFixed(2)} for ${t.applicant_role} duty has been disbursed via DuitNow Bulk (Ref: ${batch.batch_reference}).`
+    );
+  }
+
+  audit(req, "facility.payout.batch_disburse", { target: ["facility_payout_batch", batchId], details: { batchRef: batch.batch_reference, totalAmount: batch.total_amount_myr } });
+
+  res.json({
+    status: "success",
+    message: `Batch ${batch.batch_reference} disbursed successfully. All ${timesheets.length} timesheets marked as paid.`,
+    data: { id: batchId, status: "disbursed", disbursedAt: now }
+  });
+});
+
+// -------------------------------------------------------------
+// Phase 4: Locum Performance & Clinical Governance Scorecards (KKM Act 586 Audit)
+// -------------------------------------------------------------
+app.get("/api/facility/evaluations", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const { applicantUserId } = req.query;
+
+  let query = "SELECT * FROM facility_locum_evaluations WHERE facility_id = ?";
+  const params: any[] = [facilityId];
+
+  if (applicantUserId) {
+    query += " AND applicant_user_id = ?";
+    params.push(String(applicantUserId));
+  }
+
+  query += " ORDER BY created_at DESC";
+  const rows = db.prepare(query).all(...params) as any[];
+
+  res.json({
+    status: "success",
+    data: rows.map(r => ({
+      id: r.id,
+      facilityId: r.facility_id,
+      jobId: r.job_id,
+      applicantUserId: r.applicant_user_id,
+      applicantName: r.applicant_name,
+      applicantRole: r.applicant_role,
+      punctualityRating: r.punctuality_rating,
+      clinicalSkillRating: r.clinical_skill_rating,
+      documentationRating: r.documentation_rating,
+      teamworkRating: r.teamwork_rating,
+      overallScore: r.overall_score,
+      notes: r.notes,
+      isPreferred: Boolean(r.is_preferred),
+      isBlacklisted: Boolean(r.is_blacklisted),
+      incidentReported: Boolean(r.incident_reported),
+      incidentSummary: r.incident_summary,
+      evaluatedBy: r.evaluated_by,
+      createdAt: r.created_at
+    }))
+  });
+});
+
+app.post("/api/facility/evaluations", requireRole("facility", "admin"), (req, res) => {
+  const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  const {
+    jobId, applicantUserId, applicantName, applicantRole,
+    punctualityRating, clinicalSkillRating, documentationRating, teamworkRating,
+    notes, isPreferred, isBlacklisted, incidentReported, incidentSummary
+  } = req.body;
+
+  if (!applicantUserId || !applicantName) {
+    return fail(res, 400, "Applicant information required for clinical evaluation.");
+  }
+
+  const p = Math.max(1, Math.min(5, Number(punctualityRating) || 5));
+  const c = Math.max(1, Math.min(5, Number(clinicalSkillRating) || 5));
+  const d = Math.max(1, Math.min(5, Number(documentationRating) || 5));
+  const t = Math.max(1, Math.min(5, Number(teamworkRating) || 5));
+  const overallScore = Math.round(((p + c + d + t) / 4) * 10) / 10;
+
+  const evalId = generateId("feval");
+  const now = new Date().toISOString();
+
+  db.prepare(`
+    INSERT INTO facility_locum_evaluations (
+      id, facility_id, job_id, applicant_user_id, applicant_name, applicant_role,
+      punctuality_rating, clinical_skill_rating, documentation_rating, teamwork_rating,
+      overall_score, notes, is_preferred, is_blacklisted, incident_reported, incident_summary,
+      evaluated_by, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    evalId, facilityId, jobId || "general", applicantUserId, str(applicantName, 100), applicantRole || "doctor",
+    p, c, d, t, overallScore, notes ? str(notes, 500) : null,
+    isPreferred ? 1 : 0, isBlacklisted ? 1 : 0, incidentReported ? 1 : 0, incidentSummary ? str(incidentSummary, 500) : null,
+    req.user!.id, now
+  );
+
+  audit(req, "facility.locum.evaluate", {
+    target: ["locum_evaluation", evalId],
+    details: { applicantUserId, overallScore, isPreferred, isBlacklisted, incidentReported }
+  });
+
+  res.status(201).json({
+    status: "success",
+    message: `Clinical audit evaluation filed (Overall Score: ${overallScore}/5.0). ${isPreferred ? "Added to Hospital Preferred Roster." : ""}`,
+    data: { id: evalId, overallScore, isPreferred: Boolean(isPreferred), isBlacklisted: Boolean(isBlacklisted) }
+  });
+});
+
+// -------------------------------------------------------------
 // Reviews
 // -------------------------------------------------------------
 app.get("/api/reviews", (req, res) => {

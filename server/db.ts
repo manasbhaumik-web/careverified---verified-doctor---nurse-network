@@ -148,7 +148,49 @@ CREATE TABLE IF NOT EXISTS facility_documents (
   created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_fac_doc_facility ON facility_documents(facility_id);
+
+-- Phase 4: Batch Financial Reconciliation & Locum Performance Scorecards
+CREATE TABLE IF NOT EXISTS facility_payout_batches (
+  id TEXT PRIMARY KEY,
+  facility_id TEXT NOT NULL,
+  batch_reference TEXT NOT NULL,
+  period_start TEXT,
+  period_end TEXT,
+  total_amount_myr REAL NOT NULL,
+  total_shifts INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'draft',
+  bank_name TEXT,
+  disbursed_at TEXT,
+  disbursed_by TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_payout_fac ON facility_payout_batches(facility_id);
+
+CREATE TABLE IF NOT EXISTS facility_locum_evaluations (
+  id TEXT PRIMARY KEY,
+  facility_id TEXT NOT NULL,
+  job_id TEXT NOT NULL,
+  applicant_user_id TEXT NOT NULL,
+  applicant_name TEXT NOT NULL,
+  applicant_role TEXT NOT NULL,
+  punctuality_rating INTEGER NOT NULL DEFAULT 5,
+  clinical_skill_rating INTEGER NOT NULL DEFAULT 5,
+  documentation_rating INTEGER NOT NULL DEFAULT 5,
+  teamwork_rating INTEGER NOT NULL DEFAULT 5,
+  overall_score REAL NOT NULL DEFAULT 5.0,
+  notes TEXT,
+  is_preferred INTEGER NOT NULL DEFAULT 0,
+  is_blacklisted INTEGER NOT NULL DEFAULT 0,
+  incident_reported INTEGER NOT NULL DEFAULT 0,
+  incident_summary TEXT,
+  evaluated_by TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_eval_user ON facility_locum_evaluations(applicant_user_id);
+CREATE INDEX IF NOT EXISTS idx_eval_facility ON facility_locum_evaluations(facility_id);
 `);
+
+try { db.exec("ALTER TABLE job_applications ADD COLUMN payout_batch_id TEXT"); } catch { /* column already exists */ }
 
 // ---- Migration: allow the 'pharmacy' and 'facility' roles. ----
 {
