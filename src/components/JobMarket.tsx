@@ -132,13 +132,15 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob, role = 'p
         title="Hospital Staffing & Nurse Shift Marketplace"
         description="Clinics source credential-verified staff for temporary and full contract roles."
         actions={
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold transition-colors cursor-pointer flex items-center gap-2"
-          >
-            <PlusCircle className="h-4 w-4" />
-            {showForm ? 'View Active Shifts' : 'Post Hospital Vacancy'}
-          </button>
+          (role === 'facility' || role === 'admin') ? (
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold transition-colors cursor-pointer flex items-center gap-2"
+            >
+              <PlusCircle className="h-4 w-4" />
+              {showForm ? 'View Active Shifts' : 'Post Hospital Vacancy'}
+            </button>
+          ) : undefined
         }
         tabs={[
           { id: 'open' as const, label: 'Open shifts', icon: Briefcase, count: jobs.length },
@@ -626,28 +628,41 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob, role = 'p
               >
                 Close Details
               </button>
-              <button
-                type="button"
-                onClick={() => {
-                  handleApply(selectedModalJob.id);
-                  setSelectedModalJob(null);
-                }}
-                disabled={appliedJobs.includes(selectedModalJob.id) || !!selectedModalJob.applyBlockedReason}
-                className={`flex-1 text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer ${
-                  appliedJobs.includes(selectedModalJob.id) || selectedModalJob.applyBlockedReason 
-                    ? "bg-emerald-50 border-2 border-emerald-100 text-emerald-800 cursor-not-allowed" 
-                    : "bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white hover:scale-[1.01]"
-                }`}
-              >
-                {appliedJobs.includes(selectedModalJob.id) ? (
-                  <>
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                    Applied
-                  </>
-                ) : (
-                  "Apply for Shift"
+              <div className="flex-1 flex flex-col gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleApply(selectedModalJob.id);
+                    setSelectedModalJob(null);
+                  }}
+                  disabled={appliedJobs.includes(selectedModalJob.id) || !!selectedModalJob.applyBlockedReason || role === 'patient'}
+                  className={`w-full text-xs font-bold py-2.5 transition-all flex items-center justify-center gap-1.5 ${
+                    appliedJobs.includes(selectedModalJob.id)
+                      ? "bg-emerald-50 border border-emerald-200 text-emerald-800 cursor-not-allowed" 
+                      : selectedModalJob.applyBlockedReason || role === 'patient'
+                      ? "bg-slate-100 border border-slate-300 text-slate-500 cursor-not-allowed"
+                      : "bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer"
+                  }`}
+                >
+                  {appliedJobs.includes(selectedModalJob.id) ? (
+                    <>
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                      Applied
+                    </>
+                  ) : selectedModalJob.applyBlockedReason ? (
+                    "Not Eligible"
+                  ) : role === 'patient' ? (
+                    "Practitioners Only"
+                  ) : (
+                    "Apply for Shift"
+                  )}
+                </button>
+                {selectedModalJob.applyBlockedReason && (
+                  <span className="text-[10px] text-rose-600 font-semibold text-center leading-tight">
+                    {selectedModalJob.applyBlockedReason}
+                  </span>
                 )}
-              </button>
+              </div>
             </div>
           </div>
         </div>
