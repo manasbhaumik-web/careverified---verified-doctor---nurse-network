@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocale } from '../locale';
 import { ArrowRight, BadgeCheck, Bookmark, BookOpen, ExternalLink, Flag, Printer, Search, Send, ShieldCheck, X } from 'lucide-react';
-import { Article, DoctorProfile, NurseProfile } from '../types';
+import { Article, DoctorProfile, NurseProfile, Review, Booking } from '../types';
 import DashboardHeader, { BannerKpis, FilterSelect } from './DashboardHeader';
+import PractitionerHeroBanner from './PractitionerHeroBanner';
 
 interface MedicalLibraryProps {
   articles: Article[];
@@ -13,6 +14,9 @@ interface MedicalLibraryProps {
   onReportProblem?: (article: Article) => void;
   /** Opens the directory, optionally filtered to a specialty. */
   onFindDoctor: (specialty?: string) => void;
+  currentUser?: any;
+  reviews?: Review[];
+  bookings?: Booking[];
 }
 
 const ALL = 'All articles';
@@ -171,8 +175,17 @@ function AuthorBadge({ article, large = false }: { article: Article; large?: boo
   );
 }
 
-export default function MedicalLibrary({ articles, professionals = [], onFindDoctor, onReportProblem, canRecommend = false }: MedicalLibraryProps) {
-  const isPractitioner = canRecommend;
+export default function MedicalLibrary({
+  articles,
+  professionals = [],
+  onFindDoctor,
+  onReportProblem,
+  canRecommend = false,
+  currentUser,
+  reviews = [],
+  bookings = [],
+}: MedicalLibraryProps) {
+  const isPractitioner = canRecommend || currentUser?.role === 'practitioner';
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>(ALL);
   const [source, setSource] = useState<SourceFilter>('all');
@@ -261,19 +274,29 @@ export default function MedicalLibrary({ articles, professionals = [], onFindDoc
 
   return (
     <div className="w-full space-y-0" id="medical-library-section">
-      <DashboardHeader
-        icon={BookOpen}
-        eyebrow="Verified Medical Library"
-        title="Clinical Articles & Published Research"
-        description="Articles by credential-checked practitioners, plus peer-reviewed papers from PubMed that our medical board has approved. Every item lists its sources."
-        actions={
-          <BannerKpis items={[
-            { value: articles.length, label: 'Articles' },
-            { value: articles.filter(a => a.source).length, label: 'Research papers' },
-            { value: categories.length, label: 'Topics' },
-          ]} />
-        }
-      />
+      {isPractitioner ? (
+        <PractitionerHeroBanner
+          currentUser={currentUser}
+          professionals={professionals as any}
+          reviews={reviews}
+          bookings={bookings}
+          groupName="Medical Library"
+        />
+      ) : (
+        <DashboardHeader
+          icon={BookOpen}
+          eyebrow="Verified Medical Library"
+          title="Clinical Articles & Published Research"
+          description="Articles by credential-checked practitioners, plus peer-reviewed papers from PubMed that our medical board has approved. Every item lists its sources."
+          actions={
+            <BannerKpis items={[
+              { value: articles.length, label: 'Articles' },
+              { value: articles.filter(a => a.source).length, label: 'Research papers' },
+              { value: categories.length, label: 'Topics' },
+            ]} />
+          }
+        />
+      )}
 
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Search + categories */}

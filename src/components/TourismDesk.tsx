@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Briefcase, Building2, Download, FolderOpen } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
+import PractitionerHeroBanner from './PractitionerHeroBanner';
 import { formatMoney, formatDate } from '../locale';
 
 const jget = (url: string) => fetch(url).then(r => r.json());
@@ -13,20 +14,54 @@ const ITIN: [string, string][] = [['arrival', 'Arrival'], ['consultation', 'Cons
 const input = 'border border-slate-300 p-1.5 text-xs bg-white';
 const btn = 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold px-3 py-2 cursor-pointer';
 
+interface TourismDeskProps {
+  isAdmin: boolean;
+  currentUser?: any;
+  professionals?: any[];
+  reviews?: any[];
+  bookings?: any[];
+}
+
 /** Facility staff (practitioners assigned to a facility) work cases; admins also manage facilities. */
-export default function TourismDesk({ isAdmin }: { isAdmin: boolean }) {
+export default function TourismDesk({
+  isAdmin,
+  currentUser,
+  professionals = [],
+  reviews = [],
+  bookings = [],
+}: TourismDeskProps) {
   const [tab, setTab] = useState<'cases' | 'facilities'>('cases');
   const [me, setMe] = useState<any>(null);
   const [open, setOpen] = useState<string | null>(null);
   useEffect(() => { jget('/api/tourism/desk/me').then(d => d.status === 'success' && setMe(d.data)).catch(() => {}); }, []);
+
+  const isPractitioner = currentUser?.role === 'practitioner' || (!isAdmin && currentUser);
+
   return (
     <div className="w-full space-y-0">
-      <DashboardHeader
-        icon={Briefcase} eyebrow="Cross-Border Care & Referrals" title="Global Patient Services Desk"
-        description="Manage international enquiries, review cross-border medical files, issue itemised hospital quotes, and author discharge summaries."
-        tabs={[{ id: 'cases', label: 'Cases', icon: FolderOpen }, ...(isAdmin ? [{ id: 'facilities', label: 'Facilities', icon: Building2 }] : [])]}
-        activeTab={tab} onTabChange={t => { setTab(t as any); setOpen(null); }}
-      />
+      {isPractitioner ? (
+        <PractitionerHeroBanner
+          currentUser={currentUser}
+          professionals={professionals}
+          reviews={reviews}
+          bookings={bookings}
+          groupName="Global Patient Services"
+          tabs={[
+            { id: 'cases', label: 'Cases', icon: FolderOpen },
+            ...(isAdmin ? [{ id: 'facilities', label: 'Facilities', icon: Building2 }] : []),
+          ]}
+          activeTab={tab}
+          onTabChange={t => { setTab(t as any); setOpen(null); }}
+          tabsLabel="Global Patient Services Desk"
+        />
+      ) : (
+        <DashboardHeader
+          icon={Briefcase} eyebrow="Cross-Border Care & Referrals" title="Global Patient Services Desk"
+          description="Manage international enquiries, review cross-border medical files, issue itemised hospital quotes, and author discharge summaries."
+          tabs={[{ id: 'cases', label: 'Cases', icon: FolderOpen }, ...(isAdmin ? [{ id: 'facilities', label: 'Facilities', icon: Building2 }] : [])]}
+          activeTab={tab} onTabChange={t => { setTab(t as any); setOpen(null); }}
+        />
+      )}
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {tab === 'cases' && (me && me.facilities.length === 0
           ? <p className="text-sm bg-white border border-dashed border-slate-300 p-6 text-center text-slate-600">You are not assigned to a facility yet. An admin adds you from Global Patient Services &gt; Facilities.</p>

@@ -3,8 +3,9 @@ import {
   Briefcase, MapPin, Search, PlusCircle, 
   CheckCircle2, Loader, Tag, Users, ShieldCheck, LayoutGrid, List, Eye, X, Clock 
 } from 'lucide-react';
-import { JobPost } from '../types';
+import { JobPost, Professional, Review, Booking } from '../types';
 import DashboardHeader from './DashboardHeader';
+import PractitionerHeroBanner from './PractitionerHeroBanner';
 import { JobFormFields, JobFilters, JobBadges, JobDetailExtras, EligibilityInfo, LocumBoard, blankExtras, blankFilter, extrasPayload, matchesFilter, type JobExtras, type JobFilter } from './JobMarketMy';
 
 interface JobMarketProps {
@@ -13,9 +14,23 @@ interface JobMarketProps {
   onApplyJob: (id: string, userId: string) => void;
   onRefreshData?: () => void;
   role?: string;
+  currentUser?: any;
+  professionals?: Professional[];
+  reviews?: Review[];
+  bookings?: Booking[];
 }
 
-export default function JobMarket({ jobs, onNewJobCreated, onApplyJob, onRefreshData, role = 'practitioner' }: JobMarketProps) {
+export default function JobMarket({
+  jobs,
+  onNewJobCreated,
+  onApplyJob,
+  onRefreshData,
+  role = 'practitioner',
+  currentUser,
+  professionals = [],
+  reviews = [],
+  bookings = [],
+}: JobMarketProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedCity, setSelectedCity] = useState<string>('all');
@@ -265,32 +280,51 @@ export default function JobMarket({ jobs, onNewJobCreated, onApplyJob, onRefresh
 
   return (
     <div className="w-full space-y-0" id="job-market-section">
-      {/* Standard dashboard header with attached tabs */}
-      <DashboardHeader
-        eyebrow="B2B Shift & Staff Recruitment"
-        title="Hospital Staffing & Nurse Shift Marketplace"
-        description="Clinics source credential-verified staff for temporary and full contract roles."
-        actions={
-          (role === 'facility' || role === 'admin') ? (
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold transition-colors cursor-pointer flex items-center gap-2"
-            >
-              <PlusCircle className="h-4 w-4" />
-              {showForm ? 'View Active Shifts' : 'Post Hospital Vacancy'}
-            </button>
-          ) : undefined
-        }
-        tabs={[
-          { id: 'open' as const, label: 'Open shifts', icon: Briefcase, count: jobs.length },
-          { id: 'applied' as const, label: 'My applications', icon: CheckCircle2, count: myApplications.length },
-          { id: 'locums' as const, label: 'Locums', icon: Users },
-          { id: 'eligibility' as const, label: 'Eligibility', icon: ShieldCheck },
-        ]}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        tabsLabel="Shift sections"
-      />
+      {/* Hero Header with attached tabs */}
+      {role === 'practitioner' ? (
+        <PractitionerHeroBanner
+          currentUser={currentUser}
+          professionals={professionals}
+          reviews={reviews}
+          bookings={bookings}
+          groupName="Clinical Shifts"
+          tabs={[
+            { id: 'open' as const, label: 'Open shifts', icon: Briefcase, count: jobs.length },
+            { id: 'applied' as const, label: 'My applications', icon: CheckCircle2, count: myApplications.length },
+            { id: 'locums' as const, label: 'Locums', icon: Users },
+            { id: 'eligibility' as const, label: 'Eligibility', icon: ShieldCheck },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          tabsLabel="Shift sections"
+        />
+      ) : (
+        <DashboardHeader
+          eyebrow="B2B Shift & Staff Recruitment"
+          title="Hospital Staffing & Nurse Shift Marketplace"
+          description="Clinics source credential-verified staff for temporary and full contract roles."
+          actions={
+            (role === 'facility' || role === 'admin') ? (
+              <button
+                onClick={() => setShowForm(!showForm)}
+                className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold transition-colors cursor-pointer flex items-center gap-2"
+              >
+                <PlusCircle className="h-4 w-4" />
+                {showForm ? 'View Active Shifts' : 'Post Hospital Vacancy'}
+              </button>
+            ) : undefined
+          }
+          tabs={[
+            { id: 'open' as const, label: 'Open shifts', icon: Briefcase, count: jobs.length },
+            { id: 'applied' as const, label: 'My applications', icon: CheckCircle2, count: myApplications.length },
+            { id: 'locums' as const, label: 'Locums', icon: Users },
+            { id: 'eligibility' as const, label: 'Eligibility', icon: ShieldCheck },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          tabsLabel="Shift sections"
+        />
+      )}
 
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Summary metrics */}

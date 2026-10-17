@@ -94,6 +94,8 @@ export interface NurseProfile {
   shiftTypes: string[]; // e.g. "Day Shift", "Night Shift", "24-Hour Care"
 }
 
+export type Professional = DoctorProfile | NurseProfile;
+
 export interface VerificationRequest {
   id: string;
   userId: string;

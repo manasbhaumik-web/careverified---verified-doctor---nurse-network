@@ -18,6 +18,7 @@ import PractitionerEarnings from './PractitionerEarnings';
 import PractitionerOnCall from './PractitionerOnCall';
 import PractitionerQuality from './PractitionerQuality';
 import SecureMessenger from './SecureMessenger';
+import PractitionerHeroBanner from './PractitionerHeroBanner';
 import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from './DashboardHeader';
 import PageBanner from './PageBanner';
 
@@ -431,93 +432,17 @@ export default function VerificationTerminal({
           </div>
         )}
 
-          <DashboardHeader
-            tabs={currentGroupTabs}
-            activeTab={activeDashboardTab}
-            onTabChange={setActiveDashboardTab}
-            tabsLabel={`${PRACTITIONER_GROUPS[currentGroup].name} sections`}
-          >
-            <BannerRow
-              identity={
-                <BannerIdentity
-                  name={matchedProfile.name}
-                  avatarUrl={matchedProfile.avatar}
-                  avatarBadge={isVerified && (
-                    <span
-                      className="absolute -bottom-1 -right-1 bg-white text-[color:var(--t-600)] p-1.5 rounded-full shadow-md flex items-center justify-center border border-[color:var(--t-200)]"
-                      title="Verified Licensed Practitioner"
-                    >
-                      <Shield className="h-3.5 w-3.5 fill-current text-[color:var(--t-600)]" />
-                    </span>
-                  )}
-                  badges={
-                    <>
-                      <BannerBadge tone="brand">{PRACTITIONER_GROUPS[currentGroup].name}</BannerBadge>
-                      <BannerBadge>{isDoc ? "Physician Account" : "Nurse Account"}</BannerBadge>
-                      {isVerified && <BannerBadge tone="success"><Check className="h-3 w-3 text-emerald-600 stroke-[3]" /> Verified Active</BannerBadge>}
-                    </>
-                  }
-                  meta={
-                    <>
-                      <span className="font-extrabold text-[color:var(--ink)]">{matchedProfile.specialization}</span>
-                      <span className="text-slate-400">&bull;</span>
-                      <span className="font-mono text-[color:var(--ink-2)]">{matchedProfile.experienceYears} Years Exp.</span>
-                      <span className="text-slate-400">&bull;</span>
-                      <span className="font-mono font-bold text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)] text-[10px] rounded-none shadow-2xs">
-                        {matchedProfile.licenseNumber}
-                      </span>
-                      <span className="text-slate-400">&bull;</span>
-                      <span className="font-mono text-slate-700 text-[10px] bg-white px-1.5 py-0.5 border border-slate-200 rounded-none">
-                        ID: {matchedProfile.id}
-                      </span>
-                      {isVerified && <span className="text-slate-400">&bull;</span>}
-                      {isVerified && <span className="text-emerald-700 font-extrabold flex items-center gap-1.5">
-                        <span className="relative flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                        </span>
-                        Verified by the medical board
-                      </span>}
-                      {((matchedProfile as any).apcExpiry || (matchedProfile as any).licenseExpiry) && (
-                        <>
-                          <span className="text-slate-400">&bull;</span>
-                          <span className="font-mono text-[color:var(--ink-2)] text-[11px] font-semibold">
-                            APC: {new Date((matchedProfile as any).apcExpiry || (matchedProfile as any).licenseExpiry).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}
-                          </span>
-                        </>
-                      )}
-                    </>
-                  }
-                />
-              }
-              aside={
-                <>
-                  <BannerKpis items={[
-                    { value: patientsAttendedCount, label: 'Patients' },
-                    { value: upcomingBookingsCount, label: 'Upcoming' },
-                    { value: avgOverall ?? '5.0', label: 'Rating' },
-                  ]} />
-                  <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                    <button type="button" onClick={() => setShowPublicProfilePreview(true)} className={bannerOnBrandPrimaryBtn}>
-                      <Eye className="h-4 w-4" />
-                      <span>View Public Profile</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(`https://medicert.com/practitioner/${matchedProfile.id}`);
-                        showToast("Profile link copied to clipboard!");
-                      }}
-                      className={bannerOnBrandSecondaryBtn}
-                    >
-                      <Send className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                      <span>Share Link</span>
-                    </button>
-                  </div>
-                </>
-              }
-            />
-          </DashboardHeader>
+        <PractitionerHeroBanner
+          currentUser={currentUser}
+          professionals={professionals}
+          reviews={reviews}
+          bookings={bookings}
+          groupName={PRACTITIONER_GROUPS[currentGroup].name}
+          tabs={currentGroupTabs}
+          activeTab={activeDashboardTab}
+          onTabChange={setActiveDashboardTab}
+          tabsLabel={`${PRACTITIONER_GROUPS[currentGroup].name} sections`}
+        />
 
           <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
             

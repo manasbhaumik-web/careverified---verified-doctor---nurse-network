@@ -806,6 +806,10 @@ export default function App() {
                 onApplyJob={handleApplyJob}
                 onRefreshData={loadData}
                 role={currentUser.role}
+                currentUser={currentUser}
+                professionals={professionals}
+                reviews={reviews}
+                bookings={bookings}
               />
             )}
 
@@ -826,7 +830,15 @@ export default function App() {
               <MedicalTourism onOpenProfessional={(id) => { setSelectedProfId(id); setActiveView('registry'); }} />
             )}
 
-            {activeView === 'tourism_desk' && (currentUser.role === 'practitioner' || currentUser.role === 'admin') && <TourismDesk isAdmin={currentUser.role === 'admin'} />}
+            {activeView === 'tourism_desk' && (currentUser.role === 'practitioner' || currentUser.role === 'admin') && (
+              <TourismDesk
+                isAdmin={currentUser.role === 'admin'}
+                currentUser={currentUser}
+                professionals={professionals}
+                reviews={reviews}
+                bookings={bookings}
+              />
+            )}
 
             {activeView === 'help' && currentUser.role !== 'admin' && <SupportDesk />}
 
@@ -923,6 +935,9 @@ export default function App() {
                 articles={articles}
                 professionals={professionals}
                 canRecommend={currentUser.role === 'practitioner'}
+                currentUser={currentUser}
+                reviews={reviews}
+                bookings={bookings}
                 onReportProblem={(a) => {
                   try { sessionStorage.setItem('support_prefill', JSON.stringify({ category: 'Feedback', subject: `Problem with article: ${a.title}`.slice(0, 120) })); } catch { /* ignore */ }
                   setActiveView('help');
