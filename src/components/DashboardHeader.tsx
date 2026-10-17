@@ -6,6 +6,7 @@ export interface DashboardTab<T extends string = string> {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   count?: number;
+  group?: string;
 }
 
 interface DashboardHeaderProps<T extends string> {
@@ -101,32 +102,46 @@ export default function DashboardHeader<T extends string>({
               fullWidth ? 'max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8' : 'px-3 sm:px-5'
             }`}
           >
-            {tabs.map(tab => {
+            {tabs.map((tab, idx) => {
               const selected = activeTab === tab.id;
+              const prevTab = idx > 0 ? tabs[idx - 1] : null;
+              const isNewGroup = prevTab && tab.group && tab.group !== prevTab.group;
+
               return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  role="tab"
-                  id={`tab-${tab.id}`}
-                  aria-selected={selected}
-                  tabIndex={selected ? 0 : -1}
-                  onClick={() => onTabChange?.(tab.id)}
-                  onKeyDown={handleKeyDown}
-                  className={`shrink-0 min-h-[48px] px-4 text-[13px] flex items-center gap-2 cursor-pointer border-b transition-colors ${
-                    selected
-                      ? 'font-semibold text-[color:var(--t-700)] border-[color:var(--t-600)]'
-                      : 'font-medium text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
-                  }`}
-                >
-                  <tab.icon className={`h-4 w-4 ${selected ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
-                  <span className="whitespace-nowrap">{tab.label}</span>
-                  {tab.count !== undefined && tab.count > 0 && (
-                    <span className="tabular-nums text-[11px] min-w-[20px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
-                      {tab.count}
-                    </span>
+                <React.Fragment key={tab.id}>
+                  {isNewGroup && (
+                    <div className="flex items-center shrink-0 mx-2 self-center h-6 select-none" aria-hidden="true">
+                      <span className="w-px h-5 bg-[color:var(--t-200)]" />
+                      {tab.group && (
+                        <span className="ml-2.5 mr-1 text-[9px] font-black uppercase tracking-widest text-[color:var(--t-700)]/70 hidden xl:inline-block">
+                          {tab.group}
+                        </span>
+                      )}
+                    </div>
                   )}
-                </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    id={`tab-${tab.id}`}
+                    aria-selected={selected}
+                    tabIndex={selected ? 0 : -1}
+                    onClick={() => onTabChange?.(tab.id)}
+                    onKeyDown={handleKeyDown}
+                    className={`shrink-0 min-h-[48px] px-4 text-[13px] flex items-center gap-2 cursor-pointer border-b transition-colors ${
+                      selected
+                        ? 'font-semibold text-[color:var(--t-700)] border-[color:var(--t-600)]'
+                        : 'font-medium text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
+                    }`}
+                  >
+                    <tab.icon className={`h-4 w-4 ${selected ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
+                    <span className="whitespace-nowrap">{tab.label}</span>
+                    {tab.count !== undefined && tab.count > 0 && (
+                      <span className="tabular-nums text-[11px] min-w-[20px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
+                        {tab.count}
+                      </span>
+                    )}
+                  </button>
+                </React.Fragment>
               );
             })}
           </div>

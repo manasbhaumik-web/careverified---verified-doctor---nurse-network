@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   Award, FileText, Loader, 
   CheckCircle2, AlertCircle, Edit, Shield, ShieldCheck, MessageSquare, 
-  X, Send, Check, Calendar, TrendingUp, Eye, LayoutGrid, Wallet, Radio
+  X, Send, Check, Calendar, TrendingUp, Eye, LayoutGrid, Wallet, Radio,
+  Star, SlidersHorizontal
 } from 'lucide-react';
 import { UserRole, DoctorProfile, NurseProfile, Review, VerificationStatus, Booking, OnCallDispatch } from '../types';
 import PractitionerOverviewTab from './practitioner/PractitionerOverviewTab';
@@ -16,10 +17,11 @@ import PractitionerSettingsTab from './practitioner/PractitionerSettingsTab';
 import PractitionerEarnings from './PractitionerEarnings';
 import PractitionerOnCall from './PractitionerOnCall';
 import PractitionerQuality from './PractitionerQuality';
+import SecureMessenger from './SecureMessenger';
 import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from './DashboardHeader';
 import PageBanner from './PageBanner';
 
-export type PractitionerDashboardTab = 'home' | 'bookings' | 'oncall' | 'earnings' | 'quality' | 'accreditation' | 'reviews' | 'analytics' | 'settings';
+export type PractitionerDashboardTab = 'home' | 'bookings' | 'oncall' | 'messages' | 'earnings' | 'quality' | 'accreditation' | 'reviews' | 'analytics' | 'settings';
 
 interface VerificationTerminalProps {
   currentUser?: { role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; avatarUrl?: string; profileId?: string | null; id?: string } | null;
@@ -349,7 +351,7 @@ export default function VerificationTerminal({
       .sort((a, b) => new Date(`${a.date} ${a.timeSlot}`).getTime() - new Date(`${b.date} ${b.timeSlot}`).getTime())[0];
 
     const dashboardTabOrder: PractitionerDashboardTab[] =
-      ['home', 'bookings', 'oncall', 'earnings', 'quality', 'accreditation', 'reviews', 'analytics', 'settings'];
+      ['home', 'bookings', 'oncall', 'messages', 'earnings', 'quality', 'accreditation', 'reviews', 'analytics', 'settings'];
     const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
       const currentIndex = dashboardTabOrder.indexOf(activeDashboardTab);
       let nextIndex = currentIndex;
@@ -374,15 +376,21 @@ export default function VerificationTerminal({
 
           <DashboardHeader
             tabs={[
-              { id: 'home' as const, label: 'Overview', icon: LayoutGrid },
-              { id: 'bookings' as const, label: 'Bookings', icon: Calendar, count: upcomingBookingsCount },
-              { id: 'oncall' as const, label: 'On Call', icon: Radio },
-              { id: 'earnings' as const, label: 'Earnings', icon: Wallet },
-              { id: 'quality' as const, label: 'Quality & CPD', icon: Award },
-              { id: 'accreditation' as const, label: 'Accreditation', icon: ShieldCheck },
-              { id: 'reviews' as const, label: 'Feedback', icon: MessageSquare },
-              { id: 'analytics' as const, label: 'Analytics', icon: TrendingUp },
-              { id: 'settings' as const, label: 'Settings', icon: Edit },
+              // Group 1: Clinical Care (Daily Patient Care)
+              { id: 'home' as const, label: 'Overview', icon: LayoutGrid, group: 'Clinical Care' },
+              { id: 'bookings' as const, label: 'Bookings', icon: Calendar, count: upcomingBookingsCount, group: 'Clinical Care' },
+              { id: 'oncall' as const, label: 'On Call', icon: Radio, group: 'Clinical Care' },
+              { id: 'messages' as const, label: 'Mailbox', icon: MessageSquare, group: 'Clinical Care' },
+
+              // Group 2: Practice & Compliance (Financial & Board Standing)
+              { id: 'earnings' as const, label: 'Earnings', icon: Wallet, group: 'Practice & Compliance' },
+              { id: 'quality' as const, label: 'Quality & CPD', icon: Award, group: 'Practice & Compliance' },
+              { id: 'accreditation' as const, label: 'Accreditation', icon: ShieldCheck, group: 'Practice & Compliance' },
+
+              // Group 3: Performance & Profile (Reputation & Public Config)
+              { id: 'reviews' as const, label: 'Feedback', icon: Star, group: 'Performance & Profile' },
+              { id: 'analytics' as const, label: 'Analytics', icon: TrendingUp, group: 'Performance & Profile' },
+              { id: 'settings' as const, label: 'Settings', icon: SlidersHorizontal, group: 'Performance & Profile' },
             ]}
             activeTab={activeDashboardTab}
             onTabChange={setActiveDashboardTab}
@@ -619,6 +627,13 @@ export default function VerificationTerminal({
         {activeDashboardTab === 'oncall' && (
           <div id="panel-oncall" role="tabpanel" aria-labelledby="tab-oncall" tabIndex={0} className="space-y-6 animate-fade-in">
             <PractitionerOnCall myUserId={currentUser?.id || matchedProfile.id} embedded={true} />
+          </div>
+        )}
+
+        {/* TAB CONTENT: SECURE MAILBOX & PATIENT CHATS */}
+        {activeDashboardTab === 'messages' && (
+          <div id="panel-messages" role="tabpanel" aria-labelledby="tab-messages" tabIndex={0} className="space-y-6 animate-fade-in">
+            <SecureMessenger currentUserId={currentUser?.profileId || currentUser?.id || matchedProfile.id} embedded={true} />
           </div>
         )}
 

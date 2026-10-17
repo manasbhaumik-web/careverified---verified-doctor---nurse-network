@@ -9,7 +9,7 @@ const jpost = (url: string, body?: unknown, method = 'POST') =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
 
 /** Messages with the people you are in a care relationship with. Block anyone who bothers you; report problems to support. */
-export default function SecureMessenger({ currentUserId }: { currentUserId: string }) {
+export default function SecureMessenger({ currentUserId, embedded = false }: { currentUserId: string; embedded?: boolean }) {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -59,17 +59,19 @@ export default function SecureMessenger({ currentUserId }: { currentUserId: stri
 
   const shown = threads.filter(t => t.name.toLowerCase().includes(search.toLowerCase()));
   return (
-    <div className="w-full space-y-0" id="secure-messenger-panel">
-      <div className={mobileThread ? 'hidden lg:block' : ''}>
-        <DashboardHeader
-          icon={MessageSquare}
-          eyebrow="Messages"
-          title="Your care team"
-          description="Messages are private to you and the other person. Do not use messages for emergencies: call 999. Replies can take time."
-        />
-      </div>
+    <div className={embedded ? "space-y-4" : "w-full space-y-0"} id="secure-messenger-panel">
+      {!embedded && (
+        <div className={mobileThread ? 'hidden lg:block' : ''}>
+          <DashboardHeader
+            icon={MessageSquare}
+            eyebrow="Messages"
+            title="Your care team"
+            description="Messages are private to you and the other person. Do not use messages for emergencies: call 999. Replies can take time."
+          />
+        </div>
+      )}
 
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+      <div className={embedded ? "space-y-4" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
         <div className={`bg-white border border-[color:var(--t-200)] shadow-xs grid grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)] lg:h-[calc(100dvh-280px)] lg:min-h-[520px] ${mobileThread ? 'h-[calc(100dvh-9rem-env(safe-area-inset-bottom))]' : ''}`}>
         <aside aria-label="Conversations" className={`${mobileThread ? 'hidden lg:flex' : 'flex'} border-b lg:border-b-0 lg:border-r border-[color:var(--t-200)] flex-col min-h-0 lg:max-h-none bg-white`}>
           <div className="p-3 border-b border-[color:var(--t-200)]">

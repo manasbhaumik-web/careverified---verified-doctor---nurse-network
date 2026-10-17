@@ -362,10 +362,8 @@ export default function App() {
     }
   } else if (currentUser.role === 'practitioner') {
     if (isPackageEnabled('onboard')) {
-      navItems.push({ id: 'onboard', name: 'Practitioner Portal', icon: PlusCircle });
+      navItems.push({ id: 'onboard', name: 'Practitioner Portal', icon: Stethoscope });
     }
-    navItems.push({ id: 'tourism_desk', name: 'Global Patient Services', icon: Plane });
-    navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
     if (isPackageEnabled('recruitment')) {
       navItems.push({ id: 'recruitment', name: 'Clinical Shifts', icon: Calendar });
     }
@@ -375,6 +373,8 @@ export default function App() {
     if (isPackageEnabled('articles')) {
       navItems.push({ id: 'articles', name: 'Medical Library', icon: BookOpen });
     }
+    navItems.push({ id: 'tourism_desk', name: 'Global Patient Services', icon: Plane });
+    navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
   } else if (currentUser.role === 'facility') {
     navItems.push({ id: 'facility_workspace', name: 'Facility Hub', icon: Building2 });
     navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
@@ -418,7 +418,7 @@ export default function App() {
   // The mobile bottom bar shows the places each role uses most (up to four); everything else is under "More".
   const PRIORITY: Record<string, string[]> = {
     patient: ['patient_dashboard', 'consult', 'pharmacies', 'messages'],
-    practitioner: ['onboard', 'oncall', 'recruitment', 'messages'],
+    practitioner: ['onboard', 'recruitment', 'messages', 'articles'],
     pharmacy: ['pharmacy_workspace', 'help'],
     facility: ['facility_workspace', 'help'],
     admin: ['admin', 'facility_workspace', 'recruitment', 'registry'],
@@ -820,7 +820,18 @@ export default function App() {
               />
             )}
 
-            {activeView === 'messages' && (
+            {activeView === 'messages' && currentUser.role === 'practitioner' && (
+              <VerificationTerminal
+                currentUser={currentUser}
+                professionals={professionals}
+                reviews={reviews}
+                bookings={bookings}
+                onRefreshData={loadData}
+                initialTab="messages"
+              />
+            )}
+
+            {activeView === 'messages' && currentUser.role !== 'practitioner' && (
               <SecureMessenger currentUserId={currentUser.profileId || currentUser.id} />
             )}
 
