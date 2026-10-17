@@ -4,8 +4,8 @@ import ClinicalWorkspace from './ClinicalWorkspace';
 import React, { useState, useEffect } from 'react';
 import { 
   Award, FileText, Loader, 
-  CheckCircle2, AlertCircle, Edit, Shield, MessageSquare, 
-  X, Send, Check, Calendar, TrendingUp, Eye, LayoutGrid, Wallet
+  CheckCircle2, AlertCircle, Edit, Shield, ShieldCheck, MessageSquare, 
+  X, Send, Check, Calendar, TrendingUp, Eye, LayoutGrid, Wallet, Radio
 } from 'lucide-react';
 import { UserRole, DoctorProfile, NurseProfile, Review, VerificationStatus, Booking, OnCallDispatch } from '../types';
 import PractitionerOverviewTab from './practitioner/PractitionerOverviewTab';
@@ -15,13 +15,15 @@ import PractitionerFeedbackTab from './practitioner/PractitionerFeedbackTab';
 import PractitionerAnalyticsTab from './practitioner/PractitionerAnalyticsTab';
 import PractitionerSettingsTab from './practitioner/PractitionerSettingsTab';
 import PractitionerEarnings from './PractitionerEarnings';
+import PractitionerOnCall from './PractitionerOnCall';
+import PractitionerQuality from './PractitionerQuality';
 import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from './DashboardHeader';
 import PageBanner from './PageBanner';
 
-export type PractitionerDashboardTab = 'home' | 'bookings' | 'earnings' | 'accreditation' | 'reviews' | 'analytics' | 'settings';
+export type PractitionerDashboardTab = 'home' | 'bookings' | 'oncall' | 'earnings' | 'quality' | 'accreditation' | 'reviews' | 'analytics' | 'settings';
 
 interface VerificationTerminalProps {
-  currentUser?: { role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; avatarUrl?: string; profileId?: string | null } | null;
+  currentUser?: { role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; avatarUrl?: string; profileId?: string | null; id?: string } | null;
   professionals?: (DoctorProfile | NurseProfile)[];
   reviews?: Review[];
   bookings?: Booking[];
@@ -348,7 +350,7 @@ export default function VerificationTerminal({
       .sort((a, b) => new Date(`${a.date} ${a.timeSlot}`).getTime() - new Date(`${b.date} ${b.timeSlot}`).getTime())[0];
 
     const dashboardTabOrder: PractitionerDashboardTab[] =
-      ['home', 'bookings', 'earnings', 'accreditation', 'reviews', 'analytics', 'settings'];
+      ['home', 'bookings', 'oncall', 'earnings', 'quality', 'accreditation', 'reviews', 'analytics', 'settings'];
     const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
       const currentIndex = dashboardTabOrder.indexOf(activeDashboardTab);
       let nextIndex = currentIndex;
@@ -375,8 +377,10 @@ export default function VerificationTerminal({
             tabs={[
               { id: 'home' as const, label: 'Overview', icon: LayoutGrid },
               { id: 'bookings' as const, label: 'Bookings', icon: Calendar, count: upcomingBookingsCount },
+              { id: 'oncall' as const, label: 'On Call', icon: Radio },
               { id: 'earnings' as const, label: 'Earnings', icon: Wallet },
-              { id: 'accreditation' as const, label: 'Accreditation', icon: Award },
+              { id: 'quality' as const, label: 'Quality & CPD', icon: Award },
+              { id: 'accreditation' as const, label: 'Accreditation', icon: ShieldCheck },
               { id: 'reviews' as const, label: 'Feedback', icon: MessageSquare },
               { id: 'analytics' as const, label: 'Analytics', icon: TrendingUp },
               { id: 'settings' as const, label: 'Settings', icon: Edit },
@@ -605,10 +609,24 @@ export default function VerificationTerminal({
           />
         )}
 
+        {/* TAB CONTENT: ON CALL TELEHEALTH RADAR & ROSTER */}
+        {activeDashboardTab === 'oncall' && (
+          <div id="panel-oncall" role="tabpanel" aria-labelledby="tab-oncall" tabIndex={0} className="space-y-6 animate-fade-in">
+            <PractitionerOnCall myUserId={currentUser?.id || matchedProfile.id} embedded={true} />
+          </div>
+        )}
+
         {/* TAB CONTENT: PRACTITIONER EARNINGS & DIRECT BANK PAYOUTS */}
         {activeDashboardTab === 'earnings' && (
           <div id="panel-earnings" role="tabpanel" aria-labelledby="tab-earnings" tabIndex={0} className="space-y-6 animate-fade-in">
             <PractitionerEarnings embedded={true} />
+          </div>
+        )}
+
+        {/* TAB CONTENT: QUALITY, CPD & PEER REVIEW HUB */}
+        {activeDashboardTab === 'quality' && (
+          <div id="panel-quality" role="tabpanel" aria-labelledby="tab-quality" tabIndex={0} className="space-y-6 animate-fade-in">
+            <PractitionerQuality profileId={matchedProfile.id || currentUser?.profileId || null} embedded={true} />
           </div>
         )}
 
