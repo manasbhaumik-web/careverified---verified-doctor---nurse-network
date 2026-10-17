@@ -1056,27 +1056,7 @@ export default function FacilityWorkspace() {
   });
 
   return (
-    <div className="space-y-6">
-      {/* Toast Notification */}
-      {notificationMsg && (
-        <div
-          className={`p-4 border text-xs font-bold flex items-center justify-between ${
-            notificationMsg.type === 'success'
-              ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-              : 'bg-rose-50 text-rose-800 border-rose-300'
-          }`}
-        >
-          <span>{notificationMsg.text}</span>
-          <button
-            type="button"
-            onClick={() => setNotificationMsg(null)}
-            className="text-slate-500 hover:text-slate-800 text-sm ml-4 cursor-pointer"
-          >
-            &times;
-          </button>
-        </div>
-      )}
-
+    <div className="w-full space-y-0" id="facility-workspace-root">
       {/* Main Facility Banner */}
       <DashboardHeader
         fullWidth={true}
@@ -1150,26 +1130,56 @@ export default function FacilityWorkspace() {
         />
       </DashboardHeader>
 
-      {/* Loading & Error States */}
-      {loading && !facility && (
-        <div className="p-12 text-center text-slate-500 text-xs flex items-center justify-center gap-2">
-          <RefreshCw className="h-4 w-4 animate-spin text-[color:var(--t-600)]" />
-          Loading clinical network workspace…
-        </div>
-      )}
+      {/* Main Inner Workspace Content Container */}
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* Toast / Status Notification */}
+        {notificationMsg && (
+          <div
+            role="status"
+            className={`p-4 border text-xs font-bold flex items-center justify-between shadow-xs animate-fade-in ${
+              notificationMsg.type === 'success'
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 border-l-4 border-l-emerald-600'
+                : 'bg-rose-50 text-rose-800 border-rose-300 border-l-4 border-l-rose-600'
+            }`}
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              {notificationMsg.type === 'success' ? (
+                <CheckCircle2 className="h-4.5 w-4.5 text-emerald-600 shrink-0" />
+              ) : (
+                <AlertCircle className="h-4.5 w-4.5 text-rose-600 shrink-0" />
+              )}
+              <span className="leading-snug">{notificationMsg.text}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setNotificationMsg(null)}
+              className="text-xs font-bold px-3 py-1 bg-white border border-slate-200 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer shrink-0 ml-4"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
-      {error && (
-        <div className="p-4 bg-rose-50 text-rose-800 text-xs font-bold border border-rose-200">
-          {error}
-        </div>
-      )}
+        {/* Loading & Error States */}
+        {loading && !facility && (
+          <div className="p-12 text-center text-slate-500 text-xs flex items-center justify-center gap-2 bg-white border border-[color:var(--t-200)] shadow-xs">
+            <RefreshCw className="h-4 w-4 animate-spin text-[color:var(--t-600)]" />
+            Loading clinical network workspace…
+          </div>
+        )}
 
-      {/* Main Tab Panels */}
-      <div>
-        {/* ========================================================================= */}
-        {/* TAB 1: CLINICAL JOB POSTINGS & APPLICANTS */}
-        {/* ========================================================================= */}
-        {tab === 'shifts' && (
+        {error && (
+          <div className="p-4 bg-rose-50 text-rose-800 text-xs font-bold border border-rose-200 border-l-4 border-l-rose-600 shadow-xs">
+            {error}
+          </div>
+        )}
+
+        {/* Main Tab Panels Wrapper */}
+        <div className="space-y-6">
+          {/* ========================================================================= */}
+          {/* TAB 1: CLINICAL JOB POSTINGS & APPLICANTS */}
+          {/* ========================================================================= */}
+          {tab === 'shifts' && (
           <div className="space-y-4">
             {/* Filter & Search Bar */}
             <div className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap items-center justify-between gap-4">
@@ -2930,6 +2940,7 @@ export default function FacilityWorkspace() {
             </div>
           </div>
         )}
+      </div>
       </div>
 
       {/* ========================================================================= */}
