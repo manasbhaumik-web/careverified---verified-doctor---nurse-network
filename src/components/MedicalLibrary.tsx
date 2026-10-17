@@ -272,6 +272,18 @@ export default function MedicalLibrary({
   const featured = filtered[0];
   const rest = filtered.slice(1);
 
+  type LibraryTabId = 'all' | 'practitioner' | 'research' | 'saved';
+  const activeLibraryTab: LibraryTabId = onlySaved ? 'saved' : source;
+  const handleLibraryTabChange = (t: LibraryTabId) => {
+    if (t === 'saved') {
+      setOnlySaved(true);
+    } else {
+      setOnlySaved(false);
+      setSource(t as SourceFilter);
+      if (t === 'practitioner') setEvidence('all');
+    }
+  };
+
   return (
     <div className="w-full space-y-0" id="medical-library-section">
       {isPractitioner ? (
@@ -281,6 +293,15 @@ export default function MedicalLibrary({
           reviews={reviews}
           bookings={bookings}
           groupName="Medical Library"
+          tabs={[
+            { id: 'all' as const, label: 'All Articles', icon: BookOpen, count: articles.length },
+            { id: 'practitioner' as const, label: 'Clinical Articles', icon: ShieldCheck, count: articles.filter(a => !a.source).length },
+            { id: 'research' as const, label: 'Research Papers', icon: BadgeCheck, count: articles.filter(a => !!a.source).length },
+            { id: 'saved' as const, label: 'Saved Articles', icon: Bookmark, count: savedIds.length },
+          ]}
+          activeTab={activeLibraryTab}
+          onTabChange={handleLibraryTabChange}
+          tabsLabel="Medical Library sections"
         />
       ) : (
         <DashboardHeader

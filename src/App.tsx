@@ -363,11 +363,13 @@ export default function App() {
   } else if (currentUser.role === 'practitioner') {
     if (isPackageEnabled('onboard')) {
       navItems.push({ id: 'onboard', name: 'Clinical Care', icon: Stethoscope });
-      navItems.push({ id: 'practice_compliance', name: 'Practice & Compliance', icon: ShieldCheck });
-      navItems.push({ id: 'performance_profile', name: 'Performance & Profile', icon: TrendingUp });
     }
     if (isPackageEnabled('recruitment')) {
       navItems.push({ id: 'recruitment', name: 'Clinical Shifts', icon: Calendar });
+    }
+    if (isPackageEnabled('onboard')) {
+      navItems.push({ id: 'practice_compliance', name: 'Practice & Compliance', icon: ShieldCheck });
+      navItems.push({ id: 'performance_profile', name: 'Performance & Profile', icon: TrendingUp });
     }
     if (isPackageEnabled('articles')) {
       navItems.push({ id: 'articles', name: 'Medical Library', icon: BookOpen });
@@ -581,6 +583,16 @@ export default function App() {
                           Profile
                         </span>
                       )}
+                      {item.id === 'articles' && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                          Library
+                        </span>
+                      )}
+                      {item.id === 'tourism_desk' && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                          Global
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -665,6 +677,16 @@ export default function App() {
                     {item.id === 'performance_profile' && (
                       <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Profile
+                      </span>
+                    )}
+                    {item.id === 'articles' && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                        Library
+                      </span>
+                    )}
+                    {item.id === 'tourism_desk' && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                        Global
                       </span>
                     )}
                     {item.id === 'seo' && (
@@ -840,7 +862,14 @@ export default function App() {
               />
             )}
 
-            {activeView === 'help' && currentUser.role !== 'admin' && <SupportDesk />}
+            {activeView === 'help' && currentUser.role !== 'admin' && (
+              <SupportDesk
+                currentUser={currentUser}
+                professionals={professionals}
+                reviews={reviews}
+                bookings={bookings}
+              />
+            )}
 
             {activeView === 'quality' && currentUser.role === 'practitioner' && (
               <VerificationTerminal

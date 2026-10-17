@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { TestimonialForm } from './TestimonialPanels';
 import { AlertTriangle, LifeBuoy } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
+import PractitionerHeroBanner from './PractitionerHeroBanner';
 import { useLocale } from '../locale/store';
 
 const jpost = (url: string, body?: unknown) =>
@@ -9,8 +10,20 @@ const jpost = (url: string, body?: unknown) =>
 const field = 'border border-slate-200 bg-white px-3 py-2 text-sm w-full focus:outline-none focus:border-[color:var(--t-600)]';
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString() : '');
 
+interface SupportDeskProps {
+  currentUser?: any;
+  professionals?: any[];
+  reviews?: any[];
+  bookings?: any[];
+}
+
 /** Help & support for patients and practitioners: open a ticket, follow replies. Safety concerns are answered first. */
-export default function SupportDesk() {
+export default function SupportDesk({
+  currentUser,
+  professionals = [],
+  reviews = [],
+  bookings = [],
+}: SupportDeskProps = {}) {
   const [cats, setCats] = useState<{ name: string; priority: string; respondWithinHours: number }[]>([]);
   const [tickets, setTickets] = useState<any[]>([]);
   const [open, setOpen] = useState<any | null>(null);
@@ -64,15 +77,25 @@ export default function SupportDesk() {
 
   return (
     <div className="w-full space-y-0">
-      <DashboardHeader
-        icon={LifeBuoy}
-        eyebrow="Support"
-        title="Help & support"
-        description="Tell us what went wrong. Safety concerns are answered first."
-        actions={
-          <p className="text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-900 p-3 flex gap-2 items-center max-w-sm"><AlertTriangle className="h-4 w-4 shrink-0" />If you or someone else is in danger, call 999. Do not wait for a support reply.</p>
-        }
-      />
+      {currentUser?.role === 'practitioner' ? (
+        <PractitionerHeroBanner
+          currentUser={currentUser}
+          professionals={professionals}
+          reviews={reviews}
+          bookings={bookings}
+          groupName="Help & Support"
+        />
+      ) : (
+        <DashboardHeader
+          icon={LifeBuoy}
+          eyebrow="Support"
+          title="Help & support"
+          description="Tell us what went wrong. Safety concerns are answered first."
+          actions={
+            <p className="text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-900 p-3 flex gap-2 items-center max-w-sm"><AlertTriangle className="h-4 w-4 shrink-0" />If you or someone else is in danger, call 999. Do not wait for a support reply.</p>
+          }
+        />
+      )}
 
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
         {hours && (
