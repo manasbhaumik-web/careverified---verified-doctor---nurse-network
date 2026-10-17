@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Power, Radio } from 'lucide-react';
 import ConsultRoom from './ConsultRoom';
 import { formatMoney } from '../locale';
 
@@ -94,38 +94,86 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
 
   return (
     <div className={embedded ? "space-y-6 w-full" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
-      {/* Status bar with at-a-glance numbers */}
-      <section className={`border p-4 sm:p-6 grid gap-4 sm:gap-6 lg:grid-cols-[1fr_auto] items-center shadow-xs transition-colors ${me?.online ? 'bg-emerald-50/70 border-emerald-300' : 'bg-white border-[color:var(--t-200)]'}`}>
-        <div className="flex flex-wrap items-center gap-x-10 gap-y-4 min-w-0">
-          <div className="min-w-0 sm:min-w-[280px] max-w-md">
-            <h2 className="text-lg font-black flex items-center gap-2.5 text-[color:var(--ink)]">
-              <span className="relative flex h-3 w-3">
-                {me?.online && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>}
-                <span className={`relative inline-flex rounded-full h-3 w-3 ${me?.online ? 'bg-emerald-600' : 'bg-slate-400'}`}></span>
-              </span>
-              {me?.online ? 'You are On Call & Accepting Patients' : 'You are Currently Offline'}
-            </h2>
-            <p className="text-xs text-[color:var(--ink-2)] mt-1 leading-relaxed">
-              While online, you are dispatched incoming telehealth consults. Keep this browser tab open to receive audio chimes.
-            </p>
+      {/* Compact Status Bar with Inline Telemetry */}
+      <section
+        aria-label="On-call status and telemetry"
+        className={`border px-4 py-3 sm:px-5 sm:py-3.5 shadow-xs transition-colors flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4 ${
+          me?.online
+            ? 'bg-emerald-50/70 border-emerald-300'
+            : 'bg-white border-[color:var(--t-200)]'
+        }`}
+      >
+        {/* Left: Status Indicator & Headline */}
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="relative flex h-3 w-3 shrink-0">
+            {me?.online && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>}
+            <span className={`relative inline-flex rounded-full h-3 w-3 ${me?.online ? 'bg-emerald-600' : 'bg-slate-400'}`}></span>
+          </span>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
+              <h2 className="text-sm sm:text-base font-black text-[color:var(--ink)] tracking-tight whitespace-nowrap">
+                {me?.online ? 'On Call & Accepting Patients' : 'You are Currently Offline'}
+              </h2>
+              <span className="hidden sm:inline text-xs text-slate-400">·</span>
+              <p className="text-[11px] text-[color:var(--ink-2)] truncate">
+                {me?.online
+                  ? 'Incoming consults dispatch automatically. Keep this tab open.'
+                  : 'While online, you are dispatched incoming telehealth consults. Keep this tab open for audio chimes.'}
+              </p>
+            </div>
           </div>
-          <dl className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-x-8 sm:gap-y-3 w-full sm:w-auto">
-            {[
-              ['Waiting Patients', me?.online ? String(offers.length) : '—'],
-              ['Committed Hours / Wk', String(roster.size)],
-              ['Daily Coverage Window', `${coveredHours} / 24 hrs`],
-              ['Accrued Net Earnings', earnings ? fmtRM(earnings.totals.net) : '—'],
-            ].map(([l, v]) => (
-              <div key={l} className="bg-white/80 border border-[color:var(--t-200)] px-3.5 py-2">
-                <dt className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">{l}</dt>
-                <dd className="text-lg font-black tabular-nums text-[color:var(--ink)]">{v}</dd>
-              </div>
-            ))}
-          </dl>
         </div>
-        <button onClick={() => setOnline(!me?.online)} className={`h-12 w-full lg:w-auto px-8 text-xs font-extrabold uppercase tracking-wider cursor-pointer transition-colors shadow-xs ${me?.online ? 'bg-white border border-slate-300 text-slate-800 hover:bg-slate-100' : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white'}`}>
-          {me?.online ? 'Go Offline' : 'Go Online Now'}
-        </button>
+
+        {/* Right: Inline Telemetry Strip + Action Button */}
+        <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3 sm:gap-4 shrink-0">
+          <dl className="flex items-center divide-x divide-[color:var(--t-200)] border border-[color:var(--t-200)] bg-white shadow-2xs">
+            <div className="px-3 py-1.5 text-center min-w-[68px]">
+              <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Waiting</dt>
+              <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
+                {me?.online ? String(offers.length) : '—'}
+              </dd>
+            </div>
+            <div className="px-3 py-1.5 text-center min-w-[82px]">
+              <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Committed</dt>
+              <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
+                {roster.size}h / wk
+              </dd>
+            </div>
+            <div className="px-3 py-1.5 text-center min-w-[92px]">
+              <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Daily Window</dt>
+              <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
+                {coveredHours} / 24 hrs
+              </dd>
+            </div>
+            <div className="px-3 py-1.5 text-center min-w-[92px]">
+              <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Accrued Net</dt>
+              <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--t-700)] leading-tight">
+                {earnings ? fmtRM(earnings.totals.net) : '—'}
+              </dd>
+            </div>
+          </dl>
+
+          <button
+            onClick={() => setOnline(!me?.online)}
+            className={`h-10 px-5 text-xs font-black uppercase tracking-wider cursor-pointer transition-all flex items-center justify-center gap-2 shadow-xs whitespace-nowrap flex-1 sm:flex-none ${
+              me?.online
+                ? 'bg-white border border-slate-300 text-slate-800 hover:bg-slate-50'
+                : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white'
+            }`}
+          >
+            {me?.online ? (
+              <>
+                <Power className="h-3.5 w-3.5 text-rose-600" />
+                <span>Go Offline</span>
+              </>
+            ) : (
+              <>
+                <Radio className="h-3.5 w-3.5 text-white animate-pulse" />
+                <span>Go Online Now</span>
+              </>
+            )}
+          </button>
+        </div>
       </section>
       {msg && <p className="text-xs font-bold text-slate-700 bg-slate-50 border border-slate-200 p-3">{msg}</p>}
 
