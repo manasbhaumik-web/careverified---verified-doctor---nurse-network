@@ -349,7 +349,7 @@ export default function App() {
     navItems.push({ id: 'packages', name: 'Medical Packages & Promos', icon: PackagePlus });
     navItems.push({ id: 'assistance', name: 'Assistance & Quotes', icon: HeartHandshake });
     navItems.push({ id: 'pharmacies', name: 'Pharmacies', icon: Pill });
-    navItems.push({ id: 'tourism', name: 'Medical Tourism', icon: Plane });
+    navItems.push({ id: 'tourism', name: 'Global Patient Services', icon: Plane });
     navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
     if (isPackageEnabled('registry')) {
       navItems.push({ id: 'registry', name: 'Doctors & Nurses', icon: Search });
@@ -366,7 +366,7 @@ export default function App() {
     }
     navItems.push({ id: 'oncall', name: 'On Call', icon: Radio });
     navItems.push({ id: 'earnings', name: 'Earnings', icon: Wallet });
-    navItems.push({ id: 'tourism_desk', name: 'Specialist Referrals', icon: Plane });
+    navItems.push({ id: 'tourism_desk', name: 'Global Patient Services', icon: Plane });
     navItems.push({ id: 'quality', name: 'Quality & CPD', icon: Award });
     navItems.push({ id: 'help', name: 'Help', icon: LifeBuoy });
     if (isPackageEnabled('recruitment')) {
@@ -390,7 +390,7 @@ export default function App() {
     if (isPackageEnabled('recruitment')) {
       navItems.push({ id: 'recruitment', name: 'Clinical Shifts', icon: Calendar });
     }
-    navItems.push({ id: 'tourism_desk', name: 'Specialist Referrals', icon: Plane });
+    navItems.push({ id: 'tourism_desk', name: 'Global Patient Services', icon: Plane });
     if (isPackageEnabled('seo')) {
       navItems.push({ id: 'seo', name: 'SEO Compliance', icon: Globe });
     }
@@ -428,7 +428,7 @@ export default function App() {
   };
   const SHORT_LABEL: Record<string, string> = {
     patient_dashboard: 'Home', consult: 'Consult', packages: 'Packages', assistance: 'Assistance', pharmacies: 'Pharmacy', messages: 'Mailbox', registry: 'Doctors', oncall: 'On Call', earnings: 'Earnings', onboard: 'Portal',
-    recruitment: 'Shifts', admin: 'Admin', tourism_desk: 'Referrals', pharmacy_workspace: 'Workspace', facility_workspace: 'Facility', help: 'Help', articles: 'Library', tourism: 'Tourism', quality: 'Quality', seo: 'SEO',
+    recruitment: 'Shifts', admin: 'Admin', tourism_desk: 'Global Care', pharmacy_workspace: 'Workspace', facility_workspace: 'Facility', help: 'Help', articles: 'Library', tourism: 'Global Care', quality: 'Quality', seo: 'SEO',
   };
   const mobileTabs = (() => {
     const wanted = (PRIORITY[currentUser.role] ?? []).map(id => navItems.find(n => n.id === id)).filter(Boolean) as typeof navItems;

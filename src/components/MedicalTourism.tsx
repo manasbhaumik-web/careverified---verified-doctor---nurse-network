@@ -23,9 +23,9 @@ export default function MedicalTourism({ onOpenProfessional }: { onOpenProfessio
     <div className="w-full space-y-0">
       <DashboardHeader
         icon={Plane}
-        eyebrow="International patients"
-        title="Medical tourism in Malaysia"
-        description="Find facilities that welcome international patients, get an itemised quote, and keep your documents, itinerary and discharge summary in one place."
+        eyebrow="Cross-Border & International Patients"
+        title="Global Patient Services"
+        description="Find verified hospital centres in Malaysia welcoming international patients, receive transparent itemised quotations, and manage travel itineraries, documents, and discharge summaries in one secure portal."
         tabs={[{ id: 'find', label: 'Find a facility', icon: Search }, { id: 'cases', label: 'My cases', icon: FolderOpen }, { id: 'info', label: 'Travel information', icon: Info }]}
         activeTab={tab}
         onTabChange={t => { setTab(t as Tab); setOpenCase(null); }}

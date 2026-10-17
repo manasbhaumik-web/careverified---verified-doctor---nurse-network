@@ -22,14 +22,14 @@ export default function TourismDesk({ isAdmin }: { isAdmin: boolean }) {
   return (
     <div className="w-full space-y-0">
       <DashboardHeader
-        icon={Briefcase} eyebrow="Clinical Cases & Inbound Referrals" title="Specialist Referrals Desk"
-        description="Answer specialist enquiries, review cross-border medical files, send itemised quotes, and author discharge summaries."
+        icon={Briefcase} eyebrow="Cross-Border Care & Referrals" title="Global Patient Services Desk"
+        description="Manage international enquiries, review cross-border medical files, issue itemised hospital quotes, and author discharge summaries."
         tabs={[{ id: 'cases', label: 'Cases', icon: FolderOpen }, ...(isAdmin ? [{ id: 'facilities', label: 'Facilities', icon: Building2 }] : [])]}
         activeTab={tab} onTabChange={t => { setTab(t as any); setOpen(null); }}
       />
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {tab === 'cases' && (me && me.facilities.length === 0
-          ? <p className="text-sm bg-white border border-dashed border-slate-300 p-6 text-center text-slate-600">You are not assigned to a facility yet. An admin adds you from Specialist Referrals &gt; Facilities.</p>
+          ? <p className="text-sm bg-white border border-dashed border-slate-300 p-6 text-center text-slate-600">You are not assigned to a facility yet. An admin adds you from Global Patient Services &gt; Facilities.</p>
           : open ? <StaffCase id={open} onBack={() => setOpen(null)} /> : <CaseQueue onOpen={setOpen} />)}
         {tab === 'facilities' && isAdmin && <FacilityAdmin />}
       </div>
