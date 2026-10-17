@@ -22,6 +22,42 @@ import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, ba
 import PageBanner from './PageBanner';
 
 export type PractitionerDashboardTab = 'home' | 'bookings' | 'oncall' | 'messages' | 'earnings' | 'quality' | 'accreditation' | 'reviews' | 'analytics' | 'settings';
+export type PractitionerTabGroup = 'clinical' | 'practice' | 'performance';
+
+export const PRACTITIONER_GROUPS: Record<PractitionerTabGroup, {
+  name: string;
+  defaultTab: PractitionerDashboardTab;
+  tabs: { id: PractitionerDashboardTab; label: string; icon: any }[];
+}> = {
+  clinical: {
+    name: 'Clinical Care',
+    defaultTab: 'home',
+    tabs: [
+      { id: 'home', label: 'Overview', icon: LayoutGrid },
+      { id: 'bookings', label: 'Bookings', icon: Calendar },
+      { id: 'oncall', label: 'On Call', icon: Radio },
+      { id: 'messages', label: 'Mailbox', icon: MessageSquare },
+    ],
+  },
+  practice: {
+    name: 'Practice & Compliance',
+    defaultTab: 'earnings',
+    tabs: [
+      { id: 'earnings', label: 'Earnings', icon: Wallet },
+      { id: 'quality', label: 'Quality & CPD', icon: Award },
+      { id: 'accreditation', label: 'Accreditation', icon: ShieldCheck },
+    ],
+  },
+  performance: {
+    name: 'Performance & Profile',
+    defaultTab: 'reviews',
+    tabs: [
+      { id: 'reviews', label: 'Feedback', icon: Star },
+      { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+      { id: 'settings', label: 'Settings', icon: SlidersHorizontal },
+    ],
+  },
+};
 
 interface VerificationTerminalProps {
   currentUser?: { role: 'patient' | 'practitioner' | 'admin'; name: string; email: string; avatarUrl?: string; profileId?: string | null; id?: string } | null;
@@ -30,6 +66,7 @@ interface VerificationTerminalProps {
   bookings?: Booking[];
   onRefreshData?: () => void;
   initialTab?: PractitionerDashboardTab;
+  activeGroup?: PractitionerTabGroup;
 }
 
 export default function VerificationTerminal({ 
@@ -38,21 +75,37 @@ export default function VerificationTerminal({
   reviews = [], 
   bookings = [], 
   onRefreshData,
-  initialTab
+  initialTab,
+  activeGroup
 }: VerificationTerminalProps) {
   // Try to match logged in practitioner with an existing registry profile
   const matchedProfile = professionals.find(p => 
     p.name.toLowerCase() === currentUser?.name?.toLowerCase()
   );
 
+  // Track currently active group and ensure the active tab belongs to the active group
+  const currentGroup: PractitionerTabGroup = activeGroup || (
+    initialTab ? (
+      (['earnings', 'quality', 'accreditation'].includes(initialTab)) ? 'practice' :
+      (['reviews', 'analytics', 'settings'].includes(initialTab)) ? 'performance' : 'clinical'
+    ) : 'clinical'
+  );
+
   // Dashboard state variables (for registered practitioner)
-  const [activeDashboardTab, setActiveDashboardTab] = useState<PractitionerDashboardTab>(initialTab || 'home');
+  const [activeDashboardTab, setActiveDashboardTab] = useState<PractitionerDashboardTab>(
+    initialTab || PRACTITIONER_GROUPS[currentGroup].defaultTab
+  );
 
   useEffect(() => {
-    if (initialTab) {
+    if (activeGroup) {
+      const allowed = PRACTITIONER_GROUPS[activeGroup].tabs.map(t => t.id);
+      if (!allowed.includes(activeDashboardTab)) {
+        setActiveDashboardTab(initialTab && allowed.includes(initialTab) ? initialTab : PRACTITIONER_GROUPS[activeGroup].defaultTab);
+      }
+    } else if (initialTab) {
       setActiveDashboardTab(initialTab);
     }
-  }, [initialTab]);
+  }, [activeGroup, initialTab]);
 
   const [editBio, setEditBio] = useState('');
   const [editFee, setEditFee] = useState(0);
@@ -350,8 +403,12 @@ export default function VerificationTerminal({
       .filter(b => b.status === 'Upcoming')
       .sort((a, b) => new Date(`${a.date} ${a.timeSlot}`).getTime() - new Date(`${b.date} ${b.timeSlot}`).getTime())[0];
 
-    const dashboardTabOrder: PractitionerDashboardTab[] =
-      ['home', 'bookings', 'oncall', 'messages', 'earnings', 'quality', 'accreditation', 'reviews', 'analytics', 'settings'];
+    const currentGroupTabs = PRACTITIONER_GROUPS[currentGroup].tabs.map(tab => ({
+      ...tab,
+      count: tab.id === 'bookings' ? upcomingBookingsCount : undefined,
+    }));
+
+    const dashboardTabOrder: PractitionerDashboardTab[] = currentGroupTabs.map(t => t.id);
     const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
       const currentIndex = dashboardTabOrder.indexOf(activeDashboardTab);
       let nextIndex = currentIndex;
@@ -375,26 +432,10 @@ export default function VerificationTerminal({
         )}
 
           <DashboardHeader
-            tabs={[
-              // Group 1: Clinical Care (Daily Patient Care)
-              { id: 'home' as const, label: 'Overview', icon: LayoutGrid, group: 'Clinical Care' },
-              { id: 'bookings' as const, label: 'Bookings', icon: Calendar, count: upcomingBookingsCount, group: 'Clinical Care' },
-              { id: 'oncall' as const, label: 'On Call', icon: Radio, group: 'Clinical Care' },
-              { id: 'messages' as const, label: 'Mailbox', icon: MessageSquare, group: 'Clinical Care' },
-
-              // Group 2: Practice & Compliance (Financial & Board Standing)
-              { id: 'earnings' as const, label: 'Earnings', icon: Wallet, group: 'Practice & Compliance' },
-              { id: 'quality' as const, label: 'Quality & CPD', icon: Award, group: 'Practice & Compliance' },
-              { id: 'accreditation' as const, label: 'Accreditation', icon: ShieldCheck, group: 'Practice & Compliance' },
-
-              // Group 3: Performance & Profile (Reputation & Public Config)
-              { id: 'reviews' as const, label: 'Feedback', icon: Star, group: 'Performance & Profile' },
-              { id: 'analytics' as const, label: 'Analytics', icon: TrendingUp, group: 'Performance & Profile' },
-              { id: 'settings' as const, label: 'Settings', icon: SlidersHorizontal, group: 'Performance & Profile' },
-            ]}
+            tabs={currentGroupTabs}
             activeTab={activeDashboardTab}
             onTabChange={setActiveDashboardTab}
-            tabsLabel="Practitioner workspace sections"
+            tabsLabel={`${PRACTITIONER_GROUPS[currentGroup].name} sections`}
           >
             <BannerRow
               identity={
@@ -411,6 +452,7 @@ export default function VerificationTerminal({
                   )}
                   badges={
                     <>
+                      <BannerBadge tone="brand">{PRACTITIONER_GROUPS[currentGroup].name}</BannerBadge>
                       <BannerBadge>{isDoc ? "Physician Account" : "Nurse Account"}</BannerBadge>
                       {isVerified && <BannerBadge tone="success"><Check className="h-3 w-3 text-emerald-600 stroke-[3]" /> Verified Active</BannerBadge>}
                     </>

@@ -362,13 +362,12 @@ export default function App() {
     }
   } else if (currentUser.role === 'practitioner') {
     if (isPackageEnabled('onboard')) {
-      navItems.push({ id: 'onboard', name: 'Practitioner Portal', icon: Stethoscope });
+      navItems.push({ id: 'onboard', name: 'Clinical Care', icon: Stethoscope });
+      navItems.push({ id: 'practice_compliance', name: 'Practice & Compliance', icon: ShieldCheck });
+      navItems.push({ id: 'performance_profile', name: 'Performance & Profile', icon: TrendingUp });
     }
     if (isPackageEnabled('recruitment')) {
       navItems.push({ id: 'recruitment', name: 'Clinical Shifts', icon: Calendar });
-    }
-    if (isPackageEnabled('messages')) {
-      navItems.push({ id: 'messages', name: 'Secure Mailbox', icon: MessageSquare });
     }
     if (isPackageEnabled('articles')) {
       navItems.push({ id: 'articles', name: 'Medical Library', icon: BookOpen });
@@ -397,7 +396,7 @@ export default function App() {
   }
 
   // Append any active extensions that aren't standard
-  const standardIds = ['patient_dashboard', 'registry', 'recruitment', 'articles', 'onboard', 'messages', 'seo', 'admin', 'consult', 'oncall', 'earnings', 'quality', 'help'];
+  const standardIds = ['patient_dashboard', 'registry', 'recruitment', 'articles', 'onboard', 'practice_compliance', 'performance_profile', 'messages', 'seo', 'admin', 'consult', 'oncall', 'earnings', 'quality', 'help'];
   const customPackages = (currentUser.role === 'pharmacy' || currentUser.role === 'facility') ? [] : packages.filter(p => !standardIds.includes(p.id) && p.isEnabled);
   customPackages.forEach(p => {
     let icon = Puzzle;
@@ -418,13 +417,14 @@ export default function App() {
   // The mobile bottom bar shows the places each role uses most (up to four); everything else is under "More".
   const PRIORITY: Record<string, string[]> = {
     patient: ['patient_dashboard', 'consult', 'pharmacies', 'messages'],
-    practitioner: ['onboard', 'recruitment', 'messages', 'articles'],
+    practitioner: ['onboard', 'practice_compliance', 'performance_profile', 'recruitment'],
     pharmacy: ['pharmacy_workspace', 'help'],
     facility: ['facility_workspace', 'help'],
     admin: ['admin', 'facility_workspace', 'recruitment', 'registry'],
   };
   const SHORT_LABEL: Record<string, string> = {
-    patient_dashboard: 'Home', consult: 'Consult', packages: 'Packages', assistance: 'Assistance', pharmacies: 'Pharmacy', messages: 'Mailbox', registry: 'Doctors', oncall: 'On Call', earnings: 'Earnings', onboard: 'Portal',
+    patient_dashboard: 'Home', consult: 'Consult', packages: 'Packages', assistance: 'Assistance', pharmacies: 'Pharmacy', messages: 'Mailbox', registry: 'Doctors', oncall: 'On Call', earnings: 'Earnings',
+    onboard: 'Clinical', practice_compliance: 'Practice', performance_profile: 'Profile',
     recruitment: 'Shifts', admin: 'Admin', tourism_desk: 'Global Care', pharmacy_workspace: 'Workspace', facility_workspace: 'Facility', help: 'Help', articles: 'Library', tourism: 'Global Care', quality: 'Quality', seo: 'SEO',
   };
   const mobileTabs = (() => {
@@ -568,7 +568,17 @@ export default function App() {
                       )}
                       {item.id === 'onboard' && (
                         <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          MMC
+                          Clinical
+                        </span>
+                      )}
+                      {item.id === 'practice_compliance' && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                          MMC/LJM
+                        </span>
+                      )}
+                      {item.id === 'performance_profile' && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                          Profile
                         </span>
                       )}
                     </button>
@@ -644,7 +654,17 @@ export default function App() {
                     )}
                     {item.id === 'onboard' && (
                       <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        MMC
+                        Clinical
+                      </span>
+                    )}
+                    {item.id === 'practice_compliance' && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                        MMC/LJM
+                      </span>
+                    )}
+                    {item.id === 'performance_profile' && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                        Profile
                       </span>
                     )}
                     {item.id === 'seo' && (
@@ -744,7 +764,7 @@ export default function App() {
               </div>
             )}
 
-            {/* VIEW 3: MULTI-STEP ONBOARDING */}
+            {/* VIEW 3: PRACTITIONER PORTAL PARENT VIEWS */}
             {activeView === 'onboard' && (
               <VerificationTerminal
                 currentUser={currentUser}
@@ -752,6 +772,29 @@ export default function App() {
                 reviews={reviews}
                 bookings={bookings}
                 onRefreshData={loadData}
+                activeGroup="clinical"
+              />
+            )}
+
+            {activeView === 'practice_compliance' && (
+              <VerificationTerminal
+                currentUser={currentUser}
+                professionals={professionals}
+                reviews={reviews}
+                bookings={bookings}
+                onRefreshData={loadData}
+                activeGroup="practice"
+              />
+            )}
+
+            {activeView === 'performance_profile' && (
+              <VerificationTerminal
+                currentUser={currentUser}
+                professionals={professionals}
+                reviews={reviews}
+                bookings={bookings}
+                onRefreshData={loadData}
+                activeGroup="performance"
               />
             )}
 
@@ -794,6 +837,7 @@ export default function App() {
                 reviews={reviews}
                 bookings={bookings}
                 onRefreshData={loadData}
+                activeGroup="practice"
                 initialTab="quality"
               />
             )}
@@ -805,6 +849,7 @@ export default function App() {
                 reviews={reviews}
                 bookings={bookings}
                 onRefreshData={loadData}
+                activeGroup="practice"
                 initialTab="earnings"
               />
             )}
@@ -816,6 +861,7 @@ export default function App() {
                 reviews={reviews}
                 bookings={bookings}
                 onRefreshData={loadData}
+                activeGroup="clinical"
                 initialTab="oncall"
               />
             )}
@@ -827,6 +873,7 @@ export default function App() {
                 reviews={reviews}
                 bookings={bookings}
                 onRefreshData={loadData}
+                activeGroup="clinical"
                 initialTab="messages"
               />
             )}
@@ -885,7 +932,7 @@ export default function App() {
             )}
 
             {/* VIEW: DYNAMIC CUSTOM / MARKETPLACE MODULE VIEW */}
-            {!['registry', 'profile', 'onboard', 'recruitment', 'messages', 'admin', 'seo', 'articles', 'patient_dashboard'].includes(activeView) && (
+            {!['registry', 'profile', 'onboard', 'practice_compliance', 'performance_profile', 'recruitment', 'messages', 'admin', 'seo', 'articles', 'patient_dashboard'].includes(activeView) && (
               (() => {
                 const activePkg = packages.find(p => p.id === activeView);
                 if (!activePkg) return null;
