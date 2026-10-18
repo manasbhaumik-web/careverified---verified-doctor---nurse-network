@@ -18,6 +18,7 @@ interface ProfessionalProfileProps {
   reviews: Review[];
   onNewReviewPosted: (review: Review) => void;
   currentUser: { name: string; email: string; role: string } | null;
+  prefilledSymptoms?: string;
 }
 
 export default function ProfessionalProfile({ 
@@ -26,7 +27,8 @@ export default function ProfessionalProfile({
   onNewBookingCreated,
   reviews,
   onNewReviewPosted,
-  currentUser
+  currentUser,
+  prefilledSymptoms
 }: ProfessionalProfileProps) {
   const [prof, setProf] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
@@ -60,7 +62,13 @@ export default function ProfessionalProfile({
   const [bookingSlot, setBookingSlot] = useState('');
   const [bookingMode, setBookingMode] = useState<ConsultationMode>(ConsultationMode.IN_PERSON);
   const [tele, setTele] = useState<TeleAnswers>(defaultTeleAnswers);
-  const [symptoms, setSymptoms] = useState('');
+  const [symptoms, setSymptoms] = useState(prefilledSymptoms || '');
+
+  useEffect(() => {
+    if (prefilledSymptoms && !symptoms) {
+      setSymptoms(prefilledSymptoms);
+    }
+  }, [prefilledSymptoms]);
   const [shareRecord, setShareRecord] = useState(false);
   const [canReview, setCanReview] = useState<boolean | null>(null);
   const [credentials, setCredentials] = useState<{ name: string; issuer: string; expiry_date: string | null }[]>([]);
@@ -663,13 +671,20 @@ export default function ProfessionalProfile({
 
                 {/* Symptoms description box */}
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">Consultation Notes (Optional)</label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)]">Consultation Notes (Optional)</label>
+                    {prefilledSymptoms && symptoms === prefilledSymptoms && (
+                      <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5">
+                        Pre-filled from AI Triage
+                      </span>
+                    )}
+                  </div>
                   <textarea
                     rows={2}
                     value={symptoms}
                     onChange={(e) => setSymptoms(e.target.value)}
                     placeholder="Briefly state symptoms or clinical concerns…"
-                    className="w-full text-xs border border-[color:var(--t-200)] p-3 outline-none focus:border-[color:var(--t-600)] text-[color:var(--ink)] placeholder-slate-400 bg-[color:var(--t-bg)]"
+                    className="w-full text-xs border border-[color:var(--t-200)] p-3 outline-none focus:border-[color:var(--t-600)] text-[color:var(--ink)] placeholder-slate-400 bg-[color:var(--t-bg)] font-medium"
                   />
                 </div>
 

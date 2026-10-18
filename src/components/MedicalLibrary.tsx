@@ -2,8 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useLocale } from '../locale';
 import { ArrowRight, BadgeCheck, Bookmark, BookOpen, ExternalLink, Flag, Printer, Search, Send, ShieldCheck, X } from 'lucide-react';
 import { Article, DoctorProfile, NurseProfile, Review, Booking } from '../types';
-import DashboardHeader, { BannerKpis, FilterSelect } from './DashboardHeader';
+import DashboardHeader, { BannerBadge, BannerKpis, FilterSelect } from './DashboardHeader';
 import PractitionerHeroBanner from './PractitionerHeroBanner';
+import WorkspaceHeader from './WorkspaceHeader';
+import { UserAvatar } from '../avatars';
 
 interface MedicalLibraryProps {
   articles: Article[];
@@ -18,6 +20,7 @@ interface MedicalLibraryProps {
   reviews?: Review[];
   bookings?: Booking[];
   onOpenHelp?: () => void;
+  embedded?: boolean;
 }
 
 const ALL = 'All articles';
@@ -154,11 +157,11 @@ function AuthorBadge({ article, large = false }: { article: Article; large?: boo
   return (
     <div className="flex items-center gap-2.5 min-w-0">
       {article.authorAvatar ? (
-        <img
+        <UserAvatar
           src={article.authorAvatar}
-          alt=""
+          role="doctor"
+          alt={article.authorName}
           className={`${large ? 'h-10 w-10' : 'h-9 w-9'} rounded-full object-cover border border-[color:var(--t-200)] shrink-0`}
-          referrerPolicy="no-referrer"
         />
       ) : (
         <div className="h-9 w-9 rounded-full bg-[color:var(--e-50)] text-[color:var(--e-800)] flex items-center justify-center text-xs font-bold shrink-0">
@@ -186,6 +189,7 @@ export default function MedicalLibrary({
   reviews = [],
   bookings = [],
   onOpenHelp,
+  embedded = false,
 }: MedicalLibraryProps) {
   const isPractitioner = canRecommend || currentUser?.role === 'practitioner';
   const [query, setQuery] = useState('');
@@ -286,43 +290,101 @@ export default function MedicalLibrary({
     }
   };
 
+  const libraryTabMeta: Record<LibraryTabId, {
+    icon: any;
+    eyebrow: string;
+    title: string;
+    description: string;
+    badges: React.ReactNode;
+  }> = {
+    all: {
+      icon: BookOpen,
+      eyebrow: "Evidence-Based Medicine · Clinical Knowledge Base",
+      title: "Medical Library & Published Clinical Research",
+      description: "Access peer-reviewed PubMed clinical studies, physician-authored medical articles, and statutory clinical practice guidelines.",
+      badges: (
+        <>
+          <BannerBadge tone="brand">MMC / LJM Accredited</BannerBadge>
+          <BannerBadge tone="success">PubMed Indexed</BannerBadge>
+        </>
+      ),
+    },
+    practitioner: {
+      icon: ShieldCheck,
+      eyebrow: "Practitioner Contributions · Peer-Reviewed Guidance",
+      title: "Physician & Clinical Nurse Authored Articles",
+      description: "Clinical treatment protocols, local disease management advice, and practice case summaries by registered healthcare professionals.",
+      badges: <BannerBadge tone="brand">Doctor Verified</BannerBadge>,
+    },
+    research: {
+      icon: BadgeCheck,
+      eyebrow: "PubMed Repository · Medical Board Oversight",
+      title: "Peer-Reviewed Clinical Trials & Research Papers",
+      description: "National Library of Medicine systematic reviews, randomized clinical trials, and meta-analyses vetted by our medical board.",
+      badges: (
+        <>
+          <BannerBadge tone="brand">PubMed Central</BannerBadge>
+          <BannerBadge tone="success">Retraction Screened</BannerBadge>
+        </>
+      ),
+    },
+    saved: {
+      icon: Bookmark,
+      eyebrow: "Clinical Reference · Personal Archive",
+      title: "Saved Clinical Articles & Bookmarked Research",
+      description: "Quick access to your bookmarked patient guides, clinical studies, and medical references for rapid bedside consultation.",
+      badges: <BannerBadge tone="brand">Personal Reading List</BannerBadge>,
+    },
+  };
+
   return (
-    <div className="w-full space-y-0" id="medical-library-section">
-      {isPractitioner ? (
-        <PractitionerHeroBanner
-          currentUser={currentUser}
-          professionals={professionals as any}
-          reviews={reviews}
-          bookings={bookings}
-          groupName="Medical Library"
-          tabs={[
-            { id: 'all' as const, label: 'All Articles', icon: BookOpen, count: articles.length },
-            { id: 'practitioner' as const, label: 'Clinical Articles', icon: ShieldCheck, count: articles.filter(a => !a.source).length },
-            { id: 'research' as const, label: 'Research Papers', icon: BadgeCheck, count: articles.filter(a => !!a.source).length },
-            { id: 'saved' as const, label: 'Saved Articles', icon: Bookmark, count: savedIds.length },
-          ]}
-          activeTab={activeLibraryTab}
-          onTabChange={handleLibraryTabChange}
-          tabsLabel="Medical Library sections"
-          onOpenHelp={onOpenHelp}
-        />
-      ) : (
-        <DashboardHeader
-          icon={BookOpen}
-          eyebrow="Verified Medical Library"
-          title="Clinical Articles & Published Research"
-          description="Articles by credential-checked practitioners, plus peer-reviewed papers from PubMed that our medical board has approved. Every item lists its sources."
-          actions={
-            <BannerKpis items={[
-              { value: articles.length, label: 'Articles' },
-              { value: articles.filter(a => a.source).length, label: 'Research papers' },
-              { value: categories.length, label: 'Topics' },
-            ]} />
-          }
-        />
+    <div className={embedded ? "w-full space-y-4" : "w-full space-y-0"} id="medical-library-section">
+      {!embedded && (
+        isPractitioner ? (
+          <PractitionerHeroBanner
+            currentUser={currentUser}
+            professionals={professionals as any}
+            reviews={reviews}
+            bookings={bookings}
+            groupName="Medical Library"
+            tabs={[
+              { id: 'all' as const, label: 'All Articles', icon: BookOpen, count: articles.length },
+              { id: 'practitioner' as const, label: 'Clinical Articles', icon: ShieldCheck, count: articles.filter(a => !a.source).length },
+              { id: 'research' as const, label: 'Research Papers', icon: BadgeCheck, count: articles.filter(a => !!a.source).length },
+              { id: 'saved' as const, label: 'Saved Articles', icon: Bookmark, count: savedIds.length },
+            ]}
+            activeTab={activeLibraryTab}
+            onTabChange={handleLibraryTabChange}
+            tabsLabel="Medical Library sections"
+            onOpenHelp={onOpenHelp}
+          />
+        ) : (
+          <DashboardHeader
+            icon={BookOpen}
+            eyebrow="Verified Medical Library"
+            title="Clinical Articles & Published Research"
+            description="Articles by credential-checked practitioners, plus peer-reviewed papers from PubMed that our medical board has approved. Every item lists its sources."
+            actions={
+              <BannerKpis items={[
+                { value: articles.length, label: 'Articles' },
+                { value: articles.filter(a => a.source).length, label: 'Research papers' },
+                { value: categories.length, label: 'Topics' },
+              ]} />
+            }
+          />
+        )
       )}
 
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className={embedded ? "space-y-6 pt-2" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
+        {!embedded && (
+          <WorkspaceHeader
+            icon={libraryTabMeta[activeLibraryTab].icon}
+            eyebrow={libraryTabMeta[activeLibraryTab].eyebrow}
+            title={libraryTabMeta[activeLibraryTab].title}
+            description={libraryTabMeta[activeLibraryTab].description}
+            badges={libraryTabMeta[activeLibraryTab].badges}
+          />
+        )}
         {/* Search + categories */}
         <section aria-label="Find articles" className="bg-white border border-[color:var(--t-200)] shadow-xs px-5 py-4 space-y-3">
         {/* Row 1: search + saved */}

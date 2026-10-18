@@ -151,17 +151,26 @@ export const rxPayload = (r: any) => ({ id: r.id, code: r.code, patient: r.patie
 const certPayload = (c: any) => ({ id: c.id, code: c.code, patient: c.patient_user_id, professional: c.professional_id, from: c.from_date, to: c.to_date, issuedAt: c.issued_at });
 
 // ---------- consent ----------
+export function purgeExpiredGrants(): number {
+  const res = db.prepare("UPDATE record_grants SET revoked_at = datetime('now') WHERE revoked_at IS NULL AND expires_at <= datetime('now')").run();
+  return res.changes;
+}
+
 export function createGrant(patientUserId: string, professionalId: string, source: "booking" | "consult" | "manual", refId: string | null, days = 30) {
-  const existing = row("SELECT id FROM record_grants WHERE patient_user_id = ? AND professional_id = ? AND revoked_at IS NULL AND expires_at > ?", patientUserId, professionalId, iso());
-  const expires = new Date(Date.now() + days * 86400_000).toISOString();
+  // Enforce statutory 30-day ceiling under Malaysian medical data governance
+  const cappedDays = Math.min(30, Math.max(1, Number(days) || 30));
+  purgeExpiredGrants();
+  const existing = row("SELECT id FROM record_grants WHERE patient_user_id = ? AND professional_id = ? AND revoked_at IS NULL AND expires_at > datetime('now')", patientUserId, professionalId);
+  const expires = new Date(Date.now() + cappedDays * 86400_000).toISOString();
   if (existing) { db.prepare("UPDATE record_grants SET expires_at = MAX(expires_at, ?) WHERE id = ?").run(expires, existing.id); return existing.id; }
   const id = newId("grt");
   db.prepare("INSERT INTO record_grants (id, patient_user_id, professional_id, source, ref_id, granted_at, expires_at) VALUES (?,?,?,?,?,?,?)")
     .run(id, patientUserId, professionalId, source, refId, iso(), expires);
   return id;
 }
-const hasGrant = (patientUserId: string, professionalId: string) =>
-  !!row("SELECT 1 AS x FROM record_grants WHERE patient_user_id = ? AND professional_id = ? AND revoked_at IS NULL AND expires_at > ?", patientUserId, professionalId, iso());
+export const hasGrant = (patientUserId: string, professionalId: string) =>
+  !!row("SELECT 1 AS x FROM record_grants WHERE patient_user_id = ? AND professional_id = ? AND revoked_at IS NULL AND expires_at > datetime('now')", patientUserId, professionalId);
+
 
 export function seedHealthItems(userId: string, conditions: string[], allergies: string[]) {
   const ins = db.prepare("INSERT INTO health_items (id,user_id,type,name,created_at,updated_at) VALUES (?,?,?,?,?,?)");
@@ -310,7 +319,7 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     const professionalId = str(req.body.professionalId, 60);
     if (!verifiedPro(professionalId)) return fail(res, 404, "Practitioner not found.");
     if (!patientHasRelationTo(req.user!.id, professionalId)) return fail(res, 403, "You can only share your record with practitioners you have booked or consulted.");
-    const days = Math.min(90, Math.max(1, Number(req.body.days) || 30));
+    const days = Math.min(30, Math.max(1, Number(req.body.days) || 30));
     createGrant(req.user!.id, professionalId, "manual", null, days);
     audit(req, "record.grant", { target: ["professional", professionalId] });
     res.status(201).json({ status: "success" });
@@ -728,6 +737,12 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     canViewLabDocument: (user: { role: string; profileId: string | null }, doc: { owner_id: string; kind: string }) =>
       user.role === "practitioner" && !!user.profileId && doc.kind === "lab_result" && hasGrant(doc.owner_id, user.profileId),
   };
+
+  // Immediate purge of expired grants on startup and hourly background tick
+  purgeExpiredGrants();
+  setInterval(() => {
+    try { purgeExpiredGrants(); } catch (err) { console.error("purgeExpiredGrants error", err); }
+  }, 3600_000).unref();
 }
 
 export type { Warning };

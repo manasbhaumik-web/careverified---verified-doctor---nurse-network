@@ -6,9 +6,9 @@ import {
   AlertTriangle, Stethoscope, Sparkles, Pill, Activity, PhoneCall,
   HeartPulse, ShieldAlert, ChevronRight, ExternalLink, LifeBuoy,
   Send, X, Star, MapPin, Radio, AlertCircle, FileText, PackagePlus,
-  HeartHandshake, Plane, Store, UserCheck, Tag
+  HeartHandshake, Plane, Store, UserCheck, Tag, FlaskConical, ClipboardList, Share2
 } from 'lucide-react';
-import { DoctorProfile, NurseProfile, Booking, PatientProfile, UserRole, Article } from '../types';
+import { DoctorProfile, NurseProfile, Booking, PatientProfile, UserRole, Article, ConsultationMode } from '../types';
 import { INITIAL_ARTICLES } from '../data';
 import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from './DashboardHeader';
 import PatientRecords, { RecordSubTab } from './PatientRecords';
@@ -22,7 +22,10 @@ import MedicalAssistanceModule from './MedicalAssistanceModule';
 import MedicalTourism from './MedicalTourism';
 import PharmacyFinder from './PharmacyFinder';
 import MedicalLibrary from './MedicalLibrary';
+import AISymptomMatcher from './AISymptomMatcher';
 import PatientHeroBanner from './PatientHeroBanner';
+import { UserAvatar } from '../avatars';
+import WorkspaceHeader from './WorkspaceHeader';
 
 export type PatientDashboardTab = 
   | 'appointments' 
@@ -32,10 +35,12 @@ export type PatientDashboardTab =
   | 'records' 
   | 'prescriptions' 
   | 'certs' 
+  | 'labs'
   | 'packages' 
   | 'assistance' 
   | 'tourism' 
   | 'registry' 
+  | 'nurses'
   | 'pharmacies' 
   | 'articles';
 
@@ -57,12 +62,13 @@ export const PATIENT_GROUPS: Record<PatientTabGroup, {
     ],
   },
   records: {
-    name: 'Clinical Records & Meds',
+    name: 'Health Records & Prescriptions',
     defaultTab: 'records',
     tabs: [
-      { id: 'records', label: 'Health Records', icon: FolderHeart },
-      { id: 'prescriptions', label: 'Prescriptions', icon: Pill },
-      { id: 'certs', label: 'Medical Certificates', icon: FileText },
+      { id: 'records', label: 'Clinical Profile & Vitals', icon: FolderHeart },
+      { id: 'prescriptions', label: 'Prescriptions & Meds', icon: Pill },
+      { id: 'certs', label: 'Certificates & Referrals', icon: FileText },
+      { id: 'labs', label: 'Labs & Doctor Notes', icon: FlaskConical },
     ],
   },
   services: {
@@ -78,7 +84,8 @@ export const PATIENT_GROUPS: Record<PatientTabGroup, {
     name: 'Medical Network & Library',
     defaultTab: 'registry',
     tabs: [
-      { id: 'registry', label: 'Doctors & Nurses', icon: Search },
+      { id: 'registry', label: 'Doctors & Specialists', icon: Search },
+      { id: 'nurses', label: 'Clinical Nurses', icon: UserCheck },
       { id: 'pharmacies', label: 'Pharmacies', icon: Store },
       { id: 'articles', label: 'Medical Library', icon: BookOpen },
     ],
@@ -106,6 +113,9 @@ export interface PatientDashboardProps {
   initialTab?: PatientDashboardTab;
   currentUser?: any;
   articles?: Article[];
+  selectedSpecialtyFilter?: string;
+  onSelectSpecialtyFilter?: (spec: string) => void;
+  onClearSpecialtyFilter?: () => void;
 }
 
 type Tab = PatientDashboardTab;
@@ -146,12 +156,13 @@ const fmtDate = (iso?: string | null) => {
 
 export default function PatientDashboard({
   bookings, setBookings, professionals, onSelectProfessional, onNavigateToMessages, onConsultNow, onOpenArticle, onFindDoctors, onOpenTriage, onOpenPharmacies, onOpenHelp, activeGroup, initialTab, currentUser, articles,
+  selectedSpecialtyFilter, onSelectSpecialtyFilter, onClearSpecialtyFilter,
 }: PatientDashboardProps) {
   const currentGroup: PatientTabGroup = activeGroup || (
     initialTab ? (
-      (['records', 'prescriptions', 'certs'].includes(initialTab)) ? 'records' :
+      (['records', 'prescriptions', 'certs', 'labs'].includes(initialTab)) ? 'records' :
       (['packages', 'assistance', 'tourism'].includes(initialTab)) ? 'services' :
-      (['registry', 'pharmacies', 'articles'].includes(initialTab)) ? 'discovery' : 'care'
+      (['registry', 'nurses', 'pharmacies', 'articles'].includes(initialTab)) ? 'discovery' : 'care'
     ) : 'care'
   );
 
@@ -170,7 +181,20 @@ export default function PatientDashboard({
     }
   }, [activeGroup, initialTab]);
 
+  // Inner Workspace Subtabs State
+  const [appointmentsSubTab, setAppointmentsSubTab] = useState<'all' | 'upcoming' | 'past'>('all');
   const [recordsSubTab, setRecordsSubTab] = useState<RecordSubTab>('overview');
+  const [rxSubTab, setRxSubTab] = useState<'active' | 'history'>('active');
+  const [certsSubTab, setCertsSubTab] = useState<'mc' | 'referrals'>('mc');
+  const [labsSubTab, setLabsSubTab] = useState<'labs' | 'notes'>('labs');
+  const [consultSubTab, setConsultSubTab] = useState<'instant' | 'triage'>('instant');
+  const [savedSubTab, setSavedSubTab] = useState<'all' | 'doctors' | 'nurses'>('all');
+  const [registrySubTab, setRegistrySubTab] = useState<'all' | 'telehealth' | 'specialists'>('all');
+  const [nursesSubTab, setNursesSubTab] = useState<'all' | 'homecare' | 'clinic'>('all');
+  const [pharmaciesSubTab, setPharmaciesSubTab] = useState<'all' | 'delivery' | 'open24'>('all');
+  const [packagesSubTab, setPackagesSubTab] = useState<'packages' | 'promotions' | 'facilities'>('packages');
+  const [assistanceSubTab, setAssistanceSubTab] = useState<'enquiry' | 'cases' | 'guide' | 'track'>('enquiry');
+  const [tourismSubTab, setTourismSubTab] = useState<'find' | 'cases' | 'info'>('find');
   const [savedIds, setSavedIds] = useState<string[]>(readSaved);
   
   // Clinical Summary & Record Data
@@ -213,8 +237,8 @@ export default function PatientDashboard({
     try { return JSON.parse(localStorage.getItem('medi_user') || 'null'); } catch { return null; }
   })();
 
-  const userName = patientUser?.name || 'there';
-  const userAvatar = patientUser?.avatarUrl || null;
+  const userName = currentUser?.name || patientUser?.name || 'there';
+  const userAvatar = currentUser?.avatarUrl || patientUser?.avatarUrl || '/assets/patient_female_malay.jpg';
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
@@ -439,6 +463,7 @@ export default function PatientDashboard({
         bpSummary={summary?.bp}
         tabs={PATIENT_GROUPS[currentGroup].tabs.map(t => {
           if (t.id === 'appointments') return { ...t, count: upcoming.length };
+          if (t.id === 'prescriptions') return { ...t, count: activePrescriptions.length || undefined };
           if (t.id === 'saved') return { ...t, count: savedIds.length };
           return t;
         })}
@@ -446,14 +471,19 @@ export default function PatientDashboard({
         onTabChange={(t) => {
           setActiveTab(t);
           if (t === 'records') setRecordsSubTab('overview');
-          if (t === 'prescriptions') setRecordsSubTab('rx');
-          if (t === 'certs') setRecordsSubTab('docs');
+          if (t === 'prescriptions') setRxSubTab('active');
+          if (t === 'certs') setCertsSubTab('mc');
+          if (t === 'labs') setLabsSubTab('labs');
+          if (t === 'consult') setConsultSubTab('instant');
         }}
         tabsLabel={`${PATIENT_GROUPS[currentGroup].name} sections`}
         onOpenHelp={onOpenHelp}
         openTicketsCount={openTickets.length}
         onConsultNow={onConsultNow}
-        onOpenTriage={onOpenTriage}
+        onOpenTriage={() => {
+          setActiveTab('consult');
+          setConsultSubTab('triage');
+        }}
         onOpenRecords={() => { setActiveTab('records'); setRecordsSubTab('overview'); }}
       />
 
@@ -482,6 +512,33 @@ export default function PatientDashboard({
       {/* 4. MAIN WORKSPACE VIEW */}
       {activeTab === 'appointments' && (
         <div id="panel-appointments" role="tabpanel" aria-labelledby="tab-appointments" tabIndex={0} className="space-y-5">
+          {/* INNER WORKSPACE HEADER TITLE SECTION */}
+          <WorkspaceHeader
+            icon={Calendar}
+            eyebrow="My Care · Clinical Encounters"
+            title="Appointments & Consultation Visits"
+            description="Manage your upcoming confirmed visits, instant video consult rooms, and clinical consultation history archive."
+            badges={<BannerBadge tone="brand">MOH Protocol</BannerBadge>}
+            aside={
+              onFindDoctors && (
+                <button
+                  type="button"
+                  onClick={onFindDoctors}
+                  className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Calendar className="h-3.5 w-3.5" />
+                  <span>Schedule Doctor Visit</span>
+                </button>
+              )
+            }
+            tabs={[
+              { id: 'all', label: 'All Encounters', count: bookings.length },
+              { id: 'upcoming', label: 'Upcoming Visits', count: upcoming.length },
+              { id: 'past', label: 'Consultation Archive', count: past.length },
+            ]}
+            activeTab={appointmentsSubTab}
+            onTabChange={setAppointmentsSubTab}
+          />
           {/* TIER 0: REAL-TIME CLINICAL TELEMETRY HUD STRIP */}
           <section aria-label="Clinical vitals telemetry HUD" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {/* 1. Blood Pressure */}
@@ -660,11 +717,12 @@ export default function PatientDashboard({
                       {/* Left: Professional info & appointment timing */}
                       <div className="flex items-start sm:items-center gap-3.5 min-w-0">
                         <div className="w-12 h-12 shrink-0 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center text-[color:var(--t-600)] overflow-hidden shadow-2xs">
-                          {prof?.avatar ? (
-                            <img src={prof.avatar} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <User className="h-5 w-5 text-[color:var(--t-600)]" />
-                          )}
+                          <UserAvatar 
+                            src={prof?.avatar} 
+                            role={prof?.role || 'doctor'}
+                            alt={b.professionalName} 
+                            className="w-full h-full object-cover" 
+                          />
                         </div>
 
                         <div className="min-w-0">
@@ -1374,8 +1432,9 @@ export default function PatientDashboard({
                   >
                     <div>
                       <div className="flex items-start gap-3 mb-3">
-                        <img
-                          src={prof.avatar || '/assets/malaysian_male_doctor.jpg'}
+                        <UserAvatar
+                          src={prof.avatar}
+                          role={prof.role || 'doctor'}
                           alt={prof.name}
                           className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0"
                         />
@@ -1591,23 +1650,201 @@ export default function PatientDashboard({
         </div>
       )}
 
-      {/* HEALTH RECORD TABS */}
-      {(activeTab === 'records' || activeTab === 'prescriptions' || activeTab === 'certs') && (
-        <div id="panel-records" role="tabpanel" aria-labelledby="tab-records" tabIndex={0}>
-          <PatientRecords initialTab={activeTab === 'prescriptions' ? 'rx' : activeTab === 'certs' ? 'docs' : recordsSubTab} />
+      {/* 1. HEALTH RECORDS: CLINICAL PROFILE & VITALS */}
+      {activeTab === 'records' && (
+        <div id="panel-records" role="tabpanel" aria-labelledby="tab-records" tabIndex={0} className="space-y-4">
+          <WorkspaceHeader
+            icon={FolderHeart}
+            eyebrow="Electronic Health Record · Encrypted Vault"
+            title="Clinical Health Profile & Biometric Vitals"
+            description="Continuous physiological telemetry, active clinical conditions, verified allergy alerts, and emergency clinical data."
+            badges={<BannerBadge tone="success"><CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" /> EHR Verified</BannerBadge>}
+            aside={
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="px-3.5 py-2 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <FileText className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                <span>Export EHR Summary</span>
+              </button>
+            }
+            tabs={[
+              { id: 'overview', label: 'Clinical Profile', icon: ClipboardList },
+              { id: 'vitals', label: 'Biometric Readings', icon: Activity },
+              { id: 'sharing', label: 'EHR Consent & PIN', icon: Share2 },
+            ]}
+            activeTab={recordsSubTab}
+            onTabChange={setRecordsSubTab}
+          />
+          <PatientRecords
+            activeSubTab={recordsSubTab}
+            onSubTabChange={setRecordsSubTab}
+            hideHeaderTabs={true}
+          />
         </div>
       )}
 
-      {/* CONSULT NOW TAB */}
+      {/* 2. PRESCRIPTIONS & MEDS */}
+      {activeTab === 'prescriptions' && (
+        <div id="panel-prescriptions" role="tabpanel" aria-labelledby="tab-prescriptions" tabIndex={0} className="space-y-4">
+          <WorkspaceHeader
+            icon={Pill}
+            eyebrow="Pharmacy Network · e-Prescriptions"
+            title="Doctor e-Prescriptions & Pharmacy Fulfillment"
+            description="Digitally signed doctor prescriptions. Transmit directly to partner pharmacies for home delivery or pickup."
+            badges={<BannerBadge tone="brand">{activePrescriptions.length} Active Prescriptions</BannerBadge>}
+            aside={
+              onOpenPharmacies && (
+                <button
+                  type="button"
+                  onClick={onOpenPharmacies}
+                  className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Store className="h-3.5 w-3.5" />
+                  <span>Locate Dispensary</span>
+                </button>
+              )
+            }
+            tabs={[
+              { id: 'active', label: 'Active Prescriptions', icon: Pill, count: activePrescriptions.length },
+              { id: 'history', label: 'Prescription Archive', icon: FileText },
+            ]}
+            activeTab={rxSubTab}
+            onTabChange={setRxSubTab}
+          />
+          <PatientRecords
+            activeSubTab={rxSubTab === 'history' ? 'docs' : 'rx'}
+            hideHeaderTabs={true}
+          />
+        </div>
+      )}
+
+      {/* 3. CERTIFICATES & REFERRALS */}
+      {activeTab === 'certs' && (
+        <div id="panel-certs" role="tabpanel" aria-labelledby="tab-certs" tabIndex={0} className="space-y-4">
+          <WorkspaceHeader
+            icon={FileText}
+            eyebrow="Official Medical Certificates · Tamper-Proof QR"
+            title="Medical Certificates (MC) & Specialist Referrals"
+            description="Authentic digital medical certificates signed with physician MMC registration numbers and instant QR verification."
+            badges={<BannerBadge tone="success"><ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" /> Council Validated</BannerBadge>}
+            tabs={[
+              { id: 'mc', label: 'Medical Certificates (MC)', icon: FileText },
+              { id: 'referrals', label: 'Referral Letters', icon: HeartHandshake },
+            ]}
+            activeTab={certsSubTab}
+            onTabChange={setCertsSubTab}
+          />
+          <PatientRecords
+            activeSubTab="docs"
+            hideHeaderTabs={true}
+          />
+        </div>
+      )}
+
+      {/* 4. LABS & DOCTOR NOTES */}
+      {activeTab === 'labs' && (
+        <div id="panel-labs" role="tabpanel" aria-labelledby="tab-labs" tabIndex={0} className="space-y-4">
+          <WorkspaceHeader
+            icon={FlaskConical}
+            eyebrow="Clinical Diagnostics · Diagnostic Reports"
+            title="Diagnostic Lab Reports & Doctor Clinical Notes"
+            description="Pathology test results, blood analysis, radiology reports, and physician consultation summaries."
+            badges={<BannerBadge tone="brand">Accredited Pathology</BannerBadge>}
+            tabs={[
+              { id: 'labs', label: 'Lab Test Reports', icon: FlaskConical },
+              { id: 'notes', label: 'Doctor Clinical Notes', icon: FileText },
+            ]}
+            activeTab={labsSubTab}
+            onTabChange={setLabsSubTab}
+          />
+          <PatientRecords
+            activeSubTab={labsSubTab}
+            onSubTabChange={setLabsSubTab}
+            hideHeaderTabs={true}
+          />
+        </div>
+      )}
+
+      {/* 5. CONSULT NOW TAB */}
       {activeTab === 'consult' && (
-        <div id="panel-consult" role="tabpanel" tabIndex={0}>
-          <ConsultNow myUserId={currentUser?.id} />
+        <div id="panel-consult" role="tabpanel" tabIndex={0} className="space-y-4">
+          <WorkspaceHeader
+            icon={Video}
+            eyebrow="Telehealth Network · 24/7 Coverage"
+            title="Instant Telehealth Consultation Room"
+            description="Connect directly with an MMC-licensed physician on-call. 10-minute maximum wait time with automatic refund guarantee."
+            badges={
+              <>
+                <BannerBadge tone="success">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1" /> Active Doctor On-Call
+                </BannerBadge>
+                <BannerBadge>WebRTC HD Encrypted</BannerBadge>
+              </>
+            }
+            aside={
+              onOpenTriage && (
+                <button
+                  type="button"
+                  onClick={onOpenTriage}
+                  className="px-3.5 py-2 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Sparkles className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                  <span>AI Symptom Triage</span>
+                </button>
+              )
+            }
+            tabs={[
+              { id: 'instant', label: 'Live Video Consult Room' },
+              { id: 'triage', label: 'Clinical Assessment & Triage' },
+            ]}
+            activeTab={consultSubTab}
+            onTabChange={setConsultSubTab}
+          />
+          {consultSubTab === 'instant' ? (
+            <ConsultNow 
+              myUserId={currentUser?.id} 
+              embedded={true} 
+              onNavigateToPrescriptions={() => setActiveTab('prescriptions')}
+            />
+          ) : (
+            <div className="space-y-4">
+              <AISymptomMatcher
+                onSelectSpecialty={(spec) => {
+                  if (onFindDoctors) onFindDoctors();
+                }}
+                onApplyTriage={(triage) => {
+                  if (onFindDoctors) onFindDoctors();
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
 
-      {/* MESSAGES TAB */}
+      {/* 6. CARE MESSAGES TAB */}
       {activeTab === 'messages' && (
-        <div id="panel-messages" role="tabpanel" tabIndex={0}>
+        <div id="panel-messages" role="tabpanel" tabIndex={0} className="space-y-4">
+          <WorkspaceHeader
+            icon={MessageSquare}
+            eyebrow="Secure Care Messenger · PDPA Encrypted"
+            title="Patient Care Mailbox & Direct Messaging"
+            description="End-to-end encrypted messaging with your verified doctors, clinical nurses, and care coordinators."
+            badges={<BannerBadge tone="brand">256-bit Encrypted</BannerBadge>}
+            aside={
+              onFindDoctors && (
+                <button
+                  type="button"
+                  onClick={onFindDoctors}
+                  className="px-3.5 py-2 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Search className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                  <span>Find Doctor to Message</span>
+                </button>
+              )
+            }
+          />
           <SecureMessenger
             currentUserId={currentUser?.profileId || currentUser?.id || 'patient-user'}
             embedded={true}
@@ -1615,11 +1852,43 @@ export default function PatientDashboard({
         </div>
       )}
 
-      {/* SAVED PRACTITIONERS TAB */}
+      {/* 7. SAVED CARE TEAM TAB */}
       {activeTab === 'saved' && (
-        <div id="panel-saved" role="tabpanel" aria-labelledby="tab-saved" tabIndex={0}>
+        <div id="panel-saved" role="tabpanel" aria-labelledby="tab-saved" tabIndex={0} className="space-y-4">
+          <WorkspaceHeader
+            icon={Heart}
+            eyebrow="Personal Care Team · Saved Providers"
+            title="My Healthcare Providers & Specialists"
+            description="Your trusted circle of verified doctors, nurses, and medical facilities saved for rapid scheduling."
+            badges={<BannerBadge tone="brand">{savedIds.length} Saved Providers</BannerBadge>}
+            aside={
+              onFindDoctors && (
+                <button
+                  type="button"
+                  onClick={onFindDoctors}
+                  className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Search className="h-3.5 w-3.5" />
+                  <span>Find More Providers</span>
+                </button>
+              )
+            }
+            tabs={[
+              { id: 'all', label: 'All Saved Providers', count: savedIds.length },
+              { id: 'doctors', label: 'Doctors & Specialists' },
+              { id: 'nurses', label: 'Clinical Nurses' },
+            ]}
+            activeTab={savedSubTab}
+            onTabChange={setSavedSubTab}
+          />
           <SavedTab
-            savedProfessionals={professionals.filter(p => savedIds.includes(p.id))}
+            hideHeader={true}
+            savedProfessionals={professionals.filter(p => {
+              if (!savedIds.includes(p.id)) return false;
+              if (savedSubTab === 'doctors' && p.role !== UserRole.DOCTOR) return false;
+              if (savedSubTab === 'nurses' && p.role !== UserRole.NURSE) return false;
+              return true;
+            })}
             onRemoveSaved={removeSaved}
             onNavigateToMessages={onNavigateToMessages}
             onSelectProfessional={onSelectProfessional}
@@ -1628,38 +1897,128 @@ export default function PatientDashboard({
         </div>
       )}
 
-      {/* PACKAGES TAB */}
+      {/* 8. PACKAGES TAB */}
       {activeTab === 'packages' && (
-        <div id="panel-packages" role="tabpanel" tabIndex={0}>
-          <MedicalPackagesModule />
+        <div id="panel-packages" role="tabpanel" tabIndex={0} className="space-y-4">
+          <WorkspaceHeader
+            icon={PackagePlus}
+            eyebrow="Preventive Health · Hospital Packages"
+            title="Comprehensive Medical Screening & Treatment Packages"
+            description="Curated healthcare packages from accredited private hospitals and specialist clinics across Malaysia."
+            badges={<BannerBadge tone="brand">Price Transparent</BannerBadge>}
+            tabs={[
+              { id: 'packages', label: 'Medical Packages' },
+              { id: 'promotions', label: 'Promotions & Offers' },
+              { id: 'facilities', label: 'Facilities & Infrastructure' },
+            ]}
+            activeTab={packagesSubTab}
+            onTabChange={(t) => setPackagesSubTab(t as any)}
+          />
+          <MedicalPackagesModule
+            embedded={true}
+            activeTab={packagesSubTab}
+            onTabChange={setPackagesSubTab}
+          />
         </div>
       )}
 
-      {/* ASSISTANCE & QUOTES TAB */}
+      {/* 9. ASSISTANCE & QUOTES TAB */}
       {activeTab === 'assistance' && (
-        <div id="panel-assistance" role="tabpanel" tabIndex={0}>
-          <MedicalAssistanceModule />
+        <div id="panel-assistance" role="tabpanel" tabIndex={0} className="space-y-4">
+          <WorkspaceHeader
+            icon={HeartHandshake}
+            eyebrow="Care Concierge · Hospital Estimates"
+            title="Patient Assistance & Treatment Quotes"
+            description="Request second opinions, procedure cost estimations, and insurance guarantee letter pre-authorizations."
+            badges={<BannerBadge tone="brand">MHTC Coordinated</BannerBadge>}
+            tabs={[
+              { id: 'enquiry', label: 'Request Treatment Quote' },
+              { id: 'cases', label: 'My Inquiries & Quotes' },
+              { id: 'guide', label: 'Expat & Travel Care Guide' },
+              { id: 'track', label: 'Track Guest Inquiry' },
+            ]}
+            activeTab={assistanceSubTab}
+            onTabChange={(t) => setAssistanceSubTab(t as any)}
+          />
+          <MedicalAssistanceModule
+            embedded={true}
+            activeTab={assistanceSubTab}
+            onTabChange={setAssistanceSubTab}
+          />
         </div>
       )}
 
-      {/* GLOBAL PATIENT SERVICES TAB */}
+      {/* 10. GLOBAL PATIENT SERVICES TAB */}
       {activeTab === 'tourism' && (
-        <div id="panel-tourism" role="tabpanel" tabIndex={0}>
-          <MedicalTourism onOpenProfessional={onSelectProfessional} />
+        <div id="panel-tourism" role="tabpanel" tabIndex={0} className="space-y-4">
+          <WorkspaceHeader
+            icon={Plane}
+            eyebrow="Malaysia Healthcare Travel Council · Cross-Border Care"
+            title="Global Patient Services & Medical Tourism"
+            description="End-to-end medical travel facilitation for international and domestic patients seeking specialist treatment in Malaysia."
+            badges={<BannerBadge tone="brand">MHTC Member Network</BannerBadge>}
+            tabs={[
+              { id: 'find', label: 'Find a Facility' },
+              { id: 'cases', label: 'My Cases' },
+              { id: 'info', label: 'Travel Information' },
+            ]}
+            activeTab={tourismSubTab}
+            onTabChange={(t) => setTourismSubTab(t as any)}
+          />
+          <MedicalTourism
+            embedded={true}
+            activeTab={tourismSubTab}
+            onTabChange={setTourismSubTab}
+            onOpenProfessional={onSelectProfessional}
+          />
         </div>
       )}
 
-      {/* PHARMACIES TAB */}
+      {/* 11. PHARMACIES TAB */}
       {activeTab === 'pharmacies' && (
-        <div id="panel-pharmacies" role="tabpanel" tabIndex={0}>
-          <PharmacyFinder />
+        <div id="panel-pharmacies" role="tabpanel" tabIndex={0} className="space-y-4">
+          <WorkspaceHeader
+            icon={Store}
+            eyebrow="Pharmacy Registry · Poison Licences"
+            title="Licensed Pharmacy Dispensary Network"
+            description="Locate Type A Poison Licensed retail pharmacies and hospital dispensaries for prescription fulfillment and delivery."
+            badges={<BannerBadge tone="brand">Type A Poison Licensed</BannerBadge>}
+            tabs={[
+              { id: 'all', label: 'All Dispensaries', count: pharmacies.length },
+              { id: 'delivery', label: 'Home Delivery Licensed' },
+              { id: 'open24', label: '24-Hour Emergency' },
+            ]}
+            activeTab={pharmaciesSubTab}
+            onTabChange={setPharmaciesSubTab}
+          />
+          <PharmacyFinder embedded={true} />
         </div>
       )}
 
-      {/* MEDICAL LIBRARY TAB */}
+      {/* 12. MEDICAL LIBRARY TAB */}
       {activeTab === 'articles' && (
-        <div id="panel-articles" role="tabpanel" tabIndex={0}>
+        <div id="panel-articles" role="tabpanel" tabIndex={0} className="space-y-4">
+          <WorkspaceHeader
+            icon={BookOpen}
+            eyebrow="Patient Health Guides · Evidence-Based Medicine"
+            title="Clinical Health Library & Patient Guides"
+            description="Physician-authored, evidence-based medical articles, disease management guides, and clinical wellness advice."
+            badges={<BannerBadge tone="brand">Doctor Reviewed</BannerBadge>}
+            aside={
+              onFindDoctors && (
+                <button
+                  type="button"
+                  onClick={onFindDoctors}
+                  className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Search className="h-3.5 w-3.5" />
+                  <span>Find Article Author</span>
+                </button>
+              )
+            }
+          />
           <MedicalLibrary
+            embedded={true}
             articles={articles || INITIAL_ARTICLES}
             professionals={professionals}
             onFindDoctor={() => {
@@ -1669,49 +2028,153 @@ export default function PatientDashboard({
         </div>
       )}
 
-      {/* REGISTRY / DOCTORS TAB */}
+      {/* 13. REGISTRY / DOCTORS TAB */}
       {activeTab === 'registry' && (
         <div id="panel-registry" role="tabpanel" tabIndex={0} className="space-y-4">
-          <div className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
-            <div>
-              <h3 className="font-display font-black text-sm text-[color:var(--ink)]">Malaysian Medical Registry Directory</h3>
-              <p className="text-xs text-slate-500 font-medium">Browse pre-verified MMC &amp; LJM accredited doctors and nurses.</p>
+          <WorkspaceHeader
+            icon={Search}
+            eyebrow="National Medical Registry · Doctor Directory"
+            title="Verified Malaysian Doctors & Specialists"
+            description="Directory of registered physicians verified directly against the Malaysian Medical Council (MMC) database with active Annual Practising Certificates (APC)."
+            badges={<BannerBadge tone="success"><CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" /> MMC Verified</BannerBadge>}
+            aside={
+              onFindDoctors && (
+                <button
+                  type="button"
+                  onClick={onFindDoctors}
+                  className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Search className="h-3.5 w-3.5" />
+                  <span>Full Interactive Directory</span>
+                </button>
+              )
+            }
+            tabs={[
+              { id: 'all', label: 'All Specialists', count: professionals.filter(p => p.role === UserRole.DOCTOR).length },
+              { id: 'telehealth', label: 'Available for Telehealth' },
+              { id: 'specialists', label: 'Consultant Physicians' },
+            ]}
+            activeTab={registrySubTab}
+            onTabChange={setRegistrySubTab}
+          />
+
+          {selectedSpecialtyFilter && (
+            <div className="bg-emerald-50 border border-emerald-200 p-3 flex items-center justify-between text-xs animate-fade-in">
+              <div className="flex items-center gap-2">
+                <span className="font-mono font-bold text-emerald-800 uppercase text-[10px] bg-emerald-100 border border-emerald-200 px-2 py-0.5">
+                  AI Triage Matched
+                </span>
+                <span className="font-extrabold text-[color:var(--ink)]">
+                  Filtering for: <span className="text-[color:var(--t-700)]">{selectedSpecialtyFilter}</span>
+                </span>
+              </div>
+              {onClearSpecialtyFilter && (
+                <button
+                  type="button"
+                  onClick={onClearSpecialtyFilter}
+                  className="font-bold text-xs text-slate-600 hover:text-slate-900 underline cursor-pointer"
+                >
+                  Clear filter
+                </button>
+              )}
             </div>
-            {onFindDoctors && (
-              <button
-                type="button"
-                onClick={onFindDoctors}
-                className="px-4 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors cursor-pointer"
-              >
-                Open Full Interactive Directory
-              </button>
-            )}
-          </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {professionals.slice(0, 6).map(prof => (
-              <div key={prof.id} className="p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all bg-white flex flex-col justify-between shadow-2xs">
-                <div>
-                  <div className="flex items-start gap-3 mb-3">
-                    <img src={prof.avatar || '/assets/malaysian_male_doctor.jpg'} alt={prof.name} className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" />
-                    <div className="min-w-0">
-                      <button type="button" onClick={() => onSelectProfessional(prof.id)} className="font-display font-extrabold text-sm text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left truncate block w-full cursor-pointer">
-                        {prof.name}
-                      </button>
-                      <p className="text-xs text-[color:var(--t-700)] font-bold">{prof.specialization}</p>
-                      <span className="inline-block mt-1 text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200">
-                        MMC Verified · Active
-                      </span>
+            {professionals
+              .filter(p => {
+                if (p.role !== UserRole.DOCTOR) return false;
+                if (registrySubTab === 'telehealth' && !p.consultationModes?.includes(ConsultationMode.VIDEO)) return false;
+                if (selectedSpecialtyFilter) {
+                  return p.specialization?.toLowerCase().includes(selectedSpecialtyFilter.toLowerCase());
+                }
+                return true;
+              })
+              .slice(0, 6)
+              .map(prof => (
+                <div key={prof.id} className="p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all bg-white flex flex-col justify-between shadow-2xs group">
+                  <div>
+                    <div className="flex items-start gap-3 mb-3">
+                      <UserAvatar src={prof.avatar} role="doctor" alt={prof.name} className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" />
+                      <div className="min-w-0">
+                        <button type="button" onClick={() => onSelectProfessional(prof.id)} className="font-display font-extrabold text-sm text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left truncate block w-full cursor-pointer">
+                          {prof.name}
+                        </button>
+                        <p className="text-xs text-[color:var(--t-700)] font-bold">{prof.specialization}</p>
+                        <span className="inline-block mt-1 text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200">
+                          MMC Verified · Active
+                        </span>
+                      </div>
                     </div>
                   </div>
+                  <div className="pt-2 border-t border-[color:var(--t-100)] flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-slate-700">RM {prof.fee}</span>
+                    <button type="button" onClick={() => onSelectProfessional(prof.id)} className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer">
+                      Book Visit &rarr;
+                    </button>
+                  </div>
                 </div>
-                <div className="pt-2 border-t border-[color:var(--t-100)] flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-slate-700">RM {prof.fee}</span>
-                  <button type="button" onClick={() => onSelectProfessional(prof.id)} className="text-xs font-bold text-[color:var(--t-600)] hover:underline">
-                    Book Visit &rarr;
-                  </button>
+              ))}
+          </div>
+        </div>
+      )}
+
+      {/* 14. CLINICAL NURSES TAB */}
+      {activeTab === 'nurses' && (
+        <div id="panel-nurses" role="tabpanel" tabIndex={0} className="space-y-4">
+          <WorkspaceHeader
+            icon={UserCheck}
+            eyebrow="National Nursing Registry · Clinical Nurses"
+            title="LJM Registered Staff Nurses & Care Providers"
+            description="Verified professional nurses registered with the Lembaga Jururawat Malaysia (LJM) for clinic care, home nursing, and wound dressing."
+            badges={<BannerBadge tone="success"><CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" /> LJM Verified</BannerBadge>}
+            aside={
+              onFindDoctors && (
+                <button
+                  type="button"
+                  onClick={onFindDoctors}
+                  className="px-3.5 py-2 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Search className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                  <span>Search All Providers</span>
+                </button>
+              )
+            }
+            tabs={[
+              { id: 'all', label: 'All Registered Nurses', count: professionals.filter(p => p.role === UserRole.NURSE).length },
+              { id: 'homecare', label: 'Home Care & Private Nursing' },
+              { id: 'clinic', label: 'Clinical & Hospital' },
+            ]}
+            activeTab={nursesSubTab}
+            onTabChange={setNursesSubTab}
+          />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {professionals
+              .filter(p => p.role === UserRole.NURSE)
+              .map(prof => (
+                <div key={prof.id} className="p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all bg-white flex flex-col justify-between shadow-2xs group">
+                  <div>
+                    <div className="flex items-start gap-3 mb-3">
+                      <UserAvatar src={prof.avatar} role="nurse" alt={prof.name} className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" />
+                      <div className="min-w-0">
+                        <button type="button" onClick={() => onSelectProfessional(prof.id)} className="font-display font-extrabold text-sm text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left truncate block w-full cursor-pointer">
+                          {prof.name}
+                        </button>
+                        <p className="text-xs text-[color:var(--t-700)] font-bold">{prof.specialization || 'Clinical Staff Nurse'}</p>
+                        <span className="inline-block mt-1 text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200">
+                          LJM Verified · Active
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="pt-2 border-t border-[color:var(--t-100)] flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-slate-700">RM {prof.fee || 60} / hr</span>
+                    <button type="button" onClick={() => onSelectProfessional(prof.id)} className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer">
+                      Book Nurse &rarr;
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       )}

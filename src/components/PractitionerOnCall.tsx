@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AlertTriangle, Power, Radio } from 'lucide-react';
+import { AlertTriangle, Power, Radio, CheckCircle2 } from 'lucide-react';
 import ConsultRoom from './ConsultRoom';
 import { formatMoney } from '../locale';
+import WorkspaceHeader from './WorkspaceHeader';
+import { BannerBadge } from './DashboardHeader';
 
 const jpost = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -83,9 +85,20 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
   if (active) return <ConsultRoom consultId={active.id} myUserId={myUserId} isDoctor onEnded={refresh} />;
 
   if (me && !me.canGoOnline) {
-    return <p className="bg-amber-50 border border-amber-200 text-amber-900 text-sm font-semibold p-5 max-w-2xl">
-      On-call consultations are available to verified doctors. Once the medical board verifies your profile you can go online here.
-    </p>;
+    return (
+      <div className={embedded ? "space-y-6 w-full" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
+        <WorkspaceHeader
+          icon={Radio}
+          eyebrow="On-Call Telehealth · Real-Time Radar"
+          title="On-Call Duty Radar & Live Queue"
+          description="Manage your active on-call shift status, accept live patient triage calls, and conduct urgent video consultations."
+          badges={<BannerBadge tone="neutral">Verification Required</BannerBadge>}
+        />
+        <p className="bg-amber-50 border border-amber-200 text-amber-900 text-sm font-semibold p-5 max-w-2xl">
+          On-call consultations are available to verified doctors. Once the medical board verifies your profile you can go online here.
+        </p>
+      </div>
+    );
   }
 
   const dayCount = (d: number) => Array.from({ length: 24 }, (_, h) => roster.has(`${d}-${h}`)).filter(Boolean).length;
@@ -94,71 +107,32 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
 
   return (
     <div className={embedded ? "space-y-6 w-full" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
-      {/* Compact Status Bar with Inline Telemetry */}
-      <section
-        aria-label="On-call status and telemetry"
-        className={`border px-4 py-3 sm:px-5 sm:py-3.5 shadow-xs transition-colors flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4 ${
-          me?.online
-            ? 'bg-emerald-50/70 border-emerald-300'
-            : 'bg-white border-[color:var(--t-200)]'
-        }`}
-      >
-        {/* Left: Status Indicator & Headline */}
-        <div className="flex items-center gap-3 min-w-0">
-          <span className="relative flex h-3 w-3 shrink-0">
-            {me?.online && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>}
-            <span className={`relative inline-flex rounded-full h-3 w-3 ${me?.online ? 'bg-emerald-600' : 'bg-slate-400'}`}></span>
-          </span>
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
-              <h2 className="text-sm sm:text-base font-black text-[color:var(--ink)] tracking-tight whitespace-nowrap">
-                {me?.online ? 'On Call & Accepting Patients' : 'You are Currently Offline'}
-              </h2>
-              <span className="hidden sm:inline text-xs text-slate-400">·</span>
-              <p className="text-[11px] text-[color:var(--ink-2)] truncate">
-                {me?.online
-                  ? 'Incoming consults dispatch automatically. Keep this tab open.'
-                  : 'While online, you are dispatched incoming telehealth consults. Keep this tab open for audio chimes.'}
-              </p>
-            </div>
+      {/* Unified Institutional Inner Workspace Header with Telemetry Sub-bar */}
+      <WorkspaceHeader
+        icon={Radio}
+        eyebrow="On-Call Telehealth · Real-Time Radar"
+        title="On-Call Duty Radar & Live Queue"
+        description="Manage your active on-call shift status, accept live patient triage calls, and conduct urgent video consultations."
+        badges={
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <BannerBadge tone={me?.online ? 'success' : 'neutral'}>
+              <span className={`w-2 h-2 rounded-full inline-block mr-1.5 ${me?.online ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+              {me?.online ? 'On Call & Accepting Patients' : 'Currently Offline'}
+            </BannerBadge>
+            <BannerBadge tone="success">
+              <CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" />
+              MMC Compliant Shift
+            </BannerBadge>
           </div>
-        </div>
-
-        {/* Right: Inline Telemetry Strip + Action Button */}
-        <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3 sm:gap-4 shrink-0">
-          <dl className="flex items-center divide-x divide-[color:var(--t-200)] border border-[color:var(--t-200)] bg-white shadow-2xs">
-            <div className="px-3 py-1.5 text-center min-w-[68px]">
-              <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Waiting</dt>
-              <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
-                {me?.online ? String(offers.length) : '—'}
-              </dd>
-            </div>
-            <div className="px-3 py-1.5 text-center min-w-[82px]">
-              <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Committed</dt>
-              <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
-                {roster.size}h / wk
-              </dd>
-            </div>
-            <div className="px-3 py-1.5 text-center min-w-[92px]">
-              <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Daily Window</dt>
-              <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
-                {coveredHours} / 24 hrs
-              </dd>
-            </div>
-            <div className="px-3 py-1.5 text-center min-w-[92px]">
-              <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Accrued Net</dt>
-              <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--t-700)] leading-tight">
-                {earnings ? fmtRM(earnings.totals.net) : '—'}
-              </dd>
-            </div>
-          </dl>
-
+        }
+        aside={
           <button
+            type="button"
             onClick={() => setOnline(!me?.online)}
-            className={`h-10 px-5 text-xs font-black uppercase tracking-wider cursor-pointer transition-all flex items-center justify-center gap-2 shadow-xs whitespace-nowrap flex-1 sm:flex-none ${
+            className={`h-9 px-4 text-xs font-black uppercase tracking-wider cursor-pointer transition-all flex items-center justify-center gap-2 shadow-xs whitespace-nowrap ${
               me?.online
                 ? 'bg-white border border-slate-300 text-slate-800 hover:bg-slate-50'
-                : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white'
+                : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white border border-[color:var(--t-700)]'
             }`}
           >
             {me?.online ? (
@@ -173,8 +147,61 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
               </>
             )}
           </button>
+        }
+      >
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
+          {/* Left: Status Indicator & Headline */}
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="relative flex h-3 w-3 shrink-0">
+              {me?.online && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>}
+              <span className={`relative inline-flex rounded-full h-3 w-3 ${me?.online ? 'bg-emerald-600' : 'bg-slate-400'}`}></span>
+            </span>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                <span className="text-xs sm:text-sm font-black text-[color:var(--ink)] tracking-tight whitespace-nowrap">
+                  {me?.online ? 'On Call & Accepting Patients' : 'You are Currently Offline'}
+                </span>
+                <span className="hidden sm:inline text-xs text-slate-400">·</span>
+                <span className="text-[11px] text-[color:var(--ink-2)] truncate">
+                  {me?.online
+                    ? 'Incoming consults dispatch automatically. Keep this tab open.'
+                    : 'While online, you are dispatched incoming telehealth consults. Keep this tab open for audio chimes.'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Inline Telemetry Strip */}
+          <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 shrink-0">
+            <dl className="flex items-center divide-x divide-[color:var(--t-200)] border border-[color:var(--t-200)] bg-[color:var(--t-50)]/70 shadow-2xs">
+              <div className="px-3 py-1.5 text-center min-w-[68px]">
+                <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Waiting</dt>
+                <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
+                  {me?.online ? String(offers.length) : '—'}
+                </dd>
+              </div>
+              <div className="px-3 py-1.5 text-center min-w-[82px]">
+                <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Committed</dt>
+                <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
+                  {roster.size}h / wk
+                </dd>
+              </div>
+              <div className="px-3 py-1.5 text-center min-w-[92px]">
+                <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Daily Window</dt>
+                <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
+                  {coveredHours} / 24 hrs
+                </dd>
+              </div>
+              <div className="px-3 py-1.5 text-center min-w-[92px]">
+                <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Accrued Net</dt>
+                <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--t-700)] leading-tight">
+                  {earnings ? fmtRM(earnings.totals.net) : '—'}
+                </dd>
+              </div>
+            </dl>
+          </div>
         </div>
-      </section>
+      </WorkspaceHeader>
       {msg && <p className="text-xs font-bold text-slate-700 bg-slate-50 border border-slate-200 p-3">{msg}</p>}
 
       {me?.online && (

@@ -25,7 +25,7 @@ const doctor = (p: Partial<DoctorProfile> & Pick<DoctorProfile, 'id' | 'name' | 
 
 export const MY_DEMO_DOCTORS: DoctorProfile[] = [
   doctor({
-    id: 'doc-my-1', name: 'Dr. Kavitha Subramaniam (demo)', avatar: '/assets/malaysian_female_doctor.jpg', specialization: 'General Physician',
+    id: 'doc-my-1', name: 'Dr. Kavitha Subramaniam (demo)', avatar: '/assets/doctor_female_indian.jpg', specialization: 'General Physician',
     licenseNumber: 'DEMO-MMC-0101', city: 'George Town', fee: 60, experienceYears: 11, education: ['MBBS (demo)', 'Diploma in Family Medicine (demo)'],
     bio: 'Demo profile. Family doctor for adults and children, with a focus on diabetes and blood pressure follow-up.',
     languages: ['English', 'Malay', 'Tamil'], practiceAddress: 'Demo Clinic, Jalan Demo, George Town, Pulau Pinang', seoSlug: 'demo-dr-kavitha-general-physician-george-town',
@@ -44,7 +44,7 @@ export const MY_DEMO_DOCTORS: DoctorProfile[] = [
     languages: ['English', 'Malay', 'Kadazan-Dusun'], practiceAddress: 'Demo Klinik, Jalan Demo, Kota Kinabalu, Sabah', seoSlug: 'demo-dr-nurul-hidayah-general-kota-kinabalu',
   }),
   doctor({
-    id: 'doc-my-4', name: 'Dr. Lim Wei Jie (demo)', avatar: '/assets/malaysian_male_doctor.jpg', specialization: 'Endocrinologist',
+    id: 'doc-my-4', name: 'Dr. Lim Wei Jie (demo)', avatar: '/assets/doctor_male_chinese.jpg', specialization: 'Endocrinologist',
     licenseNumber: 'DEMO-MMC-0104', city: 'Johor Bahru', fee: 160, experienceYears: 13, registrationType: 'specialist', education: ['MBBS (demo)', 'Master of Medicine, Internal Medicine (demo)'],
     bio: 'Demo profile. Diabetes, thyroid and hormone disorders. Sees international patients from Singapore for follow-up.',
     languages: ['English', 'Malay', 'Mandarin', 'Cantonese'], practiceAddress: 'Demo Medical Centre, Jalan Demo, Johor Bahru, Johor', seoSlug: 'demo-dr-lim-wei-jie-endocrinologist-johor-bahru',
@@ -76,7 +76,7 @@ export const MY_DEMO_NURSES: NurseProfile[] = [
     languages: ['Malay', 'English'], practiceAddress: 'Home visits around Ipoh, Perak', seoSlug: 'demo-siti-hajar-community-nurse-ipoh', shiftTypes: ['Day Shift'],
   }),
   nurse({
-    id: 'nur-my-2', name: 'Raj Kumar Pillai (demo)', avatar: '/assets/malaysian_female_nurse.jpg', specialization: 'Elderly & Palliative Care',
+    id: 'nur-my-2', name: 'Raj Kumar Pillai (demo)', avatar: '/assets/nurse_male_malaysian.jpg', specialization: 'Elderly & Palliative Care',
     licenseNumber: 'DEMO-LJM-0202', city: 'Seremban', fee: 55, experienceYears: 12,
     bio: 'Demo profile. Home nursing for older adults and palliative care support for families.',
     languages: ['English', 'Malay', 'Tamil'], practiceAddress: 'Home visits around Seremban, Negeri Sembilan', seoSlug: 'demo-raj-kumar-elderly-nurse-seremban', shiftTypes: ['Day Shift', 'Night Shift'],

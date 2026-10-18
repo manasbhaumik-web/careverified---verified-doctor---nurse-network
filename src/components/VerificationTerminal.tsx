@@ -5,7 +5,7 @@ import {
   Award, FileText, Loader, 
   CheckCircle2, AlertCircle, Edit, Shield, ShieldCheck, MessageSquare, 
   X, Send, Check, Calendar, TrendingUp, Eye, LayoutGrid, Wallet, Radio,
-  Star, SlidersHorizontal, Globe
+  Star, SlidersHorizontal, Globe, ArrowRight
 } from 'lucide-react';
 import { UserRole, DoctorProfile, NurseProfile, Review, VerificationStatus, Booking, OnCallDispatch } from '../types';
 import PractitionerOverviewTab from './practitioner/PractitionerOverviewTab';
@@ -22,6 +22,8 @@ import TourismDesk from './TourismDesk';
 import PractitionerHeroBanner from './PractitionerHeroBanner';
 import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from './DashboardHeader';
 import PageBanner from './PageBanner';
+import { UserAvatar } from '../avatars';
+import WorkspaceHeader from './WorkspaceHeader';
 
 export type PractitionerDashboardTab = 'home' | 'bookings' | 'oncall' | 'messages' | 'global' | 'earnings' | 'quality' | 'accreditation' | 'reviews' | 'analytics' | 'settings';
 export type PractitionerTabGroup = 'clinical' | 'practice' | 'performance';
@@ -468,153 +470,326 @@ export default function VerificationTerminal({
                 </span>
               </div>
 
-              {activeDashboardTab === 'home' && (
-                <PractitionerOverviewTab
-                  matchedProfile={matchedProfile}
-                  isDoc={isDoc}
-                  isVerified={isVerified}
-                  isPending={isPending}
-                  nextUpcomingBooking={nextUpcomingBooking}
-                  pendingDispatchesCount={pendingDispatchesCount}
-                  patientsAttendedCount={patientsAttendedCount}
-                  upcomingBookingsCount={upcomingBookingsCount}
-                  completedDispatchesCount={completedDispatchesCount}
-                  avgOverall={avgOverall}
-                  onViewBookings={() => setActiveDashboardTab('bookings')}
-                />
-              )}
+        {activeDashboardTab === 'home' && (
+          <div id="panel-home" role="tabpanel" aria-labelledby="tab-home" tabIndex={0} className="space-y-6 animate-fade-in">
+            <WorkspaceHeader
+              icon={LayoutGrid}
+              eyebrow="Clinical Practice Command · Active Roster"
+              title="Practitioner Clinical Command & Consultation Summary"
+              description="Real-time clinical queue overview, upcoming patient consultations, emergency dispatches, and key practice metrics."
+              badges={
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <BannerBadge tone={isVerified ? "success" : "brand"}>
+                    <ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" />
+                    {isVerified ? "MMC / LJM Active" : "Pending Verification"}
+                  </BannerBadge>
+                  <BannerBadge tone="brand">
+                    APC {matchedProfile.licenseExpiry ? `Valid to ${matchedProfile.licenseExpiry}` : '2026/2027'}
+                  </BannerBadge>
+                </div>
+              }
+              aside={
+                <button
+                  type="button"
+                  onClick={() => setActiveDashboardTab('bookings')}
+                  className="px-4 py-2.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5 border border-[color:var(--t-700)]"
+                >
+                  <Calendar className="h-3.5 w-3.5" />
+                  <span>Manage Consultation Schedule ({upcomingBookingsCount})</span>
+                  <ArrowRight className="h-3.5 w-3.5 ml-0.5" />
+                </button>
+              }
+            >
+              {/* Merged Next Patient Queue & Live Telehealth Status Strip */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[color:var(--t-50)]/70 border border-[color:var(--t-200)] px-4 py-3">
+                <div className="flex items-start sm:items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-none bg-white border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shrink-0">
+                    <Calendar className="h-4.5 w-4.5" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)]">
+                        Next Patient Queue
+                      </span>
+                      <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 text-[10px] font-extrabold flex items-center gap-1.5">
+                        <span className="w-2 h-2 bg-emerald-500 rounded-full inline-block animate-pulse shrink-0 shadow-xs" />
+                        Live Telehealth Ready
+                      </span>
+                    </div>
+                    {nextUpcomingBooking ? (
+                      <p className="text-xs font-bold text-[color:var(--ink)] truncate">
+                        <span>{nextUpcomingBooking.patientName}</span>
+                        <span className="text-slate-400 mx-1.5">&bull;</span>
+                        <span className="font-mono text-slate-600">{nextUpcomingBooking.date} {nextUpcomingBooking.timeSlot}</span>
+                        <span className="text-slate-400 mx-1.5">&bull;</span>
+                        <span className="text-[color:var(--t-600)] font-semibold">{nextUpcomingBooking.mode}</span>
+                      </p>
+                    ) : (
+                      <p className="text-xs text-slate-600 font-medium">No immediate patient consultations queued for today.</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                  <span className="text-[11px] font-bold text-slate-500 font-mono">
+                    {upcomingBookingsCount} Scheduled
+                  </span>
+                </div>
+              </div>
+            </WorkspaceHeader>
+            <PractitionerOverviewTab
+              matchedProfile={matchedProfile}
+              isDoc={isDoc}
+              isVerified={isVerified}
+              isPending={isPending}
+              nextUpcomingBooking={nextUpcomingBooking}
+              pendingDispatchesCount={pendingDispatchesCount}
+              patientsAttendedCount={patientsAttendedCount}
+              upcomingBookingsCount={upcomingBookingsCount}
+              completedDispatchesCount={completedDispatchesCount}
+              avgOverall={avgOverall}
+              onViewBookings={() => setActiveDashboardTab('bookings')}
+            />
+          </div>
+        )}
 
         {/* TAB CONTENT: ACCREDITATION OVERVIEW */}
         {activeDashboardTab === 'accreditation' && (
-          <PractitionerAccreditationTab
-            matchedProfile={matchedProfile}
-            isVerified={isVerified}
-            isPending={isPending}
-            isDoc={isDoc}
-            onRefreshData={onRefreshData}
-          />
+          <div id="panel-accreditation" role="tabpanel" aria-labelledby="tab-accreditation" tabIndex={0} className="space-y-6 animate-fade-in">
+            <WorkspaceHeader
+              icon={ShieldCheck}
+              eyebrow="Medical Council Governance · Regulatory Compliance"
+              title="Practitioner Accreditation & Statutory Licensing Status"
+              description="Official statutory credentials, council registration verification, primary medical qualifications, and annual practicing certificate validity."
+              badges={
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <BannerBadge tone="success">
+                    <ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" />
+                    Statutory Council Verified
+                  </BannerBadge>
+                  <BannerBadge tone="brand">{isDoc ? 'MMC Medical Registry' : 'LJM Nursing Registry'}</BannerBadge>
+                </div>
+              }
+              aside={
+                <button
+                  type="button"
+                  onClick={onRefreshData}
+                  className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-300 transition-colors cursor-pointer flex items-center gap-1.5"
+                  title="Re-verify Credentials"
+                >
+                  <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                  <span>Verify Status</span>
+                </button>
+              }
+            />
+            <PractitionerAccreditationTab
+              matchedProfile={matchedProfile}
+              isVerified={isVerified}
+              isPending={isPending}
+              isDoc={isDoc}
+              onRefreshData={onRefreshData}
+            />
+          </div>
         )}
 
         {/* TAB CONTENT: MANAGE PUBLIC REGISTRY FILE */}
         {activeDashboardTab === 'settings' && (
-          <PractitionerSettingsTab
-            matchedProfile={matchedProfile}
-            isVerified={isVerified}
-            isDoc={isDoc}
-            avgOverall={avgOverall}
-            reviewCount={myReviews.length}
-            editBio={editBio}
-            setEditBio={setEditBio}
-            editFee={editFee}
-            setEditFee={setEditFee}
-            editAddress={editAddress}
-            setEditAddress={setEditAddress}
-            editCity={editCity}
-            setEditCity={setEditCity}
-            certifications={certifications}
-            setCertifications={setCertifications}
-            newCert={newCert}
-            setNewCert={setNewCert}
-            editDays={editDays}
-            setEditDays={setEditDays}
-            editSlots={editSlots}
-            setEditSlots={setEditSlots}
-            newTimeSlot={newTimeSlot}
-            setNewTimeSlot={setNewTimeSlot}
-            savingSettings={savingSettings}
-            settingsSuccess={settingsSuccess}
-            onSubmit={handleSaveSettings}
-            showToast={showToast}
-          />
+          <div id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" tabIndex={0} className="space-y-6 animate-fade-in">
+            <WorkspaceHeader
+              icon={SlidersHorizontal}
+              eyebrow="Public Directory Profile · Practice Availability"
+              title="Practitioner Registry Profile & Practice Schedule"
+              description="Configure your public practitioner bio, consultation fees, clinical specialties, and weekly consultation availability."
+              badges={<BannerBadge tone="brand">Public Directory Profile</BannerBadge>}
+              aside={
+                <button
+                  type="button"
+                  onClick={() => setShowPublicProfilePreview(true)}
+                  className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                  <span>Preview Public Profile</span>
+                </button>
+              }
+            />
+            <PractitionerSettingsTab
+              matchedProfile={matchedProfile}
+              isVerified={isVerified}
+              isDoc={isDoc}
+              avgOverall={avgOverall}
+              reviewCount={myReviews.length}
+              editBio={editBio}
+              setEditBio={setEditBio}
+              editFee={editFee}
+              setEditFee={setEditFee}
+              editAddress={editAddress}
+              setEditAddress={setEditAddress}
+              editCity={editCity}
+              setEditCity={setEditCity}
+              certifications={certifications}
+              setCertifications={setCertifications}
+              newCert={newCert}
+              setNewCert={setNewCert}
+              editDays={editDays}
+              setEditDays={setEditDays}
+              editSlots={editSlots}
+              setEditSlots={setEditSlots}
+              newTimeSlot={newTimeSlot}
+              setNewTimeSlot={setNewTimeSlot}
+              savingSettings={savingSettings}
+              settingsSuccess={settingsSuccess}
+              onSubmit={handleSaveSettings}
+              showToast={showToast}
+            />
+          </div>
         )}
 
         {/* TAB CONTENT: REVIEW REPLIES LEDGER */}
         {activeDashboardTab === 'reviews' && (
-          <PractitionerFeedbackTab
-            myReviews={myReviews}
-            hasReviews={hasReviews}
-            avgOverall={avgOverall}
-            avgComm={avgComm}
-            avgPunct={avgPunct}
-            avgSatis={avgSatis}
-            replyTextMap={replyTextMap}
-            replyingMap={replyingMap}
-            replyExpandedId={replyExpandedId}
-            onStartReply={(reviewId) => {
-              setReplyExpandedId(reviewId);
-              setReplyTextMap(prev => ({ ...prev, [reviewId]: '' }));
-            }}
-            onCancelReply={() => setReplyExpandedId(null)}
-            onReplyTextChange={(reviewId, text) => setReplyTextMap(prev => ({ ...prev, [reviewId]: text }))}
-            onPublishReply={handlePublishReply}
-          />
+          <div id="panel-reviews" role="tabpanel" aria-labelledby="tab-reviews" tabIndex={0} className="space-y-6 animate-fade-in">
+            <WorkspaceHeader
+              icon={Star}
+              eyebrow="Patient Experience & Clinical Feedback · Verified Reviews"
+              title="Patient Reviews, Bedside Rating & Official Replies"
+              description="Review verified patient feedback across bedside manner, punctuality, and clinical communication, and publish practitioner replies."
+              badges={
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <BannerBadge tone="brand">Verified Patient Feedback</BannerBadge>
+                  <BannerBadge tone="success">
+                    <Star className="h-3 w-3 inline mr-1 fill-amber-400 text-amber-500" />
+                    {avgOverall ?? "5.0"} Overall Rating
+                  </BannerBadge>
+                </div>
+              }
+              aside={
+                <span className="text-xs font-mono font-bold text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5">
+                  {myReviews.length} Verified Reviews
+                </span>
+              }
+            />
+            <PractitionerFeedbackTab
+              myReviews={myReviews}
+              hasReviews={hasReviews}
+              avgOverall={avgOverall}
+              avgComm={avgComm}
+              avgPunct={avgPunct}
+              avgSatis={avgSatis}
+              replyTextMap={replyTextMap}
+              replyingMap={replyingMap}
+              replyExpandedId={replyExpandedId}
+              onStartReply={(reviewId) => {
+                setReplyExpandedId(reviewId);
+                setReplyTextMap(prev => ({ ...prev, [reviewId]: '' }));
+              }}
+              onCancelReply={() => setReplyExpandedId(null)}
+              onReplyTextChange={(reviewId, text) => setReplyTextMap(prev => ({ ...prev, [reviewId]: text }))}
+              onPublishReply={handlePublishReply}
+            />
+          </div>
         )}
 
         {/* TAB CONTENT: BOOKINGS & EMERGENCY DISPATCHES */}
         {activeDashboardTab === 'bookings' && (
-          <PractitionerBookingsTab
-            matchedProfile={matchedProfile}
-            isDoc={isDoc}
-            myBookings={myBookings}
-            dispatches={dispatches}
-            selectedBookingForPrescribe={selectedBookingForPrescribe}
-            onStartPrescription={(booking) => {
-              setSelectedBookingForPrescribe(booking);
-              setPrescribeDiagnosis('');
-              setPrescribeMeds('');
-              setPrescribeInstructions('');
-            }}
-            onCancelPrescription={() => setSelectedBookingForPrescribe(null)}
-            prescribeDiagnosis={prescribeDiagnosis}
-            setPrescribeDiagnosis={setPrescribeDiagnosis}
-            prescribeMeds={prescribeMeds}
-            setPrescribeMeds={setPrescribeMeds}
-            prescribeInstructions={prescribeInstructions}
-            setPrescribeInstructions={setPrescribeInstructions}
-            issuingPrescription={issuingPrescription}
-            onSubmitPrescription={(e) => {
-              e.preventDefault();
-              if (!selectedBookingForPrescribe) return;
-              setIssuingPrescription(true);
-              setTimeout(() => {
-                selectedBookingForPrescribe.prescription = {
-                  diagnosis: prescribeDiagnosis,
-                  medicines: prescribeMeds,
-                  instructions: prescribeInstructions,
-                  issuedAt: new Date().toISOString(),
-                  digitalSignature: `MMC-SIG-${Date.now().toString(36).toUpperCase()}`
-                };
-                selectedBookingForPrescribe.status = 'Completed';
-                setIssuingPrescription(false);
-                setSelectedBookingForPrescribe(null);
-                showToast("Doctor E-Prescription issued and digitally signed!");
-                if (onRefreshData) onRefreshData();
-              }, 400);
-            }}
-            onUpdateDispatchStatus={handleUpdateDispatchStatus}
-          />
+          <div id="panel-bookings" role="tabpanel" aria-labelledby="tab-bookings" tabIndex={0} className="space-y-6 animate-fade-in">
+            <WorkspaceHeader
+              icon={Calendar}
+              eyebrow="Patient Consultations & House Calls · Medical Act 1971"
+              title="Consultation Schedule, Bookings & Emergency Dispatches"
+              description="Manage scheduled telehealth sessions, in-person clinic visits, home care dispatches, and digitally signed clinical notes."
+              badges={
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <BannerBadge tone="brand">Active Patient Queue</BannerBadge>
+                  <BannerBadge tone="success">
+                    <ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" />
+                    Poisons Act 1952 Compliant
+                  </BannerBadge>
+                </div>
+              }
+              aside={
+                <span className="text-xs font-mono font-bold text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5">
+                  {myBookings.length} Total Consults
+                </span>
+              }
+            />
+            <PractitionerBookingsTab
+              matchedProfile={matchedProfile}
+              isDoc={isDoc}
+              myBookings={myBookings}
+              dispatches={dispatches}
+              selectedBookingForPrescribe={selectedBookingForPrescribe}
+              onStartPrescription={(booking) => {
+                setSelectedBookingForPrescribe(booking);
+                setPrescribeDiagnosis('');
+                setPrescribeMeds('');
+                setPrescribeInstructions('');
+              }}
+              onCancelPrescription={() => setSelectedBookingForPrescribe(null)}
+              prescribeDiagnosis={prescribeDiagnosis}
+              setPrescribeDiagnosis={setPrescribeDiagnosis}
+              prescribeMeds={prescribeMeds}
+              setPrescribeMeds={setPrescribeMeds}
+              prescribeInstructions={prescribeInstructions}
+              setPrescribeInstructions={setPrescribeInstructions}
+              issuingPrescription={issuingPrescription}
+              onSubmitPrescription={(e) => {
+                e.preventDefault();
+                if (!selectedBookingForPrescribe) return;
+                setIssuingPrescription(true);
+                setTimeout(() => {
+                  selectedBookingForPrescribe.prescription = {
+                    diagnosis: prescribeDiagnosis,
+                    medicines: prescribeMeds,
+                    instructions: prescribeInstructions,
+                    issuedAt: new Date().toISOString(),
+                    digitalSignature: `MMC-SIG-${Date.now().toString(36).toUpperCase()}`
+                  };
+                  selectedBookingForPrescribe.status = 'Completed';
+                  setIssuingPrescription(false);
+                  setSelectedBookingForPrescribe(null);
+                  showToast("Doctor E-Prescription issued and digitally signed!");
+                  if (onRefreshData) onRefreshData();
+                }, 400);
+              }}
+              onUpdateDispatchStatus={handleUpdateDispatchStatus}
+            />
+          </div>
         )}
 
         {/* TAB CONTENT: ON CALL TELEHEALTH RADAR & ROSTER */}
         {activeDashboardTab === 'oncall' && (
-          <div id="panel-oncall" role="tabpanel" aria-labelledby="tab-oncall" tabIndex={0} className="space-y-6 animate-fade-in">
+          <div id="panel-oncall" role="tabpanel" aria-labelledby="tab-oncall" tabIndex={0} className="space-y-4 animate-fade-in">
             <PractitionerOnCall myUserId={currentUser?.id || matchedProfile.id} embedded={true} />
           </div>
         )}
 
         {/* TAB CONTENT: SECURE MAILBOX & PATIENT CHATS */}
         {activeDashboardTab === 'messages' && (
-          <div id="panel-messages" role="tabpanel" aria-labelledby="tab-messages" tabIndex={0} className="space-y-6 animate-fade-in">
+          <div id="panel-messages" role="tabpanel" aria-labelledby="tab-messages" tabIndex={0} className="space-y-4 animate-fade-in">
+            <WorkspaceHeader
+              icon={MessageSquare}
+              eyebrow="Clinical Communications · End-to-End Encrypted"
+              title="Secure Clinical Mailbox & Patient Inquiries"
+              description="Private, encrypted doctor-patient chat, specialist referrals, and clinical care team coordination."
+              badges={<BannerBadge tone="brand">PDPA Compliant · 256-bit Encrypted</BannerBadge>}
+            />
             <SecureMessenger currentUserId={currentUser?.profileId || currentUser?.id || matchedProfile.id} embedded={true} />
           </div>
         )}
 
         {/* TAB CONTENT: GLOBAL PATIENTS & CROSS-BORDER SERVICES */}
         {activeDashboardTab === 'global' && (
-          <div id="panel-global" role="tabpanel" aria-labelledby="tab-global" tabIndex={0} className="space-y-6 animate-fade-in">
+          <div id="panel-global" role="tabpanel" aria-labelledby="tab-global" tabIndex={0} className="space-y-4 animate-fade-in">
+            <WorkspaceHeader
+              icon={Globe}
+              eyebrow="Malaysia Healthcare Travel Council · Cross-Border Care"
+              title="Global Patient Services & Medical Travel Desk"
+              description="Manage international patient referrals, provide specialist pro-forma treatment quotes, and coordinate cross-border hospital care."
+              badges={<BannerBadge tone="brand">MHTC Specialist Network</BannerBadge>}
+            />
             <TourismDesk
               isAdmin={currentUser?.role === 'admin'}
               embedded={true}
+              hideWorkspaceHeader={true}
               currentUser={currentUser}
               professionals={professionals}
               reviews={reviews}
@@ -625,14 +800,21 @@ export default function VerificationTerminal({
 
         {/* TAB CONTENT: PRACTITIONER EARNINGS & DIRECT BANK PAYOUTS */}
         {activeDashboardTab === 'earnings' && (
-          <div id="panel-earnings" role="tabpanel" aria-labelledby="tab-earnings" tabIndex={0} className="space-y-6 animate-fade-in">
+          <div id="panel-earnings" role="tabpanel" aria-labelledby="tab-earnings" tabIndex={0} className="space-y-4 animate-fade-in">
+            <WorkspaceHeader
+              icon={Wallet}
+              eyebrow="Practice Financials · Bank Payouts"
+              title="Consultation Earnings & Automated Disbursements"
+              description="Track verified consultation fee disbursements, digital tax receipts, and direct bank settlement schedules."
+              badges={<BannerBadge tone="brand">Direct FPX / DuitNow Settlement</BannerBadge>}
+            />
             <PractitionerEarnings embedded={true} />
           </div>
         )}
 
         {/* TAB CONTENT: QUALITY, CPD & PEER REVIEW HUB */}
         {activeDashboardTab === 'quality' && (
-          <div id="panel-quality" role="tabpanel" aria-labelledby="tab-quality" tabIndex={0} className="space-y-6 animate-fade-in">
+          <div id="panel-quality" role="tabpanel" aria-labelledby="tab-quality" tabIndex={0} className="space-y-4 animate-fade-in">
             <PractitionerQuality profileId={matchedProfile.id || currentUser?.profileId || null} embedded={true} />
           </div>
         )}
@@ -663,11 +845,11 @@ export default function VerificationTerminal({
                   </button>
 
                   <div className="text-center space-y-3">
-                    <img
+                    <UserAvatar
                       src={matchedProfile.avatar}
+                      role={matchedProfile.role || 'doctor'}
                       alt={matchedProfile.name}
                       className="h-24 w-24 rounded-full object-cover border-4 border-[color:var(--t-600)]/20 shadow-md mx-auto"
-                      referrerPolicy="no-referrer"
                     />
                     
                     <div className="space-y-1">

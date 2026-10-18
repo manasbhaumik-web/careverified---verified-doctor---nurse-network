@@ -107,6 +107,7 @@ export default function PatientHeroBanner<T extends string = string>({
           <BannerIdentity
             name={userName}
             avatarUrl={userAvatar}
+            role="patient"
             badges={
               <>
                 {groupName && <BannerBadge tone="brand">{groupName}</BannerBadge>}

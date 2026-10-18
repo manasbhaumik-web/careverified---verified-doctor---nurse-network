@@ -15,22 +15,44 @@ const CATEGORY_LABEL: Record<string, string> = {
 const SERVICE_LABEL: Record<string, string> = { interpreter: 'Interpreter', airportPickup: 'Airport pickup', halalFood: 'Halal food', prayerRoom: 'Prayer room' };
 const input = 'border border-slate-300 p-2 text-xs bg-white';
 
+export type MedicalTourismTab = 'find' | 'cases' | 'info';
+
+interface MedicalTourismProps {
+  onOpenProfessional?: (id: string) => void;
+  embedded?: boolean;
+  activeTab?: MedicalTourismTab;
+  onTabChange?: (tab: MedicalTourismTab) => void;
+}
+
 /** Visitors and patients: find facilities that accept international patients, send an enquiry, follow the case. */
-export default function MedicalTourism({ onOpenProfessional }: { onOpenProfessional?: (id: string) => void }) {
-  const [tab, setTab] = useState<Tab>('find');
+export default function MedicalTourism({
+  onOpenProfessional,
+  embedded = false,
+  activeTab: controlledActiveTab,
+  onTabChange: setControlledActiveTab,
+}: MedicalTourismProps) {
+  const [internalTab, setInternalTab] = useState<MedicalTourismTab>('find');
   const [openCase, setOpenCase] = useState<string | null>(null);
+  const tab = controlledActiveTab !== undefined ? controlledActiveTab : internalTab;
+  const setTab = (t: MedicalTourismTab) => {
+    if (setControlledActiveTab) setControlledActiveTab(t);
+    setInternalTab(t);
+    setOpenCase(null);
+  };
   return (
-    <div className="w-full space-y-0">
-      <DashboardHeader
-        icon={Plane}
-        eyebrow="Cross-Border & International Patients"
-        title="Global Patient Services"
-        description="Find verified hospital centres in Malaysia welcoming international patients, receive transparent itemised quotations, and manage travel itineraries, documents, and discharge summaries in one secure portal."
-        tabs={[{ id: 'find', label: 'Find a facility', icon: Search }, { id: 'cases', label: 'My cases', icon: FolderOpen }, { id: 'info', label: 'Travel information', icon: Info }]}
-        activeTab={tab}
-        onTabChange={t => { setTab(t as Tab); setOpenCase(null); }}
-      />
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+    <div className={embedded ? "w-full space-y-4" : "w-full space-y-0"}>
+      {!embedded && (
+        <DashboardHeader
+          icon={Plane}
+          eyebrow="Cross-Border & International Patients"
+          title="Global Patient Services"
+          description="Find verified hospital centres in Malaysia welcoming international patients, receive transparent itemised quotations, and manage travel itineraries, documents, and discharge summaries in one secure portal."
+          tabs={[{ id: 'find', label: 'Find a facility', icon: Search }, { id: 'cases', label: 'My cases', icon: FolderOpen }, { id: 'info', label: 'Travel information', icon: Info }]}
+          activeTab={tab}
+          onTabChange={t => setTab(t as MedicalTourismTab)}
+        />
+      )}
+      <div className={embedded ? "space-y-5 pt-2" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
         {tab === 'find' && <Facilities onSent={id => { setOpenCase(id); setTab('cases'); }} />}
         {tab === 'cases' && (openCase ? <CaseDetail id={openCase} onBack={() => setOpenCase(null)} onOpenProfessional={onOpenProfessional} /> : <CaseList onOpen={setOpenCase} />)}
         {tab === 'info' && <TravelInfo />}

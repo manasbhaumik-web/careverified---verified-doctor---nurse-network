@@ -56,6 +56,24 @@ interface Ctx { findProfessional: (id: string) => any | undefined }
 export function registerPharmacyWorkspace(app: Application, ctx: Ctx) {
   const userName = (id: string) => (row("SELECT name FROM users WHERE id = ?", id)?.name as string) ?? "Patient";
 
+  // Statutory Poisons Book register table under Section 21 of the Poisons Act 1952
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS pharmacy_poisons_register (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      pharmacy_id TEXT NOT NULL,
+      prescription_id TEXT NOT NULL,
+      entry_serial_no TEXT NOT NULL,
+      year INTEGER NOT NULL,
+      sequence_no INTEGER NOT NULL,
+      pharmacist_name TEXT NOT NULL,
+      dispensed_at TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      UNIQUE(pharmacy_id, year, sequence_no),
+      UNIQUE(pharmacy_id, prescription_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_poisons_ph ON pharmacy_poisons_register(pharmacy_id, year);
+  `);
+
   // Logins created before staff accounts existed: the earliest login of each pharmacy becomes its owner.
   for (const g of rows("SELECT DISTINCT profile_id AS pid FROM users WHERE role = 'pharmacy' AND profile_id IS NOT NULL")) {
     if (!row("SELECT 1 AS x FROM users WHERE role = 'pharmacy' AND profile_id = ? AND pharmacy_owner = 1", g.pid)) {
@@ -234,24 +252,76 @@ export function registerPharmacyWorkspace(app: Application, ctx: Ctx) {
 
   app.post("/api/pharmacy/prescriptions/:id/dispense", ...workspace, (req, res) => {
     const ph = pharmacyOf(res);
-    const r = row("SELECT * FROM prescriptions WHERE id = ?", req.params.id);
-    if (!r || !same(sign(rxPayload(r)), r.signature)) return fail(res, 404, "No valid prescription found.");
-    if (r.pharmacy_id && r.pharmacy_id !== ph.id) return fail(res, 409, "This prescription was sent to a different pharmacy.");
-    const st = rxEffectiveStatus(r);
-    if (st !== "active") return fail(res, 409, `This prescription is ${st}.`);
-    // Dispensing record: who dispensed, and the poisons / prescription book entry where the pharmacy's rules require one.
     const pharmacist = str(req.body?.pharmacistName, 100) || ph.pharmacist_name || "";
-    const poisonsEntryNo = str(req.body?.poisonsEntryNo, 40);
     if (!pharmacist) return fail(res, 400, "Record which pharmacist dispensed it.");
-    if (process.env.POISONS_BOOK_REQUIRED === "true" && !poisonsEntryNo) return fail(res, 400, "Enter the poisons / prescription book entry number.");
-    const now = iso();
-    const changed = db.prepare("UPDATE prescriptions SET status = 'dispensed', dispensed_at = ?, dispensed_by = ?, pharmacy_id = ?, fill_updated_at = ?, first_response_at = COALESCE(first_response_at, ?), dispensing_pharmacist = ?, poisons_entry_no = ? WHERE id = ? AND status = 'active'")
-      .run(now, ph.id, ph.id, now, now, pharmacist, poisonsEntryNo || null, r.id).changes;
-    if (!changed) return fail(res, 409, "Already dispensed.");
-    pharmacyEvent(ph.id, r.id, "dispensed", req.user!.id, { via: "workspace" });
-    notify(r.patient_user_id, "Prescription dispensed", `${ph.name} dispensed your prescription.`);
-    audit(req, "pharmacy.dispense", { target: ["prescription", r.id], details: { pharmacyId: ph.id } });
-    res.json({ status: "success", data: view(row("SELECT * FROM prescriptions WHERE id = ?", r.id), ph.id) });
+
+    const requestedEntryNo = str(req.body?.poisonsEntryNo, 40);
+    const currentYear = new Date().getFullYear();
+
+    try {
+      db.transaction(() => {
+        // Immediate row query with serialized lock
+        const r = row("SELECT * FROM prescriptions WHERE id = ?", req.params.id);
+        if (!r || !same(sign(rxPayload(r)), r.signature)) {
+          throw { code: 404, message: "No valid prescription found." };
+        }
+        if (r.pharmacy_id && r.pharmacy_id !== ph.id) {
+          throw { code: 409, message: "This prescription was sent to a different pharmacy." };
+        }
+        const st = rxEffectiveStatus(r);
+        if (st !== "active") {
+          throw { code: 409, message: `This prescription is ${st}.` };
+        }
+
+        // Sequential Poisons Register generation under Section 21 of the Poisons Act 1952
+        let poisonsEntryNo = requestedEntryNo;
+        if (!poisonsEntryNo) {
+          const maxSeqRow = row(
+            "SELECT COALESCE(MAX(sequence_no), 0) AS max_seq FROM pharmacy_poisons_register WHERE pharmacy_id = ? AND year = ?",
+            ph.id, currentYear
+          );
+          const nextSeq = (maxSeqRow?.max_seq ?? 0) + 1;
+          poisonsEntryNo = `PB-${currentYear}-${String(nextSeq).padStart(5, "0")}`;
+          db.prepare(
+            "INSERT INTO pharmacy_poisons_register (pharmacy_id, prescription_id, entry_serial_no, year, sequence_no, pharmacist_name, dispensed_at, created_at) VALUES (?,?,?,?,?,?,?,?)"
+          ).run(ph.id, r.id, poisonsEntryNo, currentYear, nextSeq, pharmacist, iso(), iso());
+        } else {
+          // If custom ledger number provided, check for duplication
+          const existing = row("SELECT 1 AS x FROM pharmacy_poisons_register WHERE pharmacy_id = ? AND entry_serial_no = ? AND prescription_id != ?", ph.id, poisonsEntryNo, r.id);
+          if (existing) {
+            throw { code: 409, message: "This Poisons Book entry number was already recorded for another prescription." };
+          }
+          const maxSeqRow = row(
+            "SELECT COALESCE(MAX(sequence_no), 0) AS max_seq FROM pharmacy_poisons_register WHERE pharmacy_id = ? AND year = ?",
+            ph.id, currentYear
+          );
+          const nextSeq = (maxSeqRow?.max_seq ?? 0) + 1;
+          db.prepare(
+            "INSERT INTO pharmacy_poisons_register (pharmacy_id, prescription_id, entry_serial_no, year, sequence_no, pharmacist_name, dispensed_at, created_at) VALUES (?,?,?,?,?,?,?,?) ON CONFLICT(pharmacy_id, prescription_id) DO UPDATE SET entry_serial_no=excluded.entry_serial_no, pharmacist_name=excluded.pharmacist_name"
+          ).run(ph.id, r.id, poisonsEntryNo, currentYear, nextSeq, pharmacist, iso(), iso());
+        }
+
+        const now = iso();
+        const changed = db.prepare(
+          "UPDATE prescriptions SET status = 'dispensed', dispensed_at = ?, dispensed_by = ?, pharmacy_id = ?, fill_updated_at = ?, first_response_at = COALESCE(first_response_at, ?), dispensing_pharmacist = ?, poisons_entry_no = ? WHERE id = ? AND status = 'active'"
+        ).run(now, ph.id, ph.id, now, now, pharmacist, poisonsEntryNo, r.id).changes;
+
+        if (!changed) {
+          throw { code: 409, message: "Already dispensed." };
+        }
+
+        pharmacyEvent(ph.id, r.id, "dispensed", req.user!.id, { via: "workspace", poisonsEntryNo });
+        notify(r.patient_user_id, "Prescription dispensed", `${ph.name} dispensed your prescription (Poisons Register #${poisonsEntryNo}).`);
+        audit(req, "pharmacy.dispense", { target: ["prescription", r.id], details: { pharmacyId: ph.id, poisonsEntryNo } });
+      })();
+
+      res.json({ status: "success", data: view(row("SELECT * FROM prescriptions WHERE id = ?", req.params.id), ph.id) });
+    } catch (err: any) {
+      if (err?.code && err?.message) {
+        return fail(res, err.code, err.message);
+      }
+      return fail(res, 500, err?.message || "Dispensing transaction failed.");
+    }
   });
 
   app.put("/api/pharmacy/prescriptions/:id/note", ...workspace, (req, res) => {

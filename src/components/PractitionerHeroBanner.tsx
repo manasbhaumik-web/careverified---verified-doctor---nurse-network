@@ -97,7 +97,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
   const fallbackProfile: Professional = {
     id: currentUser?.profileId || currentUser?.id || 'DOC-DEMO',
     name: currentUser?.name || 'Practitioner Account',
-    avatar: currentUser?.avatarUrl || 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=250',
+    avatar: currentUser?.avatarUrl || (currentUser?.role === 'nurse' ? '/assets/malaysian_female_nurse.jpg' : '/assets/malaysian_female_doctor.jpg'),
     role: UserRole.DOCTOR,
     specialization: 'General Practice & Telemedicine',
     licenseNumber: 'MMC-ACTIVE',
@@ -155,6 +155,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
             <BannerIdentity
               name={profile.name}
               avatarUrl={profile.avatar}
+              role={isDoc ? 'doctor' : 'nurse'}
               avatarBadge={isVerified && (
                 <span
                   className="absolute -bottom-1 -right-1 bg-white text-[color:var(--t-600)] p-1.5 rounded-full shadow-md flex items-center justify-center border border-[color:var(--t-200)]"

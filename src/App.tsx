@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { TestimonialAdmin } from './components/TestimonialPanels';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ShieldCheck, Search, Award, FileText,
   Calendar, BookOpen, Globe, RefreshCw,
   Heart, MessageSquare, Menu, X, PlusCircle, UserCheck,
   Stethoscope, Puzzle, Settings, Activity,
-  CreditCard, TrendingUp, Video, Radio, LifeBuoy, Pill, Store, Lock, Plane, Wallet, Building2, PackagePlus, HeartHandshake
+  CreditCard, TrendingUp, Video, Radio, LifeBuoy, Pill, Store, Lock, Plane, Wallet, Building2, PackagePlus, HeartHandshake, FolderHeart
 } from 'lucide-react';
 
 
@@ -54,9 +53,10 @@ import InternationalPatientsPage from './components/InternationalPatientsPage';
 import { navigate, useLocation, loginUrl } from './nav';
 import Footer from './components/Footer';
 import LoadingImage from './components/LoadingImage';
+import { UserAvatar } from './avatars';
 
 // Types import
-import { DoctorProfile, NurseProfile, Booking, Review, JobPost, Article, AppPackage } from './types';
+import { DoctorProfile, NurseProfile, Booking, Review, JobPost, Article, AppPackage, AdminSubRole, ADMIN_SUB_ROLES } from './types';
 import { INITIAL_DOCTORS, INITIAL_NURSES, INITIAL_JOBS, INITIAL_ARTICLES, INITIAL_REVIEWS } from './data';
 import PageBanner from './components/PageBanner';
 
@@ -69,6 +69,7 @@ export default function App() {
   }, [activeView]);
   const [selectedProfId, setSelectedProfId] = useState<string | null>(null);
   const [selectedSpecialtyFilter, setSelectedSpecialtyFilter] = useState<string>('');
+  const [prefilledSymptoms, setPrefilledSymptoms] = useState<string>('');
   const [registryTab, setRegistryTab] = useState<'directory' | 'triage'>('directory');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
@@ -94,14 +95,14 @@ export default function App() {
   });
 
   const getPatientGroup = (view: string): 'care' | 'records' | 'services' | 'discovery' => {
-    if (['patient_records', 'records', 'prescriptions', 'certs'].includes(view)) return 'records';
+    if (['patient_records', 'records', 'prescriptions', 'certs', 'labs'].includes(view)) return 'records';
     if (['patient_services', 'packages', 'assistance', 'tourism'].includes(view)) return 'services';
-    if (['patient_discovery', 'registry', 'pharmacies', 'articles'].includes(view)) return 'discovery';
+    if (['patient_discovery', 'registry', 'nurses', 'pharmacies', 'articles'].includes(view)) return 'discovery';
     return 'care';
   };
 
   const getPatientTab = (view: string): any => {
-    if (['consult', 'messages', 'saved', 'records', 'prescriptions', 'certs', 'packages', 'assistance', 'tourism', 'registry', 'pharmacies', 'articles'].includes(view)) {
+    if (['appointments', 'consult', 'messages', 'saved', 'records', 'prescriptions', 'certs', 'labs', 'packages', 'assistance', 'tourism', 'registry', 'nurses', 'pharmacies', 'articles'].includes(view)) {
       return view;
     }
     return undefined;
@@ -119,7 +120,7 @@ export default function App() {
   };
 
   const getAdminGroup = (view: string): 'registry' | 'ops' | 'facilities' | 'growth' => {
-    if (['admin_ops', 'ops', 'quality'].includes(view)) return 'ops';
+    if (['admin_ops', 'ops', 'quality', 'packages'].includes(view)) return 'ops';
     if (['admin_facilities', 'facilities', 'shifts'].includes(view)) return 'facilities';
     if (['admin_growth', 'tourism_desk', 'literature', 'seo'].includes(view)) return 'growth';
     return 'registry';
@@ -127,17 +128,17 @@ export default function App() {
 
   const isNavItemActive = (itemId: string, currentView: string): boolean => {
     if (currentView === itemId) return true;
-    if (itemId === 'patient_care') return ['patient_care', 'patient_dashboard', 'consult', 'messages', 'saved'].includes(currentView);
-    if (itemId === 'patient_records') return ['patient_records', 'records', 'prescriptions', 'certs'].includes(currentView);
+    if (itemId === 'patient_care') return ['patient_care', 'patient_dashboard', 'appointments', 'consult', 'messages', 'saved'].includes(currentView);
+    if (itemId === 'patient_records') return ['patient_records', 'records', 'prescriptions', 'certs', 'labs'].includes(currentView);
     if (itemId === 'patient_services') return ['patient_services', 'packages', 'assistance', 'tourism'].includes(currentView);
-    if (itemId === 'patient_discovery') return ['patient_discovery', 'registry', 'pharmacies', 'articles'].includes(currentView);
+    if (itemId === 'patient_discovery') return ['patient_discovery', 'registry', 'nurses', 'pharmacies', 'articles'].includes(currentView);
     if (itemId === 'facility_staffing') return ['facility_staffing', 'facility_workspace', 'shifts', 'locums'].includes(currentView);
     if (itemId === 'facility_care') return ['facility_care', 'cases'].includes(currentView);
     if (itemId === 'facility_profile') return ['facility_profile', 'profile'].includes(currentView);
     if (itemId === 'pharmacy_dispensing') return ['pharmacy_dispensing', 'pharmacy_workspace', 'inbox', 'activity'].includes(currentView);
     if (itemId === 'pharmacy_operations') return ['pharmacy_operations', 'reports', 'team'].includes(currentView);
     if (itemId === 'admin_registry') return ['admin_registry', 'admin', 'approvals', 'trust'].includes(currentView);
-    if (itemId === 'admin_ops') return ['admin_ops', 'ops', 'quality'].includes(currentView);
+    if (itemId === 'admin_ops') return ['admin_ops', 'ops', 'quality', 'packages'].includes(currentView);
     if (itemId === 'admin_facilities') return ['admin_facilities', 'facilities'].includes(currentView);
     if (itemId === 'admin_growth') return ['admin_growth', 'tourism_desk', 'literature', 'seo'].includes(currentView);
     return false;
@@ -283,6 +284,24 @@ export default function App() {
     return () => window.removeEventListener('medcred-navigate', handleNavigate);
   }, []);
 
+  // Admin Sub-Role (RBAC) State
+  const [adminSubRole, setAdminSubRole] = useState<AdminSubRole>(() => {
+    return (localStorage.getItem('cv_admin_subrole') as AdminSubRole) || 'super_admin';
+  });
+
+  useEffect(() => {
+    const handleSubRoleChanged = (e: Event) => {
+      const custom = e as CustomEvent<any>;
+      const role = typeof custom.detail === 'string' ? custom.detail : custom.detail?.role;
+      if (role) {
+        setAdminSubRole(role);
+        localStorage.setItem('cv_admin_subrole', role);
+      }
+    };
+    window.addEventListener('medcred-admin-subrole-changed', handleSubRoleChanged);
+    return () => window.removeEventListener('medcred-admin-subrole-changed', handleSubRoleChanged);
+  }, []);
+
   // Check if a modular package is enabled in the runtime state
   const isPackageEnabled = (id: string) => {
     const pkg = packages.find(p => p.id === id);
@@ -406,9 +425,9 @@ export default function App() {
   const navItems: { id: string; name: string; icon: React.ComponentType<any>; isExtension?: boolean }[] = [];
   if (currentUser.role === 'patient') {
     navItems.push({ id: 'patient_care', name: 'My Care', icon: Heart });
-    navItems.push({ id: 'patient_records', name: 'Clinical Records', icon: FileText });
+    navItems.push({ id: 'patient_records', name: 'Health Records', icon: FolderHeart });
     navItems.push({ id: 'patient_services', name: 'Packages & Assistance', icon: PackagePlus });
-    navItems.push({ id: 'patient_discovery', name: 'Doctors & Library', icon: Search });
+    navItems.push({ id: 'patient_discovery', name: 'Medical Network', icon: Search });
   } else if (currentUser.role === 'practitioner') {
     if (isPackageEnabled('onboard')) {
       navItems.push({ id: 'onboard', name: 'Clinical Care', icon: Stethoscope });
@@ -431,14 +450,15 @@ export default function App() {
     navItems.push({ id: 'pharmacy_dispensing', name: 'Prescription Dispensing', icon: Pill });
     navItems.push({ id: 'pharmacy_operations', name: 'Operations & Team', icon: Store });
   } else if (currentUser.role === 'admin') {
-    navItems.push({ id: 'admin_registry', name: 'Registry & Licensing', icon: ShieldCheck });
-    navItems.push({ id: 'admin_ops', name: 'Operations & Governance', icon: CreditCard });
-    navItems.push({ id: 'admin_facilities', name: 'Facilities & Staffing', icon: Building2 });
-    navItems.push({ id: 'admin_growth', name: 'Global Care & Strategy', icon: Plane });
+    const allowed = ADMIN_SUB_ROLES[adminSubRole]?.allowedGroups || ['registry', 'ops', 'facilities', 'growth'];
+    if (allowed.includes('registry')) navItems.push({ id: 'admin_registry', name: 'Registry & Licensing', icon: ShieldCheck });
+    if (allowed.includes('ops')) navItems.push({ id: 'admin_ops', name: 'Operations & Governance', icon: CreditCard });
+    if (allowed.includes('facilities')) navItems.push({ id: 'admin_facilities', name: 'Facilities & Staffing', icon: Building2 });
+    if (allowed.includes('growth')) navItems.push({ id: 'admin_growth', name: 'Global Care & Strategy', icon: Plane });
   }
 
   // Append any active extensions that aren't standard
-  const standardIds = ['patient_dashboard', 'patient_care', 'patient_records', 'patient_services', 'patient_discovery', 'registry', 'recruitment', 'articles', 'onboard', 'practice_compliance', 'performance_profile', 'messages', 'seo', 'admin', 'admin_registry', 'admin_ops', 'admin_facilities', 'admin_growth', 'consult', 'oncall', 'earnings', 'quality', 'help', 'facility_workspace', 'facility_staffing', 'facility_care', 'facility_profile', 'pharmacy_workspace', 'pharmacy_dispensing', 'pharmacy_operations'];
+  const standardIds = ['patient_dashboard', 'patient_care', 'patient_records', 'patient_services', 'patient_discovery', 'registry', 'nurses', 'recruitment', 'articles', 'onboard', 'practice_compliance', 'performance_profile', 'messages', 'seo', 'admin', 'admin_registry', 'admin_ops', 'admin_facilities', 'admin_growth', 'consult', 'oncall', 'earnings', 'quality', 'help', 'facility_workspace', 'facility_staffing', 'facility_care', 'facility_profile', 'pharmacy_workspace', 'pharmacy_dispensing', 'pharmacy_operations', 'records', 'prescriptions', 'certs', 'labs', 'saved'];
   const customPackages = (currentUser.role === 'pharmacy' || currentUser.role === 'facility') ? [] : packages.filter(p => !standardIds.includes(p.id) && p.isEnabled);
   customPackages.forEach(p => {
     let icon = Puzzle;
@@ -533,11 +553,11 @@ export default function App() {
 
               {/* Profile Badge embedded with Close Session Button */}
               <div className="flex items-center gap-2.5 bg-white/15 border-0 shadow-none px-2.5 py-1">
-                <img
-                  src={currentUser.avatarUrl || '/assets/malaysian_female_doctor.jpg'}
+                <UserAvatar
+                  src={currentUser.avatarUrl}
+                  role={currentUser.role}
                   alt={currentUser.name}
                   className="w-8 h-8 rounded-full object-cover border border-white/40 shrink-0"
-                  referrerPolicy="no-referrer"
                 />
                 <div className="text-left hidden xl:block leading-tight">
                   <p className="text-xs font-black text-white leading-none truncate max-w-[140px]">{currentUser.name}</p>
@@ -682,11 +702,11 @@ export default function App() {
                 </div>
                 <div className="pt-3 mt-3 border-t border-[color:var(--t-200)] flex items-center justify-between gap-3 px-1">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <img
-                      src={currentUser.avatarUrl || '/assets/malaysian_female_doctor.jpg'}
+                    <UserAvatar
+                      src={currentUser.avatarUrl}
+                      role={currentUser.role}
                       alt={currentUser.name}
                       className="w-9 h-9 rounded-full object-cover border border-[color:var(--t-200)] shrink-0"
-                      referrerPolicy="no-referrer"
                     />
                     <div className="min-w-0">
                       <p className="text-xs font-extrabold text-[color:var(--ink)] leading-none truncate">{currentUser.name}</p>
@@ -865,6 +885,11 @@ export default function App() {
                           setSelectedSpecialtyFilter(spec);
                           setRegistryTab('directory');
                         }}
+                        onApplyTriage={(triage) => {
+                          setSelectedSpecialtyFilter(triage.specialty);
+                          setPrefilledSymptoms(triage.symptoms);
+                          setRegistryTab('directory');
+                        }}
                       />
                     </div>
                   )}
@@ -896,6 +921,7 @@ export default function App() {
                   reviews={reviews}
                   onNewReviewPosted={handleNewReviewPosted}
                   currentUser={currentUser}
+                  prefilledSymptoms={prefilledSymptoms}
                 />
               </div>
             )}
@@ -960,14 +986,14 @@ export default function App() {
             {(currentUser.role === 'facility' || (currentUser.role === 'admin' && ['facility_workspace', 'facility_staffing', 'facility_care', 'facility_profile'].includes(activeView))) && [
               'facility_workspace', 'facility_staffing', 'facility_care', 'facility_profile'
             ].includes(activeView) && (
-              <FacilityWorkspace activeGroup={getFacilityGroup(activeView)} />
+              <FacilityWorkspace activeGroup={getFacilityGroup(activeView)} currentUser={currentUser} />
             )}
 
             {/* VIEW: PHARMACY WORKSPACE (Handles all pharmacy groups) */}
             {currentUser.role === 'pharmacy' && [
               'pharmacy_workspace', 'pharmacy_dispensing', 'pharmacy_operations'
             ].includes(activeView) && (
-              <PharmacyWorkspace activeGroup={getPharmacyGroup(activeView)} />
+              <PharmacyWorkspace activeGroup={getPharmacyGroup(activeView)} currentUser={currentUser} />
             )}
 
             {activeView === 'consult' && currentUser.role !== 'patient' && (
@@ -1073,23 +1099,22 @@ export default function App() {
             {currentUser.role === 'admin' && [
               'admin', 'admin_registry', 'admin_ops', 'admin_facilities', 'admin_growth'
             ].includes(activeView) && (
-              <>
-                <AdminDashboard
-                  professionals={professionals}
-                  onProfessionalApproved={handleProfessionalApprovedByAdmin}
-                  packages={packages}
-                  onPackagesChanged={handlePackagesChanged}
-                  activeGroup={getAdminGroup(activeView)}
-                  jobs={jobs}
-                  onNewJobCreated={handleNewJobCreated}
-                  onApplyJob={handleApplyJob}
-                  onRefreshData={loadData}
-                  currentUser={currentUser}
-                  reviews={reviews}
-                  bookings={bookings}
-                />
-                <TestimonialAdmin />
-              </>
+              <AdminDashboard
+                professionals={professionals}
+                onProfessionalApproved={handleProfessionalApprovedByAdmin}
+                packages={packages}
+                onPackagesChanged={handlePackagesChanged}
+                activeGroup={getAdminGroup(activeView)}
+                jobs={jobs}
+                onNewJobCreated={handleNewJobCreated}
+                onApplyJob={handleApplyJob}
+                onRefreshData={loadData}
+                currentUser={currentUser}
+                reviews={reviews}
+                bookings={bookings}
+                adminSubRole={adminSubRole}
+                onAdminSubRoleChange={setAdminSubRole}
+              />
             )}
 
             {/* VIEW 7: SEO DASHBOARD */}
@@ -1100,7 +1125,7 @@ export default function App() {
             {/* VIEW 9: PATIENT PORTAL DASHBOARD (Unified PatientHeroBanner & 4 parent groups for all patient views) */}
             {currentUser.role === 'patient' && [
               'patient_dashboard', 'patient_care', 'patient_records', 'patient_services', 'patient_discovery',
-              'consult', 'packages', 'assistance', 'tourism', 'pharmacies', 'messages', 'articles', 'registry'
+              'appointments', 'consult', 'packages', 'assistance', 'tourism', 'pharmacies', 'messages', 'articles', 'registry', 'nurses', 'records', 'prescriptions', 'certs', 'labs', 'saved'
             ].includes(activeView) && !selectedProfId && (
               <PatientDashboard
                 bookings={bookings}
@@ -1113,11 +1138,14 @@ export default function App() {
                 onSelectProfessional={(id) => setSelectedProfId(id)}
                 onNavigateToMessages={() => setActiveView('messages')}
                 onConsultNow={() => setActiveView('consult')}
-                onFindDoctors={() => { setRegistryTab('directory'); setActiveView('registry'); setSelectedProfId(null); }}
-                onOpenTriage={() => { setRegistryTab('triage'); setActiveView('registry'); setSelectedProfId(null); }}
+                onFindDoctors={() => { setRegistryTab('directory'); setActiveView('patient_discovery'); setSelectedProfId(null); }}
+                onOpenTriage={() => { setActiveView('patient_care'); setSelectedProfId(null); }}
                 onOpenPharmacies={() => setActiveView('pharmacies')}
                 onOpenHelp={() => setActiveView('help')}
                 onOpenArticle={(id) => { try { sessionStorage.setItem('open_article', id); } catch { /* ignore */ } setActiveView('articles'); }}
+                selectedSpecialtyFilter={selectedSpecialtyFilter}
+                onSelectSpecialtyFilter={(spec) => setSelectedSpecialtyFilter(spec)}
+                onClearSpecialtyFilter={() => setSelectedSpecialtyFilter('')}
               />
             )}
 

@@ -48,23 +48,54 @@ export function TestimonialForm() {
 }
 
 /** Admins approve or reject testimonials before they appear on the landing page. */
-export function TestimonialAdmin() {
+export function TestimonialAdmin({ className = '' }: { className?: string } = {}) {
   const [list, setList] = useState<any[]>([]);
   const [msg, setMsg] = useState('');
   const load = useCallback(() => { jget('/api/admin/testimonials').then(d => d.status === 'success' && setList(d.data)).catch(() => {}); }, []);
   useEffect(() => { load(); }, [load]);
   const act = async (id: string, action: 'approve' | 'reject') => { const d = await jsend('POST', `/api/admin/testimonials/${id}/${action}`); setMsg(d.status === 'success' ? 'Saved.' : d.message); load(); };
   return (
-    <section className="bg-white border border-slate-200 p-5 space-y-3 text-xs mt-6" aria-label="Testimonials">
-      <h3 className="text-sm font-extrabold">Patient testimonials</h3>
-      {msg && <p className="font-bold text-sky-900 bg-sky-50 border border-sky-200 p-2" role="status">{msg}</p>}
-      {list.length === 0 && <p className="text-slate-500">None yet. The home page shows this section only when at least one is approved.</p>}
+    <section className={`bg-white border border-slate-200 p-5 space-y-3 text-xs rounded-none ${className}`} aria-label="Patient Testimonials">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-extrabold text-slate-900">Patient Testimonials Moderation (Landing Page)</h3>
+        <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">{list.length} total</span>
+      </div>
+      {msg && <p className="font-bold text-sky-900 bg-sky-50 border border-sky-200 p-2 rounded-none" role="status">{msg}</p>}
+      {list.length === 0 && <p className="text-slate-500">None yet. The home page shows this section only when at least one testimonial is approved.</p>}
       <ul className="space-y-2">{list.map(t => (
-        <li key={t.id} className="border border-slate-200 p-3 space-y-1">
-          <p><b>{t.name}</b>{t.location ? ` · ${t.location}` : ''}{t.rating ? ` · ${t.rating}★` : ''} · <b>{t.status}</b>{t.demo ? ' · DEMO' : ''} · {formatDate(t.createdAt)}</p>
-          <p className="text-slate-700">“{t.text}”</p>
-          {t.status !== 'approved' && <button className="font-bold text-emerald-700 cursor-pointer" onClick={() => act(t.id, 'approve')}>Approve</button>}{' '}
-          {t.status !== 'rejected' && <button className="font-bold text-rose-700 cursor-pointer" onClick={() => act(t.id, 'reject')}>Reject</button>}
+        <li key={t.id} className="border border-slate-200 p-3 space-y-2 bg-slate-50/50 rounded-none">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="font-bold text-slate-900">{t.name}{t.location ? ` · ${t.location}` : ''}{t.rating ? ` · ${t.rating}★` : ''}</span>
+            <span className={`text-[10px] font-black uppercase px-2 py-0.5 border rounded-none ${
+              t.status === 'approved' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
+              t.status === 'rejected' ? 'bg-rose-50 text-rose-800 border-rose-200' :
+              'bg-amber-50 text-amber-800 border-amber-200'
+            }`}>
+              {t.status}{t.demo ? ' · DEMO' : ''}
+            </span>
+          </div>
+          <p className="text-slate-700 italic">“{t.text}”</p>
+          <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">
+            <span>Submitted {formatDate(t.createdAt)}</span>
+            <div className="flex gap-2">
+              {t.status !== 'approved' && (
+                <button
+                  className="px-2.5 py-1 text-xs font-bold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white border border-[color:var(--t-700)] rounded-none cursor-pointer"
+                  onClick={() => act(t.id, 'approve')}
+                >
+                  Approve
+                </button>
+              )}
+              {t.status !== 'rejected' && (
+                <button
+                  className="px-2.5 py-1 text-xs font-bold bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 rounded-none cursor-pointer"
+                  onClick={() => act(t.id, 'reject')}
+                >
+                  Reject
+                </button>
+              )}
+            </div>
+          </div>
         </li>))}</ul>
     </section>
   );

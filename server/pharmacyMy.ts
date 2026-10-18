@@ -48,6 +48,17 @@ CREATE TABLE IF NOT EXISTS deliveries (
 );
 CREATE INDEX IF NOT EXISTS idx_del_rx ON deliveries(prescription_id);
 CREATE INDEX IF NOT EXISTS idx_del_ph ON deliveries(pharmacy_id, status);
+CREATE TABLE IF NOT EXISTS delivery_temperature_logs (
+  id TEXT PRIMARY KEY,
+  delivery_id TEXT NOT NULL,
+  temperature_celsius REAL NOT NULL,
+  checkpoint TEXT NOT NULL,
+  excursion_flag INTEGER NOT NULL DEFAULT 0,
+  note TEXT,
+  recorded_at TEXT NOT NULL,
+  recorded_by_user_id TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_temp_delivery ON delivery_temperature_logs(delivery_id);
 `);
 
 const DELIVERY_STATUS = ["requested", "arranged", "out_for_delivery", "delivered", "failed", "cancelled"] as const;
@@ -219,10 +230,34 @@ export function registerPharmacyMy(app: Application) {
 
     db.prepare("UPDATE deliveries SET status=?, partner_ref=?, tracking_url=?, fee_sen=?, updated_at=?, delivered_at=?, recipient_name=?, failure_reason=? WHERE id=?")
       .run(next, partnerRef || null, trackingUrl || null, feeSen ?? null, iso(), next === "delivered" ? iso() : d.delivered_at, recipient || d.recipient_name, next === "failed" ? reason : null, d.id);
-    // Handing the medicine to the patient is the dispensing event.
+
+    // Temperature telemetry logging under NPRA Good Distribution Practice (GDP)
+    if (req.body.temperatureCelsius !== undefined && req.body.temperatureCelsius !== null) {
+      const tempVal = typeof req.body.temperatureCelsius === "number" ? req.body.temperatureCelsius : parseFloat(String(req.body.temperatureCelsius));
+      if (!isNaN(tempVal)) {
+        const isExcursion = d.cold_chain && (tempVal < 2.0 || tempVal > 8.0) ? 1 : 0;
+        const tempId = newId("temp");
+        db.prepare("INSERT INTO delivery_temperature_logs (id, delivery_id, temperature_celsius, checkpoint, excursion_flag, note, recorded_at, recorded_by_user_id) VALUES (?,?,?,?,?,?,?,?)")
+          .run(tempId, d.id, tempVal, next, isExcursion, isExcursion ? `Temperature excursion recorded at ${next}: ${tempVal}°C (compliant range: 2.0-8.0°C)` : null, iso(), req.user?.id || null);
+      }
+    }
+
+    // Handing the medicine to the patient is the dispensing event under the Poisons Act 1952.
     if (next === "delivered" && rx.status === "active") {
-      db.prepare("UPDATE prescriptions SET status='dispensed', dispensed_at=?, dispensed_by=?, fill_updated_at=?, first_response_at=COALESCE(first_response_at, ?), dispensing_pharmacist=? WHERE id=? AND status='active'").run(iso(), ph.id, iso(), iso(), ph.pharmacist_name ?? null, rx.id);
-      pharmacyEvent(ph.id, rx.id, "dispensed", req.user!.id, { via: "delivery" });
+      const currentYear = new Date().getFullYear();
+      let poisonsNo = rx.poisons_entry_no;
+      if (!poisonsNo) {
+        const maxSeqRow = row("SELECT COALESCE(MAX(sequence_no), 0) AS max_seq FROM pharmacy_poisons_register WHERE pharmacy_id = ? AND year = ?", ph.id, currentYear);
+        const nextSeq = (maxSeqRow?.max_seq ?? 0) + 1;
+        poisonsNo = `PB-${currentYear}-${String(nextSeq).padStart(5, "0")}`;
+        try {
+          db.prepare("INSERT INTO pharmacy_poisons_register (pharmacy_id, prescription_id, entry_serial_no, year, sequence_no, pharmacist_name, dispensed_at, created_at) VALUES (?,?,?,?,?,?,?,?)")
+            .run(ph.id, rx.id, poisonsNo, currentYear, nextSeq, ph.pharmacist_name || "Dispensing Pharmacist", iso(), iso());
+        } catch { /* duplicate entry ignore */ }
+      }
+      db.prepare("UPDATE prescriptions SET status='dispensed', dispensed_at=?, dispensed_by=?, fill_updated_at=?, first_response_at=COALESCE(first_response_at, ?), dispensing_pharmacist=?, poisons_entry_no=COALESCE(poisons_entry_no, ?) WHERE id=? AND status='active'")
+        .run(iso(), ph.id, iso(), iso(), ph.pharmacist_name ?? null, poisonsNo, rx.id);
+      pharmacyEvent(ph.id, rx.id, "dispensed", req.user!.id, { via: "delivery", poisonsEntryNo: poisonsNo });
     }
     pharmacyEvent(ph.id, d.prescription_id, `delivery_${next}`, req.user!.id);
     const text: Record<string, [string, string]> = {

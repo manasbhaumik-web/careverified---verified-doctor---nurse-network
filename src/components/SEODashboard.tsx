@@ -1,13 +1,15 @@
-import DashboardHeader from './DashboardHeader';
+import DashboardHeader, { BannerBadge } from './DashboardHeader';
+import WorkspaceHeader from './WorkspaceHeader';
 import React, { useState } from 'react';
 import { Search, Code, Zap, FileSpreadsheet, Eye, Copy, CheckCircle, List, LayoutGrid, X, Globe } from 'lucide-react';
 import { DoctorProfile, NurseProfile } from '../types';
 
 interface SEODashboardProps {
   professionals: (DoctorProfile | NurseProfile)[];
+  embedded?: boolean;
 }
 
-export default function SEODashboard({ professionals }: SEODashboardProps) {
+export default function SEODashboard({ professionals, embedded = false }: SEODashboardProps) {
   const [activeTab, setActiveTab] = useState<'schema' | 'programmatic' | 'vitals' | 'sitemap'>('schema');
   const [selectedProfId, setSelectedProfId] = useState<string>(professionals[0]?.id || '');
   const [copied, setCopied] = useState(false);
@@ -92,25 +94,43 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
 
   return (
     <div className="w-full space-y-0" id="seo-dashboard-panel">
-      {/* Standard dashboard header with attached tabs */}
-      <DashboardHeader
-        fullWidth={true}
-        icon={Globe}
-        eyebrow="SEO & Schema Engine"
-        title="Active SEO Strategy & Schema Engine"
-        description="Programmatic landing page generators and YMYL E-E-A-T compliant meta engines."
-        tabs={[
-          { id: 'schema' as const, label: 'JSON-LD Structured Schema', icon: Code },
-          { id: 'programmatic' as const, label: 'Programmatic Landing Pages', icon: Search },
-          { id: 'vitals' as const, label: 'Core Web Vitals Scoring', icon: Zap },
-          { id: 'sitemap' as const, label: 'Sitemap Generator', icon: FileSpreadsheet },
-        ]}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        tabsLabel="SEO engine sections"
-      />
+      {/* Header section: WorkspaceHeader when embedded, otherwise full DashboardHeader */}
+      {embedded ? (
+        <WorkspaceHeader
+          icon={Globe}
+          eyebrow="Search Visibility & Schema Engine · Act 586 & YMYL E-E-A-T"
+          title="Active SEO Strategy & Dynamic Schema Engine"
+          description="Programmatic landing page generators, YMYL E-E-A-T structured schema, and Core Web Vitals scoring."
+          badges={<BannerBadge tone="brand">Google Rich Snippets</BannerBadge>}
+          tabs={[
+            { id: 'schema' as const, label: 'JSON-LD Structured Schema', icon: Code },
+            { id: 'programmatic' as const, label: 'Programmatic Landing Pages', icon: Search },
+            { id: 'vitals' as const, label: 'Core Web Vitals Scoring', icon: Zap },
+            { id: 'sitemap' as const, label: 'Sitemap Generator', icon: FileSpreadsheet },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
+      ) : (
+        <DashboardHeader
+          fullWidth={true}
+          icon={Globe}
+          eyebrow="SEO & Schema Engine"
+          title="Active SEO Strategy & Schema Engine"
+          description="Programmatic landing page generators and YMYL E-E-A-T compliant meta engines."
+          tabs={[
+            { id: 'schema' as const, label: 'JSON-LD Structured Schema', icon: Code },
+            { id: 'programmatic' as const, label: 'Programmatic Landing Pages', icon: Search },
+            { id: 'vitals' as const, label: 'Core Web Vitals Scoring', icon: Zap },
+            { id: 'sitemap' as const, label: 'Sitemap Generator', icon: FileSpreadsheet },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          tabsLabel="SEO engine sections"
+        />
+      )}
 
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className={embedded ? "space-y-6" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
         {/* TAB 1: SCHEMA GENERATOR */}
         {activeTab === 'schema' && (
           <div className="space-y-6">
@@ -209,7 +229,7 @@ export default function SEODashboard({ professionals }: SEODashboardProps) {
               </pre>
               <button
                 onClick={copyToClipboard}
-                className="absolute top-4 right-4 h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] active:bg-slate-900 text-white rounded-none px-4 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-none"
+                className="absolute top-4 right-4 h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] active:bg-[color:var(--t-800)] border border-[color:var(--t-700)] text-white rounded-none px-4 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-none"
               >
                 {copied ? <CheckCircle className="h-3.5 w-3.5 text-white" /> : <Copy className="h-3.5 w-3.5 text-white" />}
                 {copied ? 'Copied!' : 'Copy Code'}

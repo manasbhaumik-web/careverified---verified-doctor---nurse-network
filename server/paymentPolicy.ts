@@ -12,26 +12,48 @@
 
 export type PatientRegion = "MY" | "INTL";
 
-// ---------- payment methods ----------
-export const METHOD_INFO: Record<string, { label: string; note: string }> = {
-  card: { label: "Credit / debit card", note: "Local and international cards" },
-  fpx: { label: "FPX online banking", note: "Malaysian bank accounts only" },
-  grabpay: { label: "GrabPay", note: "Grab wallet (Malaysia and Singapore)" },
+// ---------- payment methods & Malaysian local rails ----------
+export const MALAYSIA_FPX_BANKS: { code: string; name: string; status: 'online' | 'maintenance' }[] = [
+  { code: 'MBB0227', name: 'Maybank2u', status: 'online' },
+  { code: 'CIMB0569', name: 'CIMB Clicks', status: 'online' },
+  { code: 'PBB0233', name: 'Public Bank PBe', status: 'online' },
+  { code: 'RHB0218', name: 'RHB Now', status: 'online' },
+  { code: 'HLB0224', name: 'Hong Leong Connect', status: 'online' },
+  { code: 'AMBB0209', name: 'AmOnline', status: 'online' },
+  { code: 'BIMB0340', name: 'Bank Islam', status: 'online' },
+  { code: 'BMMB0341', name: 'Bank Muamalat', status: 'online' },
+  { code: 'AFFIN0336', name: 'Affin Bank (AffinAlways)', status: 'online' },
+  { code: 'ALLIANCE0302', name: 'allianceonline', status: 'online' },
+  { code: 'BSN0601', name: 'myBSN', status: 'online' },
+  { code: 'OCBC0229', name: 'OCBC Online Banking', status: 'online' },
+  { code: 'SCB0216', name: 'Standard Chartered', status: 'online' },
+  { code: 'UOB0226', name: 'UOB Personal Internet Banking', status: 'online' },
+  { code: 'HSBC0223', name: 'HSBC Online Banking', status: 'online' },
+  { code: 'KFH0346', name: 'Kuwait Finance House', status: 'online' },
+  { code: 'AGRO01', name: 'Agrobank Agronet', status: 'online' },
+];
+
+export const METHOD_INFO: Record<string, { label: string; note: string; category?: 'fpx' | 'duitnow' | 'card' | 'wallet' }> = {
+  fpx: { label: "FPX Online Banking", note: "Direct debit across 17 Malaysian commercial & Islamic banks", category: 'fpx' },
+  duitnow: { label: "DuitNow QR", note: "National QR standard by PayNet — instant scan & pay with any banking app or e-wallet", category: 'duitnow' },
+  card: { label: "Credit / Debit Card", note: "Visa, Mastercard, MyDebit local and international cards", category: 'card' },
+  grabpay: { label: "GrabPay", note: "Grab wallet balance (Malaysia & Singapore)", category: 'wallet' },
+  tng: { label: "Touch 'n Go eWallet", note: "Direct TNG eWallet payment via PayNet DuitNow network", category: 'wallet' },
 };
 
-/** Methods offered at checkout (Stripe identifiers). PAYMENT_METHODS overrides, e.g. "card,fpx". */
+/** Methods offered at checkout. PAYMENT_METHODS overrides, e.g. "fpx,duitnow,card,grabpay,tng". */
 export const paymentMethods = (): string[] => {
-  const raw = (process.env.PAYMENT_METHODS ?? "card,fpx,grabpay").split(",").map(s => s.trim().toLowerCase());
+  const raw = (process.env.PAYMENT_METHODS ?? "fpx,duitnow,card,grabpay,tng").split(",").map(s => s.trim().toLowerCase());
   const known = raw.filter(m => m in METHOD_INFO);
-  return known.length ? [...new Set(known)] : ["card"];
+  return known.length ? [...new Set(known)] : ["fpx", "duitnow", "card"];
 };
 
-/** Wallets patients expect but that need a different provider. Shown in docs, not offered in the app. */
-export const NOT_YET_AVAILABLE = ["Touch 'n Go eWallet", "Boost", "DuitNow QR"];
+/** Wallets & payment systems requiring external settlement gateway. */
+export const NOT_YET_AVAILABLE = ["Boost", "ShopeePay"];
 
-/** Methods suitable for a patient region: FPX needs a Malaysian bank account. */
+/** Methods suitable for a patient region: FPX and DuitNow require Malaysian bank/e-wallet accounts. */
 export const methodsFor = (region: PatientRegion) =>
-  paymentMethods().filter(m => region === "MY" || m !== "fpx").map(id => ({ id, ...METHOD_INFO[id] }));
+  paymentMethods().filter(m => region === "MY" || (m !== "fpx" && m !== "duitnow" && m !== "tng")).map(id => ({ id, ...METHOD_INFO[id] }));
 
 // ---------- service tax ----------
 export const sstConfig = () => ({

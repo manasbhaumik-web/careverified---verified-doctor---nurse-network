@@ -295,8 +295,8 @@ function ensureDemoData() {
       profileId: docProfile.id,
       consentVersion: "2026-11",
     });
-  } else if (!docUser.profile_id) {
-    db.prepare("UPDATE users SET profile_id = ? WHERE id = ?").run(docProfile.id, docUser.id);
+  } else {
+    db.prepare("UPDATE users SET avatar_url = '/assets/malaysian_male_doctor.jpg', profile_id = ? WHERE id = ?").run(docProfile.id, docUser.id);
   }
 
   // Weekday on-call roster 08:00-20:00 for Demo Doctor
@@ -316,9 +316,11 @@ function ensureDemoData() {
       password: DEMO_PASSWORD,
       role: "patient",
       name: "Demo Patient",
-      avatarUrl: "/assets/malaysian_male_patient.jpg",
+      avatarUrl: "/assets/patient_female_malay.jpg",
       consentVersion: "2026-11",
     });
+  } else {
+    db.prepare("UPDATE users SET avatar_url = '/assets/patient_female_malay.jpg' WHERE id = ?").run(patUser.id);
   }
 
   let patProfile = patients.find(p => p.userId === patUser.id || p.email === "demo.patient@careverified.test");
@@ -360,7 +362,7 @@ function ensureDemoData() {
       "INSERT INTO vitals (id, user_id, ts, kind, value1, value2, unit, note) VALUES (?, ?, ?, 'bp', 134, 86, 'mmHg', 'Morning reading')"
     ).run("vit-demo-bp-1", patUser.id, now);
   }
-  createGrant(patUser.id, docProfile.id, "booking", "bkg-202223", 365);
+  createGrant(patUser.id, docProfile.id, "booking", "bkg-202223", 30);
 
   // 3. Demo Pharmacies & Pharmacy Workspace User
   let demoPharm = db.prepare("SELECT * FROM pharmacies WHERE name = 'Demo Pharmacy'").get() as any;
@@ -394,10 +396,14 @@ function ensureDemoData() {
       role: "pharmacy",
       name: "Demo Pharmacy Team",
       profileId: demoPharm.id,
+      avatarUrl: "/assets/pharmacist_female_malay.jpg",
     });
     db.prepare("UPDATE users SET pharmacy_owner = 1, must_change_password = 0 WHERE id = ?").run(pharmUser.id);
-  } else if (pharmUser.profile_id !== demoPharm.id || pharmUser.must_change_password) {
-    db.prepare("UPDATE users SET profile_id = ?, pharmacy_owner = 1, must_change_password = 0 WHERE id = ?").run(demoPharm.id, pharmUser.id);
+  } else {
+    db.prepare("UPDATE users SET avatar_url = '/assets/pharmacist_female_malay.jpg' WHERE id = ?").run(pharmUser.id);
+    if (pharmUser.profile_id !== demoPharm.id || pharmUser.must_change_password) {
+      db.prepare("UPDATE users SET profile_id = ?, pharmacy_owner = 1, must_change_password = 0 WHERE id = ?").run(demoPharm.id, pharmUser.id);
+    }
   }
 
   // Seed sample prescriptions in Demo Pharmacy inbox if empty
@@ -488,10 +494,10 @@ function ensureDemoData() {
       name: "Pantai Medical Centre Operations",
       profileId: "fac-demo-1",
       facilityId: "fac-demo-1",
-      avatarUrl: "/assets/clinics_hospital_hero_bg.jpg",
+      avatarUrl: "/assets/facility_director_male.jpg",
     });
   } else {
-    db.prepare("UPDATE users SET profile_id = 'fac-demo-1', facility_id = 'fac-demo-1' WHERE id = ?").run(facUser.id);
+    db.prepare("UPDATE users SET avatar_url = '/assets/facility_director_male.jpg', profile_id = 'fac-demo-1', facility_id = 'fac-demo-1' WHERE id = ?").run(facUser.id);
   }
   db.prepare("INSERT OR IGNORE INTO tourism_facility_staff (facility_id, user_id) VALUES (?, ?)").run("fac-demo-1", facUser.id);
 
@@ -1251,7 +1257,7 @@ app.post("/api/bookings", requireRole("patient"), (req, res) => {
 
   bookings.push(newBooking);
   // Opt-in consent: the patient chose to share their health record with this practitioner for the visit.
-  if (req.body.shareRecord === true) createGrant(user.id, professionalId, "booking", newBooking.id, 45);
+  if (req.body.shareRecord === true) createGrant(user.id, professionalId, "booking", newBooking.id, 30);
   audit(req, "booking.create", { target: ["booking", newBooking.id], details: { professionalId } });
   res.status(201).json({ status: "success", message: "Appointment booked successfully!", data: newBooking });
 });

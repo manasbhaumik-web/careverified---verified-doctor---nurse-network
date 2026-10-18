@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Briefcase, Building2, Download, FolderOpen } from 'lucide-react';
-import DashboardHeader from './DashboardHeader';
+import { Briefcase, Building2, Download, FolderOpen, Plane } from 'lucide-react';
+import DashboardHeader, { BannerBadge } from './DashboardHeader';
 import PractitionerHeroBanner from './PractitionerHeroBanner';
+import WorkspaceHeader from './WorkspaceHeader';
 import { formatMoney, formatDate } from '../locale';
 
 const jget = (url: string) => fetch(url).then(r => r.json());
@@ -21,6 +22,7 @@ interface TourismDeskProps {
   reviews?: any[];
   bookings?: any[];
   embedded?: boolean;
+  hideWorkspaceHeader?: boolean;
 }
 
 /** Facility staff (practitioners assigned to a facility) work cases; admins also manage facilities. */
@@ -31,6 +33,7 @@ export default function TourismDesk({
   reviews = [],
   bookings = [],
   embedded = false,
+  hideWorkspaceHeader = false,
 }: TourismDeskProps) {
   const [tab, setTab] = useState<'cases' | 'facilities'>('cases');
   const [me, setMe] = useState<any>(null);
@@ -42,25 +45,21 @@ export default function TourismDesk({
   if (embedded) {
     return (
       <div className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--t-200)] pb-3">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => { setTab('cases'); setOpen(null); }}
-              className={`px-3.5 py-1.5 text-xs font-bold cursor-pointer transition-colors ${tab === 'cases' ? 'bg-[color:var(--t-600)] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-            >
-              Cross-Border Patient Cases
-            </button>
-            {isAdmin && (
-              <button
-                onClick={() => { setTab('facilities'); setOpen(null); }}
-                className={`px-3.5 py-1.5 text-xs font-bold cursor-pointer transition-colors ${tab === 'facilities' ? 'bg-[color:var(--t-600)] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-              >
-                Facilities Management
-              </button>
-            )}
-          </div>
-          <span className="text-xs text-slate-500 font-semibold">International Patient Dossiers & Treatment Quotes</span>
-        </div>
+        {!hideWorkspaceHeader && (
+          <WorkspaceHeader
+            icon={Plane}
+            eyebrow="Medical Travel & Global Patient Flow · MHTC Registered"
+            title="Cross-Border Medical Tourism & International Patient Inquiries"
+            description="Facility medical travel coordination desk, treatment cost quotation estimations, and travel itinerary tracking."
+            badges={<BannerBadge tone="brand">MHTC Healthcare Travel</BannerBadge>}
+            tabs={isAdmin ? [
+              { id: 'cases', label: 'Cross-Border Patient Cases', icon: Briefcase },
+              { id: 'facilities', label: 'Facilities Management', icon: Building2 },
+            ] : undefined}
+            activeTab={tab}
+            onTabChange={(id) => { setTab(id as any); setOpen(null); }}
+          />
+        )}
         {tab === 'cases' && (me && me.facilities.length === 0
           ? <p className="text-sm bg-white border border-dashed border-slate-300 p-6 text-center text-slate-600">You are not assigned to a facility yet. An admin adds you from Global Patient Services &gt; Facilities.</p>
           : open ? <StaffCase id={open} onBack={() => setOpen(null)} /> : <CaseQueue onOpen={setOpen} />)}

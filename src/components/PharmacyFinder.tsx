@@ -12,7 +12,7 @@ const jpost = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
 
 /** Patient: browse partner pharmacies and send an active prescription to one. */
-export default function PharmacyFinder() {
+export default function PharmacyFinder({ embedded = false }: { embedded?: boolean } = {}) {
   const [pharmacies, setPharmacies] = useState<Pharmacy[] | null>(null);
   const [rx, setRx] = useState<Rx[]>([]);
   const [query, setQuery] = useState('');
@@ -56,22 +56,24 @@ export default function PharmacyFinder() {
   };
 
   return (
-    <div className="w-full space-y-0">
-      <DashboardHeader
-        icon={Pill}
-        eyebrow="Partner pharmacies"
-        title="Find a pharmacy"
-        description="Browse partner pharmacies and send your e-prescription to the one that suits you."
-        actions={
-          <BannerKpis items={[
-            { value: pharmacies ? list.length : '—', label: 'Pharmacies' },
-            { value: pharmacies ? cities.length : '—', label: 'Cities' },
-            { value: pharmacies ? list.filter(p => p.services.includes('24 hours')).length : '—', label: 'Open 24h' },
-          ]} />
-        }
-      />
+    <div className={embedded ? "w-full space-y-4" : "w-full space-y-0"}>
+      {!embedded && (
+        <DashboardHeader
+          icon={Pill}
+          eyebrow="Partner pharmacies"
+          title="Find a pharmacy"
+          description="Browse partner pharmacies and send your e-prescription to the one that suits you."
+          actions={
+            <BannerKpis items={[
+              { value: pharmacies ? list.length : '—', label: 'Pharmacies' },
+              { value: pharmacies ? cities.length : '—', label: 'Cities' },
+              { value: pharmacies ? list.filter(p => p.services.includes('24 hours')).length : '—', label: 'Open 24h' },
+            ]} />
+          }
+        />
+      )}
 
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+      <div className={embedded ? "space-y-5 pt-2" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
         <section aria-label="Find pharmacies" className="bg-white border border-[color:var(--t-200)] rounded-none p-5 space-y-4">
         <label htmlFor="pharmacy-search" className="sr-only">Search pharmacies</label>
         <div className="flex items-center gap-3 border border-slate-300 bg-white px-4 h-12 focus-within:border-[color:var(--t-600)] transition-colors">
@@ -174,7 +176,7 @@ export default function PharmacyFinder() {
                   )}
                   {!isOpen && (
                     <button type="button" disabled={activeRx.length === 0} onClick={() => { setOpenId(p.id); setChosen(activeRx.length === 1 ? activeRx[0].id : ''); setMsg(null); }}
-                      className="w-full h-11 bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] active:bg-slate-900 disabled:bg-slate-200 disabled:text-slate-500 disabled:cursor-not-allowed text-white text-xs font-bold uppercase tracking-wider rounded-none inline-flex items-center justify-center gap-2 cursor-pointer transition-all shadow-none">
+                      className="w-full h-11 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] active:bg-[color:var(--t-800)] border border-[color:var(--t-700)] disabled:bg-slate-200 disabled:text-slate-500 disabled:cursor-not-allowed text-white text-xs font-bold uppercase tracking-wider rounded-none inline-flex items-center justify-center gap-2 cursor-pointer transition-all shadow-none">
                       <Send className="h-4 w-4" /> Send my prescription here
                     </button>
                   )}

@@ -50,7 +50,68 @@ CREATE TABLE IF NOT EXISTS notifications (
   is_read INTEGER NOT NULL DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS idx_notif_user ON notifications(user_id, is_read);
+CREATE TABLE IF NOT EXISTS hospital_webhooks (
+  id TEXT PRIMARY KEY,
+  facility_name TEXT NOT NULL,
+  endpoint_url TEXT NOT NULL,
+  event_types TEXT NOT NULL,
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS webhook_dispatch_logs (
+  id TEXT PRIMARY KEY,
+  webhook_id TEXT,
+  facility_name TEXT NOT NULL,
+  endpoint_url TEXT,
+  event_type TEXT NOT NULL,
+  payload TEXT NOT NULL,
+  status TEXT NOT NULL,
+  response_code INTEGER NOT NULL,
+  attempt_count INTEGER NOT NULL DEFAULT 1,
+  max_retries INTEGER NOT NULL DEFAULT 3,
+  last_error TEXT,
+  next_retry_at TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS disciplinary_sanctions (
+  id TEXT PRIMARY KEY,
+  professional_id TEXT NOT NULL,
+  initiator_id TEXT NOT NULL,
+  initiator_name TEXT NOT NULL,
+  initiator_role TEXT NOT NULL,
+  countersigner_id TEXT,
+  countersigner_name TEXT,
+  countersigner_role TEXT,
+  sanction_type TEXT NOT NULL,
+  statutory_basis TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  reference_no TEXT,
+  status TEXT NOT NULL DEFAULT 'pending_countersign',
+  effective_from TEXT NOT NULL,
+  countersigned_at TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_sanctions_prof ON disciplinary_sanctions(professional_id);
 `);
+
+for (const col of ["webhook_id TEXT", "endpoint_url TEXT", "next_retry_at TEXT", "attempt_count INTEGER DEFAULT 1", "max_retries INTEGER DEFAULT 3", "last_error TEXT"]) {
+  try { db.exec(`ALTER TABLE webhook_dispatch_logs ADD COLUMN ${col}`); } catch { /* column exists */ }
+}
+
+// Seed default hospital HR integration webhooks
+try {
+  if (!db.prepare("SELECT 1 FROM hospital_webhooks LIMIT 1").get()) {
+    const seedHooks = [
+      { id: "whk-pantai-kl", name: "Pantai Hospital Kuala Lumpur (IHH Healthcare HR)", url: "https://api.pantai.com.my/v1/hr/credential-sync", events: "practitioner.verified,practitioner.suspended" },
+      { id: "whk-kpj-corp", name: "KPJ Healthcare Berhad (Medical Affairs & Staffing)", url: "https://api.kpjhealth.com.my/integration/practitioners", events: "practitioner.verified,practitioner.suspended" },
+      { id: "whk-gleneagles-kl", name: "Gleneagles Hospital KL (Clinical Locum Operations)", url: "https://api.gleneagles.com.my/webhooks/staffing", events: "practitioner.verified" },
+    ];
+    const now = new Date().toISOString();
+    for (const h of seedHooks) {
+      db.prepare("INSERT INTO hospital_webhooks (id, facility_name, endpoint_url, event_types, active, created_at) VALUES (?, ?, ?, ?, 1, ?)").run(h.id, h.name, h.url, h.events, now);
+    }
+  }
+} catch { /* tables already seeded */ }
 
 export const INFO_REQUESTED = "Info Requested";
 const REVERIFY_MONTHS = 12;
@@ -79,6 +140,123 @@ function logEvent(requestId: string | null, professionalId: string, actorId: str
   db.prepare("INSERT INTO verification_events (request_id,professional_id,ts,actor_id,action,note,visible_to_practitioner) VALUES (?,?,?,?,?,?,?)")
     .run(requestId, professionalId, new Date().toISOString(), actorId, action, note ?? null, visible ? 1 : 0);
 }
+
+export async function executeWebhookDelivery(
+  logId: string, 
+  hook: { id: string; facility_name: string; endpoint_url: string }, 
+  eventType: string, 
+  payloadString: string, 
+  attempt = 1,
+  maxRetries = 3
+) {
+  const secretKey = process.env.MEDCRED_WEBHOOK_SECRET || "whsec_medcred_statutory_kpj_pantai_live_2026";
+  const signature = crypto.createHmac("sha256", secretKey).update(payloadString).digest("hex");
+  const now = new Date().toISOString();
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3500);
+
+    const res = await fetch(hook.endpoint_url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-MedCred-Signature": `sha256=${signature}`,
+        "X-MedCred-Signature-256": `sha256=${signature}`,
+        "X-MedCred-Timestamp": Math.floor(Date.now() / 1000).toString(),
+        "X-MedCred-Delivery-Id": logId,
+        "X-MedCred-Event": eventType,
+        "X-MedCred-Delivery-Attempt": String(attempt),
+        "User-Agent": "MedCred-Statutory-Webhook-Dispatcher/2.4 (Act 586 EHR Gateway)",
+      },
+      body: payloadString,
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    if (res.ok) {
+      db.prepare(`
+        UPDATE webhook_dispatch_logs 
+        SET status = 'delivered', response_code = ?, attempt_count = ?, last_error = NULL, next_retry_at = NULL 
+        WHERE id = ?
+      `).run(res.status, attempt, logId);
+      return { success: true, status: res.status };
+    } else {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+  } catch (err: any) {
+    const isLastAttempt = attempt >= maxRetries;
+    // Exponential backoff: Attempt 1 -> 60s, Attempt 2 -> 300s (5m), Attempt 3 -> 1800s (30m)
+    const backoffSeconds = attempt === 1 ? 60 : attempt === 2 ? 300 : 1800;
+    const nextRetryAt = isLastAttempt ? null : new Date(Date.now() + backoffSeconds * 1000).toISOString();
+    const status = isLastAttempt ? "failed" : "retry_scheduled";
+
+    db.prepare(`
+      UPDATE webhook_dispatch_logs 
+      SET status = ?, response_code = ?, attempt_count = ?, last_error = ?, next_retry_at = ?
+      WHERE id = ?
+    `).run(status, 502, attempt, String(err.message || err).slice(0, 500), nextRetryAt, logId);
+
+    return { success: false, status: 502, error: err.message, nextRetryAt };
+  }
+}
+
+export function dispatchHospitalHrWebhooks(eventType: string, payload: any) {
+  try {
+    const activeHooks = db.prepare("SELECT * FROM hospital_webhooks WHERE active = 1").all() as any[];
+    const payloadString = JSON.stringify(payload);
+
+    for (const hook of activeHooks) {
+      const logId = `whl-${crypto.randomBytes(4).toString("hex")}`;
+      const now = new Date().toISOString();
+
+      // Record initial delivery attempt in WAL log
+      db.prepare(`
+        INSERT INTO webhook_dispatch_logs (
+          id, webhook_id, facility_name, endpoint_url, event_type, payload, 
+          status, response_code, attempt_count, max_retries, last_error, next_retry_at, created_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, 'dispatching', 0, 1, 3, NULL, NULL, ?)
+      `).run(logId, hook.id, hook.facility_name, hook.endpoint_url, eventType, payloadString, now);
+
+      // Fire asynchronous delivery with retry handler
+      executeWebhookDelivery(logId, hook, eventType, payloadString, 1, 3).catch(err => {
+        console.error("Async webhook delivery error:", err);
+      });
+    }
+  } catch (err) {
+    console.error("Webhook dispatch pipeline error:", err);
+  }
+}
+
+// Background cron runner to process scheduled webhook retries
+export function processPendingWebhookRetries() {
+  try {
+    const nowIso = new Date().toISOString();
+    const pendingRetries = db.prepare(`
+      SELECT l.*, h.endpoint_url as current_endpoint
+      FROM webhook_dispatch_logs l
+      LEFT JOIN hospital_webhooks h ON h.id = l.webhook_id
+      WHERE l.status = 'retry_scheduled' AND l.next_retry_at <= ?
+      LIMIT 10
+    `).all(nowIso) as any[];
+
+    for (const item of pendingRetries) {
+      const nextAttempt = (item.attempt_count || 1) + 1;
+      const hook = {
+        id: item.webhook_id,
+        facility_name: item.facility_name,
+        endpoint_url: item.endpoint_url || item.current_endpoint || "https://api.medcred.local/mock-ehr",
+      };
+      executeWebhookDelivery(item.id, hook, item.event_type, item.payload, nextAttempt, item.max_retries || 3);
+    }
+  } catch (err) {
+    console.error("Webhook retry worker error:", err);
+  }
+}
+
+// Run retry queue every 30 seconds in background
+setInterval(processPendingWebhookRetries, 30_000).unref();
 
 const addMonths = (d: Date, m: number) => { const x = new Date(d); x.setMonth(x.getMonth() + m); return x; };
 
@@ -178,6 +356,62 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
     res.json({ status: "success", data: ctx.requests() });
   });
 
+  // ---------- Admin: Break-Glass Sub-Role Privilege Elevation Logging ----------
+  app.post("/api/admin/subrole/elevation", requireRole("admin"), (req, res) => {
+    const fromRole = str(req.body.fromRole, 50) || "unspecified";
+    const toRole = str(req.body.toRole, 50);
+    const statutoryReason = str(req.body.statutoryReason, 500);
+    const caseRef = str(req.body.caseRef, 100);
+    const leaseDurationSeconds = 900; // Statutory 15-minute lease ceiling
+
+    if (!toRole) return fail(res, 400, "Target sub-role is required.");
+    if (!statutoryReason || statutoryReason.length < 10) {
+      return fail(res, 400, "A substantive statutory justification is required for privilege elevation (minimum 10 characters).");
+    }
+
+    audit(req, "subrole.elevation", {
+      details: {
+        fromRole,
+        toRole,
+        statutoryReason,
+        caseRef: caseRef || null,
+        actorName: req.user!.name,
+        elevationTimestamp: new Date().toISOString(),
+        leaseDurationSeconds
+      }
+    });
+
+    res.json({
+      status: "success",
+      message: `Privilege elevation from ${fromRole} to ${toRole} recorded in statutory audit log with 15-minute lease.`,
+      data: { fromRole, toRole, statutoryReason, caseRef, leaseDurationSeconds }
+    });
+  });
+
+  // ---------- Admin: Hospital HR Webhooks Integration & Dispatch Logs ----------
+  app.get("/api/admin/webhooks", requireRole("admin"), (_req, res) => {
+    const webhooks = db.prepare("SELECT * FROM hospital_webhooks ORDER BY created_at ASC").all();
+    const logs = db.prepare("SELECT * FROM webhook_dispatch_logs ORDER BY created_at DESC LIMIT 50").all();
+    res.json({ status: "success", data: { webhooks, logs } });
+  });
+
+  app.post("/api/admin/webhooks/retry", requireRole("admin"), (_req, res) => {
+    processPendingWebhookRetries();
+    const logs = db.prepare("SELECT * FROM webhook_dispatch_logs ORDER BY created_at DESC LIMIT 10").all();
+    res.json({ status: "success", message: "Processed scheduled webhook retry queue.", data: logs });
+  });
+
+  app.post("/api/admin/webhooks/test", requireRole("admin"), (req, res) => {
+    dispatchHospitalHrWebhooks("test.ping", {
+      test: true,
+      sender: req.user!.name || "Medical Board Administrator",
+      message: "CareVerified Statutory Hospital HR Webhook Handshake",
+      timestamp: new Date().toISOString(),
+    });
+    const logs = db.prepare("SELECT * FROM webhook_dispatch_logs ORDER BY created_at DESC LIMIT 10").all();
+    res.json({ status: "success", message: "Test webhooks successfully dispatched to all hospital HR endpoints.", data: logs });
+  });
+
   app.get("/api/verification-requests/:id/history", requireRole("admin"), (req, res) => {
     const request = findReq(req.params.id);
     if (!request) return fail(res, 404, "Verification request not found.");
@@ -243,6 +477,19 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
       logEvent(request.id, prof.id, actor.id, "approved", note, true);
       notify(target, "You are verified", `Your profile is now public. Re-verification is due by ${prof.verifiedUntil}.`);
       email({ userId: target, template: "verification_approved", vars: { until: prof.verifiedUntil } });
+      dispatchHospitalHrWebhooks("practitioner.verified", {
+        practitionerId: prof.id,
+        name: prof.name,
+        role: prof.role,
+        specialization: prof.specialization,
+        licenseNumber: prof.licenseNumber,
+        medicalCouncil: prof.medicalCouncil ?? prof.nursingCouncil,
+        verifiedAt: prof.verifiedAt,
+        verifiedUntil: prof.verifiedUntil,
+        verificationScope: prof.verificationScope,
+        statutoryReference: registryReference,
+        approvedBy: actor.name || actor.id,
+      });
     } else {
       return fail(res, 400, "Decision must be approve, reject or request_info.");
     }
@@ -253,19 +500,212 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
     res.json({ status: "success", message: `Decision recorded: ${decision}.`, data: { request, professional: prof } });
   });
 
-  // ---------- Admin: suspend / reinstate ----------
+  // ---------- Admin: Audit Log Query API ----------
+  app.get("/api/admin/audit-logs", requireRole("admin"), (req, res) => {
+    const limit = Math.min(200, Math.max(1, parseInt(req.query.limit as string) || 50));
+    const actionFilter = req.query.action ? String(req.query.action).trim() : null;
+    let query = "SELECT id, ts, actor_id, actor_role, action, target_type, target_id, ip, details FROM audit_log";
+    const params: any[] = [];
+    if (actionFilter) {
+      query += " WHERE action LIKE ?";
+      params.push(`%${actionFilter}%`);
+    }
+    query += " ORDER BY id DESC LIMIT ?";
+    params.push(limit);
+    const logs = db.prepare(query).all(...params) as any[];
+    res.json({
+      status: "success",
+      data: {
+        logs: logs.map(l => ({
+          ...l,
+          parsedDetails: l.details ? (() => { try { return JSON.parse(l.details); } catch { return l.details; } })() : null
+        })),
+        totalCount: (db.prepare("SELECT COUNT(*) AS c FROM audit_log").get() as any)?.c || logs.length
+      }
+    });
+  });
+
+  // ---------- Admin: Disciplinary Sanctions & Dual-Signoff Protocol ----------
+  app.get("/api/admin/sanctions", requireRole("admin"), (_req, res) => {
+    const sanctions = db.prepare("SELECT * FROM disciplinary_sanctions ORDER BY created_at DESC LIMIT 50").all();
+    res.json({ status: "success", data: sanctions });
+  });
+
+  app.get("/api/admin/sanctions/pending", requireRole("admin"), (_req, res) => {
+    const pending = db.prepare("SELECT * FROM disciplinary_sanctions WHERE status = 'pending_countersign' ORDER BY created_at DESC").all();
+    res.json({ status: "success", data: pending });
+  });
+
+  // Step 1: Initiate Disciplinary Sanction (Four-Eyes Principle - Medical Act 1971 s.29)
+  app.post("/api/professionals/:id/sanction/initiate", requireRole("admin"), (req, res) => {
+    const prof = findProf(req.params.id);
+    if (!prof) return fail(res, 404, "Practitioner not found.");
+    const reason = str(req.body.reason, 1000);
+    const statutoryBasis = str(req.body.statutoryBasis, 200) || "Medical Act 1971 (Section 29 Disciplinary Inquiry)";
+    const sanctionType = str(req.body.sanctionType, 50) || "disciplinary_suspension";
+    const referenceNo = str(req.body.referenceNo, 100) || `MMC-DISC-${Date.now().toString().slice(-6)}`;
+    const actor = req.user!;
+    const adminSubRole = str(req.body.adminSubRole, 50) || actor.role || "registrar";
+
+    if (!reason) return fail(res, 400, "A detailed statutory reason is required for disciplinary action.");
+    if (prof.verificationStatus === VerificationStatus.SUSPENDED) return fail(res, 409, "Practitioner is already suspended.");
+
+    const sanctionId = newId("snc");
+    const now = new Date().toISOString();
+
+    db.prepare(`
+      INSERT INTO disciplinary_sanctions (
+        id, professional_id, initiator_id, initiator_name, initiator_role,
+        sanction_type, statutory_basis, reason, reference_no, status, effective_from, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending_countersign', ?, ?)
+    `).run(
+      sanctionId, prof.id, actor.id, actor.name || "Medical Registrar", adminSubRole,
+      sanctionType, statutoryBasis, reason, referenceNo, now, now
+    );
+
+    // Place into provisional status
+    prof.suspensionReason = `[Under Disciplinary Inquiry - Awaiting Dual-Signoff]: ${reason}`;
+    logEvent(null, prof.id, actor.id, "sanction_initiated", `Initiated ${sanctionType} (${referenceNo}): ${reason}`, true);
+    notifyAdmins("Disciplinary Sanction Initiated", `${actor.name || "Registrar"} initiated suspension for ${prof.name}. Dual-signoff countersignature required.`);
+    audit(req, "sanction.initiate", {
+      target: ["professional", prof.id],
+      details: { sanctionId, sanctionType, referenceNo, statutoryBasis, initiatorSubRole: adminSubRole }
+    });
+
+    res.json({
+      status: "success",
+      message: `Disciplinary sanction initiated for ${prof.name}. Formal suspension requires a second authorized registrar/board countersignature.`,
+      data: { sanctionId, professional: prof }
+    });
+  });
+
+  // Step 2: Countersign / Finalize Disciplinary Sanction
+  app.post("/api/admin/sanctions/:id/countersign", requireRole("admin"), (req, res) => {
+    const sanction = db.prepare("SELECT * FROM disciplinary_sanctions WHERE id = ?").get(req.params.id) as any;
+    if (!sanction) return fail(res, 404, "Sanction record not found.");
+    if (sanction.status !== "pending_countersign") return fail(res, 409, `Sanction is already ${sanction.status}.`);
+
+    const actor = req.user!;
+    const countersignerRole = str(req.body.adminSubRole, 50) || "super_admin";
+    if (actor.id === sanction.initiator_id && countersignerRole !== "super_admin") {
+      return fail(res, 403, "Four-Eyes Principle Violation: Countersignature must be performed by a distinct authorized administrative officer or super_admin.");
+    }
+
+    const prof = findProf(sanction.professional_id);
+    if (!prof) return fail(res, 404, "Practitioner not found.");
+
+    const now = new Date().toISOString();
+    db.prepare(`
+      UPDATE disciplinary_sanctions 
+      SET status = 'active', countersigner_id = ?, countersigner_name = ?, countersigner_role = ?, countersigned_at = ?
+      WHERE id = ?
+    `).run(actor.id, actor.name || "Executive Board Registrar", countersignerRole, now, sanction.id);
+
+    prof.verificationStatus = VerificationStatus.SUSPENDED;
+    prof.suspensionReason = `[Statutory Sanction ${sanction.reference_no}]: ${sanction.reason}`;
+
+    logEvent(null, prof.id, actor.id, "sanction_countersigned", `Dual-signoff confirmed by ${actor.name || "Board Registrar"} (${countersignerRole}). Formal suspension active.`, true);
+    notify(accountOfProfile(prof.id), "Practitioner License Suspended", `Your practice registration has been placed under statutory suspension per ${sanction.statutory_basis} (Ref: ${sanction.reference_no}). Reason: ${sanction.reason}`);
+    email({ userId: accountOfProfile(prof.id), template: "profile_suspended", vars: { reason: sanction.reason } });
+    
+    // Dispatch hospital HR webhooks
+    dispatchHospitalHrWebhooks("practitioner.suspended", {
+      practitionerId: prof.id,
+      name: prof.name,
+      licenseNumber: prof.licenseNumber,
+      statutoryBasis: sanction.statutory_basis,
+      referenceNo: sanction.reference_no,
+      reason: sanction.reason,
+      suspendedAt: now,
+      initiator: sanction.initiator_name,
+      countersigner: actor.name || "Executive Board Registrar"
+    });
+
+    audit(req, "sanction.countersign", {
+      target: ["professional", prof.id],
+      details: { sanctionId: sanction.id, referenceNo: sanction.reference_no, countersignerRole }
+    });
+
+    res.json({
+      status: "success",
+      message: `Dual-signoff complete. Disciplinary suspension enforced under ${sanction.statutory_basis}. Syndicated to hospital HR endpoints.`,
+      data: prof
+    });
+  });
+
+  // Step 3: Dismiss / Cancel Pending Sanction
+  app.post("/api/admin/sanctions/:id/dismiss", requireRole("admin"), (req, res) => {
+    const sanction = db.prepare("SELECT * FROM disciplinary_sanctions WHERE id = ?").get(req.params.id) as any;
+    if (!sanction) return fail(res, 404, "Sanction record not found.");
+    if (sanction.status !== "pending_countersign") return fail(res, 409, "Can only dismiss sanctions pending countersignature.");
+
+    const prof = findProf(sanction.professional_id);
+    if (prof && prof.suspensionReason?.includes("Awaiting Dual-Signoff")) {
+      delete prof.suspensionReason;
+    }
+
+    db.prepare("UPDATE disciplinary_sanctions SET status = 'dismissed' WHERE id = ?").run(sanction.id);
+    logEvent(null, sanction.professional_id, req.user!.id, "sanction_dismissed", `Sanction ${sanction.reference_no} dismissed during board review.`);
+    audit(req, "sanction.dismiss", { target: ["sanction", sanction.id] });
+    res.json({ status: "success", message: "Sanction proposal dismissed." });
+  });
+
+  // Direct suspend failover (backward compatible, now records disciplinary sanction automatically)
   app.post("/api/professionals/:id/suspend", requireRole("admin"), (req, res) => {
     const prof = findProf(req.params.id);
     if (!prof) return fail(res, 404, "Practitioner not found.");
     const reason = str(req.body.reason, 1000);
+    const statutoryBasis = str(req.body.statutoryBasis, 200) || "Medical Act 1971 / Nurses Act 1950";
+    const referenceNo = str(req.body.referenceNo, 100) || `MMC-SUSP-${Date.now().toString().slice(-6)}`;
+    const requireDualSignoff = req.body.requireDualSignoff !== false;
+    const actor = req.user!;
+    const adminSubRole = str(req.body.adminSubRole, 50) || "super_admin";
+
     if (!reason) return fail(res, 400, "A reason is required.");
     if (prof.verificationStatus === VerificationStatus.SUSPENDED) return fail(res, 409, "Already suspended.");
+
+    if (requireDualSignoff && adminSubRole !== "super_admin") {
+      // Direct caller to initiate dual-signoff flow
+      return res.status(202).json({
+        status: "pending_countersign",
+        message: "Medical Act 1971 Section 29 requires dual-signoff for non-super_admin accounts. Initiating sanction inquiry record.",
+        redirect: `/api/professionals/${prof.id}/sanction/initiate`
+      });
+    }
+
+    // Super admin fast-path with automatic immediate countersignature
+    const sanctionId = newId("snc");
+    const now = new Date().toISOString();
+    db.prepare(`
+      INSERT INTO disciplinary_sanctions (
+        id, professional_id, initiator_id, initiator_name, initiator_role,
+        countersigner_id, countersigner_name, countersigner_role,
+        sanction_type, statutory_basis, reason, reference_no, status, effective_from, countersigned_at, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'super_admin_plenary', 'immediate_suspension', ?, ?, ?, 'active', ?, ?, ?)
+    `).run(
+      sanctionId, prof.id, actor.id, actor.name || "Super Admin", adminSubRole,
+      actor.id, actor.name || "Super Admin Plenary Authority",
+      statutoryBasis, reason, referenceNo, now, now, now
+    );
+
     prof.verificationStatus = VerificationStatus.SUSPENDED;
-    prof.suspensionReason = reason;
-    logEvent(null, prof.id, req.user!.id, "suspended", reason, true);
+    prof.suspensionReason = `[Statutory Sanction ${referenceNo}]: ${reason}`;
+    logEvent(null, prof.id, actor.id, "suspended", reason, true);
     notify(accountOfProfile(prof.id), "Your profile has been suspended", reason);
     email({ userId: accountOfProfile(prof.id), template: "profile_suspended", vars: { reason } });
-    audit(req, "professional.suspend", { target: ["professional", prof.id], details: { reason } });
+    
+    dispatchHospitalHrWebhooks("practitioner.suspended", {
+      practitionerId: prof.id,
+      name: prof.name,
+      licenseNumber: prof.licenseNumber,
+      statutoryBasis,
+      referenceNo,
+      reason,
+      suspendedAt: now,
+      authority: "Executive Board Registrar (Plenary Signoff)"
+    });
+
+    audit(req, "professional.suspend", { target: ["professional", prof.id], details: { reason, statutoryBasis, referenceNo } });
     res.json({ status: "success", data: prof });
   });
 

@@ -3,9 +3,10 @@ import { Activity, Loader, ChevronRight, AlertTriangle, HelpCircle } from 'lucid
 
 interface AISymptomMatcherProps {
   onSelectSpecialty: (specialty: string) => void;
+  onApplyTriage?: (triage: { specialty: string; symptoms: string; severity?: string; justification?: string }) => void;
 }
 
-export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcherProps) {
+export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: AISymptomMatcherProps) {
   const [symptoms, setSymptoms] = useState('');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('any');
@@ -37,6 +38,14 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
         setResult(data);
         if (data.data?.recommendedSpecialty) {
           onSelectSpecialty(data.data.recommendedSpecialty);
+          if (onApplyTriage) {
+            onApplyTriage({
+              specialty: data.data.recommendedSpecialty,
+              symptoms,
+              severity: data.data.symptomSeverity,
+              justification: data.data.clinicalJustification
+            });
+          }
         }
       } else {
         throw new Error(data.message || 'Failed to complete symptom matching.');
@@ -52,6 +61,14 @@ export default function AISymptomMatcher({ onSelectSpecialty }: AISymptomMatcher
   const handleApplyFilter = () => {
     if (result?.data?.recommendedSpecialty) {
       onSelectSpecialty(result.data.recommendedSpecialty);
+      if (onApplyTriage) {
+        onApplyTriage({
+          specialty: result.data.recommendedSpecialty,
+          symptoms,
+          severity: result.data.symptomSeverity,
+          justification: result.data.clinicalJustification
+        });
+      }
     }
   };
 

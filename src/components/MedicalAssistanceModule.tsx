@@ -130,8 +130,25 @@ const STATUS_DISPLAY: Record<string, { label: string; color: string; border: str
   closed: { label: 'Closed', color: 'text-slate-500', border: 'border-slate-200', bg: 'bg-slate-50' },
 };
 
-export default function MedicalAssistanceModule() {
-  const [activeTab, setActiveTab] = useState<'enquiry' | 'cases' | 'guide' | 'track'>('enquiry');
+export type AssistanceTab = 'enquiry' | 'cases' | 'guide' | 'track';
+
+interface MedicalAssistanceModuleProps {
+  embedded?: boolean;
+  activeTab?: AssistanceTab;
+  onTabChange?: (tab: AssistanceTab) => void;
+}
+
+export default function MedicalAssistanceModule({
+  embedded = false,
+  activeTab: controlledActiveTab,
+  onTabChange: setControlledActiveTab,
+}: MedicalAssistanceModuleProps = {}) {
+  const [internalActiveTab, setInternalActiveTab] = useState<AssistanceTab>('enquiry');
+  const activeTab = controlledActiveTab !== undefined ? controlledActiveTab : internalActiveTab;
+  const setActiveTab = (tab: AssistanceTab) => {
+    if (setControlledActiveTab) setControlledActiveTab(tab);
+    setInternalActiveTab(tab);
+  };
   const [selectedCurrency, setSelectedCurrency] = useState('MYR');
 
   // Cases List State
@@ -403,24 +420,26 @@ export default function MedicalAssistanceModule() {
   };
 
   return (
-    <div className="w-full bg-[color:var(--t-bg)] min-h-screen text-slate-800 pb-16">
+    <div className={embedded ? "w-full text-slate-800" : "w-full bg-[color:var(--t-bg)] min-h-screen text-slate-800 pb-16"}>
       {/* Module Header */}
-      <DashboardHeader
-        icon={HeartHandshake}
-        eyebrow="Clinical Logistics & Cross-Border Care"
-        title="Patient Enquiries, Assistance & Treatment Quotations"
-        description="Comprehensive clinical intake, itemized surgical & hospital quotations, and logistical assistance coordination for local Malaysian citizens, resident expatriates, and MHTC international medical travelers."
-        tabs={[
-          { id: 'enquiry', label: 'Request Treatment Quote', icon: FileText },
-          { id: 'cases', label: `My Inquiries & Quotes (${cases.length})`, icon: DollarSign },
-          { id: 'guide', label: 'Expat & Travel Care Guide', icon: Globe },
-          { id: 'track', label: 'Track Guest Inquiry', icon: Search },
-        ]}
-        activeTab={activeTab}
-        onTabChange={(t) => setActiveTab(t as any)}
-      />
+      {!embedded && (
+        <DashboardHeader
+          icon={HeartHandshake}
+          eyebrow="Clinical Logistics & Cross-Border Care"
+          title="Patient Enquiries, Assistance & Treatment Quotations"
+          description="Comprehensive clinical intake, itemized surgical & hospital quotations, and logistical assistance coordination for local Malaysian citizens, resident expatriates, and MHTC international medical travelers."
+          tabs={[
+            { id: 'enquiry', label: 'Request Treatment Quote', icon: FileText },
+            { id: 'cases', label: `My Inquiries & Quotes (${cases.length})`, icon: DollarSign },
+            { id: 'guide', label: 'Expat & Travel Care Guide', icon: Globe },
+            { id: 'track', label: 'Track Guest Inquiry', icon: Search },
+          ]}
+          activeTab={activeTab}
+          onTabChange={(t) => setActiveTab(t as any)}
+        />
+      )}
 
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className={embedded ? "space-y-6 pt-2" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
 
         {/* Global Currency & Fast Info Bar */}
         <div className="bg-white border border-[color:var(--t-200)] p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -493,7 +512,7 @@ export default function MedicalAssistanceModule() {
                     <button
                       type="button"
                       onClick={() => setActiveTab('cases')}
-                      className="px-3 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs uppercase cursor-pointer"
+                      className="px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white font-bold text-xs uppercase cursor-pointer shadow-xs"
                     >
                       View in My Inquiries & Quotes →
                     </button>
@@ -1039,7 +1058,7 @@ export default function MedicalAssistanceModule() {
                         <button
                           type="button"
                           onClick={() => openProformaDocument(selectedCase.id)}
-                          className="px-3 py-1.5 bg-slate-900 hover:bg-black text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
+                          className="px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-xs"
                         >
                           <Printer className="h-3.5 w-3.5" />
                           Official Pro-Forma Quote
@@ -1206,7 +1225,7 @@ export default function MedicalAssistanceModule() {
                                   type="button"
                                   onClick={() => handleQuoteDecision('accept')}
                                   disabled={decisionSubmitting}
-                                  className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-black uppercase cursor-pointer flex items-center gap-1.5 shadow-sm"
+                                  className="px-4 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-black uppercase cursor-pointer flex items-center gap-1.5 shadow-xs"
                                 >
                                   <CheckCircle2 className="h-4 w-4" />
                                   Accept Quotation
@@ -1424,7 +1443,7 @@ export default function MedicalAssistanceModule() {
               <button
                 type="submit"
                 disabled={trackingLoading}
-                className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-black uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2 shadow-xs"
               >
                 {trackingLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                 Lookup Case & Quotation
@@ -1449,7 +1468,7 @@ export default function MedicalAssistanceModule() {
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="px-3 py-1.5 bg-slate-900 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   <Printer className="h-3.5 w-3.5" /> Print / Save as PDF
                 </button>

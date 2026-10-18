@@ -379,6 +379,12 @@ export function registerPackagesRoutes(app: Application) {
 
     const result = pkgs.map(p => ({
       ...p,
+      name: p.title,
+      author: p.facility_name,
+      version: p.code || "1.0.0",
+      isEnabled: p.status === "published",
+      isRemovable: true,
+      icon: p.category === "Health Screening" ? "Heart" : p.category === "Cardiology" ? "Activity" : "Puzzle",
       priceMyr: p.price_sen / 100,
       originalPriceMyr: p.original_price_sen ? p.original_price_sen / 100 : null,
       inclusions: JSON.parse(p.inclusions || "[]"),
@@ -429,7 +435,10 @@ export function registerPackagesRoutes(app: Application) {
   // -----------------------------------------------------------
   // FACILITY / ADMIN: Publish & Manage Medical Packages
   // -----------------------------------------------------------
-  app.post("/api/packages", requireRole("facility", "admin"), (req: Request, res: Response) => {
+  app.post("/api/packages", requireRole("facility", "admin"), (req: Request, res: Response, next: any) => {
+    if (!req.body.title && req.body.name && !req.body.priceMyr && !req.body.price) {
+      if (typeof next === "function") return next();
+    }
     const facilityId = req.user!.facilityId || req.user!.profileId || req.body.facilityId || "fac-demo-1";
     const title = str(req.body.title, 150);
     const category = str(req.body.category, 60) || "Health Screening";
@@ -515,9 +524,35 @@ export function registerPackagesRoutes(app: Application) {
     res.json({ status: "success", message: "Medical package updated successfully." });
   });
 
-  app.delete("/api/packages/:id", requireRole("facility", "admin"), (req: Request, res: Response) => {
+  // Toggle enabled/published status
+  app.post("/api/packages/:id/toggle", requireRole("facility", "admin"), (req: Request, res: Response, next: any) => {
+    const pkg = db.prepare("SELECT * FROM medical_packages WHERE id = ?").get(req.params.id) as any;
+    if (!pkg) {
+      if (typeof next === "function") return next();
+      return fail(res, 404, "Medical package not found.");
+    }
+    const nextStatus = pkg.status === "published" ? "draft" : "published";
+    db.prepare("UPDATE medical_packages SET status = ?, updated_at = ? WHERE id = ?").run(nextStatus, iso(), req.params.id);
+    audit(req, "package.toggle", { target: ["package", req.params.id], details: { status: nextStatus } });
+    res.json({
+      status: "success",
+      message: `Package "${pkg.title}" is now ${nextStatus === "published" ? "enabled" : "disabled"}.`,
+      data: {
+        ...pkg,
+        name: pkg.title,
+        status: nextStatus,
+        isEnabled: nextStatus === "published",
+        priceMyr: pkg.price_sen / 100
+      }
+    });
+  });
+
+  app.delete("/api/packages/:id", requireRole("facility", "admin"), (req: Request, res: Response, next: any) => {
     const existing = db.prepare("SELECT * FROM medical_packages WHERE id = ?").get(req.params.id) as any;
-    if (!existing) return fail(res, 404, "Medical package not found.");
+    if (!existing) {
+      if (typeof next === "function") return next();
+      return fail(res, 404, "Medical package not found.");
+    }
 
     if (req.user!.role === "facility" && req.user!.facilityId && existing.facility_id !== req.user!.facilityId) {
       return fail(res, 403, "You can only delete packages for your own facility.");

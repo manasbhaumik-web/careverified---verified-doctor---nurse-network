@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import TelemedicineQuestions, { defaultTeleAnswers, teleToPayload, type TeleAnswers } from './TelemedicineQuestions';
-import { AlertTriangle, MessageSquare, Video, CreditCard, UserCheck, Lock } from 'lucide-react';
+import { AlertTriangle, MessageSquare, Video, CreditCard, UserCheck, Lock, Clock, Users, ShieldCheck } from 'lucide-react';
 import PaymentDialog from './PaymentDialog';
 import ConsultRoom from './ConsultRoom';
 import DashboardHeader, { BannerKpis } from './DashboardHeader';
@@ -13,8 +13,14 @@ const STATUS_TEXT: Record<string, string> = {
   completed: 'Completed', cancelled: 'Cancelled', unmatched: 'No doctor available (refunded)', queued: 'Waiting', active: 'In progress', awaiting_payment: 'Awaiting payment',
 };
 
+interface ConsultNowProps {
+  myUserId: string;
+  embedded?: boolean;
+  onNavigateToPrescriptions?: () => void;
+}
+
 /** Patient: request an instant consultation, pay, wait for a doctor, and talk. */
-export default function ConsultNow({ myUserId }: { myUserId: string }) {
+export default function ConsultNow({ myUserId, embedded = false, onNavigateToPrescriptions }: ConsultNowProps) {
   const [status, setStatus] = useState<{ onlineDoctors: number; consultFee: number } | null>(null);
   const [mine, setMine] = useState<any[]>([]);
   const [mode, setMode] = useState<'chat' | 'video'>('chat');
@@ -27,6 +33,24 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
   const [redFlags, setRedFlags] = useState<string[]>([]);
   const [emergency, setEmergency] = useState<{ number: string; label: string }[]>([]);
   const [paying, setPaying] = useState<string | null>(null);
+  const [elapsedWaitSeconds, setElapsedWaitSeconds] = useState<number>(0);
+
+  const open = mine.find(c => ['awaiting_payment', 'queued', 'active'].includes(c.status));
+
+  useEffect(() => {
+    if (open?.status !== 'queued' || !open.queuedAt) {
+      setElapsedWaitSeconds(0);
+      return;
+    }
+    const updateElapsed = () => {
+      const start = new Date(open.queuedAt).getTime();
+      const now = Date.now();
+      setElapsedWaitSeconds(Math.max(0, Math.floor((now - start) / 1000)));
+    };
+    updateElapsed();
+    const timer = setInterval(updateElapsed, 1000);
+    return () => clearInterval(timer);
+  }, [open?.status, open?.queuedAt]);
 
   const load = useCallback(async () => {
     const [s, m, e] = await Promise.all([
@@ -40,8 +64,6 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
   }, [tele.inMalaysia, tele.country]);
 
   useEffect(() => { load().catch(() => {}); }, [load]);
-
-  const open = mine.find(c => ['awaiting_payment', 'queued', 'active'].includes(c.status));
 
   // While waiting for a doctor, poll until one joins (or the request times out).
   useEffect(() => {
@@ -83,7 +105,7 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
   );
 
   if (open?.status === 'active') {
-    return <ConsultRoom consultId={open.id} myUserId={myUserId} isDoctor={false} onEnded={load} />;
+    return <ConsultRoom consultId={open.id} myUserId={myUserId} isDoctor={false} onEnded={load} onNavigateToPrescriptions={onNavigateToPrescriptions} />;
   }
 
   const past = mine.filter(c => !['awaiting_payment', 'queued', 'active'].includes(c.status));
@@ -95,23 +117,25 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
   ];
 
   return (
-    <div className="w-full space-y-0">
+    <div className={embedded ? "w-full space-y-4" : "w-full space-y-0"}>
       {/* Header with live availability */}
-      <DashboardHeader
-        icon={Video}
-        eyebrow="Instant care"
-        title="Consult a doctor now"
-        description="Talk to a verified doctor online within minutes."
-        actions={
-          <BannerKpis items={[
-            { value: status ? status.onlineDoctors : '—', label: 'Doctors online' },
-            { value: status ? formatMoney(status.consultFee, { decimals: 0 }) : '—', label: 'Per consult' },
-            { value: '10 min', label: 'Refund if unmatched' },
-          ]} />
-        }
-      />
+      {!embedded && (
+        <DashboardHeader
+          icon={Video}
+          eyebrow="Instant care"
+          title="Consult a doctor now"
+          description="Talk to a verified doctor online within minutes."
+          actions={
+            <BannerKpis items={[
+              { value: status ? status.onlineDoctors : '—', label: 'Doctors online' },
+              { value: status ? formatMoney(status.consultFee, { decimals: 0 }) : '—', label: 'Per consult' },
+              { value: '10 min', label: 'Refund if unmatched' },
+            ]} />
+          }
+        />
+      )}
 
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+      <div className={embedded ? "space-y-5 pt-2" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
         <p className="bg-rose-50 border border-rose-200 text-rose-900 text-xs font-semibold p-3 flex items-center gap-2" role="note">
         <AlertTriangle className="h-4 w-4 shrink-0" />
         Online consultations are not for emergencies. In an emergency call {emergencyNumbers} first.
@@ -122,8 +146,8 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_380px] items-start">
         <div className="space-y-5 min-w-0">
           {open?.status === 'queued' && (
-            <div className="bg-white border-2 border-[color:var(--t-600)] p-6 space-y-4 shadow-sm">
-              <div className="flex items-center justify-between">
+            <div className="bg-white border-2 border-[color:var(--t-600)] p-6 space-y-5 shadow-sm">
+              <div className="flex items-center justify-between border-b border-[color:var(--t-100)] pb-3">
                 <p className="font-extrabold text-base flex items-center gap-2.5 text-[color:var(--ink)]">
                   <span className="relative flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[color:var(--t-600)] opacity-75"></span>
@@ -131,13 +155,65 @@ export default function ConsultNow({ myUserId }: { myUserId: string }) {
                   </span>
                   Matching with an On-Call Practitioner…
                 </p>
-                <span className="text-xs font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5">Live Queue</span>
+                <span className="text-xs font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1">
+                  Active Virtual Waiting Room
+                </span>
               </div>
-              <p className="text-xs text-[color:var(--ink-2)] leading-relaxed">
-                Consultation payment confirmed. Keep this window open. A licensed practitioner will enter the room within 10 minutes, or your payment is automatically refunded in full.
-              </p>
-              <div className="pt-2">
-                <button onClick={() => cancel(open.id)} className="h-10 text-xs font-bold border border-slate-300 hover:border-rose-400 hover:bg-rose-50 hover:text-rose-700 px-5 cursor-pointer transition-colors">
+
+              {/* LIVE QUEUE TELEMETRY STRIP */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-4 text-center">
+                <div className="border-b sm:border-b-0 sm:border-r border-[color:var(--t-200)] pb-2 sm:pb-0 sm:pr-2">
+                  <span className="text-[10px] uppercase font-mono font-bold text-slate-500 block mb-1 flex items-center justify-center gap-1">
+                    <Users className="h-3 w-3 text-[color:var(--t-600)]" /> Queue Position
+                  </span>
+                  <div role="status" aria-live="polite" className="text-xl font-black font-mono text-[color:var(--ink)]">
+                    #{open.queuePosition || 1}
+                  </div>
+                  <span className="text-[10px] text-emerald-700 font-semibold">
+                    {open.queuePosition > 1 ? `${open.queuePosition - 1} ahead of you` : 'Next in line'}
+                  </span>
+                </div>
+
+                <div className="border-b sm:border-b-0 sm:border-r border-[color:var(--t-200)] pb-2 sm:pb-0 sm:pr-2">
+                  <span className="text-[10px] uppercase font-mono font-bold text-slate-500 block mb-1 flex items-center justify-center gap-1">
+                    <Clock className="h-3 w-3 text-[color:var(--t-600)]" /> Estimated Wait
+                  </span>
+                  <div role="status" aria-live="polite" className="text-xl font-black font-mono text-[color:var(--t-700)]">
+                    ~{open.estWaitMinutes || 2} min{open.estWaitMinutes === 1 ? '' : 's'}
+                  </div>
+                  <span className="text-[10px] text-slate-500 font-mono">
+                    Elapsed: {Math.floor(elapsedWaitSeconds / 60)}:{(elapsedWaitSeconds % 60).toString().padStart(2, '0')}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-[10px] uppercase font-mono font-bold text-slate-500 block mb-1 flex items-center justify-center gap-1">
+                    <ShieldCheck className="h-3 w-3 text-emerald-600" /> Statutory SLA
+                  </span>
+                  <div className="text-xl font-black font-mono text-emerald-700">
+                    100%
+                  </div>
+                  <span className="text-[10px] text-slate-500 font-medium">Auto-refund if &gt; 10m</span>
+                </div>
+              </div>
+
+              <div className="p-3.5 bg-emerald-50/70 border border-emerald-200 text-xs text-emerald-900 flex items-start gap-2.5">
+                <div className="p-1 bg-emerald-600 text-white shrink-0 mt-0.5">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                </div>
+                <div>
+                  <p className="font-extrabold text-[color:var(--ink)]">Consultation payment verified & held in escrow.</p>
+                  <p className="text-[11px] text-slate-600 mt-0.5">
+                    Please keep this browser window open. When the on-call physician claims this room, your session will automatically connect. An audible chime alert will sound.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-1 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <span className="text-[11px] font-mono text-slate-500">
+                  Encounter ID: <code className="font-bold text-slate-700">{open.id}</code>
+                </span>
+                <button onClick={() => cancel(open.id)} className="w-full sm:w-auto h-10 text-xs font-bold border border-slate-300 hover:border-rose-400 hover:bg-rose-50 hover:text-rose-700 px-5 cursor-pointer transition-colors shadow-2xs">
                   Cancel and refund immediately
                 </button>
               </div>

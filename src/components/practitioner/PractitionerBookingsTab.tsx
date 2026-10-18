@@ -319,7 +319,7 @@ export default function PractitionerBookingsTab({
                 <button
                   type="submit"
                   disabled={savingNurseLog}
-                  className="bg-emerald-600 hover:bg-emerald-700 border border-emerald-700 disabled:bg-slate-300 text-white text-xs font-black px-6 py-2 rounded-none transition-all flex items-center gap-1.5 cursor-pointer shadow-3xs"
+                  className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-black px-6 py-2 rounded-none transition-all flex items-center gap-1.5 cursor-pointer shadow-3xs"
                 >
                   {savingNurseLog ? (
                     <>
@@ -551,11 +551,7 @@ export default function PractitionerBookingsTab({
                     {isUpcoming && (
                       <button
                         onClick={() => onStartPrescription(booking)}
-                        className={`text-white text-[10px] font-black py-2 px-4 rounded-none transition-all cursor-pointer flex items-center gap-1 shadow-3xs ${
-                          isDoc
-                            ? 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)]'
-                            : 'bg-emerald-600 hover:bg-emerald-700 border border-emerald-700'
-                        }`}
+                        className="text-white text-[10px] font-black py-2 px-4 rounded-none transition-all cursor-pointer flex items-center gap-1 shadow-3xs bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)]"
                       >
                         {isDoc ? (
                           <>

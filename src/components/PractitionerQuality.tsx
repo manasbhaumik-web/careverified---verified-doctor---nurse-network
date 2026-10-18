@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Award, ClipboardCheck, Flag, GraduationCap, ShieldAlert, Star } from 'lucide-react';
+import WorkspaceHeader from './WorkspaceHeader';
+import { BannerBadge } from './DashboardHeader';
 
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -32,17 +34,50 @@ export default function PractitionerQuality({ profileId, embedded = false }: { p
 
   const say = (ok: boolean, text: string) => setMsg({ ok, text });
 
-  if (!profileId) return <p className="bg-amber-50 border border-amber-200 text-amber-900 text-sm font-semibold p-5 max-w-2xl">Submit your credentials in the Practitioner Portal first. Quality tools open once you have a profile.</p>;
+  if (!profileId) {
+    return (
+      <div className={embedded ? "space-y-6 w-full" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
+        <WorkspaceHeader
+          icon={Award}
+          eyebrow="Continuous Professional Development · Audit"
+          title="Quality Assurance, CPD Points & Peer Reviews"
+          description="Log verified CPD education credits, submit peer clinical audits, and review regulatory practice compliance with the medical council."
+          badges={<BannerBadge tone="brand">MMC CPD Accredited</BannerBadge>}
+        />
+        <p className="bg-amber-50 border border-amber-200 text-amber-900 text-sm font-semibold p-5 max-w-2xl">
+          Submit your credentials in the Practitioner Portal first. Quality tools open once you have a profile.
+        </p>
+      </div>
+    );
+  }
 
-  const tabs = [['reviews', 'Ratings & reviews', Star], ['cpd', 'CPD & certificates', GraduationCap], ['peer', 'Peer review', ClipboardCheck], ['incidents', 'Report an incident', ShieldAlert]] as const;
   return (
     <div className={embedded ? "space-y-6 w-full" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
-      <div role="tablist" className="flex flex-wrap gap-2 border-b border-[color:var(--t-200)] pb-2">
-        {tabs.map(([id, text, Icon]) => (
-          <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setMsg(null); }}
-            className={`px-4 py-2.5 text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors ${tab === id ? 'bg-[color:var(--t-600)] text-white shadow-xs' : 'bg-white border border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'}`}><Icon className="h-4 w-4" /> {text}</button>
-        ))}
-      </div>
+      <WorkspaceHeader
+        icon={Award}
+        eyebrow="Continuous Professional Development · Audit"
+        title="Quality Assurance, CPD Points & Peer Reviews"
+        description="Log verified CPD education credits, submit peer clinical audits, and review regulatory practice compliance with the medical council."
+        badges={
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <BannerBadge tone="brand">MMC CPD Accredited</BannerBadge>
+            {cred && (
+              <BannerBadge tone="success">
+                {cred.pointsApproved ?? 0} / {cred.target ?? 50} CPD Points
+              </BannerBadge>
+            )}
+          </div>
+        }
+        tabs={[
+          { id: 'reviews', label: 'Ratings & Reviews', icon: Star, count: cred?.reviews?.count },
+          { id: 'cpd', label: 'CPD & Certificates', icon: GraduationCap },
+          { id: 'peer', label: 'Peer Review', icon: ClipboardCheck },
+          { id: 'incidents', label: 'Report Incident', icon: ShieldAlert },
+        ]}
+        activeTab={tab}
+        onTabChange={(id) => { setTab(id as any); setMsg(null); }}
+        tabsLabel="Quality Assurance and CPD Sections"
+      />
       {msg && <p role="status" className={`text-xs font-bold p-3 border ${msg.ok ? 'text-emerald-800 bg-emerald-50 border-emerald-200' : 'text-rose-800 bg-rose-50 border-rose-200'}`}>{msg.text}</p>}
 
       {tab === 'reviews' && (

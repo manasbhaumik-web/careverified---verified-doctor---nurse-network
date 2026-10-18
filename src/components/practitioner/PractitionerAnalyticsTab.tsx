@@ -2,6 +2,8 @@ import React from 'react';
 import { TrendingUp, Star } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking, OnCallDispatch, ConsultationMode } from '../../types';
 import { formatMoney } from '../../locale';
+import WorkspaceHeader from '../WorkspaceHeader';
+import { BannerBadge } from '../DashboardHeader';
 
 interface PractitionerAnalyticsTabProps {
   matchedProfile: DoctorProfile | NurseProfile;
@@ -31,6 +33,18 @@ export default function PractitionerAnalyticsTab({
 
   return (
     <div id="panel-analytics" role="tabpanel" aria-labelledby="tab-analytics" tabIndex={0} className="space-y-6 animate-fade-in">
+      <WorkspaceHeader
+        icon={TrendingUp}
+        eyebrow="Practice Intelligence & Clinical Metrics · Analytics"
+        title="Consultation Analytics, Patient Volume & Clinical Performance"
+        description="Comprehensive clinical workload insights, completed consultation trends, revenue distribution, and patient satisfaction ratings."
+        badges={
+          <>
+            <BannerBadge tone="brand">Practice Intelligence</BannerBadge>
+            <BannerBadge tone="success">100% Payout Rate</BannerBadge>
+          </>
+        }
+      />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
           <span className="text-[13px] font-semibold text-[color:var(--ink-2)] block">Generated Income</span>

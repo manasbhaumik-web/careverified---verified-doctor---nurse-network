@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { ShieldAlert } from 'lucide-react';
 import { MACROS, MACRO_LANGS, fillMacro, type MacroLang, type SupportHours } from '../supportMy';
 import AdminPartners from './AdminPartners';
+import { TestimonialAdmin } from './TestimonialPanels';
 
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -9,22 +11,57 @@ const lab = 'text-[10px] font-extrabold uppercase tracking-wider text-slate-500'
 const btn = 'text-xs font-bold cursor-pointer';
 const field = 'border border-slate-200 px-3 py-2 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
 
-type Sub = 'support' | 'partners' | 'reviews' | 'incidents' | 'peer' | 'credentials';
+export type QualitySubTab = 'support' | 'partners' | 'reviews' | 'incidents' | 'peer' | 'credentials';
+
+export const QUALITY_SUBS: { id: QualitySubTab; label: string }[] = [
+  { id: 'support', label: 'Support Desk' },
+  { id: 'partners', label: 'Partner Enquiries' },
+  { id: 'reviews', label: 'Reviews & Testimonials' },
+  { id: 'incidents', label: 'Incidents' },
+  { id: 'peer', label: 'Peer Review & Audits' },
+  { id: 'credentials', label: 'CPD & Certificates' },
+];
+
+export interface AdminQualityProps {
+  activeSub?: QualitySubTab;
+  onSubChange?: (sub: QualitySubTab) => void;
+  hideHeaderTabs?: boolean;
+}
 
 /** Admin quality and safety: support queue with response targets, review moderation, incidents, peer review, credentials. */
-export default function AdminQuality() {
-  const [sub, setSub] = useState<Sub>('support');
+export default function AdminQuality({
+  activeSub,
+  onSubChange,
+  hideHeaderTabs = false,
+}: AdminQualityProps = {}) {
+  const [internalSub, setInternalSub] = useState<QualitySubTab>('support');
+  const sub = activeSub ?? internalSub;
+  const setSub = (newSub: QualitySubTab) => {
+    if (onSubChange) onSubChange(newSub);
+    else setInternalSub(newSub);
+  };
   const [msg, setMsg] = useState('');
-  const subs: [Sub, string][] = [['support', 'Support desk'], ['partners', 'Partner enquiries'], ['reviews', 'Review moderation'], ['incidents', 'Incidents'], ['peer', 'Peer review & audits'], ['credentials', 'CPD & certificates']];
+
   return (
     <div className="space-y-4 text-slate-800">
-      <div role="tablist" className="flex flex-wrap gap-1 border-b border-slate-200">
-        {subs.map(([id, text]) => (
-          <button key={id} role="tab" aria-selected={sub === id} onClick={() => { setSub(id); setMsg(''); }}
-            className={`px-3 py-2.5 text-xs font-bold cursor-pointer ${sub === id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-500'}`}>{text}</button>
-        ))}
-      </div>
-      {msg && <p role="status" className="text-xs font-bold bg-slate-50 border border-slate-200 p-2.5">{msg}</p>}
+      {!hideHeaderTabs && (
+        <div role="tablist" className="flex flex-wrap gap-1 border-b border-slate-200">
+          {QUALITY_SUBS.map(t => (
+            <button
+              key={t.id}
+              role="tab"
+              aria-selected={sub === t.id}
+              onClick={() => { setSub(t.id); setMsg(''); }}
+              className={`px-3 py-2.5 text-xs font-bold cursor-pointer rounded-none ${
+                sub === t.id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
+      {msg && <p role="status" className="text-xs font-bold bg-slate-50 border border-slate-200 rounded-none p-2.5">{msg}</p>}
       {sub === 'support' && <Support say={setMsg} />}
       {sub === 'partners' && <AdminPartners say={setMsg} />}
       {sub === 'reviews' && <Reviews say={setMsg} />}
@@ -89,6 +126,7 @@ function Support({ say }: { say: (t: string) => void }) {
 }
 
 function Reviews({ say }: { say: (t: string) => void }) {
+  const [mode, setMode] = useState<'practitioner_reviews' | 'testimonials'>('practitioner_reviews');
   const [filter, setFilter] = useState<'reported' | 'all'>('reported');
   const [list, setList] = useState<any[]>([]);
   const load = useCallback(() => fetch(`/api/admin/reviews${filter === 'reported' ? '?filter=reported' : ''}`).then(r => r.json()).then(d => d.status === 'success' && setList(d.data)), [filter]);
@@ -98,22 +136,68 @@ function Reviews({ say }: { say: (t: string) => void }) {
     const d = await jreq(`/api/admin/reviews/${id}/moderate`, 'POST', { action, reason }); say(d.status === 'success' ? 'Decision recorded.' : d.message); load();
   };
   return (
-    <div className="space-y-3">
-      <div className="flex gap-2 text-xs font-bold">{(['reported', 'all'] as const).map(v => <button key={v} onClick={() => setFilter(v)} className={`px-3 py-1.5 cursor-pointer ${filter === v ? 'bg-[color:var(--t-600)] text-white' : 'bg-slate-100'}`}>{v === 'reported' ? 'Reported by practitioners' : 'All reviews'}</button>)}</div>
-      {list.length === 0 && <p className="text-xs text-slate-500 bg-white border border-slate-200 p-4">Nothing to moderate.</p>}
-      {list.map(r => (
-        <article key={r.id} className="bg-white border border-slate-200 p-4 text-sm space-y-1">
-          <p className="font-bold">{r.professionalName} · {'★'.repeat(r.rating)} <span className="text-xs text-slate-500 font-normal">by {r.patientName} · {r.date} · {r.status ?? 'published'}</span></p>
-          {r.comment && <p>{r.comment}</p>}
-          {r.reportedAt && <p className="text-xs bg-amber-50 border border-amber-200 p-2">Reported: {r.reportReason}</p>}
-          {r.moderatedAt && <p className="text-xs text-slate-500">Decided: {r.moderationReason}</p>}
-          <div className="flex gap-4 pt-1">
-            {r.status !== 'hidden' && <button className={`${btn} text-rose-700`} onClick={() => decide(r.id, 'hide')}>Remove</button>}
-            {r.reportedAt && !r.moderatedAt && <button className={btn} onClick={() => decide(r.id, 'keep')}>Keep</button>}
-            {r.status === 'hidden' && <button className={`${btn} text-emerald-700`} onClick={() => decide(r.id, 'restore')}>Restore</button>}
+    <div className="space-y-4">
+      {/* Moderation Stream Switcher */}
+      <div className="flex gap-2 border-b border-slate-200 pb-2">
+        <button
+          type="button"
+          onClick={() => setMode('practitioner_reviews')}
+          className={`px-3 py-1.5 text-xs font-bold rounded-none cursor-pointer border ${
+            mode === 'practitioner_reviews'
+              ? 'bg-[color:var(--t-600)] border-[color:var(--t-700)] text-white shadow-xs'
+              : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+          }`}
+        >
+          Practitioner Reviews Moderation
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('testimonials')}
+          className={`px-3 py-1.5 text-xs font-bold rounded-none cursor-pointer border ${
+            mode === 'testimonials'
+              ? 'bg-[color:var(--t-600)] border-[color:var(--t-700)] text-white shadow-xs'
+              : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+          }`}
+        >
+          Patient Testimonials (Landing Page)
+        </button>
+      </div>
+
+      {mode === 'testimonials' ? (
+        <TestimonialAdmin className="border-0 p-0 shadow-none" />
+      ) : (
+        <div className="space-y-3">
+          <div className="flex gap-2 text-xs font-bold">
+            {(['reported', 'all'] as const).map(v => (
+              <button
+                key={v}
+                onClick={() => setFilter(v)}
+                className={`px-3 py-1.5 cursor-pointer rounded-none border ${
+                  filter === v
+                    ? 'bg-[color:var(--t-600)] border-[color:var(--t-700)] text-white shadow-xs'
+                    : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                {v === 'reported' ? 'Reported by practitioners' : 'All reviews'}
+              </button>
+            ))}
           </div>
-        </article>
-      ))}
+          {list.length === 0 && <p className="text-xs text-slate-500 bg-white border border-slate-200 rounded-none p-4">Nothing to moderate.</p>}
+          {list.map(r => (
+            <article key={r.id} className="bg-white border border-slate-200 rounded-none p-4 text-sm space-y-1">
+              <p className="font-bold">{r.professionalName} · {'★'.repeat(r.rating)} <span className="text-xs text-slate-500 font-normal">by {r.patientName} · {r.date} · {r.status ?? 'published'}</span></p>
+              {r.comment && <p>{r.comment}</p>}
+              {r.reportedAt && <p className="text-xs bg-amber-50 border border-amber-200 rounded-none p-2">Reported: {r.reportReason}</p>}
+              {r.moderatedAt && <p className="text-xs text-slate-500">Decided: {r.moderationReason}</p>}
+              <div className="flex gap-4 pt-1">
+                {r.status !== 'hidden' && <button className={`${btn} text-rose-700`} onClick={() => decide(r.id, 'hide')}>Remove</button>}
+                {r.reportedAt && !r.moderatedAt && <button className={btn} onClick={() => decide(r.id, 'keep')}>Keep</button>}
+                {r.status === 'hidden' && <button className={`${btn} text-emerald-700`} onClick={() => decide(r.id, 'restore')}>Restore</button>}
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -136,10 +220,35 @@ function Incidents({ say }: { say: (t: string) => void }) {
           <p>{i.description}</p>
           {i.relatedType && <p className="text-[11px] text-slate-500">Related {i.relatedType}: {i.relatedId}</p>}
           <details className="text-xs"><summary className="cursor-pointer font-bold">Timeline ({i.events.length})</summary><ul className="mt-1 space-y-1">{i.events.map((e: any, k: number) => <li key={k}>{when(e.ts)} · <b>{e.action}</b>{e.actor ? ` · ${e.actor}` : ''}{e.note ? ` · ${e.note}` : ''}</li>)}</ul></details>
-          {(i.status === 'new' || i.status === 'investigating') && <div className="flex gap-4 pt-1">
-            {i.status === 'new' && <button className={btn} onClick={() => update(i.id, 'investigating')}>Start investigation</button>}
-            <button className={`${btn} text-emerald-700`} onClick={() => update(i.id, 'resolved')}>Resolve</button>
-            <button className={btn} onClick={() => update(i.id, 'closed')}>Close</button></div>}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+            {(i.status === 'new' || i.status === 'investigating') ? (
+              <div className="flex items-center gap-3">
+                {i.status === 'new' && <button className={`${btn} text-[color:var(--t-700)] hover:underline`} onClick={() => update(i.id, 'investigating')}>Start investigation</button>}
+                <button className={`${btn} text-emerald-700 hover:underline`} onClick={() => update(i.id, 'resolved')}>Resolve</button>
+                <button className={`${btn} text-slate-600 hover:underline`} onClick={() => update(i.id, 'closed')}>Close</button>
+              </div>
+            ) : <div />}
+            <button
+              type="button"
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('medcred-admin-nav', {
+                  detail: {
+                    group: 'registry',
+                    tab: 'trust',
+                    sub: 'complaints',
+                    practitionerId: i.relatedId,
+                    incidentId: i.id,
+                    incidentReason: i.description
+                  }
+                }));
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold uppercase tracking-wider rounded-none cursor-pointer transition-colors"
+              title="Escalate incident directly to Trust Watchlist & Complaints"
+            >
+              <ShieldAlert className="h-3.5 w-3.5 text-amber-700" />
+              <span>Escalate to Trust Watchlist</span>
+            </button>
+          </div>
         </article>
       ))}
     </div>

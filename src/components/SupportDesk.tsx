@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { TestimonialForm } from './TestimonialPanels';
 import { AlertTriangle, LifeBuoy } from 'lucide-react';
-import DashboardHeader from './DashboardHeader';
+import DashboardHeader, { BannerBadge } from './DashboardHeader';
 import PractitionerHeroBanner from './PractitionerHeroBanner';
 import PatientHeroBanner from './PatientHeroBanner';
+import WorkspaceHeader from './WorkspaceHeader';
 import { useLocale } from '../locale/store';
 
 const jpost = (url: string, body?: unknown) =>
@@ -108,6 +109,13 @@ export default function SupportDesk({
       )}
 
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+        <WorkspaceHeader
+          icon={LifeBuoy}
+          eyebrow="Care Assistance & Resolution · 24/7 Support Desk"
+          title="MedCred Support Desk & Help Center"
+          description="Submit inquiries, report clinical issues, track ticket resolution SLAs, and contact our operations team."
+          badges={<BannerBadge tone="brand">Priority Response</BannerBadge>}
+        />
         {hours && (
           <p role="status" className={`text-xs font-semibold border p-3 ${hours.open ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
             {hours.open ? 'Our team is online now.' : `Our team is away. We will reply from ${new Date(hours.nextChange).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur', weekday: 'short', hour: '2-digit', minute: '2-digit' })} Malaysia time.`}

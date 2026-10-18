@@ -19,18 +19,32 @@ function Qr({ text }: { text: string }) {
 
 export type RecordSubTab = 'overview' | 'vitals' | 'rx' | 'docs' | 'labs' | 'notes' | 'sharing';
 
+export interface PatientRecordsProps {
+  initialTab?: RecordSubTab;
+  activeSubTab?: RecordSubTab;
+  onSubTabChange?: (tab: RecordSubTab) => void;
+  hideHeaderTabs?: boolean;
+}
+
 /** The patient's own health record: allergies, conditions, medicines, readings, prescriptions, certificates, referrals, labs, sharing. */
-export default function PatientRecords({ initialTab }: { initialTab?: RecordSubTab } = {}) {
+export default function PatientRecords({
+  initialTab,
+  activeSubTab,
+  onSubTabChange,
+  hideHeaderTabs = false,
+}: PatientRecordsProps = {}) {
   const [data, setData] = useState<any | null>(null);
-  const [tab, setTab] = useState<RecordSubTab>(initialTab || 'overview');
+  const [tab, setTab] = useState<RecordSubTab>(activeSubTab || initialTab || 'overview');
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [pharmacies, setPharmacies] = useState<any[]>([]);
 
   useEffect(() => {
-    if (initialTab) {
+    if (activeSubTab) {
+      setTab(activeSubTab);
+    } else if (initialTab) {
       setTab(initialTab);
     }
-  }, [initialTab]);
+  }, [activeSubTab, initialTab]);
 
   const load = useCallback(async () => {
     const d = await fetch('/api/records/me').then(r => r.json());
@@ -63,14 +77,16 @@ export default function PatientRecords({ initialTab }: { initialTab?: RecordSubT
 
   return (
     <div className="space-y-4">
-      <div role="tablist" className="flex flex-wrap gap-1 border-b border-slate-200">
-        {tabs.map(([id, text, Icon]) => (
-          <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setMsg(null); }}
-            className={`px-3 py-2.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer ${tab === id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-500'}`}>
-            <Icon className="h-3.5 w-3.5" /> {text}
-          </button>
-        ))}
-      </div>
+      {!hideHeaderTabs && (
+        <div role="tablist" className="flex flex-wrap gap-1 border-b border-slate-200">
+          {tabs.map(([id, text, Icon]) => (
+            <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setMsg(null); onSubTabChange?.(id); }}
+              className={`px-3 py-2.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer ${tab === id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-500'}`}>
+              <Icon className="h-3.5 w-3.5" /> {text}
+            </button>
+          ))}
+        </div>
+      )}
       {msg && (
         <div
           role="status"

@@ -12,6 +12,7 @@ interface SavedTabProps {
   onNavigateToMessages: () => void;
   onSelectProfessional: (id: string) => void;
   onVerifyCredentials: (p: DoctorProfile | NurseProfile) => void;
+  hideHeader?: boolean;
 }
 
 export default function SavedTab({
@@ -19,7 +20,8 @@ export default function SavedTab({
   onRemoveSaved,
   onNavigateToMessages,
   onSelectProfessional,
-  onVerifyCredentials
+  onVerifyCredentials,
+  hideHeader = false,
 }: SavedTabProps) {
 
   const containerVariants = {
@@ -38,18 +40,20 @@ export default function SavedTab({
   return (
     <div className="space-y-6" id="patient-saved-tab-root">
       {/* Header Panel */}
-      <div className="border-b border-[color:var(--t-200)] pb-4">
-        <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-600)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-1 mb-2 shadow-2xs">
-          Clinical Network Directory
-        </span>
-        <h3 className="font-display font-black text-xl text-[color:var(--ink)] tracking-tight flex items-center gap-2">
-          <Heart className="h-5 w-5 text-rose-500 fill-rose-500" />
-          Saved Clinical Specialists
-        </h3>
-        <p className="text-xs text-slate-600 font-medium mt-1">
-          Recall trusted providers instantly for immediate chat, streamlined scheduling, or registry checks.
-        </p>
-      </div>
+      {!hideHeader && (
+        <div className="border-b border-[color:var(--t-200)] pb-4">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-600)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-1 mb-2 shadow-2xs">
+            Clinical Network Directory
+          </span>
+          <h3 className="font-display font-black text-xl text-[color:var(--ink)] tracking-tight flex items-center gap-2">
+            <Heart className="h-5 w-5 text-rose-500 fill-rose-500" />
+            Saved Clinical Specialists
+          </h3>
+          <p className="text-xs text-slate-600 font-medium mt-1">
+            Recall trusted providers instantly for immediate chat, streamlined scheduling, or registry checks.
+          </p>
+        </div>
+      )}
 
       {savedProfessionals.length === 0 ? (
         <motion.div 

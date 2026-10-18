@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShieldCheck } from 'lucide-react';
+import { UserAvatar } from '../avatars';
 
 export interface DashboardTab<T extends string = string> {
   id: T;
@@ -186,6 +187,8 @@ export function BannerRow({ identity, aside }: { identity: React.ReactNode; asid
 interface BannerIdentityProps {
   name: React.ReactNode;
   avatarUrl?: string | null;
+  /** Role of the entity for smart failover avatar if avatarUrl fails to load */
+  role?: string;
   /** Used instead of a photo or initials for pages that are not about a person. */
   icon?: React.ComponentType<{ className?: string }>;
   /** Heading level; h1 for a page's primary banner. */
@@ -200,17 +203,23 @@ interface BannerIdentityProps {
   meta?: React.ReactNode;
 }
 
-export function BannerIdentity({ name, avatarUrl, icon: Icon, as: Heading = 'h2', description, avatarBadge, badges, meta }: BannerIdentityProps) {
+export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading = 'h2', description, avatarBadge, badges, meta }: BannerIdentityProps) {
   const initials = typeof name === 'string' ? name.replace(/^Dr\.?\s+/i, '').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() : '';
   return (
     <div className="flex items-center gap-3 sm:gap-5 min-w-0">
       <div className="relative shrink-0">
-        {avatarUrl ? (
-          <img src={avatarUrl} alt={typeof name === 'string' ? name : ''} className="h-14 w-14 sm:h-20 sm:w-20 rounded-full object-cover border-2 border-white shadow-xs" referrerPolicy="no-referrer" />
-        ) : (
+        {Icon ? (
           <div aria-hidden="true" className="h-14 w-14 sm:h-20 sm:w-20 rounded-2xl border-2 border-white shadow-xs bg-white text-[color:var(--t-700)] flex items-center justify-center text-lg sm:text-2xl font-bold">
-            {Icon ? <Icon className="h-6 w-6 sm:h-8 sm:w-8" /> : initials || '?'}
+            <Icon className="h-6 w-6 sm:h-8 sm:w-8" />
           </div>
+        ) : (
+          <UserAvatar 
+            src={avatarUrl} 
+            role={role} 
+            alt={typeof name === 'string' ? name : 'User profile'} 
+            className="h-14 w-14 sm:h-20 sm:w-20 rounded-full object-cover border-2 border-white shadow-xs" 
+            referrerPolicy="no-referrer" 
+          />
         )}
         {avatarBadge}
       </div>
@@ -226,11 +235,18 @@ export function BannerIdentity({ name, avatarUrl, icon: Icon, as: Heading = 'h2'
   );
 }
 
-/** Pill used beside the name: neutral (brand) or success. */
-export function BannerBadge({ tone = 'brand', children }: { tone?: 'brand' | 'success'; children: React.ReactNode }) {
-  return tone === 'success' ? (
-    <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none flex items-center gap-1 shadow-2xs">{children}</span>
-  ) : (
+/** Pill used beside the name: brand, success, neutral, or warning. */
+export function BannerBadge({ tone = 'brand', children }: { tone?: 'brand' | 'success' | 'neutral' | 'warning'; children: React.ReactNode }) {
+  if (tone === 'success') {
+    return <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none flex items-center gap-1 shadow-2xs">{children}</span>;
+  }
+  if (tone === 'neutral') {
+    return <span className="bg-slate-50 text-slate-700 border border-slate-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none flex items-center gap-1 shadow-2xs">{children}</span>;
+  }
+  if (tone === 'warning') {
+    return <span className="bg-amber-50 text-amber-800 border border-amber-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none flex items-center gap-1 shadow-2xs">{children}</span>;
+  }
+  return (
     <span className="bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none shadow-2xs">{children}</span>
   );
 }

@@ -30,7 +30,7 @@ export const INITIAL_DOCTORS: DoctorProfile[] = [
   {
     id: "doc-2",
     name: "Dr. Tan Seng Hock",
-    avatar: "/assets/malaysian_male_doctor.jpg",
+    avatar: "/assets/doctor_male_chinese.jpg",
     role: UserRole.DOCTOR,
     specialization: "Pediatrician",
     licenseNumber: "DEMO-MMC-32109",
@@ -134,7 +134,7 @@ export const INITIAL_NURSES: NurseProfile[] = [
   {
     id: "nur-2",
     name: "Karthik Loganathan",
-    avatar: "/assets/malaysian_male_patient.jpg",
+    avatar: "/assets/nurse_male_malaysian.jpg",
     role: UserRole.NURSE,
     specialization: "Geriatric & Eldercare",
     licenseNumber: "DEMO-LJM-RN-11892",

@@ -10,6 +10,7 @@ import {
 import DashboardHeader, {
   BannerRow, BannerIdentity, BannerBadge, BannerKpis, DashboardTab, bannerPrimaryBtn
 } from './DashboardHeader';
+import WorkspaceHeader from './WorkspaceHeader';
 
 export type FacilityTab = 'shifts' | 'locums' | 'cases' | 'packages' | 'profile';
 export type FacilityTabGroup = 'staffing' | 'care' | 'profile';
@@ -49,6 +50,8 @@ type Tab = FacilityTab;
 export interface FacilityWorkspaceProps {
   activeGroup?: FacilityTabGroup;
   initialTab?: FacilityTab;
+  currentUser?: any;
+  embedded?: boolean;
 }
 
 export interface MedicalPackage {
@@ -303,7 +306,7 @@ interface FacilityMessage {
   mine: boolean;
 }
 
-export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityWorkspaceProps = {}) {
+export default function FacilityWorkspace({ activeGroup, initialTab, currentUser, embedded = false }: FacilityWorkspaceProps = {}) {
   const currentGroup: FacilityTabGroup = activeGroup || (
     initialTab ? (
       (['cases', 'packages'].includes(initialTab)) ? 'care' :
@@ -1133,82 +1136,85 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
   return (
     <div className="w-full space-y-0" id="facility-workspace-root">
       {/* Main Facility Banner */}
-      <DashboardHeader
-        fullWidth={true}
-        tabs={displayedTabs}
-        activeTab={tab}
-        onTabChange={setTab}
-        tabsLabel={`${FACILITY_GROUPS[currentGroup].name} sections`}
-        tabsRight={facilityHelpTab}
-      >
-        <BannerRow
-          identity={
-            <BannerIdentity
-              as="h1"
-              icon={Building2}
-              name={facility?.name || 'Healthcare Facility & Clinic'}
-              badges={
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <BannerBadge tone="brand">{FACILITY_GROUPS[currentGroup].name}</BannerBadge>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200">
-                    {facility?.kind || 'Medical Centre'}
+      {!embedded && (
+        <DashboardHeader
+          fullWidth={true}
+          tabs={displayedTabs}
+          activeTab={tab}
+          onTabChange={setTab}
+          tabsLabel={`${FACILITY_GROUPS[currentGroup].name} sections`}
+          tabsRight={facilityHelpTab}
+        >
+          <BannerRow
+            identity={
+              <BannerIdentity
+                as="h1"
+                avatarUrl={currentUser?.avatarUrl || '/assets/facility_director_male.jpg'}
+                role="facility"
+                name={facility?.name || 'Healthcare Facility & Clinic'}
+                badges={
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <BannerBadge tone="brand">{FACILITY_GROUPS[currentGroup].name}</BannerBadge>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200">
+                      {facility?.kind || 'Medical Centre'}
+                    </span>
+                    {facility?.isLicenceValid && (
+                      <BannerBadge tone="success">
+                        <ShieldCheck className="h-3 w-3 inline mr-1" />
+                        Act 586 Licensed
+                      </BannerBadge>
+                    )}
+                    {facility?.mhtcMember && (
+                      <BannerBadge tone="brand">
+                        MHTC Medical Travel
+                      </BannerBadge>
+                    )}
+                  </div>
+                }
+                description={
+                  <span>
+                    {facility?.city || 'Kuala Lumpur'}, {facility?.state || 'Malaysia'} • Licence: {facility?.licenceNo || 'Act 586 Verified'} • {facility?.phone || '+60 3-2296 0888'}
                   </span>
-                  {facility?.isLicenceValid && (
-                    <BannerBadge tone="success">
-                      <ShieldCheck className="h-3 w-3 inline mr-1" />
-                      Act 586 Licensed
-                    </BannerBadge>
-                  )}
-                  {facility?.mhtcMember && (
-                    <BannerBadge tone="brand">
-                      MHTC Medical Travel
-                    </BannerBadge>
-                  )}
-                </div>
-              }
-              description={
-                <span>
-                  {facility?.city || 'Kuala Lumpur'}, {facility?.state || 'Malaysia'} • Licence: {facility?.licenceNo || 'Act 586 Verified'} • {facility?.phone || '+60 3-2296 0888'}
-                </span>
-              }
-            />
-          }
-          aside={
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <BannerKpis
-                items={[
-                  { label: 'Active Jobs', value: stats.activeVacancies },
-                  { label: 'Applicants', value: stats.pendingApplicants },
-                  { label: 'Confirmed', value: stats.acceptedLocums },
-                  { label: 'Referrals', value: stats.patientCases },
-                ]}
+                }
               />
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={loadFacilityData}
-                  disabled={loading}
-                  className="p-2 text-slate-600 hover:text-slate-900 border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer disabled:opacity-50 h-11 w-11 flex items-center justify-center"
-                  title="Refresh Data"
-                >
-                  <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowNewJobModal(true)}
-                  className={bannerPrimaryBtn}
-                >
-                  <Plus className="h-4 w-4" />
-                  Post Job Vacancy
-                </button>
+            }
+            aside={
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <BannerKpis
+                  items={[
+                    { label: 'Active Jobs', value: stats.activeVacancies },
+                    { label: 'Applicants', value: stats.pendingApplicants },
+                    { label: 'Confirmed', value: stats.acceptedLocums },
+                    { label: 'Referrals', value: stats.patientCases },
+                  ]}
+                />
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={loadFacilityData}
+                    disabled={loading}
+                    className="p-2 text-slate-600 hover:text-slate-900 border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer disabled:opacity-50 h-11 w-11 flex items-center justify-center"
+                    title="Refresh Data"
+                  >
+                    <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowNewJobModal(true)}
+                    className={bannerPrimaryBtn}
+                  >
+                    <Plus className="h-4 w-4" />
+                    Post Job Vacancy
+                  </button>
+                </div>
               </div>
-            </div>
-          }
-        />
-      </DashboardHeader>
+            }
+          />
+        </DashboardHeader>
+      )}
 
       {/* Main Inner Workspace Content Container */}
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className={embedded ? "space-y-6" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
         {/* Toast / Status Notification */}
         {notificationMsg && (
           <div
@@ -1258,6 +1264,26 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
           {/* ========================================================================= */}
           {tab === 'shifts' && (
           <div className="space-y-4">
+            <WorkspaceHeader
+              icon={Calendar}
+              eyebrow="Clinical Human Capital · Act 586 Staffing"
+              title="Clinical Job Postings, Locum Shifts & Applications"
+              description="Recruit credentialed doctors, staff nurses, and allied healthcare practitioners with automated regulatory license checks."
+              badges={<BannerBadge tone="success"><ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" /> Act 586 Staffing Compliant</BannerBadge>}
+              tabs={embedded && displayedTabs.length > 1 ? displayedTabs : undefined}
+              activeTab={tab}
+              onTabChange={setTab}
+              aside={
+                <button
+                  type="button"
+                  onClick={() => setShowNewJobModal(true)}
+                  className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Post Job Vacancy</span>
+                </button>
+              }
+            />
             {/* Filter & Search Bar */}
             <div className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap items-center justify-between gap-4">
               <div className="flex-1 min-w-[260px] relative">
@@ -1423,7 +1449,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
                           <button
                             type="button"
                             onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
-                            className="px-3 py-1.5 text-xs font-black uppercase tracking-wider bg-slate-900 hover:bg-black text-white cursor-pointer flex items-center gap-1.5"
+                            className="px-3 py-1.5 text-xs font-black uppercase tracking-wider bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white cursor-pointer flex items-center gap-1.5 shadow-xs"
                           >
                             <span>Applicants ({applications.length})</span>
                             {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
@@ -1483,7 +1509,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
                                             <button
                                               type="button"
                                               onClick={() => setDecisionModal({ jobId: job.id, applicant: app, action: 'accepted' })}
-                                              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer"
+                                              className="px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer border border-[color:var(--t-700)] shadow-xs"
                                             >
                                               <Check className="h-3.5 w-3.5" />
                                               Accept
@@ -1591,6 +1617,16 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
         {/* ========================================================================= */}
         {tab === 'locums' && (
           <div className="space-y-4">
+            <WorkspaceHeader
+              icon={Users}
+              eyebrow="Practitioner Directory · On-Demand Talent"
+              title="Verified Doctor & Nurse Talent Network"
+              description="Directly source and engage credentialed doctors and nurses with active APC registration for scheduled shifts and emergency relief."
+              badges={<BannerBadge tone="brand">MMC / LJM Verified</BannerBadge>}
+              tabs={embedded && displayedTabs.length > 1 ? displayedTabs : undefined}
+              activeTab={tab}
+              onTabChange={setTab}
+            />
             <div className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap items-center justify-between gap-4">
               <div className="flex-1 min-w-[280px] relative">
                 <Search className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -1708,50 +1744,19 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
         {/* ========================================================================= */}
         {tab === 'cases' && (
           <div className="space-y-4">
-            <div className="bg-white border border-[color:var(--t-200)] p-5">
-              
-              {/* Header Title & Sub-tabs */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-100">
-                <div>
-                  <h2 className="text-base font-black text-slate-900 tracking-tight flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-[color:var(--t-600)]" />
-                    Patient Referrals, Quotations & Facilitator Ledger
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Manage cross-border medical referrals, issue formal treatment quotes, and track automated 8% institutional facilitator success fees.
-                  </p>
-                </div>
-
-                {/* Sub-tab Switcher */}
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setCasesSubTab('referrals')}
-                    className={`px-3 py-1.5 text-xs font-black cursor-pointer transition-all ${
-                      casesSubTab === 'referrals'
-                        ? 'bg-slate-900 text-white'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    Inbound Referrals ({cases.length})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCasesSubTab('ledger')}
-                    className={`px-3 py-1.5 text-xs font-black cursor-pointer transition-all flex items-center gap-1.5 ${
-                      casesSubTab === 'ledger'
-                        ? 'bg-slate-900 text-white'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    <Receipt className="h-3.5 w-3.5 text-emerald-500" />
-                    Commission Ledger ({referralLedger?.cases.length || 0})
-                    <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1 py-0.2 font-mono font-bold">
-                      8% Success Fee
-                    </span>
-                  </button>
-                </div>
-              </div>
+            <WorkspaceHeader
+              icon={Building2}
+              eyebrow="Clinical Logistics & Patient Intake"
+              title="Patient Referrals, Quotations & Facilitator Ledger"
+              description="Manage cross-border medical referrals, issue formal treatment quotes, and track automated 8% institutional facilitator success fees."
+              badges={<BannerBadge tone="brand">MHTC Coordinated</BannerBadge>}
+              tabs={[
+                { id: 'referrals', label: 'Inbound Referrals', count: cases.length },
+                { id: 'ledger', label: 'Commission Ledger (8% Fee)', count: referralLedger?.cases.length || 0 },
+              ]}
+              activeTab={casesSubTab}
+              onTabChange={(t) => setCasesSubTab(t as any)}
+            />
 
               {/* ------------------------------------------------------------------- */}
               {/* SUB-TAB 1: INBOUND REFERRALS & TREATMENT QUOTES */}
@@ -1897,7 +1902,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
                                   setQuoteProcedure(c.specialty ? `${c.specialty} Treatment Package` : 'Clinical Procedure Package');
                                   setQuoteAmount(c.latestQuote ? String(c.latestQuote.total) : '5500');
                                 }}
-                                className="px-3 py-1.5 bg-slate-900 hover:bg-black text-white text-xs font-black uppercase tracking-wider cursor-pointer flex items-center gap-1.5"
+                                className="px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider cursor-pointer flex items-center gap-1.5 shadow-xs"
                               >
                                 <DollarSign className="h-3.5 w-3.5" />
                                 {c.latestQuote ? 'Update Quote' : 'Issue Treatment Quote'}
@@ -1918,7 +1923,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
                                 <button
                                   type="button"
                                   onClick={() => handleUpdateCaseStatus(c.id, 'in_treatment')}
-                                  className="px-2 py-1 text-[11px] font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-300 cursor-pointer"
+                                  className="px-2 py-1 text-[11px] font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] border border-[color:var(--t-200)] cursor-pointer"
                                 >
                                   Admit / In Treatment
                                 </button>
@@ -1927,7 +1932,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
                                 <button
                                   type="button"
                                   onClick={() => handleUpdateCaseStatus(c.id, 'completed')}
-                                  className="px-2 py-1 text-[11px] font-bold text-white bg-emerald-700 hover:bg-emerald-800 cursor-pointer flex items-center gap-1 shadow-xs"
+                                  className="px-2 py-1 text-[11px] font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] cursor-pointer flex items-center gap-1 shadow-xs"
                                 >
                                   <CheckCircle2 className="h-3.5 w-3.5" />
                                   Discharge & Invoice Fee
@@ -2102,7 +2107,6 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
                   </div>
                 </div>
               )}
-            </div>
           </div>
         )}
 
@@ -2111,21 +2115,13 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
         {/* ========================================================================= */}
         {tab === 'packages' && (
           <div className="space-y-6">
-            {/* Packages / Promotions Header Controls */}
-            <div className="bg-white border border-[color:var(--t-200)] p-5 shadow-2xs space-y-4">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <PackagePlus className="h-5 w-5 text-[color:var(--t-600)]" />
-                    <h2 className="text-base font-black text-slate-900">
-                      Medical Packages & Promotional Offers
-                    </h2>
-                  </div>
-                  <p className="text-xs text-slate-500">
-                    Publish clinical health checkups, surgical packages, and seasonal promotional codes across the care network.
-                  </p>
-                </div>
-
+            <WorkspaceHeader
+              icon={PackagePlus}
+              eyebrow="Direct Hospital Care · Public Directory"
+              title="Medical Packages & Promotional Offers"
+              description="Publish clinical health checkups, surgical packages, and seasonal promotional codes across the care network."
+              badges={<BannerBadge tone="brand">MOH Approved</BannerBadge>}
+              aside={
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -2137,7 +2133,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
                     className="px-3.5 py-2 text-xs font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer shadow-xs flex items-center gap-1.5"
                   >
                     <Plus className="h-4 w-4" />
-                    Publish Medical Package
+                    <span>Publish Medical Package</span>
                   </button>
                   <button
                     type="button"
@@ -2149,52 +2145,18 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
                     className="px-3.5 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 text-slate-800 cursor-pointer flex items-center gap-1.5"
                   >
                     <Tag className="h-3.5 w-3.5 text-amber-600" />
-                    Create Promotion
+                    <span>Create Promotion</span>
                   </button>
                 </div>
-              </div>
-
-              {/* Sub-tab Switcher: Packages vs. Promotions vs. Orders */}
-              <div className="flex items-center gap-2 border-t border-slate-100 pt-3 flex-wrap">
-                <button
-                  type="button"
-                  onClick={() => setPackageSubTab('packages')}
-                  className={`px-3 py-1.5 text-xs font-extrabold cursor-pointer transition-colors ${
-                    packageSubTab === 'packages'
-                      ? 'bg-slate-900 text-white'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
-                >
-                  Medical Packages ({packages.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPackageSubTab('promotions')}
-                  className={`px-3 py-1.5 text-xs font-extrabold cursor-pointer transition-colors ${
-                    packageSubTab === 'promotions'
-                      ? 'bg-slate-900 text-white'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
-                >
-                  Promotions & Campaign Codes ({promotions.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPackageSubTab('orders')}
-                  className={`px-3 py-1.5 text-xs font-extrabold cursor-pointer transition-colors flex items-center gap-1.5 ${
-                    packageSubTab === 'orders'
-                      ? 'bg-slate-900 text-white'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
-                >
-                  <CreditCard className="h-3.5 w-3.5 text-emerald-500" />
-                  Deposit Reservations ({packageOrders.length})
-                  <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1 py-0.2 font-mono font-bold">
-                    10% Pre-Auth
-                  </span>
-                </button>
-              </div>
-            </div>
+              }
+              tabs={[
+                { id: 'packages', label: 'Medical Packages', count: packages.length },
+                { id: 'promotions', label: 'Promotions & Campaign Codes', count: promotions.length },
+                { id: 'orders', label: 'Deposit Reservations (10% Pre-Auth)', count: packageOrders.length },
+              ]}
+              activeTab={packageSubTab}
+              onTabChange={(t) => setPackageSubTab(t as any)}
+            />
 
             {/* Sub-tab 1: Medical Packages */}
             {packageSubTab === 'packages' && (
@@ -2585,7 +2547,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
                                     <button
                                       type="button"
                                       onClick={() => handleConfirmPackageOrder(ord.id, 'confirmed')}
-                                      className="px-2.5 py-1 text-[11px] font-bold bg-emerald-700 hover:bg-emerald-800 text-white cursor-pointer shadow-xs"
+                                      className="px-2.5 py-1 text-[11px] font-bold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white cursor-pointer shadow-xs"
                                     >
                                       Confirm Slot
                                     </button>
@@ -2593,7 +2555,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
                                     <button
                                       type="button"
                                       onClick={() => handleConfirmPackageOrder(ord.id, 'completed')}
-                                      className="px-2.5 py-1 text-[11px] font-bold bg-slate-800 hover:bg-slate-900 text-white cursor-pointer"
+                                      className="px-2.5 py-1 text-[11px] font-bold bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-200)] cursor-pointer"
                                     >
                                       Check In
                                     </button>
@@ -2618,6 +2580,13 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
         {/* ========================================================================= */}
         {tab === 'profile' && (
           <div className="space-y-6">
+            <WorkspaceHeader
+              icon={Building2}
+              eyebrow="Statutory Licensing · Act 586 Compliance"
+              title="Facility Operating Profile & Infrastructure Capacity"
+              description="Maintain official hospital licensing, MSQH/JCI accreditations, intensive care bed counts, and specialized operating theatre capacity."
+              badges={<BannerBadge tone="success"><ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" /> Act 586 Licensed</BannerBadge>}
+            />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Facility Identity & Licensing */}
               <div className="bg-white border border-[color:var(--t-200)] p-5 space-y-4">
@@ -2766,7 +2735,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
                   type="button"
                   onClick={handleSaveInfrastructure}
                   disabled={infraSaving}
-                  className="px-4 py-2 bg-slate-900 hover:bg-black text-white text-xs font-extrabold cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shrink-0"
+                  className="px-4 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shrink-0 shadow-xs"
                 >
                   <Check className="h-4 w-4 text-emerald-400" />
                   {infraSaving ? 'Saving…' : 'Save Infrastructure'}
@@ -3472,7 +3441,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
               <button
                 type="submit"
                 disabled={chatSending || !chatInput.trim()}
-                className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-slate-900 hover:bg-black text-white cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shadow-xs"
               >
                 <Send className="h-3.5 w-3.5" />
                 {chatSending ? 'Sending…' : 'Send'}
@@ -3587,7 +3556,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
                 <button
                   type="submit"
                   disabled={quoteSubmitting}
-                  className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-slate-900 hover:bg-black text-white cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shadow-xs"
                 >
                   <DollarSign className="h-3.5 w-3.5" />
                   {quoteSubmitting ? 'Dispatching…' : 'Dispatch Treatment Quote'}
@@ -4029,7 +3998,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
                 <button
                   type="submit"
                   disabled={promoSubmitting}
-                  className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-slate-900 hover:bg-black text-white cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white cursor-pointer disabled:opacity-50 shadow-xs"
                 >
                   {promoSubmitting ? 'Saving Promo…' : editingPromoId ? 'Update Promotion' : 'Publish Promotion'}
                 </button>
@@ -4152,7 +4121,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab }: FacilityW
               <button
                 type="button"
                 onClick={() => setSelectedInvoice(null)}
-                className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-slate-900 hover:bg-black text-white cursor-pointer"
+                className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white cursor-pointer shadow-xs"
               >
                 Close
               </button>

@@ -92,18 +92,31 @@ const CATEGORIES = [
   'Aesthetics',
 ];
 
+export type PackageTabType = 'packages' | 'promotions' | 'facilities';
+
 interface MedicalPackagesModuleProps {
   initialCategory?: string;
   onSelectFacility?: (facilityId: string) => void;
   onEnquirePackage?: (pkg: MedicalPackage) => void;
+  embedded?: boolean;
+  activeTab?: PackageTabType;
+  onTabChange?: (tab: PackageTabType) => void;
 }
 
 export default function MedicalPackagesModule({
   initialCategory = 'All',
   onSelectFacility,
   onEnquirePackage,
+  embedded = false,
+  activeTab: controlledActiveTab,
+  onTabChange: setControlledActiveTab,
 }: MedicalPackagesModuleProps) {
-  const [activeTab, setActiveTab] = useState<'packages' | 'promotions' | 'facilities'>('packages');
+  const [internalActiveTab, setInternalActiveTab] = useState<PackageTabType>('packages');
+  const activeTab = controlledActiveTab !== undefined ? controlledActiveTab : internalActiveTab;
+  const setActiveTab = (tab: PackageTabType) => {
+    if (setControlledActiveTab) setControlledActiveTab(tab);
+    setInternalActiveTab(tab);
+  };
   const [packages, setPackages] = useState<MedicalPackage[]>([]);
   const [promotions, setPromotions] = useState<MedicalPromotion[]>([]);
   const [facilities, setFacilities] = useState<FacilityDirectoryItem[]>([]);
@@ -339,24 +352,26 @@ export default function MedicalPackagesModule({
   };
 
   return (
-    <div className="w-full space-y-0">
+    <div className={embedded ? "w-full space-y-4" : "w-full space-y-0"}>
       {/* Module Header Banner */}
-      <DashboardHeader
-        fullWidth={true}
-        eyebrow="Accredited Clinical Network"
-        title="Medical Packages, Promotions & Facilities"
-        description="Explore published medical screening packages, surgical procedures, and exclusive promotional campaigns across certified Act 586 hospitals & specialist clinics in Malaysia."
-        tabs={[
-          { id: 'packages', label: 'Medical Packages', icon: PackagePlus, count: packages.length },
-          { id: 'promotions', label: 'Promotions & Offers', icon: Tag, count: promotions.length },
-          { id: 'facilities', label: 'Facilities & Infrastructure', icon: Building2, count: facilities.length },
-        ]}
-        activeTab={activeTab}
-        onTabChange={(id) => setActiveTab(id as any)}
-        tabsLabel="Medical package modules"
-      />
+      {!embedded && (
+        <DashboardHeader
+          fullWidth={true}
+          eyebrow="Accredited Clinical Network"
+          title="Medical Packages, Promotions & Facilities"
+          description="Explore published medical screening packages, surgical procedures, and exclusive promotional campaigns across certified Act 586 hospitals & specialist clinics in Malaysia."
+          tabs={[
+            { id: 'packages', label: 'Medical Packages', icon: PackagePlus, count: packages.length },
+            { id: 'promotions', label: 'Promotions & Offers', icon: Tag, count: promotions.length },
+            { id: 'facilities', label: 'Facilities & Infrastructure', icon: Building2, count: facilities.length },
+          ]}
+          activeTab={activeTab}
+          onTabChange={(id) => setActiveTab(id as any)}
+          tabsLabel="Medical package modules"
+        />
+      )}
 
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className={embedded ? "space-y-6 pt-2" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
 
         {/* ------------------------------------------------------------------- */}
         {/* ACTIVE PROMOTIONS MARQUEE STRIP (Shown on all tabs) */}
@@ -1006,7 +1021,7 @@ export default function MedicalPackagesModule({
                     <button
                       type="button"
                       onClick={() => handleApplyPromo()}
-                      className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold cursor-pointer"
+                      className="px-4 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer shadow-xs"
                     >
                       Apply Code
                     </button>

@@ -4,8 +4,9 @@ import {
   CheckCircle2, Loader, Tag, Users, ShieldCheck, LayoutGrid, List, Eye, X, Clock 
 } from 'lucide-react';
 import { JobPost, Professional, Review, Booking } from '../types';
-import DashboardHeader from './DashboardHeader';
+import DashboardHeader, { BannerBadge } from './DashboardHeader';
 import PractitionerHeroBanner from './PractitionerHeroBanner';
+import WorkspaceHeader from './WorkspaceHeader';
 import { JobFormFields, JobFilters, JobBadges, JobDetailExtras, EligibilityInfo, LocumBoard, blankExtras, blankFilter, extrasPayload, matchesFilter, type JobExtras, type JobFilter } from './JobMarketMy';
 
 interface JobMarketProps {
@@ -19,6 +20,7 @@ interface JobMarketProps {
   reviews?: Review[];
   bookings?: Booking[];
   onOpenHelp?: () => void;
+  embedded?: boolean;
 }
 
 export default function JobMarket({
@@ -32,6 +34,7 @@ export default function JobMarket({
   reviews = [],
   bookings = [],
   onOpenHelp,
+  embedded = false,
 }: JobMarketProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
@@ -244,14 +247,14 @@ export default function JobMarket({
                 type="button"
                 onClick={(e) => { e.stopPropagation(); handleClockIn(job.id); }}
                 disabled={shiftActionLoading === job.id}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white font-bold px-3 py-1.5 flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-xs"
               >
                 {shiftActionLoading === job.id ? <Loader className="h-3 w-3 animate-spin" /> : <Clock className="h-3 w-3" />}
                 Clock In for Shift
               </button>
             ) : !clockOutAt ? (
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-1 flex items-center gap-1">
+                <span className="font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-1 flex items-center gap-1">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
                   On Duty ({new Date(clockInAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})
                 </span>
@@ -259,7 +262,7 @@ export default function JobMarket({
                   type="button"
                   onClick={(e) => { e.stopPropagation(); handleClockOut(job.id); }}
                   disabled={shiftActionLoading === job.id}
-                  className="bg-slate-800 hover:bg-slate-900 text-white font-bold px-3 py-1.5 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="bg-[color:var(--t-700)] hover:bg-[color:var(--t-800)] border border-[color:var(--t-800)] text-white font-bold px-3 py-1.5 flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-xs"
                 >
                   {shiftActionLoading === job.id ? <Loader className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3" />}
                   Clock Out & Submit Hours
@@ -282,8 +285,36 @@ export default function JobMarket({
 
   return (
     <div className="w-full space-y-0" id="job-market-section">
-      {/* Hero Header with attached tabs */}
-      {role === 'practitioner' ? (
+      {/* Header section: WorkspaceHeader when embedded, otherwise full banner */}
+      {embedded ? (
+        <WorkspaceHeader
+          icon={Briefcase}
+          eyebrow="Clinical Human Capital · Act 586 Staffing"
+          title="Hospital Staffing & Nurse Shift Marketplace"
+          description="Clinics source credential-verified staff for temporary and full contract roles with automated compliance tracking."
+          badges={<BannerBadge tone="brand">National Shift Registry</BannerBadge>}
+          tabs={[
+            { id: 'open' as const, label: 'Open shifts', icon: Briefcase, count: jobs.length },
+            { id: 'applied' as const, label: 'My applications', icon: CheckCircle2, count: myApplications.length },
+            { id: 'locums' as const, label: 'Locums', icon: Users },
+            { id: 'eligibility' as const, label: 'Eligibility', icon: ShieldCheck },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          aside={
+            (role === 'facility' || role === 'admin') ? (
+              <button
+                type="button"
+                onClick={() => setShowForm(!showForm)}
+                className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <PlusCircle className="h-3.5 w-3.5" />
+                <span>{showForm ? 'View Active Shifts' : 'Post Hospital Vacancy'}</span>
+              </button>
+            ) : undefined
+          }
+        />
+      ) : role === 'practitioner' ? (
         <PractitionerHeroBanner
           currentUser={currentUser}
           professionals={professionals}
@@ -329,7 +360,7 @@ export default function JobMarket({
         />
       )}
 
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className={embedded ? "space-y-6" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
         {/* Compact Summary Metrics Bar */}
         <section
           aria-label="Marketplace summary"

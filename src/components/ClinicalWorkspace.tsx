@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { AlertTriangle, Ban, FilePlus2, Lock, Pill, Plus, Stethoscope, Trash2 } from 'lucide-react';
+import PrescriptionCancelModal from './clinical/PrescriptionCancelModal';
 
 type Kind = 'booking' | 'consult';
 interface Props { kind: Kind; refId: string }
@@ -85,11 +86,22 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
     if (d.data?.policyBlock) { setPolicyBlock(d.data.policyBlock); if (!d.data?.warnings) setWarnings([]); }
     setError(d.message || 'Could not issue the prescription.');
   };
-  const cancelRx = async (id: string) => {
-    const reason = window.prompt('Reason for cancelling this prescription?');
-    if (!reason) return;
-    const d = await jpost(`/api/prescriptions/${id}/cancel`, { reason });
-    if (d.status !== 'success') setError(d.message); else load();
+
+  const [cancelModalRx, setCancelModalRx] = useState<{ id: string; code: string; medications: string } | null>(null);
+  const [cancelBusy, setCancelBusy] = useState(false);
+
+  const handleConfirmCancelRx = async (reason: string) => {
+    if (!cancelModalRx) return;
+    setCancelBusy(true);
+    const d = await jpost(`/api/prescriptions/${cancelModalRx.id}/cancel`, { reason });
+    setCancelBusy(false);
+    if (d.status !== 'success') {
+      setError(d.message || 'Could not cancel prescription.');
+    } else {
+      setCancelModalRx(null);
+      setOk('Prescription cancelled.');
+      load();
+    }
   };
   const setItem = (i: number, patch: object) => { setItems(prev => prev.map((it, idx) => idx === i ? { ...it, ...patch } : it)); setWarnings(null); setPolicyBlock(null); };
 
@@ -239,7 +251,19 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
               {ctx.prescriptions.map((p: any) => (
                 <div key={p.id} className="border border-slate-200 p-2.5 text-xs flex flex-wrap justify-between gap-2">
                   <span><b>{p.items.map((i: any) => i.name).join(', ')}</b> · code <span className="font-mono font-bold">{p.code}</span> · {p.status}</span>
-                  {p.status === 'active' && <button onClick={() => cancelRx(p.id)} className="font-bold text-rose-700 cursor-pointer">Cancel</button>}
+                  {p.status === 'active' && (
+                    <button
+                      type="button"
+                      onClick={() => setCancelModalRx({
+                        id: p.id,
+                        code: p.code,
+                        medications: p.items.map((i: any) => i.name).join(', ')
+                      })}
+                      className="font-bold text-rose-700 cursor-pointer hover:underline"
+                    >
+                      Cancel
+                    </button>
+                  )}
                 </div>
               ))}
             </section>
@@ -248,15 +272,76 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
       )}
 
       {tab === 'mc' && (
-        <div className="space-y-3 max-w-md">
-          <p className="text-xs text-slate-600">Medical certificates do not state the diagnosis. Online certificates are limited to 14 days.</p>
+        <div className="space-y-3.5 max-w-lg">
+          {kind === 'consult' ? (
+            <div role="alert" className="border-2 border-amber-300 bg-amber-50 text-amber-900 p-3.5 text-xs space-y-1.5 shadow-xs">
+              <div className="flex items-center gap-2 font-black text-amber-950">
+                <AlertTriangle className="h-4 w-4 text-amber-700 shrink-0" />
+                <span>MMC Regulatory Restriction · Virtual Teleconsultation</span>
+              </div>
+              <p className="leading-relaxed font-medium">
+                Under MMC Ethical Guidelines, medical certificates cannot be issued for virtual teleconsultations alone. If the patient requires medical leave, refer them for an in-person physical assessment.
+              </p>
+            </div>
+          ) : (
+            <p className="text-xs text-slate-600">
+              Medical certificates do not state the diagnosis. In-clinic digital certificates are limited to 14 days.
+            </p>
+          )}
+
           <div className="grid grid-cols-2 gap-2">
-            <div><label className={label}>From</label><input type="date" className={field} value={mc.fromDate} onChange={e => setMc({ ...mc, fromDate: e.target.value })} /></div>
-            <div><label className={label}>To</label><input type="date" className={field} value={mc.toDate} onChange={e => setMc({ ...mc, toDate: e.target.value })} /></div>
+            <div>
+              <label className={label}>From</label>
+              <input
+                type="date"
+                className={`${field} disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed`}
+                value={mc.fromDate}
+                disabled={kind === 'consult'}
+                onChange={e => setMc({ ...mc, fromDate: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className={label}>To</label>
+              <input
+                type="date"
+                className={`${field} disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed`}
+                value={mc.toDate}
+                disabled={kind === 'consult'}
+                onChange={e => setMc({ ...mc, toDate: e.target.value })}
+              />
+            </div>
           </div>
-          <div><label className={label}>Remarks (optional)</label><input className={field} value={mc.remarks} onChange={e => setMc({ ...mc, remarks: e.target.value })} maxLength={200} /></div>
-          <button onClick={() => submit('/api/certificates', mc, () => setMc({ ...mc, remarks: '' }))} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Sign and issue certificate</button>
-          {ctx.certificates.length > 0 && <ul className="text-xs space-y-1 pt-2 border-t border-slate-200">{ctx.certificates.map((c: any) => <li key={c.id}>{c.fromDate} to {c.toDate} · code <span className="font-mono font-bold">{c.code}</span></li>)}</ul>}
+
+          <div>
+            <label className={label}>Remarks (optional)</label>
+            <input
+              className={`${field} disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed`}
+              value={mc.remarks}
+              disabled={kind === 'consult'}
+              onChange={e => setMc({ ...mc, remarks: e.target.value })}
+              maxLength={200}
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={() => submit('/api/certificates', mc, () => setMc({ ...mc, remarks: '' }))}
+            disabled={busy || kind === 'consult'}
+            className="bg-[color:var(--t-600)] disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer transition-colors shadow-xs"
+            title={kind === 'consult' ? 'Under MMC Ethical Guidelines, medical certificates cannot be issued for virtual teleconsultations alone.' : 'Sign and issue certificate'}
+          >
+            {kind === 'consult' ? 'Certificate Disabled for Teleconsult (MMC Rule)' : 'Sign and issue certificate'}
+          </button>
+
+          {ctx.certificates.length > 0 && (
+            <ul className="text-xs space-y-1 pt-2 border-t border-slate-200">
+              {ctx.certificates.map((c: any) => (
+                <li key={c.id}>
+                  {c.fromDate} to {c.toDate} · code <span className="font-mono font-bold">{c.code}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
@@ -281,6 +366,15 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
           </div>
         </div>
       )}
+
+      <PrescriptionCancelModal
+        isOpen={Boolean(cancelModalRx)}
+        rxCode={cancelModalRx?.code}
+        rxMedications={cancelModalRx?.medications}
+        onClose={() => setCancelModalRx(null)}
+        onConfirm={handleConfirmCancelRx}
+        busy={cancelBusy}
+      />
     </div>
   );
 }

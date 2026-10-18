@@ -5,6 +5,8 @@ import { btnDanger, btnPlain, btnPrimary, fmtDate, fmtTime, jfetch } from './pha
 import { useLiveAlerts } from './pharmacy/useLiveAlerts';
 import SecurityCard from './pharmacy/SecurityCard';
 import TeamTab from './pharmacy/TeamTab';
+import DeliveryActionModal from './pharmacy/DeliveryActionModal';
+import WorkspaceHeader from './WorkspaceHeader';
 
 export type PharmacyTab = 'inbox' | 'activity' | 'reports' | 'team' | 'profile';
 export type PharmacyTabGroup = 'dispensing' | 'operations';
@@ -38,6 +40,7 @@ type Tab = PharmacyTab;
 export interface PharmacyWorkspaceProps {
   activeGroup?: PharmacyTabGroup;
   initialTab?: PharmacyTab;
+  currentUser?: any;
 }
 
 type Bucket = 'new' | 'in_progress' | 'ready' | 'cannot_fill' | 'dispensed' | 'closed';
@@ -87,7 +90,7 @@ const waiting = (iso: string) => {
   return m < 60 ? `${m} min` : m < 1440 ? `${Math.round(m / 60)} h` : `${Math.round(m / 1440)} d`;
 };
 
-export default function PharmacyWorkspace({ activeGroup, initialTab }: PharmacyWorkspaceProps = {}) {
+export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser }: PharmacyWorkspaceProps = {}) {
   const currentGroup: PharmacyTabGroup = activeGroup || (
     initialTab ? (
       (['reports', 'team', 'profile'].includes(initialTab)) ? 'operations' : 'dispensing'
@@ -189,7 +192,8 @@ export default function PharmacyWorkspace({ activeGroup, initialTab }: PharmacyW
           identity={
             <BannerIdentity
               as="h1"
-              icon={Store}
+              avatarUrl={currentUser?.avatarUrl || me?.account?.avatarUrl || '/assets/pharmacist_female_malay.jpg'}
+              role="pharmacy"
               name={me?.pharmacy.name ?? 'Pharmacy workspace'}
               badges={
                 <div className="flex flex-wrap items-center gap-1.5">
@@ -246,11 +250,66 @@ export default function PharmacyWorkspace({ activeGroup, initialTab }: PharmacyW
         </div>
 
       <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
-        {tab === 'inbox' && <InboxTab counts={counts} onChanged={loadMe} tick={alerts.tick} />}
-        {tab === 'activity' && <ActivityTab />}
-        {tab === 'reports' && <ReportsTab />}
-        {tab === 'team' && me?.account.isOwner && <TeamTab />}
-        {tab === 'profile' && me && <ProfileTab me={me} onSaved={loadMe} />}
+        {tab === 'inbox' && (
+          <div className="space-y-4">
+            <WorkspaceHeader
+              icon={Inbox}
+              eyebrow="Electronic Prescription Dispensing · Poison Licence"
+              title="Prescription Dispensing Inbox & Live Orders"
+              description="Receive electronic prescriptions from MMC-verified physicians, review patient drug allergies, and prepare medication dispatches."
+              badges={<BannerBadge tone="brand">Type A Poison Licensed</BannerBadge>}
+            />
+            <InboxTab counts={counts} onChanged={loadMe} tick={alerts.tick} />
+          </div>
+        )}
+        {tab === 'activity' && (
+          <div className="space-y-4">
+            <WorkspaceHeader
+              icon={Activity}
+              eyebrow="Dispensing Audit Trail · Ministry of Health"
+              title="Medication Dispensing Activity & Fulfillment Logs"
+              description="Permanent digital dispensing registry, pharmacist verification sign-offs, and cold-chain delivery confirmation."
+              badges={<BannerBadge tone="brand">Poisons Act 1952 Compliant</BannerBadge>}
+            />
+            <ActivityTab />
+          </div>
+        )}
+        {tab === 'reports' && (
+          <div className="space-y-4">
+            <WorkspaceHeader
+              icon={BarChart3}
+              eyebrow="Dispensary Analytics · Volume & Medication Demand"
+              title="Pharmacy Dispensing Reports & Financial Telemetry"
+              description="Overview of dispensed prescriptions, average turnaround times, insurance guarantee fulfillment, and drug category distribution."
+              badges={<BannerBadge tone="brand">Monthly Audit Summary</BannerBadge>}
+            />
+            <ReportsTab />
+          </div>
+        )}
+        {tab === 'team' && me?.account.isOwner && (
+          <div className="space-y-4">
+            <WorkspaceHeader
+              icon={Users}
+              eyebrow="Dispensary Staffing · Pharmacist Licences"
+              title="Pharmacy Team & Dispensing Personnel"
+              description="Manage registered pharmacists, dispensary assistants, and delivery dispatch personnel with verified credentials."
+              badges={<BannerBadge tone="brand">Pharmacy Board Registered</BannerBadge>}
+            />
+            <TeamTab />
+          </div>
+        )}
+        {tab === 'profile' && me && (
+          <div className="space-y-4">
+            <WorkspaceHeader
+              icon={Store}
+              eyebrow="Retail & Hospital Dispensary Details"
+              title="Pharmacy Profile, Services & Operating Hours"
+              description="Maintain official pharmacy address, cold-chain delivery capabilities, 24-hour emergency status, and insurance panel affiliations."
+              badges={<BannerBadge tone="brand">Licensed Community Pharmacy</BannerBadge>}
+            />
+            <ProfileTab me={me} onSaved={loadMe} />
+          </div>
+        )}
       </div>
       </div>
     </div>
@@ -357,6 +416,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
   const [poisonsNo, setPoisonsNo] = useState('');
   const [glNumber, setGlNumber] = useState('');
   const [glNote, setGlNote] = useState('');
+  const [deliveryModalStatus, setDeliveryModalStatus] = useState<'arranged' | 'delivered' | 'failed' | null>(null);
   const active = rx.status === 'active';
 
   const run = async (url: string, method: string, body?: unknown, done?: string) => {
@@ -372,11 +432,18 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
   const decideGl = (status: 'approved' | 'declined') => run(`/api/pharmacy/prescriptions/${rx.id}/guarantee-letter`, 'POST', { status, glNumber, note: glNote }, status === 'approved' ? 'Guarantee letter recorded.' : 'The patient was told to pay directly.');
   const deliveryStep = async (status: string) => {
     if (!rx.delivery) return;
-    const body: Record<string, unknown> = { status };
-    if (status === 'arranged') { const ref = rx.delivery.method === 'pharmacy_courier' ? '' : prompt('Booking reference from the delivery partner:') || ''; if (rx.delivery.method !== 'pharmacy_courier' && !ref) return; body.partnerRef = ref; const t = prompt('Tracking link (https://…), optional:'); if (t) body.trackingUrl = t; }
-    if (status === 'delivered') { const who = prompt('Who received the medicine?'); if (!who) return; body.recipientName = who; }
-    if (status === 'failed') { const why = prompt('Why did the delivery fail?'); if (!why) return; body.reason = why; }
-    await run(`/api/pharmacy/deliveries/${rx.delivery.id}/status`, 'POST', body, 'Delivery updated. The patient was notified.');
+    if (status === 'out_for_delivery') {
+      await run(`/api/pharmacy/deliveries/${rx.delivery.id}/status`, 'POST', { status }, 'Delivery updated. The patient was notified.');
+    } else if (status === 'arranged' || status === 'delivered' || status === 'failed') {
+      setDeliveryModalStatus(status);
+    }
+  };
+  const handleDeliveryModalSubmit = async (body: Record<string, unknown>) => {
+    if (!rx.delivery) return;
+    const res = await run(`/api/pharmacy/deliveries/${rx.delivery.id}/status`, 'POST', body, 'Delivery updated. The patient was notified.');
+    if (res?.status === 'success') {
+      setDeliveryModalStatus(null);
+    }
   };
   const saveNote = async () => { const d = await run(`/api/pharmacy/prescriptions/${rx.id}/note`, 'PUT', { note }, 'Note saved.'); if (d.status === 'success') setNoting(false); };
 
@@ -530,6 +597,19 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
       )}
 
       {msg && <p role="status" className={`text-xs font-bold p-3 border rounded-none ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-300' : 'text-rose-900 bg-rose-50 border-rose-300'}`}>{msg.text}</p>}
+
+      {rx.delivery && deliveryModalStatus && (
+        <DeliveryActionModal
+          isOpen={true}
+          status={deliveryModalStatus}
+          delivery={rx.delivery}
+          rxCode={rx.code}
+          patientName={rx.patientName}
+          onClose={() => setDeliveryModalStatus(null)}
+          onSubmit={handleDeliveryModalSubmit}
+          busy={busy}
+        />
+      )}
     </article>
   );
 }

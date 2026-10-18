@@ -1,6 +1,6 @@
 import { payoutTerms } from "./payouts";
 import crypto from "crypto";
-import { computeTax, indicativeConversions, methodsFor, paymentMethods, refundPolicy, sstConfig, type PatientRegion } from "./paymentPolicy";
+import { computeTax, indicativeConversions, methodsFor, paymentMethods, refundPolicy, sstConfig, MALAYSIA_FPX_BANKS, type PatientRegion } from "./paymentPolicy";
 import express, { Application, Response } from "express";
 import { db } from "./db";
 import { audit } from "./audit";
@@ -176,7 +176,7 @@ export function registerPaymentRoutes(app: Application) {
     }
     const breakdown = {
       amount: amountSen / 100, subtotal: subtotalSen / 100, tax: tax.taxSen / 100, taxRatePct: tax.ratePct, taxNote: tax.note,
-      methods: methodsFor(region), indicative: indicativeConversions(amountSen / 100), policy: refundPolicy(region),
+      methods: methodsFor(region), fpxBanks: MALAYSIA_FPX_BANKS, indicative: indicativeConversions(amountSen / 100), policy: refundPolicy(region),
     };
 
     if (prov === "sandbox") {
@@ -217,6 +217,9 @@ export function registerPaymentRoutes(app: Application) {
     const p = getPayment(req.params.id);
     if (!p || p.user_id !== req.user!.id) return fail(res, 404, "Payment not found.");
     if (p.provider !== "sandbox" || provider() !== "sandbox") return fail(res, 400, "This payment cannot be confirmed here.");
+    const method = req.body?.method || 'fpx';
+    const bank = req.body?.bankCode || null;
+    db.prepare("UPDATE payments SET payment_intent = ? WHERE id = ?").run(bank ? `FPX-${bank}` : `PAYNET-${method.toUpperCase()}`, p.id);
     markPaid(p);
     res.json({ status: "success", data: getPayment(p.id) });
   });

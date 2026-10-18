@@ -243,11 +243,14 @@ export function emailTaken(email: string): boolean {
  */
 export function ensureAdmin() {
   const exists = db.prepare("SELECT 1 AS x FROM users WHERE role = 'admin'").get();
-  if (exists) return;
+  if (exists) {
+    db.prepare("UPDATE users SET avatar_url = '/assets/admin_board_female.jpg' WHERE role = 'admin' AND (avatar_url IS NULL OR avatar_url = '')").run();
+    return;
+  }
   const email = (process.env.ADMIN_EMAIL || "admin@careverified.local").toLowerCase();
   const generated = !process.env.ADMIN_PASSWORD && process.env.NODE_ENV === "production";
   const password = process.env.ADMIN_PASSWORD || (generated ? crypto.randomBytes(15).toString("base64url") : "DemoPass123");
-  createUser({ id: "usr-demo-admin", email, password, role: "admin", name: "Board Administrator" });
+  createUser({ id: "usr-demo-admin", email, password, role: "admin", name: "Board Administrator", avatarUrl: "/assets/admin_board_female.jpg" });
   console.log("=".repeat(60));
   console.log(`Created first admin account: ${email}`);
   if (generated) console.log(`Generated admin password (shown once): ${password}`);

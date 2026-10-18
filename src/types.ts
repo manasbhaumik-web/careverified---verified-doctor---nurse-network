@@ -267,14 +267,20 @@ export interface SEOMetadata {
 
 export interface AppPackage {
   id: string;
-  name: string;
+  name?: string;
+  title?: string;
   description: string;
-  icon: string; // lucide icon name
-  isEnabled: boolean;
+  icon?: string; // lucide icon name
+  isEnabled?: boolean;
+  status?: string;
   category: string;
-  version: string;
-  author: string;
-  isRemovable: boolean;
+  version?: string;
+  code?: string;
+  author?: string;
+  facility_name?: string;
+  isRemovable?: boolean;
+  priceMyr?: number;
+  duration?: string;
 }
 
 export interface PatientProfile {
@@ -335,5 +341,71 @@ export interface PaymentReceipt {
   purpose: string;
   timestamp: string;
 }
+
+export type AdminSubRole = 'super_admin' | 'registrar' | 'finance' | 'facilities' | 'growth';
+
+export interface AdminSubRoleConfig {
+  id: AdminSubRole;
+  title: string;
+  shortTitle: string;
+  department: string;
+  description: string;
+  authority: string;
+  allowedGroups: ('registry' | 'ops' | 'facilities' | 'growth')[];
+  badgeTone: 'brand' | 'success' | 'warning' | 'neutral';
+}
+
+export const ADMIN_SUB_ROLES: Record<AdminSubRole, AdminSubRoleConfig> = {
+  super_admin: {
+    id: 'super_admin',
+    title: 'Executive Board Registrar (Super-Admin)',
+    shortTitle: 'Super-Admin',
+    department: 'National Medical Council Board',
+    description: 'Unrestricted statutory authority across all clinical licensing, operations, hospital staffing, and international strategy workspaces.',
+    authority: 'Full Statutory Oversight (Act 50, Act 586, MOH)',
+    allowedGroups: ['registry', 'ops', 'facilities', 'growth'],
+    badgeTone: 'brand',
+  },
+  registrar: {
+    id: 'registrar',
+    title: 'Council Medical Registrar',
+    shortTitle: 'Medical Registrar',
+    department: 'Licensing & Credentialing Board',
+    description: 'Statutory mandate for practitioner approvals, MMC/LJM register verification, trust complaints, and disciplinary sanctions.',
+    authority: 'Medical Act 1971 / Nurses Act 1950',
+    allowedGroups: ['registry'],
+    badgeTone: 'brand',
+  },
+  finance: {
+    id: 'finance',
+    title: 'Chief Financial Controller & Operations Lead',
+    shortTitle: 'Finance Officer',
+    department: 'Clinical Operations & Fiscal Governance',
+    description: 'Fiscal authority over escrow releases, teleconsultation payouts, locum doctor wages, SST tax remittance, and support quality.',
+    authority: 'Financial Services Act 2013 / SST Compliance',
+    allowedGroups: ['ops'],
+    badgeTone: 'success',
+  },
+  facilities: {
+    id: 'facilities',
+    title: 'Hospital Relations & Staffing Lead',
+    shortTitle: 'Hospital Staffing Lead',
+    department: 'Institutional Healthcare Operations',
+    description: 'B2B management of private hospital facilities, clinic bed audits, and on-demand clinical shift staffing.',
+    authority: 'Private Healthcare Facilities & Services Act 1998 (Act 586)',
+    allowedGroups: ['facilities'],
+    badgeTone: 'neutral',
+  },
+  growth: {
+    id: 'growth',
+    title: 'Medical Tourism & Evidence Director',
+    shortTitle: 'Tourism Coordinator',
+    department: 'Global Care & Clinical Publishing',
+    description: 'MHTC cross-border patient liaison, international medical quotations, PubMed literature moderation, and SEO indexing.',
+    authority: 'Malaysia Healthcare Travel Council (MHTC) Charter',
+    allowedGroups: ['growth'],
+    badgeTone: 'warning',
+  },
+};
 
 
