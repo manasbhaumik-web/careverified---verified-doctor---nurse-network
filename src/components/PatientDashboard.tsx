@@ -24,6 +24,8 @@ import PharmacyFinder from './PharmacyFinder';
 import MedicalLibrary from './MedicalLibrary';
 import AISymptomMatcher from './AISymptomMatcher';
 import PatientHeroBanner from './PatientHeroBanner';
+import { useOnCallStatus, onCallLabel } from '../useOnCallStatus';
+import { useSavedProviders } from '../savedProviders';
 import { UserAvatar } from '../avatars';
 import WorkspaceHeader from './WorkspaceHeader';
 
@@ -139,10 +141,6 @@ interface SupportTicket {
   respondWithinHours?: number;
 }
 
-const readSaved = (): string[] => {
-  try { return JSON.parse(localStorage.getItem('saved_practitioners') || '[]'); } catch { return []; }
-};
-
 
 const fmtDate = (iso?: string | null) => {
   if (!iso) return '';
@@ -173,8 +171,11 @@ export default function PatientDashboard({
   useEffect(() => {
     if (activeGroup) {
       const allowed = PATIENT_GROUPS[activeGroup].tabs.map(t => t.id);
-      if (!allowed.includes(activeTab)) {
-        setActiveTab(initialTab && allowed.includes(initialTab) ? initialTab : PATIENT_GROUPS[activeGroup].defaultTab);
+      if (initialTab && allowed.includes(initialTab)) {
+        // The app asked for a specific tab in this group (for example "Message" on a doctor's card): go there
+        setActiveTab(initialTab);
+      } else if (!allowed.includes(activeTab)) {
+        setActiveTab(PATIENT_GROUPS[activeGroup].defaultTab);
       }
     } else if (initialTab) {
       setActiveTab(initialTab);
@@ -188,6 +189,7 @@ export default function PatientDashboard({
   const [certsSubTab, setCertsSubTab] = useState<'mc' | 'referrals'>('mc');
   const [labsSubTab, setLabsSubTab] = useState<'labs' | 'notes'>('labs');
   const [consultSubTab, setConsultSubTab] = useState<'instant' | 'triage'>('instant');
+  const onCall = useOnCallStatus();
   const [savedSubTab, setSavedSubTab] = useState<'all' | 'doctors' | 'nurses'>('all');
   const [registrySubTab, setRegistrySubTab] = useState<'all' | 'telehealth' | 'specialists'>('all');
   const [nursesSubTab, setNursesSubTab] = useState<'all' | 'homecare' | 'clinic'>('all');
@@ -195,7 +197,9 @@ export default function PatientDashboard({
   const [packagesSubTab, setPackagesSubTab] = useState<'packages' | 'promotions' | 'facilities'>('packages');
   const [assistanceSubTab, setAssistanceSubTab] = useState<'enquiry' | 'cases' | 'guide' | 'track'>('enquiry');
   const [tourismSubTab, setTourismSubTab] = useState<'find' | 'cases' | 'info'>('find');
-  const [savedIds, setSavedIds] = useState<string[]>(readSaved);
+  // Saved on the account (with a local copy), so they follow the patient to any device
+  const savedStore = useSavedProviders({ id: currentUser?.id, role: currentUser?.role });
+  const savedIds = savedStore.ids;
   
   // Clinical Summary & Record Data
   const [summary, setSummary] = useState<{
@@ -363,11 +367,8 @@ export default function PatientDashboard({
     }
   };
 
-  const removeSaved = (id: string) => {
-    const next = savedIds.filter(x => x !== id);
-    setSavedIds(next);
-    try { localStorage.setItem('saved_practitioners', JSON.stringify(next)); } catch { /* ignore */ }
-  };
+  const removeSaved = (id: string) => { void savedStore.remove(id); };
+  const restoreSaved = (id: string) => { void savedStore.add(id); };
 
   const classifyBp = (v1?: number | string | null, v2?: number | string | null) => {
     const sys = Number(v1);
@@ -434,13 +435,13 @@ export default function PatientDashboard({
           if (onOpenHelp) onOpenHelp();
           else window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
         }}
-        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-[13px] flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
+        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-sm flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
         title="Patient Help & Concierge Support Desk"
       >
         <LifeBuoy className="h-4 w-4 text-slate-500" />
         <span className="whitespace-nowrap font-medium sm:font-semibold">Help & Support</span>
         {openTickets.length > 0 && (
-          <span className="tabular-nums text-[10px] min-w-[18px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
+          <span className="tabular-nums text-xs min-w-[18px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
             {openTickets.length}
           </span>
         )}
@@ -485,6 +486,7 @@ export default function PatientDashboard({
           setConsultSubTab('triage');
         }}
         onOpenRecords={() => { setActiveTab('records'); setRecordsSubTab('overview'); }}
+        compact={activeTab === 'consult' || activeTab === 'messages'}
       />
 
       {/* 3. MAIN WORKSPACE CONTENT CONTAINER */}
@@ -562,7 +564,7 @@ export default function PatientDashboard({
                 </div>
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-mono font-black uppercase tracking-wider px-2 py-0.5 bg-emerald-600 text-white">
+                    <span className="text-xs font-mono font-black uppercase tracking-wider px-2 py-0.5 bg-emerald-600 text-white">
                       {activeConsult.status === 'active'
                         ? 'Live Room Open'
                         : activeConsult.status === 'queued'
@@ -619,7 +621,7 @@ export default function PatientDashboard({
                       <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
                         Upcoming Consultations
                       </h2>
-                      <span className="text-[10px] font-mono font-extrabold bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-2 py-0.5">
+                      <span className="text-xs font-mono font-extrabold bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-2 py-0.5">
                         {upcoming.length} Scheduled
                       </span>
                     </div>
@@ -728,20 +730,20 @@ export default function PatientDashboard({
                               >
                                 {b.professionalName}
                               </button>
-                              <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
+                              <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
                                 <ShieldCheck className="h-3 w-3 text-emerald-600" />
                                 {isNurse ? 'LJM Board Verified' : 'MMC Council Verified'}
                               </span>
                               {isVideo ? (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
+                                <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
                                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> WebRTC Audio/Video Encrypted
                                 </span>
                               ) : isHomeVisit ? (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-cyan-800 bg-cyan-50 border border-cyan-200 px-2 py-0.5">
+                                <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-cyan-800 bg-cyan-50 border border-cyan-200 px-2 py-0.5">
                                   <MapPin className="h-3 w-3 text-cyan-600" /> Home Care Visit
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5">
+                                <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5">
                                   <MapPin className="h-3 w-3 text-slate-600" /> In-Clinic Consultation
                                 </span>
                               )}
@@ -777,12 +779,12 @@ export default function PatientDashboard({
                               </span>
                               <span className="text-slate-300">&bull;</span>
                               {isPending ? (
-                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5">
+                                <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5">
                                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
                                   Awaiting Payment
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
+                                <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
                                   <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                                   Confirmed &amp; Paid
                                 </span>
@@ -850,7 +852,7 @@ export default function PatientDashboard({
                 </div>
               )}
 
-              <div className="mt-4 pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between text-[11px] text-slate-500 font-medium">
+              <div className="mt-4 pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between text-xs text-slate-500 font-medium">
                 <span>Cancellations &gt;24h in advance are 100% refunded to the original payment method.</span>
                 <span className="font-bold text-[color:var(--t-600)] hidden sm:inline">Statutory SLA Compliant</span>
               </div>
@@ -869,7 +871,7 @@ export default function PatientDashboard({
                   <span className="hidden sm:inline text-xs text-slate-400">&bull;</span>
                   <span className="hidden sm:inline text-xs text-slate-500 font-medium">On-demand video doctor, clinical AI triage &amp; dispensary routing</span>
                 </div>
-                <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
+                <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
                   {onCallStatus && onCallStatus.onlineDoctors > 0 ? `${onCallStatus.onlineDoctors} Doctors Online` : '24/7 Care Triage'}
                 </span>
               </div>
@@ -887,27 +889,27 @@ export default function PatientDashboard({
                           <h3 className="font-display font-black text-xs sm:text-sm text-[color:var(--ink)] leading-tight truncate">
                             On-Call Video Doctor
                           </h3>
-                          <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
+                          <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
                             &lt; 3 min wait · MMC Certified
                           </p>
                         </div>
                       </div>
-                      <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 shrink-0">
+                      <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 shrink-0">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
                       </span>
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-2.5">
-                      <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Digital MC</span>
-                      <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">e-Prescription</span>
-                      <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">WebRTC HD</span>
+                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Digital MC</span>
+                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">e-Prescription</span>
+                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">WebRTC HD</span>
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={onConsultNow}
-                    className="w-full min-h-[34px] px-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-[11px] font-black border border-[color:var(--t-700)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    className="w-full min-h-[34px] px-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black border border-[color:var(--t-700)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Video className="h-3.5 w-3.5" />
                     <span>Start Instant Consult</span>
@@ -927,27 +929,27 @@ export default function PatientDashboard({
                           <h3 className="font-display font-black text-xs sm:text-sm text-[color:var(--ink)] leading-tight truncate">
                             AI Symptom Triage
                           </h3>
-                          <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
+                          <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
                             MOH Protocol · Free Assessment
                           </p>
                         </div>
                       </div>
-                      <span className="text-[9px] font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-1.5 py-0.2 shrink-0">
+                      <span className="text-xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-1.5 py-0.2 shrink-0">
                         Triage
                       </span>
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-2.5">
-                      <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">180+ Conditions</span>
-                      <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Red-Flag Check</span>
-                      <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Dept Route</span>
+                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">180+ Conditions</span>
+                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Red-Flag Check</span>
+                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Dept Route</span>
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={onOpenTriage ? onOpenTriage : onConsultNow}
-                    className="w-full min-h-[34px] px-3 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-[11px] font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    className="w-full min-h-[34px] px-3 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Stethoscope className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                     <span>Run Symptom Triage</span>
@@ -967,27 +969,27 @@ export default function PatientDashboard({
                           <h3 className="font-display font-black text-xs sm:text-sm text-[color:var(--ink)] leading-tight truncate">
                             Pharmacy Dispensary
                           </h3>
-                          <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
+                          <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
                             {summary?.activeRx || 0} Active Prescriptions
                           </p>
                         </div>
                       </div>
-                      <span className="text-[9px] font-mono font-bold text-cyan-800 bg-cyan-50 border border-cyan-200 px-1.5 py-0.2 shrink-0">
+                      <span className="text-xs font-mono font-bold text-cyan-800 bg-cyan-50 border border-cyan-200 px-1.5 py-0.2 shrink-0">
                         Dispensary
                       </span>
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-2.5">
-                      <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">50+ Retail Branches</span>
-                      <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">QR Verified</span>
-                      <span className="text-[9px] font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Home Courier</span>
+                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">50+ Retail Branches</span>
+                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">QR Verified</span>
+                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Home Courier</span>
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={onOpenPharmacies ? onOpenPharmacies : () => { setRecordsSubTab('rx'); setActiveTab('records'); }}
-                    className="w-full min-h-[34px] px-3 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-[11px] font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    className="w-full min-h-[34px] px-3 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Pill className="h-3.5 w-3.5 text-cyan-600" />
                     <span>Refill Prescriptions</span>
@@ -1011,7 +1013,7 @@ export default function PatientDashboard({
                       <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
                         Consultation History &amp; Encounter Archive
                       </h2>
-                      <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 border border-slate-200">
+                      <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 border border-slate-200">
                         {past.length} Encounters
                       </span>
                     </div>
@@ -1057,11 +1059,11 @@ export default function PatientDashboard({
                               >
                                 {b.professionalName}
                               </button>
-                              <span className="text-[11px] font-semibold text-[color:var(--t-700)]">
+                              <span className="text-xs font-semibold text-[color:var(--t-700)]">
                                 {prof?.specialization || 'Clinical Specialist'}
                               </span>
                               <span
-                                className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono font-bold border ${
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-bold border ${
                                   isCancelled
                                     ? 'bg-slate-100 text-slate-600 border-slate-200'
                                     : 'bg-emerald-50 text-emerald-800 border-emerald-200'
@@ -1120,7 +1122,7 @@ export default function PatientDashboard({
                 <div className="py-8 text-center bg-[color:var(--t-50)]/30 border border-dashed border-[color:var(--t-200)] my-1">
                   <Calendar className="h-6 w-6 text-slate-400 mx-auto mb-1.5" />
                   <p className="text-xs font-bold text-slate-700">No Past Consultations Yet</p>
-                  <p className="text-[11px] text-slate-500 mt-0.5 max-w-xs mx-auto">
+                  <p className="text-xs text-slate-500 mt-0.5 max-w-xs mx-auto">
                     Completed consultations and clinical visits will be archived here for your permanent record.
                   </p>
                 </div>
@@ -1140,20 +1142,26 @@ export default function PatientDashboard({
                   <h2 className="font-display font-black text-sm sm:text-base text-[color:var(--ink)]">
                     Pre-Consultation Vitals &amp; Safety Snapshot
                   </h2>
-                  <span className="hidden sm:inline text-xs text-slate-400">&bull;</span>
-                  <span className="hidden sm:inline text-xs text-slate-500 font-medium">
-                    Shared automatically with your consulting physician
+                  <span className="hidden sm:inline text-xs text-slate-600">&bull;</span>
+                  <span className="hidden sm:inline text-xs text-slate-600 font-medium">
+                    Your doctor sees this only if you share your record
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span
-                    className={`text-[10px] font-mono font-bold px-2 py-0.5 border ${
+                    className={`text-xs font-mono font-bold px-2 py-0.5 border ${
                       patientAllergies.length > 0
                         ? 'bg-rose-50 text-rose-800 border-rose-200'
-                        : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                        : recordsData?.allergyStatement?.kind === 'none_known'
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          : 'bg-slate-100 text-slate-800 border-slate-300'
                     }`}
                   >
-                    {patientAllergies.length > 0 ? `Allergies: ${patientAllergies.join(', ')}` : 'NKDA · No Known Allergies'}
+                    {patientAllergies.length > 0
+                      ? `Allergies: ${patientAllergies.join(', ')}`
+                      : recordsData?.allergyStatement?.kind === 'none_known'
+                        ? 'You said: no known allergies'
+                        : 'No allergies recorded yet'}
                   </span>
                   <button
                     type="button"
@@ -1172,20 +1180,20 @@ export default function PatientDashboard({
                   onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
                   className="bg-white border border-[color:var(--t-200)] p-3.5 border-l-4 border-l-[color:var(--t-600)] shadow-2xs hover:border-[color:var(--t-600)] transition-all cursor-pointer"
                 >
-                  <div className="flex items-center justify-between gap-1 text-slate-500 text-[10px] font-black uppercase tracking-wider">
+                  <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
                     <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
                       <HeartPulse className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                       Blood Pressure
                     </span>
-                    <span className={`text-[10px] font-bold px-1.5 py-0.2 border ${classifyBp(summary?.bp?.value1 || 120, summary?.bp?.value2 || 78).badgeClass}`}>
+                    <span className={`text-xs font-bold px-1.5 py-0.2 border ${classifyBp(summary?.bp?.value1 || 120, summary?.bp?.value2 || 78).badgeClass}`}>
                       {classifyBp(summary?.bp?.value1 || 120, summary?.bp?.value2 || 78).label.split('/')[0].trim()}
                     </span>
                   </div>
                   <div className="text-xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
                     <span>{summary?.bp ? `${summary.bp.value1}/${summary.bp.value2}` : '120/78'}</span>
-                    <span className="text-[11px] font-normal text-slate-500 font-sans">mmHg</span>
+                    <span className="text-xs font-normal text-slate-500 font-sans">mmHg</span>
                   </div>
-                  <p className="text-[10px] text-slate-500 font-medium mt-1 truncate">
+                  <p className="text-xs text-slate-500 font-medium mt-1 truncate">
                     {summary?.bp?.recordedAt ? `Logged ${fmtDate(summary.bp.recordedAt)}` : 'Reference Target < 120/80'}
                   </p>
                 </div>
@@ -1195,20 +1203,20 @@ export default function PatientDashboard({
                   onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
                   className="bg-white border border-[color:var(--t-200)] p-3.5 border-l-4 border-l-emerald-600 shadow-2xs hover:border-[color:var(--t-600)] transition-all cursor-pointer"
                 >
-                  <div className="flex items-center justify-between gap-1 text-slate-500 text-[10px] font-black uppercase tracking-wider">
+                  <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
                     <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
                       <Activity className="h-3.5 w-3.5 text-emerald-600" />
                       Heart Rate
                     </span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span className="text-xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
                       Normal
                     </span>
                   </div>
                   <div className="text-xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
                     <span>{summary?.pulse?.value1 || '72'}</span>
-                    <span className="text-[11px] font-normal text-slate-500 font-sans">BPM</span>
+                    <span className="text-xs font-normal text-slate-500 font-sans">BPM</span>
                   </div>
-                  <p className="text-[10px] text-slate-500 font-medium mt-1 truncate">
+                  <p className="text-xs text-slate-500 font-medium mt-1 truncate">
                     Resting target 60–100 BPM
                   </p>
                 </div>
@@ -1218,20 +1226,20 @@ export default function PatientDashboard({
                   onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
                   className="bg-white border border-[color:var(--t-200)] p-3.5 border-l-4 border-l-amber-500 shadow-2xs hover:border-[color:var(--t-600)] transition-all cursor-pointer"
                 >
-                  <div className="flex items-center justify-between gap-1 text-slate-500 text-[10px] font-black uppercase tracking-wider">
+                  <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
                     <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
                       <Sparkles className="h-3.5 w-3.5 text-amber-600" />
                       Blood Glucose
                     </span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span className="text-xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
                       {summary?.glucose?.value1 ? (summary.glucose.value1 > 6.0 ? 'Elevated' : 'Target') : 'Target'}
                     </span>
                   </div>
                   <div className="text-xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
                     <span>{summary?.glucose?.value1 || '5.4'}</span>
-                    <span className="text-[11px] font-normal text-slate-500 font-sans">{summary?.glucose?.unit || 'mmol/L'}</span>
+                    <span className="text-xs font-normal text-slate-500 font-sans">{summary?.glucose?.unit || 'mmol/L'}</span>
                   </div>
-                  <p className="text-[10px] text-slate-500 font-medium mt-1 truncate">
+                  <p className="text-xs text-slate-500 font-medium mt-1 truncate">
                     Fasting target 4.0–7.0 mmol/L
                   </p>
                 </div>
@@ -1241,20 +1249,20 @@ export default function PatientDashboard({
                   onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
                   className="bg-white border border-[color:var(--t-200)] p-3.5 border-l-4 border-l-cyan-600 shadow-2xs hover:border-[color:var(--t-600)] transition-all cursor-pointer"
                 >
-                  <div className="flex items-center justify-between gap-1 text-slate-500 text-[10px] font-black uppercase tracking-wider">
+                  <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
                     <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
                       <ShieldCheck className="h-3.5 w-3.5 text-cyan-600" />
                       Oxygen (SpO₂)
                     </span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span className="text-xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
                       Optimal
                     </span>
                   </div>
                   <div className="text-xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
                     <span>{summary?.spo2?.value1 || '99'}</span>
-                    <span className="text-[11px] font-normal text-slate-500 font-sans">%</span>
+                    <span className="text-xs font-normal text-slate-500 font-sans">%</span>
                   </div>
-                  <p className="text-[10px] text-slate-500 font-medium mt-1 truncate">
+                  <p className="text-xs text-slate-500 font-medium mt-1 truncate">
                     Arterial saturation ≥ 95%
                   </p>
                 </div>
@@ -1294,7 +1302,7 @@ export default function PatientDashboard({
                       <p className="text-xs font-bold text-[color:var(--ink)] mb-0.5">
                         No Active Prescriptions Requiring Refill
                       </p>
-                      <p className="text-[11px] text-slate-500 font-medium max-w-sm mx-auto">
+                      <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
                         Medications prescribed during your telehealth consultations appear here automatically for one-click pharmacy dispensing.
                       </p>
                     </div>
@@ -1306,7 +1314,7 @@ export default function PatientDashboard({
                           <div key={rx.id} className="p-3.5 border border-[color:var(--t-200)] bg-white hover:border-[color:var(--t-600)] transition-colors shadow-2xs">
                             <div className="flex items-start justify-between gap-2 mb-2">
                               <div>
-                                <span className="inline-block text-[10px] font-mono font-black text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
+                                <span className="inline-block text-xs font-mono font-black text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
                                   RX CODE: {rx.code}
                                 </span>
                                 <h4 className="font-display font-black text-sm text-[color:var(--ink)] mt-1">
@@ -1321,15 +1329,15 @@ export default function PatientDashboard({
 
                               <div className="text-right shrink-0">
                                 {rx.fillStatus === 'ready' ? (
-                                  <span className="inline-block text-[10px] font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5">
+                                  <span className="inline-block text-xs font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5">
                                     Ready for Pickup
                                   </span>
                                 ) : rx.fillStatus === 'preparing' ? (
-                                  <span className="inline-block text-[10px] font-mono font-bold bg-[color:var(--t-50)] text-[color:var(--t-800)] border border-[color:var(--t-200)] px-2 py-0.5">
+                                  <span className="inline-block text-xs font-mono font-bold bg-[color:var(--t-50)] text-[color:var(--t-800)] border border-[color:var(--t-200)] px-2 py-0.5">
                                     Being Prepared
                                   </span>
                                 ) : rx.pharmacyName ? (
-                                  <span className="inline-block text-[10px] font-mono font-bold bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 truncate max-w-[130px]">
+                                  <span className="inline-block text-xs font-mono font-bold bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 truncate max-w-[130px]">
                                     {rx.pharmacyName}
                                   </span>
                                 ) : (
@@ -1339,18 +1347,18 @@ export default function PatientDashboard({
                                       setDispatchingRx(rx);
                                       if (pharmacies.length > 0) setSelectedPharmacyId(pharmacies[0].id);
                                     }}
-                                    className="inline-flex items-center gap-1 text-[11px] font-mono font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white px-2.5 py-1 shadow-2xs cursor-pointer transition-colors"
+                                    className="inline-flex items-center gap-1 text-xs font-mono font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white px-2.5 py-1 shadow-2xs cursor-pointer transition-colors"
                                   >
                                     <Send className="h-3 w-3" /> Dispatch to Pharmacy
                                   </button>
                                 )}
-                                <p className="text-[10px] font-mono text-slate-600 mt-1">
+                                <p className="text-xs font-mono text-slate-600 mt-1">
                                   Valid until: {fmtDate(rx.validUntil)}
                                 </p>
                               </div>
                             </div>
 
-                            <div className="flex items-center justify-between pt-2 border-t border-[color:var(--t-100)] text-[11px]">
+                            <div className="flex items-center justify-between pt-2 border-t border-[color:var(--t-100)] text-xs">
                               <span className="text-slate-500 font-medium">
                                 Doctor: <strong className="text-slate-700">{rx.doctor?.name || 'Verified Physician'}</strong>
                               </span>
@@ -1360,7 +1368,7 @@ export default function PatientDashboard({
                                   setDispatchingRx(rx);
                                   if (pharmacies.length > 0) setSelectedPharmacyId(pharmacies[0].id);
                                 }}
-                                className="text-[11px] font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
+                                className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
                               >
                                 Transfer or View Details &rarr;
                               </button>
@@ -1442,7 +1450,7 @@ export default function PatientDashboard({
                             >
                               {prof.name}
                             </button>
-                            <p className="text-[11px] text-[color:var(--t-700)] font-bold truncate">
+                            <p className="text-xs text-[color:var(--t-700)] font-bold truncate">
                               {prof.specialization} · <span className="text-slate-500 font-medium">{prof.city || 'Kuala Lumpur'}</span>
                             </p>
                           </div>
@@ -1489,24 +1497,23 @@ export default function PatientDashboard({
         <div id="panel-records" role="tabpanel" aria-labelledby="tab-records" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={FolderHeart}
-            eyebrow="Electronic Health Record · Encrypted Vault"
-            title="Clinical Health Profile & Biometric Vitals"
-            description="Continuous physiological telemetry, active clinical conditions, verified allergy alerts, and emergency clinical data."
-            badges={<BannerBadge tone="success"><CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" /> EHR Verified</BannerBadge>}
+            eyebrow="Health record"
+            title="Your health profile and readings"
+            description="Your allergies, conditions, medicines and readings. You decide which doctors can see them."
             aside={
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="px-3.5 py-2 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                className="px-3.5 min-h-[44px] bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
               >
                 <FileText className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                <span>Export EHR Summary</span>
+                <span>Print this page</span>
               </button>
             }
             tabs={[
-              { id: 'overview', label: 'Clinical Profile', icon: ClipboardList },
-              { id: 'vitals', label: 'Biometric Readings', icon: Activity },
-              { id: 'sharing', label: 'EHR Consent & PIN', icon: Share2 },
+              { id: 'overview', label: 'Profile', icon: ClipboardList },
+              { id: 'vitals', label: 'Readings', icon: Activity },
+              { id: 'sharing', label: 'Sharing & PIN', icon: Share2 },
             ]}
             activeTab={recordsSubTab}
             onTabChange={setRecordsSubTab}
@@ -1524,31 +1531,32 @@ export default function PatientDashboard({
         <div id="panel-prescriptions" role="tabpanel" aria-labelledby="tab-prescriptions" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={Pill}
-            eyebrow="Pharmacy Network · e-Prescriptions"
-            title="Doctor e-Prescriptions & Pharmacy Fulfillment"
-            description="Digitally signed doctor prescriptions. Transmit directly to partner pharmacies for home delivery or pickup."
-            badges={<BannerBadge tone="brand">{activePrescriptions.length} Active Prescriptions</BannerBadge>}
+            eyebrow="Pharmacy"
+            title="Prescriptions & medicines"
+            description="Send a prescription to a partner pharmacy, follow its progress, and keep the past ones."
             aside={
               onOpenPharmacies && (
                 <button
                   type="button"
                   onClick={onOpenPharmacies}
-                  className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                  className="px-3.5 min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <Store className="h-3.5 w-3.5" />
-                  <span>Locate Dispensary</span>
+                  <span>Find a pharmacy</span>
                 </button>
               )
             }
             tabs={[
-              { id: 'active', label: 'Active Prescriptions', icon: Pill, count: activePrescriptions.length },
-              { id: 'history', label: 'Prescription Archive', icon: FileText },
+              { id: 'active', label: 'Active', icon: Pill, count: activePrescriptions.length },
+              { id: 'history', label: 'Past prescriptions', icon: FileText },
             ]}
             activeTab={rxSubTab}
             onTabChange={setRxSubTab}
           />
           <PatientRecords
-            activeSubTab={rxSubTab === 'history' ? 'docs' : 'rx'}
+            activeSubTab={rxSubTab === 'history' ? 'rxhist' : 'rx'}
+            onSubTabChange={t => setRxSubTab(t === 'rxhist' ? 'history' : 'active')}
+            onOpenPharmacies={onOpenPharmacies}
             hideHeaderTabs={true}
           />
         </div>
@@ -1559,10 +1567,9 @@ export default function PatientDashboard({
         <div id="panel-certs" role="tabpanel" aria-labelledby="tab-certs" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={FileText}
-            eyebrow="Official Medical Certificates · Tamper-Proof QR"
-            title="Medical Certificates (MC) & Specialist Referrals"
-            description="Authentic digital medical certificates signed with physician MMC registration numbers and instant QR verification."
-            badges={<BannerBadge tone="success"><ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" /> Council Validated</BannerBadge>}
+            eyebrow="Certificates and referrals"
+            title="Medical certificates & referrals"
+            description="Each certificate has a code and QR that your employer can check online. The check shows the doctor's registration number and whether the certificate has been changed since it was signed."
             tabs={[
               { id: 'mc', label: 'Medical Certificates (MC)', icon: FileText },
               { id: 'referrals', label: 'Referral Letters', icon: HeartHandshake },
@@ -1571,7 +1578,9 @@ export default function PatientDashboard({
             onTabChange={setCertsSubTab}
           />
           <PatientRecords
-            activeSubTab="docs"
+            activeSubTab={certsSubTab}
+            onFindDoctors={onFindDoctors}
+            onBookSpecialist={(id) => { if (id) onSelectProfessional(id); else onFindDoctors?.(); }}
             hideHeaderTabs={true}
           />
         </div>
@@ -1606,41 +1615,46 @@ export default function PatientDashboard({
         <div id="panel-consult" role="tabpanel" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={Video}
-            eyebrow="Telehealth Network · 24/7 Coverage"
-            title="Instant Telehealth Consultation Room"
-            description="Connect directly with an MMC-licensed physician on-call. 10-minute maximum wait time with automatic refund guarantee."
+            eyebrow="Telehealth network"
+            title="Consult a doctor now"
+            description="Chat or video with a doctor. If no doctor joins within 10 minutes you are refunded automatically."
             badges={
-              <>
+              onCall && onCall.onlineDoctors > 0 ? (
                 <BannerBadge tone="success">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1" /> Active Doctor On-Call
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1" /> {onCallLabel(onCall)}
                 </BannerBadge>
-                <BannerBadge>WebRTC HD Encrypted</BannerBadge>
-              </>
+              ) : (
+                <span className="bg-amber-50 text-amber-900 border border-amber-300 text-xs font-black uppercase px-2.5 py-0.5">{onCallLabel(onCall)}</span>
+              )
             }
             aside={
-              onOpenTriage && (
+              consultSubTab === 'instant' ? (
                 <button
                   type="button"
-                  onClick={onOpenTriage}
-                  className="px-3.5 py-2 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                  onClick={() => setConsultSubTab('triage')}
+                  className="px-3.5 min-h-[44px] bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <Sparkles className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                  <span>AI Symptom Triage</span>
+                  <span>Not sure? Try AI symptom triage</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConsultSubTab('instant')}
+                  className="px-3.5 min-h-[44px] bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Video className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                  <span>Back to consultation</span>
                 </button>
               )
             }
-            tabs={[
-              { id: 'instant', label: 'Live Video Consult Room' },
-              { id: 'triage', label: 'Clinical Assessment & Triage' },
-            ]}
-            activeTab={consultSubTab}
-            onTabChange={setConsultSubTab}
           />
           {consultSubTab === 'instant' ? (
             <ConsultNow 
               myUserId={currentUser?.id} 
               embedded={true} 
               onNavigateToPrescriptions={() => setActiveTab('prescriptions')}
+              onBookAppointment={onFindDoctors}
             />
           ) : (
             <div className="space-y-4">
@@ -1662,10 +1676,9 @@ export default function PatientDashboard({
         <div id="panel-messages" role="tabpanel" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={MessageSquare}
-            eyebrow="Secure Care Messenger · PDPA Encrypted"
+            eyebrow="Care messages"
             title="Patient Care Mailbox & Direct Messaging"
-            description="End-to-end encrypted messaging with your verified doctors, clinical nurses, and care coordinators."
-            badges={<BannerBadge tone="brand">256-bit Encrypted</BannerBadge>}
+            description="Private messages with the doctors and nurses you have booked or consulted. Replies can take time. Not for emergencies: call 999."
             aside={
               onFindDoctors && (
                 <button
@@ -1691,10 +1704,10 @@ export default function PatientDashboard({
         <div id="panel-saved" role="tabpanel" aria-labelledby="tab-saved" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={Heart}
-            eyebrow="Personal Care Team · Saved Providers"
-            title="My Healthcare Providers & Specialists"
-            description="Your trusted circle of verified doctors, nurses, and medical facilities saved for rapid scheduling."
-            badges={<BannerBadge tone="brand">{savedIds.length} Saved Providers</BannerBadge>}
+            eyebrow="Care team"
+            title="Your care team"
+            description="The doctors and nurses you have seen, and others you saved to book later."
+            badges={<BannerBadge tone="brand">{careTeam.length} seen · {savedIds.length} saved</BannerBadge>}
             aside={
               onFindDoctors && (
                 <button
@@ -1703,20 +1716,22 @@ export default function PatientDashboard({
                   className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <Search className="h-3.5 w-3.5" />
-                  <span>Find More Providers</span>
+                  <span>Find a doctor or nurse</span>
                 </button>
               )
             }
-            tabs={[
-              { id: 'all', label: 'All Saved Providers', count: savedIds.length },
-              { id: 'doctors', label: 'Doctors & Specialists' },
-              { id: 'nurses', label: 'Clinical Nurses' },
-            ]}
+            tabs={savedIds.length > 6 ? [
+              { id: 'all', label: 'All saved', count: savedIds.length },
+              { id: 'doctors', label: 'Doctors' },
+              { id: 'nurses', label: 'Nurses' },
+            ] : undefined}
             activeTab={savedSubTab}
             onTabChange={setSavedSubTab}
           />
           <SavedTab
             hideHeader={true}
+            careTeam={careTeam}
+            onFindProviders={onFindDoctors}
             savedProfessionals={professionals.filter(p => {
               if (!savedIds.includes(p.id)) return false;
               if (savedSubTab === 'doctors' && p.role !== UserRole.DOCTOR) return false;
@@ -1724,6 +1739,7 @@ export default function PatientDashboard({
               return true;
             })}
             onRemoveSaved={removeSaved}
+            onRestoreSaved={restoreSaved}
             onNavigateToMessages={onNavigateToMessages}
             onSelectProfessional={onSelectProfessional}
             onVerifyCredentials={p => onSelectProfessional(p.id)}
@@ -1895,7 +1911,7 @@ export default function PatientDashboard({
           {selectedSpecialtyFilter && (
             <div className="bg-emerald-50 border border-emerald-200 p-3 flex items-center justify-between text-xs animate-fade-in">
               <div className="flex items-center gap-2">
-                <span className="font-mono font-bold text-emerald-800 uppercase text-[10px] bg-emerald-100 border border-emerald-200 px-2 py-0.5">
+                <span className="font-mono font-bold text-emerald-800 uppercase text-xs bg-emerald-100 border border-emerald-200 px-2 py-0.5">
                   AI Triage Matched
                 </span>
                 <span className="font-extrabold text-[color:var(--ink)]">
@@ -1935,7 +1951,7 @@ export default function PatientDashboard({
                           {prof.name}
                         </button>
                         <p className="text-xs text-[color:var(--t-700)] font-bold">{prof.specialization}</p>
-                        <span className="inline-block mt-1 text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200">
+                        <span className="inline-block mt-1 text-xs font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200">
                           MMC Verified · Active
                         </span>
                       </div>
@@ -1995,7 +2011,7 @@ export default function PatientDashboard({
                           {prof.name}
                         </button>
                         <p className="text-xs text-[color:var(--t-700)] font-bold">{prof.specialization || 'Clinical Staff Nurse'}</p>
-                        <span className="inline-block mt-1 text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200">
+                        <span className="inline-block mt-1 text-xs font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200">
                           LJM Verified · Active
                         </span>
                       </div>
@@ -2031,7 +2047,7 @@ export default function PatientDashboard({
                   <h3 id="dispatch-dialog-title" className="font-display font-black text-sm text-[color:var(--ink)] leading-tight">
                     Dispatch Prescription to Pharmacy
                   </h3>
-                  <p className="text-[11px] font-mono text-slate-500">RX CODE: {dispatchingRx.code}</p>
+                  <p className="text-xs font-mono text-slate-500">RX CODE: {dispatchingRx.code}</p>
                 </div>
               </div>
               <button
@@ -2052,7 +2068,7 @@ export default function PatientDashboard({
               {Array.isArray(dispatchingRx.items) && dispatchingRx.items[0]?.instructions && (
                 <p className="text-slate-600 font-medium">{dispatchingRx.items[0].instructions}</p>
               )}
-              <p className="text-[11px] font-mono text-slate-500 pt-0.5">
+              <p className="text-xs font-mono text-slate-500 pt-0.5">
                 Prescribing Doctor: {dispatchingRx.doctor?.name || 'Verified Physician'}
               </p>
             </div>
@@ -2088,14 +2104,14 @@ export default function PatientDashboard({
                           />
                           <div className="min-w-0 flex-1">
                             <p className="font-bold text-xs text-[color:var(--ink)] leading-snug">{p.name}</p>
-                            <p className="text-[11px] text-slate-500 truncate mt-0.5 flex items-center gap-1">
+                            <p className="text-xs text-slate-500 truncate mt-0.5 flex items-center gap-1">
                               <MapPin className="h-3 w-3 shrink-0 text-slate-400" />
                               <span>{p.address}, {p.city}</span>
                             </p>
                             {p.services.length > 0 && (
                               <div className="flex flex-wrap gap-1 mt-1.5">
                                 {p.services.map((s, idx) => (
-                                  <span key={idx} className="text-[9px] font-bold uppercase bg-white border border-[color:var(--t-200)] px-1.5 py-0.2 text-slate-700">
+                                  <span key={idx} className="text-xs font-bold uppercase bg-white border border-[color:var(--t-200)] px-1.5 py-0.2 text-slate-700">
                                     {s}
                                   </span>
                                 ))}

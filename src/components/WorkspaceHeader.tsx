@@ -54,7 +54,7 @@ export default function WorkspaceHeader<T extends string = string>({
           </div>
           <div className="min-w-0">
             {eyebrow && (
-              <span className="text-[10px] font-mono font-black uppercase tracking-wider text-[color:var(--t-700)] block mb-0.5">
+              <span className="text-xs font-mono font-black uppercase tracking-wider text-[color:var(--t-700)] block mb-0.5">
                 {eyebrow}
               </span>
             )}
@@ -65,7 +65,7 @@ export default function WorkspaceHeader<T extends string = string>({
               {badges}
             </div>
             {description && (
-              <p className="text-xs text-slate-500 font-medium mt-0.5 leading-relaxed line-clamp-2 md:line-clamp-none">
+              <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed line-clamp-2 md:line-clamp-none">
                 {description}
               </p>
             )}
@@ -104,19 +104,19 @@ export default function WorkspaceHeader<T extends string = string>({
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => onTabChange?.(tab.id)}
-                  className={`min-h-[32px] px-3 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`min-h-[44px] px-3.5 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                     isActive
                       ? 'bg-[color:var(--t-600)] text-white shadow-2xs border border-[color:var(--t-700)]'
                       : 'bg-[color:var(--t-50)]/70 hover:bg-[color:var(--t-100)] text-slate-700 hover:text-[color:var(--t-700)] border border-[color:var(--t-200)]'
                   }`}
                 >
                   {TabIcon && (
-                    <TabIcon className={`h-3.5 w-3.5 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                    <TabIcon className={`h-3.5 w-3.5 ${isActive ? 'text-white' : 'text-slate-600'}`} />
                   )}
                   <span>{tab.label}</span>
                   {tab.count !== undefined && (
                     <span
-                      className={`text-[10px] font-mono font-bold px-1.5 py-0.2 leading-none ${
+                      className={`text-xs font-mono font-bold px-1.5 py-0.2 leading-none ${
                         isActive
                           ? 'bg-white/20 text-white'
                           : 'bg-white text-slate-700 border border-[color:var(--t-200)]'
@@ -126,7 +126,7 @@ export default function WorkspaceHeader<T extends string = string>({
                     </span>
                   )}
                   {tab.badge && (
-                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
                       {tab.badge}
                     </span>
                   )}

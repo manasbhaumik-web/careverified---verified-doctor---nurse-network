@@ -3,7 +3,37 @@ import { Send, MessageSquare, Search, Ban } from 'lucide-react';
 import { ChatMessage } from '../types';
 import DashboardHeader from './DashboardHeader';
 
-interface Thread { id: string; name: string; role: string; blocked: boolean }
+interface Thread { id: string; name: string; role: string; blocked: boolean; verified?: boolean }
+
+/** "now", "5 m", "3 h", or the date: short enough for a list row. */
+function ago(iso: string): string {
+  const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  if (mins < 1) return 'now';
+  if (mins < 60) return `${mins} m`;
+  if (mins < 1440) return `${Math.floor(mins / 60)} h`;
+  return new Date(iso).toLocaleDateString([], { day: 'numeric', month: 'short' });
+}
+
+/**
+ * The server does not track which messages were read, so "new reply" is worked out in this browser: a conversation is new
+ * when its latest message from the other person is newer than the last time you had it open here.
+ */
+const seenKey = (userId: string) => `medcred-mailbox-seen:${userId}`;
+
+/**
+ * "Message" on a doctor's card: remember who to open, then go to the mailbox, which opens that conversation.
+ * (Kept in sessionStorage so the two screens need no shared state.)
+ */
+const OPEN_KEY = 'medcred-mailbox-open';
+export function requestConversationWith(threadId: string) {
+  try { sessionStorage.setItem(OPEN_KEY, threadId); } catch { /* the mailbox then opens on the newest conversation */ }
+}
+function takeConversationRequest(): string | null {
+  try { const v = sessionStorage.getItem(OPEN_KEY); if (v) sessionStorage.removeItem(OPEN_KEY); return v; } catch { return null; }
+}
+function loadSeen(userId: string): Record<string, string> {
+  try { return JSON.parse(localStorage.getItem(seenKey(userId)) || '{}') || {}; } catch { return {}; }
+}
 
 const jpost = (url: string, body?: unknown, method = 'POST') =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -18,11 +48,18 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
   const [text, setText] = useState('');
   const [search, setSearch] = useState('');
   const [error, setError] = useState('');
+  const [seen, setSeen] = useState<Record<string, string>>(() => loadSeen(currentUserId));
   const endRef = useRef<HTMLDivElement>(null);
+  const picked = useRef(false); // true once the person has chosen a conversation themselves
 
   const loadThreads = useCallback(async () => {
     const d = await fetch('/api/chats/threads').then(r => r.json()).catch(() => null);
-    if (d?.status === 'success') { setThreads(d.data); setActiveId(prev => prev ?? d.data[0]?.id ?? null); }
+    if (d?.status === 'success') {
+      setThreads(d.data);
+      setActiveId(prev => prev ?? d.data[0]?.id ?? null);
+      const want = takeConversationRequest();
+      if (want && (d.data as Thread[]).some(t => t.id === want)) { picked.current = true; setActiveId(want); setMobileThread(true); }
+    }
   }, []);
   const loadMessages = useCallback(async () => {
     const d = await fetch('/api/chats').then(r => r.json()).catch(() => null);
@@ -35,6 +72,14 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
     return () => clearInterval(t);
   }, [loadThreads, loadMessages]);
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, activeId]);
+
+  // Until the person picks one, open the conversation with the most recent message (not just the first contact)
+  useEffect(() => {
+    if (picked.current || threads.length === 0 || messages.length === 0) return;
+    const newest = messages.reduce((a, m) => (m.timestamp > a.timestamp ? m : a));
+    const id = threads.find(t => t.id === newest.senderId || t.id === newest.receiverId)?.id;
+    if (id && id !== activeId) setActiveId(id);
+  }, [threads, messages]);
 
   const current = threads.find(t => t.id === activeId) ?? null;
   const thread = messages.filter(m => current && (m.senderId === current.id || m.receiverId === current.id));
@@ -57,7 +102,31 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
     loadThreads();
   };
 
-  const shown = threads.filter(t => t.name.toLowerCase().includes(search.toLowerCase()));
+  // Latest message and newest incoming message per conversation
+  const summary = (t: Thread) => {
+    const all = messages.filter(m => m.senderId === t.id || m.receiverId === t.id);
+    const last = all.reduce<ChatMessage | null>((a, m) => (!a || m.timestamp > a.timestamp ? m : a), null);
+    const lastIn = all.filter(m => m.senderId === t.id).reduce<string | null>((a, m) => (!a || m.timestamp > a ? m.timestamp : a), null);
+    return { last, isNew: !!lastIn && (!seen[t.id] || lastIn > seen[t.id]) };
+  };
+
+  // Opening a conversation (a visible one, not just the default selection on a phone) marks it as seen
+  useEffect(() => {
+    if (!current) return;
+    const visible = mobileThread || (typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 1024px)').matches);
+    if (!visible) return;
+    const newest = thread.filter(m => m.senderId === current.id).reduce<string | null>((a, m) => (!a || m.timestamp > a ? m.timestamp : a), null);
+    if (!newest || (seen[current.id] && seen[current.id] >= newest)) return;
+    const next = { ...seen, [current.id]: newest };
+    setSeen(next);
+    try { localStorage.setItem(seenKey(currentUserId), JSON.stringify(next)); } catch { /* storage unavailable */ }
+  }, [current?.id, thread.length, mobileThread]);
+
+  // Conversations with messages first (newest at the top), then the rest by name
+  const shown = threads
+    .filter(t => t.name.toLowerCase().includes(search.toLowerCase()))
+    .map(t => ({ t, ...summary(t) }))
+    .sort((a, b) => (b.last?.timestamp ?? '').localeCompare(a.last?.timestamp ?? '') || a.t.name.localeCompare(b.t.name));
   return (
     <div className={embedded ? "space-y-4" : "w-full space-y-0"} id="secure-messenger-panel">
       {!embedded && (
@@ -82,19 +151,27 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
             </div>
           </div>
           <ul className="flex-1 overflow-y-auto divide-y divide-[color:var(--t-100)]">
-            {shown.map(t => (
+            {shown.map(({ t, last, isNew }) => (
               <li key={t.id}>
-                <button onClick={() => { setActiveId(t.id); setMobileThread(true); }} aria-current={t.id === activeId ? 'true' : undefined}
-                  className={`w-full text-left px-4 py-3.5 flex items-center gap-3 cursor-pointer transition-colors ${t.id === activeId ? 'bg-[color:var(--t-50)] shadow-[inset_4px_0_0_var(--t-600)]' : 'hover:bg-[color:var(--t-50)]'}`}>
-                  <div className="relative shrink-0">
-                    <div className="h-10 w-10 bg-[color:var(--t-100)] border border-[color:var(--t-200)] flex items-center justify-center font-bold text-xs text-[color:var(--t-700)]">
-                      {t.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
-                    </div>
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+                <button onClick={() => { picked.current = true; setActiveId(t.id); setMobileThread(true); }} aria-current={t.id === activeId ? 'true' : undefined}
+                  className={`w-full text-left px-4 py-3.5 min-h-[68px] flex items-center gap-3 cursor-pointer transition-colors ${t.id === activeId ? 'bg-[color:var(--t-50)] shadow-[inset_4px_0_0_var(--t-600)]' : 'hover:bg-[color:var(--t-50)]'}`}>
+                  <div className="h-10 w-10 shrink-0 bg-[color:var(--t-100)] border border-[color:var(--t-200)] flex items-center justify-center font-bold text-xs text-[color:var(--t-700)]">
+                    {t.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-bold text-[color:var(--ink)] truncate">{t.name}</p>
-                    <p className="text-xs text-[color:var(--ink-2)] truncate mt-0.5">{t.role}{t.blocked ? ' · blocked' : ''}</p>
+                    <div className="flex items-baseline justify-between gap-2">
+                      <p className={`text-sm text-[color:var(--ink)] truncate ${isNew ? 'font-extrabold' : 'font-bold'}`}>{t.name}</p>
+                      {last && <span className="text-xs text-slate-600 shrink-0">{ago(last.timestamp)}</span>}
+                    </div>
+                    <div className="flex items-center justify-between gap-2 mt-0.5">
+                      <p className={`text-xs truncate ${isNew ? 'text-[color:var(--ink)] font-semibold' : 'text-slate-600'}`}>
+                        {last ? `${last.senderId === t.id ? '' : 'You: '}${last.text}` : `${t.role}${t.blocked ? ' · blocked' : ''}`}
+                      </p>
+                      {isNew && (
+                        <span className="shrink-0 h-2.5 w-2.5 rounded-full bg-[color:var(--t-600)]" role="img" aria-label="New reply"></span>
+                      )}
+                    </div>
+                    {last && <p className="text-xs text-slate-600 truncate">{t.role}{t.blocked ? ' · blocked' : ''}</p>}
                   </div>
                 </button>
               </li>
@@ -120,7 +197,7 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
                   <div className="min-w-0">
                     <h2 className="text-sm font-bold text-[color:var(--ink)] truncate flex items-center gap-2">
                       {current.name}
-                      <span className="text-[10px] font-mono uppercase tracking-wider bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-1.5 py-0.5">Verified</span>
+                      {current.verified && <span className="text-xs font-mono uppercase tracking-wider bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-1.5 py-0.5">Verified</span>}
                     </h2>
                     <p className="text-xs text-[color:var(--ink-2)] truncate">{current.role}</p>
                   </div>
@@ -143,7 +220,7 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
                       <div className={`px-4 py-3 text-sm leading-relaxed ${mine ? 'bg-[color:var(--t-600)] text-white shadow-xs' : 'bg-white border border-[color:var(--t-200)] text-[color:var(--ink)] shadow-xs'}`}>
                         {m.text}
                       </div>
-                      <span className="text-[11px] text-slate-500 mt-1 font-mono">{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span className="text-xs text-slate-600 mt-1">{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
                   );
                 })}

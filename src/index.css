@@ -35,6 +35,25 @@
   --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Type scale: the only sizes the app uses, from Tailwind's own steps (no text-[Npx]; tests/type-scale.test.ts enforces it).
+   *   text-xs   12px  badges, captions, helper text, table cells, eyebrows (the minimum)
+   *   text-sm   14px  buttons, form fields, tabs, secondary body text
+   *   text-base 16px  body text, card titles
+   *   text-lg   18px  small headings
+   *   text-xl   20px  section headings
+   *   text-2xl  24px  page headings
+   *   text-3xl  30px  hero headings (phones)
+   *   text-4xl  36px  hero headings (desktop)
+   * One line height per step, set here so every use of a step looks the same. */
+  --text-xs: 0.75rem;   --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;    --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;   --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;   --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem; --text-3xl--line-height: 2.25rem;
+  --text-4xl: 2.25rem;  --text-4xl--line-height: 2.5rem;
+
   /* Single family: mono utilities resolve to Inter (tabular figures set below) */
   --font-mono: "Inter", ui-sans-serif, system-ui, sans-serif;
 
@@ -385,6 +404,10 @@ footer button.bg-slate-800:hover,
   .print-article, .print-article * { visibility: visible; }
   .print-article { position: absolute; inset: 0; max-height: none !important; width: 100% !important; max-width: none !important; box-shadow: none !important; border: 0 !important; }
   .print-article .no-print { display: none !important; }
+  /* Printing one prescription card */
+  .print-rx, .print-rx * { visibility: visible; }
+  .print-rx { position: absolute; inset: 0 auto auto 0; width: 100%; box-shadow: none !important; }
+  .print-rx .no-print { display: none !important; }
 }
 
 /* -------------------------------------------------------------
@@ -441,9 +464,8 @@ a, button, [role="button"], summary, label, select, input { touch-action: manipu
   button.min-h-\[44px\]::after, button.min-h-11::after, button.h-11::after, button.h-12::after, button.h-14::after { inset: 0; }
 }
 
-/* Small screens: nothing under 11px, long words and codes wrap instead of pushing the layout */
+/* Small screens: long words and codes wrap instead of pushing the layout */
 @media (max-width: 639px) {
-  .text-\[8px\], .text-\[9px\], .text-\[10px\] { font-size: 11px; }
   h1, h2, h3, p, li, dd, td { overflow-wrap: anywhere; }
   table { font-size: 12px; }
 }
@@ -589,7 +611,7 @@ a, button, [role="button"], summary, label, select, input { touch-action: manipu
 
 .section-index-badge {
   font-family: var(--font-mono, monospace);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 800;
   color: var(--t-600);
   background: var(--t-50);

@@ -22,6 +22,7 @@ import SEODashboard from './components/SEODashboard';
 import AdminDashboard from './components/AdminDashboard';
 import NotificationBell from './components/NotificationBell';
 import ThemeSwitcher from './components/ThemeSwitcher';
+import OnCallChip from './components/OnCallChip';
 import LocaleSwitcher from './components/LocaleSwitcher';
 import { useLocale } from './locale';
 import SOSButton from './components/SOSButton';
@@ -459,7 +460,8 @@ export default function App() {
 
   // Append any active extensions that aren't standard
   const standardIds = ['patient_dashboard', 'patient_care', 'patient_records', 'patient_services', 'patient_discovery', 'registry', 'nurses', 'recruitment', 'articles', 'onboard', 'practice_compliance', 'performance_profile', 'messages', 'seo', 'admin', 'admin_registry', 'admin_ops', 'admin_facilities', 'admin_growth', 'consult', 'oncall', 'earnings', 'quality', 'help', 'facility_workspace', 'facility_staffing', 'facility_care', 'facility_profile', 'pharmacy_workspace', 'pharmacy_dispensing', 'pharmacy_operations', 'records', 'prescriptions', 'certs', 'labs', 'saved'];
-  const customPackages = (currentUser.role === 'pharmacy' || currentUser.role === 'facility') ? [] : packages.filter(p => !standardIds.includes(p.id) && p.isEnabled);
+  // Hospital health-screening packages (they have a facility) are patient products listed under Services, not app modules: never menu items
+  const customPackages = (currentUser.role === 'pharmacy' || currentUser.role === 'facility') ? [] : packages.filter(p => !(p as any).facility_id && !standardIds.includes(p.id) && p.isEnabled);
   customPackages.forEach(p => {
     let icon = Puzzle;
     if (p.icon === 'Activity') icon = Activity;
@@ -528,10 +530,10 @@ export default function App() {
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
             </div>
             <div className="leading-none">
-              <span className="font-display font-extrabold text-[22px] text-white tracking-tight block">
+              <span className="font-display font-extrabold text-xl text-white tracking-tight block">
                 MedCred<span className="text-white/80">.</span>
               </span>
-              <span className="text-[10px] font-mono font-bold text-white/90 uppercase tracking-[0.14em] block mt-1">
+              <span className="text-xs font-mono font-bold text-white/90 uppercase tracking-[0.14em] block mt-1">
                 {currentUser.role === 'admin' ? 'Board Console' : currentUser.role === 'practitioner' ? 'Practitioner Hub' : currentUser.role === 'pharmacy' ? 'Pharmacy Workspace' : 'Member Portal'}
               </span>
             </div>
@@ -561,7 +563,7 @@ export default function App() {
                 />
                 <div className="text-left hidden xl:block leading-tight">
                   <p className="text-xs font-black text-white leading-none truncate max-w-[140px]">{currentUser.name}</p>
-                  <p className="text-[10px] text-white/80 font-bold uppercase tracking-wider mt-0.5">
+                  <p className="text-xs text-white/80 font-bold uppercase tracking-wider mt-0.5">
                     {currentUser.role === 'admin' ? 'Board Admin' : currentUser.role === 'practitioner' ? 'Practitioner' : currentUser.role === 'pharmacy' ? 'Pharmacy' : 'Member'}
                   </p>
                 </div>
@@ -623,72 +625,72 @@ export default function App() {
                       </div>
 
                       {item.id === 'patient_care' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Live Care
                         </span>
                       )}
                       {item.id === 'patient_records' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           EHR
                         </span>
                       )}
                       {item.id === 'patient_services' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Packages
                         </span>
                       )}
                       {item.id === 'facility_staffing' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Shifts
                         </span>
                       )}
                       {item.id === 'pharmacy_dispensing' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Rx Live
                         </span>
                       )}
                       {item.id === 'admin_registry' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Audit
                         </span>
                       )}
                       {item.id === 'admin_ops' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Ops
                         </span>
                       )}
                       {item.id === 'messages' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-100)] text-[color:var(--t-600)]'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-100)] text-[color:var(--t-600)]'}`}>
                           2 new
                         </span>
                       )}
                       {item.id === 'recruitment' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           9 Open
                         </span>
                       )}
                       {item.id === 'onboard' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Clinical
                         </span>
                       )}
                       {item.id === 'practice_compliance' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           MMC/LJM
                         </span>
                       )}
                       {item.id === 'performance_profile' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Profile
                         </span>
                       )}
                       {item.id === 'articles' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Library
                         </span>
                       )}
                       {item.id === 'tourism_desk' && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Global
                         </span>
                       )}
@@ -697,7 +699,7 @@ export default function App() {
                 })}
 
                 <div className="flex items-center justify-between px-1 pt-3 mt-3 border-t border-[color:var(--t-200)]">
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-[color:var(--ink-2)]">Settings</span>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ink-2)]">Settings</span>
                   <span className="flex items-center gap-2"><LocaleSwitcher /><ThemeSwitcher /></span>
                 </div>
                 <div className="pt-3 mt-3 border-t border-[color:var(--t-200)] flex items-center justify-between gap-3 px-1">
@@ -710,7 +712,7 @@ export default function App() {
                     />
                     <div className="min-w-0">
                       <p className="text-xs font-extrabold text-[color:var(--ink)] leading-none truncate">{currentUser.name}</p>
-                      <p className="text-[11px] text-[color:var(--ink-2)] font-semibold capitalize mt-1">{currentUser.role === 'patient' ? 'member' : currentUser.role} Account</p>
+                      <p className="text-xs text-[color:var(--ink-2)] font-semibold capitalize mt-1">{currentUser.role === 'patient' ? 'member' : currentUser.role} Account</p>
                     </div>
                   </div>
                   <button
@@ -754,77 +756,77 @@ export default function App() {
                     <span>{item.name}</span>
 
                     {item.id === 'patient_care' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Live Care
                       </span>
                     )}
                     {item.id === 'patient_records' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         EHR
                       </span>
                     )}
                     {item.id === 'patient_services' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Packages
                       </span>
                     )}
                     {item.id === 'facility_staffing' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Shifts
                       </span>
                     )}
                     {item.id === 'pharmacy_dispensing' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Rx Live
                       </span>
                     )}
                     {item.id === 'admin_registry' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Audit
                       </span>
                     )}
                     {item.id === 'admin_ops' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Ops
                       </span>
                     )}
                     {item.id === 'messages' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         2 new
                       </span>
                     )}
                     {item.id === 'recruitment' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         9 Open
                       </span>
                     )}
                     {item.id === 'onboard' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Clinical
                       </span>
                     )}
                     {item.id === 'practice_compliance' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         MMC/LJM
                       </span>
                     )}
                     {item.id === 'performance_profile' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Profile
                       </span>
                     )}
                     {item.id === 'articles' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Library
                       </span>
                     )}
                     {item.id === 'tourism_desk' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Global
                       </span>
                     )}
                     {item.id === 'seo' && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         98%
                       </span>
                     )}
@@ -835,10 +837,7 @@ export default function App() {
           </div>
 
           {/* Right: Registry live doctor telemetry indicator */}
-          <div className="hidden xl:flex items-center gap-2.5 self-center shrink-0 whitespace-nowrap bg-white/15 border-0 px-3.5 py-1.5 rounded-none text-[11px] font-extrabold text-white my-auto">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>24/7 MMC Doctors On-Call</span>
-          </div>
+          <OnCallChip />
 
         </div>
       </div>
@@ -1181,8 +1180,8 @@ export default function App() {
                         description={`Compiled & hot-loaded by ${activePkg.author}`}
                         actions={
                           <>
-                            <span className="bg-[color:var(--t-50)] text-[color:var(--t-600)] text-[10px] font-extrabold px-2 py-0.5 rounded-lg border border-[color:var(--t-200)]">v{activePkg.version}</span>
-                            <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-3 py-1.5 rounded-xs border border-emerald-200 uppercase tracking-wider inline-flex items-center gap-1.5">
+                            <span className="bg-[color:var(--t-50)] text-[color:var(--t-600)] text-xs font-extrabold px-2 py-0.5 rounded-lg border border-[color:var(--t-200)]">v{activePkg.version}</span>
+                            <span className="bg-emerald-50 text-emerald-800 text-xs font-extrabold px-3 py-1.5 rounded-xs border border-emerald-200 uppercase tracking-wider inline-flex items-center gap-1.5">
                               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-xs animate-pulse"></span>
                               <span>Active Runtime Package</span>
                             </span>
@@ -1207,16 +1206,16 @@ export default function App() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                           <div className="space-y-4">
                             <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
-                              <span className="text-[10px] text-slate-400 font-extrabold uppercase">Mountpoint Hook</span>
+                              <span className="text-xs text-slate-400 font-extrabold uppercase">Mountpoint Hook</span>
                               <p className="text-xs font-mono font-bold text-[color:var(--t-600)]">/src/modules/{activePkg.id}/index.tsx</p>
                             </div>
                             <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
-                              <span className="text-[10px] text-slate-400 font-extrabold uppercase">Isolation</span>
+                              <span className="text-xs text-slate-400 font-extrabold uppercase">Isolation</span>
                               <p className="text-xs font-mono font-bold text-emerald-600">Runs inside the app</p>
                             </div>
                           </div>
 
-                          <div className="bg-slate-100 text-slate-800 border border-slate-300 font-mono p-4 rounded-xl text-[10px] leading-relaxed shadow-inner overflow-x-auto max-h-40">
+                          <div className="bg-slate-100 text-slate-800 border border-slate-300 font-mono p-4 rounded-xl text-xs leading-relaxed shadow-inner overflow-x-auto max-h-40">
                             <p className="text-emerald-400">[INFO] Hot-mounting package: {activePkg.id}</p>
                             <p className="text-slate-400">[OK] Injecting dynamic layout nodes...</p>
                             <p className="text-slate-400">[OK] Instantiating core API controllers...</p>
@@ -1258,7 +1257,7 @@ export default function App() {
                   type="button"
                   onClick={() => { setActiveView(item.id); setSelectedProfId(null); setMobileMenuOpen(false); window.scrollTo({ top: 0 }); }}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`w-full h-16 flex flex-col items-center justify-center gap-1 text-[11px] font-bold cursor-pointer ${isActive ? 'text-[color:var(--t-700)]' : 'text-slate-500'}`}
+                  className={`w-full h-16 flex flex-col items-center justify-center gap-1 text-xs font-bold cursor-pointer ${isActive ? 'text-[color:var(--t-700)]' : 'text-slate-500'}`}
                 >
                   <span className={`h-7 w-12 rounded-full flex items-center justify-center transition-colors ${isActive ? 'bg-[color:var(--t-100)]' : ''}`}><Icon className="h-5 w-5" /></span>
                   <span className="max-w-full truncate px-1">{SHORT_LABEL[item.id] ?? item.name}</span>
@@ -1271,7 +1270,7 @@ export default function App() {
               type="button"
               onClick={() => setMobileMenuOpen(o => !o)}
               aria-expanded={mobileMenuOpen}
-              className={`w-full h-16 flex flex-col items-center justify-center gap-1 text-[11px] font-bold cursor-pointer ${mobileMenuOpen ? 'text-[color:var(--t-700)]' : 'text-slate-500'}`}
+              className={`w-full h-16 flex flex-col items-center justify-center gap-1 text-xs font-bold cursor-pointer ${mobileMenuOpen ? 'text-[color:var(--t-700)]' : 'text-slate-500'}`}
             >
               <span className={`h-7 w-12 rounded-full flex items-center justify-center ${mobileMenuOpen ? 'bg-[color:var(--t-100)]' : ''}`}>{mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</span>
               <span>{mobileMenuOpen ? 'Close' : 'More'}</span>

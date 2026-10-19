@@ -10,6 +10,7 @@ import {
 import { ConsultationMode, UserRole, Booking, Review } from '../types';
 import PaymentDialog from './PaymentDialog';
 import { formatMoney } from '../locale';
+import { useSavedProviders } from '../savedProviders';
 
 interface ProfessionalProfileProps {
   professionalId: string;
@@ -17,7 +18,7 @@ interface ProfessionalProfileProps {
   onNewBookingCreated: (booking: Booking) => void;
   reviews: Review[];
   onNewReviewPosted: (review: Review) => void;
-  currentUser: { name: string; email: string; role: string } | null;
+  currentUser: { id?: string; name: string; email: string; role: string } | null;
   prefilledSymptoms?: string;
 }
 
@@ -33,28 +34,13 @@ export default function ProfessionalProfile({
   const [prof, setProf] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   
-  // Saved / Bookmarked state
-  const [isSaved, setIsSaved] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (prof?.id) {
-      const saved = JSON.parse(localStorage.getItem('saved_practitioners') || '[]');
-      setIsSaved(saved.includes(prof.id));
-    }
-  }, [prof?.id]);
+  // Saved / Bookmarked state: on the patient's account, shared with the Care Team page
+  const savedStore = useSavedProviders({ id: currentUser?.id, role: currentUser?.role });
+  const isSaved = !!prof?.id && savedStore.ids.includes(prof.id);
 
   const handleToggleSave = () => {
     if (!prof?.id) return;
-    const saved = JSON.parse(localStorage.getItem('saved_practitioners') || '[]');
-    let updated;
-    if (saved.includes(prof.id)) {
-      updated = saved.filter((id: string) => id !== prof.id);
-      setIsSaved(false);
-    } else {
-      updated = [...saved, prof.id];
-      setIsSaved(true);
-    }
-    localStorage.setItem('saved_practitioners', JSON.stringify(updated));
+    if (isSaved) void savedStore.remove(prof.id); else void savedStore.add(prof.id);
   };
   
   // Booking Form State
@@ -264,7 +250,7 @@ export default function ProfessionalProfile({
       {!bookingSuccess && (
         <div className="lg:hidden fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 bg-white border-t border-[color:var(--t-200)] shadow-[0_-4px_12px_rgba(15,23,42,0.08)] px-4 py-2.5 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold text-slate-500 leading-none">Consultation fee</p>
+            <p className="text-xs font-semibold text-slate-500 leading-none">Consultation fee</p>
             <p className="text-base font-black text-[color:var(--ink)] tabular-nums leading-tight">{formatMoney(prof.fee)}</p>
           </div>
           <button type="button" onClick={() => document.getElementById('booking-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
@@ -286,13 +272,13 @@ export default function ProfessionalProfile({
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
                     <h2 className="text-xl font-extrabold text-[color:var(--ink)]">{prof.name}</h2>
-                    <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 border border-emerald-200 flex items-center gap-1 shadow-2xs">
+                    <span className="bg-emerald-50 text-emerald-800 text-xs font-extrabold px-2 py-0.5 border border-emerald-200 flex items-center gap-1 shadow-2xs">
                       <BadgeCheck className="h-3.5 w-3.5 text-emerald-600" />
                       Verified
                     </span>
                   </div>
 
-                  <span className="inline-block text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
+                  <span className="inline-block text-xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
                     {isDoc ? "Doctor (MMC Registered)" : "Registered Nurse (LJM Registered)"}
                   </span>
 
@@ -309,24 +295,24 @@ export default function ProfessionalProfile({
               </div>
 
               <div className="text-left sm:text-right bg-[color:var(--t-bg)] p-4 border border-[color:var(--t-200)] min-w-[150px]">
-                <span className="text-[10px] text-slate-500 font-bold uppercase block tracking-wider">Consultation Fee</span>
+                <span className="text-xs text-slate-500 font-bold uppercase block tracking-wider">Consultation Fee</span>
                 <span className="text-xl font-extrabold text-[color:var(--t-700)] block">
                   RM {prof.fee}
                   <span className="text-xs font-normal text-slate-500">{isDoc ? "" : "/hr"}</span>
                 </span>
-                <span className="text-[10px] font-mono text-emerald-700 font-bold">Verified Practitioner</span>
+                <span className="text-xs font-mono text-emerald-700 font-bold">Verified Practitioner</span>
               </div>
             </div>
 
             {/* License details */}
             <div className="bg-emerald-50/60 border border-emerald-200 p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <span className="text-[10px] font-bold text-emerald-900 uppercase block tracking-wider">Council Accreditation</span>
+                <span className="text-xs font-bold text-emerald-900 uppercase block tracking-wider">Council Accreditation</span>
                 <p className="text-xs font-semibold text-slate-800 mt-0.5">{prof.medicalCouncil || (prof as any).nursingCouncil}</p>
                 <VerificationScopeBadge prof={prof as any} className="mt-1" />
               </div>
               <div>
-                <span className="text-[10px] font-bold text-emerald-900 uppercase block tracking-wider">Annual Practising Certificate</span>
+                <span className="text-xs font-bold text-emerald-900 uppercase block tracking-wider">Annual Practising Certificate</span>
                 <code className="text-xs font-bold font-mono text-emerald-950 mt-0.5 block">{prof.licenseNumber}</code>
               </div>
             </div>
@@ -342,7 +328,7 @@ export default function ProfessionalProfile({
               </p>
               {credentials.length > 0 && (
                 <div className="pt-3">
-                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-600 mb-1.5">Verified Medical Credentials</p>
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-1.5">Verified Medical Credentials</p>
                   <ul className="flex flex-wrap gap-2">
                     {credentials.map((c, i) => (
                       <li key={i} className="text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-900 px-2.5 py-1">{c.name} · {c.issuer}</li>
@@ -376,7 +362,7 @@ export default function ProfessionalProfile({
                 </h4>
                 <div className="flex flex-wrap gap-1.5">
                   {prof.languages.map((lang: string, i: number) => (
-                    <span key={i} className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-[10px] font-bold py-1 px-2.5">
+                    <span key={i} className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-xs font-bold py-1 px-2.5">
                       {lang}
                     </span>
                   ))}
@@ -404,7 +390,7 @@ export default function ProfessionalProfile({
                 <p className="font-extrabold text-slate-800">Primary Outpatient Ward</p>
                 <p className="text-slate-500 mt-1 font-medium">{prof.practiceAddress}</p>
               </div>
-              <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-2.5 py-1 rounded-lg border border-emerald-100">
+              <span className="bg-emerald-50 text-emerald-800 text-xs font-extrabold px-2.5 py-1 rounded-lg border border-emerald-100">
                 Active Now
               </span>
             </div>
@@ -423,22 +409,22 @@ export default function ProfessionalProfile({
                 <div className="flex justify-center my-1">
                   <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
                 </div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">{filteredReviews.length} Review{filteredReviews.length === 1 ? '' : 's'}</span>
+                <span className="text-xs text-slate-400 font-bold uppercase block">{filteredReviews.length} Review{filteredReviews.length === 1 ? '' : 's'}</span>
               </div>
 
               <div className="text-center md:border-r border-slate-200/50">
                 <span className="text-lg font-extrabold text-[color:var(--t-700)] block">{hasReviews ? `⭐ ${scorePunctuality} / 5` : '—'}</span>
-                <span className="text-[10px] text-slate-500 font-bold uppercase block mt-1">Punctuality</span>
+                <span className="text-xs text-slate-500 font-bold uppercase block mt-1">Punctuality</span>
               </div>
 
               <div className="text-center md:border-r border-slate-200/50">
                 <span className="text-lg font-extrabold text-[color:var(--t-700)] block">{hasReviews ? `⭐ ${scoreCommunication} / 5` : '—'}</span>
-                <span className="text-[10px] text-slate-500 font-bold uppercase block mt-1">Communication</span>
+                <span className="text-xs text-slate-500 font-bold uppercase block mt-1">Communication</span>
               </div>
 
               <div className="text-center">
                 <span className="text-lg font-extrabold text-[color:var(--t-700)] block">{hasReviews ? `⭐ ${scoreSatisfaction} / 5` : '—'}</span>
-                <span className="text-[10px] text-slate-500 font-bold uppercase block mt-1">Satisfaction</span>
+                <span className="text-xs text-slate-500 font-bold uppercase block mt-1">Satisfaction</span>
               </div>
             </div>
 
@@ -453,12 +439,12 @@ export default function ProfessionalProfile({
                       <div>
                         <span className="font-bold text-xs text-slate-800">{rev.patientName}</span>
                         {rev.isVerifiedPatient && (
-                          <span className="bg-emerald-50 text-emerald-800 text-[9px] font-extrabold ml-2 px-1.5 py-0.5 rounded border border-emerald-100">
+                          <span className="bg-emerald-50 text-emerald-800 text-xs font-extrabold ml-2 px-1.5 py-0.5 rounded border border-emerald-100">
                             Verified Patient
                           </span>
                         )}
                       </div>
-                      <span className="text-[10px] text-slate-400 font-semibold">{rev.date}</span>
+                      <span className="text-xs text-slate-400 font-semibold">{rev.date}</span>
                     </div>
 
                     <div className="flex items-center gap-1">
@@ -657,7 +643,7 @@ export default function ProfessionalProfile({
                         type="button"
                         key={idx}
                         onClick={() => setBookingSlot(slot)}
-                        className={`h-10 text-[11px] font-bold border transition-all cursor-pointer ${
+                        className={`h-10 text-xs font-bold border transition-all cursor-pointer ${
                           bookingSlot === slot 
                             ? "bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white shadow-xs" 
                             : "bg-white border-[color:var(--t-200)] text-[color:var(--ink-2)] hover:border-[color:var(--t-600)]"
@@ -674,7 +660,7 @@ export default function ProfessionalProfile({
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)]">Consultation Notes (Optional)</label>
                     {prefilledSymptoms && symptoms === prefilledSymptoms && (
-                      <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5">
+                      <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5">
                         Pre-filled from AI Triage
                       </span>
                     )}

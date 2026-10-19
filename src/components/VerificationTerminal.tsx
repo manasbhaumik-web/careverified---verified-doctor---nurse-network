@@ -465,7 +465,7 @@ export default function VerificationTerminal({
                     return `${greeting}, ${matchedProfile.name}.`;
                   })()}
                 </h3>
-                <span className="text-[11px] font-mono font-semibold text-slate-400 tabular-nums">
+                <span className="text-xs font-mono font-semibold text-slate-400 tabular-nums">
                   {new Date().toLocaleDateString('en-MY', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
               </div>
@@ -508,10 +508,10 @@ export default function VerificationTerminal({
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)]">
+                      <span className="text-xs font-black uppercase tracking-widest text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)]">
                         Next Patient Queue
                       </span>
-                      <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 text-[10px] font-extrabold flex items-center gap-1.5">
+                      <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 text-xs font-extrabold flex items-center gap-1.5">
                         <span className="w-2 h-2 bg-emerald-500 rounded-full inline-block animate-pulse shrink-0 shadow-xs" />
                         Live Telehealth Ready
                       </span>
@@ -531,7 +531,7 @@ export default function VerificationTerminal({
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                  <span className="text-[11px] font-bold text-slate-500 font-mono">
+                  <span className="text-xs font-bold text-slate-500 font-mono">
                     {upcomingBookingsCount} Scheduled
                   </span>
                 </div>
@@ -767,10 +767,9 @@ export default function VerificationTerminal({
           <div id="panel-messages" role="tabpanel" aria-labelledby="tab-messages" tabIndex={0} className="space-y-4 animate-fade-in">
             <WorkspaceHeader
               icon={MessageSquare}
-              eyebrow="Clinical Communications · End-to-End Encrypted"
+              eyebrow="Patient messages"
               title="Secure Clinical Mailbox & Patient Inquiries"
-              description="Private, encrypted doctor-patient chat, specialist referrals, and clinical care team coordination."
-              badges={<BannerBadge tone="brand">PDPA Compliant · 256-bit Encrypted</BannerBadge>}
+              description="Private messages with patients you have treated. Patients are told replies can take time and not to use messages for emergencies."
             />
             <SecureMessenger currentUserId={currentUser?.profileId || currentUser?.id || matchedProfile.id} embedded={true} />
           </div>
@@ -864,27 +863,27 @@ export default function VerificationTerminal({
                   {/* Bio & Details */}
                   <div className="space-y-4 text-xs font-semibold text-slate-600">
                     <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-1.5">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider animate-pulse">Clinical Philosophy</span>
+                      <span className="text-xs text-slate-400 font-bold uppercase tracking-wider animate-pulse">Clinical Philosophy</span>
                       <p className="text-slate-700 leading-relaxed italic whitespace-pre-line">{editBio || "No description provided."}</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Registration ID</span>
+                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">Registration ID</span>
                         <strong className="text-slate-800 font-extrabold">{matchedProfile.id}</strong>
                       </div>
                       <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Co-Pay / Hourly Fee</span>
+                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">Co-Pay / Hourly Fee</span>
                         <strong className="text-slate-800 font-extrabold">RM {editFee}</strong>
                       </div>
                     </div>
 
                     {certifications.length > 0 && (
                       <div className="space-y-1.5">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Verified Clinical Credentials</span>
+                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Verified Clinical Credentials</span>
                         <div className="flex flex-wrap gap-1.5">
                           {certifications.map(cert => (
-                            <span key={cert} className="bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-[10px] font-bold px-2.5 py-1 rounded-md">
+                            <span key={cert} className="bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold px-2.5 py-1 rounded-md">
                               {cert}
                             </span>
                           ))}
@@ -893,7 +892,7 @@ export default function VerificationTerminal({
                     )}
 
                     <div className="space-y-1">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Clinical Center Address</span>
+                      <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Clinical Center Address</span>
                       <p className="text-slate-800 font-bold">{editAddress || "Beach Specialist Center"}, {editCity}</p>
                     </div>
                   </div>
@@ -932,11 +931,11 @@ export default function VerificationTerminal({
       {/* Premium Stepped Progress Guide */}
       <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4.5 mb-6 space-y-3 shadow-3xs select-none">
         <div className="flex items-center justify-between px-1">
-          <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
+          <span className="text-xs font-black uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
             <Award className="h-4 w-4 text-[color:var(--t-600)]" />
             Onboarding Progress Guide
           </span>
-          <span className="text-[10px] text-slate-500 font-mono font-bold">Step {step > 3 ? 3 : step} of 3</span>
+          <span className="text-xs text-slate-500 font-mono font-bold">Step {step > 3 ? 3 : step} of 3</span>
         </div>
         
         <div className="flex items-center justify-between relative">
@@ -951,7 +950,7 @@ export default function VerificationTerminal({
             }`}>
               {step > 1 ? <Check className="h-3.5 w-3.5 stroke-[3]" /> : <span className="text-xs font-black">1</span>}
             </div>
-            <span className={`text-[10px] font-black uppercase hidden sm:inline ${step === 1 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Professional Info</span>
+            <span className={`text-xs font-black uppercase hidden sm:inline ${step === 1 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Professional Info</span>
           </div>
 
           <div className={`flex-1 h-0.5 mx-3 transition-all ${step > 1 ? 'bg-[color:var(--t-600)]' : 'bg-slate-200'}`}></div>
@@ -967,7 +966,7 @@ export default function VerificationTerminal({
             }`}>
               {step > 2 ? <Check className="h-3.5 w-3.5 stroke-[3]" /> : <span className="text-xs font-black">2</span>}
             </div>
-            <span className={`text-[10px] font-black uppercase hidden sm:inline ${step === 2 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Licensing Credentials</span>
+            <span className={`text-xs font-black uppercase hidden sm:inline ${step === 2 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Licensing Credentials</span>
           </div>
 
           <div className={`flex-1 h-0.5 mx-3 transition-all ${step > 2 ? 'bg-[color:var(--t-600)]' : 'bg-slate-200'}`}></div>
@@ -983,7 +982,7 @@ export default function VerificationTerminal({
             }`}>
               {step > 3 ? <Check className="h-3.5 w-3.5 stroke-[3]" /> : <span className="text-xs font-black">3</span>}
             </div>
-            <span className={`text-[10px] font-black uppercase hidden sm:inline ${step === 3 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Certificate Upload</span>
+            <span className={`text-xs font-black uppercase hidden sm:inline ${step === 3 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Certificate Upload</span>
           </div>
         </div>
       </div>
@@ -1228,7 +1227,7 @@ export default function VerificationTerminal({
             <FileText className="h-10 w-10 text-slate-400 mx-auto" />
             <div>
               <p className="text-xs font-bold text-slate-800">Drag & Drop Degree Certificate or Council Practicing Slip</p>
-              <p className="text-[10px] text-slate-500 mt-1">Supports PDF, JPG or PNG formats up to 5MB</p>
+              <p className="text-xs text-slate-500 mt-1">Supports PDF, JPG or PNG formats up to 5MB</p>
             </div>
             {fileAttached && (
               <div className="bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs font-bold py-2 px-4 rounded-xl inline-flex items-center gap-2 mx-auto animate-pulse">
@@ -1297,7 +1296,7 @@ export default function VerificationTerminal({
             </div>
             <div className="flex justify-between font-semibold text-slate-600">
               <span>SEO Slug Allocated:</span>
-              <code className="text-[10px] text-[color:var(--t-600)] font-mono">{success?.seoSlug}</code>
+              <code className="text-xs text-[color:var(--t-600)] font-mono">{success?.seoSlug}</code>
             </div>
             <div className="flex justify-between font-semibold text-slate-600">
               <span>Verification Status:</span>

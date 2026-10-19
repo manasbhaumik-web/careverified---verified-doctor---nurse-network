@@ -117,7 +117,7 @@ export default function DashboardHeader<T extends string>({
                     <div className="flex items-center shrink-0 mx-2 self-center h-6 select-none" aria-hidden="true">
                       <span className="w-px h-5 bg-[color:var(--t-200)]" />
                       {tab.group && (
-                        <span className="ml-2.5 mr-1 text-[9px] font-black uppercase tracking-widest text-[color:var(--t-700)]/70 hidden xl:inline-block">
+                        <span className="ml-2.5 mr-1 text-xs font-black uppercase tracking-widest text-[color:var(--t-700)]/70 hidden xl:inline-block">
                           {tab.group}
                         </span>
                       )}
@@ -131,7 +131,7 @@ export default function DashboardHeader<T extends string>({
                     tabIndex={selected ? 0 : -1}
                     onClick={() => onTabChange?.(tab.id)}
                     onKeyDown={handleKeyDown}
-                    className={`shrink-0 min-h-[48px] px-4 text-[13px] flex items-center gap-2 cursor-pointer border-b transition-colors ${
+                    className={`shrink-0 min-h-[48px] px-4 text-sm flex items-center gap-2 cursor-pointer border-b transition-colors ${
                       selected
                         ? 'font-semibold text-[color:var(--t-700)] border-[color:var(--t-600)]'
                         : 'font-medium text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
@@ -140,7 +140,7 @@ export default function DashboardHeader<T extends string>({
                     <tab.icon className={`h-4 w-4 ${selected ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
                     <span className="whitespace-nowrap">{tab.label}</span>
                     {tab.count !== undefined && tab.count > 0 && (
-                      <span className="tabular-nums text-[11px] min-w-[20px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
+                      <span className="tabular-nums text-xs min-w-[20px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
                         {tab.count}
                       </span>
                     )}
@@ -226,7 +226,7 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
       <div className="space-y-1.5 min-w-0">
         <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap sm:flex-nowrap">
           <Heading className="text-xl sm:text-3xl font-extrabold text-[color:var(--ink)] tracking-tight shrink-0">{name}</Heading>
-          {badges && <div className="inline-flex items-center gap-2 shrink-0 flex-nowrap">{badges}</div>}
+          {badges && <div className="inline-flex items-center gap-2 max-w-full flex-wrap sm:flex-nowrap sm:shrink-0">{badges}</div>}
         </div>
         {description && <p className="text-sm text-[color:var(--ink-2)] leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
         {meta && <div className="flex items-center gap-2.5 text-xs text-[color:var(--ink-2)] font-semibold flex-wrap">{meta}</div>}
@@ -238,16 +238,16 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
 /** Pill used beside the name: brand, success, neutral, or warning. */
 export function BannerBadge({ tone = 'brand', children }: { tone?: 'brand' | 'success' | 'neutral' | 'warning'; children: React.ReactNode }) {
   if (tone === 'success') {
-    return <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
+    return <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   if (tone === 'neutral') {
-    return <span className="bg-slate-50 text-slate-700 border border-slate-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
+    return <span className="bg-slate-50 text-slate-700 border border-slate-300 text-xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   if (tone === 'warning') {
-    return <span className="bg-amber-50 text-amber-800 border border-amber-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
+    return <span className="bg-amber-50 text-amber-800 border border-amber-300 text-xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   return (
-    <span className="bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>
+    <span className="bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>
   );
 }
 
@@ -258,7 +258,7 @@ export function BannerKpis({ items }: { items: { value: React.ReactNode; label: 
       {items.map((k, i) => (
         <div key={k.label} className={`flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-0 min-w-0 ${i > 0 ? 'border-l border-[color:var(--t-100)]' : ''}`}>
           <span className="text-base font-extrabold text-[color:var(--ink)] leading-none tabular-nums">{k.value}</span>
-          <span className="text-[9px] sm:text-[10px] font-bold text-[color:var(--t-600)] uppercase tracking-wider leading-tight text-center">{k.label}</span>
+          <span className="text-xs font-bold text-[color:var(--t-600)] uppercase tracking-wider leading-tight text-center">{k.label}</span>
         </div>
       ))}
     </div>
@@ -269,9 +269,9 @@ export function BannerKpis({ items }: { items: { value: React.ReactNode; label: 
 export function FilterSelect({ label, value, onChange, children }: { label: string; value: string; onChange: (v: string) => void; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1 min-w-0 basis-[calc(50%-8px)] sm:basis-auto sm:w-[190px]">
-      <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-600">{label}</span>
+      <span className="text-xs font-extrabold uppercase tracking-wider text-slate-600">{label}</span>
       <select value={value} onChange={e => onChange(e.target.value)}
-        className="w-full border border-[color:var(--t-200)] bg-white px-2 sm:px-3 min-h-[40px] text-[13px] font-semibold text-[color:var(--ink)] cursor-pointer focus:outline-none focus:border-[color:var(--t-600)]">
+        className="w-full border border-[color:var(--t-200)] bg-white px-2 sm:px-3 min-h-[40px] text-sm font-semibold text-[color:var(--ink)] cursor-pointer focus:outline-none focus:border-[color:var(--t-600)]">
         {children}
       </select>
     </label>
