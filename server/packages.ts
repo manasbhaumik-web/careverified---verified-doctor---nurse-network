@@ -1,4 +1,6 @@
 import crypto from "crypto";
+import fs from "fs";
+import path from "path";
 import type { Application, Request, Response } from "express";
 import { db } from "./db";
 import { audit } from "./audit";
@@ -8,6 +10,27 @@ const newId = (p: string) => `${p}-${crypto.randomBytes(6).toString("hex")}`;
 const iso = () => new Date().toISOString();
 const str = (v: unknown, max = 250) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const fail = (res: Response, code: number, message: string) => res.status(code).json({ status: "error", message });
+
+/**
+ * Images saved with a build-hash in the name (/assets/photo-C0TGKdC3.jpg) only exist in one build. Point them at the stable copy
+ * (/assets/photo.jpg) when it is there, so packages and hospitals never show a broken picture.
+ */
+function stableImagePath(url: string | null | undefined): string | null | undefined {
+  const m = typeof url === "string" ? url.match(/^(\/assets\/[A-Za-z0-9_]+)-[A-Za-z0-9_-]{8}(\.(?:jpg|png))$/) : null;
+  if (!m) return url;
+  const file = `${m[1]}${m[2]}`.replace(/^\//, "");
+  return ["public", "dist"].some(dir => fs.existsSync(path.join(process.cwd(), dir, file))) ? `/${file}` : url;
+}
+function fixSavedImages() {
+  for (const [table, col] of [["medical_packages", "image_url"], ["tourism_facilities", "cover_image"]] as const) {
+    try {
+      for (const r of db.prepare(`SELECT id, ${col} AS img FROM ${table} WHERE ${col} LIKE '/assets/%-%'`).all() as { id: string; img: string }[]) {
+        const fixed = stableImagePath(r.img);
+        if (fixed && fixed !== r.img) db.prepare(`UPDATE ${table} SET ${col} = ? WHERE id = ?`).run(fixed, r.id);
+      }
+    } catch { /* table not created yet */ }
+  }
+}
 
 // -------------------------------------------------------------
 // Initialize Tables & Columns for Packages, Promos, Facilities
@@ -101,7 +124,7 @@ export function initPackagesSchema() {
         ]),
         exclusions: "Additional advanced imaging (CT/MRI) charged separately if clinically indicated.",
         preparation_instructions: "Strict 10-hour overnight fasting required. Plain water allowed. Report to Executive Screening Lounge Level 2 at 8:00 AM.",
-        image_url: "/assets/clean_light_doctor_suite_full-C0TGKdC3.jpg",
+        image_url: "/assets/clean_light_doctor_suite_full.jpg",
         status: "published",
         featured: 1,
       },
@@ -126,7 +149,7 @@ export function initPackagesSchema() {
         ]),
         exclusions: "Interventional catheterisation or stent placement not included.",
         preparation_instructions: "Fast for 4 hours prior. Avoid caffeine, chocolate, and smoking for 12 hours. Continue blood pressure medications as advised.",
-        image_url: "/assets/clinics_hospital_hero_bg-CAmCzOcG.jpg",
+        image_url: "/assets/clinics_hospital_hero_bg.jpg",
         status: "published",
         featured: 1,
       },
@@ -153,7 +176,7 @@ export function initPackagesSchema() {
         ]),
         exclusions: "Pre-existing ICU complications beyond 3 nights single room stay.",
         preparation_instructions: "Pre-admission clinical workup scheduled 3 days prior. Stop anticoagulants/aspirin under physician guidance.",
-        image_url: "/assets/landing_hero_treatment_nursing_pharmacy_2-nl_EhdMX.jpg",
+        image_url: "/assets/landing_hero_treatment_nursing_pharmacy_2.jpg",
         status: "published",
         featured: 1,
       },
@@ -180,7 +203,7 @@ export function initPackagesSchema() {
         ]),
         exclusions: "Emergency caesarean conversion or nursery phototherapy if needed.",
         preparation_instructions: "Bring maternal health record (buku merah / antenatal book) and registration documents.",
-        image_url: "/assets/practitioners_hero_bg-C3LrtmIJ.jpg",
+        image_url: "/assets/practitioners_hero_bg.jpg",
         status: "published",
         featured: 0,
       },
@@ -206,7 +229,7 @@ export function initPackagesSchema() {
         ]),
         exclusions: "Stimulation gonadotropin injections and embryo freezing storage after year 1.",
         preparation_instructions: "Initial consultation on Day 2 of menstrual cycle.",
-        image_url: "/assets/malaysian_female_doctor-Duvufgb3.jpg",
+        image_url: "/assets/malaysian_female_doctor.jpg",
         status: "published",
         featured: 1,
       },
@@ -322,8 +345,11 @@ export function initPackagesSchema() {
       UPDATE tourism_facilities
       SET equipment = ?, amenities = ?, cover_image = ?
       WHERE id = 'fac-demo-1'
-    `).run(defaultEquipment, defaultAmenities, "/assets/clinics_hospital_hero_bg-CAmCzOcG.jpg");
+    `).run(defaultEquipment, defaultAmenities, "/assets/clinics_hospital_hero_bg.jpg");
   }
+
+  // 4. Older rows point at hashed image names
+  fixSavedImages();
 }
 
 // -------------------------------------------------------------
@@ -345,12 +371,23 @@ export function registerPackagesRoutes(app: Application) {
     `;
     const params: any[] = [];
 
-    // Default to published unless specified by facility/admin
-    if (status && typeof status === "string") {
+    // Everyone sees published packages. Only the board (all) and a facility (its own) may list drafts, or ask for "all".
+    const role = req.user?.role;
+    const mayListUnpublished = role === "admin" || role === "facility";
+    const wantStatus = typeof status === "string" ? status : "";
+    if (mayListUnpublished && wantStatus === "all") {
+      // no status filter
+    } else if (mayListUnpublished && wantStatus) {
       sql += " AND p.status = ?";
-      params.push(status);
+      params.push(wantStatus);
     } else {
       sql += " AND p.status = 'published'";
+    }
+
+    // A facility only ever sees its own unpublished packages
+    if (role === "facility" && req.user?.facilityId && wantStatus && wantStatus !== "published") {
+      sql += " AND p.facility_id = ?";
+      params.push(req.user.facilityId);
     }
 
     if (facility_id && typeof facility_id === "string") {
@@ -460,7 +497,7 @@ export function registerPackagesRoutes(app: Application) {
     const fasting = req.body.fastingRequired ? 1 : 0;
     const featured = req.body.featured ? 1 : 0;
     const status = ["published", "draft", "archived"].includes(req.body.status) ? req.body.status : "published";
-    const imageUrl = str(req.body.imageUrl, 300) || "/assets/clean_light_doctor_suite_full-C0TGKdC3.jpg";
+    const imageUrl = str(req.body.imageUrl, 300) || "/assets/clean_light_doctor_suite_full.jpg";
 
     const id = newId("pkg");
     const now = iso();
@@ -774,7 +811,8 @@ export function registerPackagesRoutes(app: Application) {
 
     const orderId = newId("pord");
     const now = iso();
-    const depositPaymentRef = `DEP-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+    // A request reference only: no payment is taken here, so it is never called a payment reference to the patient.
+    const depositPaymentRef = `REQ-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
 
     db.prepare(`
       INSERT INTO package_orders (
@@ -786,18 +824,18 @@ export function registerPackagesRoutes(app: Application) {
     `).run(
       orderId, pkg.id, pkg.facility_id, req.user?.id || null, patientName, patientEmail, patientPhone,
       patientCountry, preferredDate || null, finalPriceMyr, depositPct, depositAmountMyr,
-      remainingPayableMyr, promoCode || null, discountMyr, paymentMethod, "deposit_paid",
+      remainingPayableMyr, promoCode || null, discountMyr, paymentMethod, "awaiting_payment",
       depositPaymentRef, "pending", notes || null, now, now
     );
 
     audit(req, "package.order.deposit", {
       target: ["package_order", orderId],
-      details: { packageId: pkg.id, facilityId: pkg.facility_id, depositAmountMyr, depositPaymentRef }
+      details: { packageId: pkg.id, facilityId: pkg.facility_id, depositAmountMyr, depositPaymentRef, paid: false }
     });
 
     res.status(201).json({
       status: "success",
-      message: `Package reserved successfully! 10% advance deposit of RM ${depositAmountMyr.toFixed(2)} has been secured (Ref: ${depositPaymentRef}).`,
+      message: `Request sent (Ref: ${depositPaymentRef}). No payment has been taken. The hospital will confirm and tell you if a deposit of RM ${depositAmountMyr.toFixed(2)} is needed.`,
       data: {
         orderId,
         depositPaymentRef,
@@ -880,7 +918,7 @@ export function registerPackagesRoutes(app: Application) {
         licenceNo: f.licence_no,
         licenceExpiry: f.licence_expiry,
         isLicenceValid: !f.licence_expiry || f.licence_expiry >= new Date().toISOString().slice(0, 10),
-        coverImage: f.cover_image || "/assets/clinics_hospital_hero_bg-CAmCzOcG.jpg",
+        coverImage: f.cover_image || "/assets/clinics_hospital_hero_bg.jpg",
         specialties: JSON.parse(f.specialties || "[]"),
         equipment: JSON.parse(f.equipment || "[]"),
         amenities: JSON.parse(f.amenities || "[]"),
@@ -915,7 +953,7 @@ export function registerPackagesRoutes(app: Application) {
         licenceCheckedAt: fac.licence_checked_at,
         isLicenceValid: !fac.licence_expiry || fac.licence_expiry >= new Date().toISOString().slice(0, 10),
         mhtcMember: !!fac.mhtc_member,
-        coverImage: fac.cover_image || "/assets/clinics_hospital_hero_bg-CAmCzOcG.jpg",
+        coverImage: fac.cover_image || "/assets/clinics_hospital_hero_bg.jpg",
         specialties: JSON.parse(fac.specialties || "[]"),
         equipment: JSON.parse(fac.equipment || "[]"),
         amenities: JSON.parse(fac.amenities || "[]"),

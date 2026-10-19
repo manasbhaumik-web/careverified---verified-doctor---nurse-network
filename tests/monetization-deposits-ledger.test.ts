@@ -38,7 +38,7 @@ test('guest / patient can reserve a medical package with 10% advance deposit', a
   assert.equal(res.status, 201);
   assert.equal(res.data.status, 'success');
   assert.ok(res.data.data.orderId);
-  assert.ok(res.data.data.depositPaymentRef.startsWith('DEP-'));
+  assert.ok(res.data.data.depositPaymentRef.startsWith('REQ-'));
   assert.equal(res.data.data.patientName, 'Budi Santoso');
   assert.ok(res.data.data.depositAmountMyr > 0);
   assert.equal(
@@ -55,6 +55,7 @@ test('guest / patient can reserve a medical package with 10% advance deposit', a
   assert.equal(order.patient_name, 'Budi Santoso');
   assert.equal(order.deposit_payment_ref, res.data.data.depositPaymentRef);
   assert.equal(order.hospital_confirmation_status, 'pending');
+  assert.equal(order.payment_status, 'awaiting_payment', 'no payment is taken, so the order is not marked paid');
 
   // Facility / admin can confirm the package order
   const confirmRes = await admin.call('PATCH', `/api/facility/package-orders/${order.id}/confirm`, {

@@ -1,7 +1,7 @@
 import DashboardHeader, { BannerKpis, BannerBadge, BannerRow, BannerIdentity } from './DashboardHeader';
 import { expiryLabel } from '../registries';
 import { UserAvatar, getRoleFailoverAvatar } from '../avatars';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   ShieldCheck, UserCheck, Check, X, ShieldAlert, Award, FileText, 
   Loader, CheckCircle2, List, LayoutGrid, Eye,
@@ -60,7 +60,7 @@ export const ADMIN_GROUPS: Record<AdminTabGroup, {
     tabs: [
       { id: 'ops', label: 'Operations & Payments', icon: CreditCard },
       { id: 'quality', label: 'Quality & Support', icon: CheckCircle2 },
-      { id: 'packages', label: 'Package Manager', icon: Puzzle },
+      { id: 'packages', label: 'Medical Packages', icon: Puzzle },
     ],
   },
   facilities: {
@@ -126,7 +126,7 @@ function RequestDocuments({ requestId }: { requestId: string }) {
             <FileText className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
             <span className="font-bold text-slate-800 truncate">{d.originalName}</span>
           </span>
-          <span className="text-[10px] bg-slate-100 border border-slate-200 text-slate-600 px-2 py-0.5 rounded-none font-mono font-bold uppercase">
+          <span className="text-xs bg-slate-100 border border-slate-200 text-slate-600 px-2 py-0.5 rounded-none font-mono font-bold uppercase">
             {d.kind} · {Math.max(1, Math.round(d.size / 1024))} KB
           </span>
         </a>
@@ -619,7 +619,17 @@ export default function AdminDashboard({
     }
   ];
 
-  const getPkgName = (p: any) => p?.name || p?.title || p?.code || 'Clinical Package';
+  // The board sees every package, published or draft. (The list the rest of the app shares only has published ones.)
+  const [adminPackages, setAdminPackages] = useState<any[]>([]);
+  const loadAdminPackages = useCallback(async () => {
+    try {
+      const d = await fetch('/api/packages?status=all').then(r => r.json());
+      if (d?.status === 'success') setAdminPackages(d.data);
+    } catch { /* keep the last list */ }
+  }, []);
+  useEffect(() => { void loadAdminPackages(); }, [loadAdminPackages]);
+
+  const getPkgName = (p: any) => p?.name || p?.title || p?.code || 'Medical package';
   const getPkgDesc = (p: any) => p?.description || '';
   const getPkgAuthor = (p: any) => p?.author || p?.facility_name || 'System Provider';
   const getPkgVersion = (p: any) => p?.version || (p?.code ? `Code: ${p.code}` : '1.0.0');
@@ -634,6 +644,7 @@ export default function AdminDashboard({
       });
       const data = await response.json();
       if (data.status === 'success') {
+        await loadAdminPackages();
         onPackagesChanged();
       }
     } catch (err) {
@@ -848,7 +859,7 @@ export default function AdminDashboard({
           <button
             type="button"
             onClick={revertElevationToRegistrar}
-            className="ml-1 px-1.5 py-0.5 bg-slate-900 hover:bg-slate-800 text-amber-300 text-[10px] font-bold uppercase transition-colors cursor-pointer"
+            className="ml-1 px-1.5 py-0.5 bg-slate-900 hover:bg-slate-800 text-amber-300 text-xs font-bold uppercase transition-colors cursor-pointer"
             title="Immediately drop elevated privileges and revert to Council Medical Registrar"
           >
             Revert
@@ -890,7 +901,7 @@ export default function AdminDashboard({
         <Sliders className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
         <span className="hidden sm:inline">Role: {currentSubRoleConfig.shortTitle}</span>
         <span className="sm:hidden">{currentSubRoleConfig.shortTitle}</span>
-        <span className="text-[10px] text-slate-500 font-mono">▾</span>
+        <span className="text-xs text-slate-500 font-mono">▾</span>
       </button>
 
       <div className="h-5 w-px bg-slate-200 mx-1 hidden sm:block" aria-hidden="true" />
@@ -919,7 +930,7 @@ export default function AdminDashboard({
             : t.id === 'trust'
             ? (pendingSanctions.length > 0 ? pendingSanctions.length : undefined)
             : t.id === 'packages' 
-            ? packages.length 
+            ? adminPackages.length 
             : undefined
         })) || []}
         activeTab={activeTab}
@@ -938,7 +949,7 @@ export default function AdminDashboard({
                 <div className="flex flex-wrap items-center gap-1.5">
                   <BannerBadge tone={currentSubRoleConfig.badgeTone}>{currentSubRoleConfig.shortTitle}</BannerBadge>
                   {elevationSecondsLeft !== null && elevationSecondsLeft > 0 && (
-                    <div className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-amber-400 text-slate-950 border border-amber-500 rounded-none">
+                    <div className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-black uppercase tracking-wider bg-amber-400 text-slate-950 border border-amber-500 rounded-none">
                       <Clock className="h-3 w-3 text-slate-950" />
                       <span>Lease: {formatTimer(elevationSecondsLeft)}</span>
                       <button
@@ -954,7 +965,7 @@ export default function AdminDashboard({
                   <button
                     type="button"
                     onClick={() => setRbacModalOpen(true)}
-                    className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-slate-900 text-amber-300 border border-amber-400 hover:bg-slate-800 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-slate-900 text-amber-300 border border-amber-400 hover:bg-slate-800 transition-colors cursor-pointer"
                   >
                     <Sliders className="h-3 w-3 text-amber-400" />
                     <span>Switch Persona</span>
@@ -969,7 +980,7 @@ export default function AdminDashboard({
               items={[
                 { value: pendingRequests.length, label: 'Pending' },
                 { value: professionals.filter(p => p.verificationStatus === VerificationStatus.VERIFIED).length, label: 'Verified' },
-                { value: packages.filter(p => (p as any).installed).length || 3, label: 'Modules' },
+                { value: adminPackages.filter(p => p.status === 'published').length, label: 'Packages' },
               ]}
             />
           }
@@ -985,7 +996,7 @@ export default function AdminDashboard({
               </div>
               <div className="space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">
+                  <span className="text-xs font-black uppercase tracking-wider px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">
                     Statutory Segregation of Duties (SoD)
                   </span>
                   <span className="text-xs text-slate-500 font-mono">Malaysian Healthcare Regulatory Guard</span>
@@ -1006,29 +1017,29 @@ export default function AdminDashboard({
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
-                  <span className="text-slate-500 block text-[11px]">Assigned Role</span>
+                  <span className="text-slate-500 block text-xs">Assigned Role</span>
                   <span className="font-bold text-slate-900">{currentSubRoleConfig.title}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[11px]">Assigned Department</span>
+                  <span className="text-slate-500 block text-xs">Assigned Department</span>
                   <span className="font-bold text-slate-900">{currentSubRoleConfig.department}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[11px]">Statutory Authority</span>
+                  <span className="text-slate-500 block text-xs">Statutory Authority</span>
                   <span className="font-mono font-bold text-slate-800">{currentSubRoleConfig.authority}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[11px]">Permitted Workspaces</span>
+                  <span className="text-slate-500 block text-xs">Permitted Workspaces</span>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {currentSubRoleConfig.allowedGroups.map(g => (
-                      <span key={g} className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold uppercase text-[10px]">
+                      <span key={g} className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold uppercase text-xs">
                         {ADMIN_GROUPS[g]?.name || g}
                       </span>
                     ))}
                   </div>
                 </div>
               </div>
-              <div className="pt-2 border-t border-slate-200 text-[11px] text-slate-600 leading-relaxed">
+              <div className="pt-2 border-t border-slate-200 text-xs text-slate-600 leading-relaxed">
                 <strong>Statutory Context:</strong> Under the Medical Act 1971, Nurses Act 1950, and Private Healthcare Facilities & Services Act 1998 (Act 586), regulatory credentialing audits and operational/fiscal disbursements must maintain strict segregation of duties to ensure independence, patient safety, and audit integrity.
               </div>
             </div>
@@ -1080,7 +1091,7 @@ export default function AdminDashboard({
                       <h3 className="text-sm font-black text-amber-950 uppercase tracking-tight">
                         Dual-Signoff Disciplinary &amp; Sanction Inbox
                       </h3>
-                      <span className="px-2 py-0.5 text-[10px] font-black uppercase bg-amber-600 text-white">
+                      <span className="px-2 py-0.5 text-xs font-black uppercase bg-amber-600 text-white">
                         {pendingSanctions.length} Countersignature{pendingSanctions.length > 1 ? 's' : ''} Required
                       </span>
                     </div>
@@ -1128,10 +1139,10 @@ export default function AdminDashboard({
                       <div className="space-y-1.5 min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-black text-sm text-slate-900">{prof?.name || s.professional_id}</span>
-                          <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-0.5 border border-slate-200">
+                          <span className="text-xs font-mono font-bold bg-slate-100 text-slate-700 px-2 py-0.5 border border-slate-200">
                             Ref: {s.reference_no}
                           </span>
-                          <span className="text-[10px] font-bold text-amber-800 uppercase px-2 py-0.5 bg-amber-100 border border-amber-200">
+                          <span className="text-xs font-bold text-amber-800 uppercase px-2 py-0.5 bg-amber-100 border border-amber-200">
                             {s.sanction_type.replace(/_/g, ' ')}
                           </span>
                         </div>
@@ -1141,7 +1152,7 @@ export default function AdminDashboard({
                         <p className="text-xs text-slate-600 italic bg-amber-50/50 p-2 border border-amber-200/60">
                           "{s.reason}"
                         </p>
-                        <div className="text-[11px] text-slate-500 font-mono">
+                        <div className="text-xs text-slate-500 font-mono">
                           Initiated by <strong className="text-slate-800">{s.initiator_name}</strong> ({s.initiator_role}) on {new Date(s.created_at).toLocaleDateString()}
                         </div>
                       </div>
@@ -1222,9 +1233,9 @@ export default function AdminDashboard({
             <div>
               <div className="flex items-center gap-2">
                 <h4 className="text-xs font-black uppercase tracking-wider text-white">Statutory Credentialing SLA &amp; Cohort Telemetry</h4>
-                <span className="text-[9px] font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5">30-Day Rolling Window</span>
+                <span className="text-xs font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5">30-Day Rolling Window</span>
               </div>
-              <p className="text-[11px] text-slate-400 font-semibold mt-0.5">Statutory 24-hour turnaround target under MMC &amp; LJM accreditation frameworks.</p>
+              <p className="text-xs text-slate-400 font-semibold mt-0.5">Statutory 24-hour turnaround target under MMC &amp; LJM accreditation frameworks.</p>
             </div>
           </div>
           <div className="flex items-center gap-4 text-xs">
@@ -1232,7 +1243,7 @@ export default function AdminDashboard({
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>96.4% SLA Adherence</span>
             </div>
-            <div className="text-slate-400 font-mono text-[11px]">
+            <div className="text-slate-400 font-mono text-xs">
               Target: &lt;24h · Avg: <strong className="text-white">14.8h</strong>
             </div>
           </div>
@@ -1240,51 +1251,51 @@ export default function AdminDashboard({
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
           <div className="space-y-1">
-            <span className="text-[10px] uppercase font-mono font-bold text-slate-400 tracking-wider">Avg Turnaround</span>
+            <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">Avg Turnaround</span>
             <div className="text-xl font-black text-white flex items-baseline gap-1.5">
               <span>14.8 hrs</span>
-              <span className="text-[10px] text-emerald-400 font-semibold font-mono">(-2.1h MoM)</span>
+              <span className="text-xs text-emerald-400 font-semibold font-mono">(-2.1h MoM)</span>
             </div>
-            <p className="text-[10px] text-slate-400">Statutory SLA limit: 24h</p>
+            <p className="text-xs text-slate-400">Statutory SLA limit: 24h</p>
           </div>
 
           <div className="space-y-1">
-            <span className="text-[10px] uppercase font-mono font-bold text-slate-400 tracking-wider">Statutory Adherence</span>
+            <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">Statutory Adherence</span>
             <div className="text-xl font-black text-white flex items-baseline gap-1.5">
               <span>96.4%</span>
-              <span className="text-[10px] text-emerald-400 font-semibold font-mono">(+1.2%)</span>
+              <span className="text-xs text-emerald-400 font-semibold font-mono">(+1.2%)</span>
             </div>
-            <p className="text-[10px] text-slate-400">137 of 142 on-time</p>
+            <p className="text-xs text-slate-400">137 of 142 on-time</p>
           </div>
 
           <div className="space-y-1">
-            <span className="text-[10px] uppercase font-mono font-bold text-slate-400 tracking-wider">Clearance Velocity</span>
+            <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">Clearance Velocity</span>
             <div className="text-xl font-black text-white flex items-baseline gap-1.5">
               <span>4.8 / day</span>
-              <span className="text-[10px] text-cyan-400 font-semibold font-mono">(Cohort Mode)</span>
+              <span className="text-xs text-cyan-400 font-semibold font-mono">(Cohort Mode)</span>
             </div>
-            <p className="text-[10px] text-slate-400">Peak throughput reached</p>
+            <p className="text-xs text-slate-400">Peak throughput reached</p>
           </div>
 
           <div className="space-y-1">
-            <span className="text-[10px] uppercase font-mono font-bold text-slate-400 tracking-wider">Active Queue SLA Health</span>
+            <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">Active Queue SLA Health</span>
             <div className="flex items-center gap-2 pt-1">
-              <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-800">
+              <span className="inline-flex items-center gap-1 text-xs font-mono font-bold px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-800">
                 <CheckCircle2 className="h-3 w-3" />
                 {pendingRequests.filter(r => getSlaStatus(r).tone === 'normal').length} On-Track
               </span>
-              <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 bg-amber-950 text-amber-300 border border-amber-800">
+              <span className="inline-flex items-center gap-1 text-xs font-mono font-bold px-2 py-0.5 bg-amber-950 text-amber-300 border border-amber-800">
                 <Clock className="h-3 w-3" />
                 {pendingRequests.filter(r => getSlaStatus(r).tone === 'warning').length} Active
               </span>
               {pendingRequests.filter(r => getSlaStatus(r).tone === 'urgent').length > 0 && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 bg-rose-950 text-rose-300 border border-rose-800 animate-pulse">
+                <span className="inline-flex items-center gap-1 text-xs font-mono font-bold px-2 py-0.5 bg-rose-950 text-rose-300 border border-rose-800 animate-pulse">
                   <AlertTriangle className="h-3 w-3" />
                   {pendingRequests.filter(r => getSlaStatus(r).tone === 'urgent').length} Warning
                 </span>
               )}
             </div>
-            <p className="text-[10px] text-slate-400">Automatic priority ordering</p>
+            <p className="text-xs text-slate-400">Automatic priority ordering</p>
           </div>
         </div>
       </div>
@@ -1431,7 +1442,7 @@ export default function AdminDashboard({
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 min-w-0">
                           <h4 className="font-sans text-sm font-black text-slate-900 truncate min-w-0">{reqName}</h4>
-                          <span className={`shrink-0 text-[9px] font-black uppercase px-2 py-0.5 rounded-none border ${
+                          <span className={`shrink-0 text-xs font-black uppercase px-2 py-0.5 rounded-none border ${
                             reqRole === UserRole.DOCTOR ? "bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]" : "bg-emerald-50 text-emerald-800 border-emerald-200"
                           }`}>
                             {reqRole === UserRole.DOCTOR ? "Doctor" : "Nurse"}
@@ -1441,13 +1452,13 @@ export default function AdminDashboard({
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 items-center text-[10px] font-mono font-bold text-slate-600 lg:flex-1">
+                    <div className="flex flex-wrap gap-2 items-center text-xs font-mono font-bold text-slate-600 lg:flex-1">
                       <span className="bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-none">Lic: {req.licenseNumber}</span>
                       <span className="bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-none truncate max-w-[180px]">{req.medicalCouncil || req.nursingCouncil || "National Council"}</span>
                       {(() => {
                         const sla = getSlaStatus(req);
                         return (
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 border text-[10px] font-mono font-bold ${
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 border text-xs font-mono font-bold ${
                             sla.tone === 'urgent'
                               ? 'bg-rose-50 text-rose-800 border-rose-300 animate-pulse'
                               : sla.tone === 'warning'
@@ -1505,7 +1516,7 @@ export default function AdminDashboard({
                       <div>
                         <div className="flex items-center gap-2">
                           <h4 className="text-sm font-black text-slate-900">{reqName}</h4>
-                          <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-none border ${
+                          <span className={`text-xs font-black uppercase px-2 py-0.5 rounded-none border ${
                             reqRole === UserRole.DOCTOR ? "bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]" : "bg-emerald-50 text-emerald-800 border-emerald-200"
                           }`}>
                             {reqRole === UserRole.DOCTOR ? "Doctor" : "Registered Nurse"}
@@ -1516,7 +1527,7 @@ export default function AdminDashboard({
                           {(() => {
                             const sla = getSlaStatus(req);
                             return (
-                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 border text-[9px] font-mono font-bold ${
+                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 border text-xs font-mono font-bold ${
                                 sla.tone === 'urgent'
                                   ? 'bg-rose-50 text-rose-800 border-rose-300 animate-pulse'
                                   : sla.tone === 'warning'
@@ -1534,21 +1545,21 @@ export default function AdminDashboard({
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                       <div className="bg-slate-50 p-3 rounded-none border border-slate-200">
-                        <span className="text-[10px] text-slate-500 font-black block uppercase tracking-wide">Submitted License</span>
+                        <span className="text-xs text-slate-500 font-black block uppercase tracking-wide">Submitted License</span>
                         <code className="text-xs font-bold font-mono text-slate-900 mt-0.5 block">{req.licenseNumber}</code>
                       </div>
                       <div className="bg-slate-50 p-3 rounded-none border border-slate-200">
-                        <span className="text-[10px] text-slate-500 font-black block uppercase tracking-wide">Council Registry</span>
+                        <span className="text-xs text-slate-500 font-black block uppercase tracking-wide">Council Registry</span>
                         <p className="text-xs font-bold text-slate-800 mt-0.5 truncate">{req.medicalCouncil || req.nursingCouncil || "National Council"}</p>
                       </div>
                       <div className="bg-slate-50 p-3 rounded-none border border-slate-200">
-                        <span className="text-[10px] text-slate-500 font-black block uppercase tracking-wide">Primary Degree</span>
+                        <span className="text-xs text-slate-500 font-black block uppercase tracking-wide">Primary Degree</span>
                         <p className="text-xs font-bold text-slate-800 mt-0.5 truncate">{reqEducation}</p>
                       </div>
                     </div>
 
                     <div>
-                      <span className="text-[10px] text-slate-500 font-black block uppercase tracking-wide mb-1">Onboarding Philosophy & Bio</span>
+                      <span className="text-xs text-slate-500 font-black block uppercase tracking-wide mb-1">Onboarding Philosophy & Bio</span>
                       <p className="text-xs text-slate-650 leading-relaxed font-semibold bg-slate-50 p-3.5 rounded-none border border-slate-200 italic">
                         "{reqBio}"
                       </p>
@@ -1583,7 +1594,7 @@ export default function AdminDashboard({
           >
             <div className="flex items-start justify-between border-b border-slate-200 pb-3">
               <div>
-                <span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider block">Statutory Cohort Accreditation</span>
+                <span className="text-xs font-black uppercase text-emerald-800 tracking-wider block">Statutory Cohort Accreditation</span>
                 <h3 className="font-sans text-lg font-black text-slate-900">
                   Batch Verify & Approve ({selectedRequestIds.length} Practitioners)
                 </h3>
@@ -1600,7 +1611,7 @@ export default function AdminDashboard({
 
             <div className="space-y-4 text-xs">
               <div>
-                <label className="text-[10px] font-black uppercase text-slate-600 block mb-1.5 tracking-wider">
+                <label className="text-xs font-black uppercase text-slate-600 block mb-1.5 tracking-wider">
                   Selected Cohort Practitioners
                 </label>
                 <div className="max-h-40 overflow-y-auto border border-slate-200 divide-y divide-slate-100 bg-slate-50 p-2">
@@ -1609,9 +1620,9 @@ export default function AdminDashboard({
                     .map(r => (
                       <div key={r.id} className="py-1.5 flex items-center justify-between text-slate-800">
                         <span className="font-bold">{r.userName || r.name}</span>
-                        <div className="flex items-center gap-2 font-mono text-[11px] text-slate-600">
+                        <div className="flex items-center gap-2 font-mono text-xs text-slate-600">
                           <span>{r.licenseNumber}</span>
-                          <span className="bg-slate-200 px-1.5 py-0.5 text-[9px] font-bold uppercase">{r.userType || r.role || 'Doctor'}</span>
+                          <span className="bg-slate-200 px-1.5 py-0.5 text-xs font-bold uppercase">{r.userType || r.role || 'Doctor'}</span>
                         </div>
                       </div>
                     ))}
@@ -1619,7 +1630,7 @@ export default function AdminDashboard({
               </div>
 
               <div>
-                <label className="text-[10px] font-black uppercase text-slate-600 block mb-1.5 tracking-wider">
+                <label className="text-xs font-black uppercase text-slate-600 block mb-1.5 tracking-wider">
                   Council Verification Reference (Statutory Audit Trail)
                 </label>
                 <input
@@ -1633,7 +1644,7 @@ export default function AdminDashboard({
               </div>
 
               <div>
-                <label className="text-[10px] font-black uppercase text-slate-600 block mb-1.5 tracking-wider">
+                <label className="text-xs font-black uppercase text-slate-600 block mb-1.5 tracking-wider">
                   Board Accreditation Audit Note
                 </label>
                 <textarea
@@ -1709,7 +1720,7 @@ export default function AdminDashboard({
                   className="h-16 w-16 rounded-full object-cover border border-slate-300"
                 />
                 <div className="space-y-1">
-                  <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-none border ${
+                  <span className={`text-xs font-black uppercase px-2 py-0.5 rounded-none border ${
                     (selectedModalRequest.userType || selectedModalRequest.role) === UserRole.DOCTOR 
                       ? "bg-[color:var(--t-50)] text-[color:var(--t-600)] border-[color:var(--t-200)]" 
                       : "bg-emerald-50 text-emerald-850 border-emerald-200"
@@ -1729,11 +1740,11 @@ export default function AdminDashboard({
               {/* Submitted Licenses details info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-none">
-                  <span className="text-[10px] text-slate-500 font-black uppercase block tracking-wider mb-1">State License Key</span>
+                  <span className="text-xs text-slate-500 font-black uppercase block tracking-wider mb-1">State License Key</span>
                   <code className="font-mono text-sm font-bold text-slate-900">{selectedModalRequest.licenseNumber}</code>
                 </div>
                 <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-none">
-                  <span className="text-[10px] text-slate-500 font-black uppercase block tracking-wider mb-1">Assigned Medical Council</span>
+                  <span className="text-xs text-slate-500 font-black uppercase block tracking-wider mb-1">Assigned Medical Council</span>
                   <p className="text-xs font-bold text-slate-800">{selectedModalRequest.medicalCouncil || selectedModalRequest.nursingCouncil || "National Regulatory Board"}</p>
                 </div>
               </div>
@@ -1750,7 +1761,7 @@ export default function AdminDashboard({
                   <div className="border border-slate-250 bg-slate-50/80 p-4 space-y-3 rounded-none">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200">
                       <div className="flex items-center gap-2">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono font-bold uppercase ${
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-bold uppercase ${
                           statutory.isValid 
                             ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' 
                             : 'bg-amber-100 text-amber-800 border border-amber-300'
@@ -1758,12 +1769,12 @@ export default function AdminDashboard({
                           {statutory.isValid ? <Check className="h-3 w-3 text-emerald-700" /> : <AlertTriangle className="h-3 w-3 text-amber-700" />}
                           {statutory.badgeText}
                         </span>
-                        <span className="text-[10px] text-slate-400 font-bold hidden sm:inline">·</span>
-                        <span className="text-[10px] text-slate-600 font-semibold">{statutory.standard}</span>
+                        <span className="text-xs text-slate-400 font-bold hidden sm:inline">·</span>
+                        <span className="text-xs text-slate-600 font-semibold">{statutory.standard}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Clock className="h-3 w-3 text-slate-500" />
-                        <span className={`text-[10px] font-mono font-bold ${
+                        <span className={`text-xs font-mono font-bold ${
                           sla.tone === 'urgent' ? 'text-rose-700 font-black' : sla.tone === 'warning' ? 'text-amber-700' : 'text-emerald-700'
                         }`}>
                           {sla.label}
@@ -1776,7 +1787,7 @@ export default function AdminDashboard({
                     </p>
 
                     <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-                      <span className="text-[11px] text-slate-500 font-semibold">
+                      <span className="text-xs text-slate-500 font-semibold">
                         Cross-check with statutory council database:
                       </span>
                       <button
@@ -1797,7 +1808,7 @@ export default function AdminDashboard({
                     </div>
 
                     {copiedLicence && (
-                      <p className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-none animate-fade-in flex items-center gap-1.5">
+                      <p className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-none animate-fade-in flex items-center gap-1.5">
                         <Check className="h-3.5 w-3.5 text-emerald-600" />
                         Licence number copied to clipboard! Paste into official council search portal.
                       </p>
@@ -1808,7 +1819,7 @@ export default function AdminDashboard({
 
               {/* Bio block */}
               <div className="space-y-1.5">
-                <span className="text-[10px] text-slate-500 font-black uppercase block tracking-wider">Statement of Clinical Philosophy</span>
+                <span className="text-xs text-slate-500 font-black uppercase block tracking-wider">Statement of Clinical Philosophy</span>
                 <p className="text-xs text-slate-700 italic bg-slate-50 p-4 border-l-4 border-[color:var(--t-600)] rounded-none leading-relaxed font-semibold">
                   "{selectedModalRequest.bio || "Applicant is seeking medical or nurse credential verification."}"
                 </p>
@@ -1816,7 +1827,7 @@ export default function AdminDashboard({
 
               {/* Credentials scans and PDF attachments */}
               <div className="space-y-2">
-                <span className="text-[10px] text-slate-500 font-black uppercase block tracking-wider">Proof of Registry & Certifications</span>
+                <span className="text-xs text-slate-500 font-black uppercase block tracking-wider">Proof of Registry & Certifications</span>
                 <RequestDocuments requestId={selectedModalRequest.id} />
               </div>
             </div>
@@ -1926,29 +1937,10 @@ export default function AdminDashboard({
         <div id="panel-packages" role="tabpanel" aria-labelledby="tab-packages" tabIndex={0} className="space-y-6 animate-fade-in text-slate-800">
           <WorkspaceHeader
             icon={Puzzle}
-            eyebrow="System Architecture · Modular Clinical Runtime"
-            title="Clinical Package & Extension Architecture Manager"
-            description="Compile, audit, hot-mount, and manage modular healthcare extensions and MediCert cloud marketplace plug-ins."
-            badges={<BannerBadge tone="brand">Modular System Runtime</BannerBadge>}
-            tabs={[
-              { id: 'installed', label: 'Installed Modules & Runtime', count: packages.length },
-              { id: 'marketplace', label: 'Cloud Marketplace', count: MARKETPLACE_ADDONS.filter(addon => !packages.some(p => p.id === addon.id)).length },
-              { id: 'compiler', label: 'Custom Module Compiler' },
-            ]}
-            activeTab={packageSubTab}
-            onTabChange={(t) => setPackageSubTab(t as PackageSubTab)}
-            aside={
-              packageSubTab !== 'compiler' ? (
-                <button
-                  type="button"
-                  onClick={() => setPackageSubTab('compiler')}
-                  className="px-3.5 py-2 text-xs font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer shadow-xs flex items-center gap-1.5"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span>Compile New Module</span>
-                </button>
-              ) : undefined
-            }
+            eyebrow="Partner hospitals · Patient catalogue"
+            title="Medical packages"
+            description="Health-screening and treatment packages from partner hospitals. Publishing a package lists it for patients under Services, Medical Packages. It does not add anything to the menu."
+            badges={<BannerBadge tone="brand">Board control</BannerBadge>}
           />
 
           {/* SUBTAB 1: INSTALLED MODULES & RUNTIME */}
@@ -1958,29 +1950,29 @@ export default function AdminDashboard({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">Installed packages</span>
+                    <span className="text-sm font-semibold text-[color:var(--ink-2)]">Packages</span>
                     <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-600)]"><Puzzle className="h-4 w-4" /></span>
                   </div>
-                  <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{packages.length} Active Modules</span>
-                  <span className="text-xs text-slate-600">Clinical packages compiled & mounted.</span>
+                  <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{adminPackages.length} in total</span>
+                  <span className="text-xs text-slate-600">Across all partner hospitals.</span>
                 </div>
 
                 <div className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">Active Run-time</span>
+                    <span className="text-sm font-semibold text-[color:var(--ink-2)]">Published</span>
                     <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--e-50)] border-[color:var(--e-200)] text-[color:var(--e-600)]"><CheckCircle2 className="h-4 w-4" /></span>
                   </div>
-                  <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{packages.filter(p => getPkgEnabled(p)).length} Enabled</span>
-                  <span className="text-xs text-slate-600">Active navigation endpoints in sidebar.</span>
+                  <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{adminPackages.filter(p => getPkgEnabled(p)).length} published</span>
+                  <span className="text-xs text-slate-600">Visible to patients.</span>
                 </div>
 
                 <div className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">Marketplace Extensions</span>
+                    <span className="text-sm font-semibold text-[color:var(--ink-2)]">Drafts</span>
                     <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-600)]"><Download className="h-4 w-4" /></span>
                   </div>
-                  <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{MARKETPLACE_ADDONS.filter(addon => !packages.some(p => p.id === addon.id)).length} Available</span>
-                  <span className="text-xs text-slate-600">Ready to download from official cloud registry.</span>
+                  <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{adminPackages.filter(p => !getPkgEnabled(p)).length === 1 ? '1 draft' : `${adminPackages.filter(p => !getPkgEnabled(p)).length} drafts`}</span>
+                  <span className="text-xs text-slate-600">Hidden from patients until published.</span>
                 </div>
               </div>
 
@@ -1991,37 +1983,26 @@ export default function AdminDashboard({
                     <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
                     <input
                       type="text"
-                      placeholder="Search installed clinical packages…"
+                      placeholder="Search packages or hospitals…"
                       value={packageSearch}
                       onChange={(e) => setPackageSearch(e.target.value)}
                       className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white h-12 pl-10 pr-4 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors"
                     />
                   </div>
 
-                  <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => setPackageSubTab('compiler')}
-                      className="w-full sm:w-auto px-5 h-12 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <Plus className="h-4 w-4" />
-                      <span>Compile Custom Package</span>
-                    </button>
-                  </div>
                 </div>
 
                 {/* Category filtering tags */}
                 <div className="flex flex-wrap gap-2 pt-2 border-t border-[color:var(--t-100)]">
                   {Array.from(new Set([
                     'All',
-                    ...packages.map(p => getPkgCategory(p)).filter(Boolean),
-                    'Patient Services', 'Clinical Operations', 'SEO & Growth', 'Communication', 'Credentialing'
+                    ...adminPackages.map(p => getPkgCategory(p)).filter(Boolean),
                   ])).map((cat) => (
                     <button
                       key={cat}
                       type="button"
                       onClick={() => setPackageCategoryFilter(cat)}
-                      className={`px-3 py-1.5 text-[11px] font-bold border transition-colors cursor-pointer ${
+                      className={`px-3 py-1.5 text-xs font-bold border transition-colors cursor-pointer ${
                         packageCategoryFilter === cat
                           ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white shadow-xs'
                           : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'
@@ -2037,10 +2018,10 @@ export default function AdminDashboard({
               <div className="space-y-4">
                 <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
                   <Puzzle className="h-4 w-4 text-[color:var(--t-600)]" />
-                  <span>Installed Packages ({packages.length})</span>
+                  <span>Packages ({adminPackages.length})</span>
                 </h3>
 
-                {packages.filter(p => {
+                {adminPackages.filter(p => {
                   const name = getPkgName(p).toLowerCase();
                   const desc = getPkgDesc(p).toLowerCase();
                   const author = getPkgAuthor(p).toLowerCase();
@@ -2051,12 +2032,12 @@ export default function AdminDashboard({
                 }).length === 0 ? (
                   <div className="bg-white border border-slate-200 p-12 text-center text-slate-500 rounded-none">
                     <Search className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                    <p className="text-xs font-bold text-slate-700">No installed packages match your filter criteria.</p>
-                    <button type="button" onClick={() => { setPackageSearch(''); setPackageCategoryFilter('All'); }} className="mt-2 text-[11px] font-bold text-[color:var(--t-700)] underline cursor-pointer">Reset filters</button>
+                    <p className="text-xs font-bold text-slate-700">No packages match your search.</p>
+                    <button type="button" onClick={() => { setPackageSearch(''); setPackageCategoryFilter('All'); }} className="mt-2 text-xs font-bold text-[color:var(--t-700)] underline cursor-pointer">Reset filters</button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {packages
+                    {adminPackages
                       .filter(p => {
                         const name = getPkgName(p).toLowerCase();
                         const desc = getPkgDesc(p).toLowerCase();
@@ -2098,27 +2079,27 @@ export default function AdminDashboard({
                                   <div>
                                     <h4 className="text-xs font-black text-slate-800 leading-tight flex items-center gap-1.5 flex-wrap">
                                       {pkgName}
-                                      <span className="bg-slate-100 border border-slate-200 text-slate-600 font-mono text-[9px] px-1.5 py-0.5 rounded-none font-bold">
+                                      <span className="bg-slate-100 border border-slate-200 text-slate-600 font-mono text-xs px-1.5 py-0.5 rounded-none font-bold">
                                         {pkgVersion.startsWith('v') || pkgVersion.startsWith('Code:') ? pkgVersion : `v${pkgVersion}`}
                                       </span>
                                       {price !== undefined && price !== null && (
-                                        <span className="bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono text-[9px] px-1.5 py-0.5 rounded-none font-bold">
+                                        <span className="bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono text-xs px-1.5 py-0.5 rounded-none font-bold">
                                           MYR {Number(price).toLocaleString()}
                                         </span>
                                       )}
                                     </h4>
-                                    <span className="text-[10px] text-slate-400 font-bold block mt-1 tracking-wide">
+                                    <span className="text-xs text-slate-400 font-bold block mt-1 tracking-wide">
                                       by {pkgAuthor} · <span className="text-[color:var(--t-600)]">{pkgCategory}</span>
                                     </span>
                                   </div>
                                 </div>
 
-                                <span className={`text-[9px] font-black px-2.5 py-1 rounded-none border uppercase tracking-wider shrink-0 ${
+                                <span className={`text-xs font-black px-2.5 py-1 rounded-none border uppercase tracking-wider shrink-0 ${
                                   isEnabled
                                     ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
                                     : 'bg-amber-50 border-amber-200 text-amber-800'
                                 }`}>
-                                  {isEnabled ? 'Enabled' : 'Disabled'}
+                                  {isEnabled ? 'Published' : 'Draft'}
                                 </span>
                               </div>
 
@@ -2132,6 +2113,9 @@ export default function AdminDashboard({
                                 <button
                                   type="button"
                                   onClick={() => handleTogglePackage(pkg.id)}
+                                  role="switch"
+                                  aria-checked={isEnabled}
+                                  aria-label={`${isEnabled ? 'Unpublish' : 'Publish'} ${pkgName}`}
                                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-none border border-slate-300 transition-colors duration-150 ease-in-out focus:outline-none ${
                                     isEnabled ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)]' : 'bg-slate-200'
                                   }`}
@@ -2142,23 +2126,23 @@ export default function AdminDashboard({
                                     }`}
                                   />
                                 </button>
-                                <span className="text-[10px] font-extrabold text-slate-600 uppercase tracking-wide">
-                                  {isEnabled ? 'Active in Runtime' : 'Disabled'}
+                                <span className="text-xs font-extrabold text-slate-600 uppercase tracking-wide">
+                                  {isEnabled ? 'Listed for patients' : 'Hidden from patients'}
                                 </span>
                               </div>
 
                               {pkg.isRemovable ? (
                                 <button
                                   type="button"
-                                  onClick={() => handleUninstallPackage(pkg.id)}
-                                  className="h-8 px-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-none border border-transparent hover:border-rose-200 transition-all cursor-pointer flex items-center gap-1 text-[11px] font-bold"
-                                  title="Uninstall & Remove Package"
+                                  onClick={() => { if (window.confirm(`Delete "${pkgName}"? Patients will no longer see it, and this cannot be undone.`)) handleUninstallPackage(pkg.id); }}
+                                  className="h-8 px-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-none border border-transparent hover:border-rose-200 transition-all cursor-pointer flex items-center gap-1 text-xs font-bold"
+                                  title="Delete this package"
                                 >
                                   <Trash2 className="h-3.5 w-3.5" />
                                   <span>Remove</span>
                                 </button>
                               ) : (
-                                <span className="text-[9px] font-black text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-none uppercase tracking-wider">
+                                <span className="text-xs font-black text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-none uppercase tracking-wider">
                                   Core Module
                                 </span>
                               )}
@@ -2170,195 +2154,6 @@ export default function AdminDashboard({
                 )}
               </div>
             </div>
-          )}
-
-          {/* SUBTAB 2: CLOUD MARKETPLACE */}
-          {packageSubTab === 'marketplace' && (
-            <div className="bg-slate-50 text-slate-800 p-6 rounded-none border border-[color:var(--t-200)] space-y-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-4">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black text-[color:var(--t-600)] uppercase tracking-wider block">Official Extensions Registry</span>
-                  <h3 className="text-base font-black text-slate-800 leading-tight">MediCert Cloud Marketplace</h3>
-                  <p className="text-xs text-slate-500 font-semibold leading-relaxed">Expand clinical compliance and services with verified platform plug-ins.</p>
-                </div>
-                <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-3 py-1.5 rounded-none text-[10px] font-black text-[color:var(--t-600)] flex items-center gap-1.5 uppercase tracking-wider">
-                  <span className="w-2 h-2 bg-emerald-500 rounded-none animate-pulse"></span>
-                  <span>Registry Server Active</span>
-                </div>
-              </div>
-
-              {MARKETPLACE_ADDONS.filter(addon => !packages.some(p => p.id === addon.id)).length === 0 ? (
-                <div className="text-center py-12 border border-dashed border-slate-300 rounded-none bg-white space-y-2">
-                  <CheckCircle2 className="h-10 w-10 text-emerald-500 mx-auto" />
-                  <h4 className="text-sm font-bold text-slate-700">All Available Marketplace Add-ons Installed</h4>
-                  <p className="text-xs text-slate-400 font-medium">Your MediCert workspace is running the maximum suite configuration.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {MARKETPLACE_ADDONS
-                    .filter(addon => !packages.some(p => p.id === addon.id))
-                    .map((addon) => (
-                      <div key={addon.id} className="bg-white border border-slate-200 hover:border-[color:var(--t-200)] p-5 rounded-none flex flex-col justify-between gap-4 transition-all text-slate-700 shadow-none">
-                        <div className="space-y-2.5">
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="bg-slate-50 text-slate-600 border border-slate-200 font-mono text-[9px] px-1.5 py-0.5 rounded-none font-bold">v{addon.version}</span>
-                            <span className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] text-[9px] font-black px-1.5 py-0.5 rounded-none uppercase tracking-wide">{addon.category}</span>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <div className="p-1.5 bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] rounded-none shrink-0">
-                              {renderIcon(addon.icon, "h-4 w-4")}
-                            </div>
-                            <h4 className="text-xs font-black text-slate-800 truncate">{addon.name}</h4>
-                          </div>
-
-                          <p className="text-[11px] text-slate-500 font-semibold leading-relaxed line-clamp-3">
-                            {addon.description}
-                          </p>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => handleInstallPackage(addon)}
-                          className="w-full h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] active:bg-[color:var(--t-800)] border border-[color:var(--t-700)] text-white rounded-none text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-none"
-                        >
-                          <Download className="h-3.5 w-3.5" />
-                          <span>Hot-Install Package</span>
-                        </button>
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* SUBTAB 3: CUSTOM MODULE COMPILER */}
-          {packageSubTab === 'compiler' && (
-            <form onSubmit={handleCreateCustomPackage} className="bg-white border-2 border-[color:var(--t-600)] p-6 shadow-md space-y-5 animate-fade-in rounded-none">
-              <div className="flex items-center justify-between border-b border-[color:var(--t-200)] pb-3">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-[color:var(--t-600)]" />
-                  <div>
-                    <h4 className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)]">Custom Module Compiler</h4>
-                    <p className="text-xs text-slate-500 font-semibold mt-0.5">Author and mount bespoke clinical modules directly into the MedCred runtime.</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setPackageSubTab('installed')}
-                  className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-700 cursor-pointer"
-                  title="Close Compiler"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div className="space-y-1.5">
-                  <label className="block text-[10px] font-black text-slate-600 uppercase tracking-wider">Package Unique ID *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. diagnostics-charting"
-                    value={newPkgId}
-                    onChange={(e) => setNewPkgId(e.target.value)}
-                    className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white h-12 px-3 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)]"
-                  />
-                </div>
-
-                <div className="space-y-1.5 col-span-2">
-                  <label className="block text-[10px] font-black text-slate-600 uppercase tracking-wider">Package Name *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Real-Time Vitals Charting Engine"
-                    value={newPkgName}
-                    onChange={(e) => setNewPkgName(e.target.value)}
-                    className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white h-12 px-3 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)]"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="block text-[10px] font-black text-slate-600 uppercase tracking-wider">Package Functional Description *</label>
-                <textarea
-                  required
-                  rows={3}
-                  placeholder="Explain exactly what features this modular package mounts in the system, its integration, and patient impact…"
-                  value={newPkgDesc}
-                  onChange={(e) => setNewPkgDesc(e.target.value)}
-                  className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white p-3 text-xs font-medium text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)]"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-[10px] font-black text-slate-600 uppercase tracking-wider">Category</label>
-                  <select
-                    value={newPkgCategory}
-                    onChange={(e) => setNewPkgCategory(e.target.value)}
-                    className="w-full bg-white border border-[color:var(--t-200)] h-12 px-3 text-xs font-bold text-[color:var(--ink)] cursor-pointer outline-none focus:border-[color:var(--t-600)]"
-                  >
-                    {['Patient Services', 'Clinical Operations', 'SEO & Growth', 'Communication', 'Credentialing', 'Custom Extension'].map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-[10px] font-black text-slate-600 uppercase tracking-wider">Lucide Icon Badge</label>
-                  <select
-                    value={newPkgIcon}
-                    onChange={(e) => setNewPkgIcon(e.target.value)}
-                    className="w-full bg-white border border-[color:var(--t-200)] h-12 px-3 text-xs font-bold text-[color:var(--ink)] cursor-pointer outline-none focus:border-[color:var(--t-600)]"
-                  >
-                    {['Activity', 'CreditCard', 'TrendingUp', 'Heart', 'Search', 'Calendar', 'BookOpen', 'PlusCircle', 'MessageSquare', 'Globe'].map(ic => (
-                      <option key={ic} value={ic}>{ic} Icon</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-[10px] font-black text-slate-600 uppercase tracking-wider">Version</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 1.0.0"
-                    value={newPkgVersion}
-                    onChange={(e) => setNewPkgVersion(e.target.value)}
-                    className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white h-12 px-3 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)]"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-[10px] font-black text-slate-600 uppercase tracking-wider">Package Author</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Clinical Ops Admin"
-                    value={newPkgAuthor}
-                    onChange={(e) => setNewPkgAuthor(e.target.value)}
-                    className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white h-12 px-3 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)]"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-3 border-t border-[color:var(--t-200)]">
-                <button
-                  type="button"
-                  onClick={() => setPackageSubTab('installed')}
-                  className="h-12 px-5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold uppercase tracking-wider border border-slate-300 transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isCompiling}
-                  className="h-12 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold uppercase tracking-wider shadow-xs flex items-center gap-2 disabled:opacity-50 cursor-pointer transition-colors"
-                >
-                  {isCompiling ? <Loader className="h-4 w-4 animate-spin" /> : <Settings className="h-4 w-4" />}
-                  <span>Compile & Mount Module</span>
-                </button>
-              </div>
-            </form>
           )}
         </div>
       )}
@@ -2406,7 +2201,7 @@ export default function AdminDashboard({
             <div className="overflow-x-auto border border-slate-200">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[10px]">
+                  <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-xs">
                     <th className="p-3">Practitioner</th>
                     <th className="p-3">Council &amp; Licence</th>
                     <th className="p-3">Specialization</th>
@@ -2435,12 +2230,12 @@ export default function AdminDashboard({
                           <td colSpan={6} className="p-12 text-center text-slate-500 bg-slate-50/50">
                             <Search className="h-8 w-8 text-slate-300 mx-auto mb-2" />
                             <p className="text-xs font-bold text-slate-700">No registered practitioners match your search criteria.</p>
-                            <p className="text-[11px] text-slate-500 mt-1">Try adjusting your search terms or filter tabs.</p>
+                            <p className="text-xs text-slate-500 mt-1">Try adjusting your search terms or filter tabs.</p>
                             {registrySearch && (
                               <button
                                 type="button"
                                 onClick={() => setRegistrySearch('')}
-                                className="mt-3 text-[11px] font-bold text-[color:var(--t-700)] underline cursor-pointer"
+                                className="mt-3 text-xs font-bold text-[color:var(--t-700)] underline cursor-pointer"
                               >
                                 Clear search query
                               </button>
@@ -2457,7 +2252,7 @@ export default function AdminDashboard({
                             <UserAvatar src={prof.avatar} role={prof.role === UserRole.DOCTOR ? 'doctor' : 'nurse'} alt={prof.name} className="h-8 w-8 rounded-full object-cover border border-slate-200 shrink-0" />
                             <div>
                               <p className="font-bold text-slate-900">{prof.name}</p>
-                              <span className="text-[10px] text-slate-500 uppercase font-bold">{prof.role}</span>
+                              <span className="text-xs text-slate-500 uppercase font-bold">{prof.role}</span>
                             </div>
                           </div>
                         </td>
@@ -2465,7 +2260,7 @@ export default function AdminDashboard({
                           <code className="font-mono font-bold text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded-none border border-slate-200">
                             {prof.licenseNumber}
                           </code>
-                          <p className="text-[10px] text-slate-500 font-semibold mt-0.5">
+                          <p className="text-xs text-slate-500 font-semibold mt-0.5">
                             {(prof as any).medicalCouncil || (prof as any).nursingCouncil || 'National Board'}
                           </p>
                         </td>
@@ -2473,7 +2268,7 @@ export default function AdminDashboard({
                           {prof.specialization || 'General Practice'}
                         </td>
                         <td className="p-3">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider border ${
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-black uppercase tracking-wider border ${
                             prof.verificationStatus === VerificationStatus.VERIFIED
                               ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                               : 'bg-amber-50 text-amber-800 border-amber-200'
@@ -2482,7 +2277,7 @@ export default function AdminDashboard({
                             {prof.verificationStatus}
                           </span>
                         </td>
-                        <td className="p-3 font-mono text-[11px] text-slate-600">
+                        <td className="p-3 font-mono text-xs text-slate-600">
                           {prof.licenseExpiry || 'N/A'}
                         </td>
                         <td className="p-3 text-right">
@@ -2491,7 +2286,7 @@ export default function AdminDashboard({
                             onClick={() => {
                               window.dispatchEvent(new CustomEvent('medcred-view-profile', { detail: prof.id }));
                             }}
-                            className="px-2.5 py-1 text-[11px] font-bold bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 transition-colors cursor-pointer"
+                            className="px-2.5 py-1 text-xs font-bold bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 transition-colors cursor-pointer"
                           >
                             Profile
                           </button>
@@ -2607,12 +2402,12 @@ export default function AdminDashboard({
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="text-sm font-black text-slate-900">{roleItem.title}</span>
                             {isActive ? (
-                              <span className="px-2 py-0.5 text-[10px] font-black uppercase bg-emerald-600 text-white tracking-wider flex items-center gap-1">
+                              <span className="px-2 py-0.5 text-xs font-black uppercase bg-emerald-600 text-white tracking-wider flex items-center gap-1">
                                 <Check className="h-3 w-3" />
                                 Active Mandate
                               </span>
                             ) : (
-                              <span className="px-2 py-0.5 text-[10px] font-bold uppercase bg-slate-100 text-slate-700 border border-slate-300">
+                              <span className="px-2 py-0.5 text-xs font-bold uppercase bg-slate-100 text-slate-700 border border-slate-300">
                                 {roleItem.shortTitle}
                               </span>
                             )}
@@ -2638,18 +2433,18 @@ export default function AdminDashboard({
                         </div>
                       </div>
 
-                      <div className="mt-3 pt-3 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                      <div className="mt-3 pt-3 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs">
                         <div className="flex items-center gap-1.5 text-slate-600">
                           <span className="font-bold text-slate-700">Permitted Workspaces:</span>
                           <div className="flex flex-wrap gap-1">
                             {roleItem.allowedGroups.map(g => (
-                              <span key={g} className="px-1.5 py-0.5 bg-slate-100 text-slate-800 font-mono font-bold uppercase text-[10px] border border-slate-200">
+                              <span key={g} className="px-1.5 py-0.5 bg-slate-100 text-slate-800 font-mono font-bold uppercase text-xs border border-slate-200">
                                 {ADMIN_GROUPS[g]?.name || g}
                               </span>
                             ))}
                           </div>
                         </div>
-                        <div className="font-mono text-[10px] text-slate-500">
+                        <div className="font-mono text-xs text-slate-500">
                           {roleItem.authority}
                         </div>
                       </div>
@@ -2690,7 +2485,7 @@ export default function AdminDashboard({
                 <div>
                   <h3 className="text-base font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
                     Hospital HR Webhook Event Dispatcher &amp; Telemetry
-                    <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">
+                    <span className="text-xs font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">
                       Act 586 Compliant
                     </span>
                   </h3>
@@ -2711,19 +2506,19 @@ export default function AdminDashboard({
             {/* Quick Metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="p-3 bg-slate-50 border border-slate-200">
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">Active Hospital Gateways</span>
+                <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Active Hospital Gateways</span>
                 <span className="text-xl font-black text-slate-900 tabular-nums">{webhooks.length || 3} Endpoints</span>
-                <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">Pantai KL, KPJ, Gleneagles KL</span>
+                <span className="text-xs text-emerald-700 font-bold block mt-0.5">Pantai KL, KPJ, Gleneagles KL</span>
               </div>
               <div className="p-3 bg-slate-50 border border-slate-200">
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">Security &amp; Encryption</span>
+                <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Security &amp; Encryption</span>
                 <span className="text-xl font-black text-slate-900">HMAC-SHA256</span>
-                <span className="text-[10px] text-slate-600 font-semibold block mt-0.5">Signed webhook payloads + TLS 1.3</span>
+                <span className="text-xs text-slate-600 font-semibold block mt-0.5">Signed webhook payloads + TLS 1.3</span>
               </div>
               <div className="p-3 bg-slate-50 border border-slate-200">
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">Automated Triggers</span>
+                <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Automated Triggers</span>
                 <span className="text-xl font-black text-slate-900 font-mono text-sm">practitioner.verified</span>
-                <span className="text-[10px] text-slate-600 font-semibold block mt-0.5">On council registration approval</span>
+                <span className="text-xs text-slate-600 font-semibold block mt-0.5">On council registration approval</span>
               </div>
             </div>
 
@@ -2741,13 +2536,13 @@ export default function AdminDashboard({
                   </span>
                   <button 
                     onClick={() => setWebhookTestResult(null)}
-                    className="text-[10px] text-slate-500 hover:text-slate-800 font-mono uppercase underline cursor-pointer"
+                    className="text-xs text-slate-500 hover:text-slate-800 font-mono uppercase underline cursor-pointer"
                   >
                     Dismiss
                   </button>
                 </div>
                 {webhookTestResult.payload && (
-                  <div className="mt-2 bg-slate-900 text-emerald-300 p-3 font-mono text-[11px] overflow-x-auto max-h-40 border border-slate-800">
+                  <div className="mt-2 bg-slate-900 text-emerald-300 p-3 font-mono text-xs overflow-x-auto max-h-40 border border-slate-800">
                     <pre>{JSON.stringify(webhookTestResult.payload, null, 2)}</pre>
                   </div>
                 )}
@@ -2765,7 +2560,7 @@ export default function AdminDashboard({
                   type="button"
                   onClick={fetchWebhooks}
                   disabled={webhookLoading}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 hover:text-slate-900 cursor-pointer"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer"
                 >
                   <RefreshCw className={`h-3.5 w-3.5 ${webhookLoading ? 'animate-spin' : ''}`} />
                   Refresh
@@ -2782,16 +2577,16 @@ export default function AdminDashboard({
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <span className="font-black text-xs text-slate-900">{wh.facility_name || wh.hospital_name}</span>
-                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        <span className="text-xs font-bold uppercase px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300">
                           Active Endpoint
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 font-semibold">{wh.system_name || 'Hospital Staffing & Credentialing Gateway'}</p>
+                      <p className="text-xs text-slate-500 font-semibold">{wh.system_name || 'Hospital Staffing & Credentialing Gateway'}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <code className="text-[10px] font-mono bg-slate-100 text-slate-700 px-2 py-0.5 border border-slate-200">
+                        <code className="text-xs font-mono bg-slate-100 text-slate-700 px-2 py-0.5 border border-slate-200">
                           {wh.endpoint_url}
                         </code>
-                        <span className="text-[10px] font-mono text-slate-400">
+                        <span className="text-xs font-mono text-slate-400">
                           Secret: {wh.secret_token ? `${wh.secret_token.slice(0, 10)}...` : 'whsec_••••••••'}
                         </span>
                       </div>
@@ -2801,7 +2596,7 @@ export default function AdminDashboard({
                         type="button"
                         onClick={() => handleTestWebhookPing(wh.id)}
                         disabled={webhookTesting === wh.id}
-                        className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-black uppercase tracking-wider inline-flex items-center gap-1.5 transition-colors cursor-pointer rounded-none disabled:opacity-50"
+                        className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 transition-colors cursor-pointer rounded-none disabled:opacity-50"
                       >
                         {webhookTesting === wh.id ? (
                           <>
@@ -2830,7 +2625,7 @@ export default function AdminDashboard({
               <div className="overflow-x-auto border border-slate-200">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[10px]">
+                    <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-xs">
                       <th className="p-2.5">Time</th>
                       <th className="p-2.5">Target Hospital</th>
                       <th className="p-2.5">Event</th>
@@ -2843,19 +2638,19 @@ export default function AdminDashboard({
                     {webhookLogs.length > 0 ? (
                       webhookLogs.slice(0, 5).map((log: any) => (
                         <tr key={log.id} className="hover:bg-slate-50 transition-colors">
-                          <td className="p-2.5 font-mono text-[11px] text-slate-600">
+                          <td className="p-2.5 font-mono text-xs text-slate-600">
                             {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                           </td>
                           <td className="p-2.5 font-bold text-slate-900">{log.facility_name || log.hospital_name || log.webhook_id}</td>
-                          <td className="p-2.5 font-mono text-[11px] text-[color:var(--t-700)] font-bold">{log.event_type}</td>
+                          <td className="p-2.5 font-mono text-xs text-[color:var(--t-700)] font-bold">{log.event_type}</td>
                           <td className="p-2.5">
-                            <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 border border-emerald-200 text-[10px]">
+                            <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 border border-emerald-200 text-xs">
                               {log.response_code || 200} OK
                             </span>
                           </td>
                           <td className="p-2.5 font-mono text-slate-500">{log.execution_time_ms || 48}ms</td>
                           <td className="p-2.5">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300">
+                            <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300">
                               {log.status || 'delivered'}
                             </span>
                           </td>
@@ -2874,7 +2669,7 @@ export default function AdminDashboard({
             </div>
 
             <div className="pt-3 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
-              <span className="font-mono text-[10px]">
+              <span className="font-mono text-xs">
                 Specification: MedCred Event Dispatcher v2.4 · SHA-256 HMAC
               </span>
               <button
@@ -2913,7 +2708,7 @@ export default function AdminDashboard({
                   <ShieldAlert className="h-5 w-5" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 block">
+                  <span className="text-xs font-black uppercase tracking-wider text-amber-800 block">
                     Statutory Segregation of Duties (SoD) Protocol
                   </span>
                   <h3 id="elevation-modal-title" className="text-sm font-black text-slate-900 uppercase tracking-tight">
@@ -2931,8 +2726,8 @@ export default function AdminDashboard({
             </div>
 
             <div className="p-3 bg-amber-50/80 border border-amber-200 text-amber-950 space-y-1">
-              <span className="font-bold block text-[11px]">Notice of Statutory Role Elevation</span>
-              <p className="text-[11px] leading-relaxed">
+              <span className="font-bold block text-xs">Notice of Statutory Role Elevation</span>
+              <p className="text-xs leading-relaxed">
                 You are transitioning from <strong className="font-bold text-slate-900">{ADMIN_SUB_ROLES[subRole]?.shortTitle}</strong> to <strong className="font-bold text-slate-900">{ADMIN_SUB_ROLES[pendingSubRoleTarget]?.shortTitle}</strong>. 
                 Under Medical Act 1971 and Financial Services Act 2013, role switches must be justified and are logged to the immutable SQLite audit trail.
               </p>
@@ -2946,7 +2741,7 @@ export default function AdminDashboard({
 
             <form onSubmit={executeElevationSwitch} className="space-y-3.5">
               <div>
-                <label className="text-[10px] font-black uppercase text-slate-700 tracking-wider block mb-1">
+                <label className="text-xs font-black uppercase text-slate-700 tracking-wider block mb-1">
                   Duty Handover / Incident Case Reference
                 </label>
                 <input
@@ -2959,7 +2754,7 @@ export default function AdminDashboard({
               </div>
 
               <div>
-                <label className="text-[10px] font-black uppercase text-slate-600 tracking-wider block mb-1">
+                <label className="text-xs font-black uppercase text-slate-600 tracking-wider block mb-1">
                   Preset Regulatory Justifications:
                 </label>
                 <div className="flex flex-wrap gap-1">
@@ -2973,7 +2768,7 @@ export default function AdminDashboard({
                       key={idx}
                       type="button"
                       onClick={() => setElevationReason(preset)}
-                      className="px-2 py-1 text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 cursor-pointer text-left font-medium"
+                      className="px-2 py-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 cursor-pointer text-left font-medium"
                     >
                       + {preset}
                     </button>
@@ -2982,7 +2777,7 @@ export default function AdminDashboard({
               </div>
 
               <div>
-                <label className="text-[10px] font-black uppercase text-slate-700 tracking-wider block mb-1">
+                <label className="text-xs font-black uppercase text-slate-700 tracking-wider block mb-1">
                   Statutory Duty Reason *
                 </label>
                 <textarea

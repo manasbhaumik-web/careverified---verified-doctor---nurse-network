@@ -94,6 +94,21 @@ const CATEGORIES = [
 
 export type PackageTabType = 'packages' | 'promotions' | 'facilities';
 
+/** A package photo that never shows broken-image text: a missing file leaves a plain tinted block with the category on it. */
+function PackageImage({ src, alt, category }: { src?: string | null; alt: string; category: string }) {
+  const [failed, setFailed] = useState(false);
+  if (!src || failed) {
+    return (
+      <div role="img" aria-label={`${category} package`} className="w-full h-full flex items-center justify-center bg-[color:var(--t-50)] text-[color:var(--t-700)]">
+        <PackagePlus className="h-10 w-10 opacity-60" aria-hidden="true" />
+      </div>
+    );
+  }
+  return <img src={src} alt={alt} loading="lazy" onError={() => setFailed(true)} className="w-full h-full object-cover" />;
+}
+
+type PackageSort = 'featured' | 'price-asc' | 'price-desc' | 'saving';
+
 interface MedicalPackagesModuleProps {
   initialCategory?: string;
   onSelectFacility?: (facilityId: string) => void;
@@ -127,6 +142,7 @@ export default function MedicalPackagesModule({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedAudience, setSelectedAudience] = useState<'all' | 'local' | 'international'>('all');
+  const [sortBy, setSortBy] = useState<PackageSort>('featured');
 
   // Detail Modal / Booking state
   const [selectedPackage, setSelectedPackage] = useState<MedicalPackage | null>(null);
@@ -145,10 +161,6 @@ export default function MedicalPackagesModule({
   const [bookCountry, setBookCountry] = useState('Malaysia');
   const [bookDate, setBookDate] = useState('');
   const [bookNotes, setBookNotes] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'credit_card' | 'fpx' | 'intl_transfer'>('credit_card');
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExp, setCardExp] = useState('');
-  const [cardCvc, setCardCvc] = useState('');
   const [bookSubmitting, setBookSubmitting] = useState(false);
   const [bookFeedback, setBookFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [depositReceipt, setDepositReceipt] = useState<{
@@ -266,90 +278,43 @@ export default function MedicalPackagesModule({
     setTimeout(() => setCopiedCode(null), 2500);
   };
 
-  // Submit booking / enquiry or pre-authorized deposit
+  // Send a request for this package to the hospital. No payment is taken here: the hospital confirms and says how any deposit is paid.
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!bookingModal) return;
     setBookSubmitting(true);
     setBookFeedback(null);
-
     try {
-      if (bookingMode === 'deposit') {
-        // 10% Pre-Authorized Reservation Deposit
-        const res = await fetch(`/api/packages/${bookingModal.id}/reserve-deposit`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            patientName: bookName,
-            patientPhone: bookPhone,
-            patientEmail: bookEmail,
-            patientCountry: bookCountry,
-            preferredDate: bookDate || undefined,
-            promoCode: appliedPromo?.code || undefined,
-            paymentMethod,
-            notes: bookNotes,
-          }),
-        });
-        const data = await res.json();
-        if (data.status === 'success') {
-          setDepositReceipt(data.data);
-          setBookFeedback({
-            type: 'success',
-            message: data.message || '10% Advance Deposit secured successfully! Your hospital booking voucher is generated below.',
-          });
-        } else {
-          setBookFeedback({
-            type: 'error',
-            message: data.message || 'Failed to complete deposit checkout. Please verify your details.',
-          });
-        }
+      const res = await fetch(`/api/packages/${bookingModal.id}/reserve-deposit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          patientName: bookName,
+          patientPhone: bookPhone,
+          patientEmail: bookEmail,
+          patientCountry: bookCountry,
+          preferredDate: bookDate || undefined,
+          promoCode: appliedPromo?.code || undefined,
+          notes: bookNotes,
+        }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setDepositReceipt(data.data);
       } else {
-        // General enquiry mode
-        const summaryText = `[Package Booking Enquiry] ${bookingModal.title} (${bookingModal.code}) - Indicative Price: RM ${bookingModal.priceMyr.toLocaleString()} MYR. Preferred Date: ${bookDate || 'Flexible'}. Country: ${bookCountry}. Notes: ${bookNotes || 'None'}`;
-        const res = await fetch('/api/tourism/cases', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            facilityId: bookingModal.facility_id,
-            specialty: bookingModal.category,
-            summary: summaryText,
-            homeCountry: bookCountry || (selectedAudience === 'international' ? 'International Patient' : 'Malaysia'),
-            preferredFrom: bookDate || undefined,
-            patientName: bookName,
-            patientPhone: bookPhone,
-            patientEmail: bookEmail,
-          }),
-        });
-        const data = await res.json();
-        if (data.status === 'success') {
-          setBookFeedback({
-            type: 'success',
-            message: 'Your booking enquiry has been submitted directly to the facility admissions desk.',
-          });
-          setTimeout(() => {
-            setBookingModal(null);
-            setBookFeedback(null);
-            setBookName('');
-            setBookPhone('');
-            setBookEmail('');
-            setBookNotes('');
-          }, 3000);
-        } else {
-          setBookFeedback({
-            type: 'error',
-            message: data.message || 'Failed to submit booking enquiry. Please try again.',
-          });
-        }
+        setBookFeedback({ type: 'error', message: data.message || 'The request could not be sent. Please check your details and try again.' });
       }
     } catch {
-      setBookFeedback({
-        type: 'error',
-        message: 'Network error. Please try again or contact the medical facility directly.',
-      });
+      setBookFeedback({ type: 'error', message: 'Network error. Please try again, or contact the hospital directly.' });
     } finally {
       setBookSubmitting(false);
     }
   };
+
+  // Sorted view of the list the server returned
+  const savingPct = (p: MedicalPackage) => (p.originalPriceMyr ? (p.originalPriceMyr - p.priceMyr) / p.originalPriceMyr : 0);
+  const visiblePackages = sortBy === 'featured' ? packages : [...packages].sort((x, y) =>
+    sortBy === 'price-asc' ? x.priceMyr - y.priceMyr : sortBy === 'price-desc' ? y.priceMyr - x.priceMyr : savingPct(y) - savingPct(x));
 
   return (
     <div className={embedded ? "w-full space-y-4" : "w-full space-y-0"}>
@@ -357,13 +322,13 @@ export default function MedicalPackagesModule({
       {!embedded && (
         <DashboardHeader
           fullWidth={true}
-          eyebrow="Accredited Clinical Network"
-          title="Medical Packages, Promotions & Facilities"
-          description="Explore published medical screening packages, surgical procedures, and exclusive promotional campaigns across certified Act 586 hospitals & specialist clinics in Malaysia."
+          eyebrow="Partner hospitals"
+          title="Medical packages"
+          description="Health screening and treatment packages from partner hospitals. Prices are set by each hospital and may change. Requesting a package does not charge you."
           tabs={[
             { id: 'packages', label: 'Medical Packages', icon: PackagePlus, count: packages.length },
-            { id: 'promotions', label: 'Promotions & Offers', icon: Tag, count: promotions.length },
-            { id: 'facilities', label: 'Facilities & Infrastructure', icon: Building2, count: facilities.length },
+            { id: 'promotions', label: 'Offers', icon: Tag, count: promotions.length },
+            { id: 'facilities', label: 'Hospitals', icon: Building2, count: facilities.length },
           ]}
           activeTab={activeTab}
           onTabChange={(id) => setActiveTab(id as any)}
@@ -385,20 +350,20 @@ export default function MedicalPackagesModule({
                 </span>
                 <div>
                   <h4 className="text-xs font-black uppercase tracking-wider text-amber-950 flex items-center gap-2">
-                    Active Healthcare Promotions & Seasonal Rebates
-                    <span className="text-[10px] font-mono font-bold bg-amber-200/80 text-amber-900 px-1.5 py-0.2">
+                    Offers from partner hospitals
+                    <span className="text-xs font-mono font-bold bg-amber-200/80 text-amber-900 px-1.5 py-0.2">
                       {promotions.length} Available
                     </span>
                   </h4>
                   <p className="text-xs text-amber-900/90 mt-0.5">
-                    Save on comprehensive health screenings, surgical procedures, and fertility assessments with official promotional codes.
+                    Tap a code to copy it, then paste it under Details to see your price.
                   </p>
                 </div>
               </div>
 
               {/* Promo chips carousel */}
-              <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
-                {promotions.slice(0, 3).map((pr) => (
+              <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                {promotions.map((pr) => (
                   <button
                     key={pr.id}
                     type="button"
@@ -406,18 +371,18 @@ export default function MedicalPackagesModule({
                       copyPromoCode(pr.code);
                       setPromoCodeInput(pr.code);
                     }}
-                    className="shrink-0 flex items-center gap-2 px-3 py-1.5 bg-white border border-amber-400 text-slate-800 text-xs font-bold hover:bg-amber-100/50 cursor-pointer transition-colors shadow-2xs"
+                    className="flex items-center gap-2 px-3 min-h-[44px] bg-white border border-amber-400 text-slate-800 text-xs font-bold hover:bg-amber-100/50 cursor-pointer transition-colors shadow-2xs"
                     title="Click to copy promo code"
                   >
                     <Tag className="h-3.5 w-3.5 text-amber-700" />
                     <span className="font-mono font-extrabold text-[color:var(--t-700)]">{pr.code}</span>
-                    <span className="text-[10px] text-emerald-700 font-extrabold uppercase px-1.5 py-0.2 bg-emerald-50 border border-emerald-300">
+                    <span className="text-xs text-emerald-700 font-extrabold uppercase px-1.5 py-0.2 bg-emerald-50 border border-emerald-300">
                       {pr.badge_text || (pr.discount_type === 'percentage' ? `${pr.discount_value}% OFF` : `RM ${pr.discountValueMyr} OFF`)}
                     </span>
                     {copiedCode === pr.code ? (
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                      <span className="flex items-center gap-1 text-emerald-800"><CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> Copied</span>
                     ) : (
-                      <Copy className="h-3 w-3 text-slate-400" />
+                      <Copy className="h-3.5 w-3.5 text-slate-600" aria-label="Copy code" />
                     )}
                   </button>
                 ))}
@@ -442,7 +407,7 @@ export default function MedicalPackagesModule({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search packages by procedure, health test, hospital, or city..."
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 text-xs text-slate-800 font-medium focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white rounded-none"
+                    className="w-full pl-10 pr-4 min-h-[44px] bg-slate-50 border border-slate-300 text-sm text-slate-800 font-medium focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white rounded-none"
                   />
                   {searchQuery && (
                     <button
@@ -456,8 +421,8 @@ export default function MedicalPackagesModule({
                 </div>
 
                 {/* Target Audience Pill Filter */}
-                <div className="flex items-center gap-1.5 border border-slate-200 bg-slate-50 p-1 shrink-0">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 px-2 flex items-center gap-1">
+                <div className="flex flex-wrap items-center gap-1.5 border border-slate-200 bg-slate-50 p-1 max-w-full lg:shrink-0">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500 px-2 flex items-center gap-1">
                     <Filter className="h-3 w-3" />
                     Audience:
                   </span>
@@ -470,7 +435,7 @@ export default function MedicalPackagesModule({
                       key={aud.id}
                       type="button"
                       onClick={() => setSelectedAudience(aud.id as any)}
-                      className={`text-[11px] font-bold px-3 py-1 transition-all cursor-pointer rounded-none ${
+                      className={`text-xs font-bold px-3 min-h-[44px] transition-all cursor-pointer rounded-none ${
                         selectedAudience === aud.id
                           ? 'bg-white text-[color:var(--t-700)] shadow-xs border border-[color:var(--t-200)]'
                           : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -484,13 +449,13 @@ export default function MedicalPackagesModule({
 
               {/* Category Horizontal Scroll Chips */}
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-t border-slate-100 pt-3">
-                <span className="text-[10px] font-bold uppercase text-slate-400 shrink-0 mr-1">Category:</span>
+                <span className="text-xs font-bold uppercase text-slate-400 shrink-0 mr-1">Category:</span>
                 {CATEGORIES.map((cat) => (
                   <button
                     key={cat}
                     type="button"
                     onClick={() => setSelectedCategory(cat)}
-                    className={`shrink-0 text-xs font-bold px-3 py-1.5 transition-colors cursor-pointer rounded-none border ${
+                    className={`shrink-0 text-xs font-bold px-3 min-h-[44px] transition-colors cursor-pointer rounded-none border ${
                       selectedCategory === cat
                         ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]'
                         : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
@@ -527,138 +492,90 @@ export default function MedicalPackagesModule({
                 </button>
               </div>
             ) : (
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p role="status" className="text-sm font-bold text-slate-800">
+                    {packages.length} {packages.length === 1 ? 'package' : 'packages'}
+                  </p>
+                  <label className="flex items-center gap-2 text-sm font-bold text-slate-800">
+                    Sort by
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as PackageSort)}
+                      className="border border-slate-300 bg-white px-3 min-h-[44px] text-sm font-medium focus:outline-none focus:border-[color:var(--t-600)]"
+                    >
+                      <option value="featured">Recommended</option>
+                      <option value="price-asc">Price: low to high</option>
+                      <option value="price-desc">Price: high to low</option>
+                      <option value="saving">Biggest saving</option>
+                    </select>
+                  </label>
+                </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {packages.map((pkg) => (
+                {visiblePackages.map((pkg) => (
                   <article
                     key={pkg.id}
-                    className="group bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-400)] transition-all duration-300 shadow-2xs hover:shadow-md flex flex-col justify-between overflow-hidden"
+                    className="group bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-400)] transition-colors shadow-2xs flex flex-col overflow-hidden"
                   >
-                    <div>
-                      {/* Photo / Header Banner */}
-                      <div className="relative aspect-16/9 overflow-hidden bg-slate-100">
-                        <img
-                          src={pkg.image_url || '/assets/clean_light_doctor_suite_full-C0TGKdC3.jpg'}
-                          alt={pkg.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 flex-wrap">
-                          <span className="text-[10px] font-mono font-black uppercase tracking-wider px-2 py-0.5 bg-slate-900/90 text-white border border-white/20 backdrop-blur-xs">
-                            {pkg.code}
-                          </span>
-                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-600)] text-white shadow-xs">
-                            {pkg.category}
-                          </span>
-                        </div>
-                        <div className="absolute top-2.5 right-2.5 flex flex-col items-end gap-1">
-                          {Boolean(pkg.mhtc_member) && (
-                            <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-sky-800/95 text-white border border-sky-400/60 backdrop-blur-xs shadow-xs flex items-center gap-1">
-                              🇲🇾 MHTC Member
-                            </span>
-                          )}
-                          {pkg.verified_facilitator !== 0 && (
-                            <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-emerald-800/95 text-white border border-emerald-400/60 backdrop-blur-xs shadow-xs flex items-center gap-1">
-                              <ShieldCheck className="h-3 w-3" />
-                              Verified Facilitator
-                            </span>
-                          )}
-                          {pkg.target_audience === 'international' && !pkg.mhtc_member && (
-                            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 bg-blue-700/90 text-white border border-blue-400/50 backdrop-blur-xs">
-                              MHTC Travel
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Content Body */}
-                      <div className="p-5 space-y-3">
-                        <div>
-                          <div className="flex items-center justify-between text-xs text-slate-500">
-                            <span className="flex items-center gap-1 font-semibold text-slate-700">
-                              <Building2 className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                              {pkg.facility_name}
-                            </span>
-                            <span>{pkg.facility_city}</span>
-                          </div>
-                          <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
-                            {pkg.verified_facilitator !== 0 && (
-                              <span className="text-[10px] font-black uppercase text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 flex items-center gap-1">
-                                <BadgeCheck className="h-3 w-3 text-emerald-600" />
-                                Verified Facilitator
-                              </span>
-                            )}
-                            {Boolean(pkg.mhtc_member) && (
-                              <span className="text-[10px] font-black uppercase text-sky-800 bg-sky-50 border border-sky-200 px-1.5 py-0.2">
-                                🇲🇾 MHTC Hospital
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <h3 className="font-extrabold text-base text-[color:var(--ink)] leading-snug group-hover:text-[color:var(--t-600)] transition-colors">
-                          {pkg.title}
-                        </h3>
-
-                        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                          {pkg.description}
-                        </p>
-
-                        <div className="flex items-center gap-3 text-xs text-slate-500 pt-1">
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3.5 w-3.5 text-slate-400" />
-                            {pkg.duration}
-                          </span>
-                          {pkg.fastingRequired && (
-                            <span className="text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[10px] font-bold uppercase">
-                              Fasting Required
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Inclusions Highlights */}
-                        <div className="pt-3 border-t border-slate-100 space-y-1.5">
-                          <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                            Includes ({pkg.inclusions.length} Clinical Items):
-                          </div>
-                          {pkg.inclusions.slice(0, 3).map((inc, i) => (
-                            <div key={i} className="flex items-start gap-1.5 text-xs text-slate-700">
-                              <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                              <span className="line-clamp-1">{inc}</span>
-                            </div>
-                          ))}
-                          {pkg.inclusions.length > 3 && (
-                            <div className="text-[11px] text-[color:var(--t-600)] font-semibold pt-0.5">
-                              + {pkg.inclusions.length - 3} more included services & tests
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                    <div className="relative aspect-21/9 overflow-hidden bg-[color:var(--t-50)]">
+                      <PackageImage src={pkg.image_url} alt={pkg.title} category={pkg.category} />
+                      <span className="absolute top-2.5 left-2.5 text-xs font-bold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-600)] text-white shadow-xs">
+                        {pkg.category}
+                      </span>
                     </div>
 
-                    {/* Footer / Pricing & Actions */}
-                    <div className="p-5 pt-3 bg-slate-50 border-t border-[color:var(--t-100)] flex items-end justify-between gap-3">
+                    <div className="p-4 space-y-2.5 flex-1 flex flex-col">
                       <div>
-                        {pkg.originalPriceMyr && (
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-xs text-slate-400 line-through">
-                              RM {pkg.originalPriceMyr.toLocaleString()}
-                            </span>
-                            <span className="text-[10px] font-black uppercase text-emerald-700 bg-emerald-100 px-1.5 py-0.2">
-                              Save {Math.round(((pkg.originalPriceMyr - pkg.priceMyr) / pkg.originalPriceMyr) * 100)}%
-                            </span>
-                          </div>
-                        )}
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-xs font-bold text-slate-500 uppercase">MYR</span>
-                          <span className="text-xl font-extrabold text-[color:var(--ink)] tabular-nums">
-                            {pkg.priceMyr.toLocaleString()}
+                        <h3 className="font-extrabold text-base text-[color:var(--ink)] leading-snug">
+                          {pkg.title}
+                        </h3>
+                        <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-700">
+                          <span className="flex items-center gap-1 font-semibold">
+                            <Building2 className="h-3.5 w-3.5 text-[color:var(--t-600)]" aria-hidden="true" />
+                            {pkg.facility_name}, {pkg.facility_city}
                           </span>
-                        </div>
-                        <div className="text-[10px] font-bold text-emerald-700 flex items-center gap-1 mt-0.5">
-                          <ShieldCheck className="h-3 w-3" />
-                          10% Deposit: RM {(pkg.priceMyr * 0.1).toFixed(0)} to reserve
-                        </div>
+                          {Boolean(pkg.verified_facilitator) && (
+                            <span className="flex items-center gap-1 font-semibold text-emerald-800">
+                              <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" /> Verified facilitator
+                            </span>
+                          )}
+                          {Boolean(pkg.mhtc_member) && <span className="font-semibold text-sky-800">MHTC member</span>}
+                        </p>
                       </div>
 
+                      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                        <span className="text-2xl font-extrabold text-[color:var(--ink)] tabular-nums">RM {pkg.priceMyr.toLocaleString()}</span>
+                        {pkg.originalPriceMyr ? (
+                          <>
+                            <span className="text-xs text-slate-700 line-through">RM {pkg.originalPriceMyr.toLocaleString()}</span>
+                            <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5">
+                              Save {Math.round(savingPct(pkg) * 100)}%
+                            </span>
+                          </>
+                        ) : null}
+                      </div>
+
+                      <p className="text-xs text-slate-700 flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5 text-slate-600" aria-hidden="true" /> {pkg.duration}</span>
+                        {pkg.fastingRequired && <span className="font-bold text-amber-900">Fasting required</span>}
+                      </p>
+
+                      <p className="text-sm text-slate-700 line-clamp-2">{pkg.description}</p>
+
+                      <ul className="space-y-1 pt-2.5 mt-auto border-t border-slate-100">
+                        {pkg.inclusions.slice(0, 2).map((inc, i) => (
+                          <li key={i} className="flex items-start gap-1.5 text-xs text-slate-800">
+                            <Check className="h-3.5 w-3.5 text-emerald-700 shrink-0 mt-0.5" aria-hidden="true" />
+                            <span className="line-clamp-1">{inc}</span>
+                          </li>
+                        ))}
+                        {pkg.inclusions.length > 2 && (
+                          <li className="text-xs font-semibold text-[color:var(--t-700)]">+ {pkg.inclusions.length - 2} more in Details</li>
+                        )}
+                      </ul>
+                    </div>
+
+                    <div className="p-4 bg-slate-50 border-t border-[color:var(--t-100)] space-y-1.5">
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
@@ -668,7 +585,7 @@ export default function MedicalPackagesModule({
                             setPromoError(null);
                             setPromoSuccess(null);
                           }}
-                          className="px-3 py-2 text-xs font-bold border border-slate-300 hover:border-slate-400 bg-white text-slate-800 hover:bg-slate-50 cursor-pointer"
+                          className="flex-1 min-h-[44px] px-3 text-sm font-bold border border-slate-300 hover:border-slate-400 bg-white text-slate-800 hover:bg-slate-50 cursor-pointer"
                         >
                           Details
                         </button>
@@ -680,15 +597,16 @@ export default function MedicalPackagesModule({
                             setDepositReceipt(null);
                             setBookFeedback(null);
                           }}
-                          className="px-4 py-2 text-xs font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer shadow-xs flex items-center gap-1.5"
+                          className="flex-1 min-h-[44px] px-4 text-sm font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer shadow-xs"
                         >
-                          <CreditCard className="h-3.5 w-3.5" />
-                          Reserve Now
+                          Request this package
                         </button>
                       </div>
+                      <p className="text-xs text-slate-700">No payment is taken. The hospital confirms and tells you how any deposit is paid.</p>
                     </div>
                   </article>
                 ))}
+              </div>
               </div>
             )}
           </div>
@@ -710,7 +628,7 @@ export default function MedicalPackagesModule({
                       <span className="text-xs font-extrabold uppercase px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300">
                         {promo.badge_text || (promo.discount_type === 'percentage' ? `${promo.discount_value}% Discount` : `RM ${promo.discountValueMyr} Rebate`)}
                       </span>
-                      <span className="text-[10px] font-mono text-slate-500">
+                      <span className="text-xs font-mono text-slate-500">
                         Valid until {promo.valid_until}
                       </span>
                     </div>
@@ -730,7 +648,7 @@ export default function MedicalPackagesModule({
                     )}
 
                     {promo.terms && (
-                      <p className="text-[11px] text-slate-400 italic">
+                      <p className="text-xs text-slate-400 italic">
                         *{promo.terms}
                       </p>
                     )}
@@ -783,21 +701,21 @@ export default function MedicalPackagesModule({
                     {/* Facility Header Image */}
                     <div className="relative aspect-16/7 bg-slate-100 overflow-hidden">
                       <img
-                        src={fac.coverImage || '/assets/clinics_hospital_hero_bg-CAmCzOcG.jpg'}
+                        src={fac.coverImage || '/assets/clinics_hospital_hero_bg.jpg'}
                         alt={fac.name}
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-slate-900/90 text-white backdrop-blur-xs">
+                        <span className="text-xs font-black uppercase px-2.5 py-1 bg-slate-900/90 text-white backdrop-blur-xs">
                           {fac.kind.replace('_', ' ').toUpperCase()}
                         </span>
                         {fac.mhtcMember && (
-                          <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-sky-800/95 text-white border border-sky-400/60 backdrop-blur-xs flex items-center gap-1">
+                          <span className="text-xs font-black uppercase px-2.5 py-1 bg-sky-800/95 text-white border border-sky-400/60 backdrop-blur-xs flex items-center gap-1">
                             🇲🇾 MHTC Member Hospital
                           </span>
                         )}
-                        {(fac.verifiedFacilitator ?? true) && (
-                          <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-emerald-800/95 text-white border border-emerald-400/60 backdrop-blur-xs flex items-center gap-1">
+                        {Boolean(fac.verifiedFacilitator) && (
+                          <span className="text-xs font-black uppercase px-2.5 py-1 bg-emerald-800/95 text-white border border-emerald-400/60 backdrop-blur-xs flex items-center gap-1">
                             <ShieldCheck className="h-3 w-3" />
                             Verified Facilitator Partner
                           </span>
@@ -823,25 +741,25 @@ export default function MedicalPackagesModule({
 
                       {/* Licence & Accreditations Badge Row */}
                       <div className="flex flex-wrap items-center gap-2 text-xs">
-                        {(fac.verifiedFacilitator ?? true) && (
-                          <span className="px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 text-[10px] font-black uppercase flex items-center gap-1">
+                        {Boolean(fac.verifiedFacilitator) && (
+                          <span className="px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 text-xs font-black uppercase flex items-center gap-1">
                             <BadgeCheck className="h-3 w-3 text-emerald-600" />
-                            Verified Facilitator Network (Deposit-Protected & MMC Compliant)
+                            Verified facilitator
                           </span>
                         )}
                         {fac.mhtcMember && (
-                          <span className="px-2.5 py-1 bg-sky-50 text-sky-800 border border-sky-300 text-[10px] font-black uppercase flex items-center gap-1">
+                          <span className="px-2.5 py-1 bg-sky-50 text-sky-800 border border-sky-300 text-xs font-black uppercase flex items-center gap-1">
                             🇲🇾 MHTC Affiliated
                           </span>
                         )}
                         {fac.isLicenceValid && (
-                          <span className="px-2.5 py-1 bg-slate-100 text-slate-800 border border-slate-300 text-[10px] font-black uppercase flex items-center gap-1">
+                          <span className="px-2.5 py-1 bg-slate-100 text-slate-800 border border-slate-300 text-xs font-black uppercase flex items-center gap-1">
                             <ShieldCheck className="h-3 w-3 text-slate-600" />
-                            Act 586 Licensed ({fac.licenceNo || 'Verified'})
+                            Licensed hospital{fac.licenceNo ? ` (${fac.licenceNo})` : ''}
                           </span>
                         )}
                         {fac.accreditations.map((a, i) => (
-                          <span key={i} className="px-2 py-1 bg-blue-50 text-blue-800 border border-blue-200 text-[10px] font-bold uppercase">
+                          <span key={i} className="px-2 py-1 bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold uppercase">
                             {a.body} ({a.number})
                           </span>
                         ))}
@@ -850,7 +768,7 @@ export default function MedicalPackagesModule({
                       {/* Clinical Specialties */}
                       {fac.specialties.length > 0 && (
                         <div className="space-y-1.5">
-                          <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                          <div className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
                             Specialist Clinical Services:
                           </div>
                           <div className="flex flex-wrap gap-1.5">
@@ -866,7 +784,7 @@ export default function MedicalPackagesModule({
                       {/* Advanced Diagnostic Equipment */}
                       {fac.equipment.length > 0 && (
                         <div className="space-y-1.5 pt-2 border-t border-slate-100">
-                          <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                          <div className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
                             <HeartPulse className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                             Diagnostic Equipment & Infrastructure:
                           </div>
@@ -884,12 +802,12 @@ export default function MedicalPackagesModule({
                       {/* Patient Amenities */}
                       {fac.amenities.length > 0 && (
                         <div className="space-y-1.5 pt-2 border-t border-slate-100">
-                          <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                          <div className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
                             Patient Care Amenities & Services:
                           </div>
                           <div className="flex flex-wrap gap-1.5">
                             {fac.amenities.map((am, i) => (
-                              <span key={i} className="text-[11px] px-2 py-0.5 bg-amber-50 text-amber-900 border border-amber-200">
+                              <span key={i} className="text-xs px-2 py-0.5 bg-amber-50 text-amber-900 border border-amber-200">
                                 {am}
                               </span>
                             ))}
@@ -931,7 +849,7 @@ export default function MedicalPackagesModule({
             <div className="bg-white border border-slate-300 w-full max-w-2xl max-h-[90vh] flex flex-col shadow-xl my-auto">
               <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono font-black uppercase px-2 py-0.5 bg-slate-900 text-white">
+                  <span className="text-xs font-mono font-black uppercase px-2 py-0.5 bg-slate-900 text-white">
                     {selectedPackage.code}
                   </span>
                   <span className="text-xs font-extrabold text-[color:var(--t-700)]">
@@ -941,7 +859,8 @@ export default function MedicalPackagesModule({
                 <button
                   type="button"
                   onClick={() => setSelectedPackage(null)}
-                  className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  aria-label="Close"
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-slate-900 cursor-pointer"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -965,11 +884,11 @@ export default function MedicalPackagesModule({
                 {/* Duration & Fasting metadata */}
                 <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 border border-slate-200 text-xs">
                   <div>
-                    <span className="text-[10px] font-bold uppercase text-slate-400 block">Procedure Duration:</span>
+                    <span className="text-xs font-bold uppercase text-slate-400 block">Procedure Duration:</span>
                     <span className="font-semibold text-slate-800">{selectedPackage.duration}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase text-slate-400 block">Clinical Fasting:</span>
+                    <span className="text-xs font-bold uppercase text-slate-400 block">Clinical Fasting:</span>
                     <span className={`font-semibold ${selectedPackage.fastingRequired ? 'text-amber-800' : 'text-slate-800'}`}>
                       {selectedPackage.fastingRequired ? 'Fasting Required (8–10 hours)' : 'No Fasting Required'}
                     </span>
@@ -994,7 +913,7 @@ export default function MedicalPackagesModule({
                 {/* Preparation Instructions */}
                 {selectedPackage.preparation_instructions && (
                   <div className="p-3 bg-amber-50 border border-amber-200 space-y-1">
-                    <div className="text-[11px] font-bold text-amber-900 flex items-center gap-1.5">
+                    <div className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
                       <AlertCircle className="h-3.5 w-3.5 text-amber-700" />
                       Preparation & Instructions Before Visit:
                     </div>
@@ -1055,7 +974,7 @@ export default function MedicalPackagesModule({
                   <div className="pt-2 border-t border-slate-200 flex items-baseline justify-between">
                     <span className="font-extrabold text-sm text-slate-900">Total Payable:</span>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-xs font-bold text-slate-500">MYR</span>
+                      <span className="text-xs font-bold text-slate-700">RM</span>
                       <span className="text-2xl font-black text-[color:var(--ink)] tabular-nums">
                         {(selectedPackage.priceMyr - (appliedPromo?.discountMyr || 0)).toLocaleString()}
                       </span>
@@ -1081,7 +1000,7 @@ export default function MedicalPackagesModule({
                   }}
                   className={bannerPrimaryBtn}
                 >
-                  Proceed to Book Package
+                  Request this package
                 </button>
               </div>
             </div>
@@ -1099,7 +1018,7 @@ export default function MedicalPackagesModule({
               <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-black uppercase px-2 py-0.5 bg-slate-900 text-white">
+                    <span className="text-xs font-mono font-black uppercase px-2 py-0.5 bg-slate-900 text-white">
                       {bookingModal.code}
                     </span>
                     <span className="text-xs font-extrabold text-[color:var(--t-700)]">
@@ -1107,7 +1026,7 @@ export default function MedicalPackagesModule({
                     </span>
                   </div>
                   <h3 className="font-extrabold text-base text-[color:var(--ink)] mt-1">
-                    {depositReceipt ? 'Official Package Reservation Voucher' : 'Reserve Medical Package'}
+                    {depositReceipt ? 'Request received' : 'Request this package'}
                   </h3>
                 </div>
                 <button
@@ -1116,379 +1035,136 @@ export default function MedicalPackagesModule({
                     setBookingModal(null);
                     setDepositReceipt(null);
                   }}
-                  className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  aria-label="Close"
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-slate-900 cursor-pointer"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
               {depositReceipt ? (
-                /* ============================================================ */
-                /* OFFICIAL BOOKING VOUCHER RECEIPT */
-                /* ============================================================ */
                 <div className="p-6 space-y-5">
-                  <div className="p-4 bg-emerald-50 border border-emerald-300 flex items-start gap-3">
-                    <CheckCircle2 className="h-6 w-6 text-emerald-600 shrink-0 mt-0.5" />
+                  <div role="status" className="p-4 bg-sky-50 border border-sky-300 flex items-start gap-3">
+                    <CheckCircle2 className="h-6 w-6 text-sky-800 shrink-0 mt-0.5" aria-hidden="true" />
                     <div className="space-y-1">
-                      <h4 className="font-black text-sm text-emerald-950">
-                        10% Pre-Authorized Deposit Secured!
-                      </h4>
-                      <p className="text-xs text-emerald-900/90 leading-relaxed">
-                        Your hospital slot has been pre-booked directly with {bookingModal.facility_name}. An official booking voucher has been issued and sent to <strong className="font-mono">{bookEmail}</strong>.
+                      <h4 className="font-extrabold text-base text-sky-950">Your request has been sent. No payment has been taken.</h4>
+                      <p className="text-sm text-sky-950 leading-relaxed">
+                        {bookingModal.facility_name} will check availability and contact you on <strong className="font-mono">{bookEmail}</strong> or {bookPhone}. They will also tell you if a deposit is needed and how to pay it.
                       </p>
                     </div>
                   </div>
 
-                  {/* Printable Voucher Card */}
                   <div className="p-5 bg-slate-50 border-2 border-dashed border-slate-300 space-y-4">
-                    <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
                       <div>
-                        <div className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider">
-                          Voucher Reference No.
-                        </div>
-                        <div className="text-lg font-mono font-black text-[color:var(--t-700)] tracking-wide">
-                          {depositReceipt.depositPaymentRef}
-                        </div>
+                        <div className="text-xs font-bold uppercase text-slate-700 tracking-wider">Request reference</div>
+                        <div className="text-lg font-mono font-black text-[color:var(--t-700)] tracking-wide">{depositReceipt.depositPaymentRef}</div>
                       </div>
-                      <div className="text-right">
-                        <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black uppercase">
-                          Deposit Secured
-                        </span>
-                        <div className="text-[10px] text-slate-500 mt-1">
-                          Order ID: <code className="font-mono">{depositReceipt.orderId}</code>
-                        </div>
-                      </div>
+                      <span className="px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-300 text-xs font-bold uppercase">Waiting for the hospital</span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 text-xs">
-                      <div>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Patient Name</span>
-                        <strong className="text-slate-900">{depositReceipt.patientName}</strong>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Target Hospital</span>
-                        <strong className="text-slate-900">{bookingModal.facility_name}</strong>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Package</span>
-                        <strong className="text-slate-900">{depositReceipt.packageTitle}</strong>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Preferred Admission Date</span>
-                        <strong className="text-slate-900">{depositReceipt.preferredDate || 'Flexible / As Arranged'}</strong>
-                      </div>
+                    <dl className="grid grid-cols-2 gap-3 text-sm">
+                      <div><dt className="text-xs text-slate-700 font-bold uppercase">Patient</dt><dd className="font-bold text-slate-900">{depositReceipt.patientName}</dd></div>
+                      <div><dt className="text-xs text-slate-700 font-bold uppercase">Hospital</dt><dd className="font-bold text-slate-900">{bookingModal.facility_name}</dd></div>
+                      <div><dt className="text-xs text-slate-700 font-bold uppercase">Package</dt><dd className="font-bold text-slate-900">{depositReceipt.packageTitle}</dd></div>
+                      <div><dt className="text-xs text-slate-700 font-bold uppercase">Preferred date</dt><dd className="font-bold text-slate-900">{depositReceipt.preferredDate || 'Flexible'}</dd></div>
+                    </dl>
+
+                    <div className="p-3 bg-white border border-slate-200 space-y-1.5 text-sm">
+                      <div className="flex items-center justify-between text-slate-800"><span>Package price</span><span className="font-bold tabular-nums">RM {depositReceipt.totalPriceMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span></div>
+                      <div className="flex items-center justify-between text-slate-800"><span>Deposit the hospital may ask for (10%)</span><span className="tabular-nums">RM {depositReceipt.depositAmountMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span></div>
+                      <div className="flex items-center justify-between text-slate-800"><span>Balance after the deposit</span><span className="tabular-nums">RM {depositReceipt.remainingPayableMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span></div>
                     </div>
 
-                    {/* Financial Summary */}
-                    <div className="p-3 bg-white border border-slate-200 space-y-2 text-xs">
-                      <div className="flex items-center justify-between text-slate-600">
-                        <span>Total Package Value:</span>
-                        <span className="font-bold tabular-nums">RM {depositReceipt.totalPriceMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-emerald-800 font-bold border-t border-slate-100 pt-1.5">
-                        <span className="flex items-center gap-1">
-                          <Check className="h-3.5 w-3.5 text-emerald-600" />
-                          10% Pre-Auth Deposit Paid:
-                        </span>
-                        <span className="tabular-nums">- RM {depositReceipt.depositAmountMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-slate-900 font-black border-t border-slate-200 pt-2 text-sm">
-                        <span>Remaining Balance at Hospital Check-in:</span>
-                        <span className="tabular-nums text-[color:var(--t-700)]">RM {depositReceipt.remainingPayableMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span>
-                      </div>
-                    </div>
-
-                    <div className="text-[11px] text-slate-500 leading-normal">
-                      <strong>Check-in Instructions:</strong> Please show this confirmation reference at {bookingModal.facility_name}'s Executive Health / International Patient Lounge. The remaining balance will be settled at hospital admission.
-                    </div>
+                    <p className="text-xs text-slate-700 leading-normal">
+                      Quote this reference when the hospital contacts you. Your request does not guarantee a slot until the hospital confirms it. The price is the one the hospital published and may change.
+                    </p>
                   </div>
 
-                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
-                    <button
-                      type="button"
-                      onClick={() => window.print()}
-                      className="px-4 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 cursor-pointer flex items-center gap-1.5"
-                    >
-                      <Printer className="h-4 w-4" />
-                      Print Voucher
+                  <div className="flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-slate-200">
+                    <button type="button" onClick={() => window.print()} className="min-h-[44px] px-4 text-sm font-bold border border-slate-300 hover:bg-slate-50 cursor-pointer flex items-center gap-1.5">
+                      <Printer className="h-4 w-4" aria-hidden="true" />
+                      Print summary
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setBookingModal(null);
-                        setDepositReceipt(null);
-                      }}
-                      className={bannerPrimaryBtn}
-                    >
-                      Done & Close
+                    <button type="button" onClick={() => { setBookingModal(null); setDepositReceipt(null); }} className={`${bannerPrimaryBtn} min-h-[44px]`}>
+                      Done
                     </button>
                   </div>
                 </div>
               ) : (
-                /* ============================================================ */
-                /* BOOKING / DEPOSIT FORM */
-                /* ============================================================ */
                 <form onSubmit={handleBookingSubmit} className="p-6 space-y-4">
-                  
-                  {/* Mode Selector Tabs */}
-                  <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 border border-slate-200">
-                    <button
-                      type="button"
-                      onClick={() => setBookingMode('deposit')}
-                      className={`py-2 px-3 text-xs font-black cursor-pointer flex items-center justify-center gap-1.5 transition-all ${
-                        bookingMode === 'deposit'
-                          ? 'bg-white text-[color:var(--t-700)] shadow-xs border border-slate-200'
-                          : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      <CreditCard className="h-3.5 w-3.5" />
-                      10% Deposit Checkout
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setBookingMode('enquiry')}
-                      className={`py-2 px-3 text-xs font-black cursor-pointer flex items-center justify-center gap-1.5 transition-all ${
-                        bookingMode === 'enquiry'
-                          ? 'bg-white text-[color:var(--t-700)] shadow-xs border border-slate-200'
-                          : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      <Mail className="h-3.5 w-3.5" />
-                      General Inquiry Only
-                    </button>
-                  </div>
+                  <p className="text-sm text-slate-800">
+                    Send your details to {bookingModal.facility_name}. They check availability and contact you. <strong>No payment is taken here.</strong>
+                  </p>
 
-                  {/* Feedback Message */}
                   {bookFeedback && (
-                    <div
-                      className={`p-3 text-xs flex items-start gap-2 ${
-                        bookFeedback.type === 'success'
-                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
-                          : 'bg-red-50 text-red-800 border border-red-300'
-                      }`}
-                    >
-                      {bookFeedback.type === 'success' ? (
-                        <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
-                      ) : (
-                        <AlertCircle className="h-4 w-4 shrink-0 text-red-600 mt-0.5" />
-                      )}
+                    <div role="alert" className="p-3 text-sm flex items-start gap-2 bg-red-50 text-red-900 border border-red-300">
+                      <AlertCircle className="h-4 w-4 shrink-0 text-red-700 mt-0.5" aria-hidden="true" />
                       <span>{bookFeedback.message}</span>
                     </div>
                   )}
 
-                  {/* Deposit Pricing Callout */}
-                  {bookingMode === 'deposit' && (
-                    <div className="p-3.5 bg-emerald-50/70 border border-emerald-300 space-y-2">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-600">Published Package Price:</span>
-                        <span className="font-semibold tabular-nums">RM {bookingModal.priceMyr.toLocaleString()}</span>
-                      </div>
-                      {appliedPromo && (
-                        <div className="flex items-center justify-between text-xs text-emerald-700 font-bold">
-                          <span>Promo Discount ({appliedPromo.code}):</span>
-                          <span className="tabular-nums">- RM {appliedPromo.discountMyr.toLocaleString()}</span>
-                        </div>
-                      )}
-                      <div className="pt-2 border-t border-emerald-200 flex items-center justify-between">
-                        <div>
-                          <span className="text-xs font-black text-emerald-950 block">10% Advance Deposit:</span>
-                          <span className="text-[10px] text-emerald-700">Pre-authorizes & confirms your hospital appointment</span>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-lg font-black text-emerald-900 tabular-nums">
-                            RM {Math.max(50, Math.round((bookingModal.priceMyr - (appliedPromo?.discountMyr || 0)) * 0.1)).toFixed(2)}
-                          </span>
-                          <div className="text-[10px] text-slate-500">
-                            Balance RM {Math.round((bookingModal.priceMyr - (appliedPromo?.discountMyr || 0)) * 0.9).toLocaleString()} at admission
-                          </div>
-                        </div>
-                      </div>
+                  <div className="p-3.5 bg-slate-50 border border-slate-200 space-y-2 text-sm">
+                    <div className="flex items-center justify-between"><span className="text-slate-800">Package price</span><span className="font-semibold tabular-nums">RM {bookingModal.priceMyr.toLocaleString()}</span></div>
+                    {appliedPromo && (
+                      <div className="flex items-center justify-between text-emerald-800 font-bold"><span>Offer ({appliedPromo.code})</span><span className="tabular-nums">- RM {appliedPromo.discountMyr.toLocaleString()}</span></div>
+                    )}
+                    <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                      <span className="text-slate-800">Deposit the hospital may ask for (10%)</span>
+                      <span className="font-bold tabular-nums">RM {Math.max(50, Math.round((bookingModal.priceMyr - (appliedPromo?.discountMyr || 0)) * 0.1)).toFixed(2)}</span>
                     </div>
-                  )}
+                  </div>
 
-                  {/* Patient Info Fields */}
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-700 block">Full Patient Name (as in Passport / NRIC) *</label>
-                    <input
-                      type="text"
-                      required
-                      value={bookName}
-                      onChange={(e) => setBookName(e.target.value)}
-                      placeholder="e.g. Siti Sarah binti Ahmad or Dr. James Tan"
-                      className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
-                    />
+                    <label htmlFor="pkg-name" className="text-sm font-bold text-slate-800 block">Full name (as in passport or NRIC) *</label>
+                    <input id="pkg-name" type="text" required value={bookName} onChange={(e) => setBookName(e.target.value)} placeholder="e.g. Siti Sarah binti Ahmad" className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-700 block">Mobile Phone (WhatsApp) *</label>
-                      <input
-                        type="tel"
-                        required
-                        value={bookPhone}
-                        onChange={(e) => setBookPhone(e.target.value)}
-                        placeholder="+60 12-345 6789"
-                        className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
-                      />
+                      <label htmlFor="pkg-phone" className="text-sm font-bold text-slate-800 block">Mobile phone (WhatsApp) *</label>
+                      <input id="pkg-phone" type="tel" required value={bookPhone} onChange={(e) => setBookPhone(e.target.value)} placeholder="+60 12-345 6789" className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-700 block">Email Address *</label>
-                      <input
-                        type="email"
-                        required
-                        value={bookEmail}
-                        onChange={(e) => setBookEmail(e.target.value)}
-                        placeholder="patient@example.com"
-                        className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
-                      />
+                      <label htmlFor="pkg-email" className="text-sm font-bold text-slate-800 block">Email *</label>
+                      <input id="pkg-email" type="email" required value={bookEmail} onChange={(e) => setBookEmail(e.target.value)} placeholder="you@example.com" className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-700 block">Country of Residence</label>
-                      <select
-                        value={bookCountry}
-                        onChange={(e) => setBookCountry(e.target.value)}
-                        className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
-                      >
-                        <option value="Malaysia">🇲🇾 Malaysia</option>
-                        <option value="Indonesia">🇮🇩 Indonesia</option>
-                        <option value="Singapore">🇸🇬 Singapore</option>
-                        <option value="China">🇨🇳 China</option>
-                        <option value="Australia">🇦🇺 Australia</option>
-                        <option value="United Kingdom">🇬🇧 United Kingdom</option>
-                        <option value="Other">🌍 Other International</option>
+                      <label htmlFor="pkg-country" className="text-sm font-bold text-slate-800 block">Country of residence</label>
+                      <select id="pkg-country" value={bookCountry} onChange={(e) => setBookCountry(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]">
+                        <option value="Malaysia">Malaysia</option>
+                        <option value="Indonesia">Indonesia</option>
+                        <option value="Singapore">Singapore</option>
+                        <option value="China">China</option>
+                        <option value="Australia">Australia</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="Other">Other</option>
                       </select>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-700 block">Preferred Date of Visit</label>
-                      <input
-                        type="date"
-                        value={bookDate}
-                        onChange={(e) => setBookDate(e.target.value)}
-                        min={new Date().toISOString().slice(0, 10)}
-                        className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
-                      />
+                      <label htmlFor="pkg-date" className="text-sm font-bold text-slate-800 block">Preferred date</label>
+                      <input id="pkg-date" type="date" value={bookDate} onChange={(e) => setBookDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                     </div>
                   </div>
 
-                  {/* Payment Method Selector (Only for Deposit mode) */}
-                  {bookingMode === 'deposit' && (
-                    <div className="space-y-3 pt-2 border-t border-slate-200">
-                      <label className="text-xs font-bold text-slate-700 block">Select Deposit Payment Channel</label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {[
-                          { id: 'credit_card', label: 'Credit Card', icon: CreditCard, sub: 'Visa / MC' },
-                          { id: 'fpx', label: 'FPX Online', icon: Building2, sub: 'Malaysian Banks' },
-                          { id: 'intl_transfer', label: 'Telegraphic', icon: Globe, sub: 'Wire / TT' },
-                        ].map(pm => (
-                          <button
-                            key={pm.id}
-                            type="button"
-                            onClick={() => setPaymentMethod(pm.id as any)}
-                            className={`p-2.5 text-center border cursor-pointer transition-all ${
-                              paymentMethod === pm.id
-                                ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)] text-[color:var(--t-700)]'
-                                : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
-                            }`}
-                          >
-                            <pm.icon className="h-4 w-4 mx-auto mb-1 text-[color:var(--t-600)]" />
-                            <div className="text-[11px] font-bold">{pm.label}</div>
-                            <div className="text-[9px] text-slate-400">{pm.sub}</div>
-                          </button>
-                        ))}
-                      </div>
-
-                      {paymentMethod === 'credit_card' && (
-                        <div className="p-3 bg-slate-50 border border-slate-200 space-y-2">
-                          <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-slate-600 block uppercase">Card Number</label>
-                            <input
-                              type="text"
-                              value={cardNumber}
-                              onChange={(e) => setCardNumber(e.target.value)}
-                              placeholder="4111 •••• •••• 4242"
-                              className="w-full p-2 border border-slate-300 text-xs font-mono bg-white rounded-none"
-                            />
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div>
-                              <label className="text-[10px] font-bold text-slate-600 block uppercase">Expiry Date</label>
-                              <input
-                                type="text"
-                                value={cardExp}
-                                onChange={(e) => setCardExp(e.target.value)}
-                                placeholder="MM / YY"
-                                className="w-full p-2 border border-slate-300 text-xs font-mono bg-white rounded-none"
-                              />
-                            </div>
-                            <div>
-                              <label className="text-[10px] font-bold text-slate-600 block uppercase">Security CVC</label>
-                              <input
-                                type="password"
-                                maxLength={4}
-                                value={cardCvc}
-                                onChange={(e) => setCardCvc(e.target.value)}
-                                placeholder="CVC"
-                                className="w-full p-2 border border-slate-300 text-xs font-mono bg-white rounded-none"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Notes */}
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-700 block">Clinical Remarks / Requirements</label>
-                    <textarea
-                      rows={2}
-                      value={bookNotes}
-                      onChange={(e) => setBookNotes(e.target.value)}
-                      placeholder="Any pre-existing conditions, mobility assistance, wheelchair needs, or dietary preferences..."
-                      className="w-full p-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
-                    />
+                    <label htmlFor="pkg-notes" className="text-sm font-bold text-slate-800 block">Anything the hospital should know (optional)</label>
+                    <textarea id="pkg-notes" rows={2} value={bookNotes} onChange={(e) => setBookNotes(e.target.value)} placeholder="Health conditions, mobility needs, dietary needs…" className="w-full px-3 py-2 border border-slate-300 text-sm bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                   </div>
 
-                  {/* Regulatory Compliance & Assurance */}
-                  <div className="p-3 bg-slate-50 border border-slate-200 text-[11px] text-slate-500 space-y-1">
-                    <div className="font-bold text-slate-700 flex items-center gap-1.5">
-                      <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-                      Act 586 & MMC 1971 Compliant Institutional Booking:
-                    </div>
-                    <span>
-                      {bookingMode === 'deposit'
-                        ? `Your 10% advance deposit pre-authorizes and locks in your package with ${bookingModal.facility_name}. Zero doctor fee-splitting: platform facilitator fees are purely institutional and comply with MMC ethical guidelines.`
-                        : `Your inquiry will be routed to ${bookingModal.facility_name}'s admissions coordinator who will respond within 24 business hours.`}
-                    </span>
-                  </div>
+                  <p className="p-3 bg-slate-50 border border-slate-200 text-xs text-slate-700">
+                    Your details go to {bookingModal.facility_name}'s admissions desk and MedCred. They are used only to arrange this package.
+                  </p>
 
-                  {/* Modal Action Buttons */}
-                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
-                    <button
-                      type="button"
-                      onClick={() => setBookingModal(null)}
-                      className="px-4 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 cursor-pointer"
-                    >
+                  <div className="flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-slate-200">
+                    <button type="button" onClick={() => setBookingModal(null)} className="min-h-[44px] px-4 text-sm font-bold border border-slate-300 hover:bg-slate-50 cursor-pointer">
                       Cancel
                     </button>
-                    <button
-                      type="submit"
-                      disabled={bookSubmitting}
-                      className={`${bannerPrimaryBtn} disabled:opacity-50 flex items-center gap-1.5`}
-                    >
-                      {bookSubmitting ? (
-                        'Processing…'
-                      ) : bookingMode === 'deposit' ? (
-                        <>
-                          <Lock className="h-3.5 w-3.5" />
-                          Pay RM {Math.max(50, Math.round((bookingModal.priceMyr - (appliedPromo?.discountMyr || 0)) * 0.1)).toFixed(2)} Deposit & Reserve
-                        </>
-                      ) : (
-                        'Submit Free Enquiry'
-                      )}
+                    <button type="submit" disabled={bookSubmitting} className={`${bannerPrimaryBtn} min-h-[44px] disabled:opacity-50`}>
+                      {bookSubmitting ? 'Sending…' : 'Send request'}
                     </button>
                   </div>
                 </form>
