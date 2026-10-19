@@ -1,15 +1,19 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { ADMIN_EMAIL, ADMIN_PASSWORD, startTestServer, type Client, type TestServer } from './helpers/server';
+import { ADMIN_EMAIL, ADMIN_PASSWORD, DEMO, DEMO_PASSWORD, startTestServer, type Client, type TestServer } from './helpers/server';
 
 let srv: TestServer;
-let anon: Client, admin: Client;
+let anon: Client, admin: Client, patient: Client, doctor: Client;
 
 before(async () => {
   srv = await startTestServer();
   anon = srv.client();
   admin = srv.client();
   assert.equal((await admin.login(ADMIN_EMAIL, ADMIN_PASSWORD, 'admin')).status, 200);
+  patient = srv.client();
+  assert.equal((await patient.login(DEMO.patient, DEMO_PASSWORD, 'patient')).status, 200);
+  doctor = srv.client();
+  assert.equal((await doctor.login(DEMO.doctor, DEMO_PASSWORD, 'practitioner')).status, 200);
 });
 
 after(async () => {
@@ -39,7 +43,7 @@ test('public / guest can submit an assistance enquiry and receive a tracking cod
   assert.equal(r.status, 201);
   assert.equal(r.data.status, 'success');
   assert.ok(r.data.data.id);
-  assert.ok(r.data.data.trackingCode.startsWith('MED-MY'));
+  assert.match(r.data.data.trackingCode, /^MED-MY-[A-HJ-NP-Z2-9]{8}$/, 'an 8-character code, not a 4-digit number');
 });
 
 test('enquiry with short summary is rejected', async () => {
@@ -51,75 +55,94 @@ test('enquiry with short summary is rejected', async () => {
   assert.equal(r.status, 400);
 });
 
-test('fetching assistance cases returns list including seeded and new cases', async () => {
+// Cases hold a patient's name, contact details and clinical summary. Nobody sees one without being entitled to it.
+const allCases = async () => (await admin.call('GET', '/api/assistance/cases')).data.data as any[];
+const withQuote = async () => (await allCases()).find(c => c.latestQuote && c.latestQuote.status === 'sent' && c.patientEmail)!;
+
+test('there is no public list of cases: a visitor with no code and email gets nothing', async () => {
   const r = await anon.call('GET', '/api/assistance/cases');
   assert.equal(r.status, 200);
-  assert.equal(r.data.status, 'success');
-  assert.ok(Array.isArray(r.data.data));
-  assert.ok(r.data.data.length >= 1);
-
-  const firstCase = r.data.data[0];
-  assert.ok(firstCase.id);
-  assert.ok(firstCase.trackingCode);
-  assert.ok(firstCase.summary);
+  assert.deepEqual(r.data.data, []);
 });
 
-test('retrieving single assistance case by id or tracking code', async () => {
-  const listRes = await anon.call('GET', '/api/assistance/cases');
-  const target = listRes.data.data[0];
+test('a guest needs BOTH the tracking code and the email; either alone, or the wrong email, finds nothing', async () => {
+  const target = (await allCases())[0];
+  assert.equal((await anon.call('GET', `/api/assistance/cases/${target.trackingCode}`)).status, 404);
+  assert.equal((await anon.call('GET', `/api/assistance/cases/${target.trackingCode}?email=someone.else@example.com`)).status, 404);
+  assert.equal((await anon.call('GET', `/api/assistance/cases/${target.id}`)).status, 404, 'the internal id is no way in either');
 
-  const byId = await anon.call('GET', `/api/assistance/cases/${target.id}`);
-  assert.equal(byId.status, 200);
-  assert.equal(byId.data.data.id, target.id);
+  const ok = await anon.call('GET', `/api/assistance/cases/${target.trackingCode}?email=${encodeURIComponent(target.patientEmail)}`);
+  assert.equal(ok.status, 200);
+  assert.equal(ok.data.data.trackingCode, target.trackingCode);
 
-  const byCode = await anon.call('GET', `/api/assistance/cases/${target.trackingCode}`);
-  assert.equal(byCode.status, 200);
-  assert.equal(byCode.data.data.trackingCode, target.trackingCode);
+  const list = await anon.call('GET', `/api/assistance/cases?trackingCode=${target.trackingCode}&email=${encodeURIComponent(target.patientEmail)}`);
+  assert.equal(list.data.data.length, 1);
+  assert.equal((await anon.call('GET', `/api/assistance/cases?trackingCode=${target.trackingCode}&email=wrong@example.com`)).data.data.length, 0);
 });
 
-test('pro-forma medical quotation endpoint formats official hospital breakdown', async () => {
-  const listRes = await anon.call('GET', '/api/assistance/cases');
-  const caseWithQuote = (listRes.data.data as any[]).find(c => c.quotes && c.quotes.length > 0);
-  assert.ok(caseWithQuote, 'At least one case has an active quotation');
-
-  const proforma = await anon.call('GET', `/api/assistance/cases/${caseWithQuote.id}/proforma`);
-  assert.equal(proforma.status, 200);
-  assert.equal(proforma.data.status, 'success');
-  assert.ok(proforma.data.data.referenceNumber);
-  assert.ok(proforma.data.data.facility.name);
-  assert.ok(proforma.data.data.totalMYR > 0);
-  assert.ok(Array.isArray(proforma.data.data.items));
+test('a signed-in patient cannot read another person case, and a doctor who is not hospital staff cannot either', async () => {
+  const target = (await allCases()).find(c => c.patientEmail && c.patientEmail.toLowerCase() !== DEMO.patient)!;
+  assert.equal((await patient.call('GET', `/api/assistance/cases/${target.id}`)).status, 404);
+  assert.equal((await doctor.call('GET', `/api/assistance/cases/${target.id}`)).status, 404);
+  const mine = (await patient.call('GET', '/api/assistance/cases')).data.data as any[];
+  assert.ok(mine.every(c => c.patientEmail?.toLowerCase() === DEMO.patient), 'a patient lists only their own cases');
 });
 
-test('patient can request revision on an active quotation', async () => {
-  const listRes = await anon.call('GET', '/api/assistance/cases');
-  const caseWithQuote = (listRes.data.data as any[]).find(c => c.latestQuote && c.latestQuote.status === 'sent');
-  if (caseWithQuote) {
-    const rev = await anon.call('POST', `/api/assistance/cases/${caseWithQuote.id}/quote-decision`, {
-      quoteId: caseWithQuote.latestQuote.id,
-      action: 'request_revision',
-      notes: 'Please adjust accommodation to standard single room and update target admission date.',
-    });
-    assert.equal(rev.status, 200);
-    assert.equal(rev.data.status, 'success');
-    assert.equal(rev.data.data.revisionNotes, 'Please adjust accommodation to standard single room and update target admission date.');
+test('the pro-forma quotation is only given to the people entitled to the case', async () => {
+  const target = await withQuote();
+  assert.equal((await anon.call('GET', `/api/assistance/cases/${target.id}/proforma`)).status, 404);
+  const ok = await anon.call('GET', `/api/assistance/cases/${target.trackingCode}/proforma?email=${encodeURIComponent(target.patientEmail)}`);
+  assert.equal(ok.status, 200);
+  assert.ok(ok.data.data.referenceNumber);
+  assert.ok(ok.data.data.totalMYR > 0);
+  assert.ok(Array.isArray(ok.data.data.items));
+});
+
+test('a stranger cannot accept, decline or ask for changes to a quote, even knowing the code', async () => {
+  const target = await withQuote();
+  for (const action of ['accept', 'decline', 'request_revision']) {
+    const r = await anon.call('POST', `/api/assistance/cases/${target.trackingCode}/quote-decision`, { quoteId: target.latestQuote.id, action, notes: 'x' });
+    assert.equal(r.status, 404, action);
   }
+  const still = (await allCases()).find(c => c.id === target.id)!;
+  assert.equal(still.latestQuote.status, 'sent', 'the quote was not touched');
 });
 
-test('patient can post direct messages on an assistance case', async () => {
-  const listRes = await anon.call('GET', '/api/assistance/cases');
-  const target = listRes.data.data[0];
+test('hospital staff cannot accept a quote on the patient behalf', async () => {
+  const target = await withQuote();
+  const r = await admin.call('POST', `/api/assistance/cases/${target.id}/quote-decision`, { quoteId: target.latestQuote.id, action: 'accept' });
+  assert.equal(r.status, 404);
+});
 
-  const msg = await anon.call('POST', `/api/assistance/cases/${target.id}/messages`, {
-    text: 'Hello, our family will be arriving at KLIA on 15th November. Please confirm flight pickup.'
+test('the patient (code + email) can ask for a revision; a decided quote cannot be decided again', async () => {
+  const target = await withQuote();
+  const rev = await anon.call('POST', `/api/assistance/cases/${target.trackingCode}/quote-decision`, {
+    email: target.patientEmail, quoteId: target.latestQuote.id, action: 'request_revision',
+    notes: 'Please adjust accommodation to standard single room and update target admission date.',
+  });
+  assert.equal(rev.status, 200, JSON.stringify(rev.data));
+  assert.equal(rev.data.data.revisionNotes, 'Please adjust accommodation to standard single room and update target admission date.');
+
+  const decline = await anon.call('POST', `/api/assistance/cases/${target.trackingCode}/quote-decision`, { email: target.patientEmail, quoteId: target.latestQuote.id, action: 'decline', notes: 'Too expensive' });
+  assert.equal(decline.status, 200);
+  const again = await anon.call('POST', `/api/assistance/cases/${target.trackingCode}/quote-decision`, { email: target.patientEmail, quoteId: target.latestQuote.id, action: 'accept' });
+  assert.equal(again.status, 409, 'a declined quote cannot be accepted afterwards');
+});
+
+test('messages need the same entitlement; the patient can post, a stranger cannot', async () => {
+  const target = (await allCases())[0];
+  assert.equal((await anon.call('POST', `/api/assistance/cases/${target.id}/messages`, { text: 'Hello from a stranger' })).status, 404);
+  const msg = await anon.call('POST', `/api/assistance/cases/${target.trackingCode}/messages`, {
+    email: target.patientEmail, text: 'Hello, our family will be arriving at KLIA on 15th November. Please confirm flight pickup.',
   });
   assert.equal(msg.status, 201);
-  assert.equal(msg.data.status, 'success');
 });
 
-test('facility staff / admin can issue a comprehensive treatment quotation', async () => {
-  const listRes = await anon.call('GET', '/api/assistance/cases');
-  const target = listRes.data.data[0];
+test('only the hospital of the case (or an admin) can issue a quotation, not any doctor', async () => {
+  const target = (await allCases())[0];
+  const body = { items: [{ label: 'Consultant assessment', category: 'doctor_fees', amount: 350 }], validUntil: '2030-12-31' };
+  assert.equal((await doctor.call('POST', `/api/assistance/facility/cases/${target.id}/quotes`, body)).status, 404, 'a practitioner who is not hospital staff');
+  assert.equal((await anon.call('POST', `/api/assistance/facility/cases/${target.id}/quotes`, body)).status, 401);
 
   const newQuote = await admin.call('POST', `/api/assistance/facility/cases/${target.id}/quotes`, {
     items: [
@@ -129,10 +152,17 @@ test('facility staff / admin can issue a comprehensive treatment quotation', asy
     ],
     inclusions: 'Full specialist procedure, pre-admission labs, post-op consultation.',
     exclusions: 'Emergency complications, medications beyond 7-day take home.',
-    validUntil: '2026-12-31',
+    validUntil: '2030-12-31',
   });
-
   assert.equal(newQuote.status, 201);
-  assert.equal(newQuote.data.status, 'success');
   assert.ok(newQuote.data.data.latestQuote);
+});
+
+test('an expired quote cannot be accepted', async () => {
+  const target = (await allCases()).find(c => c.patientEmail)!;
+  const q = await admin.call('POST', `/api/assistance/facility/cases/${target.id}/quotes`, { items: [{ label: 'Old estimate', category: 'procedure', amount: 100 }], validUntil: '2020-01-01' });
+  assert.equal(q.status, 201);
+  const r = await anon.call('POST', `/api/assistance/cases/${target.trackingCode}/quote-decision`, { email: target.patientEmail, quoteId: q.data.data.latestQuote.id, action: 'accept' });
+  assert.equal(r.status, 409);
+  assert.match(r.data.message, /expired/);
 });

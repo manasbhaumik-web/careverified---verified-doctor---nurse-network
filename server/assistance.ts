@@ -1,5 +1,6 @@
 import crypto from "crypto";
-import type { Application, Request, Response } from "express";
+import type { Application, NextFunction, Request, Response } from "express";
+import rateLimit from "express-rate-limit";
 import { db } from "./db";
 import { audit } from "./audit";
 import { requireAuth, requireRole } from "./auth";
@@ -24,6 +25,10 @@ const rows = (sql: string, ...p: any[]) => db.prepare(sql).all(...p) as any[];
 const row = (sql: string, ...p: any[]) => db.prepare(sql).get(...p) as any;
 const isDate = (s: unknown): s is string => typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s));
 const json = (v: unknown) => JSON.stringify(v);
+
+/** Tracking codes are 8 characters from an alphabet without look-alikes (about 10^12 possibilities), never a short number. */
+const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const randomCode = (n = 8) => Array.from({ length: n }, () => CODE_ALPHABET[crypto.randomInt(CODE_ALPHABET.length)]).join("");
 const parse = <T,>(s: string | null | undefined, fallback: T): T => { try { return s ? JSON.parse(s) : fallback; } catch { return fallback; } };
 
 // ---------- Schema Migrations for Medical Assistance & Enquiries ----------
@@ -338,11 +343,41 @@ function formatCase(c: any) {
 // ---------- Register Assistance Routes ----------
 export function registerAssistanceRoutes(app: Application, ctx?: { findProfessional?: (id: string) => any; allProfessionals?: () => any[] }) {
 
+  // ---------- Who may see or act on a case ----------
+  // A case holds a patient's name, contact details and clinical summary. It is visible only to:
+  //   staff    - an admin, or a member of the hospital the case was sent to
+  //   patient  - the signed-in patient it belongs to
+  //   guest    - someone who gives BOTH the tracking code and the contact email used on the request
+  // Anything else gets "not found", so a stranger cannot tell whether a code exists.
+  const lookupLimiter = rateLimit({ windowMs: 60_000, limit: 30, standardHeaders: true, legacyHeaders: false });
+  const enquiryLimiter = rateLimit({ windowMs: 10 * 60_000, limit: 20, standardHeaders: true, legacyHeaders: false });
+  /** Rate limits only people who are not signed in (guests guessing codes, or form spam). */
+  const guestLimit = (limiter: (req: Request, res: Response, next: NextFunction) => unknown) =>
+    (req: Request, res: Response, next: NextFunction) => (req.user ? next() : limiter(req, res, next));
+
+  const isFacilityStaff = (u: NonNullable<Request["user"]>, facilityId: string) =>
+    u.role === "admin" ||
+    ((u.facilityId === facilityId || u.profileId === facilityId) && u.role === "facility") ||
+    !!row("SELECT 1 AS x FROM tourism_facility_staff WHERE user_id = ? AND facility_id = ?", u.id, facilityId);
+
+  const emailGiven = (req: Request) => str(req.query?.email ?? req.body?.email, 120).toLowerCase();
+  const sameEmail = (a: unknown, b: string) => typeof a === "string" && !!b && a.trim().toLowerCase() === b;
+
+  const accessTo = (req: Request, c: any): "staff" | "patient" | "guest" | null => {
+    const u = req.user;
+    if (u) {
+      if (isFacilityStaff(u, c.facility_id)) return "staff";
+      if (c.patient_user_id === u.id || sameEmail(c.patient_email, (u.email ?? "").toLowerCase())) return "patient";
+    }
+    return sameEmail(c.patient_email, emailGiven(req)) ? "guest" : null;
+  };
+  const findCase = (param: string) => row("SELECT * FROM tourism_cases WHERE id = ? OR tracking_code = ?", param, param.toUpperCase());
+
   /**
    * POST /api/assistance/enquiries
    * Public or authenticated: Submit a clinical inquiry for local/expat/international medical assistance.
    */
-  app.post("/api/assistance/enquiries", (req, res) => {
+  app.post("/api/assistance/enquiries", guestLimit(enquiryLimiter), (req, res) => {
     const summary = str(req.body.summary, 3000);
     if (summary.length < 15) {
       return fail(res, 400, "Please describe the patient condition or requested medical treatment (at least 15 characters).");
@@ -357,10 +392,19 @@ export function registerAssistanceRoutes(app: Application, ctx?: { findProfessio
     }
 
     // Determine target facility
+    // Only a listed hospital (switched on, licence not expired) can receive a request; there is no invented default.
+    const listedHospital = (id: string) => {
+      const f = row("SELECT id, licence_expiry FROM tourism_facilities WHERE id = ? AND active = 1", id);
+      return f && (!f.licence_expiry || f.licence_expiry >= today()) ? f.id as string : "";
+    };
     let facilityId = str(req.body.facilityId, 60);
-    if (!facilityId) {
-      const firstFac = row("SELECT id FROM tourism_facilities WHERE active = 1 LIMIT 1");
-      facilityId = firstFac?.id || "fac-demo-1";
+    if (facilityId) {
+      facilityId = listedHospital(facilityId);
+      if (!facilityId) return fail(res, 400, "Choose a hospital from the list.");
+    } else {
+      const first = rows("SELECT id FROM tourism_facilities WHERE active = 1 ORDER BY mhtc_member DESC, name ASC").map(r => listedHospital(r.id)).find(Boolean);
+      if (!first) return fail(res, 503, "No hospital is available to receive requests right now. Please try again later.");
+      facilityId = first;
     }
 
     const patientType = ["local_malaysian", "expat_resident", "international_traveler"].includes(req.body.patientType)
@@ -396,7 +440,8 @@ export function registerAssistanceRoutes(app: Application, ctx?: { findProfessio
     // Generate case ID and human-friendly tracking code
     const caseId = newId("tcs");
     const prefix = patientType === "local_malaysian" ? "MED-MY" : patientType === "expat_resident" ? "MED-EX" : "MED-INT";
-    const trackingCode = `${prefix}-${Math.floor(1000 + Math.random() * 9000)}`;
+    let trackingCode = "";
+    do { trackingCode = `${prefix}-${randomCode(8)}`; } while (row("SELECT 1 AS x FROM tourism_cases WHERE tracking_code = ?", trackingCode));
 
     const userId = req.user ? req.user.id : `guest-${crypto.randomBytes(4).toString("hex")}`;
 
@@ -452,7 +497,7 @@ export function registerAssistanceRoutes(app: Application, ctx?: { findProfessio
    * Fetch active assistance cases.
    * If logged in, returns user's cases. If facility, returns facility cases.
    */
-  app.get("/api/assistance/cases", (req, res) => {
+  app.get("/api/assistance/cases", guestLimit(lookupLimiter), (req, res) => {
     const user = req.user;
     let caseRows: any[] = [];
 
@@ -469,14 +514,11 @@ export function registerAssistanceRoutes(app: Application, ctx?: { findProfessio
         caseRows = rows("SELECT * FROM tourism_cases WHERE patient_user_id = ? OR patient_email = ? ORDER BY updated_at DESC", user.id, user.email);
       }
     } else {
-      // Unauthenticated: check trackingCode query if provided
-      const track = str(req.query.trackingCode, 30);
+      // Not signed in: a guest sees their own case only, with the tracking code AND the email used on the request. There is no public list.
+      const track = str(req.query.trackingCode, 30).toUpperCase();
       const email = str(req.query.email, 120);
       if (track && email) {
         caseRows = rows("SELECT * FROM tourism_cases WHERE (tracking_code = ? OR id = ?) AND LOWER(patient_email) = LOWER(?)", track, track, email);
-      } else {
-        // Sample public showcase cases
-        caseRows = rows("SELECT * FROM tourism_cases ORDER BY updated_at DESC LIMIT 5");
       }
     }
 
@@ -490,9 +532,9 @@ export function registerAssistanceRoutes(app: Application, ctx?: { findProfessio
    * GET /api/assistance/cases/:id
    * Get single assistance case with full quotations, messages, and itinerary.
    */
-  app.get("/api/assistance/cases/:id", (req, res) => {
-    const c = row("SELECT * FROM tourism_cases WHERE id = ? OR tracking_code = ?", req.params.id, req.params.id);
-    if (!c) return fail(res, 404, "Medical assistance case not found.");
+  app.get("/api/assistance/cases/:id", guestLimit(lookupLimiter), (req, res) => {
+    const c = findCase(req.params.id);
+    if (!c || !accessTo(req, c)) return fail(res, 404, "Medical assistance case not found.");
     res.json({ status: "success", data: formatCase(c) });
   });
 
@@ -500,13 +542,17 @@ export function registerAssistanceRoutes(app: Application, ctx?: { findProfessio
    * POST /api/assistance/cases/:id/quote-decision
    * Patient accepts, declines, or requests revision for a quotation.
    */
-  app.post("/api/assistance/cases/:id/quote-decision", (req, res) => {
-    const c = row("SELECT * FROM tourism_cases WHERE id = ? OR tracking_code = ?", req.params.id, req.params.id);
-    if (!c) return fail(res, 404, "Case not found.");
+  app.post("/api/assistance/cases/:id/quote-decision", guestLimit(lookupLimiter), (req, res) => {
+    const c = findCase(req.params.id);
+    // Only the patient (or the guest who holds the code and the email) can decide on a quote; hospital staff cannot accept for them.
+    const who = c ? accessTo(req, c) : null;
+    if (!c || (who !== "patient" && who !== "guest")) return fail(res, 404, "Case not found.");
 
     const quoteId = str(req.body.quoteId, 60);
     const q = row("SELECT * FROM tourism_quotes WHERE id = ? AND case_id = ?", quoteId, c.id);
     if (!q) return fail(res, 404, "Quotation not found.");
+    if (q.status !== "sent") return fail(res, 409, "This quotation has already been decided or replaced by a newer one. Reload to see the current quotation.");
+    if (req.body.action === "accept" && q.valid_until && q.valid_until < today()) return fail(res, 409, "This quotation has expired. Ask the hospital to issue a new one.");
 
     const action = req.body.action; // 'accept' | 'decline' | 'request_revision'
     if (!["accept", "decline", "request_revision"].includes(action)) {
@@ -556,9 +602,9 @@ export function registerAssistanceRoutes(app: Application, ctx?: { findProfessio
    * POST /api/assistance/cases/:id/messages
    * Send a message on the assistance case.
    */
-  app.post("/api/assistance/cases/:id/messages", (req, res) => {
-    const c = row("SELECT * FROM tourism_cases WHERE id = ? OR tracking_code = ?", req.params.id, req.params.id);
-    if (!c) return fail(res, 404, "Case not found.");
+  app.post("/api/assistance/cases/:id/messages", guestLimit(lookupLimiter), (req, res) => {
+    const c = findCase(req.params.id);
+    if (!c || !accessTo(req, c)) return fail(res, 404, "Case not found.");
 
     const text = str(req.body.text, 2500);
     if (!text) return fail(res, 400, "Message cannot be empty.");
@@ -576,9 +622,9 @@ export function registerAssistanceRoutes(app: Application, ctx?: { findProfessio
    * GET /api/assistance/cases/:id/proforma
    * Return formal Pro-Forma Medical Quotation document data suitable for printing / official hospital presentation.
    */
-  app.get("/api/assistance/cases/:id/proforma", (req, res) => {
-    const c = row("SELECT * FROM tourism_cases WHERE id = ? OR tracking_code = ?", req.params.id, req.params.id);
-    if (!c) return fail(res, 404, "Case not found.");
+  app.get("/api/assistance/cases/:id/proforma", guestLimit(lookupLimiter), (req, res) => {
+    const c = findCase(req.params.id);
+    if (!c || !accessTo(req, c)) return fail(res, 404, "Case not found.");
 
     const fac = row("SELECT * FROM tourism_facilities WHERE id = ?", c.facility_id);
     const q = row("SELECT * FROM tourism_quotes WHERE case_id = ? ORDER BY version DESC LIMIT 1", c.id);
@@ -588,18 +634,19 @@ export function registerAssistanceRoutes(app: Application, ctx?: { findProfessio
     res.json({
       status: "success",
       data: {
-        documentTitle: "OFFICIAL PRO-FORMA MEDICAL TREATMENT QUOTATION",
+        documentTitle: "PRO-FORMA TREATMENT QUOTATION",
         referenceNumber: `QUO-${c.tracking_code || c.id.slice(-6).toUpperCase()}-v${q.version}`,
         issueDate: q.created_at.slice(0, 10),
         validUntil: q.valid_until,
         facility: {
-          name: fac?.name || "Licensed Healthcare Facility",
-          licenceNo: fac?.licence_no || "KKM/ACT586/MED-8819",
-          city: fac?.city || "Kuala Lumpur",
-          state: fac?.state || "Wilayah Persekutuan",
-          address: fac?.address || "Medical Centre Drive, Kuala Lumpur",
-          phone: fac?.phone || "+60-3-2288-9000",
-          email: fac?.email || "international@facility.my",
+          // Only what the hospital's own record holds: nothing is filled in with made-up details
+          name: fac?.name || "Hospital",
+          licenceNo: fac?.licence_no || null,
+          city: fac?.city || null,
+          state: fac?.state || null,
+          address: fac?.address || null,
+          phone: fac?.phone || null,
+          email: fac?.email || null,
           mhtcMember: !!fac?.mhtc_member,
         },
         patient: {
@@ -625,7 +672,7 @@ export function registerAssistanceRoutes(app: Application, ctx?: { findProfessio
         exclusions: q.exclusions,
         cancellationTerms: q.cancellation_terms,
         paymentTerms: q.payment_terms,
-        regulatoryNotice: "Issued in accordance with the Malaysian Private Healthcare Facilities and Services Act 1998 (Act 586). Quotation valid strictly for the clinical items itemized above.",
+        regulatoryNotice: "Prepared by the hospital named above. The price is valid for the items listed until the date shown. Nothing is charged by accepting it.",
       }
     });
   });
@@ -636,7 +683,7 @@ export function registerAssistanceRoutes(app: Application, ctx?: { findProfessio
    */
   app.post("/api/assistance/facility/cases/:id/quotes", requireRole("facility", "admin", "practitioner"), (req, res) => {
     const c = row("SELECT * FROM tourism_cases WHERE id = ?", req.params.id);
-    if (!c) return fail(res, 404, "Case not found.");
+    if (!c || !isFacilityStaff(req.user!, c.facility_id)) return fail(res, 404, "Case not found.");
 
     const rawItems = Array.isArray(req.body.items) ? req.body.items : [];
     if (rawItems.length === 0) return fail(res, 400, "Please provide at least one quotation line item.");
