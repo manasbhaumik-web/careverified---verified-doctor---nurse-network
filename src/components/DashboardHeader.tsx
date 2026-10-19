@@ -224,9 +224,9 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
         {avatarBadge}
       </div>
       <div className="space-y-1.5 min-w-0">
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <Heading className="text-xl sm:text-3xl font-extrabold text-[color:var(--ink)] tracking-tight">{name}</Heading>
-          {badges}
+        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap sm:flex-nowrap">
+          <Heading className="text-xl sm:text-3xl font-extrabold text-[color:var(--ink)] tracking-tight shrink-0">{name}</Heading>
+          {badges && <div className="inline-flex items-center gap-2 shrink-0 flex-nowrap">{badges}</div>}
         </div>
         {description && <p className="text-sm text-[color:var(--ink-2)] leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
         {meta && <div className="flex items-center gap-2.5 text-xs text-[color:var(--ink-2)] font-semibold flex-wrap">{meta}</div>}
@@ -238,16 +238,16 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
 /** Pill used beside the name: brand, success, neutral, or warning. */
 export function BannerBadge({ tone = 'brand', children }: { tone?: 'brand' | 'success' | 'neutral' | 'warning'; children: React.ReactNode }) {
   if (tone === 'success') {
-    return <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none flex items-center gap-1 shadow-2xs">{children}</span>;
+    return <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   if (tone === 'neutral') {
-    return <span className="bg-slate-50 text-slate-700 border border-slate-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none flex items-center gap-1 shadow-2xs">{children}</span>;
+    return <span className="bg-slate-50 text-slate-700 border border-slate-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   if (tone === 'warning') {
-    return <span className="bg-amber-50 text-amber-800 border border-amber-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none flex items-center gap-1 shadow-2xs">{children}</span>;
+    return <span className="bg-amber-50 text-amber-800 border border-amber-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   return (
-    <span className="bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none shadow-2xs">{children}</span>
+    <span className="bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>
   );
 }
 
