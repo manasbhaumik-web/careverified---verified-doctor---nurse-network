@@ -103,15 +103,15 @@ export default function LandingDesignPreview() {
           <div className="grid grid-cols-3 gap-3 bg-[color:var(--t-50)]/70 border border-[color:var(--t-200)] p-4 text-center shrink-0">
             <div>
               <div className="text-xl font-black text-emerald-600">-65%</div>
-              <div className="text-[10px] font-bold text-slate-500 uppercase mt-0.5">Word Count</div>
+              <div className="text-xs font-bold text-slate-500 uppercase mt-0.5">Word Count</div>
             </div>
             <div className="border-x border-[color:var(--t-200)] px-3">
               <div className="text-xl font-black text-[color:var(--t-600)]">1 : 1</div>
-              <div className="text-[10px] font-bold text-slate-500 uppercase mt-0.5">Image to Copy</div>
+              <div className="text-xs font-bold text-slate-500 uppercase mt-0.5">Image to Copy</div>
             </div>
             <div>
               <div className="text-xl font-black text-slate-900">&lt; 3s</div>
-              <div className="text-[10px] font-bold text-slate-500 uppercase mt-0.5">Scan Speed</div>
+              <div className="text-xs font-bold text-slate-500 uppercase mt-0.5">Scan Speed</div>
             </div>
           </div>
         </div>
@@ -148,8 +148,8 @@ export default function LandingDesignPreview() {
                   </div>
                   <div className="bg-white border border-slate-300 p-5 font-mono text-xs text-slate-700 space-y-3 shadow-2xs">
                     <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                      <span className="text-slate-500 font-bold uppercase text-[10px]">Verified Doctor on Call</span>
-                      <span className="text-emerald-700 font-black text-[10px] bg-emerald-50 px-2 py-0.5 border border-emerald-200">Verified Active</span>
+                      <span className="text-slate-500 font-bold uppercase text-xs">Verified Doctor on Call</span>
+                      <span className="text-emerald-700 font-black text-xs bg-emerald-50 px-2 py-0.5 border border-emerald-200">Verified Active</span>
                     </div>
                     <div className="text-sm font-bold text-slate-900 font-sans">Attentive Clinical Care</div>
                     <div className="text-slate-500 text-xs font-sans">Dr. Tan Seng Hock · MMC Registered · Kuala Lumpur Specialist Hospital</div>
@@ -167,7 +167,7 @@ export default function LandingDesignPreview() {
                         <span className="text-slate-800 font-bold">Unhurried Video or Chat</span>
                       </div>
                     </div>
-                    <div className="pt-2 text-[10px] text-slate-400 flex justify-between border-t border-slate-100">
+                    <div className="pt-2 text-xs text-slate-400 flex justify-between border-t border-slate-100">
                       <span>AUDIT REF: 8F2A-9912</span>
                       <span>MEDCRED REGISTRY</span>
                     </div>
@@ -198,7 +198,7 @@ export default function LandingDesignPreview() {
                       <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md border border-[color:var(--t-200)] px-3 py-1 flex items-center gap-2 shadow-xs">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span className="text-xs font-extrabold text-slate-900">Dr. Tan Seng Hock</span>
-                        <span className="text-[10px] font-mono text-[color:var(--t-700)] font-extrabold bg-[color:var(--t-50)] px-1.5 py-0.5 border border-[color:var(--t-200)]">
+                        <span className="text-xs font-mono text-[color:var(--t-700)] font-extrabold bg-[color:var(--t-50)] px-1.5 py-0.5 border border-[color:var(--t-200)]">
                           MMC 32109
                         </span>
                       </div>
@@ -216,7 +216,7 @@ export default function LandingDesignPreview() {
                     <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
                       <div>
                         <div className="text-xs font-black text-slate-900">10-Min Wait Guarantee · RM 35</div>
-                        <div className="text-[11px] text-slate-500 font-medium">Full refund if doctor is delayed</div>
+                        <div className="text-xs text-slate-500 font-medium">Full refund if doctor is delayed</div>
                       </div>
                       <button
                         type="button"
@@ -272,7 +272,7 @@ export default function LandingDesignPreview() {
                       alt="Tele-Consultation"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-2.5 left-2.5 bg-[color:var(--t-600)] text-white text-[10px] font-mono font-extrabold px-2 py-0.5 shadow-xs">
+                    <div className="absolute top-2.5 left-2.5 bg-[color:var(--t-600)] text-white text-xs font-mono font-extrabold px-2 py-0.5 shadow-xs">
                       01 · TREATMENT
                     </div>
                   </div>
@@ -316,7 +316,7 @@ export default function LandingDesignPreview() {
                       alt="Home Nursing"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-2.5 left-2.5 bg-emerald-600 text-white text-[10px] font-mono font-extrabold px-2 py-0.5 shadow-xs">
+                    <div className="absolute top-2.5 left-2.5 bg-emerald-600 text-white text-xs font-mono font-extrabold px-2 py-0.5 shadow-xs">
                       02 · NURSING
                     </div>
                   </div>
@@ -360,7 +360,7 @@ export default function LandingDesignPreview() {
                       alt="Pharmacy Dispensing"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-2.5 left-2.5 bg-amber-600 text-white text-[10px] font-mono font-extrabold px-2 py-0.5 shadow-xs">
+                    <div className="absolute top-2.5 left-2.5 bg-amber-600 text-white text-xs font-mono font-extrabold px-2 py-0.5 shadow-xs">
                       03 · PHARMACY
                     </div>
                   </div>
@@ -404,7 +404,7 @@ export default function LandingDesignPreview() {
                       alt="Hospital Tourism"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-2.5 left-2.5 bg-indigo-600 text-white text-[10px] font-mono font-extrabold px-2 py-0.5 shadow-xs">
+                    <div className="absolute top-2.5 left-2.5 bg-indigo-600 text-white text-xs font-mono font-extrabold px-2 py-0.5 shadow-xs">
                       04 · HOSPITALS
                     </div>
                   </div>
@@ -468,7 +468,7 @@ export default function LandingDesignPreview() {
                   <span className="w-9 h-9 rounded-none bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
                     01
                   </span>
-                  <span className="text-[10px] font-mono font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2 py-0.5 border border-[color:var(--t-200)]">
+                  <span className="text-xs font-mono font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2 py-0.5 border border-[color:var(--t-200)]">
                     Official Audit
                   </span>
                 </div>
@@ -493,7 +493,7 @@ export default function LandingDesignPreview() {
                   <span className="w-9 h-9 rounded-none bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
                     02
                   </span>
-                  <span className="text-[10px] font-mono font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2 py-0.5 border border-[color:var(--t-200)]">
+                  <span className="text-xs font-mono font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2 py-0.5 border border-[color:var(--t-200)]">
                     Hourly Sync
                   </span>
                 </div>
@@ -518,7 +518,7 @@ export default function LandingDesignPreview() {
                   <span className="w-9 h-9 rounded-none bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
                     03
                   </span>
-                  <span className="text-[10px] font-mono font-extrabold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+                  <span className="text-xs font-mono font-extrabold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2 py-0.5 border border-emerald-200">
                     Patient Safe
                   </span>
                 </div>

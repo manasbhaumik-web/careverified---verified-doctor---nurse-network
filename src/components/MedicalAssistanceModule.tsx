@@ -546,7 +546,7 @@ export default function MedicalAssistanceModule({
                       <div className="flex items-center gap-1.5 font-black text-xs">
                         <span>🇲🇾</span> Local Malaysian Citizen
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-1">
+                      <p className="text-xs text-slate-500 mt-1">
                         MyKad ID holder. 0% SST on healthcare, domestic insurance panel & Medisave.
                       </p>
                     </button>
@@ -563,7 +563,7 @@ export default function MedicalAssistanceModule({
                       <div className="flex items-center gap-1.5 font-black text-xs">
                         <span>🌏</span> Expatriate Resident
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-1">
+                      <p className="text-xs text-slate-500 mt-1">
                         Employment Pass, MM2H, Diplomat or Student residing in Malaysia.
                       </p>
                     </button>
@@ -580,7 +580,7 @@ export default function MedicalAssistanceModule({
                       <div className="flex items-center gap-1.5 font-black text-xs">
                         <span>✈️</span> International Traveler
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-1">
+                      <p className="text-xs text-slate-500 mt-1">
                         Traveling to Malaysia for medical care. MHTC visa & airport support eligible.
                       </p>
                     </button>
@@ -1004,18 +1004,18 @@ export default function MedicalAssistanceModule({
                         <div>
                           <div className="flex items-center gap-1.5">
                             <span className="font-mono text-xs font-black text-slate-900">{c.trackingCode}</span>
-                            <span className="text-[10px] uppercase font-extrabold px-1.5 py-0.2 bg-slate-100 text-slate-700">
+                            <span className="text-xs uppercase font-extrabold px-1.5 py-0.2 bg-slate-100 text-slate-700">
                               {c.patientType === 'local_malaysian' ? '🇲🇾 Local' : c.patientType === 'expat_resident' ? '🌏 Expat' : '✈️ Int’l'}
                             </span>
                           </div>
                           <p className="text-xs font-bold text-slate-800 mt-1 line-clamp-1">{c.summary}</p>
                         </div>
-                        <span className={`px-2 py-0.5 text-[10px] font-black uppercase border shrink-0 ${st.bg} ${st.color} ${st.border}`}>
+                        <span className={`px-2 py-0.5 text-xs font-black uppercase border shrink-0 ${st.bg} ${st.color} ${st.border}`}>
                           {st.label}
                         </span>
                       </div>
 
-                      <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                      <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                         <span>{c.facility?.name || 'Accredited Facility'}</span>
                         {c.latestQuote && (
                           <span className="font-mono font-black text-emerald-800">
@@ -1040,7 +1040,7 @@ export default function MedicalAssistanceModule({
                         <span className="text-base font-black text-slate-900 tracking-tight">
                           Case {selectedCase.trackingCode}
                         </span>
-                        <span className={`px-2 py-0.5 text-[10px] font-black uppercase border ${
+                        <span className={`px-2 py-0.5 text-xs font-black uppercase border ${
                           STATUS_DISPLAY[selectedCase.status]?.bg || 'bg-slate-50'
                         } ${STATUS_DISPLAY[selectedCase.status]?.color || 'text-slate-700'} ${
                           STATUS_DISPLAY[selectedCase.status]?.border || 'border-slate-300'
@@ -1114,7 +1114,7 @@ export default function MedicalAssistanceModule({
                               <span className="text-xs font-black uppercase tracking-wider text-slate-900">
                                 Quotation Version v{selectedCase.latestQuote.version}
                               </span>
-                              <span className="text-[11px] text-slate-500 ml-2">
+                              <span className="text-xs text-slate-500 ml-2">
                                 Valid until {selectedCase.latestQuote.validUntil}
                               </span>
                             </div>
@@ -1124,7 +1124,7 @@ export default function MedicalAssistanceModule({
                                 {formatCur(selectedCase.latestQuote.total)}
                               </span>
                               {selectedCurrency !== 'MYR' && (
-                                <span className="block text-[10px] text-slate-400 font-mono">
+                                <span className="block text-xs text-slate-400 font-mono">
                                   Base: RM {selectedCase.latestQuote.total.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
                                 </span>
                               )}
@@ -1135,7 +1135,7 @@ export default function MedicalAssistanceModule({
                           <div className="p-4 overflow-x-auto">
                             <table className="w-full text-xs text-left">
                               <thead>
-                                <tr className="border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px]">
+                                <tr className="border-b border-slate-200 text-slate-500 uppercase tracking-wider text-xs">
                                   <th className="py-2 font-bold">Category</th>
                                   <th className="py-2 font-bold">Clinical Service Description</th>
                                   <th className="py-2 font-bold text-right">Price ({selectedCurrency})</th>
@@ -1167,10 +1167,10 @@ export default function MedicalAssistanceModule({
                                 </tr>
                                 {selectedCase.latestQuote.tax > 0 && (
                                   <tr>
-                                    <td colSpan={2} className="py-1 text-right text-slate-500 text-[11px]">
+                                    <td colSpan={2} className="py-1 text-right text-slate-500 text-xs">
                                       Healthcare Service Tax ({selectedCase.latestQuote.taxRatePct}% SST):
                                     </td>
-                                    <td className="py-1 text-right font-mono text-slate-600 text-[11px]">
+                                    <td className="py-1 text-right font-mono text-slate-600 text-xs">
                                       {formatCur(selectedCase.latestQuote.tax)}
                                     </td>
                                   </tr>
@@ -1269,7 +1269,7 @@ export default function MedicalAssistanceModule({
                               </div>
                               <div className="space-y-0.5">
                                 <span className="text-xs font-black text-slate-900">{it.title}</span>
-                                <span className="ml-2 text-[10px] font-extrabold uppercase px-1.5 py-0.2 bg-slate-100 text-slate-600">
+                                <span className="ml-2 text-xs font-extrabold uppercase px-1.5 py-0.2 bg-slate-100 text-slate-600">
                                   {it.kind}
                                 </span>
                                 {it.note && <p className="text-xs text-slate-600">{it.note}</p>}
@@ -1298,7 +1298,7 @@ export default function MedicalAssistanceModule({
                                   : 'bg-white border border-slate-200 text-slate-800'
                               }`}
                             >
-                              <div className="flex items-center justify-between gap-2 text-[10px] text-slate-400 mb-1 font-semibold">
+                              <div className="flex items-center justify-between gap-2 text-xs text-slate-400 mb-1 font-semibold">
                                 <span>{m.senderName || m.senderId}</span>
                                 <span>{new Date(m.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                               </div>
@@ -1493,7 +1493,7 @@ export default function MedicalAssistanceModule({
                   Licence: {proformaData.facility.licenceNo} · Tel: {proformaData.facility.phone}
                 </p>
                 {proformaData.facility.mhtcMember && (
-                  <span className="inline-block mt-1 text-[10px] font-black uppercase px-2 py-0.5 bg-sky-50 text-sky-800 border border-sky-300">
+                  <span className="inline-block mt-1 text-xs font-black uppercase px-2 py-0.5 bg-sky-50 text-sky-800 border border-sky-300">
                     Malaysia Healthcare Travel Council (MHTC) Endorsed
                   </span>
                 )}
@@ -1520,13 +1520,13 @@ export default function MedicalAssistanceModule({
             {/* Patient & Clinical Grid */}
             <div className="grid grid-cols-2 gap-4 text-xs bg-slate-50 p-4 border border-slate-200">
               <div>
-                <span className="text-[10px] font-black uppercase text-slate-400 block">Patient Information</span>
+                <span className="text-xs font-black uppercase text-slate-400 block">Patient Information</span>
                 <p className="font-bold text-slate-900 mt-1">{proformaData.patient.name}</p>
                 <p className="text-slate-600">Nationality: {proformaData.patient.nationality}</p>
                 <p className="text-slate-600">Insurance / Settlement: {proformaData.patient.insuranceCarrier}</p>
               </div>
               <div>
-                <span className="text-[10px] font-black uppercase text-slate-400 block">Clinical Overview</span>
+                <span className="text-xs font-black uppercase text-slate-400 block">Clinical Overview</span>
                 <p className="font-bold text-slate-900 mt-1">Specialty: {proformaData.clinicalDetails.specialty}</p>
                 <p className="text-slate-600 line-clamp-2">{proformaData.clinicalDetails.clinicalSummary}</p>
               </div>
@@ -1535,7 +1535,7 @@ export default function MedicalAssistanceModule({
             {/* Itemized Table */}
             <div>
               <table className="w-full text-xs text-left border border-slate-200">
-                <thead className="bg-slate-100 text-slate-700 uppercase tracking-wider text-[10px]">
+                <thead className="bg-slate-100 text-slate-700 uppercase tracking-wider text-xs">
                   <tr>
                     <th className="p-2.5 font-bold">Item Description</th>
                     <th className="p-2.5 font-bold">Category</th>
@@ -1562,10 +1562,10 @@ export default function MedicalAssistanceModule({
                   </tr>
                   {proformaData.taxMYR > 0 && (
                     <tr>
-                      <td colSpan={2} className="p-1.5 text-right text-[11px] text-slate-600">
+                      <td colSpan={2} className="p-1.5 text-right text-xs text-slate-600">
                         Service Tax ({proformaData.taxRatePct}% SST):
                       </td>
-                      <td className="p-1.5 text-right font-mono text-[11px]">
+                      <td className="p-1.5 text-right font-mono text-xs">
                         RM {proformaData.taxMYR.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
                       </td>
                     </tr>
@@ -1581,14 +1581,14 @@ export default function MedicalAssistanceModule({
             </div>
 
             {/* Terms and Exclusions */}
-            <div className="text-[11px] text-slate-600 space-y-1.5 border-t border-slate-200 pt-3">
+            <div className="text-xs text-slate-600 space-y-1.5 border-t border-slate-200 pt-3">
               <p><strong>Inclusions:</strong> {proformaData.inclusions}</p>
               <p><strong>Exclusions:</strong> {proformaData.exclusions}</p>
               <p><strong>Cancellation:</strong> {proformaData.cancellationTerms}</p>
               <p><strong>Payment Guidelines:</strong> {proformaData.paymentTerms}</p>
             </div>
 
-            <div className="pt-4 border-t border-slate-200 text-[10px] text-slate-400 text-center">
+            <div className="pt-4 border-t border-slate-200 text-xs text-slate-400 text-center">
               {proformaData.regulatoryNotice}
             </div>
           </div>

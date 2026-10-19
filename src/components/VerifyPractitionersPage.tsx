@@ -167,7 +167,7 @@ export default function VerifyPractitionersPage({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-10 sm:py-14">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="max-w-3xl space-y-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-2xs">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="font-mono">01</span>
                 <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
@@ -292,7 +292,7 @@ export default function VerifyPractitionersPage({
 
           {/* Quick-Search Sample Chips */}
           <div className="flex flex-wrap items-center gap-2 pt-2 text-xs border-t border-slate-100">
-            <span className="text-slate-500 font-bold uppercase tracking-wider text-[11px]">Quick Search:</span>
+            <span className="text-slate-500 font-bold uppercase tracking-wider text-xs">Quick Search:</span>
             {['DEMO-MMC-32109', 'Cardiology', 'Dr. Tan Seng Hock', 'DEMO-LJM-88412', 'Paediatrics', 'Kuala Lumpur'].map((sample) => (
               <button
                 key={sample}
@@ -375,7 +375,7 @@ export default function VerifyPractitionersPage({
                               <h4 className="font-display font-black text-base text-[color:var(--ink)] leading-snug">
                                 {p.name}
                               </h4>
-                              <span className="text-[10px] font-mono font-extrabold uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                              <span className="text-xs font-mono font-extrabold uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
                                 Active APC 2026
                               </span>
                             </div>
@@ -385,7 +385,7 @@ export default function VerifyPractitionersPage({
                           </div>
                         </div>
 
-                        <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-mono font-bold px-2 py-1 shadow-3xs shrink-0">
+                        <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-mono font-bold px-2 py-1 shadow-3xs shrink-0">
                           <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                           <span>AUDITED</span>
                         </span>
@@ -394,7 +394,7 @@ export default function VerifyPractitionersPage({
                       {/* Detail Metrics Grid */}
                       <dl className="mt-4 pt-3.5 border-t border-slate-100 grid grid-cols-2 gap-3 text-xs">
                         <div>
-                          <dt className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500">
+                          <dt className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">
                             Registration Number
                           </dt>
                           <dd className="mt-0.5 font-mono font-bold text-[color:var(--t-700)]">
@@ -402,7 +402,7 @@ export default function VerifyPractitionersPage({
                           </dd>
                         </div>
                         <div>
-                          <dt className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500">
+                          <dt className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">
                             Statutory Council
                           </dt>
                           <dd className="mt-0.5 font-bold text-[color:var(--ink)] truncate">
@@ -410,7 +410,7 @@ export default function VerifyPractitionersPage({
                           </dd>
                         </div>
                         <div>
-                          <dt className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500">
+                          <dt className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">
                             Council Status
                           </dt>
                           <dd className="mt-0.5 font-bold text-emerald-700 flex items-center gap-1">
@@ -419,7 +419,7 @@ export default function VerifyPractitionersPage({
                           </dd>
                         </div>
                         <div>
-                          <dt className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500">
+                          <dt className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">
                             Audit Scope
                           </dt>
                           <dd className="mt-0.5">
@@ -431,7 +431,7 @@ export default function VerifyPractitionersPage({
 
                     {/* Action Bar */}
                     <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
-                      <span className="text-[11px] font-mono text-slate-500 font-medium">
+                      <span className="text-xs font-mono text-slate-500 font-medium">
                         Audit Stamp: #MC-2026-ACT
                       </span>
                       <button
@@ -453,7 +453,7 @@ export default function VerifyPractitionersPage({
         {/* ─── STATUTORY AUDIT & BOARD OVERSIGHT EXPLANATION ─── */}
         <section className="bg-white border border-[color:var(--t-200)] p-6 sm:p-8 shadow-xs space-y-6">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[10px] font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)] mb-2">
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-xs font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)] mb-2">
               <ShieldCheck className="h-3 w-3 text-[color:var(--t-600)]" />
               Statutory Transparency &amp; Medical Board Protocol
             </div>

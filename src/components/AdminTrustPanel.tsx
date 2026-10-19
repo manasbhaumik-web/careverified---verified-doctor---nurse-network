@@ -59,9 +59,9 @@ export function ReviewActions({ request, onDone }: { request: any; onDone: () =>
       )}
 
       <div>
-        <label className="text-[10px] font-black uppercase text-slate-600 block mb-1.5 tracking-wider">Council register check (required to approve)</label>
+        <label className="text-xs font-black uppercase text-slate-600 block mb-1.5 tracking-wider">Council register check (required to approve)</label>
         {registry && (
-          <p className="text-[11px] text-slate-600 font-semibold mb-1.5 bg-slate-50 border border-slate-200 p-2">
+          <p className="text-xs text-slate-600 font-semibold mb-1.5 bg-slate-50 border border-slate-200 p-2">
             <b>{registry.name}</b>: {registry.lookup.note}
             {registry.lookup.url && <> <a href={registry.lookup.url} target="_blank" rel="noopener noreferrer" className="underline text-[color:var(--t-600)]">Open register</a></>}
             {registry.lookup.contact && <> · Contact: {registry.lookup.contact}</>}
@@ -71,7 +71,7 @@ export function ReviewActions({ request, onDone }: { request: any; onDone: () =>
           placeholder="e.g. MMC online register, checked today, ref / URL" maxLength={200} />
       </div>
       <div>
-        <label className="text-[10px] font-black uppercase text-slate-600 block mb-1.5 tracking-wider">Note to practitioner (required to reject or request more information)</label>
+        <label className="text-xs font-black uppercase text-slate-600 block mb-1.5 tracking-wider">Note to practitioner (required to reject or request more information)</label>
         <textarea className={field} rows={2} value={note} onChange={e => setNote(e.target.value)} maxLength={1000} />
       </div>
       {error && <p className="text-xs font-bold text-rose-800 bg-rose-50 border border-rose-200 rounded-none p-2.5">{error}</p>}
@@ -204,7 +204,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-150 pb-3">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-bold flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-amber-600" /> Licence & re-verification watchlist</h3>
-            <span className="text-[11px] font-bold text-slate-500">({shown.length})</span>
+            <span className="text-xs font-bold text-slate-500">({shown.length})</span>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -228,7 +228,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
         {shown.length === 0 ? <p className="text-xs text-slate-500">Nobody needs attention.</p> : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead><tr className="text-left text-[10px] uppercase text-slate-500"><th className="py-2 pr-3">Practitioner</th><th className="pr-3">Licence</th><th className="pr-3">Expiry</th><th className="pr-3">Verified until</th><th className="pr-3">Status</th><th /></tr></thead>
+              <thead><tr className="text-left text-xs uppercase text-slate-500"><th className="py-2 pr-3">Practitioner</th><th className="pr-3">Licence</th><th className="pr-3">Expiry</th><th className="pr-3">Verified until</th><th className="pr-3">Status</th><th /></tr></thead>
               <tbody>
                 {shown.map(p => (
                   <tr key={p.id} className="border-t border-slate-100">
@@ -238,7 +238,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
                     <td className="pr-3">{fmt(p.verifiedUntil)}</td>
                     <td className="pr-3">
                       <span className="font-bold">{p.verificationStatus}</span>
-                      {p.flag && <span className={`ml-1.5 px-1.5 py-0.5 rounded-none text-[10px] font-bold ${FLAG_LABEL[p.flag].cls}`}>{FLAG_LABEL[p.flag].text}</span>}
+                      {p.flag && <span className={`ml-1.5 px-1.5 py-0.5 rounded-none text-xs font-bold ${FLAG_LABEL[p.flag].cls}`}>{FLAG_LABEL[p.flag].text}</span>}
                       {p.suspensionReason && <span className="block text-slate-500">{p.suspensionReason}</span>}
                     </td>
                     <td className="text-right">
@@ -268,11 +268,11 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
               <div>
                 <h3 className="text-sm font-black text-amber-950 uppercase tracking-tight flex items-center gap-2">
                   Dual-Signoff Disciplinary Sanctions Pending Countersignature
-                  <span className="px-2 py-0.5 text-[10px] font-black uppercase bg-amber-600 text-white">
+                  <span className="px-2 py-0.5 text-xs font-black uppercase bg-amber-600 text-white">
                     {sanctions.filter(s => s.status === 'pending_countersign').length} Pending
                   </span>
                 </h3>
-                <p className="text-[11px] text-amber-800 font-semibold">
+                <p className="text-xs text-amber-800 font-semibold">
                   Medical Act 1971 (Section 29) · Requires two distinct administrative officers or super_admin to execute formal suspension.
                 </p>
               </div>
@@ -290,10 +290,10 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-black text-xs text-slate-900">{prof?.name || s.professional_id}</span>
-                      <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-1.5 py-0.5 border border-slate-200">
+                      <span className="text-xs font-mono font-bold bg-slate-100 text-slate-700 px-1.5 py-0.5 border border-slate-200">
                         {s.reference_no}
                       </span>
-                      <span className="text-[10px] font-bold text-amber-800 uppercase px-1.5 py-0.5 bg-amber-100 border border-amber-200">
+                      <span className="text-xs font-bold text-amber-800 uppercase px-1.5 py-0.5 bg-amber-100 border border-amber-200">
                         {s.sanction_type}
                       </span>
                     </div>
@@ -303,7 +303,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
                     <p className="text-xs text-slate-600 italic">
                       "{s.reason}"
                     </p>
-                    <div className="text-[10px] text-slate-500 font-mono pt-0.5">
+                    <div className="text-xs text-slate-500 font-mono pt-0.5">
                       Initiated by <strong>{s.initiator_name}</strong> ({s.initiator_role}) on {new Date(s.created_at).toLocaleDateString()}
                     </div>
                   </div>
@@ -353,7 +353,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
                 <li key={c.id} className="border border-slate-200 rounded-none p-3 text-xs space-y-1.5 bg-white">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-bold">{c.professionalName || c.professional_id} · {c.category}</span>
-                    <span className="px-2 py-0.5 rounded-none bg-slate-100 border border-slate-200 font-bold uppercase text-[10px]">{c.status}</span>
+                    <span className="px-2 py-0.5 rounded-none bg-slate-100 border border-slate-200 font-bold uppercase text-xs">{c.status}</span>
                   </div>
                   <p className="text-slate-600">{c.description}</p>
                   <p className="text-slate-400">From {c.complainantName || 'patient'} · {fmt(c.created_at)}{c.resolution ? ` · Resolution: ${c.resolution}` : ''}</p>

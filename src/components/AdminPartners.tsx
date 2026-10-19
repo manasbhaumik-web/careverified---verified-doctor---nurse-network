@@ -43,20 +43,20 @@ export default function AdminPartners({ say }: { say: (t: string) => void }) {
         {(data?.rows ?? []).map(r => (
           <li key={r.id}>
             <button type="button" onClick={() => { setOpen(open === r.id ? null : r.id); setNote(r.note ?? ''); }} aria-expanded={open === r.id} className="w-full text-left p-3 cursor-pointer hover:bg-slate-50">
-              <p className="font-bold">{r.org_name} <span className="text-[10px] font-extrabold uppercase bg-slate-100 px-1.5 py-0.5 ml-1">{r.kind}</span> <span className="text-[10px] font-extrabold uppercase bg-[color:var(--t-50)] text-[color:var(--t-800)] px-1.5 py-0.5 ml-1">{r.status}</span></p>
-              <p className="text-[11px] text-slate-600">{r.city}, {r.state} · {when(r.created_at)} · {r.id}</p>
+              <p className="font-bold">{r.org_name} <span className="text-xs font-extrabold uppercase bg-slate-100 px-1.5 py-0.5 ml-1">{r.kind}</span> <span className="text-xs font-extrabold uppercase bg-[color:var(--t-50)] text-[color:var(--t-800)] px-1.5 py-0.5 ml-1">{r.status}</span></p>
+              <p className="text-xs text-slate-600">{r.city}, {r.state} · {when(r.created_at)} · {r.id}</p>
             </button>
             {open === r.id && (
               <div className="px-3 pb-4 space-y-3 text-xs">
                 <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-1.5">
-                  <div><dt className="font-extrabold text-slate-500 uppercase text-[10px]">Contact</dt><dd>{r.contact_name}</dd></div>
-                  <div><dt className="font-extrabold text-slate-500 uppercase text-[10px]">Email</dt><dd><a className="underline text-[color:var(--t-700)]" href={`mailto:${r.email}`}>{r.email}</a></dd></div>
-                  <div><dt className="font-extrabold text-slate-500 uppercase text-[10px]">Phone</dt><dd><a className="underline text-[color:var(--t-700)]" href={`tel:${r.phone}`}>{r.phone}</a></dd></div>
-                  <div><dt className="font-extrabold text-slate-500 uppercase text-[10px]">Licence number given</dt><dd>{r.licence_no ?? 'none'}</dd></div>
-                  <div className="sm:col-span-2"><dt className="font-extrabold text-slate-500 uppercase text-[10px]">Message</dt><dd className="whitespace-pre-wrap">{r.message ?? 'none'}</dd></div>
-                  <div className="sm:col-span-2"><dt className="font-extrabold text-slate-500 uppercase text-[10px]">Agreed to be contacted</dt><dd>{when(r.consent_at)}</dd></div>
+                  <div><dt className="font-extrabold text-slate-500 uppercase text-xs">Contact</dt><dd>{r.contact_name}</dd></div>
+                  <div><dt className="font-extrabold text-slate-500 uppercase text-xs">Email</dt><dd><a className="underline text-[color:var(--t-700)]" href={`mailto:${r.email}`}>{r.email}</a></dd></div>
+                  <div><dt className="font-extrabold text-slate-500 uppercase text-xs">Phone</dt><dd><a className="underline text-[color:var(--t-700)]" href={`tel:${r.phone}`}>{r.phone}</a></dd></div>
+                  <div><dt className="font-extrabold text-slate-500 uppercase text-xs">Licence number given</dt><dd>{r.licence_no ?? 'none'}</dd></div>
+                  <div className="sm:col-span-2"><dt className="font-extrabold text-slate-500 uppercase text-xs">Message</dt><dd className="whitespace-pre-wrap">{r.message ?? 'none'}</dd></div>
+                  <div className="sm:col-span-2"><dt className="font-extrabold text-slate-500 uppercase text-xs">Agreed to be contacted</dt><dd>{when(r.consent_at)}</dd></div>
                 </dl>
-                <label className="block"><span className="font-extrabold text-slate-500 uppercase text-[10px] block mb-1">Note for the team</span>
+                <label className="block"><span className="font-extrabold text-slate-500 uppercase text-xs block mb-1">Note for the team</span>
                   <textarea value={note} onChange={e => setNote(e.target.value)} maxLength={500} rows={2} className="w-full border border-slate-200 px-3 py-2 text-xs" />
                 </label>
                 <div className="flex flex-wrap gap-2">

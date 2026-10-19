@@ -190,7 +190,7 @@ export default function SanctionsDrawer({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-300">
+                <span className="text-xs font-black uppercase tracking-wider px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-300">
                   Four-Eyes Principle
                 </span>
                 <span className="text-xs text-slate-500 font-mono">Medical Act 1971 / Nurses Act 1950</span>
@@ -212,13 +212,13 @@ export default function SanctionsDrawer({
         {/* Target Practitioner Summary Box */}
         <div className="p-3.5 bg-slate-50 border border-slate-200 flex items-center justify-between">
           <div>
-            <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider block">Subject Practitioner</span>
+            <span className="text-xs font-black uppercase text-slate-500 tracking-wider block">Subject Practitioner</span>
             <span className="text-sm font-black text-slate-900">{practitioner.name}</span>
             <span className="text-xs text-slate-600 block">{practitioner.specialization} · License: <code className="font-mono font-bold text-slate-800">{practitioner.licenseNumber}</code></span>
           </div>
           <div className="text-right">
-            <span className="text-[10px] font-mono text-slate-500 block">Status</span>
-            <span className="px-2 py-0.5 text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
+            <span className="text-xs font-mono text-slate-500 block">Status</span>
+            <span className="px-2 py-0.5 text-xs font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
               {practitioner.verificationStatus}
             </span>
           </div>
@@ -226,11 +226,11 @@ export default function SanctionsDrawer({
 
         {/* Dual-Signoff Protocol Advisory Box */}
         <div className="p-3 bg-amber-50 border border-amber-300 text-xs text-amber-950 space-y-1">
-          <span className="font-bold flex items-center gap-1.5 uppercase text-[10px] tracking-wide text-amber-800">
+          <span className="font-bold flex items-center gap-1.5 uppercase text-xs tracking-wide text-amber-800">
             <Gavel className="h-3.5 w-3.5" />
             Statutory Two-Officer Signoff Mandate
           </span>
-          <p className="text-[11px] leading-relaxed">
+          <p className="text-xs leading-relaxed">
             Under Medical Act 1971 Section 29, practitioner suspension from clinical practice involves legal liability. 
             {isSuperAdmin ? (
               <span className="font-bold text-emerald-900 ml-1">
@@ -260,7 +260,7 @@ export default function SanctionsDrawer({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Statutory Basis Selection */}
           <div>
-            <label className="text-[10px] font-black uppercase text-slate-700 tracking-wider block mb-1">
+            <label className="text-xs font-black uppercase text-slate-700 tracking-wider block mb-1">
               Statutory Basis &amp; Legal Framework *
             </label>
             <select
@@ -277,7 +277,7 @@ export default function SanctionsDrawer({
           {/* Reference Number */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-black uppercase text-slate-700 tracking-wider block mb-1">
+              <label className="text-xs font-black uppercase text-slate-700 tracking-wider block mb-1">
                 Council Disciplinary Case File Ref No. *
               </label>
               <input
@@ -289,7 +289,7 @@ export default function SanctionsDrawer({
               />
             </div>
             <div>
-              <label className="text-[10px] font-black uppercase text-slate-700 tracking-wider block mb-1">
+              <label className="text-xs font-black uppercase text-slate-700 tracking-wider block mb-1">
                 Sanction Action Category
               </label>
               <select
@@ -306,7 +306,7 @@ export default function SanctionsDrawer({
 
           {/* Reason Presets */}
           <div>
-            <label className="text-[10px] font-black uppercase text-slate-600 tracking-wider block mb-1">
+            <label className="text-xs font-black uppercase text-slate-600 tracking-wider block mb-1">
               Select Standard Regulatory Ground (Optional Preset):
             </label>
             <div className="flex flex-wrap gap-1.5">
@@ -315,7 +315,7 @@ export default function SanctionsDrawer({
                   key={idx}
                   type="button"
                   onClick={() => setReason(preset)}
-                  className="px-2 py-1 text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors cursor-pointer text-left font-medium"
+                  className="px-2 py-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors cursor-pointer text-left font-medium"
                 >
                   + {preset.slice(0, 48)}...
                 </button>
@@ -325,7 +325,7 @@ export default function SanctionsDrawer({
 
           {/* Reason Textarea */}
           <div>
-            <label className="text-[10px] font-black uppercase text-slate-700 tracking-wider block mb-1">
+            <label className="text-xs font-black uppercase text-slate-700 tracking-wider block mb-1">
               Detailed Statutory Order &amp; Formal Reasons *
             </label>
             <textarea
@@ -336,7 +336,7 @@ export default function SanctionsDrawer({
               className="w-full border border-slate-300 p-2.5 text-xs font-semibold text-slate-800 bg-white focus:outline-none focus:border-rose-600"
               required
             />
-            <span className="text-[10px] text-slate-500 font-semibold block mt-0.5">
+            <span className="text-xs text-slate-500 font-semibold block mt-0.5">
               This notice will be recorded in the immutable audit log and syndicated to hospital HR EHR gateways.
             </span>
           </div>
@@ -345,7 +345,7 @@ export default function SanctionsDrawer({
           <div className="p-3 bg-slate-50 border border-slate-200 flex items-center justify-between">
             <div className="space-y-0.5">
               <span className="text-xs font-bold text-slate-800 block">Require Dual-Signoff Countersignature</span>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-xs text-slate-500">
                 {requireDualSignoff ? 'Requires approval from a 2nd council registrar or super-admin.' : 'Immediate unilateral suspension (Super-Admin only).'}
               </span>
             </div>

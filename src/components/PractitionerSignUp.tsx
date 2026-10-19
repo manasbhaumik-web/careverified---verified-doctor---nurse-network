@@ -60,7 +60,7 @@ export default function PractitionerSignUp({ onSuccess, onCancel }: {
         <div className="space-y-2">
           <label htmlFor="pr-password" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Password</label>
           <input id="pr-password" type="password" className={field} value={password} onChange={e => setPassword(e.target.value)} required minLength={8} autoComplete="new-password" />
-          <p className="text-[11px] text-slate-500">At least 8 characters, with letters and numbers.</p>
+          <p className="text-xs text-slate-500">At least 8 characters, with letters and numbers.</p>
         </div>
         <label className="flex items-start gap-3 text-xs text-slate-700 cursor-pointer">
           <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[color:var(--t-600)]" required />

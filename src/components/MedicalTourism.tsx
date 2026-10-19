@@ -90,13 +90,13 @@ function Facilities({ onSent }: { onSent: (caseId: string) => void }) {
                 <h3 className="font-extrabold text-base flex items-center gap-2"><Building2 className="h-4 w-4 text-[color:var(--t-600)]" />{fa.name}</h3>
                 <p className="text-xs text-slate-600">{[fa.city, fa.state].filter(Boolean).join(', ')}</p>
               </div>
-              {fa.mhtcMember && <span className="text-[10px] font-black uppercase px-2 py-0.5 border border-sky-300 bg-sky-50 text-sky-900">MHTC member</span>}
+              {fa.mhtcMember && <span className="text-xs font-black uppercase px-2 py-0.5 border border-sky-300 bg-sky-50 text-sky-900">MHTC member</span>}
             </div>
             {fa.description && <p className="text-xs text-slate-700 leading-relaxed">{fa.description}</p>}
             <div className="flex flex-wrap gap-1.5">
-              {fa.accreditations.map((a: any) => <span key={a.body} className="text-[10px] font-black uppercase px-2 py-0.5 border border-emerald-300 bg-emerald-50 text-emerald-900 inline-flex items-center gap-1"><BadgeCheck className="h-3 w-3" />{a.body} checked · to {a.validUntil}</span>)}
-              {fa.accreditations.length === 0 && <span className="text-[10px] text-slate-500">No accreditation verified by us yet</span>}
-              {fa.licenceChecked && <span className="text-[10px] font-black uppercase px-2 py-0.5 border border-emerald-300 bg-emerald-50 text-emerald-900">Licence checked</span>}
+              {fa.accreditations.map((a: any) => <span key={a.body} className="text-xs font-black uppercase px-2 py-0.5 border border-emerald-300 bg-emerald-50 text-emerald-900 inline-flex items-center gap-1"><BadgeCheck className="h-3 w-3" />{a.body} checked · to {a.validUntil}</span>)}
+              {fa.accreditations.length === 0 && <span className="text-xs text-slate-500">No accreditation verified by us yet</span>}
+              {fa.licenceChecked && <span className="text-xs font-black uppercase px-2 py-0.5 border border-emerald-300 bg-emerald-50 text-emerald-900">Licence checked</span>}
             </div>
             <p className="text-xs text-slate-600 flex gap-1.5"><Languages className="h-3.5 w-3.5 mt-0.5 shrink-0" />{fa.languages.join(', ') || 'Languages not listed'}</p>
             <p className="text-xs text-slate-600"><b>Specialties:</b> {fa.specialties.join(', ') || '—'}</p>
@@ -167,7 +167,7 @@ function CaseList({ onOpen }: { onOpen: (id: string) => void }) {
       {list.map(c => (
         <li key={c.id}><button onClick={() => onOpen(c.id)} className="w-full text-left bg-white border border-slate-200 hover:border-[color:var(--t-600)] p-4 cursor-pointer">
           <p className="font-bold text-sm">{c.facility} · <span className="text-[color:var(--t-700)]">{STATUS_LABEL[c.status] ?? c.status}</span></p>
-          <p className="text-xs text-slate-600">{c.summary}</p><p className="text-[11px] text-slate-400 mt-1">Updated {formatDate(c.updatedAt)}</p>
+          <p className="text-xs text-slate-600">{c.summary}</p><p className="text-xs text-slate-400 mt-1">Updated {formatDate(c.updatedAt)}</p>
         </button></li>
       ))}
     </ul>
@@ -202,7 +202,7 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
         <p className="text-sm text-slate-700">{c.summary}</p>
         <p className="text-xs text-slate-500">{c.facility?.phone} · {c.facility?.email}{c.practitioner ? ` · Doctor: ${c.practitioner.name}` : ''}</p>
         {c.practitioner && onOpenProfessional && <button className="text-xs font-bold underline cursor-pointer" onClick={() => onOpenProfessional(c.practitioner.id)}>Book a video consultation with {c.practitioner.name}</button>}
-        <p className="text-[11px] text-slate-500">A video consultation with a Malaysian doctor from your home country is possible before or after treatment. The doctor cannot give emergency care or issue e-prescriptions to you abroad.</p>
+        <p className="text-xs text-slate-500">A video consultation with a Malaysian doctor from your home country is possible before or after treatment. The doctor cannot give emergency care or issue e-prescriptions to you abroad.</p>
       </section>
 
       {/* Quotes */}
@@ -224,7 +224,7 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
             {q.status === 'sent' && c.status === 'quoted' && <QuoteDecision caseId={id} quoteId={q.id} onDone={d => say(d, 'Recorded.')} />}
           </div>
         ))}
-        <p className="text-[11px] text-slate-500">Payment is arranged directly with the facility; MedCred does not take your package payment.</p>
+        <p className="text-xs text-slate-500">Payment is arranged directly with the facility; MedCred does not take your package payment.</p>
       </section>
 
       {/* Itinerary */}

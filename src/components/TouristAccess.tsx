@@ -328,7 +328,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
   return (
     <section id="tourist-section" aria-labelledby="tourist-heading" className="bg-white border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="section-index-badge">04B</span>
           <Plane className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
@@ -348,7 +348,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
             {tx.pathway.map((p, idx) => (
               <div key={p.step} className="bg-white border border-[color:var(--t-200)] border-l-2 border-l-[color:var(--t-600)] p-4 relative">
                 <div className="flex items-center justify-between gap-2 mb-1.5">
-                  <span className="text-[11px] font-mono font-extrabold text-[color:var(--t-600)] uppercase">{p.step}</span>
+                  <span className="text-xs font-mono font-extrabold text-[color:var(--t-600)] uppercase">{p.step}</span>
                   {idx < 2 && <ArrowRight className="hidden md:block h-3.5 w-3.5 text-slate-400" aria-hidden="true" />}
                 </div>
                 <h4 className="font-display font-extrabold text-base text-[color:var(--ink)]">{p.title}</h4>
@@ -362,7 +362,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
         <div className="mt-8 border border-[color:var(--t-200)] bg-white p-5 sm:p-7 shadow-xs">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-[color:var(--t-100)]">
             <div>
-              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[10px] font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)] mb-1.5">
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-xs font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)] mb-1.5">
                 <Building2 className="h-3 w-3 text-[color:var(--t-600)]" />
                 Verified Hospital Packages · Multi-Currency Benchmarks
               </div>
@@ -409,21 +409,21 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
 
                       {/* Accreditation Pill Overlay */}
                       <div className="absolute top-2.5 left-2.5">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-mono font-extrabold tracking-wide uppercase border backdrop-blur-md ${pkg.badgeClass}`}>
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-extrabold tracking-wide uppercase border backdrop-blur-md ${pkg.badgeClass}`}>
                           <ShieldCheck className="h-3 w-3 shrink-0" />
                           {pkg.accreditation}
                         </span>
                       </div>
 
                       {/* Duration Tag */}
-                      <div className="absolute bottom-2.5 right-2.5 bg-black/80 backdrop-blur-md text-white text-[10px] font-mono font-bold px-2 py-0.5 border border-white/20">
+                      <div className="absolute bottom-2.5 right-2.5 bg-black/80 backdrop-blur-md text-white text-xs font-mono font-bold px-2 py-0.5 border border-white/20">
                         {copy.duration}
                       </div>
                     </div>
 
                     {/* Card Body */}
                     <div className="p-4 sm:p-5">
-                      <div className="flex items-center justify-between gap-2 text-[10px] font-mono font-bold text-slate-500 mb-1.5">
+                      <div className="flex items-center justify-between gap-2 text-xs font-mono font-bold text-slate-500 mb-1.5">
                         <span>{pkg.code}</span>
                         <span className="text-[color:var(--t-700)] font-semibold truncate">{pkg.specialty}</span>
                       </div>
@@ -437,7 +437,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
                       {/* Itemised Highlights */}
                       <div className="mt-3.5 pt-3 border-t border-[color:var(--t-100)] space-y-1.5">
                         {pkg.highlights.map((h, i) => (
-                          <div key={i} className="flex items-center gap-2 text-[11px] text-slate-700 font-medium">
+                          <div key={i} className="flex items-center gap-2 text-xs text-slate-700 font-medium">
                             <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
                             <span className="truncate">{h}</span>
                           </div>
@@ -451,7 +451,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
                     <div className="pt-3 border-t border-[color:var(--t-200)]">
                       <div className="flex items-baseline justify-between gap-1 mb-1">
                         <div>
-                          <div className="text-[9px] font-mono uppercase tracking-wider text-slate-400 font-bold">Indicative Tariff</div>
+                          <div className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">Indicative Tariff</div>
                           <span className="font-mono font-black text-lg text-[color:var(--ink)]">
                             RM {pkg.myr.toLocaleString('en-US')}
                           </span>
@@ -463,7 +463,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
                         )}
                       </div>
 
-                      <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1 mb-3.5">
+                      <p className="text-xs text-slate-500 font-medium flex items-center gap-1 mb-3.5">
                         <Globe className="h-3 w-3 text-[color:var(--t-600)] shrink-0" />
                         <span className="truncate">{pkg.hub}</span>
                       </p>
@@ -483,7 +483,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
             })}
           </div>
 
-          <div className="mt-5 pt-3.5 border-t border-[color:var(--t-100)] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-slate-500 font-medium">
+          <div className="mt-5 pt-3.5 border-t border-[color:var(--t-100)] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500 font-medium">
             <p>{tx.fxDisclaimer}</p>
             <span className="shrink-0 text-[color:var(--t-700)] font-bold flex items-center gap-1">
               <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
@@ -565,7 +565,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
                     <p className="text-sm text-slate-600 font-medium">{[fac.city, fac.state].filter(Boolean).join(', ')}</p>
                   </div>
                   {fac.description && <p className="text-sm text-slate-700 leading-relaxed">{fac.description}</p>}
-                  <div className="flex flex-wrap gap-1.5 text-[11px] font-bold">
+                  <div className="flex flex-wrap gap-1.5 text-xs font-bold">
                     {fac.licenceChecked && <span className="bg-emerald-50 text-emerald-900 border border-emerald-200 px-2 py-0.5">{tx.browse.licence}</span>}
                     {fac.mhtcMember && <span className="bg-[color:var(--t-50)] text-[color:var(--t-800)] border border-[color:var(--t-200)] px-2 py-0.5">{tx.browse.mhtc}</span>}
                     {fac.accreditations.map((a: any) => <span key={a.body} className="bg-emerald-50 text-emerald-900 border border-emerald-200 px-2 py-0.5">{tx.browse.acc(a.body, a.validUntil)}</span>)}

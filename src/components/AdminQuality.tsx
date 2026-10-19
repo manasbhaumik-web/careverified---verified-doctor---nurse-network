@@ -7,7 +7,7 @@ import { TestimonialAdmin } from './TestimonialPanels';
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString() : '—');
-const lab = 'text-[10px] font-extrabold uppercase tracking-wider text-slate-500';
+const lab = 'text-xs font-extrabold uppercase tracking-wider text-slate-500';
 const btn = 'text-xs font-bold cursor-pointer';
 const field = 'border border-slate-200 px-3 py-2 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
 
@@ -96,17 +96,17 @@ function Support({ say }: { say: (t: string) => void }) {
           {(data?.tickets ?? []).length === 0 && <li className="p-4 text-xs text-slate-500">No tickets.</li>}
           {(data?.tickets ?? []).map((t: any) => (
             <li key={t.id}><button onClick={() => openT(t.id)} className="w-full text-left p-3 cursor-pointer hover:bg-slate-50">
-              <p className="font-bold truncate">{t.subject} {t.overdue && <span className="text-[10px] bg-rose-100 text-rose-800 px-1.5 py-0.5 ml-1">OVERDUE</span>}</p>
-              <p className="text-[11px] text-slate-500">{t.requester} · {t.category} · {t.priority} · {t.firstResponseAt ? 'replied' : `reply due ${when(t.firstResponseDue)}`}</p></button></li>
+              <p className="font-bold truncate">{t.subject} {t.overdue && <span className="text-xs bg-rose-100 text-rose-800 px-1.5 py-0.5 ml-1">OVERDUE</span>}</p>
+              <p className="text-xs text-slate-500">{t.requester} · {t.category} · {t.priority} · {t.firstResponseAt ? 'replied' : `reply due ${when(t.firstResponseDue)}`}</p></button></li>
           ))}
         </ul>
         <div className="bg-white border border-slate-200 p-4 space-y-3">
           {!open ? <p className="text-xs text-slate-500">Select a ticket.</p> : (
             <>
-              <div className="flex justify-between gap-2"><div><h3 className="text-sm font-extrabold">{open.subject}</h3><p className="text-[11px] text-slate-500">{open.requester} · {open.category}{open.target ? ` · about: ${open.target}` : ''}</p></div>
+              <div className="flex justify-between gap-2"><div><h3 className="text-sm font-extrabold">{open.subject}</h3><p className="text-xs text-slate-500">{open.requester} · {open.category}{open.target ? ` · about: ${open.target}` : ''}</p></div>
                 <select aria-label="Priority" className="border border-slate-200 text-xs px-2 h-fit" value={open.priority} onChange={async e => { await jreq(`/api/admin/support/tickets/${open.id}/priority`, 'POST', { priority: e.target.value }); openT(open.id); load(); }}>
                   {['urgent', 'high', 'normal', 'low'].map(p => <option key={p}>{p}</option>)}</select></div>
-              <ul className="space-y-2 max-h-64 overflow-y-auto">{open.messages.map((m: any) => <li key={m.id} className={`text-sm p-2.5 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}><p className="text-[10px] font-extrabold uppercase text-slate-500">{m.fromStaff ? 'Staff' : 'User'} · {when(m.ts)}</p>{m.body}</li>)}</ul>
+              <ul className="space-y-2 max-h-64 overflow-y-auto">{open.messages.map((m: any) => <li key={m.id} className={`text-sm p-2.5 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}><p className="text-xs font-extrabold uppercase text-slate-500">{m.fromStaff ? 'Staff' : 'User'} · {when(m.ts)}</p>{m.body}</li>)}</ul>
               <div className="flex flex-wrap gap-2 items-center text-xs">
                 <label className="font-bold text-slate-600" htmlFor="macro-lang">Reply template</label>
                 <select id="macro-lang" aria-label="Template language" className="border border-slate-200 px-2 h-9" value={macroLang} onChange={e => setMacroLang(e.target.value as MacroLang)}>
@@ -216,9 +216,9 @@ function Incidents({ say }: { say: (t: string) => void }) {
       {list.length === 0 && <p className="text-xs text-slate-500 bg-white border border-slate-200 p-4">No incidents reported.</p>}
       {list.map(i => (
         <article key={i.id} className="bg-white border border-slate-200 p-4 text-sm space-y-1.5">
-          <p className="font-bold"><span className={`text-[10px] px-1.5 py-0.5 mr-2 uppercase ${tone[i.severity]}`}>{i.severity}</span>{i.kind.replace(/_/g, ' ')} <span className="text-xs text-slate-500 font-normal">· {i.status} · by {i.reporter} · {when(i.createdAt)}</span></p>
+          <p className="font-bold"><span className={`text-xs px-1.5 py-0.5 mr-2 uppercase ${tone[i.severity]}`}>{i.severity}</span>{i.kind.replace(/_/g, ' ')} <span className="text-xs text-slate-500 font-normal">· {i.status} · by {i.reporter} · {when(i.createdAt)}</span></p>
           <p>{i.description}</p>
-          {i.relatedType && <p className="text-[11px] text-slate-500">Related {i.relatedType}: {i.relatedId}</p>}
+          {i.relatedType && <p className="text-xs text-slate-500">Related {i.relatedType}: {i.relatedId}</p>}
           <details className="text-xs"><summary className="cursor-pointer font-bold">Timeline ({i.events.length})</summary><ul className="mt-1 space-y-1">{i.events.map((e: any, k: number) => <li key={k}>{when(e.ts)} · <b>{e.action}</b>{e.actor ? ` · ${e.actor}` : ''}{e.note ? ` · ${e.note}` : ''}</li>)}</ul></details>
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
             {(i.status === 'new' || i.status === 'investigating') ? (
@@ -279,7 +279,7 @@ function Peer({ say }: { say: (t: string) => void }) {
       <section className="bg-white border border-slate-200 p-4">
         <h3 className="text-sm font-extrabold mb-2">All peer reviews</h3>
         {list.length === 0 ? <p className="text-xs text-slate-500">None.</p> : (
-          <table className="w-full text-xs"><thead><tr className="text-left text-[10px] uppercase text-slate-500"><th className="py-1">Case</th><th>Author</th><th>Reviewer</th><th>Status</th><th>Outcome</th></tr></thead>
+          <table className="w-full text-xs"><thead><tr className="text-left text-xs uppercase text-slate-500"><th className="py-1">Case</th><th>Author</th><th>Reviewer</th><th>Status</th><th>Outcome</th></tr></thead>
             <tbody>{list.map(r => (
               <tr key={r.id} className="border-t border-slate-100 align-top"><td className="py-1.5">{r.subjectType} · {r.source}</td><td>{r.author}</td><td>{r.reviewer}</td><td className="font-bold">{r.status}</td>
                 <td>{r.outcome ? `${r.outcome.replace(/_/g, ' ')} (${r.score}/5)` : '—'}{r.comments ? <span className="block text-slate-600">{r.comments}</span> : null}</td></tr>

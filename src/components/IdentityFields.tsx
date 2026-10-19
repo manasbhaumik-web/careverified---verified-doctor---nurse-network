@@ -5,8 +5,8 @@ import {
   type Address,
 } from '../identity';
 
-const label = 'text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block';
-const hint = 'text-[11px] font-semibold mt-1';
+const label = 'text-xs font-extrabold uppercase tracking-wider text-slate-700 block';
+const hint = 'text-xs font-semibold mt-1';
 
 // ───────── ID: MyKad for citizens and permanent residents, passport for visitors ─────────
 export interface IdState { idType: 'nric' | 'passport'; idNumber: string; nationality: string; dob: string }

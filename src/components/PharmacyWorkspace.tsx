@@ -353,7 +353,7 @@ function InboxTab({ counts, onChanged, tick }: { counts?: Counts; onChanged: () 
       <section aria-label="Find a prescription" className="bg-white border border-[color:var(--t-200)] rounded-none p-5 space-y-3">
         <form onSubmit={lookup} className="flex flex-wrap items-end gap-3">
           <label className="flex-1 min-w-[240px]">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 block mb-1.5">Look up a code (walk-in patient)</span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-700 block mb-1.5">Look up a code (walk-in patient)</span>
             <input 
               value={code} 
               onChange={e => setCode(e.target.value.toUpperCase())} 
@@ -454,14 +454,14 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="font-mono text-sm font-extrabold text-[color:var(--t-700)] tracking-wide">{rx.code}</p>
-          <h3 className="text-[16px] font-bold text-[color:var(--ink)] flex items-center gap-1.5 [overflow-wrap:anywhere]"><UserRound className="h-4 w-4 shrink-0 text-[color:var(--t-600)]" />{rx.patientName}</h3>
+          <h3 className="text-base font-bold text-[color:var(--ink)] flex items-center gap-1.5 [overflow-wrap:anywhere]"><UserRound className="h-4 w-4 shrink-0 text-[color:var(--t-600)]" />{rx.patientName}</h3>
         </div>
-        <span className={`text-[11px] font-bold px-2.5 py-0.5 border ${BUCKET_STYLE[rx.bucket]}`}>{BUCKET_LABEL[rx.bucket]}{rx.bucket === 'in_progress' && rx.fillStatus ? ` · ${rx.fillStatus === 'received' ? 'Received' : 'Preparing'}` : ''}</span>
+        <span className={`text-xs font-bold px-2.5 py-0.5 border ${BUCKET_STYLE[rx.bucket]}`}>{BUCKET_LABEL[rx.bucket]}{rx.bucket === 'in_progress' && rx.fillStatus ? ` · ${rx.fillStatus === 'received' ? 'Received' : 'Preparing'}` : ''}</span>
       </div>
 
       <ul className="space-y-1.5">
         {rx.items.map((i, k) => (
-          <li key={k} className="text-[13px] text-slate-800 flex gap-2 [overflow-wrap:anywhere]">
+          <li key={k} className="text-sm text-slate-800 flex gap-2 [overflow-wrap:anywhere]">
             <Pill className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" />
             <span><strong>{i.name}</strong> {[i.strength, i.form].filter(Boolean).join(' ')} · {i.dose}, {i.frequency} for {i.durationDays} days · qty {i.quantity}{i.instructions ? ` · ${i.instructions}` : ''}</span>
           </li>
@@ -469,7 +469,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
       </ul>
       {rx.notes && <p className="text-xs text-slate-600 [overflow-wrap:anywhere]">Doctor's note: {rx.notes}</p>}
 
-      <div className="text-[12px] text-slate-600 space-y-0.5">
+      <div className="text-xs text-slate-600 space-y-0.5">
         {rx.prescriber && <p className="[overflow-wrap:anywhere]">Prescribed by {rx.prescriber.name} ({rx.prescriber.licenseNumber}){!rx.prescriber.stillVerified && <strong className="text-rose-700"> · NOT currently verified</strong>}</p>}
         <p>Valid until {fmtDate(rx.validUntil)}{rx.sentAt && ` · sent ${fmtTime(rx.sentAt)}`}</p>
         {overdue && rx.sentAt && <p className="font-bold text-rose-700 flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> Waiting {waiting(rx.sentAt)} with no response</p>}
@@ -556,8 +556,8 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
                 <input value={pharmacist} onChange={e => setPharmacist(e.target.value)} placeholder="Dispensing pharmacist (default: registered pharmacist)" aria-label="Dispensing pharmacist" maxLength={100} className="border border-slate-300 px-2 py-2 text-xs bg-white" />
                 <input value={poisonsNo} onChange={e => setPoisonsNo(e.target.value)} placeholder="Poisons / prescription book entry no." aria-label="Poisons book entry number" maxLength={40} className="border border-slate-300 px-2 py-2 text-xs bg-white" />
               </div>
-              {!rx.safety.shared && <p className="text-[11px] font-bold text-amber-900 bg-amber-100 border border-amber-300 p-2 rounded-none">Allergies and current medicines were not shared. Have you confirmed verbally with the patient?</p>}
-              {rx.prescriber && !rx.prescriber.stillVerified && <p className="text-[11px] font-black text-rose-800 bg-rose-100 border border-rose-300 p-2 rounded-none uppercase tracking-wide">Warning: The prescribing doctor is not currently verified by the medical board.</p>}
+              {!rx.safety.shared && <p className="text-xs font-bold text-amber-900 bg-amber-100 border border-amber-300 p-2 rounded-none">Allergies and current medicines were not shared. Have you confirmed verbally with the patient?</p>}
+              {rx.prescriber && !rx.prescriber.stillVerified && <p className="text-xs font-black text-rose-800 bg-rose-100 border border-rose-300 p-2 rounded-none uppercase tracking-wide">Warning: The prescribing doctor is not currently verified by the medical board.</p>}
               <div className="flex gap-2 pt-1">
                 <button type="button" disabled={busy} onClick={dispense} className={btnPrimary}>Yes, Mark Dispensed</button>
                 <button type="button" onClick={() => setConfirming(false)} className={btnPlain}>Go Back</button>
@@ -566,7 +566,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
           )}
           {declining && (
             <div className="space-y-2.5 bg-slate-50 border border-slate-300 p-3.5 rounded-none">
-              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 block" htmlFor={`reason-${rx.id}`}>Reason for inability to fill (sent to patient)</label>
+              <label className="text-xs font-black uppercase tracking-wider text-slate-700 block" htmlFor={`reason-${rx.id}`}>Reason for inability to fill (sent to patient)</label>
               <input id={`reason-${rx.id}`} value={reason} onChange={e => setReason(e.target.value)} maxLength={200} placeholder="e.g. Out of stock until Tuesday, recommended alternative clinic" className="h-10 w-full border border-slate-300 rounded-none px-3 bg-white text-xs font-semibold outline-none focus:border-[color:var(--t-600)]" />
               <div className="flex gap-2">
                 <button type="button" disabled={busy || reason.trim().length < 3} onClick={() => setStatus('cannot_fill')} className={btnDanger}>Send to patient</button>
@@ -585,7 +585,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
             </button>
           ) : (
             <div className="space-y-2 bg-slate-50 border border-slate-300 p-3.5 rounded-none">
-              <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 block" htmlFor={`note-${rx.id}`}>Internal Pharmacist Note (Private to this pharmacy)</label>
+              <label className="text-xs font-black uppercase tracking-wider text-slate-700 block" htmlFor={`note-${rx.id}`}>Internal Pharmacist Note (Private to this pharmacy)</label>
               <textarea id={`note-${rx.id}`} value={note} onChange={e => setNote(e.target.value)} rows={3} maxLength={500} className="w-full border border-slate-300 rounded-none p-3 bg-white text-xs font-semibold outline-none focus:border-[color:var(--t-600)]" />
               <div className="flex gap-2">
                 <button type="button" disabled={busy} onClick={saveNote} className={btnPlain}>Save note</button>
@@ -656,7 +656,7 @@ function ActivityTab() {
       <div className="bg-white border border-[color:var(--t-200)] p-10 text-center space-y-2">
         <Activity className="h-10 w-10 text-[color:var(--t-200)] mx-auto" />
         <h2 className="text-sm font-extrabold">No activity yet</h2>
-        <p className="text-[13px] text-slate-600">Everything your pharmacy does here is recorded in this timeline.</p>
+        <p className="text-sm text-slate-600">Everything your pharmacy does here is recorded in this timeline.</p>
       </div>
     );
   }
@@ -667,7 +667,7 @@ function ActivityTab() {
           <Activity className="h-4 w-4 text-[color:var(--t-600)]" />
           <span>Operational Audit Trail ({items.length})</span>
         </h3>
-        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Attributable Dispensing Logs</span>
+        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Attributable Dispensing Logs</span>
       </div>
       <ol className="divide-y divide-slate-200">
         {items.map(e => (
@@ -699,9 +699,9 @@ function ReportsTab() {
   const max = Math.max(1, ...(r?.perDay.map(d => Math.max(d.received, d.dispensed)) ?? [1]));
   const tile = (label: string, value: React.ReactNode, hint?: string) => (
     <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 min-w-0 flex flex-col justify-between gap-1">
-      <p className="text-[10px] font-black uppercase tracking-wider text-slate-600">{label}</p>
+      <p className="text-xs font-black uppercase tracking-wider text-slate-600">{label}</p>
       <p className="text-2xl font-black text-[color:var(--ink)] mt-1 tabular-nums">{value}</p>
-      {hint && <p className="text-[11px] text-slate-500 font-semibold mt-0.5">{hint}</p>}
+      {hint && <p className="text-xs text-slate-500 font-semibold mt-0.5">{hint}</p>}
     </div>
   );
 
@@ -731,7 +731,7 @@ function ReportsTab() {
             <section aria-label="Prescriptions per day" className="bg-white border border-[color:var(--t-200)] rounded-none p-5 min-w-0">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
                 <h2 className="text-sm font-black uppercase tracking-wider text-slate-800">Daily Prescription Volume</h2>
-                <p className="text-[11px] font-bold text-slate-600 flex items-center gap-4">
+                <p className="text-xs font-bold text-slate-600 flex items-center gap-4">
                   <span className="inline-flex items-center gap-1.5"><span className="h-3 w-3 bg-[color:var(--t-200)]" /> Received</span>
                   <span className="inline-flex items-center gap-1.5"><span className="h-3 w-3 bg-[color:var(--t-600)]" /> Dispensed</span>
                 </p>
@@ -744,15 +744,15 @@ function ReportsTab() {
                   </div>
                 ))}
               </div>
-              <div className="flex justify-between text-[11px] font-mono font-bold text-slate-500 mt-2"><span>{r.perDay[0]?.date}</span><span>{r.perDay[r.perDay.length - 1]?.date}</span></div>
+              <div className="flex justify-between text-xs font-mono font-bold text-slate-500 mt-2"><span>{r.perDay[0]?.date}</span><span>{r.perDay[r.perDay.length - 1]?.date}</span></div>
             </section>
 
             <section aria-label="Most prescribed medicines" className="bg-white border border-[color:var(--t-200)] rounded-none p-5 min-w-0">
               <h2 className="text-sm font-black uppercase tracking-wider text-slate-800 mb-4 border-b border-slate-100 pb-3">Top Formulations Dispensed</h2>
-              {r.topMedicines.length === 0 ? <p className="text-[13px] text-slate-600 font-semibold">Nothing in this period yet.</p> : (
+              {r.topMedicines.length === 0 ? <p className="text-sm text-slate-600 font-semibold">Nothing in this period yet.</p> : (
                 <ol className="divide-y divide-slate-100">
                   {r.topMedicines.map(m => (
-                    <li key={m.name} className="py-2.5 flex items-center justify-between gap-3 text-[13px]">
+                    <li key={m.name} className="py-2.5 flex items-center justify-between gap-3 text-sm">
                       <span className="min-w-0 [overflow-wrap:anywhere] font-bold text-slate-800 capitalize">{m.name}</span>
                       <span className="font-mono font-black tabular-nums text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">{m.count} units</span>
                     </li>
@@ -761,7 +761,7 @@ function ReportsTab() {
               )}
             </section>
           </div>
-          <p className="text-[11px] text-slate-500 font-medium">Telemetry covers prescriptions routed to your pharmacy via MedCred. Response latency runs from patient dispatch to first status mutation. Walk-in lookups are logged independently.</p>
+          <p className="text-xs text-slate-500 font-medium">Telemetry covers prescriptions routed to your pharmacy via MedCred. Response latency runs from patient dispatch to first status mutation. Walk-in lookups are logged independently.</p>
         </>
       )}
     </div>
@@ -803,17 +803,17 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
     if (d.status === 'success') { setCur(''); setNw(''); onSaved(); }
   };
 
-  const field = 'text-[10px] font-black uppercase tracking-wider text-slate-700 block mb-1.5';
+  const field = 'text-xs font-black uppercase tracking-wider text-slate-700 block mb-1.5';
   const inputCls = 'h-12 w-full border border-slate-300 rounded-none px-3.5 bg-white text-xs font-semibold text-slate-900 outline-none focus:border-[color:var(--t-600)]';
   return (
     <div className="grid gap-5 lg:grid-cols-2 items-start">
       <form onSubmit={save} className="bg-white border border-[color:var(--t-200)] rounded-none p-6 space-y-5 min-w-0">
         <div className="border-b border-slate-100 pb-3">
           <h2 className="text-sm font-black uppercase tracking-wider text-slate-800">Public Pharmacy Registry Listing</h2>
-          <p className="text-[12px] text-slate-500 font-semibold mt-1">This information appears directly on the patient-facing Pharmacies directory. The legal registered name can only be edited by the Board Admin.</p>
+          <p className="text-xs text-slate-500 font-semibold mt-1">This information appears directly on the patient-facing Pharmacies directory. The legal registered name can only be edited by the Board Admin.</p>
         </div>
         <div>
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">Official Board Entity</span>
+          <span className="text-xs font-black uppercase tracking-wider text-slate-500 block mb-1">Official Board Entity</span>
           <p className="text-base font-black text-slate-900 [overflow-wrap:anywhere]">{p.name}</p>
         </div>
         <label className="block"><span className={field}>Street Address</span><input value={address} onChange={e => setAddress(e.target.value)} required maxLength={250} className={inputCls} /></label>
@@ -823,10 +823,10 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
         </div>
         <label className="block"><span className={field}>Operational Opening Hours</span><input value={hours} onChange={e => setHours(e.target.value)} maxLength={120} placeholder="e.g. Mon–Sat 9am–10pm" className={inputCls} /></label>
         <fieldset className="border border-slate-200 p-4 rounded-none bg-slate-50">
-          <legend className="text-[10px] font-black uppercase tracking-wider text-slate-700 px-1.5 bg-white border border-slate-200">Dispensing Services Available</legend>
+          <legend className="text-xs font-black uppercase tracking-wider text-slate-700 px-1.5 bg-white border border-slate-200">Dispensing Services Available</legend>
           <div className="flex flex-wrap gap-x-5 gap-y-2.5 pt-1">
             {SERVICES.map(s => (
-              <label key={s} className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-800 cursor-pointer">
+              <label key={s} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-800 cursor-pointer">
                 <input type="checkbox" checked={services.includes(s)} onChange={e => setServices(prev => e.target.checked ? [...prev, s] : prev.filter(x => x !== s))} className="h-4 w-4 rounded-none accent-[color:var(--t-600)]" />
                 {s}
               </label>
@@ -834,20 +834,20 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
           </div>
         </fieldset>
         <fieldset className="border border-slate-200 p-4 rounded-none bg-slate-50">
-          <legend className="text-[10px] font-black uppercase tracking-wider text-slate-700 px-1.5 bg-white border border-slate-200">Home delivery partners (Malaysia)</legend>
+          <legend className="text-xs font-black uppercase tracking-wider text-slate-700 px-1.5 bg-white border border-slate-200">Home delivery partners (Malaysia)</legend>
           <div className="flex flex-wrap gap-x-5 gap-y-2.5 pt-1">
             {([['pharmacy_courier', 'Own rider'], ['grab', 'Grab'], ['lalamove', 'Lalamove'], ['other_courier', 'Other courier']] as const).map(([id, label]) => (
-              <label key={id} className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-800 cursor-pointer">
+              <label key={id} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-800 cursor-pointer">
                 <input type="checkbox" checked={deliveryMethods.includes(id)} onChange={e => setDeliveryMethods(prev => e.target.checked ? [...prev, id] : prev.filter(x => x !== id))} className="h-4 w-4 rounded-none accent-[color:var(--t-600)]" />
                 {label}
               </label>
             ))}
           </div>
-          <label className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-800 cursor-pointer mt-3">
+          <label className="inline-flex items-center gap-2 text-sm font-semibold text-slate-800 cursor-pointer mt-3">
             <input type="checkbox" checked={coldChain} onChange={e => setColdChain(e.target.checked)} className="h-4 w-4 rounded-none accent-[color:var(--t-600)]" />
             We can deliver refrigerated (cold-chain) medicines such as insulin
           </label>
-          <p className="text-[11px] text-slate-500 mt-1">Delivery also needs "Home delivery" ticked above. Only tick cold chain if you have proper cold packs and handling.</p>
+          <p className="text-xs text-slate-500 mt-1">Delivery also needs "Home delivery" ticked above. Only tick cold chain if you have proper cold packs and handling.</p>
         </fieldset>
         <label className="block"><span className={field}>Insurance panel (comma-separated insurers)</span><input value={panel} onChange={e => setPanel(e.target.value)} maxLength={400} placeholder="e.g. AIA, Great Eastern, Allianz" className={inputCls} /></label>
         <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -860,11 +860,11 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
       <form onSubmit={changePw} className="bg-white border border-[color:var(--t-200)] rounded-none p-6 space-y-5 min-w-0">
         <div className="border-b border-slate-100 pb-3">
           <h2 className="text-sm font-black uppercase tracking-wider text-slate-800 flex items-center gap-2"><KeyRound className="h-4 w-4 text-[color:var(--t-600)]" /> Account Password & Access</h2>
-          <p className="text-[12px] text-slate-500 font-semibold mt-1 [overflow-wrap:anywhere]">Signed in as {me.account.email}. Updating your password terminates active sessions on external devices.</p>
+          <p className="text-xs text-slate-500 font-semibold mt-1 [overflow-wrap:anywhere]">Signed in as {me.account.email}. Updating your password terminates active sessions on external devices.</p>
         </div>
         <label className="block"><span className={field}>Current password</span><input type="password" value={cur} onChange={e => setCur(e.target.value)} required autoComplete="current-password" className={inputCls} /></label>
         <label className="block"><span className={field}>New password</span><input type="password" value={nw} onChange={e => setNw(e.target.value)} required minLength={8} autoComplete="new-password" className={inputCls} />
-          <span className="text-[11px] text-slate-500 font-semibold mt-1 block">At least 8 characters, combining uppercase, lowercase and numerals.</span></label>
+          <span className="text-xs text-slate-500 font-semibold mt-1 block">At least 8 characters, combining uppercase, lowercase and numerals.</span></label>
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <button type="submit" className={bannerPrimaryBtn}>Update Password</button>
           {pwMsg && <p role="status" className={`text-xs font-bold p-3 border rounded-none ${pwMsg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-300' : 'text-rose-900 bg-rose-50 border-rose-300'}`}>{pwMsg.text}</p>}

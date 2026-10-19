@@ -162,7 +162,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
                   {me?.online ? 'On Call & Accepting Patients' : 'You are Currently Offline'}
                 </span>
                 <span className="hidden sm:inline text-xs text-slate-400">·</span>
-                <span className="text-[11px] text-[color:var(--ink-2)] truncate">
+                <span className="text-xs text-[color:var(--ink-2)] truncate">
                   {me?.online
                     ? 'Incoming consults dispatch automatically. Keep this tab open.'
                     : 'While online, you are dispatched incoming telehealth consults. Keep this tab open for audio chimes.'}
@@ -172,28 +172,28 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
           </div>
 
           {/* Right: Inline Telemetry Strip */}
-          <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 shrink-0">
-            <dl className="flex items-center divide-x divide-[color:var(--t-200)] border border-[color:var(--t-200)] bg-[color:var(--t-50)]/70 shadow-2xs">
+          <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 w-full sm:w-auto sm:shrink-0">
+            <dl className="grid grid-cols-2 w-full sm:w-auto sm:flex items-center divide-x divide-[color:var(--t-200)] border border-[color:var(--t-200)] bg-[color:var(--t-50)]/70 shadow-2xs">
               <div className="px-3 py-1.5 text-center min-w-[68px]">
-                <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Waiting</dt>
+                <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">Waiting</dt>
                 <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
                   {me?.online ? String(offers.length) : '—'}
                 </dd>
               </div>
               <div className="px-3 py-1.5 text-center min-w-[82px]">
-                <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Committed</dt>
+                <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">Committed</dt>
                 <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
                   {roster.size}h / wk
                 </dd>
               </div>
               <div className="px-3 py-1.5 text-center min-w-[92px]">
-                <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Daily Window</dt>
+                <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">Daily Window</dt>
                 <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
                   {coveredHours} / 24 hrs
                 </dd>
               </div>
               <div className="px-3 py-1.5 text-center min-w-[92px]">
-                <dt className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Accrued Net</dt>
+                <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">Accrued Net</dt>
                 <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--t-700)] leading-tight">
                   {earnings ? fmtRM(earnings.totals.net) : '—'}
                 </dd>
@@ -216,7 +216,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
           {offers.length === 0 ? (
             <div className="p-8 text-center border border-dashed border-[color:var(--t-200)] bg-[color:var(--t-bg)]">
               <p className="text-xs font-bold text-slate-600">No patients waiting in queue right now.</p>
-              <p className="text-[11px] text-slate-500 mt-1">Keep this tab open; newly queued consults will alert immediately.</p>
+              <p className="text-xs text-slate-500 mt-1">Keep this tab open; newly queued consults will alert immediately.</p>
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -226,7 +226,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
                     <p className="text-xs font-extrabold text-rose-800 bg-rose-50 border border-rose-200 p-2 flex items-center gap-1.5"><AlertTriangle className="h-4 w-4 shrink-0" /> Red Flags: {o.redFlags.join(', ')}</p>
                   )}
                   <p className="text-sm font-semibold text-[color:var(--ink)] leading-snug line-clamp-3">"{o.symptoms}"</p>
-                  <div className="text-[11px] font-mono text-slate-600 border-t border-[color:var(--t-100)] pt-2 space-y-0.5">
+                  <div className="text-xs font-mono text-slate-600 border-t border-[color:var(--t-100)] pt-2 space-y-0.5">
                     <p><b className="text-[color:var(--ink)]">{o.patientFirstName}</b> · {o.mode.toUpperCase()}</p>
                     <p>Queued: {new Date(o.queuedAt).toLocaleTimeString()} · Payout: <b className="text-[color:var(--t-700)]">{formatMoney(o.fee)}</b></p>
                   </div>
@@ -261,7 +261,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
             <div role="tablist" aria-label="Day of the week" className="grid grid-cols-7 gap-1">
               {DAYS.map((d, day) => (
                 <button key={d} role="tab" aria-selected={mobileDay === day} onClick={() => setMobileDay(day)}
-                  className={`h-12 flex flex-col items-center justify-center text-[11px] font-bold border cursor-pointer ${mobileDay === day ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-600)]' : 'bg-white text-slate-700 border-slate-200'}`}>
+                  className={`h-12 flex flex-col items-center justify-center text-xs font-bold border cursor-pointer ${mobileDay === day ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-600)]' : 'bg-white text-slate-700 border-slate-200'}`}>
                   <span>{d.slice(0, 3)}</span><span className="tabular-nums opacity-80">{dayCount(day)}h</span>
                 </button>
               ))}
@@ -282,11 +282,11 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
           <div className="hidden sm:block overflow-x-auto">
             <div className="min-w-[640px] grid gap-[3px] items-center" style={{ gridTemplateColumns: 'auto repeat(24, minmax(0, 1fr)) auto' }}>
               <span />
-              {Array.from({ length: 24 }, (_, h) => <span key={h} className="text-[10px] font-semibold text-slate-500 text-center">{h}</span>)}
-              <span className="text-[10px] font-semibold text-slate-500 pl-2">Hrs</span>
+              {Array.from({ length: 24 }, (_, h) => <span key={h} className="text-xs font-semibold text-slate-500 text-center">{h}</span>)}
+              <span className="text-xs font-semibold text-slate-500 pl-2">Hrs</span>
               {DAYS.map((d, day) => (
                 <React.Fragment key={d}>
-                  <span className="pr-2 text-right text-[11px] font-bold text-slate-600">{d}</span>
+                  <span className="pr-2 text-right text-xs font-bold text-slate-600">{d}</span>
                   {Array.from({ length: 24 }, (_, h) => {
                     const on = roster.has(`${day}-${h}`);
                     return (
@@ -294,12 +294,12 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
                         className={`h-8 w-full cursor-pointer ${on ? 'bg-[color:var(--t-600)]' : 'bg-slate-100 hover:bg-slate-200'}`} />
                     );
                   })}
-                  <span className="pl-2 text-[11px] font-bold text-slate-600 tabular-nums">{dayCount(day)}</span>
+                  <span className="pl-2 text-xs font-bold text-slate-600 tabular-nums">{dayCount(day)}</span>
                 </React.Fragment>
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-4 text-[11px] text-slate-500">
+          <div className="flex items-center gap-4 text-xs text-slate-500">
             <span className="inline-flex items-center gap-1.5"><i className="inline-block h-3 w-3 bg-[color:var(--t-600)]" /> On call</span>
             <span className="inline-flex items-center gap-1.5"><i className="inline-block h-3 w-3 bg-slate-100 border border-slate-200" /> Not scheduled</span>
             {rosterDirty && <span className="font-bold text-amber-700">Unsaved changes</span>}
@@ -311,10 +311,10 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
             <h3 className="text-sm font-extrabold">Earnings</h3>
             <div className="grid grid-cols-3 gap-2 text-center">
               {[['Gross', earnings.totals.gross], [`Fee (${earnings.commissionPct}%)`, earnings.totals.fee], ['Net', earnings.totals.net]].map(([l, v]) => (
-                <div key={l as string} className="bg-slate-50 border border-slate-100 p-2.5"><p className="text-[10px] uppercase font-bold text-slate-500">{l}</p><p className="text-sm font-black tabular-nums">{fmtRM(v as number)}</p></div>
+                <div key={l as string} className="bg-slate-50 border border-slate-100 p-2.5"><p className="text-xs uppercase font-bold text-slate-500">{l}</p><p className="text-sm font-black tabular-nums">{fmtRM(v as number)}</p></div>
               ))}
             </div>
-            <p className="text-[11px] text-slate-500">Payouts are not automated yet; the board settles earnings manually.</p>
+            <p className="text-xs text-slate-500">Payouts are not automated yet; the board settles earnings manually.</p>
             {earnings.rows.length > 0 ? (
               <ul className="divide-y divide-slate-100 text-xs">
                 {earnings.rows.slice(0, 10).map((r: any) => (

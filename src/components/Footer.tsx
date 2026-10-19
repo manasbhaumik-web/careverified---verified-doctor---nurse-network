@@ -52,16 +52,16 @@ export default function Footer({
               <span className="font-display font-extrabold text-sm text-white tracking-tight">MedCred</span>
             </div>
             <span className="text-slate-600 hidden sm:inline">&bull;</span>
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 flex items-center gap-1.5">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 bg-emerald-400 animate-pulse shrink-0" />
               Act 586 Verified
             </span>
             <span className="text-slate-600 hidden sm:inline">&bull;</span>
-            <span className="text-[11px] text-slate-400">&copy; {currentYear} MedCred Healthcare Network Sdn Bhd</span>
+            <span className="text-xs text-slate-400">&copy; {currentYear} MedCred Healthcare Network Sdn Bhd</span>
           </div>
 
           {/* Right: Essential Legal Links, Emergency Dispatch & Sign Out */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-slate-400 justify-center">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-400 justify-center">
             <button type="button" onClick={() => openLegal('notice')} className="hover:text-white transition-colors cursor-pointer">
               Privacy Policy
             </button>
@@ -111,7 +111,7 @@ export default function Footer({
                 <Cross className="h-4 w-4" />
               </span>
               <span className="font-display font-black text-xl text-white tracking-tight">MedCred</span>
-              <span className="text-[9px] font-black uppercase tracking-widest bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 px-2 py-0.5">
+              <span className="text-xs font-black uppercase tracking-widest bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 px-2 py-0.5">
                 Registry v2.4
               </span>
             </div>
@@ -122,7 +122,7 @@ export default function Footer({
 
           {/* Column 2: Portals & Navigation (2 Cols) */}
           <div className="hidden md:block lg:col-span-2 space-y-3">
-            <h4 className="text-[11px] font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
+            <h4 className="text-xs font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
               Portal Lounges
             </h4>
             
@@ -167,7 +167,7 @@ export default function Footer({
 
           {/* Column 3: Verification & Registers (2 Cols) */}
           <div className="hidden md:block lg:col-span-2 space-y-3">
-            <h4 className="text-[11px] font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
+            <h4 className="text-xs font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
               Verification Hub
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
@@ -206,7 +206,7 @@ export default function Footer({
 
           {/* Column 4: Compliance & Medical Governance (2 Cols) */}
           <div className="hidden md:block lg:col-span-2 space-y-3">
-            <h4 className="text-[11px] font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
+            <h4 className="text-xs font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
               Governance & Law
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
@@ -221,23 +221,23 @@ export default function Footer({
 
           {/* Column 5: Headquarters & Session Desk (2 Cols) */}
           <div className="hidden md:block lg:col-span-2 space-y-3">
-            <h4 className="text-[11px] font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
+            <h4 className="text-xs font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
               Operational HQ
             </h4>
             <div className="text-xs text-slate-400 space-y-2.5">
               <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">Kuala Lumpur Center</span>
-                <p className="text-slate-300 text-[11px] leading-tight mt-0.5">
+                <span className="block text-xs uppercase font-bold text-slate-500">Kuala Lumpur Center</span>
+                <p className="text-slate-300 text-xs leading-tight mt-0.5">
                   Level 28, The Horizon, Bangsar South, 59200 Kuala Lumpur
                 </p>
               </div>
               <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">Registry Helpdesk</span>
-                <p className="text-slate-300 font-mono text-[11px]">registry@medcred.gov.my</p>
+                <span className="block text-xs uppercase font-bold text-slate-500">Registry Helpdesk</span>
+                <p className="text-slate-300 font-mono text-xs">registry@medcred.gov.my</p>
               </div>
               <div>
-                <span className="block text-[10px] uppercase font-bold text-slate-500">Audit Hours</span>
-                <p className="text-slate-300 text-[11px]">Mon-Sun: 08:00 - 22:00 MYT</p>
+                <span className="block text-xs uppercase font-bold text-slate-500">Audit Hours</span>
+                <p className="text-slate-300 text-xs">Mon-Sun: 08:00 - 22:00 MYT</p>
               </div>
             </div>
           </div>
@@ -246,13 +246,13 @@ export default function Footer({
 
 
         {/* ─── TIER 2: CLINICAL & REGULATORY DISCLAIMER CALLOUT ─── */}
-        <div className="bg-black/25 border border-[color:var(--t-800)] p-4 sm:p-5 text-[11px] leading-relaxed">
+        <div className="bg-black/25 border border-[color:var(--t-800)] p-4 sm:p-5 text-xs leading-relaxed">
           <div className="flex items-start gap-3">
             <span className="w-6 h-6 shrink-0 bg-[color:var(--t-600)]/20 border border-[color:var(--t-600)]/40 text-white flex items-center justify-center mt-0.5">
               <Cross className="h-3.5 w-3.5 text-[color:var(--t-200)]" />
             </span>
-            <p className="flex-1 text-[11px] text-slate-400 leading-relaxed">
-              <strong className="text-white uppercase tracking-wider text-[10px] mr-1.5 font-bold">
+            <p className="flex-1 text-xs text-slate-400 leading-relaxed">
+              <strong className="text-white uppercase tracking-wider text-xs mr-1.5 font-bold">
                 Medical Disclaimer:
               </strong>
               MedCred operates as an independent medical directory, credential validation authority, and tele-consultation facilitation network. It is not an acute emergency response dispatch. Medical opinions, diagnoses, and prescriptions issued through the platform are rendered solely by autonomous, board-verified practitioners who maintain active Annual Practising Certificates (APC) under the Malaysian Medical Council or Lembaga Jururawat Malaysia. In the event of an urgent or life-threatening emergency, immediately contact national dispatch services at <strong className="text-white font-bold">999</strong> (112 from a mobile phone) or present at the nearest accredited hospital casualty department.
@@ -283,7 +283,7 @@ export default function Footer({
               Bahasa Melayu
             </span>
             <span className="text-slate-700">|</span>
-            <span className="flex items-center gap-1.5 text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5">
+            <span className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5">
               <span className="w-1.5 h-1.5 bg-emerald-400 rounded-none animate-pulse" />
               MY-KUL-01
             </span>

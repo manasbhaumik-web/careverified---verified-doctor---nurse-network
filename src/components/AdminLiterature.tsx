@@ -4,7 +4,7 @@ import { BookOpenCheck, ExternalLink, RefreshCw, Search, FileText, Sparkles, Che
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
 const field = 'border border-slate-200 bg-white px-3 py-2 text-sm w-full focus:outline-none focus:border-[color:var(--t-600)]';
-const lab = 'text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
+const lab = 'text-xs font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '—');
 
 export type LitSubTab = 'queue' | 'factsheets' | 'discovery';
@@ -152,7 +152,7 @@ export default function AdminLiterature({
           msg.ok ? 'text-emerald-800 bg-emerald-50 border-emerald-200' : 'text-rose-700 bg-rose-50 border-rose-200'
         }`}>
           <span>{msg.text}</span>
-          <button onClick={() => setMsg(null)} className="text-[10px] uppercase font-mono font-bold text-slate-500 hover:text-slate-800 cursor-pointer ml-4">Dismiss</button>
+          <button onClick={() => setMsg(null)} className="text-xs uppercase font-mono font-bold text-slate-500 hover:text-slate-800 cursor-pointer ml-4">Dismiss</button>
         </p>
       )}
 
@@ -178,7 +178,7 @@ export default function AdminLiterature({
                   }`}
                 >
                   <span>{text}</span>
-                  <span className={`ml-1.5 px-1.5 py-0.5 rounded-none text-[10px] font-mono tabular-nums ${
+                  <span className={`ml-1.5 px-1.5 py-0.5 rounded-none text-xs font-mono tabular-nums ${
                     tab === id ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
                   }`}>
                     {counts[id] ?? 0}
@@ -204,7 +204,7 @@ export default function AdminLiterature({
             <div className="grid gap-4 xl:grid-cols-2 items-start">
               {items.map(p => (
                 <article key={p.id} className="bg-white border border-slate-200 p-5 space-y-3 min-w-0 rounded-none shadow-none hover:border-[color:var(--t-200)] transition-colors">
-                  <div className="flex flex-wrap gap-1.5 text-[10px] font-bold">
+                  <div className="flex flex-wrap gap-1.5 text-xs font-bold">
                     <span className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 text-[color:var(--t-700)]">{p.condition}</span>
                     {p.pubTypes.filter((t: string) => ['Systematic Review', 'Meta-Analysis', 'Randomized Controlled Trial', 'Practice Guideline', 'Guideline', 'Review'].includes(t)).map((t: string) => (
                       <span key={t} className="bg-slate-50 border border-slate-200 px-2 py-0.5">{t}</span>
@@ -225,7 +225,7 @@ export default function AdminLiterature({
                         <label className={lab} htmlFor={`tk-${p.id}`}>Key takeaway for patients (required, plain language)</label>
                         <textarea id={`tk-${p.id}`} className={field} rows={2} maxLength={400} value={takeaway[p.id] ?? ''} onChange={e => setTakeaway({ ...takeaway, [p.id]: e.target.value })}
                           placeholder="e.g. Higher long-term blood sugar was linked to a greater chance of heart failure in people with type 2 diabetes." />
-                        <p className="text-[11px] text-slate-500 mt-0.5">Say what the paper found, not what patients should do. Shown above the abstract. {(takeaway[p.id] ?? '').length}/400</p>
+                        <p className="text-xs text-slate-500 mt-0.5">Say what the paper found, not what patients should do. Shown above the abstract. {(takeaway[p.id] ?? '').length}/400</p>
                         <label className={`${lab} mt-2`} htmlFor={`tkms-${p.id}`}>Bahasa Malaysia version (optional, written or checked by a Malay speaker)</label>
                         <textarea id={`tkms-${p.id}`} className={field} rows={2} maxLength={400} value={takeawayMs[p.id] ?? ''} onChange={e => setTakeawayMs({ ...takeawayMs, [p.id]: e.target.value })} />
                       </div>
@@ -298,7 +298,7 @@ export default function AdminLiterature({
                 <li key={s.id} className="bg-white border border-slate-200 p-5 space-y-3 text-xs min-w-0 rounded-none shadow-none hover:border-[color:var(--t-200)] transition-colors">
                   <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                     <b className="text-sm font-black text-slate-900">{s.title}</b>
-                    <span className={`font-black uppercase text-[10px] px-2.5 py-0.5 border rounded-none ${
+                    <span className={`font-black uppercase text-xs px-2.5 py-0.5 border rounded-none ${
                       s.status === 'approved' ? 'text-emerald-700 border-emerald-200 bg-emerald-50' : 'text-slate-600 border-slate-200 bg-slate-50'
                     }`}>
                       {s.status} · {s.topic}
@@ -342,7 +342,7 @@ export default function AdminLiterature({
             <button onClick={recheck} disabled={busy || !(counts.approved > 0)} className="border border-slate-200 hover:bg-slate-50 text-xs font-bold uppercase tracking-wider px-4 py-2.5 cursor-pointer inline-flex items-center gap-2 disabled:opacity-50">
               <RefreshCw className="h-4 w-4 text-[color:var(--t-600)]" /> Retraction Monitor
             </button>
-            <p className="text-[11px] text-slate-500 font-semibold xl:col-span-2">
+            <p className="text-xs text-slate-500 font-semibold xl:col-span-2">
               National Library of Medicine query filtering: Systematic reviews, meta-analyses, randomized clinical trials, and practice guidelines with abstracts are fetched. Retracted publications are automatically flagged.
             </p>
           </section>
@@ -351,7 +351,7 @@ export default function AdminLiterature({
             <div className="flex flex-wrap items-end justify-between gap-3 border-b border-slate-100 pb-3">
               <div>
                 <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide">Automated Topic Ingestion Watchlist</h3>
-                <p className="text-[11px] text-slate-500 font-semibold mt-0.5">PubMed is polled weekly for these clinical conditions; incoming literature is routed to the Research Papers Queue for moderation.</p>
+                <p className="text-xs text-slate-500 font-semibold mt-0.5">PubMed is polled weekly for these clinical conditions; incoming literature is routed to the Research Papers Queue for moderation.</p>
               </div>
               <button onClick={runTopics} disabled={busy || topics.length === 0} className="border border-slate-200 hover:bg-slate-50 text-xs font-bold uppercase tracking-wider px-4 py-2 cursor-pointer inline-flex items-center gap-2 disabled:opacity-50">
                 <RefreshCw className="h-4 w-4 text-[color:var(--t-600)]" /> Sync Watchlist Now
@@ -363,7 +363,7 @@ export default function AdminLiterature({
               {topics.map(t => (
                 <li key={t.condition} className="inline-flex items-center gap-2 border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold rounded-none">
                   <b className="text-slate-800">{t.condition}</b>
-                  <span className="text-slate-500 text-[11px] font-mono">{t.lastRunAt ? `last synced ${when(t.lastRunAt)}, +${t.lastAdded ?? 0}` : 'pending initial sync'}</span>
+                  <span className="text-slate-500 text-xs font-mono">{t.lastRunAt ? `last synced ${when(t.lastRunAt)}, +${t.lastAdded ?? 0}` : 'pending initial sync'}</span>
                   <button onClick={() => removeTopic(t.condition)} aria-label={`Stop tracking ${t.condition}`} className="text-slate-400 hover:text-rose-700 cursor-pointer font-bold text-sm">×</button>
                 </li>
               ))}

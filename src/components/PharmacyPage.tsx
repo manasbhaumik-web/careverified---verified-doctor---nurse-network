@@ -625,7 +625,7 @@ export default function PharmacyPage() {
             </span>
             <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">
               MedCred<span className="text-[color:var(--t-600)]">.</span>
-              <span className="hidden sm:inline-block ml-2 text-[10px] font-mono font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
+              <span className="hidden sm:inline-block ml-2 text-xs font-mono font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
                 {tx.headerBadge}
               </span>
             </span>
@@ -665,14 +665,14 @@ export default function PharmacyPage() {
             <div className="grid lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-8 flex flex-col justify-center max-w-2xl">
                 <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     {tx.hero.tag}
                   </div>
                 </div>
 
                 <div className="min-h-[84px] sm:min-h-[96px] flex flex-col justify-center mt-3">
-                  <h1 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl xl:text-[42px] tracking-tight leading-[1.12] text-slate-900">
+                  <h1 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-[1.12] text-slate-900">
                     <span>{tx.hero.titleLead}</span>
                     <span className="text-[color:var(--t-600)]">{tx.hero.titleAccent}</span>
                   </h1>
@@ -698,15 +698,15 @@ export default function PharmacyPage() {
                 <div className="pt-4 grid grid-cols-3 gap-2 sm:gap-3 max-w-md">
                   <div className="bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] p-2 sm:p-2.5 text-center shadow-xs">
                     <div className="font-display font-black text-sm sm:text-base text-[color:var(--t-700)]">Act 366</div>
-                    <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider truncate">{tx.hero.trust1}</div>
+                    <div className="text-xs font-bold text-slate-600 uppercase tracking-wider truncate">{tx.hero.trust1}</div>
                   </div>
                   <div className="bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] p-2 sm:p-2.5 text-center shadow-xs">
                     <div className="font-display font-black text-sm sm:text-base text-[color:var(--t-700)]">QR E-Rx</div>
-                    <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider truncate">{tx.hero.trust2}</div>
+                    <div className="text-xs font-bold text-slate-600 uppercase tracking-wider truncate">{tx.hero.trust2}</div>
                   </div>
                   <div className="bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] p-2 sm:p-2.5 text-center shadow-xs">
                     <div className="font-display font-black text-sm sm:text-base text-[color:var(--t-700)]">RM 0</div>
-                    <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider truncate">{tx.hero.trust3}</div>
+                    <div className="text-xs font-bold text-slate-600 uppercase tracking-wider truncate">{tx.hero.trust3}</div>
                   </div>
                 </div>
               </div>
@@ -798,7 +798,7 @@ export default function PharmacyPage() {
                         <div className="w-10 h-10 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center text-[color:var(--t-700)] group-hover:bg-[color:var(--t-600)] group-hover:text-white transition-colors">
                           <IconComponent className="h-5 w-5" />
                         </div>
-                        <span className="text-[10px] font-mono font-extrabold uppercase px-2 py-0.5 bg-slate-50 border border-slate-200 text-slate-700">
+                        <span className="text-xs font-mono font-extrabold uppercase px-2 py-0.5 bg-slate-50 border border-slate-200 text-slate-700">
                           {c.badge}
                         </span>
                       </div>
@@ -808,7 +808,7 @@ export default function PharmacyPage() {
                       <p className="text-xs text-slate-600 mt-2 leading-relaxed">{c.desc[L]}</p>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[color:var(--t-700)]">
+                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[color:var(--t-700)]">
                       <span>{tx.capabilitiesFooterLabel}</span>
                       <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
                     </div>
@@ -850,7 +850,7 @@ export default function PharmacyPage() {
                         }`}
                       >
                         <div className="font-bold text-xs leading-snug">{t.name}</div>
-                        <div className="text-[11px] font-mono text-[color:var(--t-700)] mt-1">
+                        <div className="text-xs font-mono text-[color:var(--t-700)] mt-1">
                           ~RM {t.avgBasket} / {t.unit}
                         </div>
                       </button>
@@ -876,14 +876,14 @@ export default function PharmacyPage() {
                     onChange={e => setDailyRx(Number(e.target.value))}
                     className="w-full accent-[color:var(--t-600)] cursor-pointer"
                   />
-                  <div className="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
+                  <div className="flex justify-between text-xs font-mono text-slate-500 mt-1">
                     <span>5 Rx/day</span>
                     <span>35 Rx/day (Busy Community Branch)</span>
                     <span>100 Rx/day (High-Volume Hub)</span>
                   </div>
                 </div>
 
-                <p className="text-[11px] text-slate-500 italic leading-relaxed pt-2 border-t border-slate-200">
+                <p className="text-xs text-slate-500 italic leading-relaxed pt-2 border-t border-slate-200">
                   {tx.calculator.disclaimer}
                 </p>
               </div>
@@ -897,7 +897,7 @@ export default function PharmacyPage() {
                       {currentType.name}
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono font-extrabold uppercase px-2 py-0.5 bg-emerald-950 text-emerald-400 border border-emerald-800">
+                  <span className="text-xs font-mono font-extrabold uppercase px-2 py-0.5 bg-emerald-950 text-emerald-400 border border-emerald-800">
                     {tx.calculator.badgeActive}
                   </span>
                 </div>
@@ -910,7 +910,7 @@ export default function PharmacyPage() {
                     <div className="font-display font-black text-3xl sm:text-4xl text-white mt-1">
                       RM {monthlyGrossValue.toLocaleString()}
                     </div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">
+                    <div className="text-xs text-slate-400 mt-0.5">
                       ~{monthlyRxCount.toLocaleString()} {tx.calculator.estMonthlySub}
                     </div>
                   </div>
@@ -922,7 +922,7 @@ export default function PharmacyPage() {
                     <div className="font-display font-black text-2xl text-emerald-400 mt-1">
                       ~{monthlyHoursSaved} {tx.calculator.hoursPerMonth}
                     </div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">
+                    <div className="text-xs text-slate-400 mt-0.5">
                       {tx.calculator.timeSavedSub}
                     </div>
                   </div>
@@ -964,7 +964,7 @@ export default function PharmacyPage() {
                     <h3 className="font-display font-extrabold text-base text-slate-900 mt-2">{it.t}</h3>
                     <p className="text-xs text-slate-600 mt-2 leading-relaxed">{it.d}</p>
                   </div>
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1 text-[11px] font-bold text-slate-500">
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1 text-xs font-bold text-slate-500">
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> {tx.steps.mandateBadge}
                   </div>
                 </li>

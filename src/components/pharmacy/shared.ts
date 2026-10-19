@@ -13,5 +13,5 @@ export const btnPlain = `${btn} bg-white border-slate-300 text-slate-800 hover:b
 export const btnPrimary = `${btn} bg-[color:var(--t-600)] border-[color:var(--t-700)] text-white hover:bg-[color:var(--t-700)] active:bg-[color:var(--t-800)] shadow-none`;
 export const btnDanger = `${btn} bg-white border-rose-300 text-rose-700 hover:bg-rose-50 hover:border-rose-400 active:bg-rose-100`;
 
-export const fieldLabel = 'text-[10px] font-black uppercase tracking-wider text-slate-700 block mb-1.5';
+export const fieldLabel = 'text-xs font-black uppercase tracking-wider text-slate-700 block mb-1.5';
 

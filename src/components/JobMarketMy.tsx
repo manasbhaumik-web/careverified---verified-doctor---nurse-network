@@ -59,8 +59,8 @@ export function JobFormFields({ value, onChange, jobType }: { value: JobExtras; 
           <option value="">{value.sector === 'private' ? 'Choose a facility…' : 'Not in the register (shown as unchecked)'}</option>
           {employers.map(e => <option key={e.id} value={e.id}>{e.name} · {e.licenceOk ? 'licence checked' : 'licence NOT checked'}</option>)}
         </select>
-        {value.sector === 'private' && employers.length === 0 && <p className="text-[11px] text-amber-800 mt-1">Private-sector posts need a licensed facility you are assigned to. Ask an admin to add the facility and assign you (Medical tourism &gt; Facilities).</p>}
-        {emp && !emp.licenceOk && <p className="text-[11px] text-rose-700 mt-1">This facility's licence has not been checked or has expired, so it cannot advertise yet.</p>}
+        {value.sector === 'private' && employers.length === 0 && <p className="text-xs text-amber-800 mt-1">Private-sector posts need a licensed facility you are assigned to. Ask an admin to add the facility and assign you (Medical tourism &gt; Facilities).</p>}
+        {emp && !emp.licenceOk && <p className="text-xs text-rose-700 mt-1">This facility's licence has not been checked or has expired, so it cannot advertise yet.</p>}
       </div>
 
       <div>
@@ -127,7 +127,7 @@ export function JobFilters({ value, onChange }: { value: JobFilter; onChange: (v
 export function JobBadges({ job }: { job: any }) {
   const emp = job.employer;
   return (
-    <div className="flex flex-wrap gap-1.5 text-[10px] font-black uppercase tracking-wide">
+    <div className="flex flex-wrap gap-1.5 text-xs font-black uppercase tracking-wide">
       {job.sector && <span className="px-2 py-0.5 border border-slate-300 bg-slate-50 text-slate-700">{SECTOR_LABEL[job.sector] ?? job.sector}</span>}
       {job.state && <span className="px-2 py-0.5 border border-slate-300 bg-slate-50 text-slate-700">{job.state}</span>}
       {emp?.licenceOk

@@ -118,14 +118,14 @@ function ArticleBody({ text, lang }: { text: string; lang: string }) {
 
 function EvidenceBadge({ article }: { article: Article }) {
   if (!article.evidence) {
-    return <span className="text-[11px] font-bold text-slate-700 bg-slate-50 border border-slate-200 px-2.5 py-0.5">{article.draft ? 'Editorial draft' : 'Practitioner article'}</span>;
+    return <span className="text-xs font-bold text-slate-700 bg-slate-50 border border-slate-200 px-2.5 py-0.5">{article.draft ? 'Editorial draft' : 'Practitioner article'}</span>;
   }
   const tone = article.evidence.level === 'high'
     ? 'text-[color:var(--e-800)] bg-[color:var(--e-50)] border-[color:var(--e-200)]'
     : article.evidence.level === 'moderate'
       ? 'text-[color:var(--t-700)] bg-[color:var(--t-50)] border-[color:var(--t-200)]'
       : 'text-slate-700 bg-slate-50 border-slate-200';
-  return <span className={`text-[11px] font-bold border px-2.5 py-0.5 ${tone}`} title="Strength of evidence, from the paper's publication type">{article.evidence.label}</span>;
+  return <span className={`text-xs font-bold border px-2.5 py-0.5 ${tone}`} title="Strength of evidence, from the paper's publication type">{article.evidence.label}</span>;
 }
 
 function Takeaway({ text, ms, className = '' }: { text?: string | null; ms?: string | null; className?: string }) {
@@ -135,9 +135,9 @@ function Takeaway({ text, ms, className = '' }: { text?: string | null; ms?: str
   return (
     <div className={`bg-[color:var(--t-50)] border-l-4 border-[color:var(--t-600)] px-3 py-2 ${className}`}>
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[10px] font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">{lang === 'ms' ? 'Intipati utama' : 'Key takeaway'}</p>
+        <p className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">{lang === 'ms' ? 'Intipati utama' : 'Key takeaway'}</p>
         {ms && (
-          <span role="group" aria-label="Language" className="inline-flex text-[10px] font-bold">
+          <span role="group" aria-label="Language" className="inline-flex text-xs font-bold">
             {([['en', 'EN'], ['ms', 'BM']] as const).map(([id, label]) => (
               <button key={id} type="button" aria-pressed={lang === id} onClick={() => setLang(id)}
                 className={`px-1.5 py-0.5 border border-[color:var(--t-200)] cursor-pointer ${lang === id ? 'bg-[color:var(--t-600)] text-white' : 'bg-white text-[color:var(--ink)]'}`}>{label}</button>
@@ -145,7 +145,7 @@ function Takeaway({ text, ms, className = '' }: { text?: string | null; ms?: str
           </span>
         )}
       </div>
-      <p lang={lang === 'ms' ? 'ms' : 'en'} className="text-[13px] text-[color:var(--ink)] leading-snug mt-0.5">{shown}</p>
+      <p lang={lang === 'ms' ? 'ms' : 'en'} className="text-sm text-[color:var(--ink)] leading-snug mt-0.5">{shown}</p>
     </div>
   );
 }
@@ -169,7 +169,7 @@ function AuthorBadge({ article, large = false }: { article: Article; large?: boo
         </div>
       )}
       <div className="min-w-0">
-        <p className="text-[13px] font-semibold text-[color:var(--ink)] truncate">{article.authorName}</p>
+        <p className="text-sm font-semibold text-[color:var(--ink)] truncate">{article.authorName}</p>
         <p className="text-xs text-[color:var(--ink-2)] truncate">
           {article.authorTitle}
           {article.authorCredentialsVerified !== false && <span className="text-[color:var(--e-700)] font-semibold"> · Verified</span>}
@@ -433,11 +433,11 @@ export default function MedicalLibrary({
           )}
           {(category !== ALL || source !== 'all' || evidence !== 'all' || onlySaved || query) && (
             <button type="button" onClick={() => { setCategory(ALL); setSource('all'); setEvidence('all'); setOnlySaved(false); setQuery(''); }}
-              className="min-h-[40px] px-3 text-[13px] font-bold text-[color:var(--t-700)] hover:underline cursor-pointer">
+              className="min-h-[40px] px-3 text-sm font-bold text-[color:var(--t-700)] hover:underline cursor-pointer">
               Clear filters
             </button>
           )}
-          <span className="ml-auto self-center text-[13px] text-slate-600 tabular-nums" aria-live="polite">{filtered.length} result{filtered.length === 1 ? '' : 's'}</span>
+          <span className="ml-auto self-center text-sm text-slate-600 tabular-nums" aria-live="polite">{filtered.length} result{filtered.length === 1 ? '' : 's'}</span>
         </div>
       </section>
 
@@ -447,7 +447,7 @@ export default function MedicalLibrary({
             <section aria-label={`${category} topic page`} className="bg-white border border-[color:var(--t-200)] border-t-[3px] border-t-[color:var(--t-600)] p-5 space-y-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-[11px] font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">Topic</p>
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">Topic</p>
                   <h2 className="text-xl font-bold text-[color:var(--ink)] leading-tight">{category}</h2>
                   <p className="text-xs text-slate-600 mt-1">{hubArticles.length} article{hubArticles.length === 1 ? '' : 's'} in this topic{hubArticles.some(a => a.source) ? `, ${hubArticles.filter(a => a.source).length} research paper${hubArticles.filter(a => a.source).length === 1 ? '' : 's'}` : ''}</p>
                 </div>
@@ -456,7 +456,7 @@ export default function MedicalLibrary({
               {hubSheet && (
                 <div className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-4 space-y-2">
                   <h3 className="text-sm font-bold">About this condition</h3>
-                  <p className="text-[13px] leading-relaxed text-[color:var(--ink-2)]">{hubSheet.summary}</p>
+                  <p className="text-sm leading-relaxed text-[color:var(--ink-2)]">{hubSheet.summary}</p>
                   <a href={hubSheet.url} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-[color:var(--t-700)] inline-flex items-center gap-1 hover:underline">
                     Read more on MedlinePlus (U.S. National Library of Medicine) <ExternalLink className="h-3 w-3" />
                   </a>
@@ -474,7 +474,7 @@ export default function MedicalLibrary({
             <div className="bg-white border border-[color:var(--t-200)] p-12 text-center space-y-3">
               <BookOpen className="h-12 w-12 text-[color:var(--t-200)] mx-auto" />
               <h3 className="text-sm font-bold text-[color:var(--ink)]">{onlySaved ? 'No saved articles match' : 'No articles match your search'}</h3>
-              <p className="text-[13px] text-slate-600">{onlySaved ? 'Open an article and tap Save to keep it here.' : 'Try a different keyword or category.'}</p>
+              <p className="text-sm text-slate-600">{onlySaved ? 'Open an article and tap Save to keep it here.' : 'Try a different keyword or category.'}</p>
             </div>
           ) : (
             <>
@@ -487,8 +487,8 @@ export default function MedicalLibrary({
                 </div>
                 <div className="flex-[2_1_380px] min-w-0 p-6 flex flex-col gap-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-white bg-[color:var(--t-600)] px-2.5 py-1">Featured</span>
-                    <span className="text-[11px] font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-0.5">{featured.category}</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-white bg-[color:var(--t-600)] px-2.5 py-1">Featured</span>
+                    <span className="text-xs font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-0.5">{featured.category}</span>
                     <EvidenceBadge article={featured} />
                     <span className="text-xs text-slate-600">{featured.date} · {readingMinutes(featured)} min read</span>
                   </div>
@@ -500,7 +500,7 @@ export default function MedicalLibrary({
                     <button
                       type="button"
                       onClick={() => setOpenArticle(featured)}
-                      className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-[13px] font-bold flex items-center gap-2 transition-colors cursor-pointer"
+                      className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold flex items-center gap-2 transition-colors cursor-pointer"
                     >
                       Read article <ArrowRight className="h-3.5 w-3.5" />
                     </button>
@@ -510,20 +510,20 @@ export default function MedicalLibrary({
 
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-base font-bold text-[color:var(--ink)]">Latest articles</h2>
-                <span className="text-[13px] text-slate-600">Showing {filtered.length} article{filtered.length === 1 ? '' : 's'}</span>
+                <span className="text-sm text-slate-600">Showing {filtered.length} article{filtered.length === 1 ? '' : 's'}</span>
               </div>
 
               <section aria-label="Articles" className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {rest.map(art => (
                   <article key={art.id} className="bg-white border border-[color:var(--t-200)] shadow-xs hover:shadow-md hover:border-[color:var(--t-300)] transition-all p-5 flex flex-col gap-3">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[11px] font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-0.5">{art.category}</span>
+                      <span className="text-xs font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-0.5">{art.category}</span>
                       <span className="text-xs text-slate-600">{art.date}</span>
                     </div>
                     <div><EvidenceBadge article={art} /></div>
-                    <h3 className="text-[17px] font-bold text-[color:var(--ink)] leading-snug [overflow-wrap:anywhere]">{art.title}</h3>
+                    <h3 className="text-lg font-bold text-[color:var(--ink)] leading-snug [overflow-wrap:anywhere]">{art.title}</h3>
                     <Takeaway text={art.takeaway} ms={art.takeawayMs} />
-                    <p className={`text-[13px] text-[color:var(--ink-2)] leading-relaxed ${art.takeaway ? 'line-clamp-2' : 'line-clamp-3'}`}>{art.excerpt}</p>
+                    <p className={`text-sm text-[color:var(--ink-2)] leading-relaxed ${art.takeaway ? 'line-clamp-2' : 'line-clamp-3'}`}>{art.excerpt}</p>
                     <div className="mt-auto pt-3.5 border-t border-[color:var(--t-100)] flex flex-wrap items-center justify-between gap-2">
                       <AuthorBadge article={art} />
                       <span className="text-xs text-slate-600">{readingMinutes(art)} min read{art.citations?.length > 0 ? ` · ${art.citations.length} citation${art.citations.length === 1 ? '' : 's'}` : ''}</span>
@@ -531,7 +531,7 @@ export default function MedicalLibrary({
                     <button
                       type="button"
                       onClick={() => setOpenArticle(art)}
-                      className="min-h-[44px] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-[13px] font-semibold cursor-pointer"
+                      className="min-h-[44px] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-sm font-semibold cursor-pointer"
                     >
                       Read article
                     </button>
@@ -567,18 +567,18 @@ export default function MedicalLibrary({
               <ShieldCheck className="h-5 w-5 text-[color:var(--e-600)]" />
               <h2 className="text-base font-bold text-[color:var(--e-800)]">How articles are verified</h2>
             </div>
-            <p className="mt-2.5 text-[13px] leading-relaxed text-[color:var(--e-800)]">
+            <p className="mt-2.5 text-sm leading-relaxed text-[color:var(--e-800)]">
               Practitioner articles are written by authors checked against MMC and LJM registries. Research papers come from PubMed, are limited to reviews, trials and guidelines, are screened for retraction, and only appear after our medical board approves them. Each item links to its source so you can confirm the evidence yourself.
             </p>
           </section>
 
           <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
             <h2 className="text-base font-bold text-[color:var(--ink)]">Need to speak to a clinician?</h2>
-            <p className="text-[13px] leading-relaxed text-[color:var(--ink-2)]">Articles are for education. For personal medical advice, book a consultation.</p>
+            <p className="text-sm leading-relaxed text-[color:var(--ink-2)]">Articles are for education. For personal medical advice, book a consultation.</p>
             <button
               type="button"
               onClick={() => onFindDoctor()}
-              className="w-full min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-[13px] font-bold transition-colors cursor-pointer"
+              className="w-full min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold transition-colors cursor-pointer"
             >
               Find a doctor
             </button>
@@ -602,7 +602,7 @@ export default function MedicalLibrary({
             <div className="bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] p-5 flex items-start justify-between gap-4 shrink-0">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                  <span className="text-[11px] font-bold text-[color:var(--t-700)] bg-white border border-[color:var(--t-200)] px-2.5 py-0.5">{openArticle.category}</span>
+                  <span className="text-xs font-bold text-[color:var(--t-700)] bg-white border border-[color:var(--t-200)] px-2.5 py-0.5">{openArticle.category}</span>
                   <EvidenceBadge article={openArticle} />
                   <span className="text-xs text-slate-600">{openArticle.date}</span>
                 </div>
@@ -621,7 +621,7 @@ export default function MedicalLibrary({
             <div className="p-6 overflow-y-auto space-y-6 text-[color:var(--ink)]">
               <div className="flex items-center gap-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3.5">
                 <AuthorBadge article={openArticle} large />
-                <span className="ml-auto hidden sm:inline-flex items-center gap-1 text-[11px] font-bold text-[color:var(--e-800)] bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-2 py-1">
+                <span className="ml-auto hidden sm:inline-flex items-center gap-1 text-xs font-bold text-[color:var(--e-800)] bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-2 py-1">
                   <BadgeCheck className="h-3.5 w-3.5 text-[color:var(--e-600)]" /> {openArticle.source ? 'PubMed paper · board-approved' : openArticle.draft ? 'Draft · not yet doctor-reviewed' : 'Verified & accredited'}
                 </span>
               </div>
@@ -634,7 +634,7 @@ export default function MedicalLibrary({
                 </p>
               )}
               {openArticle.contentMs && (
-                <div role="group" aria-label="Reading language" className="flex gap-1 text-[11px] font-bold">
+                <div role="group" aria-label="Reading language" className="flex gap-1 text-xs font-bold">
                   {([['en', 'English'], ['ms', 'Bahasa Malaysia']] as const).map(([id, label]) => (
                     <button key={id} type="button" aria-pressed={readLang === id} onClick={() => setReadLang(id)}
                       className={`px-2.5 py-1 border cursor-pointer ${readLang === id ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-600)]' : 'bg-white text-[color:var(--ink)] border-[color:var(--t-200)]'}`}>{label}</button>
@@ -647,7 +647,7 @@ export default function MedicalLibrary({
               {openArticle.localBurden && openArticle.localBurden.facts.length > 0 && (
                 <section className="border border-sky-200 bg-sky-50/60 p-4 space-y-2" aria-label={ms ? 'Angka di Malaysia' : 'Malaysia in numbers'}>
                   <h3 className="text-sm font-bold text-[color:var(--ink)]">{ms ? 'Angka di Malaysia' : 'Malaysia in numbers'}</h3>
-                  <ul className="space-y-2 text-[13px] text-[color:var(--ink-2)] leading-relaxed">
+                  <ul className="space-y-2 text-sm text-[color:var(--ink-2)] leading-relaxed">
                     {openArticle.localBurden.facts.map((f, i) => (
                       <li key={i}>
                         {ms && f.textMs ? f.textMs : f.text}{' '}
@@ -672,7 +672,7 @@ export default function MedicalLibrary({
               {openArticle.citations?.length > 0 && (
                 <section className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-4 space-y-2">
                   <h3 className="text-sm font-bold text-[color:var(--ink)]">{openArticle.source ? 'Source' : 'Peer-reviewed citations'}</h3>
-                  <ol className="list-decimal list-inside space-y-1 text-[13px] text-[color:var(--ink-2)] leading-relaxed">
+                  <ol className="list-decimal list-inside space-y-1 text-sm text-[color:var(--ink-2)] leading-relaxed">
                     {openArticle.citations.map((cit, idx) => <li key={idx}>{cit}</li>)}
                   </ol>
                 </section>
@@ -683,11 +683,11 @@ export default function MedicalLibrary({
                   <h3 className="text-sm font-bold text-[color:var(--ink)]">Common questions</h3>
                   {openArticle.faq.map((f, idx) => (
                     <details key={idx} className="group border border-[color:var(--t-200)] bg-white">
-                      <summary className="min-h-[44px] px-4 py-3 text-[13px] font-semibold text-[color:var(--ink)] flex justify-between items-center cursor-pointer list-none">
+                      <summary className="min-h-[44px] px-4 py-3 text-sm font-semibold text-[color:var(--ink)] flex justify-between items-center cursor-pointer list-none">
                         {f.question}
                         <span className="text-[color:var(--t-600)] font-bold ml-3 group-open:rotate-45 transition-transform">+</span>
                       </summary>
-                      <p className="px-4 pb-4 text-[13px] leading-relaxed text-[color:var(--ink-2)] border-t border-[color:var(--t-100)] pt-3">{f.answer}</p>
+                      <p className="px-4 pb-4 text-sm leading-relaxed text-[color:var(--ink-2)] border-t border-[color:var(--t-100)] pt-3">{f.answer}</p>
                     </details>
                   ))}
                 </section>
@@ -720,8 +720,8 @@ export default function MedicalLibrary({
                   {related.map(r => (
                     <li key={r.id}>
                       <button type="button" onClick={() => setOpenArticle(r)} className="w-full text-left bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-2.5 cursor-pointer">
-                        <span className="block text-[11px] text-slate-500">{r.category}</span>
-                        <span className="text-[13px] font-semibold leading-snug line-clamp-2 [overflow-wrap:anywhere]">{r.title}</span>
+                        <span className="block text-xs text-slate-500">{r.category}</span>
+                        <span className="text-sm font-semibold leading-snug line-clamp-2 [overflow-wrap:anywhere]">{r.title}</span>
                       </button>
                     </li>
                   ))}
@@ -731,19 +731,19 @@ export default function MedicalLibrary({
 
             <div className="no-print border-t border-[color:var(--t-200)] p-4 flex flex-wrap gap-2.5 items-center shrink-0 bg-white">
               <button type="button" onClick={() => toggleSaved(openArticle.id)} aria-pressed={savedIds.includes(openArticle.id)}
-                className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-[13px] font-semibold inline-flex items-center gap-2 cursor-pointer">
+                className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-sm font-semibold inline-flex items-center gap-2 cursor-pointer">
                 <Bookmark className={`h-4 w-4 ${savedIds.includes(openArticle.id) ? 'fill-current text-[color:var(--t-600)]' : ''}`} /> {savedIds.includes(openArticle.id) ? 'Saved' : 'Save'}
               </button>
-              <button type="button" onClick={() => window.print()} className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-[13px] font-semibold inline-flex items-center gap-2 cursor-pointer">
+              <button type="button" onClick={() => window.print()} className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-sm font-semibold inline-flex items-center gap-2 cursor-pointer">
                 <Printer className="h-4 w-4" /> Print
               </button>
               {isPractitioner && (
-                <button type="button" onClick={() => setRecOpen(v => !v)} aria-expanded={recOpen} className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-[13px] font-semibold inline-flex items-center gap-2 cursor-pointer">
+                <button type="button" onClick={() => setRecOpen(v => !v)} aria-expanded={recOpen} className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-sm font-semibold inline-flex items-center gap-2 cursor-pointer">
                   <Send className="h-4 w-4" /> Recommend to a patient
                 </button>
               )}
               {onReportProblem && (
-                <button type="button" onClick={() => { const a = openArticle; setOpenArticle(null); onReportProblem(a); }} className="min-h-[44px] px-4 text-[13px] font-semibold text-slate-600 hover:text-rose-700 inline-flex items-center gap-2 cursor-pointer">
+                <button type="button" onClick={() => { const a = openArticle; setOpenArticle(null); onReportProblem(a); }} className="min-h-[44px] px-4 text-sm font-semibold text-slate-600 hover:text-rose-700 inline-flex items-center gap-2 cursor-pointer">
                   <Flag className="h-4 w-4" /> Report a problem
                 </button>
               )}
@@ -751,14 +751,14 @@ export default function MedicalLibrary({
               <button
                 type="button"
                 onClick={() => setOpenArticle(null)}
-                className="min-h-[44px] px-5 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-[13px] font-semibold cursor-pointer"
+                className="min-h-[44px] px-5 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-sm font-semibold cursor-pointer"
               >
                 Close
               </button>
               <button
                 type="button"
                 onClick={() => { const sp = specialtyFor(openArticle, professionals); setOpenArticle(null); onFindDoctor(sp ?? undefined); }}
-                className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-[13px] font-bold cursor-pointer"
+                className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold cursor-pointer"
               >
                 {(() => { const sp = specialtyFor(openArticle, professionals); return sp ? `Find a ${sp}` : 'Find a doctor'; })()}
               </button>

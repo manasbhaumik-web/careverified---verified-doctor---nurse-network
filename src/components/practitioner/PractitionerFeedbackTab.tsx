@@ -38,7 +38,7 @@ export default function PractitionerFeedbackTab({
       {/* Reviews Metric Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-[13px] font-semibold text-[color:var(--ink-2)] block">Overall Clinical Rating</span>
+          <span className="text-sm font-semibold text-[color:var(--ink-2)] block">Overall Clinical Rating</span>
           <div className="flex items-center gap-2">
             <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{avgOverall ?? "—"}</span>
             <div className="flex text-amber-400 shrink-0">
@@ -51,7 +51,7 @@ export default function PractitionerFeedbackTab({
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-[13px] font-semibold text-[color:var(--ink-2)] block">Bedside Manners</span>
+          <span className="text-sm font-semibold text-[color:var(--ink-2)] block">Bedside Manners</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgComm} / 5.0` : '—'}</span>
           <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
             <div className="bg-[color:var(--t-600)] h-full rounded-none" style={{ width: `${hasReviews ? (Number(avgComm)/5)*100 : 0}%` }}></div>
@@ -59,7 +59,7 @@ export default function PractitionerFeedbackTab({
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-[13px] font-semibold text-[color:var(--ink-2)] block">Clinic Punctuality</span>
+          <span className="text-sm font-semibold text-[color:var(--ink-2)] block">Clinic Punctuality</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgPunct} / 5.0` : '—'}</span>
           <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
             <div className="bg-[color:var(--t-600)] h-full rounded-none" style={{ width: `${hasReviews ? (Number(avgPunct)/5)*100 : 0}%` }}></div>
@@ -67,7 +67,7 @@ export default function PractitionerFeedbackTab({
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-[13px] font-semibold text-[color:var(--ink-2)] block">Care Satisfaction</span>
+          <span className="text-sm font-semibold text-[color:var(--ink-2)] block">Care Satisfaction</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgSatis} / 5.0` : '—'}</span>
           <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
             <div className="bg-[color:var(--t-600)] h-full rounded-none" style={{ width: `${hasReviews ? (Number(avgSatis)/5)*100 : 0}%` }}></div>
@@ -79,7 +79,7 @@ export default function PractitionerFeedbackTab({
       <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-xs space-y-5">
         <div className="border-b border-[color:var(--t-200)] pb-3">
           <h3 className="text-base font-bold text-[color:var(--ink)]">Patient Care Logbook</h3>
-          <p className="text-[11px] text-slate-500 font-medium mt-0.5">Below are verified experiences left by patients post-treatment.</p>
+          <p className="text-xs text-slate-500 font-medium mt-0.5">Below are verified experiences left by patients post-treatment.</p>
         </div>
 
         {myReviews.length === 0 ? (
@@ -105,10 +105,10 @@ export default function PractitionerFeedbackTab({
                         <div className="flex items-center gap-2">
                           <h4 className="text-sm font-extrabold text-slate-800">{rev.patientName}</h4>
                           {rev.isVerifiedPatient && (
-                            <span className="bg-[color:var(--t-50)]/50 text-[color:var(--t-600)] border border-[color:var(--t-200)] text-[8px] font-bold px-1.5 py-0.5 rounded-none uppercase tracking-wider">Verified Patient</span>
+                            <span className="bg-[color:var(--t-50)]/50 text-[color:var(--t-600)] border border-[color:var(--t-200)] text-xs font-bold px-1.5 py-0.5 rounded-none uppercase tracking-wider">Verified Patient</span>
                           )}
                         </div>
-                        <p className="text-[10px] text-slate-400 font-semibold font-mono tabular-nums">{rev.date}</p>
+                        <p className="text-xs text-slate-400 font-semibold font-mono tabular-nums">{rev.date}</p>
                       </div>
                     </div>
 
@@ -132,7 +132,7 @@ export default function PractitionerFeedbackTab({
                   {/* Reply Container */}
                   {rev.replyText ? (
                     <div className="bg-[color:var(--t-50)]/40 border border-[color:var(--t-200)]/60 p-4 rounded-none space-y-1 ml-4 sm:ml-8">
-                      <div className="flex items-center gap-2 text-[10px] font-black text-[color:var(--t-600)] uppercase tracking-wider">
+                      <div className="flex items-center gap-2 text-xs font-black text-[color:var(--t-600)] uppercase tracking-wider">
                         <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                         <span>Your Clinical Clarification Reply</span>
                       </div>
@@ -153,7 +153,7 @@ export default function PractitionerFeedbackTab({
                       ) : (
                         <div className="bg-slate-50 border border-[color:var(--t-200)] rounded-none p-4 space-y-3.5 animate-fade-in max-w-xl">
                           <div className="flex justify-between items-center border-b border-[color:var(--t-200)] pb-2">
-                            <span className="text-[10px] font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                            <span className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                               <Shield className="h-3.5 w-3.5 text-slate-500" />
                               Draft Practitioner Response
                             </span>
@@ -181,7 +181,7 @@ export default function PractitionerFeedbackTab({
                             <button
                               onClick={() => onPublishReply(rev.id)}
                               disabled={isReplying || !replyTextMap[rev.id]?.trim()}
-                              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] disabled:bg-slate-300 text-white text-[10px] font-extrabold py-2 px-4 rounded-none transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
+                              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-extrabold py-2 px-4 rounded-none transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
                             >
                               {isReplying ? (
                                 <Loader className="h-3 w-3 animate-spin" />

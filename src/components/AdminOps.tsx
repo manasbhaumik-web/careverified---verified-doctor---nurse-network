@@ -147,10 +147,10 @@ export default function AdminOps({
             >
               {t.label}
               {t.id === 'roster' && openSos.length > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 text-[10px] bg-rose-100 text-rose-700 font-mono font-bold rounded-none">{openSos.length}</span>
+                <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-rose-100 text-rose-700 font-mono font-bold rounded-none">{openSos.length}</span>
               )}
               {t.id === 'pharmacies' && pharmacies.length > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 text-[10px] bg-slate-100 text-slate-700 font-mono font-bold rounded-none">{pharmacies.length}</span>
+                <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-slate-100 text-slate-700 font-mono font-bold rounded-none">{pharmacies.length}</span>
               )}
             </button>
           ))}
@@ -186,7 +186,7 @@ export default function AdminOps({
             </div>
             {coverage && (
               <div className="overflow-x-auto">
-                <table className="text-[10px] border-separate border-spacing-0.5">
+                <table className="text-xs border-separate border-spacing-0.5">
                   <thead><tr><th />{Array.from({ length: 24 }, (_, h) => <th key={h} className="font-semibold text-slate-500 w-6">{h}</th>)}</tr></thead>
                   <tbody>
                     {coverage.grid.map((row: number[], d: number) => (
@@ -200,7 +200,7 @@ export default function AdminOps({
                     ))}
                   </tbody>
                 </table>
-                <p className="text-[11px] text-slate-500 mt-2">Red = nobody rostered, amber = a single doctor, green = two or more.</p>
+                <p className="text-xs text-slate-500 mt-2">Red = nobody rostered, amber = a single doctor, green = two or more.</p>
               </div>
             )}
           </section>
@@ -215,7 +215,7 @@ export default function AdminOps({
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-extrabold text-slate-900">30-Day Shift Fill Rate &amp; Locum Telemetry</h3>
-                    <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">Rolling Window</span>
+                    <span className="text-xs font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">Rolling Window</span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">Automated tracking of clinical shift placements across emergency departments and inpatient wards.</p>
                 </div>
@@ -231,24 +231,24 @@ export default function AdminOps({
             {/* Quick KPI cohort indicators */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">Total Staffed Hours</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">Total Staffed Hours</span>
                 <span className="text-base font-black text-slate-900 font-mono">3,072 hrs</span>
-                <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">+14% vs Prev Month</span>
+                <span className="text-xs text-emerald-700 font-bold block mt-0.5">+14% vs Prev Month</span>
               </div>
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">Avg Triage Dispatch</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">Avg Triage Dispatch</span>
                 <span className="text-base font-black text-slate-900 font-mono">4.2 mins</span>
-                <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">Target: &lt;10 mins</span>
+                <span className="text-xs text-emerald-700 font-bold block mt-0.5">Target: &lt;10 mins</span>
               </div>
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">Zero-Coverage Elimination</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">Zero-Coverage Elimination</span>
                 <span className="text-base font-black text-slate-900 font-mono">-84% gaps</span>
-                <span className="text-[10px] text-slate-600 font-medium block mt-0.5">Tier-1 coverage intact</span>
+                <span className="text-xs text-slate-600 font-medium block mt-0.5">Tier-1 coverage intact</span>
               </div>
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">On-Call Readiness</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">On-Call Readiness</span>
                 <span className="text-base font-black text-emerald-700 font-mono">99.1%</span>
-                <span className="text-[10px] text-slate-600 font-medium block mt-0.5">Emergency SOS active</span>
+                <span className="text-xs text-slate-600 font-medium block mt-0.5">Emergency SOS active</span>
               </div>
             </div>
 
@@ -257,11 +257,11 @@ export default function AdminOps({
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-slate-700">Daily Shift Fill Rate Progression (30 Days)</span>
                 {hoveredShiftDay ? (
-                  <span className="font-mono text-[11px] font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
+                  <span className="font-mono text-xs font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
                     Day {hoveredShiftDay}: {SHIFT_FILL_TREND[hoveredShiftDay - 1].rate}% Fill Rate · {SHIFT_FILL_TREND[hoveredShiftDay - 1].shiftsFilled}/{SHIFT_FILL_TREND[hoveredShiftDay - 1].shiftsPosted} Shifts Filled
                   </span>
                 ) : (
-                  <span className="text-[11px] text-slate-400">Hover over bars to inspect daily shift metrics</span>
+                  <span className="text-xs text-slate-400">Hover over bars to inspect daily shift metrics</span>
                 )}
               </div>
 
@@ -291,7 +291,7 @@ export default function AdminOps({
                   );
                 })}
               </div>
-              <div className="flex justify-between text-[10px] font-mono text-slate-400 px-1">
+              <div className="flex justify-between text-xs font-mono text-slate-400 px-1">
                 <span>30 Days Ago</span>
                 <span>15 Days Ago</span>
                 <span>Today</span>
@@ -312,7 +312,7 @@ export default function AdminOps({
             {payments && (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
-                  <thead><tr className="text-left text-[10px] uppercase text-slate-500"><th className="py-2 pr-3">When</th><th className="pr-3">Patient</th><th className="pr-3">For</th><th className="pr-3">Amount</th><th className="pr-3">Status</th><th /></tr></thead>
+                  <thead><tr className="text-left text-xs uppercase text-slate-500"><th className="py-2 pr-3">When</th><th className="pr-3">Patient</th><th className="pr-3">For</th><th className="pr-3">Amount</th><th className="pr-3">Status</th><th /></tr></thead>
                   <tbody>
                     {payments.rows.slice(0, 50).map((p: any) => (
                       <tr key={p.id} className="border-t border-slate-100">
@@ -340,7 +340,7 @@ export default function AdminOps({
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-extrabold text-slate-900">30-Day Rolling Escrow &amp; Settlement Telemetry</h3>
-                    <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">Audited Financials</span>
+                    <span className="text-xs font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">Audited Financials</span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">Automated reconciliation of platform escrow holds, locum doctor wages, and 8% facilitator commissions.</p>
                 </div>
@@ -356,24 +356,24 @@ export default function AdminOps({
             {/* Financial telemetry stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">Gross Facilitator GMV</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">Gross Facilitator GMV</span>
                 <span className="text-base font-black text-slate-900 font-mono">RM 48,250.00</span>
-                <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">142 total transactions</span>
+                <span className="text-xs text-emerald-700 font-bold block mt-0.5">142 total transactions</span>
               </div>
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">Platform Commission (8%)</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">Platform Commission (8%)</span>
                 <span className="text-base font-black text-[color:var(--t-700)] font-mono">RM 3,860.00</span>
-                <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">Realized net revenue</span>
+                <span className="text-xs text-emerald-700 font-bold block mt-0.5">Realized net revenue</span>
               </div>
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">Statutory SST Remitted</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">Statutory SST Remitted</span>
                 <span className="text-base font-black text-slate-800 font-mono">RM 308.80</span>
-                <span className="text-[10px] text-slate-600 font-medium block mt-0.5">Royal Malaysian Customs</span>
+                <span className="text-xs text-slate-600 font-medium block mt-0.5">Royal Malaysian Customs</span>
               </div>
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">Escrow Release Integrity</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">Escrow Release Integrity</span>
                 <span className="text-base font-black text-emerald-700 font-mono">100.0%</span>
-                <span className="text-[10px] text-slate-600 font-medium block mt-0.5">0 disputes · 0 chargebacks</span>
+                <span className="text-xs text-slate-600 font-medium block mt-0.5">0 disputes · 0 chargebacks</span>
               </div>
             </div>
 
@@ -382,11 +382,11 @@ export default function AdminOps({
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-slate-700">Daily Settlement Volume (30 Days)</span>
                 {hoveredSettlementDay ? (
-                  <span className="font-mono text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5">
+                  <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5">
                     Day {hoveredSettlementDay}: RM {SETTLEMENT_TREND[hoveredSettlementDay - 1].volume.toLocaleString()}.00 Gross · RM {SETTLEMENT_TREND[hoveredSettlementDay - 1].platformFee}.00 Facilitator Fee ({SETTLEMENT_TREND[hoveredSettlementDay - 1].transactions} txs)
                   </span>
                 ) : (
-                  <span className="text-[11px] text-slate-400">Hover over bars to inspect daily gross settlement amounts</span>
+                  <span className="text-xs text-slate-400">Hover over bars to inspect daily gross settlement amounts</span>
                 )}
               </div>
 
@@ -415,7 +415,7 @@ export default function AdminOps({
                   );
                 })}
               </div>
-              <div className="flex justify-between text-[10px] font-mono text-slate-400 px-1">
+              <div className="flex justify-between text-xs font-mono text-slate-400 px-1">
                 <span>30 Days Ago</span>
                 <span>15 Days Ago</span>
                 <span>Today</span>
@@ -445,7 +445,7 @@ export default function AdminOps({
             </div>
             <fieldset className="flex flex-wrap gap-x-4 gap-y-1 items-center">
               <legend className="sr-only">Services</legend>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Services</span>
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Services</span>
               {SERVICES.map(s => (
                 <label key={s} className="text-xs inline-flex items-center gap-1.5 cursor-pointer"><input type="checkbox" checked={newPharm.services.includes(s)} onChange={() => setNewPharm({ ...newPharm, services: toggleService(newPharm.services, s) })} /> {s}</label>
               ))}

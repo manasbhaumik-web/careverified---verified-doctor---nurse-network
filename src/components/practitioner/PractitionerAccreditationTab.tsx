@@ -31,7 +31,7 @@ export default function PractitionerAccreditationTab({
             <Award className="h-4.5 w-4.5 text-[color:var(--t-600)]" />
             National Network Accreditation
           </h3>
-          <p className="text-[11px] text-slate-500 font-medium">Official credential status verified with governmental boards.</p>
+          <p className="text-xs text-slate-500 font-medium">Official credential status verified with governmental boards.</p>
         </div>
 
         {isVerified ? (
@@ -50,12 +50,12 @@ export default function PractitionerAccreditationTab({
 
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-emerald-100/50 text-xs">
               <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">Registry Authority</span>
+                <span className="text-xs text-slate-400 font-bold uppercase block">Registry Authority</span>
                 <span className="font-extrabold text-slate-800 mt-0.5 block">{(matchedProfile as any).medicalCouncil || (matchedProfile as any).nursingCouncil || "National Council"}</span>
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">License Key Number</span>
-                <code className="font-mono font-bold text-[color:var(--t-600)] bg-[color:var(--t-50)]/50 px-2 py-0.5 rounded-none text-[11px] mt-0.5 inline-block">{matchedProfile.licenseNumber}</code>
+                <span className="text-xs text-slate-400 font-bold uppercase block">License Key Number</span>
+                <code className="font-mono font-bold text-[color:var(--t-600)] bg-[color:var(--t-50)]/50 px-2 py-0.5 rounded-none text-xs mt-0.5 inline-block">{matchedProfile.licenseNumber}</code>
               </div>
             </div>
           </div>
@@ -145,16 +145,16 @@ export default function PractitionerAccreditationTab({
           </div>
           <div className="space-y-2.5 text-xs">
             <div>
-              <span className="text-[10px] text-slate-400 font-bold block uppercase">Clinical Days</span>
+              <span className="text-xs text-slate-400 font-bold block uppercase">Clinical Days</span>
               <div className="flex flex-wrap gap-1 mt-1.5">
                 {matchedProfile.availability.days.map(d => (
-                  <span key={d} className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]/60 font-bold text-[10px] px-2 py-0.5 rounded-none">{d}</span>
+                  <span key={d} className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]/60 font-bold text-xs px-2 py-0.5 rounded-none">{d}</span>
                 ))}
               </div>
             </div>
             <div>
-              <span className="text-[10px] text-slate-400 font-bold block uppercase">Scheduling Blocks</span>
-              <div className="flex flex-col gap-1 mt-1.5 font-mono text-[11px] text-slate-600">
+              <span className="text-xs text-slate-400 font-bold block uppercase">Scheduling Blocks</span>
+              <div className="flex flex-col gap-1 mt-1.5 font-mono text-xs text-slate-600">
                 {matchedProfile.availability.slots.map(s => (
                   <div key={s} className="bg-slate-50 border border-[color:var(--t-200)] px-2 py-1 rounded-none">{s}</div>
                 ))}

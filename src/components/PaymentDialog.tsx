@@ -102,7 +102,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
         <dd className="text-xl font-black tabular-nums text-[color:var(--ink)] pt-1 border-t border-[color:var(--t-200)]">{formatMoney(b.amount)}</dd>
       </dl>
       {b.indicative.length > 0 && (
-        <p className="text-[10px] text-slate-500 pt-1">
+        <p className="text-xs text-slate-500 pt-1">
           Indicative: {b.indicative.map(i => `${i.currency} ${i.amount.toFixed(2)}`).join(' · ')}. Settled in Malaysian Ringgit.
         </p>
       )}
@@ -114,7 +114,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
       <div className="bg-white w-full max-w-lg border border-[color:var(--t-200)] shadow-2xl p-6 space-y-4 max-h-[92vh] overflow-y-auto">
         <div className="flex items-start justify-between gap-3 pb-3 border-b border-[color:var(--t-100)]">
           <div>
-            <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2 py-0.5 border border-[color:var(--t-200)] w-fit mb-1">
+            <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2 py-0.5 border border-[color:var(--t-200)] w-fit mb-1">
               <ShieldCheck className="h-3 w-3" />
               <span>PayNet &amp; Bank Negara Certified</span>
             </div>
@@ -155,7 +155,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
 
             {/* PAYMENT RAIL SELECTOR TABS */}
             <div>
-              <label className="block text-[11px] font-black uppercase tracking-wider text-slate-700 mb-2">
+              <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
                 Select Malaysian Payment Channel:
               </label>
               <div className="grid grid-cols-4 gap-1.5">
@@ -169,7 +169,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                   }`}
                 >
                   <Building2 className="h-4 w-4 text-emerald-700" />
-                  <span className="text-[11px] leading-tight">FPX Bank</span>
+                  <span className="text-xs leading-tight">FPX Bank</span>
                 </button>
 
                 <button
@@ -182,7 +182,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                   }`}
                 >
                   <QrCode className="h-4 w-4 text-rose-700" />
-                  <span className="text-[11px] leading-tight">DuitNow QR</span>
+                  <span className="text-xs leading-tight">DuitNow QR</span>
                 </button>
 
                 <button
@@ -195,7 +195,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                   }`}
                 >
                   <CreditCard className="h-4 w-4 text-sky-700" />
-                  <span className="text-[11px] leading-tight">Cards</span>
+                  <span className="text-xs leading-tight">Cards</span>
                 </button>
 
                 <button
@@ -208,7 +208,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                   }`}
                 >
                   <Wallet className="h-4 w-4 text-purple-700" />
-                  <span className="text-[11px] leading-tight">e-Wallet</span>
+                  <span className="text-xs leading-tight">e-Wallet</span>
                 </button>
               </div>
             </div>
@@ -218,12 +218,12 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
               <div className="space-y-3 p-3.5 bg-slate-50 border border-slate-200 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-slate-800">Direct FPX Online Banking</span>
-                  <span className="text-[10px] font-mono text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.2">
+                  <span className="text-xs font-mono text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.2">
                     17 Banks Connected
                   </span>
                 </div>
                 <div>
-                  <label htmlFor="fpx-bank-select" className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  <label htmlFor="fpx-bank-select" className="block text-xs font-semibold text-slate-700 mb-1">
                     Choose Bank:
                   </label>
                   <select
@@ -248,7 +248,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="fpx-buyer-email" className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  <label htmlFor="fpx-buyer-email" className="block text-xs font-semibold text-slate-700 mb-1">
                     FPX E-Receipt Email (Optional):
                   </label>
                   <input
@@ -260,7 +260,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                     className="w-full bg-white border border-slate-300 h-9 px-3 text-xs text-slate-800 focus:outline-none focus:border-[color:var(--t-600)]"
                   />
                 </div>
-                <p className="text-[10px] text-slate-500 leading-tight">
+                <p className="text-xs text-slate-500 leading-tight">
                   By clicking confirm, you will be redirected to your selected bank&apos;s FPX portal. Minimum transfer RM1.00.
                 </p>
               </div>
@@ -274,7 +274,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                     <span className="h-2 w-2 rounded-full bg-rose-600 animate-ping" />
                     <span className="font-black text-rose-950">DuitNow National QR Standard</span>
                   </div>
-                  <span className="text-[9px] font-mono font-bold text-rose-800 bg-rose-100 border border-rose-300 px-1.5 py-0.2">
+                  <span className="text-xs font-mono font-bold text-rose-800 bg-rose-100 border border-rose-300 px-1.5 py-0.2">
                     Instant Clearance
                   </span>
                 </div>
@@ -284,17 +284,17 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                     <div className="w-36 h-36 bg-slate-900 flex flex-col items-center justify-center p-2 text-white relative">
                       <div className="absolute inset-2 border-2 border-dashed border-rose-400 opacity-60 pointer-events-none" />
                       <QrCode className="h-24 w-24 text-white" />
-                      <span className="text-[9px] font-mono font-black text-rose-300 tracking-wider">DUITNOW QR</span>
+                      <span className="text-xs font-mono font-black text-rose-300 tracking-wider">DUITNOW QR</span>
                     </div>
                   </div>
                   <div className="text-center space-y-0.5">
                     <p className="text-xs font-black text-slate-900">Scan with ANY Banking App or E-Wallet</p>
-                    <p className="text-[10px] text-slate-500">
+                    <p className="text-xs text-slate-500">
                       Maybank MAE · CIMB OCTO · TNG eWallet · GrabPay · Boost · ShopeePay
                     </p>
                   </div>
                 </div>
-                <p className="text-[10px] text-slate-500 text-center">
+                <p className="text-xs text-slate-500 text-center">
                   Payment reference: <span className="font-mono font-bold text-slate-700">{paymentId}</span> (valid for 10 minutes)
                 </p>
               </div>
@@ -304,13 +304,13 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
             {activeRail === 'card' && (
               <div className="space-y-2.5 p-3.5 bg-slate-50 border border-slate-200 text-xs">
                 <span className="font-bold text-slate-800">Debit / Credit Card (3D Secure 2.0)</span>
-                <p className="text-[11px] text-slate-600">
+                <p className="text-xs text-slate-600">
                   Accepts Malaysian MyDebit, Visa, and Mastercard with OTP authentication.
                 </p>
                 <div className="flex gap-2">
-                  <span className="px-2 py-1 bg-white border border-slate-300 font-bold text-[10px] text-slate-700">Visa</span>
-                  <span className="px-2 py-1 bg-white border border-slate-300 font-bold text-[10px] text-slate-700">Mastercard</span>
-                  <span className="px-2 py-1 bg-white border border-slate-300 font-bold text-[10px] text-slate-700">MyDebit</span>
+                  <span className="px-2 py-1 bg-white border border-slate-300 font-bold text-xs text-slate-700">Visa</span>
+                  <span className="px-2 py-1 bg-white border border-slate-300 font-bold text-xs text-slate-700">Mastercard</span>
+                  <span className="px-2 py-1 bg-white border border-slate-300 font-bold text-xs text-slate-700">MyDebit</span>
                 </div>
               </div>
             )}
@@ -319,7 +319,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
             {activeRail === 'wallet' && (
               <div className="space-y-2.5 p-3.5 bg-slate-50 border border-slate-200 text-xs">
                 <span className="font-bold text-slate-800">E-Wallet Direct Checkout</span>
-                <p className="text-[11px] text-slate-600">
+                <p className="text-xs text-slate-600">
                   Direct debit from your GrabPay or Touch &apos;n Go eWallet balance with instant OTP confirmation.
                 </p>
               </div>
@@ -348,7 +348,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
               </button>
             )}
 
-            <div className="text-[10px] text-slate-500 pt-1 border-t border-slate-100 flex items-center justify-between">
+            <div className="text-xs text-slate-500 pt-1 border-t border-slate-100 flex items-center justify-between">
               <span>{b.policy.summary.slice(0, 75)}…</span>
               <span className="font-bold text-[color:var(--t-700)]">FSA 2013 Compliant</span>
             </div>

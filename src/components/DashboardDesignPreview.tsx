@@ -36,12 +36,12 @@ export default function DashboardDesignPreview() {
         </div>
 
         <div className="flex items-center gap-2 mt-1 sm:mt-0">
-          <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Switch Layout:</span>
+          <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400">Switch Layout:</span>
           <div className="flex items-center gap-1 bg-slate-900 p-0.5 border border-slate-800">
             <button
               type="button"
               onClick={() => setSample(1)}
-              className={`px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+              className={`px-2.5 py-1 text-xs font-bold transition-all cursor-pointer ${
                 sample === 1 ? 'bg-white text-slate-950 shadow-xs' : 'text-slate-300 hover:text-white'
               }`}
             >
@@ -50,7 +50,7 @@ export default function DashboardDesignPreview() {
             <button
               type="button"
               onClick={() => setSample(2)}
-              className={`px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+              className={`px-2.5 py-1 text-xs font-bold transition-all cursor-pointer ${
                 sample === 2 ? 'bg-white text-slate-950 shadow-xs' : 'text-slate-300 hover:text-white'
               }`}
             >
@@ -59,7 +59,7 @@ export default function DashboardDesignPreview() {
             <button
               type="button"
               onClick={() => setSample(3)}
-              className={`px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+              className={`px-2.5 py-1 text-xs font-bold transition-all cursor-pointer ${
                 sample === 3 ? 'bg-white text-slate-950 shadow-xs' : 'text-slate-300 hover:text-white'
               }`}
             >
@@ -84,10 +84,10 @@ export default function DashboardDesignPreview() {
               </svg>
             </div>
             <div className="leading-none">
-              <span className="font-display font-extrabold text-[22px] text-white tracking-tight block">
+              <span className="font-display font-extrabold text-xl text-white tracking-tight block">
                 MedCred<span className="text-white/80">.</span>
               </span>
-              <span className="text-[10px] font-mono font-bold text-white/90 uppercase tracking-[0.14em] block mt-1">
+              <span className="text-xs font-mono font-bold text-white/90 uppercase tracking-[0.14em] block mt-1">
                 Member Portal &bull; Act 586 Verified
               </span>
             </div>
@@ -115,7 +115,7 @@ export default function DashboardDesignPreview() {
                 </div>
                 <div className="text-left hidden xl:block leading-tight">
                   <p className="text-xs font-black text-white leading-none truncate max-w-[140px]">Ahmad Bin Razak</p>
-                  <p className="text-[10px] text-white/80 font-bold uppercase tracking-wider mt-0.5">
+                  <p className="text-xs text-white/80 font-bold uppercase tracking-wider mt-0.5">
                     Member Account
                   </p>
                 </div>
@@ -166,7 +166,7 @@ export default function DashboardDesignPreview() {
               >
                 <Video className={`h-4 w-4 shrink-0 transition-colors ${activeNav === 'consult' ? 'text-white' : 'text-white/70'}`} />
                 <span>Consult Now</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 bg-emerald-500 text-white">
+                <span className="text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 bg-emerald-500 text-white">
                   Live
                 </span>
               </button>
@@ -182,7 +182,7 @@ export default function DashboardDesignPreview() {
               >
                 <Pill className={`h-4 w-4 shrink-0 transition-colors ${activeNav === 'pharmacies' ? 'text-white' : 'text-white/70'}`} />
                 <span>Pharmacies</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 bg-white/20 text-white">
+                <span className="text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 bg-white/20 text-white">
                   3 Rx
                 </span>
               </button>
@@ -242,7 +242,7 @@ export default function DashboardDesignPreview() {
           </div>
 
           {/* Right: Registry live doctor telemetry indicator */}
-          <div className="hidden xl:flex items-center gap-2.5 self-center shrink-0 whitespace-nowrap bg-white/15 border-0 px-3.5 py-1.5 rounded-none text-[11px] font-extrabold text-white my-auto">
+          <div className="hidden xl:flex items-center gap-2.5 self-center shrink-0 whitespace-nowrap bg-white/15 border-0 px-3.5 py-1.5 rounded-none text-xs font-extrabold text-white my-auto">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
             <span>24/7 MMC Doctors On-Call</span>
           </div>
@@ -263,7 +263,7 @@ export default function DashboardDesignPreview() {
                   <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[color:var(--ink)]">
                     Ahmad Bin Razak
                   </h1>
-                  <span className="text-[10px] font-black uppercase px-2.5 py-0.5 bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] tracking-wider shadow-2xs">
+                  <span className="text-xs font-black uppercase px-2.5 py-0.5 bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] tracking-wider shadow-2xs">
                     EHR Verified Patient &bull; Act 586
                   </span>
                 </div>
@@ -284,15 +284,15 @@ export default function DashboardDesignPreview() {
               <div className="flex items-stretch bg-white border border-[color:var(--t-200)] h-11 shadow-2xs">
                 <div className="px-3.5 flex flex-col justify-center text-center border-r border-[color:var(--t-100)]">
                   <span className="text-base font-black leading-none text-[color:var(--ink)]">2</span>
-                  <span className="text-[9px] uppercase font-bold text-[color:var(--t-600)]">Upcoming</span>
+                  <span className="text-xs uppercase font-bold text-[color:var(--t-600)]">Upcoming</span>
                 </div>
                 <div className="px-3.5 flex flex-col justify-center text-center border-r border-[color:var(--t-100)]">
                   <span className="text-base font-black leading-none text-[color:var(--ink)]">3</span>
-                  <span className="text-[9px] uppercase font-bold text-[color:var(--t-600)]">Active Rx</span>
+                  <span className="text-xs uppercase font-bold text-[color:var(--t-600)]">Active Rx</span>
                 </div>
                 <div className="px-3.5 flex flex-col justify-center text-center">
                   <span className="text-base font-black leading-none text-[color:var(--ink)]">RM 250</span>
-                  <span className="text-[9px] uppercase font-bold text-[color:var(--t-600)]">Care Wallet</span>
+                  <span className="text-xs uppercase font-bold text-[color:var(--t-600)]">Care Wallet</span>
                 </div>
               </div>
 
@@ -322,7 +322,7 @@ export default function DashboardDesignPreview() {
           <button className="px-4 py-3.5 border-b border-[color:var(--t-600)] text-[color:var(--t-700)] font-extrabold flex items-center gap-2 whitespace-nowrap">
             <Calendar className="h-4 w-4 text-[color:var(--t-600)]" />
             <span>My Care & Appointments</span>
-            <span className="bg-[color:var(--t-600)] text-white text-[10px] px-1.5 py-0.2 rounded-full">2</span>
+            <span className="bg-[color:var(--t-600)] text-white text-xs px-1.5 py-0.2 rounded-full">2</span>
           </button>
           <button className="px-4 py-3.5 border-b border-transparent text-slate-600 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors flex items-center gap-2 whitespace-nowrap">
             <FolderHeart className="h-4 w-4 text-slate-400" />
@@ -331,7 +331,7 @@ export default function DashboardDesignPreview() {
           <button className="px-4 py-3.5 border-b-2 border-transparent text-slate-600 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors flex items-center gap-2 whitespace-nowrap">
             <Pill className="h-4 w-4 text-slate-400" />
             <span>Pharmacy & e-Prescriptions</span>
-            <span className="bg-slate-200 text-slate-700 text-[10px] px-1.5 py-0.2 rounded-full">3</span>
+            <span className="bg-slate-200 text-slate-700 text-xs px-1.5 py-0.2 rounded-full">3</span>
           </button>
           <button className="px-4 py-3.5 border-b-2 border-transparent text-slate-600 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors flex items-center gap-2 whitespace-nowrap">
             <Heart className="h-4 w-4 text-slate-400" />
@@ -352,47 +352,47 @@ export default function DashboardDesignPreview() {
             {/* Live Telemetry Strip HUD */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               <div className="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs">
-                <div className="flex items-center justify-between text-slate-500 text-[10px] font-black uppercase tracking-wider">
+                <div className="flex items-center justify-between text-slate-500 text-xs font-black uppercase tracking-wider">
                   <span>Blood Pressure</span>
                   <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 border border-emerald-200 font-bold">Optimal</span>
                 </div>
                 <div className="text-2xl font-black text-slate-900 mt-1 font-mono">
                   122/80 <span className="text-xs font-normal text-slate-500">mmHg</span>
                 </div>
-                <div className="text-[11px] text-slate-500 mt-1">Logged today, 8:15 AM via Omron Sync</div>
+                <div className="text-xs text-slate-500 mt-1">Logged today, 8:15 AM via Omron Sync</div>
               </div>
 
               <div className="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-emerald-600 shadow-2xs">
-                <div className="flex items-center justify-between text-slate-500 text-[10px] font-black uppercase tracking-wider">
+                <div className="flex items-center justify-between text-slate-500 text-xs font-black uppercase tracking-wider">
                   <span>Resting Heart Rate</span>
                   <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 border border-emerald-200 font-bold">Normal</span>
                 </div>
                 <div className="text-2xl font-black text-slate-900 mt-1 font-mono">
                   68 <span className="text-xs font-normal text-slate-500">BPM</span>
                 </div>
-                <div className="text-[11px] text-slate-500 mt-1">Cardiac rhythm regular &bull; Normal sinus</div>
+                <div className="text-xs text-slate-500 mt-1">Cardiac rhythm regular &bull; Normal sinus</div>
               </div>
 
               <div className="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-amber-500 shadow-2xs">
-                <div className="flex items-center justify-between text-slate-500 text-[10px] font-black uppercase tracking-wider">
+                <div className="flex items-center justify-between text-slate-500 text-xs font-black uppercase tracking-wider">
                   <span>Fasting Glucose</span>
                   <span className="text-amber-800 bg-amber-50 px-1.5 py-0.5 border border-amber-200 font-bold">Borderline</span>
                 </div>
                 <div className="text-2xl font-black text-slate-900 mt-1 font-mono">
                   5.8 <span className="text-xs font-normal text-slate-500">mmol/L</span>
                 </div>
-                <div className="text-[11px] text-slate-500 mt-1">Slight elevation &bull; Next HbA1c test Oct 22</div>
+                <div className="text-xs text-slate-500 mt-1">Slight elevation &bull; Next HbA1c test Oct 22</div>
               </div>
 
               <div className="bg-white border border-[color:var(--t-200)] p-4 border-l-4 border-l-[color:var(--t-600)] shadow-2xs">
-                <div className="flex items-center justify-between text-slate-500 text-[10px] font-black uppercase tracking-wider">
+                <div className="flex items-center justify-between text-slate-500 text-xs font-black uppercase tracking-wider">
                   <span>Oxygen (SpO2)</span>
                   <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 border border-emerald-200 font-bold">99%</span>
                 </div>
                 <div className="text-2xl font-black text-slate-900 mt-1 font-mono">
                   99 <span className="text-xs font-normal text-slate-500">%</span>
                 </div>
-                <div className="text-[11px] text-slate-500 mt-1">Excellent peripheral saturation</div>
+                <div className="text-xs text-slate-500 mt-1">Excellent peripheral saturation</div>
               </div>
             </div>
 
@@ -418,7 +418,7 @@ export default function DashboardDesignPreview() {
                     <div>
                       <div className="flex items-center gap-2">
                         <h3 className="font-extrabold text-base text-slate-900">Dr. Tan Wei Lun</h3>
-                        <span className="text-[10px] font-mono bg-white px-1.5 py-0.2 border border-slate-300 text-slate-700">MMC #48291</span>
+                        <span className="text-xs font-mono bg-white px-1.5 py-0.2 border border-slate-300 text-slate-700">MMC #48291</span>
                       </div>
                       <p className="text-xs text-slate-600 font-medium">Consultant Cardiologist &bull; Gleneagles Hospital KL</p>
                       <p className="text-xs font-extrabold text-[color:var(--t-700)] mt-1 flex items-center gap-1.5">
@@ -458,8 +458,8 @@ export default function DashboardDesignPreview() {
                   <div className="p-3 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-between gap-3">
                     <div>
                       <div className="font-extrabold text-xs text-slate-900">Amlodipine Besylate 5mg</div>
-                      <div className="text-[11px] text-slate-600">1 Tablet Daily &bull; Morning</div>
-                      <div className="text-[10px] text-emerald-700 font-bold mt-0.5">24 Days Supply Remaining</div>
+                      <div className="text-xs text-slate-600">1 Tablet Daily &bull; Morning</div>
+                      <div className="text-xs text-emerald-700 font-bold mt-0.5">24 Days Supply Remaining</div>
                     </div>
                     <button className="px-2.5 py-1.5 bg-white border border-[color:var(--t-200)] text-[color:var(--t-700)] font-extrabold text-xs hover:bg-[color:var(--t-100)] cursor-pointer whitespace-nowrap">
                       Refill
@@ -469,10 +469,10 @@ export default function DashboardDesignPreview() {
                   <div className="p-3 bg-white border border-[color:var(--t-200)] flex items-center justify-between gap-3">
                     <div>
                       <div className="font-extrabold text-xs text-slate-900">Atorvastatin Calcium 20mg</div>
-                      <div className="text-[11px] text-slate-600">1 Tablet Nightly &bull; Before sleep</div>
-                      <div className="text-[10px] text-slate-500 font-bold mt-0.5">Dispatched to Caring Pharmacy Bangsar</div>
+                      <div className="text-xs text-slate-600">1 Tablet Nightly &bull; Before sleep</div>
+                      <div className="text-xs text-slate-500 font-bold mt-0.5">Dispatched to Caring Pharmacy Bangsar</div>
                     </div>
-                    <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200 font-bold whitespace-nowrap">
+                    <span className="text-xs font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200 font-bold whitespace-nowrap">
                       READY FOR PICKUP
                     </span>
                   </div>
@@ -495,7 +495,7 @@ export default function DashboardDesignPreview() {
             <div className="border border-[color:var(--t-200)] shadow-xs bg-white p-6 space-y-6">
               <div className="border-b border-[color:var(--t-100)] pb-4 flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-0.5 border border-[color:var(--t-200)]">
+                  <span className="text-xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-0.5 border border-[color:var(--t-200)]">
                     ACTIVE EPISODE OF CARE
                   </span>
                   <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-1.5">
@@ -518,40 +518,40 @@ export default function DashboardDesignPreview() {
               {/* 5-Step Trajectory Stepper */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
                 <div className="p-3.5 bg-emerald-50 border-t-4 border-t-emerald-600 border border-emerald-200">
-                  <span className="text-[10px] font-black text-emerald-800 uppercase flex items-center gap-1">
+                  <span className="text-xs font-black text-emerald-800 uppercase flex items-center gap-1">
                     <CheckCircle2 className="h-3 w-3" /> Step 1 &bull; Complete
                   </span>
                   <p className="font-extrabold text-xs text-slate-900 mt-1">Discharge & e-Prescription</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5">Oct 02 &bull; Hospital Pharmacy</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Oct 02 &bull; Hospital Pharmacy</p>
                 </div>
 
                 <div className="p-3.5 bg-emerald-50 border-t-4 border-t-emerald-600 border border-emerald-200">
-                  <span className="text-[10px] font-black text-emerald-800 uppercase flex items-center gap-1">
+                  <span className="text-xs font-black text-emerald-800 uppercase flex items-center gap-1">
                     <CheckCircle2 className="h-3 w-3" /> Step 2 &bull; Complete
                   </span>
                   <p className="font-extrabold text-xs text-slate-900 mt-1">In-Home Wound Dressing</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5">Oct 06 &bull; LJM Nurse Visited</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Oct 06 &bull; LJM Nurse Visited</p>
                 </div>
 
                 <div className="p-3.5 bg-[color:var(--t-50)] border-t-4 border-t-[color:var(--t-600)] border border-[color:var(--t-200)] shadow-xs">
-                  <span className="text-[10px] font-black text-[color:var(--t-700)] uppercase flex items-center gap-1">
+                  <span className="text-xs font-black text-[color:var(--t-700)] uppercase flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-[color:var(--t-600)] animate-ping" />
                     Step 3 &bull; In Progress
                   </span>
                   <p className="font-extrabold text-xs text-slate-900 mt-1">Suture Line Teleconsult</p>
-                  <p className="text-[10px] text-slate-600 font-semibold mt-0.5">Tomorrow, 10:30 AM</p>
+                  <p className="text-xs text-slate-600 font-semibold mt-0.5">Tomorrow, 10:30 AM</p>
                 </div>
 
                 <div className="p-3.5 bg-slate-50 border-t-4 border-t-slate-300 border border-slate-200 opacity-60">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">Step 4 &bull; Pending</span>
+                  <span className="text-xs font-bold text-slate-500 uppercase">Step 4 &bull; Pending</span>
                   <p className="font-bold text-xs text-slate-700 mt-1">Physiotherapy Tele-Session</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5">Scheduled Oct 20</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Scheduled Oct 20</p>
                 </div>
 
                 <div className="p-3.5 bg-slate-50 border-t-4 border-t-slate-300 border border-slate-200 opacity-60">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">Step 5 &bull; Pending</span>
+                  <span className="text-xs font-bold text-slate-500 uppercase">Step 5 &bull; Pending</span>
                   <p className="font-bold text-xs text-slate-700 mt-1">Final Care Discharge Clearance</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5">Target Oct 28</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Target Oct 28</p>
                 </div>
               </div>
 
@@ -587,7 +587,7 @@ export default function DashboardDesignPreview() {
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2 py-0.5">RAPID TELEHEALTH</span>
+                    <span className="text-xs font-black uppercase tracking-widest bg-white/20 px-2 py-0.5">RAPID TELEHEALTH</span>
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
                   </div>
                   <h3 className="text-xl font-black mt-3">Connect to On-Call Doctor</h3>
@@ -601,7 +601,7 @@ export default function DashboardDesignPreview() {
               {/* Bento 2: Act 586 QR Health Pass */}
               <div className="p-5 bg-white border border-[color:var(--t-200)] flex flex-col justify-between h-56 shadow-2xs">
                 <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2 py-0.5 border border-[color:var(--t-200)]">
+                  <span className="text-xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2 py-0.5 border border-[color:var(--t-200)]">
                     ACT 586 STATUTORY COMPLIANCE
                   </span>
                   <h3 className="text-lg font-black text-slate-900 mt-2">Hospital Check-in QR Pass</h3>
@@ -615,7 +615,7 @@ export default function DashboardDesignPreview() {
               {/* Bento 3: Records Vault */}
               <div className="p-5 bg-white border border-[color:var(--t-200)] flex flex-col justify-between h-56 shadow-2xs">
                 <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+                  <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
                     CONCIERGE VAULT
                   </span>
                   <h3 className="text-lg font-black text-slate-900 mt-2">Medical Records Vault</h3>

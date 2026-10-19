@@ -75,7 +75,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
         id="tab-practitioner-help"
         aria-selected={helpActive}
         onClick={handleHelpClick}
-        className={`shrink-0 min-h-[48px] px-3.5 sm:px-4 text-[13px] flex items-center gap-2 cursor-pointer border-b transition-colors ${
+        className={`shrink-0 min-h-[48px] px-3.5 sm:px-4 text-sm flex items-center gap-2 cursor-pointer border-b transition-colors ${
           helpActive
             ? 'font-semibold text-[color:var(--t-700)] border-[color:var(--t-600)] bg-[color:var(--t-50)]/60'
             : 'font-medium text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
@@ -181,11 +181,11 @@ export default function PractitionerHeroBanner<T extends string = string>({
                   <span className="text-slate-400">&bull;</span>
                   <span className="font-mono text-[color:var(--ink-2)]">{profile.experienceYears} Years Exp.</span>
                   <span className="text-slate-400">&bull;</span>
-                  <span className="font-mono font-bold text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)] text-[10px] rounded-none shadow-2xs">
+                  <span className="font-mono font-bold text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)] text-xs rounded-none shadow-2xs">
                     {profile.licenseNumber}
                   </span>
                   <span className="text-slate-400">&bull;</span>
-                  <span className="font-mono text-slate-700 text-[10px] bg-white px-1.5 py-0.5 border border-slate-200 rounded-none">
+                  <span className="font-mono text-slate-700 text-xs bg-white px-1.5 py-0.5 border border-slate-200 rounded-none">
                     ID: {profile.id}
                   </span>
                   {isVerified && <span className="text-slate-400">&bull;</span>}
@@ -201,7 +201,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
                   {((profile as any).apcExpiry || (profile as any).licenseExpiry) && (
                     <>
                       <span className="text-slate-400">&bull;</span>
-                      <span className="font-mono text-[color:var(--ink-2)] text-[11px] font-semibold">
+                      <span className="font-mono text-[color:var(--ink-2)] text-xs font-semibold">
                         APC: {new Date((profile as any).apcExpiry || (profile as any).licenseExpiry).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </span>
                     </>
@@ -270,27 +270,27 @@ export default function PractitionerHeroBanner<T extends string = string>({
 
             <div className="space-y-4 text-xs font-semibold text-slate-600">
               <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-1.5">
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Clinical Philosophy</span>
+                <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Clinical Philosophy</span>
                 <p className="text-slate-700 leading-relaxed italic whitespace-pre-line">{profile.bio || "Patient-centered evidence-based clinical practice."}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Registration ID</span>
+                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">Registration ID</span>
                   <strong className="text-slate-800 font-extrabold">{profile.id}</strong>
                 </div>
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Consultation Fee</span>
+                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">Consultation Fee</span>
                   <strong className="text-slate-800 font-extrabold">RM {profile.fee || 150}</strong>
                 </div>
               </div>
 
               {(profile as any).certifications && (profile as any).certifications.length > 0 && (
                 <div className="space-y-1.5">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Verified Clinical Credentials</span>
+                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Verified Clinical Credentials</span>
                   <div className="flex flex-wrap gap-1.5">
                     {((profile as any).certifications as string[]).map(cert => (
-                      <span key={cert} className="bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-[10px] font-bold px-2.5 py-1 rounded-md">
+                      <span key={cert} className="bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold px-2.5 py-1 rounded-md">
                         {cert}
                       </span>
                     ))}
@@ -299,7 +299,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
               )}
 
               <div className="space-y-1">
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Clinical Center Address</span>
+                <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Clinical Center Address</span>
                 <p className="text-slate-800 font-bold">{profile.practiceAddress || "Beach Specialist Center"}, {profile.city || "Kuala Lumpur"}</p>
               </div>
             </div>

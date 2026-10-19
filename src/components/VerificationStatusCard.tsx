@@ -91,7 +91,7 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
         </div>
 
         {events.length > 0 && (
-          <ul className="flex flex-wrap gap-1.5 text-[11px]">
+          <ul className="flex flex-wrap gap-1.5 text-xs">
             {events.map((e: any, i: number) => (
               <li key={i} title={e.note || undefined} className="bg-white/70 border border-white rounded-lg px-2 py-1">
                 <span className="font-bold capitalize">{e.action.replace(/_/g, ' ')}</span> · {fmt(e.ts)}

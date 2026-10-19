@@ -745,7 +745,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
             </span>
             <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">
               MedCred<span className="text-[color:var(--t-600)]">.</span>
-              <span className="ml-2 text-[10px] font-mono font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
+              <span className="ml-2 text-xs font-mono font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
                 Practitioner Network
               </span>
             </span>
@@ -846,7 +846,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <div className="px-2 text-[11px] font-mono font-black text-slate-600">
+                <div className="px-2 text-xs font-mono font-black text-slate-600">
                   0{currentSlide + 1} / 0{tx.heroSlides.length}
                 </div>
                 <button
@@ -873,14 +873,14 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
               {/* Left Column: Dynamic Hero Content with Static Vertical Geometry */}
               <div className="lg:col-span-7 flex flex-col justify-center max-w-2xl">
                 <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     {activeSlide.tag}
                   </div>
                 </div>
 
                 <div className="min-h-[76px] sm:min-h-[88px] lg:min-h-[96px] flex flex-col justify-center mt-3">
-                  <h1 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl xl:text-[40px] tracking-tight leading-[1.12] text-slate-900 transition-all">
+                  <h1 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-[1.12] text-slate-900 transition-all">
                     <span>{activeSlide.titleLead}</span>
                     <span
                       className={
@@ -916,15 +916,15 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                 <div className="pt-4 grid grid-cols-3 gap-2 sm:gap-3 max-w-md">
                   <div className="bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] p-2 sm:p-2.5 text-center shadow-xs">
                     <div className="font-display font-black text-sm sm:text-base text-[color:var(--t-700)]">100%</div>
-                    <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider truncate">{activeSlide.trust1}</div>
+                    <div className="text-xs font-bold text-slate-600 uppercase tracking-wider truncate">{activeSlide.trust1}</div>
                   </div>
                   <div className="bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] p-2 sm:p-2.5 text-center shadow-xs">
                     <div className="font-display font-black text-sm sm:text-base text-[color:var(--t-700)]">RM 0</div>
-                    <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider truncate">{activeSlide.trust2}</div>
+                    <div className="text-xs font-bold text-slate-600 uppercase tracking-wider truncate">{activeSlide.trust2}</div>
                   </div>
                   <div className="bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] p-2 sm:p-2.5 text-center shadow-xs">
                     <div className="font-display font-black text-sm sm:text-base text-[color:var(--t-700)]">14-Day</div>
-                    <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider truncate">{activeSlide.trust3}</div>
+                    <div className="text-xs font-bold text-slate-600 uppercase tracking-wider truncate">{activeSlide.trust3}</div>
                   </div>
                 </div>
               </div>
@@ -956,7 +956,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
         <section aria-labelledby="steps-h" className="py-14 sm:py-20 border-b border-[color:var(--t-200)] bg-[color:var(--t-bg)]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="max-w-2xl mb-10">
-              <p className="text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
+              <p className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
                 <span className="w-2 h-2 bg-[color:var(--t-600)] inline-block" />
                 Accreditation Process
               </p>
@@ -974,7 +974,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                 >
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-[11px] font-mono font-extrabold text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)]">
+                      <span className="text-xs font-mono font-extrabold text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)]">
                         STEP 0{i + 1}
                       </span>
                       <span className="w-8 h-8 bg-[color:var(--t-50)] text-[color:var(--t-700)] flex items-center justify-center border border-[color:var(--t-200)]">
@@ -987,7 +987,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                     <h3 className="font-display font-extrabold text-base text-slate-900 leading-snug">{s.t}</h3>
                     <p className="text-sm text-slate-700 mt-2 leading-relaxed font-medium">{s.d}</p>
                   </div>
-                  <div className="mt-5 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-bold text-slate-500">
+                  <div className="mt-5 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-xs font-bold text-slate-500">
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
                     <span>Verified Council Gate</span>
                   </div>
@@ -1002,7 +1002,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
               <div className="max-w-2xl">
-                <p className="text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
+                <p className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
                   <span className="w-2 h-2 bg-[color:var(--t-600)] inline-block" />
                   Clinical Tools &amp; Procedures
                 </p>
@@ -1091,7 +1091,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                           <Icon className="h-5 w-5" />
                         </span>
                         <span
-                          className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 border ${
+                          className={`text-xs font-bold uppercase tracking-wider px-2 py-0.5 border ${
                             isNurseExclusive
                               ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                               : 'bg-slate-50 text-slate-600 border-slate-200'
@@ -1106,7 +1106,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                       <p className="text-sm text-slate-700 mt-2 leading-relaxed font-medium">{mod.d[L]}</p>
                     </div>
 
-                    <div className="mt-5 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-bold text-slate-600">
+                    <div className="mt-5 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-xs font-bold text-slate-600">
                       <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
                       <span>{mod.badge ?? 'Verified Platform Feature'}</span>
                     </div>
@@ -1121,7 +1121,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
         <section aria-labelledby="paid-h" className="py-14 sm:py-20 border-b border-[color:var(--t-200)] bg-[color:var(--t-bg)]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="max-w-2xl mb-8">
-              <p className="text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
+              <p className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
                 <span className="w-2 h-2 bg-[color:var(--t-600)] inline-block" />
                 Financial Clarity &amp; Payouts
               </p>
@@ -1158,7 +1158,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                             setCalcRole('doctor');
                             setFee(150);
                           }}
-                          className={`px-3 py-1 text-[11px] font-black transition-colors cursor-pointer ${
+                          className={`px-3 py-1 text-xs font-black transition-colors cursor-pointer ${
                             calcRole === 'doctor'
                               ? 'bg-[color:var(--t-600)] text-white shadow-xs'
                               : 'text-slate-600 hover:text-slate-900'
@@ -1172,7 +1172,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                             setCalcRole('nurse');
                             setFee(120);
                           }}
-                          className={`px-3 py-1 text-[11px] font-black transition-colors cursor-pointer ${
+                          className={`px-3 py-1 text-xs font-black transition-colors cursor-pointer ${
                             calcRole === 'nurse'
                               ? 'bg-emerald-700 text-white shadow-xs'
                               : 'text-slate-600 hover:text-slate-900'
@@ -1207,7 +1207,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
 
                     {/* Presets */}
                     <div className="flex items-center gap-2 pt-1 flex-wrap">
-                      <span className="text-[11px] font-semibold text-slate-500 mr-1">Presets:</span>
+                      <span className="text-xs font-semibold text-slate-500 mr-1">Presets:</span>
                       {calcRole === 'nurse'
                         ? [80, 120, 160, 220, 360].map(val => (
                             <button
@@ -1242,11 +1242,11 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                     {/* Breakdown */}
                     <div className="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 text-center">
                       <div className="p-2 bg-slate-50 border border-slate-100">
-                        <div className="text-[10px] font-bold text-slate-500 uppercase">Gross Fee</div>
+                        <div className="text-xs font-bold text-slate-500 uppercase">Gross Fee</div>
                         <div className="text-sm font-black text-slate-800 mt-0.5">RM {fee}.00</div>
                       </div>
                       <div className="p-2 bg-slate-50 border border-slate-100">
-                        <div className="text-[10px] font-bold text-slate-500 uppercase">MedCred ({pct ?? 15}%)</div>
+                        <div className="text-xs font-bold text-slate-500 uppercase">MedCred ({pct ?? 15}%)</div>
                         <div className="text-sm font-black text-slate-600 mt-0.5">RM {platformFee.toFixed(2)}</div>
                       </div>
                       <div
@@ -1257,7 +1257,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                         }`}
                       >
                         <div
-                          className={`text-[10px] font-black uppercase ${
+                          className={`text-xs font-black uppercase ${
                             calcRole === 'nurse' ? 'text-emerald-800' : 'text-[color:var(--t-700)]'
                           }`}
                         >
@@ -1332,7 +1332,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                 </div>
 
                 <div className="p-5 bg-white border border-slate-200 text-xs space-y-2.5 shadow-2xs">
-                  <div className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">
+                  <div className="font-bold text-slate-900 uppercase tracking-wider text-xs">
                     Malaysian Banking Partner Compatibility
                   </div>
                   <p className="text-slate-600 leading-relaxed font-medium">
@@ -1349,7 +1349,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
         <section aria-labelledby="checklists-h" className="py-14 sm:py-20 bg-white border-b border-[color:var(--t-200)]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="max-w-2xl mb-10">
-              <p className="text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
+              <p className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
                 <span className="w-2 h-2 bg-[color:var(--t-600)] inline-block" />
                 Council Verification Standards
               </p>
@@ -1409,7 +1409,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
         <section aria-labelledby="rules-h" className="py-14 sm:py-20 border-b border-[color:var(--t-200)] bg-[color:var(--t-bg)]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="max-w-3xl mb-8">
-              <p className="text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
+              <p className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
                 <span className="w-2 h-2 bg-[color:var(--t-600)] inline-block" />
                 Malaysian Medical Governance
               </p>

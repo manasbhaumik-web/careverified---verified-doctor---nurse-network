@@ -46,7 +46,7 @@ export default function LocaleSwitcher({ className = '', tone = 'light' }: Props
 
       {open && (
         <div className="absolute right-0 top-full mt-1.5 w-64 z-50 bg-white border border-[color:var(--t-200)] shadow-xl text-slate-800 rounded-none overflow-hidden panel-edge">
-          <p className="px-3.5 pt-3 pb-1.5 text-[10px] font-mono font-extrabold uppercase tracking-widest text-[color:var(--t-600)] bg-[color:var(--t-50)] border-b border-[color:var(--t-200)]">
+          <p className="px-3.5 pt-3 pb-1.5 text-xs font-mono font-extrabold uppercase tracking-widest text-[color:var(--t-600)] bg-[color:var(--t-50)] border-b border-[color:var(--t-200)]">
             {t('common.region')} · Audience Mode
           </p>
           <ul role="listbox" aria-label={t('common.region')} className="py-1 border-b border-slate-100">
@@ -56,7 +56,7 @@ export default function LocaleSwitcher({ className = '', tone = 'light' }: Props
                   className="w-full flex items-center justify-between gap-2.5 px-3.5 py-2 text-left hover:bg-[color:var(--t-50)] cursor-pointer">
                   <div>
                     <span className="block text-xs font-extrabold text-[color:var(--ink)]">{REGIONS[r].label} ({r})</span>
-                    <span className="block text-[11px] text-slate-500 font-medium">
+                    <span className="block text-xs text-slate-500 font-medium">
                       {r === 'MY' ? 'MyKad · Local MYR & FPX/DuitNow' : 'Passport · Medical Tourism & FX'}
                     </span>
                   </div>
@@ -65,7 +65,7 @@ export default function LocaleSwitcher({ className = '', tone = 'light' }: Props
               </li>
             ))}
           </ul>
-          <p className="px-3.5 pt-2.5 pb-1 text-[10px] font-mono font-extrabold uppercase tracking-widest text-slate-500">
+          <p className="px-3.5 pt-2.5 pb-1 text-xs font-mono font-extrabold uppercase tracking-widest text-slate-500">
             {t('common.language')}
           </p>
           <ul role="listbox" aria-label={t('common.language')} className="pb-1.5">

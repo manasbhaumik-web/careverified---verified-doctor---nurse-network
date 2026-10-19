@@ -68,7 +68,7 @@ export default function PrescriptionCancelModal({
               <Ban className="h-5 w-5" />
             </div>
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-800 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-none">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-rose-800 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-none">
                 Poisons Act 1952 Audit Revocation
               </span>
               <h2 id="cancel-rx-modal-title" className="text-sm font-black text-slate-900 mt-1">
@@ -108,7 +108,7 @@ export default function PrescriptionCancelModal({
           )}
 
           <div>
-            <label htmlFor="cancel-reason" className="text-[10px] font-black uppercase tracking-wider text-slate-700 block mb-1.5">
+            <label htmlFor="cancel-reason" className="text-xs font-black uppercase tracking-wider text-slate-700 block mb-1.5">
               Statutory Revocation Reason *
             </label>
             <select
@@ -126,7 +126,7 @@ export default function PrescriptionCancelModal({
           </div>
 
           <div>
-            <label htmlFor="cancel-notes" className="text-[10px] font-black uppercase tracking-wider text-slate-700 block mb-1.5">
+            <label htmlFor="cancel-notes" className="text-xs font-black uppercase tracking-wider text-slate-700 block mb-1.5">
               Clinical Context / Replacement Guidance (Optional)
             </label>
             <textarea

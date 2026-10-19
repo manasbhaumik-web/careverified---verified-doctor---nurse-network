@@ -67,9 +67,9 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
             ['Paid to you', s.paid, 'Sent to your bank so far'],
           ].map(([l, v, hint]) => (
             <div key={l as string} className="bg-white border border-[color:var(--t-200)] p-4">
-              <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-600">{l}</p>
+              <p className="text-xs font-extrabold uppercase tracking-wider text-slate-600">{l}</p>
               <p className="text-2xl font-black tabular-nums mt-1">{formatMoney(v as number)}</p>
-              <p className="text-[11px] text-slate-600 mt-1 leading-snug">{hint}</p>
+              <p className="text-xs text-slate-600 mt-1 leading-snug">{hint}</p>
             </div>
           ))}
         </section>
@@ -125,7 +125,7 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
           <h2 id="up-h" className="text-sm font-extrabold mb-3">Not yet paid out</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead><tr className="text-left text-[10px] uppercase text-slate-600"><th className="py-2 pr-3">Visit</th><th className="pr-3">Status</th><th className="text-right">You receive</th></tr></thead>
+              <thead><tr className="text-left text-xs uppercase text-slate-600"><th className="py-2 pr-3">Visit</th><th className="pr-3">Status</th><th className="text-right">You receive</th></tr></thead>
               <tbody>
                 {d.upcoming.map(u => (
                   <tr key={u.paymentId} className="border-t border-slate-100">
@@ -144,7 +144,7 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
               </tbody>
             </table>
           </div>
-          <p className="text-[11px] text-slate-600 mt-3">Amounts are your fee after the platform commission. Service tax is passed on and is not your income. No income tax is deducted from payouts. Speak to an accountant about your own tax.</p>
+          <p className="text-xs text-slate-600 mt-3">Amounts are your fee after the platform commission. Service tax is passed on and is not your income. No income tax is deducted from payouts. Speak to an accountant about your own tax.</p>
         </section>
       )}
 
@@ -154,11 +154,11 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
         {d.payouts.length === 0 ? <p className="text-xs text-slate-600">No payouts yet.</p> : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead><tr className="text-left text-[10px] uppercase text-slate-600"><th className="py-2 pr-3">Payout</th><th className="pr-3">Status</th><th className="pr-3">Bank</th><th className="pr-3">Reference</th><th className="pr-3 text-right">Amount</th><th><span className="sr-only">Statement</span></th></tr></thead>
+              <thead><tr className="text-left text-xs uppercase text-slate-600"><th className="py-2 pr-3">Payout</th><th className="pr-3">Status</th><th className="pr-3">Bank</th><th className="pr-3">Reference</th><th className="pr-3 text-right">Amount</th><th><span className="sr-only">Statement</span></th></tr></thead>
               <tbody>
                 {d.payouts.map(p => (
                   <tr key={p.id} className="border-t border-slate-100">
-                    <td className="py-2 pr-3 font-mono">{p.id}<span className="block text-[10px] text-slate-600 font-sans">{formatDate(p.paidOn ?? p.createdAt)}</span></td>
+                    <td className="py-2 pr-3 font-mono">{p.id}<span className="block text-xs text-slate-600 font-sans">{formatDate(p.paidOn ?? p.createdAt)}</span></td>
                     <td className="pr-3 font-bold">{p.status === 'pending' ? 'Being prepared' : p.status === 'paid' ? 'Paid' : p.status === 'failed' ? 'Could not be sent' : p.status}{p.failureReason ? <span className="block font-normal text-slate-700">{p.failureReason}</span> : null}</td>
                     <td className="pr-3">{p.bank}</td>
                     <td className="pr-3 font-mono">{p.reference ?? ''}</td>

@@ -88,7 +88,7 @@ export default function PractitionerBookingsTab({
                   <FileSignature className="h-5 w-5 text-[color:var(--t-600)]" />
                   <div>
                     <h4 className="text-sm font-black text-slate-900">Issue Doctor-Signed E-Prescription</h4>
-                    <p className="text-[10px] text-slate-500 font-medium">Medical Act 1971 &bull; Poisons Act 1952 Compliant</p>
+                    <p className="text-xs text-slate-500 font-medium">Medical Act 1971 &bull; Poisons Act 1952 Compliant</p>
                   </div>
                 </>
               ) : (
@@ -96,7 +96,7 @@ export default function PractitionerBookingsTab({
                   <ClipboardList className="h-5 w-5 text-emerald-600" />
                   <div>
                     <h4 className="text-sm font-black text-slate-900">Official Clinical Nursing Care & Procedure Log</h4>
-                    <p className="text-[10px] text-slate-500 font-medium">Lembaga Jururawat Malaysia (LJM) &bull; Nurses Act 1950</p>
+                    <p className="text-xs text-slate-500 font-medium">Lembaga Jururawat Malaysia (LJM) &bull; Nurses Act 1950</p>
                   </div>
                 </>
               )}
@@ -115,12 +115,12 @@ export default function PractitionerBookingsTab({
             <form onSubmit={onSubmitPrescription} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Patient Identity</span>
+                  <span className="text-xs text-slate-400 font-bold block uppercase">Patient Identity</span>
                   <strong className="text-slate-800 text-sm font-extrabold">{selectedBookingForPrescribe.patientName}</strong>
                   <p className="text-slate-500 font-semibold mt-0.5">ID Ref: {selectedBookingForPrescribe.patientId}</p>
                 </div>
                 <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Consultation Mode</span>
+                  <span className="text-xs text-slate-400 font-bold block uppercase">Consultation Mode</span>
                   <strong className="text-slate-800 font-extrabold">{selectedBookingForPrescribe.mode}</strong>
                   <p className="text-slate-500 font-semibold mt-0.5">Date: {selectedBookingForPrescribe.date} &bull; {selectedBookingForPrescribe.timeSlot}</p>
                 </div>
@@ -128,7 +128,7 @@ export default function PractitionerBookingsTab({
 
               {selectedBookingForPrescribe.symptoms && (
                 <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]/50 text-xs text-slate-600">
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase mb-1">Stated Symptoms at Booking</span>
+                  <span className="text-xs text-slate-400 font-bold block uppercase mb-1">Stated Symptoms at Booking</span>
                   "{selectedBookingForPrescribe.symptoms}"
                 </div>
               )}
@@ -173,7 +173,7 @@ export default function PractitionerBookingsTab({
 
               <div className="bg-slate-100 p-3 rounded-none border border-[color:var(--t-200)] flex gap-2.5 items-start">
                 <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <div className="text-[10px] text-slate-500 leading-relaxed font-semibold">
+                <div className="text-xs text-slate-500 leading-relaxed font-semibold">
                   By signing this e-prescription, you certify that you have reviewed the patient's record, performed clinical validation, and your digital MMC registration credentials will be embedded into the PDF slip.
                 </div>
               </div>
@@ -210,12 +210,12 @@ export default function PractitionerBookingsTab({
             <form onSubmit={handleNurseCareLogSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Patient Identity</span>
+                  <span className="text-xs text-slate-400 font-bold block uppercase">Patient Identity</span>
                   <strong className="text-slate-800 text-sm font-extrabold">{selectedBookingForPrescribe.patientName}</strong>
                   <p className="text-slate-500 font-semibold mt-0.5">ID Ref: {selectedBookingForPrescribe.patientId}</p>
                 </div>
                 <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Nursing Duty Mode</span>
+                  <span className="text-xs text-slate-400 font-bold block uppercase">Nursing Duty Mode</span>
                   <strong className="text-slate-800 font-extrabold">{selectedBookingForPrescribe.mode}</strong>
                   <p className="text-slate-500 font-semibold mt-0.5">Date: {selectedBookingForPrescribe.date} &bull; {selectedBookingForPrescribe.timeSlot}</p>
                 </div>
@@ -246,7 +246,7 @@ export default function PractitionerBookingsTab({
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   <div className="bg-white p-2 border border-slate-200">
-                    <span className="text-[9px] font-mono text-slate-400 uppercase block font-bold">Blood Pressure</span>
+                    <span className="text-xs font-mono text-slate-400 uppercase block font-bold">Blood Pressure</span>
                     <input
                       type="text"
                       value={nursingBp}
@@ -256,7 +256,7 @@ export default function PractitionerBookingsTab({
                     />
                   </div>
                   <div className="bg-white p-2 border border-slate-200">
-                    <span className="text-[9px] font-mono text-slate-400 uppercase block font-bold">Heart Rate (bpm)</span>
+                    <span className="text-xs font-mono text-slate-400 uppercase block font-bold">Heart Rate (bpm)</span>
                     <input
                       type="text"
                       value={nursingHr}
@@ -266,7 +266,7 @@ export default function PractitionerBookingsTab({
                     />
                   </div>
                   <div className="bg-white p-2 border border-slate-200">
-                    <span className="text-[9px] font-mono text-slate-400 uppercase block font-bold">SpO2 Oxygen (%)</span>
+                    <span className="text-xs font-mono text-slate-400 uppercase block font-bold">SpO2 Oxygen (%)</span>
                     <input
                       type="text"
                       value={nursingSpo2}
@@ -276,7 +276,7 @@ export default function PractitionerBookingsTab({
                     />
                   </div>
                   <div className="bg-white p-2 border border-slate-200">
-                    <span className="text-[9px] font-mono text-slate-400 uppercase block font-bold">Temperature (°C)</span>
+                    <span className="text-xs font-mono text-slate-400 uppercase block font-bold">Temperature (°C)</span>
                     <input
                       type="text"
                       value={nursingTemp}
@@ -303,7 +303,7 @@ export default function PractitionerBookingsTab({
 
               <div className="bg-emerald-50/60 p-3 rounded-none border border-emerald-200 flex gap-2.5 items-start">
                 <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <div className="text-[10px] text-emerald-900 leading-relaxed font-semibold">
+                <div className="text-xs text-emerald-900 leading-relaxed font-semibold">
                   By certifying this nursing care log, you verify under the <strong>Nurses Act 1950</strong> that all recorded vital signs and procedures were conducted in adherence with Malaysian Nursing Board (LJM) clinical standards.
                 </div>
               </div>
@@ -347,16 +347,16 @@ export default function PractitionerBookingsTab({
               <Ambulance className="h-4.5 w-4.5 text-rose-500 animate-bounce" />
               Urgent On-Call Emergency Center
             </h3>
-            <p className="text-[11px] text-slate-500 font-medium mt-0.5">Claim active emergency dispatch tickets requested by high-risk patients nearby.</p>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">Claim active emergency dispatch tickets requested by high-risk patients nearby.</p>
           </div>
-          <span className="bg-rose-50 text-rose-700 border border-rose-100 text-[9px] font-bold px-2 py-0.5 rounded-none uppercase tracking-wider animate-pulse">Live Radar Active</span>
+          <span className="bg-rose-50 text-rose-700 border border-rose-100 text-xs font-bold px-2 py-0.5 rounded-none uppercase tracking-wider animate-pulse">Live Radar Active</span>
         </div>
 
         {activeDispatches.length === 0 ? (
           <div className="text-center py-8 bg-slate-50 border border-dashed border-[color:var(--t-200)] rounded-none text-xs text-slate-500 space-y-2">
             <ShieldCheck className="h-8 w-8 text-slate-300 mx-auto" />
             <p className="font-bold">No Urgent Emergency Dispatches Pending</p>
-            <p className="text-[10px] text-slate-400 max-w-sm mx-auto">Standard municipal emergency channels are quiet. If an emergency is triggered by a nearby patient, it will instantly blink here.</p>
+            <p className="text-xs text-slate-400 max-w-sm mx-auto">Standard municipal emergency channels are quiet. If an emergency is triggered by a nearby patient, it will instantly blink here.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -372,11 +372,11 @@ export default function PractitionerBookingsTab({
                 }`}>
                   <div className="flex justify-between items-start">
                     <div className="space-y-0.5">
-                      <span className="bg-red-50 text-red-700 border border-red-100 text-[8px] font-black px-1.5 py-0.5 rounded-none uppercase tracking-wider">CRITICAL ALERT</span>
+                      <span className="bg-red-50 text-red-700 border border-red-100 text-xs font-black px-1.5 py-0.5 rounded-none uppercase tracking-wider">CRITICAL ALERT</span>
                       <h4 className="text-sm font-black text-slate-900">{dispatch.patientName}</h4>
-                      <p className="text-[10px] text-slate-400 font-semibold">{(dispatch as any).timestamp}</p>
+                      <p className="text-xs text-slate-400 font-semibold">{(dispatch as any).timestamp}</p>
                     </div>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-none ${
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-none ${
                       dispatch.dispatchStatus === 'Pending Dispatch'
                         ? 'bg-amber-100 text-amber-800'
                         : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'
@@ -393,7 +393,7 @@ export default function PractitionerBookingsTab({
                   <div className="flex justify-between items-center text-xs">
                     <span className="font-black text-rose-600">Base Compensation: RM 250</span>
                     {dispatch.etaMinutes ? (
-                      <span className="text-[10px] text-slate-400 font-mono font-bold">ETA: {dispatch.etaMinutes} mins</span>
+                      <span className="text-xs text-slate-400 font-mono font-bold">ETA: {dispatch.etaMinutes} mins</span>
                     ) : null}
                   </div>
 
@@ -401,7 +401,7 @@ export default function PractitionerBookingsTab({
                     {dispatch.dispatchStatus === 'Pending Dispatch' && (
                       <button
                         onClick={() => onUpdateDispatchStatus(dispatch.id, 'En-Route')}
-                        className="w-full bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-black py-2 rounded-none transition-all shadow-3xs cursor-pointer flex items-center justify-center gap-1.5"
+                        className="w-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-black py-2 rounded-none transition-all shadow-3xs cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         <Ambulance className="h-4 w-4" />
                         <span>CLAIM EMERGENCY TRANSIT</span>
@@ -411,7 +411,7 @@ export default function PractitionerBookingsTab({
                     {dispatch.dispatchStatus === 'En-Route' && isClaimedByMe && (
                       <button
                         onClick={() => onUpdateDispatchStatus(dispatch.id, 'Arrived')}
-                        className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-[11px] font-black py-2 rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                        className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black py-2 rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         <MapPin className="h-4 w-4" />
                         <span>MARK ARRIVED AT PATIENT</span>
@@ -421,7 +421,7 @@ export default function PractitionerBookingsTab({
                     {dispatch.dispatchStatus === 'Arrived' && isClaimedByMe && (
                       <button
                         onClick={() => onUpdateDispatchStatus(dispatch.id, 'Completed')}
-                        className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-[11px] font-black py-2 rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                        className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black py-2 rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         <CheckCircle2 className="h-4 w-4" />
                         <span>✅ COMPLETE CRITICAL CARE DISPATCH</span>
@@ -446,7 +446,7 @@ export default function PractitionerBookingsTab({
             <Calendar className="h-4.5 w-4.5 text-[color:var(--t-600)]" />
             {isDoc ? `Scheduled Doctor Consultations (${myBookings.length})` : `Scheduled Home Nursing Duties (${myBookings.length})`}
           </h3>
-          <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+          <p className="text-xs text-slate-500 font-medium mt-0.5">
             {isDoc
               ? "Review appointments booked by patients and generate doctor-signed e-prescriptions upon consultation completion."
               : "Review patient home nursing bookings, post-op visits, and record certified clinical nursing care logs."}
@@ -475,17 +475,17 @@ export default function PractitionerBookingsTab({
                       </div>
                       <div>
                         <h4 className="text-sm font-black text-slate-800">{booking.patientName}</h4>
-                        <p className="text-[10px] text-slate-400 font-semibold font-mono">ID Ref: {booking.patientId}</p>
+                        <p className="text-xs text-slate-400 font-semibold font-mono">ID Ref: {booking.patientId}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-slate-600 max-w-md bg-slate-50/50 p-2.5 rounded-none border border-[color:var(--t-200)]/50">
                       <div>
-                        <span className="text-[9px] text-slate-400 font-bold block uppercase">Date & Slot</span>
+                        <span className="text-xs text-slate-400 font-bold block uppercase">Date & Slot</span>
                         <span className="text-slate-800 font-extrabold">{booking.date}</span> &bull; <span className="font-mono text-slate-700 font-bold">{booking.timeSlot}</span>
                       </div>
                       <div>
-                        <span className="text-[9px] text-slate-400 font-bold block uppercase">Consultation Mode</span>
+                        <span className="text-xs text-slate-400 font-bold block uppercase">Consultation Mode</span>
                         <span className="text-slate-800 font-extrabold">{booking.mode}</span>
                       </div>
                     </div>
@@ -498,7 +498,7 @@ export default function PractitionerBookingsTab({
 
                     {booking.prescription && (
                       <div className="bg-emerald-50/30 border border-emerald-150 p-3 rounded-none text-xs space-y-1.5 max-w-xl">
-                        <div className="flex items-center gap-1.5 text-emerald-800 font-black text-[10px] uppercase tracking-wider">
+                        <div className="flex items-center gap-1.5 text-emerald-800 font-black text-xs uppercase tracking-wider">
                           <Check className="h-4 w-4 text-emerald-600" />
                           Issued Doctor E-Prescription
                         </div>
@@ -510,18 +510,18 @@ export default function PractitionerBookingsTab({
 
                     {booking.nursingCareLog && (
                       <div className="bg-emerald-50/40 border border-emerald-200 p-3 rounded-none text-xs space-y-2 max-w-xl">
-                        <div className="flex items-center justify-between text-emerald-900 font-black text-[10px] uppercase tracking-wider">
+                        <div className="flex items-center justify-between text-emerald-900 font-black text-xs uppercase tracking-wider">
                           <span className="flex items-center gap-1.5">
                             <Check className="h-4 w-4 text-emerald-600" />
                             Completed Nursing Care Log
                           </span>
-                          <span className="font-mono text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 border border-emerald-300">
+                          <span className="font-mono text-xs bg-emerald-100 text-emerald-800 px-1.5 py-0.5 border border-emerald-300">
                             LJM Certified
                           </span>
                         </div>
                         <p><strong className="text-slate-800 font-bold">Procedure:</strong> {booking.nursingCareLog.procedurePerformed}</p>
                         {booking.nursingCareLog.vitals && (
-                          <div className="flex flex-wrap gap-2 text-[10px] font-mono">
+                          <div className="flex flex-wrap gap-2 text-xs font-mono">
                             <span className="bg-white px-2 py-0.5 border border-emerald-200 text-slate-700 font-bold">BP: {booking.nursingCareLog.vitals.bloodPressure || 'N/A'}</span>
                             <span className="bg-white px-2 py-0.5 border border-emerald-200 text-slate-700 font-bold">HR: {booking.nursingCareLog.vitals.heartRate ? `${booking.nursingCareLog.vitals.heartRate} bpm` : 'N/A'}</span>
                             <span className="bg-white px-2 py-0.5 border border-emerald-200 text-slate-700 font-bold">SpO2: {booking.nursingCareLog.vitals.spO2 ? `${booking.nursingCareLog.vitals.spO2}%` : 'N/A'}</span>
@@ -535,11 +535,11 @@ export default function PractitionerBookingsTab({
 
                   <div className="flex flex-col items-start sm:items-end justify-between shrink-0 gap-3">
                     <div className="space-y-1 sm:text-right">
-                      <span className="text-[10px] text-slate-400 font-bold block uppercase">
+                      <span className="text-xs text-slate-400 font-bold block uppercase">
                         {isDoc ? "Consultation Fee" : "Nursing Fee"}
                       </span>
                       <span className="text-sm font-black text-slate-900">RM {booking.fee}</span>
-                      <span className={`block text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-none text-center border mt-1 ${
+                      <span className={`block text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-none text-center border mt-1 ${
                         isUpcoming
                           ? 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border-[color:var(--t-200)]'
                           : 'bg-emerald-50 text-emerald-700 border-emerald-100'
@@ -551,7 +551,7 @@ export default function PractitionerBookingsTab({
                     {isUpcoming && (
                       <button
                         onClick={() => onStartPrescription(booking)}
-                        className="text-white text-[10px] font-black py-2 px-4 rounded-none transition-all cursor-pointer flex items-center gap-1 shadow-3xs bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)]"
+                        className="text-white text-xs font-black py-2 px-4 rounded-none transition-all cursor-pointer flex items-center gap-1 shadow-3xs bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)]"
                       >
                         {isDoc ? (
                           <>

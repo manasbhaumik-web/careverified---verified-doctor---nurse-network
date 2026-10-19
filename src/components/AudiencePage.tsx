@@ -140,11 +140,11 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
 
           <div className={`relative z-10 ${wrap} w-full`}>
             <div className="max-w-2xl space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 {tx.hero.eyebrow}
               </div>
-              <h1 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-[1.1] text-slate-900">
+              <h1 className="font-display font-black text-3xl sm:text-4xl tracking-tight leading-[1.1] text-slate-900">
                 {renderAudienceHeroTitle(tx.hero.h1, L)}
               </h1>
               <p className="text-base sm:text-lg text-slate-700 font-medium leading-relaxed">

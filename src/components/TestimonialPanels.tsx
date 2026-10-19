@@ -58,7 +58,7 @@ export function TestimonialAdmin({ className = '' }: { className?: string } = {}
     <section className={`bg-white border border-slate-200 p-5 space-y-3 text-xs rounded-none ${className}`} aria-label="Patient Testimonials">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-extrabold text-slate-900">Patient Testimonials Moderation (Landing Page)</h3>
-        <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">{list.length} total</span>
+        <span className="text-xs font-mono font-bold text-slate-500 uppercase">{list.length} total</span>
       </div>
       {msg && <p className="font-bold text-sky-900 bg-sky-50 border border-sky-200 p-2 rounded-none" role="status">{msg}</p>}
       {list.length === 0 && <p className="text-slate-500">None yet. The home page shows this section only when at least one testimonial is approved.</p>}
@@ -66,7 +66,7 @@ export function TestimonialAdmin({ className = '' }: { className?: string } = {}
         <li key={t.id} className="border border-slate-200 p-3 space-y-2 bg-slate-50/50 rounded-none">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="font-bold text-slate-900">{t.name}{t.location ? ` · ${t.location}` : ''}{t.rating ? ` · ${t.rating}★` : ''}</span>
-            <span className={`text-[10px] font-black uppercase px-2 py-0.5 border rounded-none ${
+            <span className={`text-xs font-black uppercase px-2 py-0.5 border rounded-none ${
               t.status === 'approved' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
               t.status === 'rejected' ? 'bg-rose-50 text-rose-800 border-rose-200' :
               'bg-amber-50 text-amber-800 border-amber-200'
@@ -75,7 +75,7 @@ export function TestimonialAdmin({ className = '' }: { className?: string } = {}
             </span>
           </div>
           <p className="text-slate-700 italic">“{t.text}”</p>
-          <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">
+          <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-200/60">
             <span>Submitted {formatDate(t.createdAt)}</span>
             <div className="flex gap-2">
               {t.status !== 'approved' && (

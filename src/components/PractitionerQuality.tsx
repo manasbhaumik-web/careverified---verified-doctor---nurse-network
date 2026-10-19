@@ -6,7 +6,7 @@ import { BannerBadge } from './DashboardHeader';
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
 const field = 'border border-slate-200 bg-white px-3 py-2 text-sm w-full focus:outline-none focus:border-[color:var(--t-600)]';
-const lab = 'text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
+const lab = 'text-xs font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
 const day = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '—');
 
 async function uploadEvidence(file: File, kind: 'cpd' | 'certificate'): Promise<string | null> {
@@ -167,7 +167,7 @@ function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say:
       <section className="bg-white border border-slate-200 p-5">
         <h3 className="text-sm font-extrabold mb-2">Your CPD entries</h3>
         {cred.entries.length === 0 ? <p className="text-xs text-slate-500">None yet.</p> : (
-          <table className="w-full text-xs"><thead><tr className="text-left text-[10px] uppercase text-slate-500"><th className="py-1">Date</th><th>Activity</th><th>Points</th><th>Status</th><th /></tr></thead>
+          <table className="w-full text-xs"><thead><tr className="text-left text-xs uppercase text-slate-500"><th className="py-1">Date</th><th>Activity</th><th>Points</th><th>Status</th><th /></tr></thead>
             <tbody>{cred.entries.map((e: any) => (
               <tr key={e.id} className="border-t border-slate-100"><td className="py-1.5">{e.activity_date}</td><td>{e.title}<span className="text-slate-400"> · {e.category}</span>{e.review_note ? <span className="block text-rose-700">{e.review_note}</span> : null}</td><td className="tabular-nums">{e.points}</td>
                 <td className="font-bold">{e.status}</td>
@@ -215,7 +215,7 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
     <div className="grid gap-5 xl:grid-cols-2 items-start">
       <section className="bg-white border border-slate-200 p-5 space-y-2 min-w-0">
         <h3 className="text-sm font-extrabold">Cases for you to review</h3>
-        <p className="text-[11px] text-slate-500">Colleagues' work, with the patient and the author hidden. Treat what you read as confidential.</p>
+        <p className="text-xs text-slate-500">Colleagues' work, with the patient and the author hidden. Treat what you read as confidential.</p>
         {tasks.length === 0 ? <p className="text-xs text-slate-500">Nothing assigned.</p> : (
           <ul className="divide-y divide-slate-100 text-sm">{tasks.map(t => (
             <li key={t.id} className="py-2 flex justify-between gap-3"><span>{t.subject_type === 'prescription' ? 'Prescription' : 'Consultation note'} · assigned {day(t.assigned_at)}</span>
@@ -228,9 +228,9 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
         <section className="bg-white border-2 border-[color:var(--t-200)] p-5 space-y-3 xl:col-span-2">
           <h3 className="text-sm font-extrabold">{c?.kind ?? 'Case'}</h3>
           {c && <div className="text-sm space-y-1.5 bg-slate-50 border border-slate-200 p-3">
-            {'subjective' in c ? (['subjective', 'objective', 'assessment', 'plan'] as const).map(k => <p key={k}><span className="text-[10px] font-extrabold uppercase text-slate-500 mr-2">{k}</span>{c[k]}</p>) : (
+            {'subjective' in c ? (['subjective', 'objective', 'assessment', 'plan'] as const).map(k => <p key={k}><span className="text-xs font-extrabold uppercase text-slate-500 mr-2">{k}</span>{c[k]}</p>) : (
               <>
-                <p><span className="text-[10px] font-extrabold uppercase text-slate-500 mr-2">Diagnosis</span>{c.diagnosis}</p>
+                <p><span className="text-xs font-extrabold uppercase text-slate-500 mr-2">Diagnosis</span>{c.diagnosis}</p>
                 <ul className="list-disc ml-5">{c.items.map((i: any, k: number) => <li key={k}>{i.name} {i.strength} · {i.dose}, {i.frequency}, {i.durationDays} days, qty {i.quantity}</li>)}</ul>
                 <p className="text-xs">Patient record was {c.patientRecordWasShared ? 'shared' : 'NOT shared'} with the prescriber. Warnings raised: {c.safetyWarnings?.length ? c.safetyWarnings.map((w: any) => `${w.severity}: ${w.message}`).join(' | ') : 'none'}. {Object.keys(c.overrideReasons ?? {}).length ? `Override reasons: ${Object.values(c.overrideReasons).join(' | ')}` : ''}</p>
               </>
@@ -270,7 +270,7 @@ function IncidentSection({ say }: { say: (ok: boolean, t: string) => void }) {
     <div className="grid gap-5 xl:grid-cols-2 items-start">
       <form onSubmit={submit} className="bg-white border border-slate-200 p-5 space-y-3">
         <h3 className="text-sm font-extrabold">Report a patient-safety incident or near miss</h3>
-        <p className="text-[11px] text-slate-500">Reporting is how we learn. Do not include patient names; describe what happened. For anyone in immediate danger call 999 first.</p>
+        <p className="text-xs text-slate-500">Reporting is how we learn. Do not include patient names; describe what happened. For anyone in immediate danger call 999 first.</p>
         <div className="grid sm:grid-cols-2 gap-3">
           <div><label className={lab}>Type</label><select className={field} value={form.kind} onChange={e => setForm({ ...form, kind: e.target.value })}>
             <option value="near_miss">Near miss</option><option value="adverse_drug_event">Adverse drug event</option><option value="patient_harm">Patient harm</option><option value="misconduct">Misconduct</option><option value="privacy">Privacy or data issue</option><option value="system">Platform problem</option><option value="other">Other</option></select></div>

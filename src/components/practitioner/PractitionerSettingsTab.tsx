@@ -96,7 +96,7 @@ export default function PractitionerSettingsTab({
             <Edit className="h-4.5 w-4.5 text-[color:var(--t-600)]" />
             Registry Listing Configuration
           </h3>
-          <p className="text-[11px] text-slate-500 font-medium">Update the public information patients find when searching the registry.</p>
+          <p className="text-xs text-slate-500 font-medium">Update the public information patients find when searching the registry.</p>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-6">
@@ -114,7 +114,7 @@ export default function PractitionerSettingsTab({
                     setEditBio(prev => prev + " **Clinical Focus:** ");
                     showToast("Added Bold template");
                   }}
-                  className="p-1 hover:bg-white text-slate-600 hover:text-slate-900 rounded-none text-[10px] font-bold transition-colors flex items-center gap-0.5 cursor-pointer"
+                  className="p-1 hover:bg-white text-slate-600 hover:text-slate-900 rounded-none text-xs font-bold transition-colors flex items-center gap-0.5 cursor-pointer"
                   title="Add Bold section header"
                 >
                   <Bold className="h-3 w-3" />
@@ -127,7 +127,7 @@ export default function PractitionerSettingsTab({
                     setEditBio(prev => prev + " *[Patient Centered care]* ");
                     showToast("Added Italic template");
                   }}
-                  className="p-1 hover:bg-white text-slate-600 hover:text-slate-900 rounded-none text-[10px] font-bold transition-colors flex items-center gap-0.5 cursor-pointer"
+                  className="p-1 hover:bg-white text-slate-600 hover:text-slate-900 rounded-none text-xs font-bold transition-colors flex items-center gap-0.5 cursor-pointer"
                   title="Add Italic emphasis"
                 >
                   <Italic className="h-3 w-3" />
@@ -140,7 +140,7 @@ export default function PractitionerSettingsTab({
                     setEditBio(prev => prev + "\n- Pediatric Primary Care\n- Child Development Milestones");
                     showToast("Added Bullet List template");
                   }}
-                  className="p-1 hover:bg-white text-slate-600 hover:text-slate-900 rounded-none text-[10px] font-bold transition-colors flex items-center gap-0.5 cursor-pointer"
+                  className="p-1 hover:bg-white text-slate-600 hover:text-slate-900 rounded-none text-xs font-bold transition-colors flex items-center gap-0.5 cursor-pointer"
                   title="Add Bullet Points"
                 >
                   <List className="h-3 w-3" />
@@ -153,7 +153,7 @@ export default function PractitionerSettingsTab({
                     setEditBio(prev => prev + '\n> "My clinical philosophy is pediatric wellness."');
                     showToast("Added Quote template");
                   }}
-                  className="p-1 hover:bg-white text-slate-600 hover:text-slate-900 rounded-none text-[10px] font-bold transition-colors flex items-center gap-0.5 cursor-pointer"
+                  className="p-1 hover:bg-white text-slate-600 hover:text-slate-900 rounded-none text-xs font-bold transition-colors flex items-center gap-0.5 cursor-pointer"
                   title="Add Blockquote Quote"
                 >
                   <Quote className="h-3 w-3" />
@@ -166,7 +166,7 @@ export default function PractitionerSettingsTab({
                     setEditBio('');
                     showToast("Cleared biography");
                   }}
-                  className="p-1 hover:bg-rose-50 text-rose-600 hover:text-rose-700 rounded-none text-[10px] font-extrabold transition-colors cursor-pointer"
+                  className="p-1 hover:bg-rose-50 text-rose-600 hover:text-rose-700 rounded-none text-xs font-extrabold transition-colors cursor-pointer"
                 >
                   Clear
                 </button>
@@ -186,11 +186,11 @@ export default function PractitionerSettingsTab({
           {/* Medical Certifications Tag Manager */}
           <div className="space-y-2 pt-2 border-t border-[color:var(--t-200)]">
             <label className="block text-xs font-black text-slate-700">Active Medical Certifications</label>
-            <p className="text-[10px] text-slate-500 font-semibold">Verify specialized training tags displayed on your public patient card.</p>
+            <p className="text-xs text-slate-500 font-semibold">Verify specialized training tags displayed on your public patient card.</p>
 
             <div className="flex flex-wrap gap-1.5 mb-2">
               {certifications.map(cert => (
-                <span key={cert} className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] font-extrabold text-[11px] px-3 py-1.5 rounded-none flex items-center gap-1.5 shadow-3xs">
+                <span key={cert} className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] font-extrabold text-xs px-3 py-1.5 rounded-none flex items-center gap-1.5 shadow-3xs">
                   <span>{cert}</span>
                   <button
                     type="button"
@@ -215,7 +215,7 @@ export default function PractitionerSettingsTab({
                 placeholder="e.g. Advanced Pediatric Life Support"
                 value={newCert}
                 onChange={(e) => setNewCert(e.target.value)}
-                className="text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 flex-1 bg-white"
+                className="text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 flex-1 min-w-0 bg-white"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -226,7 +226,7 @@ export default function PractitionerSettingsTab({
               <button
                 type="button"
                 onClick={addCertification}
-                className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-[11px] font-extrabold px-4 py-2 rounded-none transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap"
+                className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-4 py-2 rounded-none transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add Tag
@@ -287,7 +287,7 @@ export default function PractitionerSettingsTab({
                 <Calendar className="h-4 w-4 text-[color:var(--t-600)]" />
                 Availability & Timeslot Configuration
               </h4>
-              <p className="text-[10px] text-slate-500 font-semibold mb-3">Define the days and times patients are allowed to book consultations with you.</p>
+              <p className="text-xs text-slate-500 font-semibold mb-3">Define the days and times patients are allowed to book consultations with you.</p>
             </div>
 
             <div>
@@ -306,7 +306,7 @@ export default function PractitionerSettingsTab({
                           setEditDays([...editDays, day]);
                         }
                       }}
-                      className={`text-[11px] font-bold py-1.5 px-3 rounded-none border transition-all cursor-pointer ${
+                      className={`text-xs font-bold py-1.5 px-3 rounded-none border transition-all cursor-pointer ${
                         isActive
                           ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-600)] shadow-3xs'
                           : 'bg-white text-slate-600 border-[color:var(--t-200)] hover:bg-slate-50'
@@ -327,12 +327,12 @@ export default function PractitionerSettingsTab({
                   placeholder="e.g. 10:00 AM"
                   value={newTimeSlot}
                   onChange={(e) => setNewTimeSlot(e.target.value)}
-                  className="text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-700 flex-1 bg-white"
+                  className="text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-700 flex-1 min-w-0 bg-white"
                 />
                 <button
                   type="button"
                   onClick={addTimeSlot}
-                  className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-[11px] font-bold px-4 py-2 rounded-none transition-all cursor-pointer flex items-center gap-1 shrink-0"
+                  className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-bold px-4 py-2 rounded-none transition-all cursor-pointer flex items-center gap-1 shrink-0"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Add Slot
@@ -341,7 +341,7 @@ export default function PractitionerSettingsTab({
 
               <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto p-1.5 bg-slate-50 border border-[color:var(--t-200)] rounded-none">
                 {editSlots.length === 0 ? (
-                  <span className="text-[10px] text-slate-400 font-semibold p-2">No custom scheduling slots configured. Click 'Add Slot' above.</span>
+                  <span className="text-xs text-slate-400 font-semibold p-2">No custom scheduling slots configured. Click 'Add Slot' above.</span>
                 ) : (
                   editSlots.map(slot => (
                     <span key={slot} className="bg-white border border-[color:var(--t-200)] rounded-none px-2.5 py-1 text-xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-3xs font-mono">
@@ -369,12 +369,12 @@ export default function PractitionerSettingsTab({
                 </label>
                 <div className="flex flex-wrap gap-2 text-xs">
                   {['Morning Shift (07:00 - 15:00)', 'Evening Shift (14:00 - 22:00)', 'Night Shift (21:00 - 07:00)', '24-Hour In-Home Nursing'].map((shift) => (
-                    <span key={shift} className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
+                    <span key={shift} className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
                       {shift}
                     </span>
                   ))}
                 </div>
-                <p className="text-[10px] text-slate-500 font-medium mt-1">Available shift types are broadcasted to private hospitals, clinics, and home care patients across your registered city.</p>
+                <p className="text-xs text-slate-500 font-medium mt-1">Available shift types are broadcasted to private hospitals, clinics, and home care patients across your registered city.</p>
               </div>
             )}
           </div>
@@ -411,7 +411,7 @@ export default function PractitionerSettingsTab({
       {/* RIGHT PANE: Patient-Facing Live Preview Card */}
       <div className="w-full xl:w-[380px] shrink-0 space-y-4 lg:sticky lg:top-24">
         <div className="bg-white border-2 border-dashed border-[color:var(--t-200)] rounded-none p-5 shadow-xs relative overflow-hidden space-y-4">
-          <div className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] text-[9px] font-black uppercase py-1 px-3 rounded-full flex items-center gap-1.5 w-max">
+          <div className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] text-xs font-black uppercase py-1 px-3 rounded-full flex items-center gap-1.5 w-max">
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
             Live Patient Search Card Preview
           </div>
@@ -430,11 +430,11 @@ export default function PractitionerSettingsTab({
                   {isVerified && <Shield className="h-3.5 w-3.5 text-emerald-500 fill-emerald-500 shrink-0" />}
                 </div>
 
-                <p className="text-[10px] text-[color:var(--t-600)] font-extrabold uppercase tracking-wide">
+                <p className="text-xs text-[color:var(--t-600)] font-extrabold uppercase tracking-wide">
                   {matchedProfile.specialization}
                 </p>
 
-                <div className="flex items-center gap-1 text-[11px] font-extrabold text-slate-500">
+                <div className="flex items-center gap-1 text-xs font-extrabold text-slate-500">
                   <span className="text-amber-500">â˜…</span>
                   <span className="text-slate-800">{avgOverall ?? "New"}</span>
                   <span>({reviewCount} Patient Review{reviewCount === 1 ? '' : 's'})</span>
@@ -442,17 +442,17 @@ export default function PractitionerSettingsTab({
               </div>
             </div>
 
-            <p className="text-[11px] text-slate-500 font-medium leading-relaxed italic bg-slate-50 p-2.5 rounded-none border border-[color:var(--t-200)] line-clamp-3">
+            <p className="text-xs text-slate-500 font-medium leading-relaxed italic bg-slate-50 p-2.5 rounded-none border border-[color:var(--t-200)] line-clamp-3">
               {editBio || "No clinical biography provided. Please write a description to engage patients..."}
             </p>
 
             {/* Certifications displayed as patient-facing badges */}
             {certifications.length > 0 && (
               <div className="space-y-1">
-                <span className="text-[9px] text-slate-400 font-bold block uppercase">Clinical Credentials</span>
+                <span className="text-xs text-slate-400 font-bold block uppercase">Clinical Credentials</span>
                 <div className="flex flex-wrap gap-1">
                   {certifications.map(cert => (
-                    <span key={cert} className="bg-slate-100 text-slate-700 text-[9px] font-bold px-2 py-0.5 rounded-none">
+                    <span key={cert} className="bg-slate-100 text-slate-700 text-xs font-bold px-2 py-0.5 rounded-none">
                       {cert}
                     </span>
                   ))}
@@ -460,7 +460,7 @@ export default function PractitionerSettingsTab({
               </div>
             )}
 
-            <div className="pt-3 border-t border-[color:var(--t-200)] flex flex-col gap-1.5 text-[11px] text-slate-600 font-semibold">
+            <div className="pt-3 border-t border-[color:var(--t-200)] flex flex-col gap-1.5 text-xs text-slate-600 font-semibold">
               <div className="flex items-center gap-1.5">
                 <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                 <span className="truncate">{editAddress || "Metropolitan Specialist Center"}, {editCity}</span>
@@ -476,14 +476,14 @@ export default function PractitionerSettingsTab({
 
             <button
               type="button"
-              className="w-full py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-[11px] font-black rounded-none transition-all shadow-3xs cursor-not-allowed mt-2"
+              className="w-full py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black rounded-none transition-all shadow-3xs cursor-not-allowed mt-2"
               disabled
             >
               Book Appointment (Preview)
             </button>
           </div>
 
-          <p className="text-[10px] text-slate-400 font-medium text-center italic">
+          <p className="text-xs text-slate-400 font-medium text-center italic">
             Changes above reflect instantly in the live doctor directory.
           </p>
         </div>

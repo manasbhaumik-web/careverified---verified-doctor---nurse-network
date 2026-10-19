@@ -134,12 +134,12 @@ export default function PharmacyFinder({ embedded = false }: { embedded?: boolea
                 {p.services.length > 0 && (
                   <ul className="flex flex-wrap gap-1.5 pt-1">
                     {p.services.map(s => (
-                      <li key={s} className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 border rounded-none ${s === '24 hours' ? 'text-emerald-800 bg-emerald-50 border-emerald-300' : 'text-[color:var(--t-700)] bg-[color:var(--t-50)] border-[color:var(--t-200)]'}`}>{s}</li>
+                      <li key={s} className={`text-xs font-black uppercase tracking-wider px-2.5 py-1 border rounded-none ${s === '24 hours' ? 'text-emerald-800 bg-emerald-50 border-emerald-300' : 'text-[color:var(--t-700)] bg-[color:var(--t-50)] border-[color:var(--t-200)]'}`}>{s}</li>
                     ))}
                   </ul>
                 )}
 
-                <div className="text-[11px] text-slate-600 font-semibold space-y-1">
+                <div className="text-xs text-slate-600 font-semibold space-y-1">
                   {p.licenceVerified && <p className="text-emerald-800">Licence and pharmacist checked by MedCred{p.licenceExpiresOn ? ` · licence valid to ${p.licenceExpiresOn}` : ''}</p>}
                   {p.deliveryMethods && p.deliveryMethods.length > 0 && <p>Delivers (Malaysia): {p.deliveryMethods.map(m => ({ pharmacy_courier: 'own rider', grab: 'Grab', lalamove: 'Lalamove', other_courier: 'courier' } as Record<string, string>)[m] ?? m).join(', ')}{p.coldChain ? ' · cold-chain medicines (e.g. insulin) can be delivered' : ''}</p>}
                   {p.panelInsurers && p.panelInsurers.length > 0 && <p>Insurance panel: {p.panelInsurers.join(', ')}</p>}
@@ -157,7 +157,7 @@ export default function PharmacyFinder({ embedded = false }: { embedded?: boolea
                 <div className="mt-auto pt-3 border-t border-slate-200 space-y-3">
                   {isOpen && (
                     <div className="space-y-3 bg-slate-50 border border-slate-250 p-3.5 rounded-none">
-                      <label htmlFor={`rx-${p.id}`} className="text-[10px] font-black uppercase tracking-wider text-slate-700 block">Select active prescription to route</label>
+                      <label htmlFor={`rx-${p.id}`} className="text-xs font-black uppercase tracking-wider text-slate-700 block">Select active prescription to route</label>
                       <select id={`rx-${p.id}`} value={chosen} onChange={e => setChosen(e.target.value)} className="w-full border border-slate-300 bg-white px-3 h-10 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)]">
                         <option value="">Select prescription…</option>
                         {activeRx.map(r => (
@@ -180,7 +180,7 @@ export default function PharmacyFinder({ embedded = false }: { embedded?: boolea
                       <Send className="h-4 w-4" /> Send my prescription here
                     </button>
                   )}
-                  {!isOpen && activeRx.length === 0 && <p className="text-[11px] text-slate-500 font-medium">You have no active prescription to route. Once prescribed by a doctor, it will appear here.</p>}
+                  {!isOpen && activeRx.length === 0 && <p className="text-xs text-slate-500 font-medium">You have no active prescription to route. Once prescribed by a doctor, it will appear here.</p>}
                 </div>
               </article>
             );

@@ -41,7 +41,7 @@ export default function SecurityCard({ twoFactor, email, onChanged }: { twoFacto
     <section aria-label="Two-factor sign-in" className="bg-white border border-[color:var(--t-200)] rounded-none p-6 space-y-5 min-w-0">
       <div className="border-b border-slate-100 pb-3">
         <h2 className="text-sm font-black uppercase tracking-wider text-slate-800 flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[color:var(--t-600)]" /> Two-Factor Authentication (TOTP)</h2>
-        <p className="text-[12px] text-slate-500 font-semibold mt-1">
+        <p className="text-xs text-slate-500 font-semibold mt-1">
           {twoFactor.enabled
             ? 'Active. Signing in requires your primary credentials and a rotating 6-digit cryptographic authenticator code.'
             : 'Enforces a 6-digit TOTP code verification to prevent unauthorized prescription tampering from compromised passwords.'}
@@ -62,7 +62,7 @@ export default function SecurityCard({ twoFactor, email, onChanged }: { twoFacto
           <div className="flex flex-wrap items-center gap-4 bg-white p-3 border border-slate-250">
             {setup.qr && <img src={setup.qr} alt="QR code to add MedCred to your authenticator app" width={140} height={140} className="border border-slate-300 bg-white rounded-none" />}
             <div className="text-xs text-slate-600 min-w-0 space-y-1">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">Manual Configuration Key:</span>
+              <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Manual Configuration Key:</span>
               <span className="font-mono font-bold text-xs text-[color:var(--ink)] bg-slate-100 border border-slate-300 px-2 py-1 block [overflow-wrap:anywhere]">{setup.secret}</span>
             </div>
           </div>

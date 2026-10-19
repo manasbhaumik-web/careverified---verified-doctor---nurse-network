@@ -162,7 +162,7 @@ export default function SupportDesk({
             <ul className="divide-y divide-slate-100">
               {tickets.map(t => (
                 <li key={t.id}><button onClick={() => openTicket(t.id)} className={`w-full text-left py-2.5 cursor-pointer ${open?.id === t.id ? 'font-bold' : ''}`}>
-                  <p className="text-sm truncate">{t.subject}</p><p className="text-[11px] text-slate-500">{t.category} · {t.status}</p>
+                  <p className="text-sm truncate">{t.subject}</p><p className="text-xs text-slate-500">{t.category} · {t.status}</p>
                 </button></li>
               ))}
             </ul>
@@ -171,12 +171,12 @@ export default function SupportDesk({
         <section className="bg-white border border-slate-200 p-4">
           {!open ? <p className="text-sm text-slate-500">Select a ticket to read the conversation.</p> : (
             <div className="space-y-3">
-              <div className="flex justify-between gap-3"><div><h3 className="text-sm font-extrabold">{open.subject}</h3><p className="text-[11px] text-slate-500">{open.category} · {open.status} · opened {when(open.createdAt)}</p></div>
+              <div className="flex justify-between gap-3"><div><h3 className="text-sm font-extrabold">{open.subject}</h3><p className="text-xs text-slate-500">{open.category} · {open.status} · opened {when(open.createdAt)}</p></div>
                 {open.status !== 'resolved' && <button onClick={resolve} className="text-xs font-bold border border-slate-200 px-3 py-1.5 h-fit cursor-pointer">Mark resolved</button>}</div>
               <ul className="space-y-2 max-h-80 overflow-y-auto">
                 {open.messages.map((m: any) => (
                   <li key={m.id} className={`text-sm p-3 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}>
-                    <p className="text-[10px] font-extrabold uppercase text-slate-500 mb-1">{m.fromStaff ? 'MedCred support' : 'You'} · {when(m.ts)}</p>{m.body}
+                    <p className="text-xs font-extrabold uppercase text-slate-500 mb-1">{m.fromStaff ? 'MedCred support' : 'You'} · {when(m.ts)}</p>{m.body}
                   </li>
                 ))}
               </ul>

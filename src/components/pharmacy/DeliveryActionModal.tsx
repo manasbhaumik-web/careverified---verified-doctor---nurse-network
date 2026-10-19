@@ -151,7 +151,7 @@ export default function DeliveryActionModal({
                 {status === 'delivered' && 'Confirm Medication Handover (Delivered)'}
                 {status === 'failed' && 'Record Delivery Handover Failure'}
               </h2>
-              <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+              <p className="text-xs text-slate-500 font-medium mt-0.5">
                 Prescription: <span className="font-mono font-bold text-slate-700">{rxCode || delivery.id}</span>
                 {patientName && ` · Patient: ${patientName}`}
               </p>
@@ -214,11 +214,11 @@ export default function DeliveryActionModal({
                     <Snowflake className="h-4 w-4 text-sky-700" />
                     <span>NPRA GDP Cold-Chain Departure Check</span>
                   </div>
-                  <p className="text-[11px] text-sky-800">
+                  <p className="text-xs text-sky-800">
                     Insulin or biologics must depart between 2.0 °C and 8.0 °C with certified insulated ice-pack packaging.
                   </p>
                   <div>
-                    <label htmlFor="departure-temp" className="text-[10px] font-bold text-sky-950 uppercase block mb-1">
+                    <label htmlFor="departure-temp" className="text-xs font-bold text-sky-950 uppercase block mb-1">
                       Departure Box Temperature (°C)
                     </label>
                     <input
@@ -261,7 +261,7 @@ export default function DeliveryActionModal({
                     <span>Handover Temperature Verification</span>
                   </div>
                   <div>
-                    <label htmlFor="arrival-temp" className="text-[10px] font-bold text-sky-950 uppercase block mb-1">
+                    <label htmlFor="arrival-temp" className="text-xs font-bold text-sky-950 uppercase block mb-1">
                       Handover Arrival Temperature (°C)
                     </label>
                     <input
@@ -327,7 +327,7 @@ export default function DeliveryActionModal({
                 />
               </div>
 
-              <p className="text-[11px] text-slate-500 font-medium">
+              <p className="text-xs text-slate-500 font-medium">
                 The patient will be immediately notified of the delivery failure and prompted to arrange redelivery or counter pickup.
               </p>
             </div>

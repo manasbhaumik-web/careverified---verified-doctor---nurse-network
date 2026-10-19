@@ -706,13 +706,13 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
               {quickViewsOpen && (
                 <div className="absolute right-0 sm:left-0 top-full mt-1.5 w-72 sm:w-80 z-50 bg-white border border-[color:var(--t-200)] shadow-xl text-slate-800 rounded-none overflow-hidden panel-edge">
-                  <div className="px-3.5 py-2 bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] text-[10px] font-mono font-extrabold uppercase tracking-widest text-[color:var(--t-600)] flex items-center justify-between">
+                  <div className="px-3.5 py-2 bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] text-xs font-mono font-extrabold uppercase tracking-widest text-[color:var(--t-600)] flex items-center justify-between">
                     <span>Clinical Navigation</span>
                     <Activity className="h-3 w-3" />
                   </div>
 
                   {/* Clinical Protocols & Governance */}
-                  <div className="px-3 pt-2 pb-1 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                  <div className="px-3 pt-2 pb-1 text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
                     Clinical Protocols &amp; Services
                   </div>
                   <div className="px-1.5 space-y-0.5">
@@ -776,7 +776,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                   </div>
 
                   {/* Patient Intake & Access Modalities */}
-                  <div className="border-t border-slate-100 my-1 pt-1.5 px-3 pb-1 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                  <div className="border-t border-slate-100 my-1 pt-1.5 px-3 pb-1 text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
                     04 · Patient Access &amp; Intake
                   </div>
                   <div className="px-1.5 pb-1.5 space-y-0.5">
@@ -786,12 +786,12 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                       className="flex items-center justify-between px-2.5 py-2 hover:bg-[color:var(--t-50)] transition-colors group cursor-pointer"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="w-6 h-6 shrink-0 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] group-hover:bg-[color:var(--t-600)] group-hover:text-white transition-colors flex items-center justify-center text-[10px] font-mono font-black">
+                        <span className="w-6 h-6 shrink-0 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] group-hover:bg-[color:var(--t-600)] group-hover:text-white transition-colors flex items-center justify-center text-xs font-mono font-black">
                           MY
                         </span>
                         <div className="min-w-0">
                           <span className="block text-xs font-bold text-[color:var(--ink)] group-hover:text-[color:var(--t-600)]">Malaysia Patient Access</span>
-                          <span className="block text-[10px] text-slate-500 font-medium truncate">MyKad registration, local fees &amp; telemedicine</span>
+                          <span className="block text-xs text-slate-500 font-medium truncate">MyKad registration, local fees &amp; telemedicine</span>
                         </div>
                       </div>
                       <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
@@ -803,12 +803,12 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                       className="flex items-center justify-between px-2.5 py-2 hover:bg-[color:var(--t-50)] transition-colors group cursor-pointer"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="w-6 h-6 shrink-0 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] group-hover:bg-[color:var(--t-600)] group-hover:text-white transition-colors flex items-center justify-center text-[10px] font-mono font-black">
+                        <span className="w-6 h-6 shrink-0 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] group-hover:bg-[color:var(--t-600)] group-hover:text-white transition-colors flex items-center justify-center text-xs font-mono font-black">
                           INTL
                         </span>
                         <div className="min-w-0">
                           <span className="block text-xs font-bold text-[color:var(--ink)] group-hover:text-[color:var(--t-600)]">International Patient Care</span>
-                          <span className="block text-[10px] text-slate-500 font-medium truncate">Medical tourism, passport intake &amp; accredited hospitals</span>
+                          <span className="block text-xs text-slate-500 font-medium truncate">Medical tourism, passport intake &amp; accredited hospitals</span>
                         </div>
                       </div>
                       <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
@@ -840,7 +840,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
               {joinUsOpen && (
                 <div className="absolute right-0 sm:left-0 top-full mt-1.5 w-72 z-50 bg-white border border-[color:var(--t-200)] shadow-xl text-slate-800 rounded-none overflow-hidden panel-edge">
-                  <div className="px-3.5 py-2 bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] text-[10px] font-mono font-extrabold uppercase tracking-widest text-[color:var(--t-600)] flex items-center justify-between">
+                  <div className="px-3.5 py-2 bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] text-xs font-mono font-extrabold uppercase tracking-widest text-[color:var(--t-600)] flex items-center justify-between">
                     <span>Practitioner & Partner Network</span>
                     <PlusCircle className="h-3 w-3" />
                   </div>
@@ -862,7 +862,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                           <span>Doctors &amp; Specialists</span>
                           <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all" />
                         </div>
-                        <p className="text-[11px] text-slate-500 mt-0.5 leading-snug font-medium">MMC verification, consults &amp; e-Rx</p>
+                        <p className="text-xs text-slate-500 mt-0.5 leading-snug font-medium">MMC verification, consults &amp; e-Rx</p>
                       </div>
                     </a>
 
@@ -883,12 +883,12 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                           <span>Nurses &amp; Home Care</span>
                           <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-emerald-700 group-hover:translate-x-0.5 transition-all" />
                         </div>
-                        <p className="text-[11px] text-slate-500 mt-0.5 leading-snug font-medium">LJM verification, home nursing &amp; locums</p>
+                        <p className="text-xs text-slate-500 mt-0.5 leading-snug font-medium">LJM verification, home nursing &amp; locums</p>
                       </div>
                     </a>
 
                     <div className="border-t border-slate-100 my-1 pt-1">
-                      <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                      <div className="px-2 py-1 text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
                         Clinics &amp; Pharmacies
                       </div>
                       <a
@@ -908,7 +908,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                             <span>Clinics &amp; Hospitals</span>
                             <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all" />
                           </div>
-                          <p className="text-[11px] text-slate-500 mt-0.5 leading-snug font-medium">Patient intake, medical tourism &amp; staffing</p>
+                          <p className="text-xs text-slate-500 mt-0.5 leading-snug font-medium">Patient intake, medical tourism &amp; staffing</p>
                         </div>
                       </a>
 
@@ -929,7 +929,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                             <span>Community Pharmacies</span>
                             <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all" />
                           </div>
-                          <p className="text-[11px] text-slate-500 mt-0.5 leading-snug font-medium">Digital e-prescription dispensing &amp; records</p>
+                          <p className="text-xs text-slate-500 mt-0.5 leading-snug font-medium">Digital e-prescription dispensing &amp; records</p>
                         </div>
                       </a>
                     </div>
@@ -941,7 +941,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
             <a
               href="/login"
               onClick={e => { e.preventDefault(); navigate('/login'); }}
-              className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-4 sm:px-6 text-[13px] sm:text-sm font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none shadow-xs transition-all cursor-pointer whitespace-nowrap"
+              className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-4 sm:px-6 text-sm font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none shadow-xs transition-all cursor-pointer whitespace-nowrap"
             >
               {t('nav.portal')}
               <ArrowRight className="h-4 w-4" />
@@ -999,7 +999,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                 >
                   {/* Left column: message */}
                   <div className="max-w-2xl min-w-0">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-4">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                       <Cross className="h-3 w-3 text-[color:var(--t-600)]" />
                       {tr?.pill ?? s.pill}
@@ -1007,13 +1007,13 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
                     {i === 0 ? (
                       <h1
-                        className="font-display font-black text-3xl sm:text-4xl lg:text-[42px] leading-[1.12] tracking-tight text-slate-900 mb-3"
+                        className="font-display font-black text-3xl sm:text-4xl leading-[1.12] tracking-tight text-slate-900 mb-3"
                       >
                         {tr?.headline ?? s.headline}
                       </h1>
                     ) : (
                       <h2
-                        className="font-display font-black text-3xl sm:text-4xl lg:text-[42px] leading-[1.12] tracking-tight text-slate-900 mb-3"
+                        className="font-display font-black text-3xl sm:text-4xl leading-[1.12] tracking-tight text-slate-900 mb-3"
                       >
                         {tr?.headline ?? s.headline}
                       </h2>
@@ -1068,14 +1068,14 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                   <div className="hidden lg:block w-[360px] shrink-0 bg-white/95 backdrop-blur-md border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] p-5 shadow-lg panel-edge corner-bracket">
                     <div className="flex items-center justify-between gap-2 pb-3 border-b border-[color:var(--t-100)]">
                       <div>
-                        <span className="block text-[10px] font-mono font-extrabold uppercase tracking-widest text-[color:var(--t-600)]">
+                        <span className="block text-xs font-mono font-extrabold uppercase tracking-widest text-[color:var(--t-600)]">
                           {s.card.label}
                         </span>
                         <span className="font-display font-black text-sm text-[color:var(--ink)]">
                           {s.card.title}
                         </span>
                       </div>
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-extrabold">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-extrabold">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                         {s.card.status}
                       </span>
@@ -1096,7 +1096,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                       <div className="min-w-0">
                         <p className="font-display font-extrabold text-sm text-[color:var(--ink)] truncate">{s.card.person.name}</p>
                         <p className="text-xs text-slate-600 font-semibold truncate">{s.card.person.line1}</p>
-                        <p className="text-[11px] text-slate-500 font-medium truncate">{s.card.person.line2}</p>
+                        <p className="text-xs text-slate-500 font-medium truncate">{s.card.person.line2}</p>
                       </div>
                     </div>
 
@@ -1118,7 +1118,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                       ))}
                     </dl>
 
-                    <div className="pt-2.5 border-t border-[color:var(--t-100)] flex items-center justify-between text-[10px] font-mono font-bold text-slate-500">
+                    <div className="pt-2.5 border-t border-[color:var(--t-100)] flex items-center justify-between text-xs font-mono font-bold text-slate-500">
                       <span>AUDIT REF: {s.card.footId}</span>
                       <span className="text-[color:var(--t-600)]">MEDCRED REGISTRY</span>
                     </div>
@@ -1131,7 +1131,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
           {/* Interactive Audience & Care Navigator Strip */}
           <div className="mt-6 pt-3.5 border-t border-[color:var(--t-200)]/80 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-              <span className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-slate-500 mr-1 hidden md:inline-block">
+              <span className="text-xs font-mono font-extrabold uppercase tracking-widest text-slate-500 mr-1 hidden md:inline-block">
                 Explore Care:
               </span>
               {[
@@ -1163,7 +1163,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
             {/* Quick arrows & step count */}
             <div className="flex items-center gap-2 self-end sm:self-auto ml-auto">
-              <span className="text-[11px] font-mono font-bold text-slate-500">
+              <span className="text-xs font-mono font-bold text-slate-500">
                 0{slideIdx + 1} / 0{HERO_SLIDES.length}
               </span>
               <button
@@ -1274,12 +1274,12 @@ export default function LandingPage({ professionals }: LandingPageProps) {
               {/* Instant Typeahead Suggestion Dropdown */}
               {searchDropdownOpen && searchQuery.trim().length >= 2 && (
                 <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-[color:var(--t-200)] shadow-2xl z-50 overflow-hidden divide-y divide-[color:var(--t-100)] animate-fade-in">
-                  <div className="px-3.5 py-2 bg-[color:var(--t-50)] flex items-center justify-between text-[11px] font-mono font-bold text-[color:var(--t-700)]">
+                  <div className="px-3.5 py-2 bg-[color:var(--t-50)] flex items-center justify-between text-xs font-mono font-bold text-[color:var(--t-700)]">
                     <span className="flex items-center gap-1.5">
                       <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                       Verified Council Matches for "{searchQuery}"
                     </span>
-                    <span className="text-[10px] text-slate-500 font-normal">
+                    <span className="text-xs text-slate-500 font-normal">
                       Press Enter to search all
                     </span>
                   </div>
@@ -1303,13 +1303,13 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                               <p className="text-xs font-extrabold text-[color:var(--ink)] truncate group-hover:text-[color:var(--t-600)] transition-colors">
                                 {prof.name}
                               </p>
-                              <p className="text-[11px] text-slate-500 font-medium truncate">
+                              <p className="text-xs text-slate-500 font-medium truncate">
                                 {prof.specialization} &bull; {prof.city}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
-                            <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5">
+                            <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5">
                               APC 2026 Valid
                             </span>
                             <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all" />
@@ -1341,7 +1341,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                         setSearchDropdownOpen(false);
                         navigate(`/verify-practitioners?q=${encodeURIComponent(searchQuery)}`);
                       }}
-                      className="text-[11px] font-bold text-[color:var(--t-700)] hover:underline flex items-center gap-1 cursor-pointer"
+                      className="text-xs font-bold text-[color:var(--t-700)] hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <span>Open Full Practitioner Register</span>
                       <ArrowRight className="h-3 w-3" />
@@ -1352,7 +1352,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                         setSearchDropdownOpen(false);
                         navigate('/medical-tourism');
                       }}
-                      className="text-[11px] font-bold text-slate-600 hover:text-[color:var(--t-700)] hover:underline flex items-center gap-1 cursor-pointer"
+                      className="text-xs font-bold text-slate-600 hover:text-[color:var(--t-700)] hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <span>Specialist Hospital Packages</span>
                       <ChevronRight className="h-3 w-3" />
@@ -1364,7 +1364,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
             {/* Right: Quick-Tap Popular Care Pills */}
             <div className="flex flex-wrap items-center gap-1.5 xl:justify-end">
-              <span className="text-[10px] font-mono font-extrabold uppercase tracking-wider text-slate-500 mr-1 hidden sm:inline-block">
+              <span className="text-xs font-mono font-extrabold uppercase tracking-wider text-slate-500 mr-1 hidden sm:inline-block">
                 POPULAR:
               </span>
               {[
@@ -1394,7 +1394,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
       <section aria-label="Emergency Hotline Protocol" className="relative bg-rose-50/80 border-b border-rose-200 py-3.5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-start sm:items-center gap-3 min-w-0">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-600 text-white text-[11px] font-mono font-extrabold uppercase tracking-wider shrink-0">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-600 text-white text-xs font-mono font-extrabold uppercase tracking-wider shrink-0">
               <AlertCircle className="h-3.5 w-3.5 animate-pulse" />
               Emergency 999
             </span>
@@ -1421,7 +1421,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
             <div>
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 pb-6 border-b border-[color:var(--t-200)]">
                 <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     <span className="section-index-badge">01</span>
                     <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
@@ -1449,7 +1449,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     <span className="w-9 h-9 bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
                       01
                     </span>
-                    <span className="text-[10px] font-mono font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2.5 py-0.5 border border-[color:var(--t-200)]">
+                    <span className="text-xs font-mono font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2.5 py-0.5 border border-[color:var(--t-200)]">
                       Official Audit
                     </span>
                   </div>
@@ -1474,7 +1474,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     <span className="w-9 h-9 bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
                       02
                     </span>
-                    <span className="text-[10px] font-mono font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2.5 py-0.5 border border-[color:var(--t-200)]">
+                    <span className="text-xs font-mono font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2.5 py-0.5 border border-[color:var(--t-200)]">
                       Hourly Sync
                     </span>
                   </div>
@@ -1499,7 +1499,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     <span className="w-9 h-9 bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
                       03
                     </span>
-                    <span className="text-[10px] font-mono font-extrabold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-0.5 border border-emerald-200">
+                    <span className="text-xs font-mono font-extrabold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-0.5 border border-emerald-200">
                       Patient Safe
                     </span>
                   </div>
@@ -1525,7 +1525,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
             <div className="bg-[color:var(--t-50)]/70 border border-[color:var(--t-200)] p-6 sm:p-8 shadow-xs">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div className="max-w-2xl space-y-2">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-white border border-[color:var(--t-200)] text-[10px] font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-white border border-[color:var(--t-200)] text-xs font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">
                     <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                     Public Statutory Practitioner Register
                   </div>
@@ -1536,9 +1536,9 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     Search active MMC &amp; LJM doctor and nurse registration numbers, inspect 2026 Annual Practising Certificates (APC), and review official council audit stamps in real-time.
                   </p>
                   <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
-                    <span className="text-[11px] font-mono text-slate-500 font-bold uppercase tracking-wider">Audit Samples:</span>
+                    <span className="text-xs font-mono text-slate-500 font-bold uppercase tracking-wider">Audit Samples:</span>
                     {['DEMO-MMC-32109', 'Cardiology', 'Dr. Tan Seng Hock', 'DEMO-LJM-88412'].map((tag) => (
-                      <span key={tag} className="px-2 py-0.5 bg-white border border-[color:var(--t-200)] font-mono text-[11px] text-[color:var(--t-700)] font-bold">
+                      <span key={tag} className="px-2 py-0.5 bg-white border border-[color:var(--t-200)] font-mono text-xs text-[color:var(--t-700)] font-bold">
                         {tag}
                       </span>
                     ))}
@@ -1572,7 +1572,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
         <section id="services-section" aria-label="Gentle care for patients in Malaysia" className="relative overflow-hidden bg-[color:var(--t-50)]/30 border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10 space-y-10">
             <AnimatedSection className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="section-index-badge">02</span>
                 <Heart className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
@@ -1606,10 +1606,10 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                         alt="Doctor Video Consultations"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute top-2.5 left-2.5 bg-[color:var(--t-600)] text-white text-[10px] font-mono font-extrabold px-2 py-0.5 shadow-xs">
+                      <div className="absolute top-2.5 left-2.5 bg-[color:var(--t-600)] text-white text-xs font-mono font-extrabold px-2 py-0.5 shadow-xs">
                         01 · TREATMENT
                       </div>
-                      <div className="absolute top-2.5 right-2.5 bg-white/95 text-[color:var(--t-700)] text-[10px] font-mono font-extrabold px-2 py-0.5 border border-slate-200 shadow-2xs">
+                      <div className="absolute top-2.5 right-2.5 bg-white/95 text-[color:var(--t-700)] text-xs font-mono font-extrabold px-2 py-0.5 border border-slate-200 shadow-2xs">
                         RM 35 GP
                       </div>
                     </div>
@@ -1653,10 +1653,10 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                         alt="Home Nursing Care"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute top-2.5 left-2.5 bg-emerald-600 text-white text-[10px] font-mono font-extrabold px-2 py-0.5 shadow-xs">
+                      <div className="absolute top-2.5 left-2.5 bg-emerald-600 text-white text-xs font-mono font-extrabold px-2 py-0.5 shadow-xs">
                         02 · NURSING
                       </div>
-                      <div className="absolute top-2.5 right-2.5 bg-white/95 text-emerald-800 text-[10px] font-mono font-extrabold px-2 py-0.5 border border-slate-200 shadow-2xs">
+                      <div className="absolute top-2.5 right-2.5 bg-white/95 text-emerald-800 text-xs font-mono font-extrabold px-2 py-0.5 border border-slate-200 shadow-2xs">
                         From RM 120
                       </div>
                     </div>
@@ -1700,10 +1700,10 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                         alt="QR E-Prescriptions"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute top-2.5 left-2.5 bg-amber-600 text-white text-[10px] font-mono font-extrabold px-2 py-0.5 shadow-xs">
+                      <div className="absolute top-2.5 left-2.5 bg-amber-600 text-white text-xs font-mono font-extrabold px-2 py-0.5 shadow-xs">
                         03 · PHARMACY
                       </div>
-                      <div className="absolute top-2.5 right-2.5 bg-white/95 text-amber-800 text-[10px] font-mono font-extrabold px-2 py-0.5 border border-slate-200 shadow-2xs">
+                      <div className="absolute top-2.5 right-2.5 bg-white/95 text-amber-800 text-xs font-mono font-extrabold px-2 py-0.5 border border-slate-200 shadow-2xs">
                         0% Commission
                       </div>
                     </div>
@@ -1747,10 +1747,10 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                         alt="Specialist Consultations"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute top-2.5 left-2.5 bg-indigo-600 text-white text-[10px] font-mono font-extrabold px-2 py-0.5 shadow-xs">
+                      <div className="absolute top-2.5 left-2.5 bg-indigo-600 text-white text-xs font-mono font-extrabold px-2 py-0.5 shadow-xs">
                         04 · SPECIALIST
                       </div>
-                      <div className="absolute top-2.5 right-2.5 bg-white/95 text-indigo-800 text-[10px] font-mono font-extrabold px-2 py-0.5 border border-slate-200 shadow-2xs">
+                      <div className="absolute top-2.5 right-2.5 bg-white/95 text-indigo-800 text-xs font-mono font-extrabold px-2 py-0.5 border border-slate-200 shadow-2xs">
                         From RM 80
                       </div>
                     </div>
@@ -1805,7 +1805,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     </span>
                     <div>
                       <h4 className="font-display font-black text-sm text-[color:var(--ink)]">Malaysian Payment Rails</h4>
-                      <p className="text-[11px] text-slate-500 font-medium">FPX · DuitNow QR · TNG eWallet</p>
+                      <p className="text-xs text-slate-500 font-medium">FPX · DuitNow QR · TNG eWallet</p>
                     </div>
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed font-medium">
@@ -1820,7 +1820,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     </span>
                     <div>
                       <h4 className="font-display font-black text-sm text-[color:var(--ink)]">LHDN Tax Relief Ready</h4>
-                      <p className="text-[11px] text-slate-500 font-medium">Claim up to RM 10,000</p>
+                      <p className="text-xs text-slate-500 font-medium">Claim up to RM 10,000</p>
                     </div>
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed font-medium">
@@ -1835,7 +1835,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     </span>
                     <div>
                       <h4 className="font-display font-black text-sm text-[color:var(--ink)]">TPA &amp; Panel Insurers</h4>
-                      <p className="text-[11px] text-slate-500 font-medium">Corporate Reimbursement</p>
+                      <p className="text-xs text-slate-500 font-medium">Corporate Reimbursement</p>
                     </div>
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed font-medium">
@@ -1849,7 +1849,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
             <div className="bg-white border border-[color:var(--t-200)] p-6 sm:p-8 shadow-xs">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div className="max-w-2xl space-y-1.5">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[10px] font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-xs font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">
                     <Heart className="h-3 w-3 text-[color:var(--t-600)]" />
                     Comprehensive Patient Guide
                   </div>
@@ -1890,7 +1890,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10 space-y-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[color:var(--t-200)]">
               <div className="max-w-3xl space-y-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="section-index-badge">03</span>
                   <Globe className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
@@ -1905,8 +1905,8 @@ export default function LandingPage({ professionals }: LandingPageProps) {
               </div>
 
               {/* Currency Selector Pill */}
-              <div className="flex items-center gap-2 bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-1.5 shadow-2xs shrink-0">
-                <span className="text-[11px] font-mono font-bold text-slate-500 px-2 uppercase">Currency:</span>
+              <div className="flex flex-wrap items-center gap-2 bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-1.5 shadow-2xs max-w-full">
+                <span className="text-xs font-mono font-bold text-slate-500 px-2 uppercase">Currency:</span>
                 {(['MYR', 'USD', 'SGD', 'IDR', 'AUD', 'SAR'] as const).map(curr => (
                   <button
                     key={curr}
@@ -1977,7 +1977,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute top-2.5 left-2.5">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-mono font-extrabold tracking-wide uppercase border backdrop-blur-md ${pkg.badgeClass}`}>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-extrabold tracking-wide uppercase border backdrop-blur-md ${pkg.badgeClass}`}>
                             <ShieldCheck className="h-3 w-3 shrink-0" />
                             {pkg.accreditation}
                           </span>
@@ -1985,7 +1985,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                       </div>
 
                       <div className="p-4 space-y-2">
-                        <div className="text-[10px] font-mono font-bold text-slate-500 uppercase">
+                        <div className="text-xs font-mono font-bold text-slate-500 uppercase">
                           {pkg.duration} · {pkg.code}
                         </div>
                         <h4 className="font-display font-black text-sm text-[color:var(--ink)] group-hover:text-[color:var(--t-600)] transition-colors leading-snug">
@@ -1993,7 +1993,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                         </h4>
                         <div className="pt-2 border-t border-slate-100 space-y-1">
                           {pkg.highlights.map((h, i) => (
-                            <div key={i} className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
+                            <div key={i} className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
                               <Check className="h-3 w-3 text-emerald-600 shrink-0" />
                               <span className="truncate">{h}</span>
                             </div>
@@ -2006,7 +2006,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                       <div className="pt-3 border-t border-[color:var(--t-200)] space-y-2">
                         <div className="flex items-baseline justify-between gap-1">
                           <div>
-                            <span className="text-[9px] font-mono uppercase text-slate-400 font-bold block">Indicative Tariff</span>
+                            <span className="text-xs font-mono uppercase text-slate-400 font-bold block">Indicative Tariff</span>
                             <span className="font-mono font-black text-base text-[color:var(--ink)]">
                               RM {pkg.myr.toLocaleString('en-US')}
                             </span>
@@ -2059,7 +2059,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                           alt={fac.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
-                        <div className="absolute top-2 left-2 bg-emerald-50 text-emerald-800 text-[9px] font-mono font-extrabold px-1.5 py-0.5 border border-emerald-200">
+                        <div className="absolute top-2 left-2 bg-emerald-50 text-emerald-800 text-xs font-mono font-extrabold px-1.5 py-0.5 border border-emerald-200">
                           {fac.badge}
                         </div>
                       </div>
@@ -2067,14 +2067,14 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                         <h4 className="font-display font-black text-sm text-[color:var(--ink)] leading-snug group-hover:text-[color:var(--t-600)] transition-colors">
                           {fac.name}
                         </h4>
-                        <p className="text-[11px] text-slate-500 font-semibold mt-0.5 flex items-center gap-1">
+                        <p className="text-xs text-slate-500 font-semibold mt-0.5 flex items-center gap-1">
                           <Globe className="h-3 w-3 text-[color:var(--t-600)]" />
                           <span>{fac.city}</span>
                         </p>
                       </div>
-                      <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-600 space-y-1">
+                      <div className="pt-2 border-t border-slate-100 text-xs text-slate-600 space-y-1">
                         <div className="font-bold text-slate-700">Specialties:</div>
-                        <p className="text-[10px] leading-relaxed line-clamp-1">{fac.specialties.join(' · ')}</p>
+                        <p className="text-xs leading-relaxed line-clamp-1">{fac.specialties.join(' · ')}</p>
                       </div>
                     </div>
 
@@ -2095,7 +2095,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
             <div className="bg-[color:var(--t-50)]/70 border border-[color:var(--t-200)] p-6 sm:p-8 shadow-xs">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div className="max-w-2xl space-y-1.5">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-white border border-[color:var(--t-200)] text-[10px] font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-white border border-[color:var(--t-200)] text-xs font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">
                     <Plane className="h-3 w-3 text-[color:var(--t-600)]" />
                     International Travel Logistics &amp; Concierge Guide
                   </div>
@@ -2140,7 +2140,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                   {/* Top row: the clinical care triage advisory */}
                   <div className="p-7 sm:p-9 flex flex-wrap items-center justify-between gap-x-10 gap-y-6 bg-gradient-to-r from-white via-[color:var(--t-50)] to-white border-b border-[color:var(--t-200)]">
                     <div className="max-w-xl">
-                      <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
+                      <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                         <span className="section-index-badge">04</span>
                         <Cross className="h-3 w-3 text-[color:var(--t-600)]" />
@@ -2182,7 +2182,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                             {/* UI Snapshot Badges (Suggestion 3) */}
                             {i === 0 && (
                               <div className="mt-3.5 p-3 bg-[color:var(--t-50)]/60 border border-[color:var(--t-200)] text-xs space-y-1.5 shadow-2xs">
-                                <div className="flex items-center justify-between font-mono text-[10px] text-slate-500 font-bold">
+                                <div className="flex items-center justify-between font-mono text-xs text-slate-500 font-bold">
                                   <span>INTAKE SNAPSHOT</span>
                                   <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200 font-extrabold">NO APP NEEDED</span>
                                 </div>
@@ -2190,7 +2190,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                                   <ShieldCheck className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
                                   <span>MyKad or Passport Verification</span>
                                 </div>
-                                <div className="text-[11px] text-slate-500 flex justify-between pt-1 border-t border-[color:var(--t-200)] font-mono">
+                                <div className="text-xs text-slate-500 flex justify-between pt-1 border-t border-[color:var(--t-200)] font-mono">
                                   <span>Outpatient Fee</span>
                                   <span className="font-extrabold text-[color:var(--t-700)]">RM 35 Fixed</span>
                                 </div>
@@ -2199,7 +2199,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
                             {i === 1 && (
                               <div className="mt-3.5 p-3 bg-[color:var(--t-50)]/60 border border-[color:var(--t-200)] text-xs space-y-1.5 shadow-2xs">
-                                <div className="flex items-center justify-between font-mono text-[10px] text-slate-500 font-bold">
+                                <div className="flex items-center justify-between font-mono text-xs text-slate-500 font-bold">
                                   <span>BROWSER TELE-VISIT</span>
                                   <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200 font-extrabold flex items-center gap-1">
                                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>ACTIVE
@@ -2209,7 +2209,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                                   <Video className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
                                   <span>100% In-Browser HD Call</span>
                                 </div>
-                                <div className="text-[11px] text-slate-500 flex justify-between pt-1 border-t border-[color:var(--t-200)] font-mono">
+                                <div className="text-xs text-slate-500 flex justify-between pt-1 border-t border-[color:var(--t-200)] font-mono">
                                   <span>Wait Guarantee</span>
                                   <span className="font-extrabold text-emerald-700">&lt; 10 Mins or Refund</span>
                                 </div>
@@ -2218,7 +2218,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
                             {i === 2 && (
                               <div className="mt-3.5 p-3 bg-[color:var(--t-50)]/60 border border-[color:var(--t-200)] text-xs space-y-1.5 shadow-2xs">
-                                <div className="flex items-center justify-between font-mono text-[10px] text-slate-500 font-bold">
+                                <div className="flex items-center justify-between font-mono text-xs text-slate-500 font-bold">
                                   <span>DIGITAL DISPENSING</span>
                                   <span className="text-cyan-700 bg-cyan-50 px-1.5 py-0.2 border border-cyan-200 font-extrabold">VERIFIED QR</span>
                                 </div>
@@ -2226,7 +2226,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                                   <Pill className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
                                   <span>Doctor-Signed E-Prescription</span>
                                 </div>
-                                <div className="text-[11px] text-slate-500 flex justify-between pt-1 border-t border-[color:var(--t-200)] font-mono">
+                                <div className="text-xs text-slate-500 flex justify-between pt-1 border-t border-[color:var(--t-200)] font-mono">
                                   <span>Fulfilment</span>
                                   <span className="font-extrabold text-slate-700">Community Pharmacy</span>
                                 </div>
@@ -2250,7 +2250,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
         <section id="ecosystem-section" aria-label="Practitioner and partner network" className="relative overflow-hidden bg-[color:var(--t-50)]/60 border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
             <AnimatedSection className="max-w-3xl mb-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="section-index-badge">05</span>
                 <PlusCircle className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
@@ -2322,7 +2322,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                             alt={item.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
-                          <div className="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur-md px-2.5 py-0.5 border border-slate-200 text-[10px] font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)] shadow-2xs">
+                          <div className="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur-md px-2.5 py-0.5 border border-slate-200 text-xs font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)] shadow-2xs">
                             {item.badge}
                           </div>
                         </div>
@@ -2356,7 +2356,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
           <section id="feedback-section" aria-label="Patient testimonials" className="relative overflow-hidden bg-white border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10">
               <AnimatedSection className="max-w-3xl mb-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="section-index-badge">06</span>
                   <Cross className="h-3 w-3 text-[color:var(--t-600)]" />
@@ -2383,7 +2383,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                           <div className="font-display font-black text-sm text-[color:var(--ink)]">{tm.name}</div>
                           {tm.location && <div className="text-xs font-semibold text-slate-500 mt-0.5">{tm.location}</div>}
                         </div>
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 shrink-0">
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 shrink-0">
                           <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                           Verified
                         </span>
@@ -2423,14 +2423,14 @@ export default function LandingPage({ professionals }: LandingPageProps) {
               </div>
               <div className="text-left">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] sm:text-xs font-black font-display text-[color:var(--ink)] leading-none">
+                  <span className="text-xs font-black font-display text-[color:var(--ink)] leading-none">
                     On-Call Doctor Online
                   </span>
-                  <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 text-[9px] font-mono font-black uppercase">
+                  <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 text-xs font-mono font-black uppercase">
                     Live
                   </span>
                 </div>
-                <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium mt-0.5">
+                <p className="text-xs text-slate-500 font-medium mt-0.5">
                   Connect in &lt; 10 Mins · <span className="font-bold text-[color:var(--t-700)]">RM 35</span> fixed rate
                 </p>
               </div>

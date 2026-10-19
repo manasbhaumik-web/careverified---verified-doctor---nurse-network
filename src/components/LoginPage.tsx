@@ -356,7 +356,7 @@ export default function LoginPage({ onLoginSuccess }: { onLoginSuccess: (user: S
                   {demoForRole && (
                     <div className="mt-6 p-3.5 bg-[color:var(--t-50)] border border-dashed border-[color:var(--t-200)] flex flex-wrap items-center justify-between gap-3 text-xs">
                       <div className="min-w-0">
-                        <span className="font-extrabold uppercase tracking-wider text-[10px] text-[color:var(--t-700)] block">Demo mode: {demoForRole.label}</span>
+                        <span className="font-extrabold uppercase tracking-wider text-xs text-[color:var(--t-700)] block">Demo mode: {demoForRole.label}</span>
                         <span className="font-mono text-slate-800 break-all">{demoForRole.email} / {demoForRole.password}</span>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">

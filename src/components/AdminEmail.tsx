@@ -41,7 +41,7 @@ export default function AdminEmail() {
       {msg && <p role={msg.ok ? 'status' : 'alert'} className={`text-xs font-bold p-2 border ${msg.ok ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'}`}>{msg.text}</p>}
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
-          <thead><tr className="text-left text-[10px] uppercase text-slate-600"><th className="py-2 pr-3">When</th><th className="pr-3">To</th><th className="pr-3">Email</th><th className="pr-3">Status</th><th>Detail</th></tr></thead>
+          <thead><tr className="text-left text-xs uppercase text-slate-600"><th className="py-2 pr-3">When</th><th className="pr-3">To</th><th className="pr-3">Email</th><th className="pr-3">Status</th><th>Detail</th></tr></thead>
           <tbody>
             {s.recent.length === 0 && <tr><td colSpan={5} className="py-3 text-slate-600">No email yet.</td></tr>}
             {s.recent.map(r => (
@@ -49,14 +49,14 @@ export default function AdminEmail() {
                 <td className="py-2 pr-3 whitespace-nowrap">{when(r.createdAt)}</td>
                 <td className="pr-3 break-all">{r.to}</td>
                 <td className="pr-3">{r.template}<span className="block text-slate-600">{r.lang}</span></td>
-                <td className="pr-3"><span className={`px-1.5 py-0.5 text-[10px] font-extrabold uppercase ${TONE[r.status] ?? ''}`}>{r.status}</span>{r.attempts > 1 ? <span className="ml-1 text-slate-600">{r.attempts} tries</span> : null}</td>
+                <td className="pr-3"><span className={`px-1.5 py-0.5 text-xs font-extrabold uppercase ${TONE[r.status] ?? ''}`}>{r.status}</span>{r.attempts > 1 ? <span className="ml-1 text-slate-600">{r.attempts} tries</span> : null}</td>
                 <td className="text-slate-700">{r.error ?? ''}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <p className="text-[11px] text-slate-600">Message bodies are not kept. Rows are removed after 90 days (EMAIL_OUTBOX_DAYS).</p>
+      <p className="text-xs text-slate-600">Message bodies are not kept. Rows are removed after 90 days (EMAIL_OUTBOX_DAYS).</p>
     </section>
   );
 }

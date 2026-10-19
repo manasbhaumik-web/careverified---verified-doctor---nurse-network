@@ -159,7 +159,7 @@ export default function PatientAccess() {
   return (
     <section id="access-section" aria-labelledby="access-heading" className="bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-[11px] font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="section-index-badge">04A</span>
           <Heart className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
@@ -173,7 +173,7 @@ export default function PatientAccess() {
           {tx.localTrust.map(item => (
             <div key={item.title} className="bg-white p-4 sm:p-5 flex flex-col justify-between">
               <div>
-                <span className="inline-block text-[10px] font-mono font-extrabold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] mb-2">
+                <span className="inline-block text-xs font-mono font-extrabold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] mb-2">
                   {item.badge}
                 </span>
                 <h3 className="font-display font-extrabold text-sm sm:text-base text-[color:var(--ink)]">{item.title}</h3>

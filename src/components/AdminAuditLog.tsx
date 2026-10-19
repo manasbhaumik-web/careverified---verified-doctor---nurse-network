@@ -123,7 +123,7 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-slate-900 text-amber-300 border border-slate-800">
+                <span className="text-xs font-black uppercase tracking-wider px-2 py-0.5 bg-slate-900 text-amber-300 border border-slate-800">
                   Statutory Audit Log (WAL Mode)
                 </span>
                 <span className="text-xs text-slate-500 font-mono">SQLite careverified.db</span>
@@ -168,24 +168,24 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
         {/* Telemetry Metric Ribbons */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
           <div className="p-3 bg-slate-50 border border-slate-200">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">Total Audit Events</span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Total Audit Events</span>
             <span className="text-xl font-black text-slate-900 tabular-nums">{totalCount}</span>
-            <span className="text-[10px] text-slate-600 block mt-0.5 font-semibold">Persisted in SQLite</span>
+            <span className="text-xs text-slate-600 block mt-0.5 font-semibold">Persisted in SQLite</span>
           </div>
           <div className="p-3 bg-slate-50 border border-slate-200">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">Active Search Filter</span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Active Search Filter</span>
             <span className="text-xl font-black text-slate-900 tabular-nums">{filteredLogs.length}</span>
-            <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">Matching criteria</span>
+            <span className="text-xs text-emerald-700 font-bold block mt-0.5">Matching criteria</span>
           </div>
           <div className="p-3 bg-slate-50 border border-slate-200">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">Integrity Mode</span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Integrity Mode</span>
             <span className="text-xl font-black text-slate-900 font-mono text-sm">WAL PRAGMA</span>
-            <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">Crash-proof ACID log</span>
+            <span className="text-xs text-emerald-700 font-bold block mt-0.5">Crash-proof ACID log</span>
           </div>
           <div className="p-3 bg-slate-50 border border-slate-200">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">Statutory Scope</span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Statutory Scope</span>
             <span className="text-xl font-black text-slate-900 font-mono text-sm">Act 50 / 586</span>
-            <span className="text-[10px] text-slate-600 block mt-0.5 font-semibold">Retention compliance</span>
+            <span className="text-xs text-slate-600 block mt-0.5 font-semibold">Retention compliance</span>
           </div>
         </div>
 
@@ -224,7 +224,7 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
         <div className="overflow-x-auto border border-slate-200">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[10px]">
+              <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-xs">
                 <th className="p-2.5">Log ID</th>
                 <th className="p-2.5">Timestamp</th>
                 <th className="p-2.5">Actor (Role)</th>
@@ -251,8 +251,8 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
               ) : (
                 filteredLogs.map((log) => (
                   <tr key={log.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-2.5 font-mono text-[11px] text-slate-500 font-bold">#{log.id}</td>
-                    <td className="p-2.5 font-mono text-[11px] text-slate-600 whitespace-nowrap">
+                    <td className="p-2.5 font-mono text-xs text-slate-500 font-bold">#{log.id}</td>
+                    <td className="p-2.5 font-mono text-xs text-slate-600 whitespace-nowrap">
                       {new Date(log.ts).toLocaleString([], { 
                         month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
                       })}
@@ -261,21 +261,21 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
                       <span className="font-bold text-slate-900 block truncate max-w-[130px]" title={log.actor_id || 'system'}>
                         {log.actor_id || 'System Daemon'}
                       </span>
-                      <span className="text-[10px] font-mono text-slate-500 block uppercase font-semibold">
+                      <span className="text-xs font-mono text-slate-500 block uppercase font-semibold">
                         {log.actor_role || 'system'}
                       </span>
                     </td>
                     <td className="p-2.5">
-                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 border ${getActionTone(log.action)}`}>
+                      <span className={`text-xs font-bold uppercase px-2 py-0.5 border ${getActionTone(log.action)}`}>
                         {log.action}
                       </span>
                     </td>
-                    <td className="p-2.5 font-mono text-[11px] text-slate-700">
+                    <td className="p-2.5 font-mono text-xs text-slate-700">
                       {log.target_type ? `${log.target_type}:${log.target_id?.slice(0, 10)}` : '—'}
                     </td>
                     <td className="p-2.5 text-slate-600 max-w-xs truncate" title={log.details || ''}>
                       {log.details ? (
-                        <span className="font-mono text-[11px]">{log.details.slice(0, 60)}{log.details.length > 60 ? '...' : ''}</span>
+                        <span className="font-mono text-xs">{log.details.slice(0, 60)}{log.details.length > 60 ? '...' : ''}</span>
                       ) : (
                         <span className="text-slate-400 italic">None</span>
                       )}
@@ -284,7 +284,7 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
                       <button
                         type="button"
                         onClick={() => setSelectedLog(log)}
-                        className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1 cursor-pointer transition-colors"
+                        className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold uppercase tracking-wider inline-flex items-center gap-1 cursor-pointer transition-colors"
                       >
                         <Eye className="h-3 w-3" />
                         <span>Inspect</span>
@@ -309,7 +309,7 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
             >
               <div className="flex items-start justify-between pb-2 border-b border-slate-200">
                 <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Audit Record Inspector</span>
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500">Audit Record Inspector</span>
                   <h4 className="text-sm font-black text-slate-900 font-mono">Event #{selectedLog.id} · {selectedLog.action}</h4>
                 </div>
                 <button
@@ -323,26 +323,26 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
 
               <div className="grid grid-cols-2 gap-2 text-slate-700 bg-slate-50 p-3 border border-slate-200">
                 <div>
-                  <span className="text-[10px] font-bold text-slate-500 block uppercase">Timestamp (ISO)</span>
-                  <span className="font-mono font-semibold text-[11px]">{selectedLog.ts}</span>
+                  <span className="text-xs font-bold text-slate-500 block uppercase">Timestamp (ISO)</span>
+                  <span className="font-mono font-semibold text-xs">{selectedLog.ts}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-slate-500 block uppercase">IP Address</span>
-                  <span className="font-mono font-semibold text-[11px]">{selectedLog.ip || 'Local Loopback'}</span>
+                  <span className="text-xs font-bold text-slate-500 block uppercase">IP Address</span>
+                  <span className="font-mono font-semibold text-xs">{selectedLog.ip || 'Local Loopback'}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-slate-500 block uppercase">Actor ID</span>
-                  <span className="font-mono font-semibold text-[11px]">{selectedLog.actor_id || 'System'}</span>
+                  <span className="text-xs font-bold text-slate-500 block uppercase">Actor ID</span>
+                  <span className="font-mono font-semibold text-xs">{selectedLog.actor_id || 'System'}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-slate-500 block uppercase">Actor Role</span>
-                  <span className="font-mono font-bold text-[11px] uppercase text-emerald-800">{selectedLog.actor_role || 'internal'}</span>
+                  <span className="text-xs font-bold text-slate-500 block uppercase">Actor Role</span>
+                  <span className="font-mono font-bold text-xs uppercase text-emerald-800">{selectedLog.actor_role || 'internal'}</span>
                 </div>
               </div>
 
               <div>
-                <span className="text-[10px] font-bold text-slate-600 block uppercase mb-1">Parsed JSON Event Metadata:</span>
-                <div className="p-3 bg-slate-900 text-emerald-300 font-mono text-[11px] max-h-48 overflow-y-auto border border-slate-800">
+                <span className="text-xs font-bold text-slate-600 block uppercase mb-1">Parsed JSON Event Metadata:</span>
+                <div className="p-3 bg-slate-900 text-emerald-300 font-mono text-xs max-h-48 overflow-y-auto border border-slate-800">
                   <pre>{JSON.stringify(selectedLog.parsedDetails || selectedLog.details, null, 2)}</pre>
                 </div>
               </div>

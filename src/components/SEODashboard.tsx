@@ -198,7 +198,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                           />
                           <div className="min-w-0">
                             <h4 className="text-xs font-black text-slate-800 truncate">{p.name}</h4>
-                            <p className="text-[10px] text-slate-500 font-bold truncate">{p.specialization}</p>
+                            <p className="text-xs text-slate-500 font-bold truncate">{p.specialization}</p>
                           </div>
                         </div>
 
@@ -210,7 +210,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                             setSelectedSchemaProf(p);
                             setSelectedProfId(p.id);
                           }}
-                          className="h-8 px-2.5 bg-slate-50 hover:bg-[color:var(--t-50)] text-slate-600 hover:text-[color:var(--t-600)] rounded-none border border-slate-200 hover:border-[color:var(--t-200)] transition-all cursor-pointer shrink-0 flex items-center gap-1 text-[11px] font-bold"
+                          className="h-8 px-2.5 bg-slate-50 hover:bg-[color:var(--t-50)] text-slate-600 hover:text-[color:var(--t-600)] rounded-none border border-slate-200 hover:border-[color:var(--t-200)] transition-all cursor-pointer shrink-0 flex items-center gap-1 text-xs font-bold"
                           title="View JSON-LD Schema details"
                         >
                           <Eye className="h-3.5 w-3.5" />
@@ -323,15 +323,15 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-slate-50 p-4 rounded-none border border-slate-200 text-center">
                   <div className="text-xs font-black text-slate-700 uppercase tracking-wider">Specialty Landing</div>
-                  <code className="text-[11px] text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/best-[specialty]-in-[city]</code>
+                  <code className="text-xs text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/best-[specialty]-in-[city]</code>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-none border border-slate-200 text-center">
                   <div className="text-xs font-black text-slate-700 uppercase tracking-wider">Direct Doctor Link</div>
-                  <code className="text-[11px] text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/doctors/[doctor-name-slug]</code>
+                  <code className="text-xs text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/doctors/[doctor-name-slug]</code>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-none border border-slate-200 text-center">
                   <div className="text-xs font-black text-slate-700 uppercase tracking-wider">Sitemap Feed</div>
-                  <code className="text-[11px] text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/sitemap.xml</code>
+                  <code className="text-xs text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/sitemap.xml</code>
                 </div>
               </div>
             </div>
@@ -359,7 +359,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                   <span className="text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">1.1s</span>
                 </div>
                 <h4 className="text-xs font-black text-slate-800">Largest Contentful Paint</h4>
-                <p className="text-[11px] text-slate-500 font-semibold leading-relaxed">Pre-rendered above-the-fold content loads instantly, ensuring maximum crawlability.</p>
+                <p className="text-xs text-slate-500 font-semibold leading-relaxed">Pre-rendered above-the-fold content loads instantly, ensuring maximum crawlability.</p>
               </div>
 
               <div className="border border-slate-250 hover:border-[color:var(--t-600)] p-5 rounded-none bg-white transition-all space-y-2">
@@ -368,7 +368,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                   <span className="text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">24ms</span>
                 </div>
                 <h4 className="text-xs font-black text-slate-800">Interaction to Next Paint</h4>
-                <p className="text-[11px] text-slate-500 font-semibold leading-relaxed">Fast state mutations and lightweight event hooks prevent tap/click delays.</p>
+                <p className="text-xs text-slate-500 font-semibold leading-relaxed">Fast state mutations and lightweight event hooks prevent tap/click delays.</p>
               </div>
 
               <div className="border border-slate-250 hover:border-[color:var(--t-600)] p-5 rounded-none bg-white transition-all space-y-2">
@@ -377,7 +377,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                   <span className="text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">0.02</span>
                 </div>
                 <h4 className="text-xs font-black text-slate-800">Cumulative Layout Shift</h4>
-                <p className="text-[11px] text-slate-500 font-semibold leading-relaxed">Defined image dimensions and skeletal layouts prevent layout jumping during rendering.</p>
+                <p className="text-xs text-slate-500 font-semibold leading-relaxed">Defined image dimensions and skeletal layouts prevent layout jumping during rendering.</p>
               </div>
             </div>
 
@@ -447,7 +447,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                 </div>
                 <div>
                   <h3 className="text-base font-black text-slate-800 leading-tight uppercase tracking-wide">Structured Schema.org Metadata</h3>
-                  <p className="text-[11px] text-slate-500 font-semibold">JSON-LD markup validation for search engine indexing</p>
+                  <p className="text-xs text-slate-500 font-semibold">JSON-LD markup validation for search engine indexing</p>
                 </div>
               </div>
 
@@ -461,13 +461,13 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                 />
                 <div>
                   <h4 className="text-xs font-black text-slate-800">{selectedSchemaProf.name}</h4>
-                  <p className="text-[10px] text-slate-500 font-bold">{selectedSchemaProf.specialization} &bull; {selectedSchemaProf.city}</p>
+                  <p className="text-xs text-slate-500 font-bold">{selectedSchemaProf.specialization} &bull; {selectedSchemaProf.city}</p>
                 </div>
               </div>
 
               {/* JSON code block in modal */}
               <div className="relative">
-                <pre className="bg-slate-100 text-slate-850 text-[11px] p-4 rounded-none overflow-x-auto max-h-72 font-mono border border-slate-300 leading-relaxed">
+                <pre className="bg-slate-100 text-slate-850 text-xs p-4 rounded-none overflow-x-auto max-h-72 font-mono border border-slate-300 leading-relaxed">
                   <code>{generateSchema()}</code>
                 </pre>
                 <button
@@ -476,7 +476,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }}
-                  className="absolute top-3 right-3 h-8 bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] text-white rounded-none px-3 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
+                  className="absolute top-3 right-3 h-8 bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] text-white rounded-none px-3 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
                 >
                   {copied ? <CheckCircle className="h-3 w-3 text-white" /> : <Copy className="h-3 w-3 text-white" />}
                   {copied ? 'Copied!' : 'Copy Schema'}

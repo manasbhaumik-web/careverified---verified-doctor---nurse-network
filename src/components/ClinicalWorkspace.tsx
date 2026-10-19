@@ -15,7 +15,7 @@ const SEV: Record<string, string> = {
 };
 const blankItem = () => ({ name: '', strength: '', form: 'tablet', dose: '', frequency: '', durationDays: 5, quantity: 10, instructions: '', npraReg: '' });
 const field = 'w-full border border-slate-200 bg-white px-2.5 py-1.5 text-xs focus:outline-none focus:border-[color:var(--t-600)]';
-const label = 'text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
+const label = 'text-xs font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
 
 /** The doctor's clinical tools for one booking or consultation: record, notes, prescriptions, certificates, referrals, labs. */
 export default function ClinicalWorkspace({ kind, refId }: Props) {
@@ -130,7 +130,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
     <div className="space-y-3 text-slate-800">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-extrabold">{ctx.patient.name}</p>
-        <p className={`text-[11px] font-bold px-2 py-1 border ${ctx.recordShared ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
+        <p className={`text-xs font-bold px-2 py-1 border ${ctx.recordShared ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
           {ctx.recordShared ? 'Patient shared their health record with you' : 'Patient has not shared their health record'}
         </p>
       </div>
@@ -199,7 +199,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
                 <div className="col-span-2 sm:col-span-4"><label className={label}>Instructions</label><input className={field} value={it.instructions} onChange={e => setItem(i, { instructions: e.target.value })} placeholder="After meals" maxLength={200} /></div>
                 <div className="col-span-2 sm:col-span-4"><label className={label}>NPRA registration no. (optional)</label><input className={`${field} font-mono`} value={it.npraReg ?? ''} onChange={e => setItem(i, { npraReg: e.target.value.toUpperCase() })} placeholder="MAL12345678A" maxLength={20} /></div>
               </div>
-              {items.length > 1 && <button onClick={() => { setItems(items.filter((_, x) => x !== i)); setWarnings(null); }} className="text-[11px] font-bold text-rose-700 flex items-center gap-1 cursor-pointer"><Trash2 className="h-3 w-3" /> Remove</button>}
+              {items.length > 1 && <button onClick={() => { setItems(items.filter((_, x) => x !== i)); setWarnings(null); }} className="text-xs font-bold text-rose-700 flex items-center gap-1 cursor-pointer"><Trash2 className="h-3 w-3" /> Remove</button>}
             </fieldset>
           ))}
           <button onClick={() => { setItems([...items, blankItem()]); setWarnings(null); }} disabled={items.length >= 12} className="text-xs font-bold border border-slate-300 px-3 py-1.5 cursor-pointer">+ Add medicine</button>
@@ -237,7 +237,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
                   {w.severity === 'contraindicated' && <p className="font-bold">Cannot be issued.</p>}
                 </div>
               ))}
-              <p className="text-[11px] text-slate-500">Built-in checks cover a limited formulary and common interactions. They support, not replace, your clinical judgement.</p>
+              <p className="text-xs text-slate-500">Built-in checks cover a limited formulary and common interactions. They support, not replace, your clinical judgement.</p>
             </div>
           )}
 

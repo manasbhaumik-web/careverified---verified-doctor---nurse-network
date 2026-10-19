@@ -40,7 +40,7 @@ export default function NotificationBell() {
       >
         <Bell className="h-[18px] w-[18px]" />
         {unread > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-white text-[color:var(--t-700)] text-[10px] font-black flex items-center justify-center">{unread}</span>
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-white text-[color:var(--t-700)] text-xs font-black flex items-center justify-center">{unread}</span>
         )}
       </button>
       {open && (
@@ -51,7 +51,7 @@ export default function NotificationBell() {
             <div key={i.id} className={`p-3 border-b border-slate-100 text-xs ${i.isRead ? '' : 'bg-[color:var(--t-50)]'}`}>
               <p className="font-extrabold">{i.title}</p>
               <p className="text-slate-600 mt-0.5">{i.body}</p>
-              <p className="text-[10px] text-slate-400 mt-1">{new Date(i.ts).toLocaleString()}</p>
+              <p className="text-xs text-slate-400 mt-1">{new Date(i.ts).toLocaleString()}</p>
             </div>
           ))}
         </div>

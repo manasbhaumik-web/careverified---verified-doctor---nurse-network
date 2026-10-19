@@ -228,14 +228,14 @@ export default function JobMarket({
         </div>
 
         {app?.paymentRef && (
-          <div className="text-[11px] text-slate-600 flex items-center justify-between">
+          <div className="text-xs text-slate-600 flex items-center justify-between">
             <span>Security Reference:</span>
             <span className="font-mono font-bold text-[color:var(--ink)]">{app.paymentRef}</span>
           </div>
         )}
 
         {app?.decisionNote && (
-          <p className="text-[11px] text-slate-600 italic bg-white p-2 border border-slate-200">
+          <p className="text-xs text-slate-600 italic bg-white p-2 border border-slate-200">
             "{app.decisionNote}"
           </p>
         )}
@@ -381,12 +381,12 @@ export default function JobMarket({
               }`}
             >
               <div className="min-w-0">
-                <p className="text-[11px] font-bold text-[color:var(--ink-2)] uppercase tracking-wider truncate">{card.label}</p>
+                <p className="text-xs font-bold text-[color:var(--ink-2)] uppercase tracking-wider truncate">{card.label}</p>
                 <div className="flex items-baseline gap-2 mt-0.5">
                   <span className="text-xl sm:text-2xl font-black font-mono text-[color:var(--ink)] tabular-nums leading-none">
                     {card.value}
                   </span>
-                  <span className="text-[10px] text-slate-500 font-medium truncate hidden xl:inline">
+                  <span className="text-xs text-slate-500 font-medium truncate hidden xl:inline">
                     {card.caption}
                   </span>
                 </div>
@@ -612,7 +612,7 @@ export default function JobMarket({
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-base font-bold text-[color:var(--ink)]">{activeTab === 'applied' ? 'Your applications' : 'Open shifts & vacancies'}</h2>
-        <span className="text-[13px] text-slate-600">Showing {filteredJobs.length} listing{filteredJobs.length === 1 ? '' : 's'}</span>
+        <span className="text-sm text-slate-600">Showing {filteredJobs.length} listing{filteredJobs.length === 1 ? '' : 's'}</span>
       </div>
 
       {/* ACTIVE SHIFTS CONTAINER */}
@@ -628,7 +628,7 @@ export default function JobMarket({
             <h4 className="text-sm font-bold text-[color:var(--ink)]">
               {activeTab === 'applied' ? 'You have not applied to any shifts yet' : 'No shift posts match active filters'}
             </h4>
-            <p className="text-[13px] text-slate-600">
+            <p className="text-sm text-slate-600">
               {activeTab === 'applied' ? 'Apply to an open shift and it will appear here.' : 'Modify filters to explore other contract categories.'}
             </p>
           </div>
@@ -644,7 +644,7 @@ export default function JobMarket({
                 onClick={(e) => { e.stopPropagation(); handleApply(job.id); }}
                 disabled={hasApplied || !!job.applyBlockedReason}
                 title={job.applyBlockedReason ?? undefined}
-                className={`min-h-[44px] px-5 text-[13px] font-bold transition-colors flex items-center justify-center gap-1.5 ${
+                className={`min-h-[44px] px-5 text-sm font-bold transition-colors flex items-center justify-center gap-1.5 ${
                   hasApplied
                     ? 'bg-[color:var(--e-50)] border border-[color:var(--e-200)] text-[color:var(--e-800)] cursor-not-allowed'
                     : job.applyBlockedReason ? 'bg-slate-100 border border-slate-300 text-slate-500 cursor-not-allowed'
@@ -665,23 +665,23 @@ export default function JobMarket({
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className="h-12 w-12 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center text-lg shrink-0">{job.hospitalLogo}</div>
                     <div className="min-w-0">
-                      <h3 className="text-[15px] font-bold text-[color:var(--ink)] truncate">{job.title}</h3>
-                      <p className="text-[13px] text-[color:var(--ink-2)] truncate">{job.hospitalName}</p>
+                      <h3 className="text-base font-bold text-[color:var(--ink)] truncate">{job.title}</h3>
+                      <p className="text-sm text-[color:var(--ink-2)] truncate">{job.hospitalName}</p>
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 flex-1 text-xs text-[color:var(--ink-2)]">
-                    <span className={`border text-[11px] font-bold px-2.5 py-1 ${typePill}`}>{job.type}</span>
+                    <span className={`border text-xs font-bold px-2.5 py-1 ${typePill}`}>{job.type}</span>
                     <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5 text-slate-500" />{job.city}</span>
                     <span className="inline-flex items-center gap-1"><Tag className="h-3.5 w-3.5 text-slate-500" />{job.specialtyRequired}</span>
                   </div>
                   <div className="flex items-center justify-between md:justify-end gap-4 shrink-0">
-                    <span className="text-[15px] font-bold text-[color:var(--ink)]">{job.salaryRange}</span>
+                    <span className="text-base font-bold text-[color:var(--ink)]">{job.salaryRange}</span>
                     <JobBadges job={job} />
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setSelectedModalJob(job); }}
-                        className="min-h-[44px] px-4 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-[13px] font-semibold flex items-center gap-1.5 cursor-pointer"
+                        className="min-h-[44px] px-4 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-sm font-semibold flex items-center gap-1.5 cursor-pointer"
                       >
                         <Eye className="h-3.5 w-3.5" /> Details
                       </button>
@@ -706,20 +706,20 @@ export default function JobMarket({
                   <div className="h-12 w-12 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center text-lg shrink-0">{job.hospitalLogo}</div>
                   <div className="min-w-0 flex-1">
                     <h3 className="text-base font-bold text-[color:var(--ink)] leading-snug">{job.title}</h3>
-                    <p className="text-[13px] text-[color:var(--ink-2)] mt-0.5">{job.hospitalName}</p>
+                    <p className="text-sm text-[color:var(--ink-2)] mt-0.5">{job.hospitalName}</p>
                   </div>
-                  <span className={`border text-[11px] font-bold px-2.5 py-1 shrink-0 ${typePill}`}>{job.type}</span>
+                  <span className={`border text-xs font-bold px-2.5 py-1 shrink-0 ${typePill}`}>{job.type}</span>
                 </div>
 
-                <div className="flex flex-col gap-2 text-[13px] text-[color:var(--ink-2)]">
+                <div className="flex flex-col gap-2 text-sm text-[color:var(--ink-2)]">
                   <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-slate-500 shrink-0" />{job.location}, {job.city}</div>
                   <div className="flex items-center gap-2"><Tag className="h-4 w-4 text-slate-500 shrink-0" />{job.specialtyRequired}</div>
                 </div>
 
-                <p className="text-[13px] text-slate-600 leading-relaxed line-clamp-2">{job.description}</p>
+                <p className="text-sm text-slate-600 leading-relaxed line-clamp-2">{job.description}</p>
 
                 <div className="border-t border-[color:var(--t-100)] pt-3.5 flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-[15px] font-bold text-[color:var(--ink)]">{job.salaryRange}</span>
+                  <span className="text-base font-bold text-[color:var(--ink)]">{job.salaryRange}</span>
                     <JobBadges job={job} />
                   <span className="text-xs text-slate-600 inline-flex items-center gap-1.5"><Users className="h-3.5 w-3.5" /><span className="tabular-nums">{job.applicantsCount}</span> applicants</span>
                 </div>
@@ -730,7 +730,7 @@ export default function JobMarket({
                   <button
                     type="button"
                     onClick={() => setSelectedModalJob(job)}
-                    className="min-h-[44px] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-[13px] font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="min-h-[44px] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-sm font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <Eye className="h-3.5 w-3.5" /> View details
                   </button>
@@ -745,7 +745,7 @@ export default function JobMarket({
       {/* Trust note */}
       <section className="bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-5 py-4 flex flex-wrap items-center gap-3.5">
         <ShieldCheck className="h-5 w-5 text-[color:var(--e-600)] shrink-0" />
-        <p className="flex-1 min-w-[260px] text-[13px] leading-relaxed text-[color:var(--e-800)]">
+        <p className="flex-1 min-w-[260px] text-sm leading-relaxed text-[color:var(--e-800)]">
           <strong className="font-bold">Credential-verified only.</strong> Every applicant is checked against MMC and LJM registries before a hospital sees the application.
         </p>
       </section>
@@ -792,10 +792,10 @@ export default function JobMarket({
               {/* Allowance Badge Panel */}
               <div className="flex flex-wrap justify-between items-center gap-3 bg-[color:var(--t-50)] p-4 rounded-xl border border-[color:var(--t-200)]">
                 <div>
-                  <span className="text-[9px] text-[color:var(--t-700)] block font-black uppercase tracking-wider">Estimated Allowance</span>
+                  <span className="text-xs text-[color:var(--t-700)] block font-black uppercase tracking-wider">Estimated Allowance</span>
                   <span className="font-mono text-base font-extrabold text-[color:var(--ink)] leading-tight block">{selectedModalJob.salaryRange}</span>
                 </div>
-                <span className="bg-[color:var(--t-600)] text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-lg tracking-wider">
+                <span className="bg-[color:var(--t-600)] text-white text-xs font-black uppercase px-3 py-1.5 rounded-lg tracking-wider">
                   {selectedModalJob.type}
                 </span>
               </div>
@@ -803,14 +803,14 @@ export default function JobMarket({
               {/* Location & Specialty Grid */}
               <div className="grid grid-cols-2 gap-3 text-xs font-bold text-slate-700">
                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                  <span className="text-[9px] text-slate-400 block uppercase">Department & City</span>
+                  <span className="text-xs text-slate-400 block uppercase">Department & City</span>
                   <p className="text-xs font-bold text-slate-800 mt-1 flex items-center gap-1.5">
                     <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                     {selectedModalJob.location}, {selectedModalJob.city}
                   </p>
                 </div>
                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                  <span className="text-[9px] text-slate-400 block uppercase">Specialty Focus</span>
+                  <span className="text-xs text-slate-400 block uppercase">Specialty Focus</span>
                   <p className="text-xs font-bold text-slate-800 mt-1 flex items-center gap-1.5">
                     <Tag className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                     {selectedModalJob.specialtyRequired}
@@ -820,7 +820,7 @@ export default function JobMarket({
 
               {/* Description */}
               <div className="space-y-1.5">
-                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wide block">Detailed Clinical Scope & Shift Schedule</span>
+                <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wide block">Detailed Clinical Scope & Shift Schedule</span>
                 <p className="text-xs text-slate-600 leading-relaxed font-semibold bg-slate-50/40 p-4 rounded-xl border border-slate-150">
                   {selectedModalJob.description}
                 </p>
@@ -828,7 +828,7 @@ export default function JobMarket({
 
               {/* Requirements */}
               <div className="space-y-2.5">
-                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wide block flex items-center gap-1.5">
+                <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wide block flex items-center gap-1.5">
                   <ShieldCheck className="h-4.5 w-4.5 text-emerald-600" />
                   Mandated Licensing & Clinical Credentials Check:
                 </span>
@@ -849,7 +849,7 @@ export default function JobMarket({
                   <Users className="h-4 w-4 text-slate-400" />
                   {selectedModalJob.applicantsCount} Practitioners applied
                 </span>
-                <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase border ${selectedModalJob.employer?.licenceOk ? 'text-emerald-700 bg-emerald-50 border-emerald-100' : 'text-amber-800 bg-amber-50 border-amber-200'}`}>
+                <span className={`px-2 py-0.5 rounded text-xs font-extrabold uppercase border ${selectedModalJob.employer?.licenceOk ? 'text-emerald-700 bg-emerald-50 border-emerald-100' : 'text-amber-800 bg-amber-50 border-amber-200'}`}>
                   {selectedModalJob.employer?.licenceOk ? 'Facility licence checked' : 'Employer not checked'}
                 </span>
               </div>
@@ -894,7 +894,7 @@ export default function JobMarket({
                   )}
                 </button>
                 {selectedModalJob.applyBlockedReason && (
-                  <span className="text-[10px] text-rose-600 font-semibold text-center leading-tight">
+                  <span className="text-xs text-rose-600 font-semibold text-center leading-tight">
                     {selectedModalJob.applyBlockedReason}
                   </span>
                 )}

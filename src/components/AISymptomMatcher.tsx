@@ -163,11 +163,11 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
         <div className="mt-5 bg-white border border-[color:var(--t-200)] p-5 shadow-xs space-y-4 animate-fade-in">
           <div className="flex justify-between items-center border-b border-[color:var(--t-100)] pb-3">
             <div>
-              <span className="text-[10px] font-mono font-bold text-[color:var(--t-700)] uppercase tracking-wider">Suggested Specialty</span>
+              <span className="text-xs font-mono font-bold text-[color:var(--t-700)] uppercase tracking-wider">Suggested Specialty</span>
               <h4 className="text-sm font-extrabold text-[color:var(--ink)]">{result.data.recommendedSpecialty}</h4>
             </div>
             <div className="text-right max-w-[12rem]">
-              <span className="text-[10px] text-slate-500 block font-medium">Algorithmic matching · Non-diagnostic</span>
+              <span className="text-xs text-slate-500 block font-medium">Algorithmic matching · Non-diagnostic</span>
             </div>
           </div>
 
@@ -179,7 +179,7 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
 
             <div className="flex justify-between items-center p-3 border border-[color:var(--t-200)] bg-[color:var(--t-bg)]">
               <span className="font-bold text-[color:var(--ink)]">Triage Urgency:</span>
-              <span className={`px-2.5 py-1 font-mono font-bold text-[10px] uppercase tracking-wider ${result.data.symptomSeverity === 'High/Urgent'
+              <span className={`px-2.5 py-1 font-mono font-bold text-xs uppercase tracking-wider ${result.data.symptomSeverity === 'High/Urgent'
                   ? 'bg-rose-50 text-rose-800 border border-rose-200'
                   : result.data.symptomSeverity === 'Medium'
                     ? 'bg-amber-50 text-amber-800 border border-amber-200'
@@ -196,7 +196,7 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
           </div>
 
           <div className="border-t border-[color:var(--t-100)] pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <span className="text-[10px] font-mono text-slate-500 flex items-center gap-1.5">
+            <span className="text-xs font-mono text-slate-500 flex items-center gap-1.5">
               <HelpCircle className="h-3.5 w-3.5" />
               Source: {result.source}
             </span>
@@ -210,7 +210,7 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
           </div>
 
           {result.warning && (
-            <p className="text-[11px] text-amber-800 bg-amber-50 p-2.5 leading-relaxed text-center font-bold border border-amber-200">
+            <p className="text-xs text-amber-800 bg-amber-50 p-2.5 leading-relaxed text-center font-bold border border-amber-200">
               {result.warning}
             </p>
           )}

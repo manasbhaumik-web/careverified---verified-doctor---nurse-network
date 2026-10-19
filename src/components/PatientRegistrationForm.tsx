@@ -153,7 +153,7 @@ export default function PatientRegistrationForm({
           </div>
           <div>
             <h3 className="text-base font-black text-[color:var(--ink)]">Create Member Profile</h3>
-            <p className="text-[10px] text-slate-600 font-bold uppercase tracking-wider mt-0.5">Secure National Health Register</p>
+            <p className="text-xs text-slate-600 font-bold uppercase tracking-wider mt-0.5">Secure National Health Register</p>
           </div>
         </div>
         <button 
@@ -167,11 +167,11 @@ export default function PatientRegistrationForm({
       {/* Stepped Progress Guide Indicator */}
       <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] rounded-none p-4.5 space-y-3.5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[color:var(--t-600)] tracking-wider">
+          <div className="flex items-center gap-1.5 text-xs font-black uppercase text-[color:var(--t-600)] tracking-wider">
             <Activity className="h-4 w-4" />
             <span>Registration Progress Guide</span>
           </div>
-          <span className="text-[10px] text-slate-600 font-mono font-bold">Step {step} of 3</span>
+          <span className="text-xs text-slate-600 font-mono font-bold">Step {step} of 3</span>
         </div>
         
         {/* Dynamic Timeline Steps */}
@@ -218,9 +218,9 @@ export default function PatientRegistrationForm({
 
           {/* Row of labels aligned directly below circles */}
           <div className="flex items-center justify-between mt-1.5">
-            <span className={`text-[9px] font-black uppercase text-left ${step === 1 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Account Setup</span>
-            <span className={`text-[9px] font-black uppercase text-center ${step === 2 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Demographics</span>
-            <span className={`text-[9px] font-black uppercase text-right ${step === 3 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Medical Background</span>
+            <span className={`text-xs font-black uppercase text-left ${step === 1 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Account Setup</span>
+            <span className={`text-xs font-black uppercase text-center ${step === 2 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Demographics</span>
+            <span className={`text-xs font-black uppercase text-right ${step === 3 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Medical Background</span>
           </div>
         </div>
       </div>
@@ -240,14 +240,14 @@ export default function PatientRegistrationForm({
           <div className="space-y-4 animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Full Name (as on your ID) *</label>
+                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Full Name (as on your ID) *</label>
                 <div className="relative">
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                   <input type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ahmad Fauzi Bin Ramli" className="form-input pl-10" required />
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Email Address *</label>
+                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Email Address *</label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                   <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" spellCheck={false} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ahmad@gmail.com" className="form-input pl-10" required />
@@ -255,7 +255,7 @@ export default function PatientRegistrationForm({
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Account Password *</label>
+              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Account Password *</label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                 <input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters, letters and numbers" className="form-input pl-10" required />
@@ -278,21 +278,21 @@ export default function PatientRegistrationForm({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <PhoneField id="reg-phone" title="Mobile number" value={phone} onChange={setPhone} />
               <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block" htmlFor="reg-gender">Gender</label>
+                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block" htmlFor="reg-gender">Gender</label>
                 <select id="reg-gender" value={gender} onChange={(e) => setGender(e.target.value)} className="form-select">
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
                   <option value="Other">Other</option>
                 </select>
-                {nric && nric.gender !== gender && <p className="text-[11px] font-semibold text-amber-700 mt-1">Your MyKad number suggests {nric.gender}. Keep your choice if you prefer.</p>}
+                {nric && nric.gender !== gender && <p className="text-xs font-semibold text-amber-700 mt-1">Your MyKad number suggests {nric.gender}. Keep your choice if you prefer.</p>}
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block" htmlFor="reg-lang">Preferred language for care</label>
+              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block" htmlFor="reg-lang">Preferred language for care</label>
               <select id="reg-lang" value={preferredLanguage} onChange={(e) => setPreferredLanguage(e.target.value)} className="form-select">
                 {PREFERRED_LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
               </select>
-              <p className="text-[11px] text-slate-500 font-semibold mt-1">Used to match you with a practitioner who speaks your language{age ? `. Age on record: ${age}.` : '.'}</p>
+              <p className="text-xs text-slate-500 font-semibold mt-1">Used to match you with a practitioner who speaks your language{age ? `. Age on record: ${age}.` : '.'}</p>
             </div>
             <AddressFields value={address} onChange={setAddress} />
 
@@ -316,7 +316,7 @@ export default function PatientRegistrationForm({
           <div className="space-y-5 animate-fade-in">
             {/* Chronic Conditions */}
             <div className="space-y-2">
-              <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Pre-Existing Chronic Conditions</label>
+              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Pre-Existing Chronic Conditions</label>
               <div className="flex flex-wrap gap-2 pt-1">
                 {['Hypertension', 'Diabetes Mellitus', 'Asthma', 'Heart Conditions', 'Chronic Kidney Disease'].map((cond) => {
                   const isChecked = selectedConditions.includes(cond);
@@ -325,7 +325,7 @@ export default function PatientRegistrationForm({
                       type="button"
                       key={cond}
                       onClick={() => toggleCondition(cond)}
-                      className={`text-[10px] font-bold px-3 py-1.5 rounded-none border transition-all cursor-pointer ${
+                      className={`text-xs font-bold px-3 py-1.5 rounded-none border transition-all cursor-pointer ${
                         isChecked 
                           ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-600)] shadow-md font-black' 
                           : 'bg-white text-slate-600 border-[color:var(--t-200)] hover:border-[color:var(--t-600)] hover:text-[color:var(--ink)]'
@@ -340,7 +340,7 @@ export default function PatientRegistrationForm({
 
             {/* Drug Allergies */}
             <div className="space-y-1.5">
-              <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Drug or General Allergies (Optional)</label>
+              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Drug or General Allergies (Optional)</label>
               <input
                 type="text"
                 value={allergiesText}
@@ -352,14 +352,14 @@ export default function PatientRegistrationForm({
 
             {/* Emergency Contacts */}
             <div className="space-y-3.5 pt-2 border-t border-[color:var(--t-200)]">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 block">Emergency Contact (used for Doctor-on-Call dispatches) *</span>
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Emergency Contact (used for Doctor-on-Call dispatches) *</span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 block">Contact Person Name</label>
+                  <label className="text-xs font-extrabold uppercase tracking-wider text-slate-600 block">Contact Person Name</label>
                   <input type="text" value={emergencyContactName} onChange={(e) => setEmergencyContactName(e.target.value)} placeholder="Fatimah Binti Fauzi" className="form-input" required />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 block">Relationship</label>
+                  <label className="text-xs font-extrabold uppercase tracking-wider text-slate-600 block">Relationship</label>
                   <select value={emergencyRelationship} onChange={(e) => setEmergencyRelationship(e.target.value)} className="form-select">
                     {RELATIONSHIPS.map(r => <option key={r} value={r}>{r}</option>)}
                   </select>

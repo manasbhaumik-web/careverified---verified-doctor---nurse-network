@@ -30,7 +30,7 @@ export default function PractitionerOverviewTab({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">
+            <span className="text-sm font-semibold text-[color:var(--ink-2)]">
               {isDoc ? "Response SLA Speed" : "Home Care Arrival SLA"}
             </span>
             <Clock className="h-4 w-4 text-[color:var(--t-600)]" />
@@ -47,7 +47,7 @@ export default function PractitionerOverviewTab({
 
         <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">
+            <span className="text-sm font-semibold text-[color:var(--ink-2)]">
               {isDoc ? "E-Prescription Compliance" : "Aseptic Procedure Protocol"}
             </span>
             <FileText className="h-4 w-4 text-emerald-600" />
@@ -64,7 +64,7 @@ export default function PractitionerOverviewTab({
 
         <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-[color:var(--ink-2)]">
+            <span className="text-sm font-semibold text-[color:var(--ink-2)]">
               {isDoc ? "Diagnostic Accuracy" : "Patient Comfort & Care"}
             </span>
             <ShieldCheck className="h-4 w-4 text-[color:var(--t-600)]" />
@@ -96,7 +96,7 @@ export default function PractitionerOverviewTab({
             <span className="font-black text-sm">
               {isDoc ? "Issue E-Prescription" : "Complete Nursing Care Log"}
             </span>
-            <span className="text-[11px] font-semibold text-slate-600">
+            <span className="text-xs font-semibold text-slate-600">
               {isDoc
                 ? "Draft & sign digital prescriptions for active consultations."
                 : "Log sterile wound dressing, vitals telemetry & clinical care notes."}
@@ -111,7 +111,7 @@ export default function PractitionerOverviewTab({
             <span className="font-black text-sm">
               {isDoc ? "Review Patient Records" : "Patient Vitals & Care History"}
             </span>
-            <span className="text-[11px] font-semibold text-slate-600">
+            <span className="text-xs font-semibold text-slate-600">
               {isDoc
                 ? "Access verified lab reports, X-rays, and medical history."
                 : "Review patient baseline BP, blood glucose, and recovery trend."}
@@ -126,7 +126,7 @@ export default function PractitionerOverviewTab({
             <span className="font-black text-sm">
               {isDoc ? "Emergency Dispatch Log" : "Home Nursing Transit Radar"}
             </span>
-            <span className="text-[11px] font-semibold text-slate-600">
+            <span className="text-xs font-semibold text-slate-600">
               {pendingDispatchesCount > 0 ? `${pendingDispatchesCount} active dispatches awaiting response.` : 'All emergency dispatches up-to-date.'}
             </span>
           </button>

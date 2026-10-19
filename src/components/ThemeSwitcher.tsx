@@ -89,7 +89,7 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
 
       {open && (
         <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white border border-[color:var(--t-200)] shadow-xl text-slate-800 rounded-none overflow-hidden panel-edge">
-          <p className="px-3 pt-3 pb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+          <p className="px-3 pt-3 pb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
             Application theme
           </p>
           <ul role="listbox" aria-label="Application theme" className="pb-1.5">

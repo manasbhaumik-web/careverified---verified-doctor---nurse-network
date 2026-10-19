@@ -51,7 +51,7 @@ export default function HeaderColorSamples() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-xl sm:text-2xl font-black text-slate-900">Ahmad Bin Razak</h2>
-                  <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  <span className="text-xs font-black uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
                     EHR Verified Patient
                   </span>
                 </div>
@@ -62,9 +62,9 @@ export default function HeaderColorSamples() {
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-stretch bg-slate-50 border border-slate-200 h-10 text-xs">
-                <div className="px-3 flex flex-col justify-center border-r border-slate-200"><span className="font-black text-slate-900">2</span><span className="text-[9px] uppercase font-bold text-slate-500">Upcoming</span></div>
-                <div className="px-3 flex flex-col justify-center border-r border-slate-200"><span className="font-black text-slate-900">3</span><span className="text-[9px] uppercase font-bold text-slate-500">Active Rx</span></div>
-                <div className="px-3 flex flex-col justify-center"><span className="font-black text-slate-900">RM 250</span><span className="text-[9px] uppercase font-bold text-slate-500">Care Team</span></div>
+                <div className="px-3 flex flex-col justify-center border-r border-slate-200"><span className="font-black text-slate-900">2</span><span className="text-xs uppercase font-bold text-slate-500">Upcoming</span></div>
+                <div className="px-3 flex flex-col justify-center border-r border-slate-200"><span className="font-black text-slate-900">3</span><span className="text-xs uppercase font-bold text-slate-500">Active Rx</span></div>
+                <div className="px-3 flex flex-col justify-center"><span className="font-black text-slate-900">RM 250</span><span className="text-xs uppercase font-bold text-slate-500">Care Team</span></div>
               </div>
               <button className="h-10 px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black shadow-xs cursor-pointer">
                 On-Call Doctor Now
@@ -91,7 +91,7 @@ export default function HeaderColorSamples() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-xl sm:text-2xl font-black text-[color:var(--ink)]">Ahmad Bin Razak</h2>
-                  <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] shadow-2xs">
+                  <span className="text-xs font-black uppercase px-2 py-0.5 bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] shadow-2xs">
                     EHR Verified Patient
                   </span>
                 </div>
@@ -102,9 +102,9 @@ export default function HeaderColorSamples() {
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-stretch bg-white border border-[color:var(--t-200)] h-10 text-xs shadow-2xs">
-                <div className="px-3 flex flex-col justify-center border-r border-[color:var(--t-100)]"><span className="font-black text-[color:var(--ink)]">2</span><span className="text-[9px] uppercase font-bold text-[color:var(--t-600)]">Upcoming</span></div>
-                <div className="px-3 flex flex-col justify-center border-r border-[color:var(--t-100)]"><span className="font-black text-[color:var(--ink)]">3</span><span className="text-[9px] uppercase font-bold text-[color:var(--t-600)]">Active Rx</span></div>
-                <div className="px-3 flex flex-col justify-center"><span className="font-black text-[color:var(--ink)]">RM 250</span><span className="text-[9px] uppercase font-bold text-[color:var(--t-600)]">Care Team</span></div>
+                <div className="px-3 flex flex-col justify-center border-r border-[color:var(--t-100)]"><span className="font-black text-[color:var(--ink)]">2</span><span className="text-xs uppercase font-bold text-[color:var(--t-600)]">Upcoming</span></div>
+                <div className="px-3 flex flex-col justify-center border-r border-[color:var(--t-100)]"><span className="font-black text-[color:var(--ink)]">3</span><span className="text-xs uppercase font-bold text-[color:var(--t-600)]">Active Rx</span></div>
+                <div className="px-3 flex flex-col justify-center"><span className="font-black text-[color:var(--ink)]">RM 250</span><span className="text-xs uppercase font-bold text-[color:var(--t-600)]">Care Team</span></div>
               </div>
               <button className="h-10 px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black shadow-xs cursor-pointer">
                 On-Call Doctor Now
@@ -131,7 +131,7 @@ export default function HeaderColorSamples() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-xl sm:text-2xl font-black text-[color:var(--ink)]">Ahmad Bin Razak</h2>
-                  <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-white text-[color:var(--t-700)] border border-[color:var(--t-300)] shadow-2xs">
+                  <span className="text-xs font-black uppercase px-2 py-0.5 bg-white text-[color:var(--t-700)] border border-[color:var(--t-300)] shadow-2xs">
                     EHR Verified Patient
                   </span>
                 </div>
@@ -142,9 +142,9 @@ export default function HeaderColorSamples() {
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-stretch bg-white border border-[color:var(--t-300)] h-10 text-xs shadow-2xs">
-                <div className="px-3 flex flex-col justify-center border-r border-[color:var(--t-200)]"><span className="font-black text-[color:var(--ink)]">2</span><span className="text-[9px] uppercase font-bold text-[color:var(--t-600)]">Upcoming</span></div>
-                <div className="px-3 flex flex-col justify-center border-r border-[color:var(--t-200)]"><span className="font-black text-[color:var(--ink)]">3</span><span className="text-[9px] uppercase font-bold text-[color:var(--t-600)]">Active Rx</span></div>
-                <div className="px-3 flex flex-col justify-center"><span className="font-black text-[color:var(--ink)]">RM 250</span><span className="text-[9px] uppercase font-bold text-[color:var(--t-600)]">Care Team</span></div>
+                <div className="px-3 flex flex-col justify-center border-r border-[color:var(--t-200)]"><span className="font-black text-[color:var(--ink)]">2</span><span className="text-xs uppercase font-bold text-[color:var(--t-600)]">Upcoming</span></div>
+                <div className="px-3 flex flex-col justify-center border-r border-[color:var(--t-200)]"><span className="font-black text-[color:var(--ink)]">3</span><span className="text-xs uppercase font-bold text-[color:var(--t-600)]">Active Rx</span></div>
+                <div className="px-3 flex flex-col justify-center"><span className="font-black text-[color:var(--ink)]">RM 250</span><span className="text-xs uppercase font-bold text-[color:var(--t-600)]">Care Team</span></div>
               </div>
               <button className="h-10 px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black shadow-xs cursor-pointer">
                 On-Call Doctor Now
@@ -171,7 +171,7 @@ export default function HeaderColorSamples() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-xl sm:text-2xl font-black text-slate-900">Ahmad Bin Razak</h2>
-                  <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-white text-[color:var(--t-600)] border border-[color:var(--t-200)]">
+                  <span className="text-xs font-black uppercase px-2 py-0.5 bg-white text-[color:var(--t-600)] border border-[color:var(--t-200)]">
                     EHR Verified Patient
                   </span>
                 </div>
@@ -182,9 +182,9 @@ export default function HeaderColorSamples() {
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-stretch bg-white border border-[color:var(--t-200)] h-10 text-xs shadow-2xs">
-                <div className="px-3 flex flex-col justify-center border-r border-[color:var(--t-100)]"><span className="font-black text-slate-800">2</span><span className="text-[9px] uppercase font-bold text-slate-500">Upcoming</span></div>
-                <div className="px-3 flex flex-col justify-center border-r border-[color:var(--t-100)]"><span className="font-black text-slate-800">3</span><span className="text-[9px] uppercase font-bold text-slate-500">Active Rx</span></div>
-                <div className="px-3 flex flex-col justify-center"><span className="font-black text-slate-800">RM 250</span><span className="text-[9px] uppercase font-bold text-slate-500">Care Team</span></div>
+                <div className="px-3 flex flex-col justify-center border-r border-[color:var(--t-100)]"><span className="font-black text-slate-800">2</span><span className="text-xs uppercase font-bold text-slate-500">Upcoming</span></div>
+                <div className="px-3 flex flex-col justify-center border-r border-[color:var(--t-100)]"><span className="font-black text-slate-800">3</span><span className="text-xs uppercase font-bold text-slate-500">Active Rx</span></div>
+                <div className="px-3 flex flex-col justify-center"><span className="font-black text-slate-800">RM 250</span><span className="text-xs uppercase font-bold text-slate-500">Care Team</span></div>
               </div>
               <button className="h-10 px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black shadow-xs cursor-pointer">
                 On-Call Doctor Now

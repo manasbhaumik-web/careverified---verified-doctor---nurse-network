@@ -98,7 +98,7 @@ export default function PartnerEnquiryForm({ kind }: { kind: 'clinic' | 'pharmac
         <div>
           <label htmlFor={id('phone')} className={label}>{tx.phone} *</label>
           <input id={id('phone')} type="tel" inputMode="tel" className={inputCls} value={f.phone} onChange={e => set({ phone: e.target.value })} required maxLength={30} autoComplete="tel" aria-describedby={id('phone-hint')} />
-          <p id={id('phone-hint')} className="text-[11px] text-slate-600 mt-1">{tx.phoneHint}</p>
+          <p id={id('phone-hint')} className="text-xs text-slate-600 mt-1">{tx.phoneHint}</p>
         </div>
         <div>
           <label htmlFor={id('city')} className={label}>{tx.city} *</label>
@@ -114,7 +114,7 @@ export default function PartnerEnquiryForm({ kind }: { kind: 'clinic' | 'pharmac
         <div>
           <label htmlFor={id('licence')} className={label}>{tx.licence}</label>
           <input id={id('licence')} className={inputCls} value={f.licenceNo} onChange={e => set({ licenceNo: e.target.value })} maxLength={50} aria-describedby={id('licence-hint')} />
-          <p id={id('licence-hint')} className="text-[11px] text-slate-600 mt-1">{tx.licenceHint}</p>
+          <p id={id('licence-hint')} className="text-xs text-slate-600 mt-1">{tx.licenceHint}</p>
         </div>
         <div className="sm:col-span-2">
           <label htmlFor={id('msg')} className={label}>{tx.message}</label>
