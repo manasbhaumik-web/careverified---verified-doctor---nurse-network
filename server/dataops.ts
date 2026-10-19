@@ -139,6 +139,7 @@ function erasurePlan(userId: string) {
       recordAccessGrants: count("SELECT COUNT(*) AS n FROM record_grants WHERE patient_user_id = ?", userId),
       uploadedDocuments: count("SELECT COUNT(*) AS n FROM documents WHERE owner_id = ? AND kind != 'lab_result'", userId),
       sosEvents: count("SELECT COUNT(*) AS n FROM emergency_events WHERE user_id = ?", userId),
+      savedPractitioners: count("SELECT COUNT(*) AS n FROM saved_practitioners WHERE user_id = ?", userId),
     },
     deIdentify: ["account name, email and password", "patient profile (IC number, phone, emergency contact, conditions, allergies)", "name, phone and email on bookings", "chat messages"],
     retain: {
@@ -177,6 +178,8 @@ function executeErasure(userId: string, actorId: string, ctx: DataOpsCtx) {
     db.prepare("DELETE FROM record_grants WHERE patient_user_id = ?").run(userId);
     db.prepare("DELETE FROM documents WHERE owner_id = ? AND kind != 'lab_result'").run(userId);
     db.prepare("DELETE FROM emergency_events WHERE user_id = ?").run(userId);
+    db.prepare("DELETE FROM saved_practitioners WHERE user_id = ?").run(userId);
+    db.prepare("DELETE FROM allergy_statements WHERE user_id = ?").run(userId);
     db.prepare("UPDATE users SET name = 'Deleted user', email = ?, password_hash = 'deleted', avatar_url = NULL, status = 'deleted' WHERE id = ?")
       .run(`deleted-${userId}@deleted.invalid`, userId);
     db.prepare("INSERT INTO erasure_log (id,user_id,executed_at,executed_by,summary) VALUES (?,?,?,?,?)")

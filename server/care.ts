@@ -15,6 +15,16 @@ import { createGrant } from "./clinical";
  * the consultation room (chat + WebRTC signalling), and the emergency SOS log.
  */
 
+// Practitioners a patient saved to book later: kept on the account so they follow the patient to any device
+db.exec(`
+CREATE TABLE IF NOT EXISTS saved_practitioners (
+  user_id TEXT NOT NULL,
+  professional_id TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (user_id, professional_id)
+);
+`);
+
 db.exec(`
 CREATE TABLE IF NOT EXISTS presence (
   profile_id TEXT PRIMARY KEY,
@@ -142,6 +152,34 @@ export function registerCareRoutes(app: Application, ctx: Ctx) {
     (db.prepare("SELECT profile_id FROM presence WHERE online = 1").all() as any[])
       .map(r => r.profile_id).filter(id => isOnline(id) && verifiedDoctor(id));
   const accountOfProfile = (profileId: string) => ((db.prepare("SELECT id FROM users WHERE profile_id = ?").get(profileId) as any)?.id) ?? null;
+
+  // ---------- saved practitioners (bookmarks) ----------
+  const MAX_SAVED = 100;
+  const savedIds = (userId: string) =>
+    (db.prepare("SELECT professional_id FROM saved_practitioners WHERE user_id = ? ORDER BY created_at, rowid").all(userId) as any[]).map(r => r.professional_id as string);
+  const saveOne = (userId: string, id: string) => {
+    if (!ctx.findProfessional(id)) return false;
+    if (savedIds(userId).length >= MAX_SAVED) return false;
+    db.prepare("INSERT OR IGNORE INTO saved_practitioners (user_id, professional_id, created_at) VALUES (?,?,?)").run(userId, id, iso());
+    return true;
+  };
+  app.get("/api/me/saved", requireRole("patient"), (req, res) => {
+    res.json({ status: "success", data: savedIds(req.user!.id) });
+  });
+  app.put("/api/me/saved/:id", requireRole("patient"), (req, res) => {
+    if (!saveOne(req.user!.id, String(req.params.id).slice(0, 60))) return fail(res, 404, "That practitioner cannot be saved.");
+    res.json({ status: "success", data: savedIds(req.user!.id) });
+  });
+  app.delete("/api/me/saved/:id", requireRole("patient"), (req, res) => {
+    db.prepare("DELETE FROM saved_practitioners WHERE user_id = ? AND professional_id = ?").run(req.user!.id, String(req.params.id).slice(0, 60));
+    res.json({ status: "success", data: savedIds(req.user!.id) });
+  });
+  // One-time move of bookmarks that were kept in this browser before they were kept on the account
+  app.post("/api/me/saved/import", requireRole("patient"), (req, res) => {
+    const ids: unknown[] = Array.isArray(req.body?.ids) ? req.body.ids.slice(0, MAX_SAVED) : [];
+    for (const id of ids) if (typeof id === "string") saveOne(req.user!.id, id.slice(0, 60));
+    res.json({ status: "success", data: savedIds(req.user!.id) });
+  });
 
   // ---------- presence & roster ----------
   app.post("/api/presence", requireRole("practitioner"), (req, res) => {

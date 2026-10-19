@@ -259,7 +259,9 @@ export function registerPharmacyWorkspace(app: Application, ctx: Ctx) {
     const currentYear = new Date().getFullYear();
 
     try {
-      db.transaction(() => {
+      // node:sqlite has no transaction() helper: take the write lock up front, commit at the end, roll back on any throw
+      db.exec("BEGIN IMMEDIATE");
+      try {
         // Immediate row query with serialized lock
         const r = row("SELECT * FROM prescriptions WHERE id = ?", req.params.id);
         if (!r || !same(sign(rxPayload(r)), r.signature)) {
@@ -313,7 +315,11 @@ export function registerPharmacyWorkspace(app: Application, ctx: Ctx) {
         pharmacyEvent(ph.id, r.id, "dispensed", req.user!.id, { via: "workspace", poisonsEntryNo });
         notify(r.patient_user_id, "Prescription dispensed", `${ph.name} dispensed your prescription (Poisons Register #${poisonsEntryNo}).`);
         audit(req, "pharmacy.dispense", { target: ["prescription", r.id], details: { pharmacyId: ph.id, poisonsEntryNo } });
-      })();
+        db.exec("COMMIT");
+      } catch (e) {
+        try { db.exec("ROLLBACK"); } catch { /* already rolled back */ }
+        throw e;
+      }
 
       res.json({ status: "success", data: view(row("SELECT * FROM prescriptions WHERE id = ?", req.params.id), ph.id) });
     } catch (err: any) {

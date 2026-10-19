@@ -23,6 +23,10 @@ CREATE TABLE IF NOT EXISTS health_items (
   severity TEXT, active INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_health_user ON health_items(user_id, type);
+-- "I have no known allergies": a statement the patient makes, kept apart from the allergy list so that "none recorded" and "none known" are never confused
+CREATE TABLE IF NOT EXISTS allergy_statements (
+  user_id TEXT PRIMARY KEY, kind TEXT NOT NULL, recorded_at TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS vitals (
   id TEXT PRIMARY KEY, user_id TEXT NOT NULL, ts TEXT NOT NULL, kind TEXT NOT NULL,
   value1 REAL NOT NULL, value2 REAL, unit TEXT NOT NULL, note TEXT
@@ -77,6 +81,11 @@ for (const col of ["sent_at TEXT", "fill_status TEXT", "fill_reason TEXT", "fill
   try { db.exec(`ALTER TABLE prescriptions ADD COLUMN ${col}`); } catch { /* column already exists */ }
 }
 db.exec("UPDATE prescriptions SET sent_at = issued_at WHERE pharmacy_id IS NOT NULL AND sent_at IS NULL");
+
+// What a medical certificate says about the examination: the day, whether it was in person, and where. Shown on the patient's copy and on the public check page.
+for (const col of ["examined_on TEXT", "visit_mode TEXT", "practice TEXT"]) {
+  try { db.exec(`ALTER TABLE certificates ADD COLUMN ${col}`); } catch { /* column already exists */ }
+}
 db.exec(`
 CREATE TABLE IF NOT EXISTS pharmacy_events (
   id INTEGER PRIMARY KEY AUTOINCREMENT, pharmacy_id TEXT NOT NULL, prescription_id TEXT, ts TEXT NOT NULL,
@@ -153,7 +162,7 @@ const certPayload = (c: any) => ({ id: c.id, code: c.code, patient: c.patient_us
 // ---------- consent ----------
 export function purgeExpiredGrants(): number {
   const res = db.prepare("UPDATE record_grants SET revoked_at = datetime('now') WHERE revoked_at IS NULL AND expires_at <= datetime('now')").run();
-  return res.changes;
+  return Number(res.changes);
 }
 
 export function createGrant(patientUserId: string, professionalId: string, source: "booking" | "consult" | "manual", refId: string | null, days = 30) {
@@ -244,6 +253,8 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     allergies: rows("SELECT name, detail, severity FROM health_items WHERE user_id = ? AND type = 'allergy' AND active = 1", patientUserId),
     conditions: rows("SELECT name, detail FROM health_items WHERE user_id = ? AND type = 'condition' AND active = 1", patientUserId),
     medications: rows("SELECT name, detail FROM health_items WHERE user_id = ? AND type = 'medication' AND active = 1", patientUserId),
+    // null = nothing recorded and no statement: practitioners must not read that as "no allergies"
+    allergyStatement: (row("SELECT kind, recorded_at FROM allergy_statements WHERE user_id = ?", patientUserId) as { kind: string; recorded_at: string } | undefined) ?? null,
   });
 
   // =========================================================
@@ -267,6 +278,8 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
         ...patientSnapshot(u),
         items: rows("SELECT id, type, name, detail, severity, active FROM health_items WHERE user_id = ? ORDER BY type, name", u),
         vitals, grants,
+        // the units and the range each reading is accepted in, so the form can show them
+        vitalSpecs: VITAL_KINDS,
         sharableWith: [...myPros].map(([id, name]) => ({ id, name })),
         prescriptions,
         certificates: rows("SELECT * FROM certificates WHERE patient_user_id = ? ORDER BY issued_at DESC", u).map(certView),
@@ -285,9 +298,24 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     const count = row("SELECT COUNT(*) AS n FROM health_items WHERE user_id = ?", req.user!.id).n;
     if (count >= 200) return fail(res, 400, "Too many entries.");
     const id = newId("hi");
+    // An allergy now exists, so an earlier "no known allergies" statement is no longer true
+    if (type === "allergy") db.prepare("DELETE FROM allergy_statements WHERE user_id = ?").run(req.user!.id);
     db.prepare("INSERT INTO health_items (id,user_id,type,name,detail,severity,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)")
       .run(id, req.user!.id, type, name, str(req.body.detail, 300) || null, ["mild", "moderate", "severe"].includes(req.body.severity) ? req.body.severity : null, iso(), iso());
     res.status(201).json({ status: "success", data: { id } });
+  });
+
+  app.post("/api/records/allergy-status", requireRole("patient"), (req, res) => {
+    if (row("SELECT 1 AS x FROM health_items WHERE user_id = ? AND type = 'allergy' AND active = 1", req.user!.id)) {
+      return fail(res, 409, "You have allergies recorded. Remove them first if they no longer apply.");
+    }
+    db.prepare("INSERT INTO allergy_statements (user_id, kind, recorded_at) VALUES (?, 'none_known', ?) ON CONFLICT(user_id) DO UPDATE SET recorded_at = excluded.recorded_at").run(req.user!.id, iso());
+    audit(req, "record.allergy_status", { details: { kind: "none_known" } });
+    res.status(201).json({ status: "success" });
+  });
+  app.delete("/api/records/allergy-status", requireRole("patient"), (req, res) => {
+    db.prepare("DELETE FROM allergy_statements WHERE user_id = ?").run(req.user!.id);
+    res.json({ status: "success" });
   });
 
   app.delete("/api/records/items/:id", requireRole("patient"), (req, res) => {
@@ -302,9 +330,18 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     const v1 = Number(req.body.value1), v2 = spec.two ? Number(req.body.value2) : null;
     if (!(v1 >= spec.min && v1 <= spec.max)) return fail(res, 400, "That value looks wrong. Please check it.");
     if (spec.two && !(v2! >= spec.min2! && v2! <= spec.max2!)) return fail(res, 400, "The second value looks wrong. Please check it.");
+    // When the reading was taken (optional, default now): so a clinic reading from this morning can be entered. Not in the future, not older than 10 years.
+    let takenAt = iso();
+    if (req.body.takenAt !== undefined && req.body.takenAt !== null && req.body.takenAt !== "") {
+      const t = Date.parse(String(req.body.takenAt));
+      if (Number.isNaN(t)) return fail(res, 400, "That date and time is not valid.");
+      if (t > Date.now() + 5 * 60_000) return fail(res, 400, "A reading cannot be dated in the future.");
+      if (t < Date.now() - 10 * 365 * 86400_000) return fail(res, 400, "That date is too long ago.");
+      takenAt = new Date(t).toISOString();
+    }
     const id = newId("vt");
     db.prepare("INSERT INTO vitals (id,user_id,ts,kind,value1,value2,unit,note) VALUES (?,?,?,?,?,?,?,?)")
-      .run(id, req.user!.id, iso(), req.body.kind, v1, v2, spec.unit, str(req.body.note, 200) || null);
+      .run(id, req.user!.id, takenAt, req.body.kind, v1, v2, spec.unit, str(req.body.note, 200) || null);
     res.status(201).json({ status: "success", data: { id, flag: vitalFlag(req.body.kind, v1, v2) } });
   });
 
@@ -647,7 +684,11 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
   // ---------- medical certificates ----------
   function certView(c: any) {
     const prof = ctx.findProfessional(c.professional_id);
-    return { id: c.id, code: c.code, fromDate: c.from_date, toDate: c.to_date, remarks: c.remarks, issuedAt: c.issued_at, doctor: prof ? { name: prof.name, licenseNumber: prof.licenseNumber } : null };
+    return {
+      id: c.id, code: c.code, fromDate: c.from_date, toDate: c.to_date, remarks: c.remarks, issuedAt: c.issued_at,
+      examinedOn: c.examined_on ?? null, visitMode: c.visit_mode ?? null, practice: c.practice ?? null,
+      doctor: prof ? { name: prof.name, licenseNumber: prof.licenseNumber, stillVerified: prof.verificationStatus === VerificationStatus.VERIFIED } : null,
+    };
   }
   app.post("/api/certificates", requireRole("practitioner"), (req, res) => {
     const pro = verifiedPro(req.user!.profileId);
@@ -670,8 +711,11 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     void today;
     const id = newId("mc"), code = newCode(), issuedAt = iso();
     const c = { id, code, patient_user_id: rel.patientUserId, professional_id: pro.id, from_date: from, to_date: to, issued_at: issuedAt };
-    db.prepare("INSERT INTO certificates (id,code,patient_user_id,professional_id,from_date,to_date,remarks,issued_at,signature) VALUES (?,?,?,?,?,?,?,?,?)")
-      .run(id, code, rel.patientUserId, pro.id, from, to, str(req.body.remarks, 200) || null, issuedAt, sign(certPayload(c)));
+    // The day of the examination and how it was done come from the booking; they are shown, not part of the signed fields
+    const visit: any = rel.kind === "booking" ? ctx.getBooking(rel.refId) : null;
+    const examinedOn = visit ? dateOnly(visit.date) : null;
+    db.prepare("INSERT INTO certificates (id,code,patient_user_id,professional_id,from_date,to_date,remarks,issued_at,signature,examined_on,visit_mode,practice) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
+      .run(id, code, rel.patientUserId, pro.id, from, to, str(req.body.remarks, 200) || null, issuedAt, sign(certPayload(c)), examinedOn, String(visit?.mode ?? "Video Telehealth"), (pro as any).practiceAddress || null);
     notify(rel.patientUserId, "Medical certificate issued", `Valid ${from} to ${to}. Find it in your Health Record.`);
     audit(req, "certificate.issue", { target: ["certificate", id] });
     res.status(201).json({ status: "success", data: { id, code } });
@@ -683,14 +727,15 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     res.json({ status: "success", data: {
       found: true, valid: same(sign(certPayload(c)), c.signature), patient: maskName(userName(c.patient_user_id)),
       fromDate: c.from_date, toDate: c.to_date, issuedAt: c.issued_at,
-      issuedBy: prof ? { name: prof.name, licenseNumber: prof.licenseNumber } : null,
+      examinedOn: c.examined_on ?? null, visitMode: c.visit_mode ?? null, practice: c.practice ?? null,
+      issuedBy: prof ? { name: prof.name, licenseNumber: prof.licenseNumber, stillVerified: prof.verificationStatus === VerificationStatus.VERIFIED } : null,
     } });
   });
 
   // ---------- referrals ----------
   function refView(r: any) {
     const from = ctx.findProfessional(r.from_professional_id), to = r.to_professional_id ? ctx.findProfessional(r.to_professional_id) : null;
-    return { id: r.id, toSpecialty: r.to_specialty, toProfessional: to ? { id: to.id, name: to.name } : null, reason: r.reason, urgency: r.urgency, issuedAt: r.issued_at, from: from?.name };
+    return { id: r.id, toSpecialty: r.to_specialty, toProfessional: to ? { id: to.id, name: to.name } : null, reason: r.reason, urgency: r.urgency, issuedAt: r.issued_at, from: from?.name, fromLicence: from?.licenseNumber ?? null };
   }
   app.post("/api/referrals", requireRole("practitioner"), (req, res) => {
     const rel = relation(req, String(req.body.kind), String(req.body.refId));

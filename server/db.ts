@@ -204,12 +204,9 @@ CREATE INDEX IF NOT EXISTS idx_fac_msg_thread ON facility_messages(job_id, appli
   if (def && (!def.includes("'pharmacy'") || !def.includes("'facility'"))) {
     let next = def
       .replace(/^CREATE TABLE\s+(IF NOT EXISTS\s+)?["`]?users["`]?/i, "CREATE TABLE users_fac_new");
-    if (!next.includes("'pharmacy'")) {
-      next = next.replace("'admin')", "'admin','pharmacy')");
-    }
-    if (!next.includes("'facility'")) {
-      next = next.replace("'pharmacy')", "'pharmacy','facility')").replace("'admin')", "'admin','facility')");
-    }
+    // Append a role to the CHECK (role IN (...)) list wherever it ends: the list may already carry other roles (e.g. 'org').
+    const addRole = (sql: string, role: string) => sql.includes(`'${role}'`) ? sql : sql.replace(/(role\s+TEXT[^)]*?IN\s*\([^)]*)\)/i, `$1,'${role}')`);
+    next = addRole(addRole(next, "pharmacy"), "facility");
     if (!next.startsWith("CREATE TABLE users_fac_new") || !next.includes("'facility'")) throw new Error("Could not migrate the users table for the facility role.");
     try { db.exec("PRAGMA wal_checkpoint(TRUNCATE)"); } catch { /* not in WAL mode */ }
     fs.copyFileSync(path.join(dataDir, "careverified.db"), path.join(dataDir, `careverified.before-facility-role-${Date.now()}.db`));

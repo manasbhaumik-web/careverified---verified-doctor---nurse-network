@@ -256,12 +256,13 @@ export function registerQualityRoutes(app: Application, ctx: Ctx) {
   // =========================================================
   app.get("/api/chats/threads", requireRole("patient", "practitioner"), (req, res) => {
     const u = req.user!;
-    const out = new Map<string, { id: string; name: string; role: string; blocked: boolean }>();
+    // verified: from the practitioner's current verification status, so the page never claims it by default
+    const out = new Map<string, { id: string; name: string; role: string; blocked: boolean; verified?: boolean }>();
     if (u.role === "patient") {
       const pros = new Set<string>();
       for (const b of ctx.bookings()) if (b.patientUserId === u.id && b.paymentStatus === "Paid") pros.add(b.professionalId);
       for (const c of rows("SELECT DISTINCT professional_id FROM consults WHERE patient_user_id = ? AND professional_id IS NOT NULL", u.id)) pros.add(c.professional_id);
-      for (const id of pros) { const p = ctx.findProfessional(id); const acct = accountOfProfile(id); if (p) out.set(id, { id, name: p.name, role: p.specialization, blocked: !!acct && isBlocked(u.id, acct) }); }
+      for (const id of pros) { const p = ctx.findProfessional(id); const acct = accountOfProfile(id); if (p) out.set(id, { id, name: p.name, role: p.specialization, blocked: !!acct && isBlocked(u.id, acct), verified: p.verificationStatus === VerificationStatus.VERIFIED }); }
     } else if (u.profileId) {
       const patients = new Set<string>();
       for (const b of ctx.bookings()) if (b.professionalId === u.profileId && b.paymentStatus === "Paid" && b.patientUserId) patients.add(b.patientUserId);
@@ -274,7 +275,8 @@ export function registerQualityRoutes(app: Application, ctx: Ctx) {
       if (m.receiverId !== me || out.has(m.senderId)) continue;
       const acct = accountForChatId(m.senderId);
       if (!acct) continue;
-      out.set(m.senderId, { id: m.senderId, name: m.senderName || userName(acct), role: ctx.findProfessional(m.senderId)?.specialization ?? "Patient", blocked: isBlocked(u.id, acct) });
+      const sender = ctx.findProfessional(m.senderId);
+      out.set(m.senderId, { id: m.senderId, name: m.senderName || userName(acct), role: sender?.specialization ?? "Patient", blocked: isBlocked(u.id, acct), ...(sender ? { verified: sender.verificationStatus === VerificationStatus.VERIFIED } : {}) });
     }
     res.json({ status: "success", data: [...out.values()] });
   });
