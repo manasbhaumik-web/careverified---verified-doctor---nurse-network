@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   HeartHandshake,
   FileText,
@@ -34,6 +34,7 @@ import {
   FileCheck
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
+import { MyCases } from './MedicalTourism';
 
 interface QuotationItem {
   label: string;
@@ -87,7 +88,7 @@ interface AssistanceCase {
     address?: string;
     phone?: string;
     email?: string;
-    licenceNo?: string;
+    licenceNo?: string | null;
     mhtcMember?: boolean;
   };
   quotes: Quotation[];
@@ -99,13 +100,13 @@ interface AssistanceCase {
 }
 
 const CURRENCY_RATES: Record<string, { rate: number; symbol: string; label: string }> = {
-  MYR: { rate: 1, symbol: 'RM', label: 'Ringgit Malaysia (Base)' },
-  USD: { rate: 0.23, symbol: '$', label: 'US Dollar (~0.23)' },
-  SGD: { rate: 0.31, symbol: 'S$', label: 'Singapore Dollar (~0.31)' },
-  EUR: { rate: 0.21, symbol: '€', label: 'Euro (~0.21)' },
-  IDR: { rate: 3550, symbol: 'Rp', label: 'Indonesian Rupiah (~3,550)' },
-  GBP: { rate: 0.18, symbol: '£', label: 'British Pound (~0.18)' },
-  AUD: { rate: 0.35, symbol: 'A$', label: 'Australian Dollar (~0.35)' },
+  MYR: { rate: 1, symbol: 'RM', label: 'Ringgit Malaysia (the quote currency)' },
+  USD: { rate: 0.23, symbol: '$', label: 'US Dollar' },
+  SGD: { rate: 0.31, symbol: 'S$', label: 'Singapore Dollar' },
+  EUR: { rate: 0.21, symbol: '€', label: 'Euro' },
+  IDR: { rate: 3550, symbol: 'Rp', label: 'Indonesian Rupiah' },
+  GBP: { rate: 0.18, symbol: '£', label: 'British Pound' },
+  AUD: { rate: 0.35, symbol: 'A$', label: 'Australian Dollar' },
 };
 
 const CATEGORY_NAMES: Record<string, string> = {
@@ -121,12 +122,12 @@ const CATEGORY_NAMES: Record<string, string> = {
 };
 
 const STATUS_DISPLAY: Record<string, { label: string; color: string; border: string; bg: string }> = {
-  enquiry: { label: 'Enquiry Received', color: 'text-amber-800', border: 'border-amber-300', bg: 'bg-amber-50' },
-  triage: { label: 'Clinical Triage', color: 'text-blue-800', border: 'border-blue-300', bg: 'bg-blue-50' },
-  quoted: { label: 'Quotation Ready', color: 'text-sky-800', border: 'border-sky-300', bg: 'bg-sky-50' },
-  accepted: { label: 'Quote Accepted', color: 'text-emerald-800', border: 'border-emerald-300', bg: 'bg-emerald-50' },
-  in_treatment: { label: 'In-Treatment / Active Assistance', color: 'text-purple-800', border: 'border-purple-300', bg: 'bg-purple-50' },
-  completed: { label: 'Discharged & Completed', color: 'text-slate-800', border: 'border-slate-300', bg: 'bg-slate-100' },
+  enquiry: { label: 'Request sent', color: 'text-amber-800', border: 'border-amber-300', bg: 'bg-amber-50' },
+  triage: { label: 'Being reviewed', color: 'text-blue-800', border: 'border-blue-300', bg: 'bg-blue-50' },
+  quoted: { label: 'Quote received', color: 'text-sky-800', border: 'border-sky-300', bg: 'bg-sky-50' },
+  accepted: { label: 'Quote accepted', color: 'text-emerald-800', border: 'border-emerald-300', bg: 'bg-emerald-50' },
+  in_treatment: { label: 'In treatment', color: 'text-purple-800', border: 'border-purple-300', bg: 'bg-purple-50' },
+  completed: { label: 'Completed', color: 'text-slate-800', border: 'border-slate-300', bg: 'bg-slate-100' },
   closed: { label: 'Closed', color: 'text-slate-500', border: 'border-slate-200', bg: 'bg-slate-50' },
 };
 
@@ -150,6 +151,16 @@ export default function MedicalAssistanceModule({
     setInternalActiveTab(tab);
   };
   const [selectedCurrency, setSelectedCurrency] = useState('MYR');
+  const formRef = useRef<HTMLFormElement>(null);
+  // Who is signed in (for prefilling the form), and the code + email a guest uses to see their own request
+  const [me, setMe] = useState<{ name?: string; email?: string; phone?: string } | null>(null);
+  const [meLoaded, setMeLoaded] = useState(false);
+  // Signed-in patients see their requests in the same screen as Global Patient Care; guests (code + email) keep the viewer below
+  const [openCaseId, setOpenCaseId] = useState<string | null>(null);
+  const [guest, setGuest] = useState<{ code: string; email: string } | null>(null);
+  const [step, setStep] = useState(1);
+  const [showAcceptConfirm, setShowAcceptConfirm] = useState(false);
+  const [actionError, setActionError] = useState('');
 
   // Cases List State
   const [cases, setCases] = useState<AssistanceCase[]>([]);
@@ -206,6 +217,23 @@ export default function MedicalAssistanceModule({
   const [trackingLoading, setTrackingLoading] = useState(false);
   const [trackError, setTrackError] = useState('');
 
+  // Signed-in patients do not retype their details
+  useEffect(() => {
+    fetch('/api/auth/me').then(r => r.json()).then(d => {
+      const u = d?.data?.user;
+      if (d?.status !== 'success' || !u) return;
+      setMeLoaded(true);
+      setMe({ name: u.name, email: u.email, phone: d.data.patient?.phone });
+      setFullName(v => v || u.name || '');
+      setEmail(v => v || u.email || '');
+      setPhone(v => v || d.data.patient?.phone || '');
+    }).catch(() => {}).finally(() => setMeLoaded(true));
+  }, []);
+
+  // A guest proves it is their request with the code AND the email; a signed-in patient needs neither
+  const withEmail = (url: string) => (guest ? `${url}${url.includes('?') ? '&' : '?'}email=${encodeURIComponent(guest.email)}` : url);
+  const guestBody = () => (guest ? { email: guest.email } : {});
+
   // Fetch facilities list
   const [facilities, setFacilities] = useState<any[]>([]);
   useEffect(() => {
@@ -225,7 +253,7 @@ export default function MedicalAssistanceModule({
   // Fetch Cases
   const loadCases = useCallback(() => {
     setLoadingCases(true);
-    fetch('/api/assistance/cases')
+    fetch(guest ? `/api/assistance/cases?trackingCode=${encodeURIComponent(guest.code)}&email=${encodeURIComponent(guest.email)}` : '/api/assistance/cases')
       .then(r => r.json())
       .then(d => {
         if (d.status === 'success' && Array.isArray(d.data)) {
@@ -237,7 +265,7 @@ export default function MedicalAssistanceModule({
       })
       .catch(() => {})
       .finally(() => setLoadingCases(false));
-  }, [selectedCase]);
+  }, [selectedCase, guest]);
 
   useEffect(() => {
     if (activeTab === 'cases') {
@@ -255,14 +283,25 @@ export default function MedicalAssistanceModule({
     return `${config.symbol} ${converted.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
+  // Move to the next step only when the fields on this step are filled in correctly
+  const stepIsValid = (n: number) =>
+    [...(formRef.current?.querySelectorAll(`[data-step="${n}"] input, [data-step="${n}"] select, [data-step="${n}"] textarea`) ?? [])]
+      .every(el => (el as HTMLInputElement).reportValidity());
+  const goNext = () => { if (stepIsValid(step)) { setStep(step + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); } };
+  const goBack = () => setStep(Math.max(1, step - 1));
+
   // Submit New Medical Enquiry
   const handleSubmitEnquiry = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
     setFormSuccessMessage(null);
 
+    if (step < 3) { goNext(); return; }
+    if (!stepIsValid(3)) return;
+    if (!facilityId) { setFormError('No hospital is available to receive your request right now. Please try again later.'); setStep(2); return; }
     if (summary.trim().length < 15) {
-      setFormError('Please describe the clinical condition or requested medical treatment in at least 15 characters.');
+      setFormError('Please describe the condition or the treatment you want in at least 15 characters.');
+      setStep(2);
       return;
     }
     if (!fullName.trim() || !email.trim()) {
@@ -309,9 +348,10 @@ export default function MedicalAssistanceModule({
           id: data.data.id,
           trackingCode: data.data.trackingCode,
         });
+        if (!me) setGuest({ code: data.data.trackingCode, email: email.trim() });
         // Reset form
         setSummary('');
-        loadCases();
+        setStep(1);
       } else {
         setFormError(data.message || 'Failed to submit enquiry. Please verify the information provided.');
       }
@@ -326,6 +366,7 @@ export default function MedicalAssistanceModule({
   const handleQuoteDecision = async (action: 'accept' | 'decline' | 'request_revision') => {
     if (!selectedCase || !selectedCase.latestQuote) return;
     setDecisionSubmitting(true);
+    setActionError('');
     try {
       const resp = await fetch(`/api/assistance/cases/${selectedCase.id}/quote-decision`, {
         method: 'POST',
@@ -334,19 +375,21 @@ export default function MedicalAssistanceModule({
           quoteId: selectedCase.latestQuote.id,
           action,
           notes: action === 'request_revision' ? revisionNotes : undefined,
+          ...guestBody(),
         })
       });
       const data = await resp.json();
       if (resp.ok && data.status === 'success') {
         setSelectedCase(data.data);
         setShowRevisionModal(false);
+        setShowAcceptConfirm(false);
         setRevisionNotes('');
         loadCases();
       } else {
-        alert(data.message || 'Could not update quote status.');
+        setActionError(data.message || 'Your answer could not be saved. Please try again.');
       }
     } catch {
-      alert('Network error while processing quotation response.');
+      setActionError('Network error. Your answer was not saved. Please try again.');
     } finally {
       setDecisionSubmitting(false);
     }
@@ -361,18 +404,18 @@ export default function MedicalAssistanceModule({
       const resp = await fetch(`/api/assistance/cases/${selectedCase.id}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: replyMessage.trim() })
+        body: JSON.stringify({ text: replyMessage.trim(), ...guestBody() })
       });
       if (resp.ok) {
         setReplyMessage('');
         // Refresh single case
-        const refreshed = await fetch(`/api/assistance/cases/${selectedCase.id}`).then(r => r.json());
+        const refreshed = await fetch(withEmail(`/api/assistance/cases/${selectedCase.id}`)).then(r => r.json());
         if (refreshed.status === 'success') {
           setSelectedCase(refreshed.data);
         }
       }
     } catch {
-      alert('Failed to send message.');
+      setActionError('The message was not sent. Please try again.');
     } finally {
       setSendingMsg(false);
     }
@@ -381,16 +424,16 @@ export default function MedicalAssistanceModule({
   // Fetch Pro-Forma Quotation Data for Printing
   const openProformaDocument = async (caseId: string) => {
     try {
-      const resp = await fetch(`/api/assistance/cases/${caseId}/proforma`);
+      const resp = await fetch(withEmail(`/api/assistance/cases/${caseId}/proforma`));
       const data = await resp.json();
       if (resp.ok && data.status === 'success') {
         setProformaData(data.data);
         setShowProformaModal(true);
       } else {
-        alert(data.message || 'Quotation pro-forma is not yet generated for this case.');
+        setActionError(data.message || 'There is no quotation document for this request yet.');
       }
     } catch {
-      alert('Unable to load official quotation document.');
+      setActionError('The quotation document could not be loaded. Please try again.');
     }
   };
 
@@ -407,10 +450,11 @@ export default function MedicalAssistanceModule({
       const resp = await fetch(`/api/assistance/cases?trackingCode=${encodeURIComponent(trackCode.trim())}&email=${encodeURIComponent(trackEmail.trim())}`);
       const data = await resp.json();
       if (resp.ok && data.status === 'success' && data.data.length > 0) {
+        setGuest({ code: trackCode.trim().toUpperCase(), email: trackEmail.trim() });
         setSelectedCase(data.data[0]);
         setActiveTab('cases');
       } else {
-        setTrackError('No active case found matching that Tracking Code and Email address. Please verify your details.');
+        setTrackError('No request matches that code and email. Check both and try again.');
       }
     } catch {
       setTrackError('An error occurred during lookup.');
@@ -425,14 +469,14 @@ export default function MedicalAssistanceModule({
       {!embedded && (
         <DashboardHeader
           icon={HeartHandshake}
-          eyebrow="Clinical Logistics & Cross-Border Care"
-          title="Patient Enquiries, Assistance & Treatment Quotations"
-          description="Comprehensive clinical intake, itemized surgical & hospital quotations, and logistical assistance coordination for local Malaysian citizens, resident expatriates, and MHTC international medical travelers."
+          eyebrow="Treatment quotes"
+          title="Treatment quotes and assistance"
+          description="Ask a hospital for an itemised quote, then accept it or ask for changes. Sending a request is free and does not commit you."
           tabs={[
-            { id: 'enquiry', label: 'Request Treatment Quote', icon: FileText },
-            { id: 'cases', label: `My Inquiries & Quotes (${cases.length})`, icon: DollarSign },
-            { id: 'guide', label: 'Expat & Travel Care Guide', icon: Globe },
-            { id: 'track', label: 'Track Guest Inquiry', icon: Search },
+            { id: 'enquiry', label: 'Request a quote', icon: FileText },
+            { id: 'cases', label: 'My requests and quotes', icon: DollarSign },
+            { id: 'guide', label: 'Travel guide', icon: Globe },
+            ...(me ? [] : [{ id: 'track', label: 'Track a request', icon: Search }]),
           ]}
           activeTab={activeTab}
           onTabChange={(t) => setActiveTab(t as any)}
@@ -441,517 +485,293 @@ export default function MedicalAssistanceModule({
 
       <div className={embedded ? "space-y-6 pt-2" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
 
-        {/* Global Currency & Fast Info Bar */}
-        <div className="bg-white border border-[color:var(--t-200)] p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="font-extrabold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
-              <BadgeCheck className="h-4 w-4 text-[color:var(--t-600)]" />
-              Accredited Care Standards:
-            </span>
-            <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold">
-              Act 586 Licensed
-            </span>
-            <span className="px-2 py-0.5 bg-sky-50 text-sky-800 border border-sky-300 font-bold">
-              MHTC Medical Travel Partner
-            </span>
-            <span className="px-2 py-0.5 bg-purple-50 text-purple-800 border border-purple-300 font-bold">
-              JCI & MSQH Verified
-            </span>
-            <span className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 font-bold">
-              Panel LOG Direct Billing
-            </span>
-          </div>
-
-          {/* Currency Switcher */}
-          <div className="flex items-center gap-2 shrink-0">
-            <label htmlFor="currency-select" className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">
-              <CreditCard className="h-3.5 w-3.5 text-slate-400" />
-              Currency View:
-            </label>
-            <select
-              id="currency-select"
-              value={selectedCurrency}
-              onChange={(e) => setSelectedCurrency(e.target.value)}
-              className="border border-[color:var(--t-200)] bg-white text-xs font-mono font-bold py-1 px-2.5 rounded-none cursor-pointer focus:outline-none focus:border-[color:var(--t-600)]"
-            >
-              {Object.entries(CURRENCY_RATES).map(([code, item]) => (
-                <option key={code} value={code}>
-                  {code} - {item.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
         {/* ========================================================================= */}
-        {/* TAB 1: SUBMIT MEDICAL ENQUIRY & REQUEST QUOTATION */}
+        {/* TAB 1: REQUEST A TREATMENT QUOTE (three short steps) */}
         {/* ========================================================================= */}
         {activeTab === 'enquiry' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-8 bg-white border border-[color:var(--t-200)] p-6 space-y-6">
+            <div className="lg:col-span-8 bg-white border border-[color:var(--t-200)] p-6 space-y-5">
               <div>
-                <h2 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-[color:var(--t-600)]" />
-                  Clinical Intake & Treatment Quotation Request
+                <h2 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-[color:var(--t-600)]" aria-hidden="true" />
+                  Request a treatment quote
                 </h2>
-                <p className="text-xs text-slate-600 mt-1">
-                  Complete this form to receive an official itemized treatment quotation, consultant schedule, and customized clinical assistance plan from accredited Malaysian private hospitals.
+                <p className="text-sm text-slate-700 mt-1">
+                  Tell a hospital what you need and it replies with an itemised quote. Sending this request is free and does not commit you.
                 </p>
               </div>
 
               {formSuccessMessage && (
-                <div className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs space-y-2">
-                  <div className="flex items-center gap-2 font-black text-sm">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                    Enquiry Registered Successfully! Reference: {formSuccessMessage.trackingCode}
+                <div role="status" className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-950 text-sm space-y-2">
+                  <div className="flex items-center gap-2 font-extrabold text-base">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-700 shrink-0" aria-hidden="true" />
+                    Request sent. Your reference is <span className="font-mono">{formSuccessMessage.trackingCode}</span>
                   </div>
-                  <p className="leading-relaxed">
-                    Our hospital clinical coordination desk has received your request. An itemized treatment quotation will be prepared and linked to your case reference.
+                  <p>
+                    The hospital will review it and add a quote to your request. {me ? 'You will find it under My requests and quotes.' : 'Keep this reference and the email you used: you need both to see your request later.'}
                   </p>
-                  <div className="pt-2 flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('cases')}
-                      className="px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white font-bold text-xs uppercase cursor-pointer shadow-xs"
-                    >
-                      View in My Inquiries & Quotes →
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { if (me) setOpenCaseId(formSuccessMessage.id); setActiveTab('cases'); }}
+                    className="min-h-[44px] px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white font-bold text-sm cursor-pointer"
+                  >
+                    View my request
+                  </button>
                 </div>
               )}
 
               {formError && (
-                <div className="p-3 bg-red-50 border border-red-300 text-red-800 text-xs flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 shrink-0" />
+                <div role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-sm flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
                   <span>{formError}</span>
                 </div>
               )}
 
-              <form onSubmit={handleSubmitEnquiry} className="space-y-6">
-                {/* 1. Patient Classification */}
-                <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-wider text-slate-700 block">
-                    1. Patient Origin & Legal Residency Status *
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => { setPatientType('local_malaysian'); setHomeCountry('MY'); }}
-                      className={`p-3 text-left border cursor-pointer transition-all ${
-                        patientType === 'local_malaysian'
-                          ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)] text-slate-900 shadow-sm'
-                          : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5 font-black text-xs">
-                        <span>🇲🇾</span> Local Malaysian Citizen
-                      </div>
-                      <p className="text-xs text-slate-500 mt-1">
-                        MyKad ID holder. 0% SST on healthcare, domestic insurance panel & Medisave.
-                      </p>
-                    </button>
+              <ol aria-label="Steps" className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+                {['About you', 'What you need', 'Extras and consent'].map((t, i) => (
+                  <li key={t} aria-current={step === i + 1 ? 'step' : undefined} className={step === i + 1 ? 'font-extrabold text-[color:var(--t-700)]' : step > i + 1 ? 'font-semibold text-slate-800' : 'text-slate-700'}>
+                    {i + 1}. {t}{step > i + 1 ? ' (done)' : ''}
+                  </li>
+                ))}
+              </ol>
 
-                    <button
-                      type="button"
-                      onClick={() => { setPatientType('expat_resident'); if (homeCountry === 'MY') setHomeCountry('GB'); }}
-                      className={`p-3 text-left border cursor-pointer transition-all ${
-                        patientType === 'expat_resident'
-                          ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)] text-slate-900 shadow-sm'
-                          : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5 font-black text-xs">
-                        <span>🌏</span> Expatriate Resident
-                      </div>
-                      <p className="text-xs text-slate-500 mt-1">
-                        Employment Pass, MM2H, Diplomat or Student residing in Malaysia.
-                      </p>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => { setPatientType('international_traveler'); if (homeCountry === 'MY') setHomeCountry('ID'); }}
-                      className={`p-3 text-left border cursor-pointer transition-all ${
-                        patientType === 'international_traveler'
-                          ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)] text-slate-900 shadow-sm'
-                          : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5 font-black text-xs">
-                        <span>✈️</span> International Traveler
-                      </div>
-                      <p className="text-xs text-slate-500 mt-1">
-                        Traveling to Malaysia for medical care. MHTC visa & airport support eligible.
-                      </p>
-                    </button>
-                  </div>
-                </div>
-
-                {/* 2. Assistance Category & Urgency */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-700">
-                      2. Care Category *
-                    </label>
-                    <select
-                      value={assistanceType}
-                      onChange={(e) => setAssistanceType(e.target.value)}
-                      className="w-full border border-slate-300 p-2 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)]"
-                    >
-                      <option value="elective_surgery">Surgical Procedure & Hospital Stay</option>
-                      <option value="specialist_consult">Specialist Consultation & Second Opinion</option>
-                      <option value="urgent_evacuation">Urgent Medical Evacuation & Inter-Hospital Transfer</option>
-                      <option value="maternity_care">Maternity & Delivery for Expat Families</option>
-                      <option value="executive_screening">Executive Full-Body Health Screening</option>
-                      <option value="oncology_workup">Oncology & Advanced Cancer Care</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-700">
-                      Urgency / Triage Priority *
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setUrgency('routine')}
-                        className={`p-2 text-center text-xs font-bold uppercase cursor-pointer border ${
-                          urgency === 'routine' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-                        }`}
-                      >
-                        Routine (2-4 wks)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setUrgency('priority')}
-                        className={`p-2 text-center text-xs font-bold uppercase cursor-pointer border ${
-                          urgency === 'priority' ? 'bg-amber-600 text-white border-amber-600' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-                        }`}
-                      >
-                        Priority (3-7 days)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setUrgency('urgent')}
-                        className={`p-2 text-center text-xs font-bold uppercase cursor-pointer border ${
-                          urgency === 'urgent' ? 'bg-red-700 text-white border-red-700' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-                        }`}
-                      >
-                        Urgent (&lt;48 hrs)
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 3. Specialty & Target Facility */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-700">
-                      Medical Specialty *
-                    </label>
-                    <select
-                      value={specialty}
-                      onChange={(e) => setSpecialty(e.target.value)}
-                      className="w-full border border-slate-300 p-2 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)]"
-                    >
-                      <option value="Cardiology & Interventional">Cardiology & Cardiothoracic Surgery</option>
-                      <option value="Orthopaedics & Joint Reconstruction">Orthopaedics & Robotic Knee/Hip</option>
-                      <option value="Oncology & Surgical Oncology">Oncology, Radiotherapy & CyberKnife</option>
-                      <option value="Obstetrics & Gynaecology">Obstetrics, Gynaecology & IVF</option>
-                      <option value="Neurology & Neurosurgery">Neurology & Minimally Invasive Neurosurgery</option>
-                      <option value="Gastroenterology & Bariatric">Gastroenterology, Hepatology & Endoscopy</option>
-                      <option value="Paediatrics & Neonatology">Paediatrics & Paediatric Surgery</option>
-                      <option value="Executive Health Screening">Executive Screening & Preventative Health</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-700">
-                      Preferred Licensed Facility *
-                    </label>
-                    <select
-                      value={facilityId}
-                      onChange={(e) => setFacilityId(e.target.value)}
-                      className="w-full border border-slate-300 p-2 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)]"
-                    >
-                      {facilities.map(f => (
-                        <option key={f.id} value={f.id}>
-                          {f.name} {f.city ? `(${f.city})` : ''} {f.mhtcMember ? '★ MHTC' : ''}
-                        </option>
+              <form ref={formRef} onSubmit={handleSubmitEnquiry} noValidate className="space-y-5">
+                {/* STEP 1: who */}
+                <div data-step="1" hidden={step !== 1} className="space-y-4">
+                  <fieldset className="space-y-2">
+                    <legend className="text-sm font-bold text-slate-800 block">Where do you live? *</legend>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {[
+                        { id: 'local_malaysian', title: 'Malaysian citizen', text: 'You hold a MyKad.', home: 'MY' },
+                        { id: 'expat_resident', title: 'Living in Malaysia', text: 'Employment pass, MM2H, student or similar.', home: homeCountry === 'MY' ? 'GB' : homeCountry },
+                        { id: 'international_traveler', title: 'Travelling to Malaysia', text: 'You would come to Malaysia for treatment.', home: homeCountry === 'MY' ? 'ID' : homeCountry },
+                      ].map(o => (
+                        <label key={o.id} className={`flex items-start gap-3 p-3 min-h-[44px] border cursor-pointer ${patientType === o.id ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)]' : 'border-slate-300 bg-white hover:bg-slate-50'}`}>
+                          <input type="radio" name="patientType" className="mt-1 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" checked={patientType === o.id} onChange={() => { setPatientType(o.id as any); setHomeCountry(o.home); }} />
+                          <span><span className="block text-sm font-bold text-slate-900">{o.title}</span><span className="block text-xs text-slate-700">{o.text}</span></span>
+                        </label>
                       ))}
-                      {facilities.length === 0 && (
-                        <option value="fac-demo-1">Demo Specialist Hospital (Kuala Lumpur)</option>
-                      )}
-                    </select>
-                  </div>
-                </div>
+                    </div>
+                  </fieldset>
 
-                {/* 4. Patient Identity & Contact */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-700">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. John Doe / Fatimah Ali"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="w-full border border-slate-300 p-2 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)]"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-700">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="patient@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full border border-slate-300 p-2 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)]"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-700">
-                      Phone / WhatsApp *
-                    </label>
-                    <input
-                      type="tel"
-                      placeholder="+60-12-345-6789"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full border border-slate-300 p-2 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)]"
-                    />
-                  </div>
-                </div>
-
-                {/* 5. Dates & Insurance */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-700">
-                      Preferred Admission / Start
-                    </label>
-                    <input
-                      type="date"
-                      value={preferredFrom}
-                      onChange={(e) => setPreferredFrom(e.target.value)}
-                      className="w-full border border-slate-300 p-2 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)]"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-700">
-                      Insurance Provider / Panel
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Great Eastern, Bupa, Cigna, Allianz"
-                      value={insuranceCarrier}
-                      onChange={(e) => setInsuranceCarrier(e.target.value)}
-                      className="w-full border border-slate-300 p-2 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)]"
-                    />
-                  </div>
-
-                  <div className="space-y-1 flex flex-col justify-end">
-                    <label className="flex items-center gap-2 p-2 border border-slate-200 bg-slate-50 cursor-pointer text-xs font-bold text-slate-700">
-                      <input
-                        type="checkbox"
-                        checked={guaranteeLetter}
-                        onChange={(e) => setGuaranteeLetter(e.target.checked)}
-                        className="rounded-none text-[color:var(--t-600)]"
-                      />
-                      Request Insurance Guarantee Letter (LOG) Coordination
-                    </label>
-                  </div>
-                </div>
-
-                {/* 6. Clinical Description */}
-                <div className="space-y-1">
-                  <label className="text-xs font-black uppercase tracking-wider text-slate-700">
-                    Clinical Summary & Medical Background *
-                  </label>
-                  <textarea
-                    rows={4}
-                    required
-                    placeholder="Describe symptoms, primary diagnosis, past surgical history, requested procedures, or attach current medical scans..."
-                    value={summary}
-                    onChange={(e) => setSummary(e.target.value)}
-                    className="w-full border border-slate-300 p-2.5 text-xs bg-white leading-relaxed focus:outline-none focus:border-[color:var(--t-600)]"
-                  />
-                </div>
-
-                {/* 7. Specialized Assistance Services */}
-                <div className="space-y-2 border-t border-slate-200 pt-4">
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-700 block">
-                    Specialized Medical Assistance Services Requested
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
-                    <label className="flex items-center gap-2 p-2 border border-slate-200 bg-slate-50 cursor-pointer text-xs">
-                      <input
-                        type="checkbox"
-                        checked={needsInterpreter}
-                        onChange={(e) => setNeedsInterpreter(e.target.checked)}
-                      />
-                      <Languages className="h-3.5 w-3.5 text-slate-500" />
-                      <span className="font-semibold text-slate-800">Medical Interpreter</span>
-                    </label>
-
-                    <label className="flex items-center gap-2 p-2 border border-slate-200 bg-slate-50 cursor-pointer text-xs">
-                      <input
-                        type="checkbox"
-                        checked={needsAirportTransfer}
-                        onChange={(e) => setNeedsAirportTransfer(e.target.checked)}
-                      />
-                      <Car className="h-3.5 w-3.5 text-slate-500" />
-                      <span className="font-semibold text-slate-800">KLIA Airport Meet & Chauffeur</span>
-                    </label>
-
-                    <label className="flex items-center gap-2 p-2 border border-slate-200 bg-slate-50 cursor-pointer text-xs">
-                      <input
-                        type="checkbox"
-                        checked={needsAmbulanceTransfer}
-                        onChange={(e) => setNeedsAmbulanceTransfer(e.target.checked)}
-                      />
-                      <Ambulance className="h-3.5 w-3.5 text-slate-500" />
-                      <span className="font-semibold text-slate-800">Inter-Hospital Ambulance</span>
-                    </label>
-
-                    <label className="flex items-center gap-2 p-2 border border-slate-200 bg-slate-50 cursor-pointer text-xs">
-                      <input
-                        type="checkbox"
-                        checked={needsVipConcierge}
-                        onChange={(e) => setNeedsVipConcierge(e.target.checked)}
-                      />
-                      <Sparkles className="h-3.5 w-3.5 text-slate-500" />
-                      <span className="font-semibold text-slate-800">VIP Private Suite & Concierge</span>
-                    </label>
-
-                    <label className="flex items-center gap-2 p-2 border border-slate-200 bg-slate-50 cursor-pointer text-xs">
-                      <input
-                        type="checkbox"
-                        checked={needsAccommodation}
-                        onChange={(e) => setNeedsAccommodation(e.target.checked)}
-                      />
-                      <Building2 className="h-3.5 w-3.5 text-slate-500" />
-                      <span className="font-semibold text-slate-800">Family Hotel Booking</span>
-                    </label>
-
-                    <label className="flex items-center gap-2 p-2 border border-slate-200 bg-slate-50 cursor-pointer text-xs">
-                      <input
-                        type="checkbox"
-                        checked={needsHalalFood}
-                        onChange={(e) => setNeedsHalalFood(e.target.checked)}
-                      />
-                      <Utensils className="h-3.5 w-3.5 text-slate-500" />
-                      <span className="font-semibold text-slate-800">Halal Certified Clinical Meals</span>
-                    </label>
-                  </div>
-
-                  {needsInterpreter && (
-                    <div className="pt-2 flex items-center gap-2 text-xs">
-                      <span className="font-bold text-slate-700">Preferred Language:</span>
-                      <select
-                        value={interpreterLanguage}
-                        onChange={(e) => setInterpreterLanguage(e.target.value)}
-                        className="border border-slate-300 p-1.5 text-xs bg-white"
-                      >
-                        <option value="Arabic">Arabic (العربية)</option>
-                        <option value="Mandarin">Mandarin (中文)</option>
-                        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-                        <option value="Japanese">Japanese (日本語)</option>
-                        <option value="Russian">Russian (Русский)</option>
-                        <option value="French">French (Français)</option>
+                  {patientType !== 'local_malaysian' && (
+                    <div className="space-y-1 sm:max-w-xs">
+                      <label htmlFor="aq-country" className="text-sm font-bold text-slate-800 block">Country you live in</label>
+                      <select id="aq-country" value={homeCountry} onChange={(e) => setHomeCountry(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
+                        {[['ID', 'Indonesia'], ['SG', 'Singapore'], ['CN', 'China'], ['IN', 'India'], ['AU', 'Australia'], ['GB', 'United Kingdom'], ['US', 'United States'], ['SA', 'Saudi Arabia'], ['AE', 'United Arab Emirates'], ['JP', 'Japan'], ['MY', 'Malaysia'], ['XX', 'Other']].map(([c, n]) => <option key={c} value={c}>{n}</option>)}
                       </select>
                     </div>
                   )}
+
+                  <div className="space-y-1">
+                    <label htmlFor="aq-name" className="text-sm font-bold text-slate-800 block">Full name *</label>
+                    <input id="aq-name" type="text" required autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="e.g. Fatimah binti Ali" className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label htmlFor="aq-email" className="text-sm font-bold text-slate-800 block">Email *</label>
+                      <input id="aq-email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                    </div>
+                    <div className="space-y-1">
+                      <label htmlFor="aq-phone" className="text-sm font-bold text-slate-800 block">Phone or WhatsApp (helps the hospital reach you)</label>
+                      <input id="aq-phone" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+60 12-345 6789" className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                    </div>
+                  </div>
                 </div>
 
-                {/* Consent & Submit */}
-                <div className="pt-4 border-t border-slate-200 space-y-4">
-                  <label className="flex items-start gap-2 cursor-pointer text-xs text-slate-600">
-                    <input
-                      type="checkbox"
-                      required
-                      checked={shareDocuments}
-                      onChange={(e) => setShareDocuments(e.target.checked)}
-                      className="mt-0.5 rounded-none"
-                    />
-                    <span>
-                      I authorize CareVerified and the designated licensed healthcare facility to review these clinical details for the sole purpose of triage, medical case assessment, and quotation formulation in compliance with the Personal Data Protection Act 2010 (PDPA).
-                    </span>
-                  </label>
+                {/* STEP 2: what */}
+                <div data-step="2" hidden={step !== 2} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label htmlFor="aq-type" className="text-sm font-bold text-slate-800 block">What do you need? *</label>
+                      <select id="aq-type" value={assistanceType} onChange={(e) => setAssistanceType(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
+                        <option value="elective_surgery">A procedure and hospital stay</option>
+                        <option value="specialist_consult">A specialist consultation or second opinion</option>
+                        <option value="urgent_evacuation">Transfer between hospitals</option>
+                        <option value="maternity_care">Maternity and delivery</option>
+                        <option value="executive_screening">A full health screening</option>
+                        <option value="oncology_workup">Cancer care</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <label htmlFor="aq-specialty" className="text-sm font-bold text-slate-800 block">Medical specialty *</label>
+                      <select id="aq-specialty" value={specialty} onChange={(e) => setSpecialty(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
+                        <option value="Cardiology & Interventional">Cardiology and heart surgery</option>
+                        <option value="Orthopaedics & Joint Reconstruction">Orthopaedics (knee, hip, joints)</option>
+                        <option value="Oncology & Surgical Oncology">Oncology and radiotherapy</option>
+                        <option value="Obstetrics & Gynaecology">Obstetrics, gynaecology and IVF</option>
+                        <option value="Neurology & Neurosurgery">Neurology and neurosurgery</option>
+                        <option value="Gastroenterology & Bariatric">Gastroenterology and endoscopy</option>
+                        <option value="Paediatrics & Neonatology">Paediatrics</option>
+                        <option value="Executive Health Screening">Health screening</option>
+                      </select>
+                    </div>
+                  </div>
 
-                  <button
-                    type="submit"
-                    disabled={formSubmitting}
-                    className="w-full sm:w-auto px-8 py-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2 shadow-sm transition-colors"
-                  >
-                    {formSubmitting ? (
-                      <>
-                        <RefreshCw className="h-4 w-4 animate-spin" />
-                        Transmitting Clinical Intake…
-                      </>
-                    ) : (
-                      <>
-                        <Send className="h-4 w-4" />
-                        Submit Request for Official Quotation
-                      </>
+                  <fieldset className="space-y-2">
+                    <legend className="text-sm font-bold text-slate-800 block">How soon do you need a reply? *</legend>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {[
+                        { id: 'routine', title: 'Routine', text: 'Within a few weeks' },
+                        { id: 'priority', title: 'Soon', text: 'Within about a week' },
+                        { id: 'urgent', title: 'Urgent', text: 'As soon as possible' },
+                      ].map(o => (
+                        <label key={o.id} className={`flex items-start gap-3 p-3 min-h-[44px] border cursor-pointer ${urgency === o.id ? (o.id === 'urgent' ? 'border-red-700 bg-red-50' : 'border-[color:var(--t-600)] bg-[color:var(--t-50)]') : 'border-slate-300 bg-white hover:bg-slate-50'}`}>
+                          <input type="radio" name="urgency" className="mt-1 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" checked={urgency === o.id} onChange={() => setUrgency(o.id as any)} />
+                          <span><span className="block text-sm font-bold text-slate-900">{o.title}</span><span className="block text-xs text-slate-700">{o.text}</span></span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  {(urgency === 'urgent' || assistanceType === 'urgent_evacuation') && (
+                    <div role="alert" className="p-4 bg-red-50 border-2 border-red-300 text-red-950 text-sm space-y-1">
+                      <p className="font-extrabold flex items-center gap-2"><AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" /> If someone is in danger now, do not wait for this request.</p>
+                      <p>Call <strong>999</strong> (Malaysia) or go to the nearest emergency department. This form is not an emergency service and may not be read straight away.</p>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label htmlFor="aq-facility" className="text-sm font-bold text-slate-800 block">Hospital *</label>
+                      {facilities.length <= 1 ? (
+                        <p className={`min-h-[44px] flex items-center text-sm font-semibold ${facilities[0] ? 'text-slate-900' : 'text-rose-900'}`}>{facilities[0] ? `${facilities[0].name}${facilities[0].city ? `, ${facilities[0].city}` : ''}` : 'No hospital is available right now. Please try again later.'}</p>
+                      ) : (
+                        <select id="aq-facility" value={facilityId} onChange={(e) => setFacilityId(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
+                          {facilities.map(f => <option key={f.id} value={f.id}>{f.name}{f.city ? ` (${f.city})` : ''}</option>)}
+                        </select>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <label htmlFor="aq-from" className="text-sm font-bold text-slate-800 block">Earliest date you could start</label>
+                      <input id="aq-from" type="date" value={preferredFrom} min={new Date().toISOString().slice(0, 10)} onChange={(e) => setPreferredFrom(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label htmlFor="aq-summary" className="text-sm font-bold text-slate-800 block">Describe your condition or the treatment you want *</label>
+                    <textarea id="aq-summary" rows={5} required minLength={15} value={summary} onChange={(e) => setSummary(e.target.value)} placeholder="Symptoms, any diagnosis you have been given, past operations, the procedure you are asking about…" className="w-full px-3 py-2 border border-slate-300 text-sm bg-white leading-relaxed focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                    <p className="text-xs text-slate-700">At least 15 characters. Do not put passport, card or bank numbers here. You can share reports later in Messages.</p>
+                  </div>
+                </div>
+
+                {/* STEP 3: extras and consent */}
+                <div data-step="3" hidden={step !== 3} className="space-y-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label htmlFor="aq-insurer" className="text-sm font-bold text-slate-800 block">Insurance provider (optional)</label>
+                      <input id="aq-insurer" type="text" value={insuranceCarrier} onChange={(e) => setInsuranceCarrier(e.target.value)} placeholder="e.g. Great Eastern, Bupa, Cigna, Allianz" className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                    </div>
+                    <label className="flex items-center gap-3 min-h-[44px] sm:mt-7 px-3 border border-slate-300 bg-white cursor-pointer text-sm font-semibold text-slate-900">
+                      <input type="checkbox" checked={guaranteeLetter} onChange={(e) => setGuaranteeLetter(e.target.checked)} className="h-5 w-5 shrink-0 accent-[color:var(--t-600)]" />
+                      Ask the hospital about a guarantee letter from my insurer
+                    </label>
+                  </div>
+
+                  <fieldset className="space-y-2">
+                    <legend className="text-sm font-bold text-slate-800 block">Help you would like arranged (optional)</legend>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {[
+                        { label: 'A medical interpreter', v: needsInterpreter, set: setNeedsInterpreter },
+                        { label: 'Airport pickup', v: needsAirportTransfer, set: setNeedsAirportTransfer },
+                        { label: 'Ambulance between hospitals', v: needsAmbulanceTransfer, set: setNeedsAmbulanceTransfer },
+                        { label: 'A private suite', v: needsVipConcierge, set: setNeedsVipConcierge },
+                        { label: 'A hotel for family', v: needsAccommodation, set: setNeedsAccommodation },
+                        { label: 'Halal meals', v: needsHalalFood, set: setNeedsHalalFood },
+                      ].map(o => (
+                        <label key={o.label} className="flex items-center gap-3 min-h-[44px] px-3 border border-slate-300 bg-white cursor-pointer text-sm font-semibold text-slate-900">
+                          <input type="checkbox" checked={o.v} onChange={(e) => o.set(e.target.checked)} className="h-5 w-5 shrink-0 accent-[color:var(--t-600)]" />
+                          {o.label}
+                        </label>
+                      ))}
+                    </div>
+                    {needsInterpreter && (
+                      <div className="space-y-1 sm:max-w-xs">
+                        <label htmlFor="aq-lang" className="text-sm font-bold text-slate-800 block">Language</label>
+                        <select id="aq-lang" value={interpreterLanguage} onChange={(e) => setInterpreterLanguage(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
+                          <option value="Arabic">Arabic</option>
+                          <option value="Mandarin">Mandarin</option>
+                          <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                          <option value="Japanese">Japanese</option>
+                          <option value="Russian">Russian</option>
+                          <option value="French">French</option>
+                        </select>
+                      </div>
                     )}
+                  </fieldset>
+
+                  <label className="flex items-start gap-3 cursor-pointer text-sm text-slate-800">
+                    <input type="checkbox" required checked={shareDocuments} onChange={(e) => setShareDocuments(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" />
+                    <span>I agree that MedCred and the hospital I chose may read what I have written here, only to assess my request and prepare a quote (Personal Data Protection Act 2010). *</span>
+                  </label>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-200">
+                  <button type="button" onClick={goBack} disabled={step === 1} className="min-h-[44px] px-5 border border-slate-300 bg-white text-slate-800 text-sm font-bold hover:bg-slate-50 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                    Back
                   </button>
+                  {step < 3 ? (
+                    <button type="button" onClick={goNext} className="min-h-[44px] px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold cursor-pointer">
+                      Next
+                    </button>
+                  ) : (
+                    <button type="submit" disabled={formSubmitting} className="min-h-[44px] px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold cursor-pointer flex items-center gap-2 disabled:opacity-60">
+                      {formSubmitting ? (<><RefreshCw className="h-4 w-4 animate-spin" aria-hidden="true" /> Sending…</>) : (<><Send className="h-4 w-4" aria-hidden="true" /> Send request</>)}
+                    </button>
+                  )}
                 </div>
               </form>
             </div>
 
-            {/* Sidebar Guide */}
+            {/* Sidebar */}
             <div className="lg:col-span-4 space-y-4">
-              <div className="bg-slate-900 text-white p-5 space-y-3">
-                <h3 className="font-black text-sm uppercase tracking-wider flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-emerald-400" />
-                  What Happens Next?
+              <div className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
+                <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-[color:var(--t-600)]" aria-hidden="true" />
+                  What happens next
                 </h3>
-                <ol className="space-y-3 text-xs text-slate-300 list-decimal list-inside leading-relaxed">
-                  <li>
-                    <strong className="text-white">Clinical Triage:</strong> Senior nursing and medical staff review your clinical notes within 4-12 hours.
-                  </li>
-                  <li>
-                    <strong className="text-white">Itemized Quotation:</strong> The hospital generates an official pro-forma breakdown of surgeon fees, room category, OT charges, and inclusions.
-                  </li>
-                  <li>
-                    <strong className="text-white">One-Click Acceptance:</strong> You review the price in MYR or foreign currency, and either accept, request revisions, or ask questions.
-                  </li>
-                  <li>
-                    <strong className="text-white">Logistics & Care:</strong> Once accepted, your itinerary, airport transfer, and Letter of Guarantee (LOG) coordination are mobilized.
-                  </li>
+                <ol className="space-y-3 text-sm text-slate-800 list-decimal ml-5">
+                  <li><strong>The hospital reads your request.</strong> Reply times differ between hospitals.</li>
+                  <li><strong>You get an itemised quote</strong> with what is included, what is not, and how long the price is valid.</li>
+                  <li><strong>You decide.</strong> Accept it, ask for changes, or ask questions. Accepting does not charge you.</li>
+                  <li><strong>The hospital arranges the details</strong> with you: dates, transfers and any insurer guarantee letter.</li>
                 </ol>
               </div>
 
-              <div className="bg-white border border-[color:var(--t-200)] p-4 text-xs space-y-3">
-                <h4 className="font-black uppercase tracking-wide text-slate-900 flex items-center gap-1.5">
-                  <Plane className="h-4 w-4 text-[color:var(--t-600)]" />
-                  For International & Expat Patients
-                </h4>
-                <p className="text-slate-600 leading-relaxed">
-                  Malaysia is consistently ranked among the world's top healthcare travel destinations. All partner hospitals are licensed under Act 586 and monitored by the Ministry of Health Malaysia (KKM).
-                </p>
-                <div className="p-2.5 bg-sky-50 border border-sky-200 text-sky-900 font-bold">
-                  Emergency Medical Travel Assistance Hotline:
-                  <br />
-                  <span className="font-mono text-sm font-black">+60-3-2727-8900</span> (24/7 Desk)
-                </div>
+              <div role="note" className="bg-red-50 border border-red-200 p-4 text-sm text-red-950 space-y-1">
+                <p className="font-extrabold">In an emergency, call 999.</p>
+                <p>This service is for planned and urgent-but-stable care. It is not an emergency line.</p>
               </div>
             </div>
           </div>
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 2: MY INQUIRIES & OFFICIAL TREATMENT QUOTATIONS */}
+        {/* TAB 2: MY REQUESTS AND QUOTES */}
         {/* ========================================================================= */}
-        {activeTab === 'cases' && (
+        {activeTab === 'cases' && meLoaded && me && (
+          <MyCases openId={openCaseId} onOpen={setOpenCaseId} onFind={() => setActiveTab('enquiry')} />
+        )}
+
+        {activeTab === 'cases' && meLoaded && !me && (
+          <div className="space-y-4">
+          {cases.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              <label htmlFor="currency-select" className="font-bold text-slate-800">Show prices in</label>
+              <select
+                id="currency-select"
+                value={selectedCurrency}
+                onChange={(e) => setSelectedCurrency(e.target.value)}
+                className="border border-slate-300 bg-white text-sm font-semibold px-3 min-h-[44px] cursor-pointer focus:outline-none focus:border-[color:var(--t-600)]"
+              >
+                {Object.entries(CURRENCY_RATES).map(([code, item]) => (
+                  <option key={code} value={code}>{code} - {item.label}</option>
+                ))}
+              </select>
+              <span className="text-xs text-slate-700">Other currencies are a rough guide only. The hospital bills in ringgit (RM).</span>
+            </div>
+          )}
+          {actionError && <p role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-sm">{actionError}</p>}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Column: Cases List */}
             <div className="lg:col-span-5 space-y-3">
@@ -974,14 +794,15 @@ export default function MedicalAssistanceModule({
 
               {!loadingCases && cases.length === 0 && (
                 <div className="bg-white border border-dashed border-slate-300 p-8 text-center text-xs text-slate-500 space-y-2">
-                  <FileText className="h-8 w-8 text-slate-400 mx-auto" />
-                  <p className="font-bold text-slate-700">No medical inquiries registered yet.</p>
+                  <FileText className="h-8 w-8 text-slate-600 mx-auto" aria-hidden="true" />
+                  <p className="font-bold text-sm text-slate-900">You have no requests yet.</p>
+                  <p className="text-sm text-slate-700">{me ? 'Ask a hospital for a quote and it will appear here.' : 'If you already sent a request, use "Track a request" with your reference and email.'}</p>
                   <button
                     type="button"
                     onClick={() => setActiveTab('enquiry')}
-                    className="mt-2 px-3 py-1.5 bg-[color:var(--t-600)] text-white text-xs font-bold uppercase cursor-pointer"
+                    className="mt-2 min-h-[44px] px-4 bg-[color:var(--t-600)] text-white text-sm font-bold cursor-pointer"
                   >
-                    Submit New Request →
+                    Request a quote
                   </button>
                 </div>
               )}
@@ -1210,25 +1031,25 @@ export default function MedicalAssistanceModule({
                           {/* Quotation Action Buttons */}
                           {selectedCase.status === 'quoted' && (
                             <div className="p-4 bg-white border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
-                              <span className="text-xs text-slate-500">
-                                Awaiting your formal review and decision.
+                              <span className="text-sm text-slate-700">
+                                The hospital is waiting for your answer.
                               </span>
                               <div className="flex items-center gap-2">
                                 <button
                                   type="button"
                                   onClick={() => setShowRevisionModal(true)}
-                                  className="px-3 py-1.5 border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold uppercase cursor-pointer"
+                                  className="px-3 min-h-[44px] border border-slate-300 hover:bg-slate-100 text-slate-800 text-sm font-bold cursor-pointer"
                                 >
-                                  Request Revision / Negotiate
+                                  Ask for changes
                                 </button>
                                 <button
                                   type="button"
-                                  onClick={() => handleQuoteDecision('accept')}
+                                  onClick={() => { setActionError(''); setShowAcceptConfirm(true); }}
                                   disabled={decisionSubmitting}
-                                  className="px-4 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-black uppercase cursor-pointer flex items-center gap-1.5 shadow-xs"
+                                  className="px-4 min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-sm font-bold cursor-pointer flex items-center gap-1.5 shadow-xs"
                                 >
-                                  <CheckCircle2 className="h-4 w-4" />
-                                  Accept Quotation
+                                  <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                                  Accept this quote
                                 </button>
                               </div>
                             </div>
@@ -1237,7 +1058,7 @@ export default function MedicalAssistanceModule({
                           {selectedCase.status === 'accepted' && (
                             <div className="p-3 bg-emerald-50 border-t border-emerald-200 text-xs text-emerald-900 font-bold flex items-center gap-2">
                               <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                              This quotation has been officially accepted. Hospital admission & logistics are being scheduled.
+                              You accepted this quote. The hospital will contact you to arrange the details.
                             </div>
                           )}
                         </div>
@@ -1328,12 +1149,13 @@ export default function MedicalAssistanceModule({
                     </div>
                   )}
                 </div>
-              ) : (
-                <div className="p-12 bg-white border border-dashed border-slate-300 text-center text-xs text-slate-500">
-                  Select a case from the list on the left to inspect its treatment quotation, itinerary, and care coordination messages.
+              ) : cases.length > 0 ? (
+                <div className="p-12 bg-white border border-dashed border-slate-300 text-center text-sm text-slate-700">
+                  Choose a request from the list to see its quote, itinerary and messages.
                 </div>
-              )}
+              ) : null}
             </div>
+          </div>
           </div>
         )}
 
@@ -1400,7 +1222,7 @@ export default function MedicalAssistanceModule({
                 Track Medical Assistance Inquiry
               </h3>
               <p className="text-xs text-slate-600 mt-1">
-                If you submitted an enquiry as a guest or international visitor, enter your tracking code (e.g. <code>MED-MY-7821</code>) and contact email to view your itemized quotation and updates.
+                If you sent a request without signing in, enter your reference (for example <code>MED-MY-AB12CD34</code>) and contact email to view your itemized quotation and updates.
               </p>
             </div>
 
@@ -1414,21 +1236,21 @@ export default function MedicalAssistanceModule({
             <form onSubmit={handleTrackCase} className="space-y-4">
               <div className="space-y-1">
                 <label className="text-xs font-black uppercase tracking-wider text-slate-700">
-                  Case Tracking Code *
+                  Reference *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. MED-MY-7821 or MED-INT-9932"
+                  placeholder="e.g. MED-MY-AB12CD34"
                   value={trackCode}
                   onChange={(e) => setTrackCode(e.target.value)}
-                  className="w-full border border-slate-300 p-2 text-xs font-mono uppercase bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="w-full border border-slate-300 px-3 min-h-[44px] text-sm font-mono uppercase bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                 />
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-black uppercase tracking-wider text-slate-700">
-                  Contact Email Address *
+                  Email used on the request *
                 </label>
                 <input
                   type="email"
@@ -1436,17 +1258,17 @@ export default function MedicalAssistanceModule({
                   placeholder="The email you used during enquiry submission"
                   value={trackEmail}
                   onChange={(e) => setTrackEmail(e.target.value)}
-                  className="w-full border border-slate-300 p-2 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="w-full border border-slate-300 px-3 min-h-[44px] text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={trackingLoading}
-                className="w-full py-2.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2 shadow-xs"
+                className="w-full min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2 shadow-xs"
               >
                 {trackingLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                Lookup Case & Quotation
+                Find my request
               </button>
             </form>
           </div>
@@ -1454,7 +1276,7 @@ export default function MedicalAssistanceModule({
       </div>
 
       {/* ========================================================================= */}
-      {/* MODAL: OFFICIAL PRO-FORMA MEDICAL QUOTATION (PRINTABLE) */}
+      {/* MODAL: PRO-FORMA QUOTATION (PRINTABLE) */}
       {/* ========================================================================= */}
       {showProformaModal && proformaData && (
         <div className="fixed inset-0 z-50 bg-slate-900/70 flex items-center justify-center p-4 overflow-y-auto">
@@ -1488,9 +1310,9 @@ export default function MedicalAssistanceModule({
                 <h1 className="text-xl font-black text-slate-900 tracking-tight">
                   {proformaData.facility.name}
                 </h1>
-                <p className="text-xs text-slate-600 mt-0.5">{proformaData.facility.address}</p>
-                <p className="text-xs text-slate-500">
-                  Licence: {proformaData.facility.licenceNo} · Tel: {proformaData.facility.phone}
+                {proformaData.facility.address && <p className="text-xs text-slate-700 mt-0.5">{proformaData.facility.address}</p>}
+                <p className="text-xs text-slate-700">
+                  {[proformaData.facility.licenceNo && `Licence: ${proformaData.facility.licenceNo}`, proformaData.facility.phone && `Tel: ${proformaData.facility.phone}`].filter(Boolean).join(' · ')}
                 </p>
                 {proformaData.facility.mhtcMember && (
                   <span className="inline-block mt-1 text-xs font-black uppercase px-2 py-0.5 bg-sky-50 text-sky-800 border border-sky-300">
@@ -1596,27 +1418,55 @@ export default function MedicalAssistanceModule({
       )}
 
       {/* ========================================================================= */}
+      {/* MODAL: CONFIRM ACCEPTING A QUOTE */}
+      {/* ========================================================================= */}
+      {showAcceptConfirm && selectedCase?.latestQuote && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="accept-title">
+          <div className="bg-white border border-slate-300 max-w-md w-full p-6 space-y-4 shadow-xl">
+            <h3 id="accept-title" className="font-extrabold text-lg text-slate-900">Accept this quote?</h3>
+            <dl className="text-sm grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
+              <dt className="text-slate-700">Hospital</dt><dd className="font-bold text-slate-900">{selectedCase.facility?.name || 'The hospital'}</dd>
+              <dt className="text-slate-700">Total</dt><dd className="font-extrabold text-slate-900 tabular-nums">RM {selectedCase.latestQuote.total.toLocaleString('en-MY', { minimumFractionDigits: 2 })}{selectedCurrency !== 'MYR' ? ` (about ${formatCur(selectedCase.latestQuote.total)})` : ''}</dd>
+              {selectedCase.latestQuote.validUntil && <><dt className="text-slate-700">Valid until</dt><dd className="font-bold text-slate-900">{new Date(selectedCase.latestQuote.validUntil).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</dd></>}
+            </dl>
+            <p className="text-sm text-slate-800">
+              Accepting tells the hospital you want to go ahead at this price. <strong>It does not charge you.</strong> The hospital will contact you about dates and how to pay. Check what is not included and the cancellation terms first.
+            </p>
+            {actionError && <p role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-sm">{actionError}</p>}
+            <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
+              <button type="button" onClick={() => setShowAcceptConfirm(false)} className="min-h-[44px] px-4 border border-slate-300 text-slate-800 text-sm font-bold cursor-pointer">Not yet</button>
+              <button type="button" disabled={decisionSubmitting} onClick={() => handleQuoteDecision('accept')} className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold cursor-pointer disabled:opacity-60">
+                {decisionSubmitting ? 'Saving…' : 'Yes, accept this quote'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
       {/* MODAL: REQUEST QUOTATION REVISION / NEGOTIATE */}
       {/* ========================================================================= */}
       {showRevisionModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
           <div className="bg-white border border-slate-300 max-w-md w-full p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between">
-              <h3 className="font-black text-sm uppercase tracking-wider text-slate-900">
-                Request Quotation Revision
+              <h3 className="font-extrabold text-lg text-slate-900">
+                Ask for changes to this quote
               </h3>
               <button
                 type="button"
+                aria-label="Close"
                 onClick={() => setShowRevisionModal(false)}
-                className="text-slate-400 hover:text-slate-600"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-slate-900"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-600">
-              Specify what adjustments you require from the hospital (e.g. room category adjustment, date change, exclusion of optional companion items):
+            <p className="text-sm text-slate-800">
+              Say what you would like changed, for example a different room type or a different date.
             </p>
+            {actionError && <p role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-sm">{actionError}</p>}
 
             <textarea
               rows={4}
@@ -1641,7 +1491,7 @@ export default function MedicalAssistanceModule({
                 onClick={() => handleQuoteDecision('request_revision')}
                 className="px-4 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold uppercase cursor-pointer"
               >
-                {decisionSubmitting ? 'Transmitting…' : 'Submit Revision Request'}
+                {decisionSubmitting ? 'Sending…' : 'Send request for changes'}
               </button>
             </div>
           </div>

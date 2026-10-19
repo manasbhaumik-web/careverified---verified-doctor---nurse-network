@@ -27,11 +27,13 @@ test('visitors can list facilities without signing in', async () => {
 
 test('filters work for specialty, language and service', async () => {
   const names = async (qs: string) => ((await anon.call('GET', `/api/tourism/facilities?${qs}`)).data.data as any[]).map(f => f.name);
-  assert.equal((await names('specialty=cardio')).length, 1);
-  assert.equal((await names('language=arabic')).length, 1);
-  assert.equal((await names('service=prayerRoom')).length, 1);
-  assert.equal((await names('service=airportPickup')).length, 0);
-  assert.equal((await names('accreditation=JCI')).length, 0);
+  // Every active, licensed hospital is listed (including ones that do not take international patients), so check this one by name
+  const demo = 'Demo Specialist Hospital (demo data)';
+  assert.ok((await names('specialty=cardio')).includes(demo));
+  assert.ok((await names('language=arabic')).includes(demo));
+  assert.ok((await names('service=prayerRoom')).includes(demo));
+  assert.ok(!(await names('service=airportPickup')).includes(demo));
+  assert.ok(!(await names('accreditation=JCI')).includes(demo));
   assert.equal((await names('q=nowhere')).length, 0);
 });
 

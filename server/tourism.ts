@@ -149,7 +149,7 @@ export function registerTourism(app: Application, ctx: { findProfessional: (id: 
     const languages = [...new Set([...parse<string[]>(f.languages, []), ...practitioners.flatMap(p => p.languages as string[])])];
     return {
       id: f.id, name: f.name, kind: f.kind, city: f.city, state: f.state, address: f.address, description: f.description,
-      phone: f.phone, email: f.email, website: f.website, mhtcMember: !!f.mhtc_member,
+      phone: f.phone, email: f.email, website: f.website, mhtcMember: !!f.mhtc_member, acceptsInternational: !!f.accepts_international,
       specialties: parse<string[]>(f.specialties, []), languages,
       services: parse<Record<string, any>>(f.services, {}),
       accreditations: liveAccreditations(f).map(a => ({ body: a.body, number: a.number, validUntil: a.validUntil })),
@@ -157,7 +157,9 @@ export function registerTourism(app: Application, ctx: { findProfessional: (id: 
       practitioners,
     };
   };
-  const visibleFacilities = () => rows("SELECT * FROM tourism_facilities WHERE active = 1 AND accepts_international = 1").filter(licenceOk);
+  // One rule for "listed": the hospital is switched on and its licence has not expired. Whether it welcomes international patients is
+  // shown on its card (and can be filtered on); it is not a reason to hide a hospital from patients in Malaysia.
+  const visibleFacilities = () => rows("SELECT * FROM tourism_facilities WHERE active = 1").filter(licenceOk);
 
   // ---------- public: facility search ----------
   app.get("/api/tourism/facilities", (req, res) => {
@@ -568,7 +570,7 @@ export function registerTourism(app: Application, ctx: { findProfessional: (id: 
       ...publicFacility(f), active: !!f.active, acceptsInternational: !!f.accepts_international, licenceNo: f.licence_no, licenceReference: f.licence_reference,
       allAccreditations: parse<Accreditation[]>(f.accreditations, []),
       staff: rows("SELECT u.id, u.name, u.email FROM tourism_facility_staff s JOIN users u ON u.id = s.user_id WHERE s.facility_id = ?", f.id),
-      hiddenReason: !f.active ? "inactive" : !f.accepts_international ? "not accepting international patients" : !licenceOk(f) ? "licence expired" : null,
+      hiddenReason: !f.active ? "inactive" : !licenceOk(f) ? "licence expired" : null,
     }));
     res.json({ status: "success", data: list });
   });

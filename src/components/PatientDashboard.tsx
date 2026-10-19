@@ -1777,15 +1777,14 @@ export default function PatientDashboard({
         <div id="panel-assistance" role="tabpanel" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={HeartHandshake}
-            eyebrow="Care Concierge · Hospital Estimates"
-            title="Patient Assistance & Treatment Quotes"
-            description="Request second opinions, procedure cost estimations, and insurance guarantee letter pre-authorizations."
-            badges={<BannerBadge tone="brand">MHTC Coordinated</BannerBadge>}
+            eyebrow="Treatment quotes"
+            title="Treatment quotes and assistance"
+            description="Ask a hospital for an itemised quote, then accept it or ask for changes. Sending a request is free and does not commit you."
             tabs={[
-              { id: 'enquiry', label: 'Request Treatment Quote' },
-              { id: 'cases', label: 'My Inquiries & Quotes' },
-              { id: 'guide', label: 'Expat & Travel Care Guide' },
-              { id: 'track', label: 'Track Guest Inquiry' },
+              { id: 'enquiry', label: 'Request a quote' },
+              { id: 'cases', label: 'My requests and quotes' },
+              { id: 'guide', label: 'Travel guide' },
+              ...(currentUser ? [] : [{ id: 'track', label: 'Track a request' }]),
             ]}
             activeTab={assistanceSubTab}
             onTabChange={(t) => setAssistanceSubTab(t as any)}
@@ -1803,14 +1802,13 @@ export default function PatientDashboard({
         <div id="panel-tourism" role="tabpanel" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={Plane}
-            eyebrow="Malaysia Healthcare Travel Council · Cross-Border Care"
-            title="Global Patient Services & Medical Tourism"
-            description="End-to-end medical travel facilitation for international and domestic patients seeking specialist treatment in Malaysia."
-            badges={<BannerBadge tone="brand">MHTC Member Network</BannerBadge>}
+            eyebrow="Hospitals and medical travel"
+            title="Global patient care"
+            description="Find licensed hospitals in Malaysia, ask one for an itemised quote, and follow your request. For patients in Malaysia and from abroad."
             tabs={[
-              { id: 'find', label: 'Find a Facility' },
-              { id: 'cases', label: 'My Cases' },
-              { id: 'info', label: 'Travel Information' },
+              { id: 'find', label: 'Find a hospital' },
+              { id: 'cases', label: 'My requests' },
+              { id: 'info', label: 'Travel information' },
             ]}
             activeTab={tourismSubTab}
             onTabChange={(t) => setTourismSubTab(t as any)}

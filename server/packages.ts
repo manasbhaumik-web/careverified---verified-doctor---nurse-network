@@ -899,10 +899,13 @@ export function registerPackagesRoutes(app: Application) {
       WHERE f.active = 1
       ORDER BY f.mhtc_member DESC, f.name ASC
     `).all() as any[];
+    // Same rule as the Global Patient Care list: switched on, and the licence has not expired
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const listed = list.filter(f => !f.licence_expiry || f.licence_expiry >= todayKey);
 
     res.json({
       status: "success",
-      data: list.map(f => ({
+      data: listed.map(f => ({
         id: f.id,
         name: f.name,
         kind: f.kind,
