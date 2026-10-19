@@ -118,3 +118,28 @@ test('MC: ordinary validation still applies in person (dates, 14-day limit)', as
 test('MC: a booking that does not belong to the doctor is not found', async () => {
   assert.equal((await doctor.call('POST', '/api/certificates', mcBody('booking', 'bk-does-not-exist'))).status, 404);
 });
+
+test('MC: the certificate records how the patient was examined, and both the patient and the public check page show it', async () => {
+  const r = await doctor.call('POST', '/api/certificates', mcBody('booking', inPersonId));
+  assert.equal(r.status, 201, JSON.stringify(r.data));
+  const code = r.data.data.code as string;
+
+  const pub = (await srv.client().call('GET', `/api/verify/cert/${code}`)).data.data;
+  assert.equal(pub.valid, true);
+  assert.equal(pub.visitMode, 'In-person');
+  assert.match(pub.examinedOn, /^\d{4}-\d{2}-\d{2}$/, 'the day of the examination');
+  assert.equal(pub.issuedBy.stillVerified, true, 'the check page says whether the doctor is currently verified');
+  assert.ok(pub.issuedBy.licenseNumber);
+  assert.equal(JSON.stringify(pub).includes('diagnosis'), false, 'the public page never carries a diagnosis');
+
+  const mine = ((await patient.call('GET', '/api/records/me')).data.data.certificates as any[]).find(c => c.code === code);
+  assert.ok(mine, 'the patient sees it');
+  assert.equal(mine.visitMode, 'In-person');
+  assert.equal(mine.examinedOn, pub.examinedOn);
+  assert.equal(mine.doctor.stillVerified, true);
+});
+
+test('referrals show who referred the patient, with the registration number', async () => {
+  const mine = (await patient.call('GET', '/api/records/me')).data.data.referrals as any[];
+  for (const ref of mine) assert.ok('fromLicence' in ref);
+});

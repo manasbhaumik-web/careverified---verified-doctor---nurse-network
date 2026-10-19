@@ -11,7 +11,8 @@ const STATUS_LABEL: Record<string, string> = {
   requested: 'Requested', arranged: 'Arranged', out_for_delivery: 'Out for delivery', delivered: 'Delivered', failed: 'Failed', cancelled: 'Cancelled',
 };
 const GL_LABEL: Record<string, string> = { requested: 'Waiting for the pharmacy', approved: 'Guarantee letter approved', declined: 'Not covered by the guarantee letter' };
-const input = 'border border-slate-300 p-1.5 text-xs';
+const input = 'border border-slate-300 px-2 min-h-[44px] text-sm';
+const link = 'min-h-[44px] px-2 inline-flex items-center font-bold underline cursor-pointer';
 
 interface Props {
   rx: any;                  // prescription as returned by /api/records/me
@@ -75,13 +76,13 @@ export default function PrescriptionExtras({ rx, pharmacies, onChange }: Props) 
       {rx.status === 'active' && rx.pharmacyId && (
         <div className="space-y-1.5">
           <p className="font-bold flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> Insurance</p>
-          {pharmacy?.panelInsurers?.length > 0 && <p className="text-slate-500">{pharmacy.name} accepts: {pharmacy.panelInsurers.join(', ')}.</p>}
+          {pharmacy?.panelInsurers?.length > 0 && <p className="text-slate-700">{pharmacy.name} accepts: {pharmacy.panelInsurers.join(', ')}.</p>}
           <div className="flex flex-wrap gap-2">
             <select aria-label="Insurance policy" className={input} value={rx.insurancePolicyId ?? ''} onChange={async e => say(await jsend('POST', `/api/prescriptions/${rx.id}/insurance`, { policyId: e.target.value || null }), 'Updated.')}>
               <option value="">No insurance</option>
               {policies.map(p => <option key={p.id} value={p.id}>{p.insurer} · {p.memberNo}{p.policyType === 'corporate' ? ` · ${p.employer}` : ''}</option>)}
             </select>
-            <button type="button" className="font-bold underline cursor-pointer" onClick={() => setAddIns(a => !a)}>{addIns ? 'Cancel' : 'Add insurance'}</button>
+            <button type="button" className={link} onClick={() => setAddIns(a => !a)}>{addIns ? 'Cancel' : 'Add insurance'}</button>
           </div>
           {rx.insurancePolicyId && rx.glStatus && <p className={rx.glStatus === 'declined' ? 'font-bold text-rose-700' : 'font-bold text-emerald-700'}>{GL_LABEL[rx.glStatus] ?? rx.glStatus}{rx.glNumber ? ` (${rx.glNumber})` : ''}{rx.glNote ? `: ${rx.glNote}` : ''}</p>}
           {addIns && (
@@ -90,10 +91,10 @@ export default function PrescriptionExtras({ rx, pharmacies, onChange }: Props) 
               <input className={input} placeholder="Member / policy no." required value={ins.memberNo} onChange={e => setIns({ ...ins, memberNo: e.target.value })} />
               <select className={input} value={ins.policyType} onChange={e => setIns({ ...ins, policyType: e.target.value })}><option value="individual">Individual</option><option value="corporate">Corporate (employer)</option></select>
               {ins.policyType === 'corporate' ? <input className={input} placeholder="Employer" required value={ins.employer} onChange={e => setIns({ ...ins, employer: e.target.value })} /> : <span />}
-              <button className="col-span-2 bg-[color:var(--t-600)] text-white font-bold py-1.5 cursor-pointer">Save</button>
+              <button className="col-span-2 bg-[color:var(--t-600)] text-white font-bold min-h-[44px] cursor-pointer">Save</button>
             </form>
           )}
-          <p className="text-slate-500">The pharmacy sees only the insurer, your member number and employer.</p>
+          <p className="text-slate-700">The pharmacy sees only the insurer, your member number and employer.</p>
         </div>
       )}
 
@@ -107,7 +108,7 @@ export default function PrescriptionExtras({ rx, pharmacies, onChange }: Props) 
               {delivery.trackingUrl && <p><a href={delivery.trackingUrl} target="_blank" rel="noopener noreferrer" className="underline font-bold text-[color:var(--t-700)]">Track delivery</a></p>}
               {delivery.coldChain && <p className="flex gap-1.5 text-sky-900"><Snowflake className="h-3.5 w-3.5 shrink-0 mt-0.5" />{delivery.temperatureNote}</p>}
               {delivery.failureReason && <p className="text-rose-700 font-bold">{delivery.failureReason}</p>}
-              {['requested', 'arranged'].includes(delivery.status) && <button type="button" className="font-bold underline cursor-pointer" onClick={async () => say(await jsend('POST', `/api/deliveries/${delivery.id}/cancel`), 'Delivery cancelled.')}>Cancel delivery</button>}
+              {['requested', 'arranged'].includes(delivery.status) && <button type="button" className={link} onClick={async () => say(await jsend('POST', `/api/deliveries/${delivery.id}/cancel`), 'Delivery cancelled.')}>Cancel delivery</button>}
             </div>
           )}
           {offersDelivery && !open && rx.status === 'active' && (askDelivery ? (
@@ -122,10 +123,10 @@ export default function PrescriptionExtras({ rx, pharmacies, onChange }: Props) 
               <input className={input} placeholder="City" required value={dForm.city} onChange={e => setDForm({ ...dForm, city: e.target.value })} />
               <select className={input} required value={dForm.state} onChange={e => setDForm({ ...dForm, state: e.target.value })}><option value="">State…</option>{MY_STATES.map(s => <option key={s} value={s}>{s}</option>)}</select>
               <input className={input} placeholder="Phone the rider can call" required value={dForm.phone} onChange={e => setDForm({ ...dForm, phone: e.target.value })} />
-              <p className="col-span-2 text-slate-500">Your address and phone are shared with the pharmacy and its delivery partner only to deliver this order.</p>
-              <button className="col-span-2 bg-[color:var(--t-600)] text-white font-bold py-1.5 cursor-pointer">Request delivery</button>
+              <p className="col-span-2 text-slate-700">Your address and phone are shared with the pharmacy and its delivery partner only to deliver this order.</p>
+              <button className="col-span-2 bg-[color:var(--t-600)] text-white font-bold min-h-[44px] cursor-pointer">Request delivery</button>
             </form>
-          ) : <button type="button" className="font-bold underline cursor-pointer" onClick={() => setAskDelivery(true)}>Request home delivery</button>)}
+          ) : <button type="button" className={link} onClick={() => setAskDelivery(true)}>Request home delivery</button>)}
         </div>
       )}
     </div>

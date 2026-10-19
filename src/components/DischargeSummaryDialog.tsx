@@ -269,7 +269,7 @@ export default function DischargeSummaryDialog({
               <CheckCircle2 className="h-6 w-6" />
             </div>
             <div>
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-none">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-none">
                 Consultation Concluded · MMC Attested
               </span>
               <h2 id="discharge-dialog-title" className="text-base font-black text-[color:var(--ink)] mt-1">
@@ -285,19 +285,19 @@ export default function DischargeSummaryDialog({
         {/* CLINICAL SUMMARY STRIP */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-4 text-xs rounded-none">
           <div>
-            <span className="text-[10px] uppercase font-mono font-bold text-slate-500 block">Attending Physician</span>
+            <span className="text-xs uppercase font-mono font-bold text-slate-500 block">Attending Physician</span>
             <span className="font-extrabold text-[color:var(--ink)] block mt-0.5">{data.doctorName || "Dr. Sarah Chen"}</span>
-            <span className="text-[10px] text-slate-500 font-mono">MMC #{data.doctorCouncilNumber || "48921"}</span>
+            <span className="text-xs text-slate-500 font-mono">MMC #{data.doctorCouncilNumber || "48921"}</span>
           </div>
           <div>
-            <span className="text-[10px] uppercase font-mono font-bold text-slate-500 block">Clinical Diagnosis</span>
+            <span className="text-xs uppercase font-mono font-bold text-slate-500 block">Clinical Diagnosis</span>
             <span className="font-extrabold text-[color:var(--t-700)] block mt-0.5">{data.diagnosis || "Acute Upper Respiratory Assessment"}</span>
-            <span className="text-[10px] text-emerald-700 font-semibold">Triage Reviewed &amp; Managed</span>
+            <span className="text-xs text-emerald-700 font-semibold">Triage Reviewed &amp; Managed</span>
           </div>
           <div>
-            <span className="text-[10px] uppercase font-mono font-bold text-slate-500 block">Encounter Duration</span>
+            <span className="text-xs uppercase font-mono font-bold text-slate-500 block">Encounter Duration</span>
             <span className="font-extrabold text-[color:var(--ink)] block mt-0.5">{data.durationMinutes || 14} Minutes</span>
-            <span className="text-[10px] text-slate-500">Statutory Record Sealed</span>
+            <span className="text-xs text-slate-500">Statutory Record Sealed</span>
           </div>
         </div>
 
@@ -323,7 +323,7 @@ export default function DischargeSummaryDialog({
                 Prescribed Medication ({primaryRx?.items.length || 0} item{primaryRx?.items.length === 1 ? '' : 's'})
               </h3>
               {requiresColdChain && (
-                <span className="text-[10px] font-bold text-sky-900 bg-sky-50 border border-sky-300 px-2 py-0.5 inline-flex items-center gap-1 rounded-none">
+                <span className="text-xs font-bold text-sky-900 bg-sky-50 border border-sky-300 px-2 py-0.5 inline-flex items-center gap-1 rounded-none">
                   <Snowflake className="h-3 w-3 text-sky-600" /> Cold-Chain Required (2-8 °C)
                 </span>
               )}
@@ -334,16 +334,16 @@ export default function DischargeSummaryDialog({
                 <span className="font-mono font-extrabold text-cyan-900 flex items-center gap-1.5">
                   <FileText className="h-3.5 w-3.5 text-cyan-700" /> Rx Code: {primaryRx?.code}
                 </span>
-                <span className="text-[10px] font-mono font-bold text-cyan-800 bg-cyan-100 border border-cyan-200 px-2 py-0.5 rounded-none">
+                <span className="text-xs font-mono font-bold text-cyan-800 bg-cyan-100 border border-cyan-200 px-2 py-0.5 rounded-none">
                   Poisons Act 1952 Compliant
                 </span>
               </div>
               <div className="space-y-1.5">
                 {primaryRx?.items.map((item, itemIdx) => (
-                  <div key={itemIdx} className="bg-white border border-cyan-100 p-2.5 text-[11px] flex justify-between items-center rounded-none">
+                  <div key={itemIdx} className="bg-white border border-cyan-100 p-2.5 text-xs flex justify-between items-center rounded-none">
                     <div>
                       <span className="font-extrabold text-[color:var(--ink)] block">{item.name}</span>
-                      {item.instructions && <span className="text-[10px] text-slate-500">{item.instructions}</span>}
+                      {item.instructions && <span className="text-xs text-slate-500">{item.instructions}</span>}
                     </div>
                     <span className="font-mono font-semibold text-slate-700 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-none">
                       {item.dose || "As directed"} · {item.frequency || "Daily"}
@@ -351,7 +351,7 @@ export default function DischargeSummaryDialog({
                   </div>
                 ))}
               </div>
-              <p className="text-[10px] text-slate-500">
+              <p className="text-xs text-slate-500">
                 Valid Until: {primaryRx?.validUntil ? formatDateTime(primaryRx.validUntil) : "7 Days from issuance"}
               </p>
             </div>
@@ -363,7 +363,7 @@ export default function DischargeSummaryDialog({
           <div className="border-2 border-[color:var(--t-600)] bg-[color:var(--t-bg)] p-5 space-y-4 rounded-none">
             <div className="flex items-start justify-between">
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 rounded-none">
+                <span className="text-xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 rounded-none">
                   Smart Pharmacy Dispatch Loop
                 </span>
                 <h3 className="text-sm font-black text-slate-900 mt-1 flex items-center gap-1.5">
@@ -417,7 +417,7 @@ export default function DischargeSummaryDialog({
 
                 {/* 1. SELECT PARTNER PHARMACY */}
                 <div className="space-y-1.5">
-                  <label htmlFor="select-pharmacy" className="text-[10px] font-black uppercase tracking-wider text-slate-700 block">
+                  <label htmlFor="select-pharmacy" className="text-xs font-black uppercase tracking-wider text-slate-700 block">
                     Select Accredited Partner Pharmacy
                   </label>
                   {loadingPharmacies ? (
@@ -441,7 +441,7 @@ export default function DischargeSummaryDialog({
                     </select>
                   )}
                   {selectedPharmacy && (
-                    <div className="text-[11px] text-slate-600 flex flex-wrap gap-x-4 gap-y-1 pt-0.5">
+                    <div className="text-xs text-slate-600 flex flex-wrap gap-x-4 gap-y-1 pt-0.5">
                       <span className="flex items-center gap-1"><MapPin className="h-3 w-3 text-slate-400" />{selectedPharmacy.address}</span>
                       {selectedPharmacy.hours && <span className="flex items-center gap-1"><Clock className="h-3 w-3 text-slate-400" />{selectedPharmacy.hours}</span>}
                     </div>
@@ -450,7 +450,7 @@ export default function DischargeSummaryDialog({
 
                 {/* 2. FULFILLMENT MODE: HOME DELIVERY VS COUNTER PICKUP */}
                 <div className="space-y-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 block">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-700 block">
                     Choose Fulfillment Option
                   </span>
                   <div className="grid sm:grid-cols-2 gap-3">
@@ -476,7 +476,7 @@ export default function DischargeSummaryDialog({
                           className="accent-[color:var(--t-600)]"
                         />
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-1">
+                      <p className="text-xs text-slate-500 mt-1">
                         Grab / Lalamove / Rider to your doorstep (approx. 1-2 hours).
                       </p>
                     </button>
@@ -503,7 +503,7 @@ export default function DischargeSummaryDialog({
                           className="accent-[color:var(--t-600)]"
                         />
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-1">
+                      <p className="text-xs text-slate-500 mt-1">
                         Show your encrypted digital barcode at the pharmacy counter.
                       </p>
                     </button>
@@ -513,7 +513,7 @@ export default function DischargeSummaryDialog({
                 {/* 3. HOME DELIVERY DETAILS (IF DELIVERY SELECTED) */}
                 {fulfillmentType === 'delivery' && (
                   <div className="bg-white border border-slate-250 p-4 space-y-3 rounded-none">
-                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-700">
+                    <p className="text-xs font-black uppercase tracking-wider text-slate-700">
                       Delivery Address &amp; Courier Contact (Pre-filled from Profile)
                     </p>
                     <div className="grid sm:grid-cols-2 gap-2.5">
@@ -577,14 +577,14 @@ export default function DischargeSummaryDialog({
 
                     {selectedPharmacy?.deliveryMethods && selectedPharmacy.deliveryMethods.length > 0 && (
                       <div className="flex items-center gap-2 pt-1">
-                        <span className="text-[10px] font-black uppercase text-slate-600">Partner Courier:</span>
+                        <span className="text-xs font-black uppercase text-slate-600">Partner Courier:</span>
                         <div className="flex gap-2">
                           {selectedPharmacy.deliveryMethods.map(m => (
                             <button
                               key={m}
                               type="button"
                               onClick={() => setDeliveryMethod(m)}
-                              className={`px-3 py-1 text-[11px] font-bold uppercase rounded-none border cursor-pointer ${
+                              className={`px-3 py-1 text-xs font-bold uppercase rounded-none border cursor-pointer ${
                                 deliveryMethod === m
                                   ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]'
                                   : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
@@ -603,7 +603,7 @@ export default function DischargeSummaryDialog({
                 <div className="space-y-2.5 pt-1">
                   {policies.length > 0 && (
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-700">Insurance Direct-Billing:</span>
+                      <span className="text-xs font-black uppercase tracking-wider text-slate-700">Insurance Direct-Billing:</span>
                       <select
                         aria-label="Panel Insurance Policy"
                         value={selectedPolicyId}
@@ -627,7 +627,7 @@ export default function DischargeSummaryDialog({
                       onChange={e => setShareSafety(e.target.checked)}
                       className="mt-0.5 h-4 w-4 rounded-none accent-[color:var(--t-600)]"
                     />
-                    <span className="text-[11px] text-slate-700 font-semibold leading-relaxed">
+                    <span className="text-xs text-slate-700 font-semibold leading-relaxed">
                       Share registered drug allergies &amp; current medication list with the dispensing pharmacist for contraindication safety screening <b>(Strongly Recommended)</b>.
                     </span>
                   </label>
@@ -666,18 +666,18 @@ export default function DischargeSummaryDialog({
               <div key={mc.id || idx} className="border border-amber-200 bg-amber-50/40 p-3.5 text-xs flex items-center justify-between rounded-none">
                 <div>
                   <span className="font-mono font-black text-amber-900 block">MC Serial: {mc.code}</span>
-                  <p className="text-[11px] text-slate-600 mt-0.5">
+                  <p className="text-xs text-slate-600 mt-0.5">
                     Leave Granted: {mc.startDate} to {mc.endDate} ({mc.type || "Medical Leave"})
                   </p>
                 </div>
                 <a
-                  href={`/api/certificates/${mc.code}/pdf`}
+                  href={`/cert/${mc.code}`}
                   target="_blank"
                   rel="noreferrer"
                   className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-2xs rounded-none"
                 >
                   <Download className="h-3.5 w-3.5" />
-                  <span>Download MC</span>
+                  <span>View and verify MC</span>
                 </a>
               </div>
             ))}
@@ -685,7 +685,7 @@ export default function DischargeSummaryDialog({
         )}
 
         {/* STATUTORY ASSURANCE FOOTER */}
-        <div className="p-3 bg-slate-50 border border-slate-200 text-[10px] text-slate-600 flex items-center justify-between rounded-none">
+        <div className="p-3 bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between rounded-none">
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
             Telemedicine Act 1997 &amp; PDPA 2010 verified encounter record

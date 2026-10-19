@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
+import { fmtDay, leaveText, phaseOf } from './CertificatesPanel';
+import { fmtDate } from './PrescriptionList';
 
-const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '');
+const fmt = fmtDate;
 const box = 'min-h-dvh bg-[color:var(--t-bg)] flex items-start justify-center p-4 pt-12';
 const card = 'bg-white border border-[color:var(--t-200)] shadow-sm w-full max-w-lg p-6 space-y-4';
 
@@ -23,7 +25,7 @@ function Result({ ok, title, children }: { ok: boolean; title: string; children?
     <div className={box}><div className={card} role="status">
       <p className={`flex items-center gap-2 text-lg font-black ${ok ? 'text-emerald-700' : 'text-rose-700'}`}>{ok ? <CheckCircle2 className="h-6 w-6" /> : <XCircle className="h-6 w-6" />}{title}</p>
       {children}
-      <p className="text-[11px] text-slate-500">Checked live against MedCred records.</p>
+      <p className="text-xs text-slate-700">Checked live against MedCred records.</p>
     </div></div>
   );
 }
@@ -46,18 +48,28 @@ function VerifyRx({ code }: { code: string }) {
   );
 }
 
+const PHASE_TEXT = { current: 'The leave period is under way.', upcoming: 'The leave period has not started yet.', past: 'The leave period has ended.' } as const;
+
 function VerifyCert({ code }: { code: string }) {
   const d = useFetch(`/api/verify/cert/${encodeURIComponent(code)}`);
   if (d === undefined) return <div className={box}><p className="text-sm">Checking…</p></div>;
   if (!d?.found) return <Result ok={false} title="No certificate found with this code" />;
+  const stillVerified = d.issuedBy?.stillVerified;
   return (
     <Result ok={d.valid} title={d.valid ? 'Genuine medical certificate' : 'This certificate has been altered'}>
       <dl className="text-sm grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
-        <dt className="text-slate-500">Patient</dt><dd className="font-bold">{d.patient}</dd>
-        <dt className="text-slate-500">Unfit for work</dt><dd>{d.fromDate} to {d.toDate}</dd>
-        <dt className="text-slate-500">Issued by</dt><dd>{d.issuedBy?.name} ({d.issuedBy?.licenseNumber})</dd>
-        <dt className="text-slate-500">Issued on</dt><dd>{fmt(d.issuedAt)}</dd>
+        <dt className="text-slate-700">Patient</dt><dd className="font-bold">{d.patient}</dd>
+        <dt className="text-slate-700">Unfit for work</dt><dd className="font-bold">{leaveText(d.fromDate, d.toDate)}</dd>
+        <dt className="text-slate-700">Examined</dt><dd>{d.examinedOn ? `${fmtDay(d.examinedOn)}${d.visitMode ? ` · ${d.visitMode}` : ''}` : 'Not recorded on this certificate'}</dd>
+        {d.practice && <><dt className="text-slate-700">Practice</dt><dd>{d.practice}</dd></>}
+        <dt className="text-slate-700">Issued by</dt><dd>{d.issuedBy?.name}</dd>
+        <dt className="text-slate-700">Registration no.</dt><dd className="font-mono">{d.issuedBy?.licenseNumber}</dd>
+        <dt className="text-slate-700">Issued on</dt><dd>{fmt(d.issuedAt)}</dd>
       </dl>
+      {d.valid && <p className="text-sm text-slate-800">{PHASE_TEXT[phaseOf(d.fromDate, d.toDate)]}</p>}
+      {stillVerified === true && <p className="text-sm font-bold text-emerald-800">The doctor is currently verified on MedCred.</p>}
+      {stillVerified === false && <p role="alert" className="text-sm font-bold text-rose-800">The doctor is not currently verified on MedCred. Contact the clinic before relying on this certificate.</p>}
+      <p className="text-xs text-slate-700">This page confirms that MedCred issued the certificate and that it has not been changed. It does not show the diagnosis.</p>
     </Result>
   );
 }
