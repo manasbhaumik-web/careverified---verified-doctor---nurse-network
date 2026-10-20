@@ -98,7 +98,7 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
                 <button
                   type="button"
                   onClick={() => choose(t.id)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-[color:var(--t-50)] cursor-pointer"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-left hover:bg-[color:var(--t-50)] cursor-pointer"
                 >
                   <span className="h-4 w-4 rounded-full border-0 shadow-xs shrink-0" style={{ backgroundColor: t.swatch }} />
                   <span className="flex-1 font-medium">{t.label}</span>

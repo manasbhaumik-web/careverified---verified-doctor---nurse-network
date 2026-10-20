@@ -40,7 +40,7 @@ export default function NotificationBell() {
       >
         <Bell className="h-[18px] w-[18px]" />
         {unread > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-white text-[color:var(--t-700)] text-xs font-black flex items-center justify-center">{unread}</span>
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-white text-[color:var(--t-700)] text-2xs font-black flex items-center justify-center">{unread}</span>
         )}
       </button>
       {open && (

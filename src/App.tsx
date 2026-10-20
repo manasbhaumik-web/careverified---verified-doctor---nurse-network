@@ -504,7 +504,7 @@ export default function App() {
   return (
     <div className="min-h-dvh bg-[color:var(--t-bg)] text-slate-800 flex flex-col font-sans antialiased selection:bg-[color:var(--t-100)] selection:text-[color:var(--t-600)] pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
       {notice && (
-        <div role="status" className="fixed top-[calc(0.75rem+env(safe-area-inset-top))] left-3 right-3 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[120] bg-slate-900 text-white text-sm font-semibold px-4 sm:px-5 py-3 shadow-lg flex items-center justify-between sm:justify-start gap-4">
+        <div role="status" className="fixed top-[calc(0.75rem+env(safe-area-inset-top))] left-3 right-3 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[120] bg-slate-900 text-white text-xs font-semibold px-4 sm:px-5 py-3 shadow-lg flex items-center justify-between sm:justify-start gap-4">
           {notice}
           <button onClick={() => setNotice(null)} className="underline text-xs cursor-pointer">Dismiss</button>
         </div>
@@ -606,7 +606,7 @@ export default function App() {
               role="dialog"
               aria-label="Menu"
             >
-              <div className="py-3 space-y-1 text-sm font-bold text-[color:var(--ink)] pb-6">
+              <div className="py-3 space-y-1 text-xs font-bold text-[color:var(--ink)] pb-6">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = isNavItemActive(item.id, activeView);
@@ -625,72 +625,72 @@ export default function App() {
                       </div>
 
                       {item.id === 'patient_care' && (
-                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Live Care
                         </span>
                       )}
                       {item.id === 'patient_records' && (
-                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           EHR
                         </span>
                       )}
                       {item.id === 'patient_services' && (
-                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Packages
                         </span>
                       )}
                       {item.id === 'facility_staffing' && (
-                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Shifts
                         </span>
                       )}
                       {item.id === 'pharmacy_dispensing' && (
-                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Rx Live
                         </span>
                       )}
                       {item.id === 'admin_registry' && (
-                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Audit
                         </span>
                       )}
                       {item.id === 'admin_ops' && (
-                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Ops
                         </span>
                       )}
                       {item.id === 'messages' && (
-                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-100)] text-[color:var(--t-600)]'}`}>
+                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-100)] text-[color:var(--t-600)]'}`}>
                           2 new
                         </span>
                       )}
                       {item.id === 'recruitment' && (
-                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           9 Open
                         </span>
                       )}
                       {item.id === 'onboard' && (
-                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Clinical
                         </span>
                       )}
                       {item.id === 'practice_compliance' && (
-                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           MMC/LJM
                         </span>
                       )}
                       {item.id === 'performance_profile' && (
-                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Profile
                         </span>
                       )}
                       {item.id === 'articles' && (
-                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Library
                         </span>
                       )}
                       {item.id === 'tourism_desk' && (
-                        <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
+                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           Global
                         </span>
                       )}
@@ -756,77 +756,77 @@ export default function App() {
                     <span>{item.name}</span>
 
                     {item.id === 'patient_care' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Live Care
                       </span>
                     )}
                     {item.id === 'patient_records' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         EHR
                       </span>
                     )}
                     {item.id === 'patient_services' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Packages
                       </span>
                     )}
                     {item.id === 'facility_staffing' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Shifts
                       </span>
                     )}
                     {item.id === 'pharmacy_dispensing' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Rx Live
                       </span>
                     )}
                     {item.id === 'admin_registry' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Audit
                       </span>
                     )}
                     {item.id === 'admin_ops' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Ops
                       </span>
                     )}
                     {item.id === 'messages' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         2 new
                       </span>
                     )}
                     {item.id === 'recruitment' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         9 Open
                       </span>
                     )}
                     {item.id === 'onboard' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Clinical
                       </span>
                     )}
                     {item.id === 'practice_compliance' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         MMC/LJM
                       </span>
                     )}
                     {item.id === 'performance_profile' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Profile
                       </span>
                     )}
                     {item.id === 'articles' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Library
                       </span>
                     )}
                     {item.id === 'tourism_desk' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         Global
                       </span>
                     )}
                     {item.id === 'seo' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
+                      <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
                         98%
                       </span>
                     )}
@@ -1180,8 +1180,8 @@ export default function App() {
                         description={`Compiled & hot-loaded by ${activePkg.author}`}
                         actions={
                           <>
-                            <span className="bg-[color:var(--t-50)] text-[color:var(--t-600)] text-xs font-extrabold px-2 py-0.5 rounded-lg border border-[color:var(--t-200)]">v{activePkg.version}</span>
-                            <span className="bg-emerald-50 text-emerald-800 text-xs font-extrabold px-3 py-1.5 rounded-xs border border-emerald-200 uppercase tracking-wider inline-flex items-center gap-1.5">
+                            <span className="bg-[color:var(--t-50)] text-[color:var(--t-600)] text-2xs font-extrabold px-2 py-0.5 rounded-lg border border-[color:var(--t-200)]">v{activePkg.version}</span>
+                            <span className="bg-emerald-50 text-emerald-800 text-2xs font-extrabold px-3 py-1.5 rounded-xs border border-emerald-200 uppercase tracking-wider inline-flex items-center gap-1.5">
                               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-xs animate-pulse"></span>
                               <span>Active Runtime Package</span>
                             </span>
@@ -1190,8 +1190,8 @@ export default function App() {
                       />
 
                       <div className="space-y-3">
-                        <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider">Functional Package Description</h4>
-                        <p className="text-sm font-semibold text-slate-600 leading-relaxed bg-slate-50 border border-slate-100 p-4.5 rounded-xl">
+                        <h4 className="text-sm font-black uppercase text-slate-400 tracking-wider">Functional Package Description</h4>
+                        <p className="text-xs font-semibold text-slate-600 leading-relaxed bg-slate-50 border border-slate-100 p-4.5 rounded-xl">
                           {activePkg.description}
                         </p>
                       </div>
@@ -1200,7 +1200,7 @@ export default function App() {
                       <div className="border border-slate-200/60 rounded-2xl p-6 bg-slate-50/50 space-y-5">
                         <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
                           <Settings className="h-4.5 w-4.5 text-[color:var(--t-600)] animate-spin" />
-                          <h4 className="text-xs font-black uppercase text-slate-800 tracking-wider">Interactive Package Terminal & Diagnostics</h4>
+                          <h4 className="text-sm font-black uppercase text-slate-800 tracking-wider">Interactive Package Terminal & Diagnostics</h4>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -1222,16 +1222,6 @@ export default function App() {
                             <p className="text-rose-400">[DEBUG] Package Category: {activePkg.category}</p>
                             <p className="text-slate-300">[LIVE] Module {activePkg.name} is running healthy.</p>
                           </div>
-                        </div>
-
-                        <div className="pt-2">
-                          <button
-                            type="button"
-                            onClick={() => alert(`Dynamic simulation for "${activePkg.name}" triggered successfully!`)}
-                            className="px-4 py-2.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold rounded-xl transition-all shadow-sm shadow-rose-500/10 cursor-pointer"
-                          >
-                            Execute Package Dynamic Simulation
-                          </button>
                         </div>
                       </div>
                     </div>

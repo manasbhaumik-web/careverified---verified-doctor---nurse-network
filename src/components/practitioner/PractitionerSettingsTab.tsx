@@ -190,7 +190,7 @@ export default function PractitionerSettingsTab({
 
             <div className="flex flex-wrap gap-1.5 mb-2">
               {certifications.map(cert => (
-                <span key={cert} className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] font-extrabold text-xs px-3 py-1.5 rounded-none flex items-center gap-1.5 shadow-3xs">
+                <span key={cert} className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] font-extrabold text-2xs px-3 py-1.5 rounded-none flex items-center gap-1.5 shadow-3xs">
                   <span>{cert}</span>
                   <button
                     type="button"
@@ -283,7 +283,7 @@ export default function PractitionerSettingsTab({
           {/* Dynamic Availability Matrix Config */}
           <div className="border-t border-[color:var(--t-200)] pt-5 space-y-4">
             <div>
-              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 mb-1">
+              <h4 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 mb-1">
                 <Calendar className="h-4 w-4 text-[color:var(--t-600)]" />
                 Availability & Timeslot Configuration
               </h4>
@@ -344,7 +344,7 @@ export default function PractitionerSettingsTab({
                   <span className="text-xs text-slate-400 font-semibold p-2">No custom scheduling slots configured. Click 'Add Slot' above.</span>
                 ) : (
                   editSlots.map(slot => (
-                    <span key={slot} className="bg-white border border-[color:var(--t-200)] rounded-none px-2.5 py-1 text-xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-3xs font-mono">
+                    <span key={slot} className="bg-white border border-[color:var(--t-200)] rounded-none px-2.5 py-1 text-2xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-3xs font-mono">
                       <span>{slot}</span>
                       <button
                         type="button"
@@ -369,7 +369,7 @@ export default function PractitionerSettingsTab({
                 </label>
                 <div className="flex flex-wrap gap-2 text-xs">
                   {['Morning Shift (07:00 - 15:00)', 'Evening Shift (14:00 - 22:00)', 'Night Shift (21:00 - 07:00)', '24-Hour In-Home Nursing'].map((shift) => (
-                    <span key={shift} className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
+                    <span key={shift} className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-2xs font-bold">
                       {shift}
                     </span>
                   ))}
@@ -452,7 +452,7 @@ export default function PractitionerSettingsTab({
                 <span className="text-xs text-slate-400 font-bold block uppercase">Clinical Credentials</span>
                 <div className="flex flex-wrap gap-1">
                   {certifications.map(cert => (
-                    <span key={cert} className="bg-slate-100 text-slate-700 text-xs font-bold px-2 py-0.5 rounded-none">
+                    <span key={cert} className="bg-slate-100 text-slate-700 text-2xs font-bold px-2 py-0.5 rounded-none">
                       {cert}
                     </span>
                   ))}
@@ -474,13 +474,7 @@ export default function PractitionerSettingsTab({
               </div>
             </div>
 
-            <button
-              type="button"
-              className="w-full py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black rounded-none transition-all shadow-3xs cursor-not-allowed mt-2"
-              disabled
-            >
-              Book Appointment (Preview)
-            </button>
+            <div className="w-full py-2 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-mono font-bold uppercase tracking-wider text-center mt-2">Public Directory Card Preview</div>
           </div>
 
           <p className="text-xs text-slate-400 font-medium text-center italic">

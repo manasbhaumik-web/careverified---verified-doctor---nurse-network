@@ -94,7 +94,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
           description="Manage your active on-call shift status, accept live patient triage calls, and conduct urgent video consultations."
           badges={<BannerBadge tone="neutral">Verification Required</BannerBadge>}
         />
-        <p className="bg-amber-50 border border-amber-200 text-amber-900 text-sm font-semibold p-5 max-w-2xl">
+        <p className="bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold p-5 max-w-2xl">
           On-call consultations are available to verified doctors. Once the medical board verifies your profile you can go online here.
         </p>
       </div>
@@ -158,7 +158,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
             </span>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                <span className="text-xs sm:text-sm font-black text-[color:var(--ink)] tracking-tight whitespace-nowrap">
+                <span className="text-xs font-black text-[color:var(--ink)] tracking-tight whitespace-nowrap">
                   {me?.online ? 'On Call & Accepting Patients' : 'You are Currently Offline'}
                 </span>
                 <span className="hidden sm:inline text-xs text-slate-400">·</span>
@@ -176,25 +176,25 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
             <dl className="grid grid-cols-2 w-full sm:w-auto sm:flex items-center divide-x divide-[color:var(--t-200)] border border-[color:var(--t-200)] bg-[color:var(--t-50)]/70 shadow-2xs">
               <div className="px-3 py-1.5 text-center min-w-[68px]">
                 <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">Waiting</dt>
-                <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
+                <dd className="font-mono text-xs font-black text-[color:var(--ink)] leading-tight">
                   {me?.online ? String(offers.length) : '—'}
                 </dd>
               </div>
               <div className="px-3 py-1.5 text-center min-w-[82px]">
                 <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">Committed</dt>
-                <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
+                <dd className="font-mono text-xs font-black text-[color:var(--ink)] leading-tight">
                   {roster.size}h / wk
                 </dd>
               </div>
               <div className="px-3 py-1.5 text-center min-w-[92px]">
                 <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">Daily Window</dt>
-                <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--ink)] leading-tight">
+                <dd className="font-mono text-xs font-black text-[color:var(--ink)] leading-tight">
                   {coveredHours} / 24 hrs
                 </dd>
               </div>
               <div className="px-3 py-1.5 text-center min-w-[92px]">
                 <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">Accrued Net</dt>
-                <dd className="font-mono text-xs sm:text-sm font-black text-[color:var(--t-700)] leading-tight">
+                <dd className="font-mono text-xs font-black text-[color:var(--t-700)] leading-tight">
                   {earnings ? fmtRM(earnings.totals.net) : '—'}
                 </dd>
               </div>
@@ -215,7 +215,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
           </div>
           {offers.length === 0 ? (
             <div className="p-8 text-center border border-dashed border-[color:var(--t-200)] bg-[color:var(--t-bg)]">
-              <p className="text-xs font-bold text-slate-600">No patients waiting in queue right now.</p>
+              <p className="text-sm font-bold text-slate-700">No patients waiting in queue right now.</p>
               <p className="text-xs text-slate-500 mt-1">Keep this tab open; newly queued consults will alert immediately.</p>
             </div>
           ) : (
@@ -225,7 +225,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
                   {o.redFlags.length > 0 && (
                     <p className="text-xs font-extrabold text-rose-800 bg-rose-50 border border-rose-200 p-2 flex items-center gap-1.5"><AlertTriangle className="h-4 w-4 shrink-0" /> Red Flags: {o.redFlags.join(', ')}</p>
                   )}
-                  <p className="text-sm font-semibold text-[color:var(--ink)] leading-snug line-clamp-3">"{o.symptoms}"</p>
+                  <p className="text-xs font-semibold text-[color:var(--ink)] leading-snug line-clamp-3">"{o.symptoms}"</p>
                   <div className="text-xs font-mono text-slate-600 border-t border-[color:var(--t-100)] pt-2 space-y-0.5">
                     <p><b className="text-[color:var(--ink)]">{o.patientFirstName}</b> · {o.mode.toUpperCase()}</p>
                     <p>Queued: {new Date(o.queuedAt).toLocaleTimeString()} · Payout: <b className="text-[color:var(--t-700)]">{formatMoney(o.fee)}</b></p>
@@ -311,7 +311,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
             <h3 className="text-sm font-extrabold">Earnings</h3>
             <div className="grid grid-cols-3 gap-2 text-center">
               {[['Gross', earnings.totals.gross], [`Fee (${earnings.commissionPct}%)`, earnings.totals.fee], ['Net', earnings.totals.net]].map(([l, v]) => (
-                <div key={l as string} className="bg-slate-50 border border-slate-100 p-2.5"><p className="text-xs uppercase font-bold text-slate-500">{l}</p><p className="text-sm font-black tabular-nums">{fmtRM(v as number)}</p></div>
+                <div key={l as string} className="bg-slate-50 border border-slate-100 p-2.5"><p className="text-xs uppercase font-bold text-slate-500">{l}</p><p className="text-xs font-black tabular-nums">{fmtRM(v as number)}</p></div>
               ))}
             </div>
             <p className="text-xs text-slate-500">Payouts are not automated yet; the board settles earnings manually.</p>

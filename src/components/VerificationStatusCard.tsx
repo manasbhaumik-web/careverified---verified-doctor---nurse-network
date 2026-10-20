@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { expiryLabel } from '../registries';
-import { AlertCircle, CheckCircle2, Clock, ShieldOff, Upload } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, ShieldOff, Upload, Send } from 'lucide-react';
 
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '—');
 const daysUntil = (iso?: string | null) => (iso ? Math.ceil((Date.parse(iso) - Date.now()) / 86400_000) : null);
@@ -63,73 +63,161 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
     return (await upload(d.data.verificationRequestId)) ? null : 'Renewal opened, but the document upload failed. Upload it again.';
   });
 
-  const tone = verified ? 'border-emerald-200 bg-emerald-50' : suspended || rejected ? 'border-rose-200 bg-rose-50' : 'border-amber-200 bg-amber-50';
-  const Icon = verified ? CheckCircle2 : suspended || rejected ? ShieldOff : infoRequested ? AlertCircle : Clock;
-  const field = 'w-full border border-slate-200 bg-white rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[color:var(--t-600)]';
+  const toneBorder = verified
+    ? 'border-l-4 border-l-emerald-600 border-t border-r border-b border-[color:var(--t-200)] bg-white'
+    : suspended || rejected
+    ? 'border-l-4 border-l-rose-600 border-t border-r border-b border-[color:var(--t-200)] bg-white'
+    : 'border-l-4 border-l-amber-500 border-t border-r border-b border-[color:var(--t-200)] bg-white';
 
-  const events: any[] = (info.events || []).slice(0, 3);
+  const statusBadgeTone = verified
+    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+    : suspended || rejected
+    ? 'bg-rose-50 text-rose-800 border-rose-200'
+    : 'bg-amber-50 text-amber-800 border-amber-200';
+
+  const Icon = verified ? CheckCircle2 : suspended || rejected ? ShieldOff : infoRequested ? AlertCircle : Clock;
+
+  // Deduplicate identical consecutive audit events
+  const rawEvents: any[] = info.events || [];
+  const events: any[] = [];
+  for (const ev of rawEvents) {
+    const key = `${ev.action}|${ev.note || ''}`;
+    if (!events.some(x => `${x.action}|${x.note || ''}` === key)) {
+      events.push(ev);
+    }
+    if (events.length >= 3) break;
+  }
 
   return (
-    <section className={`border rounded-xl px-4 py-3 space-y-2 ${tone}`} aria-label="Verification status">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <div className="flex items-center gap-2.5 min-w-0 flex-1 basis-72">
-          <Icon className="h-5 w-5 shrink-0" />
-          <div className="min-w-0 text-sm">
-            <p className="font-extrabold leading-tight">
-              {verified ? 'Verified: your profile is public'
-                : suspended ? 'Suspended: your profile is hidden'
-                : rejected ? 'Application rejected'
-                : infoRequested ? 'The board needs more information'
-                : 'Pending: under review by the medical board'}
+    <section className={`rounded-none p-5 shadow-2xs space-y-4 ${toneBorder}`} aria-label="Verification status">
+      {/* Header Row: Status Identity + APC Expiry Pill Badges */}
+      <div className="flex flex-wrap items-start justify-between gap-3 pb-3.5 border-b border-[color:var(--t-100)]">
+        <div className="flex items-start gap-3 min-w-0 flex-1">
+          <div className={`p-2.5 border shrink-0 ${statusBadgeTone}`}>
+            <Icon className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-base font-black text-[color:var(--ink)] uppercase tracking-wide leading-tight">
+                {verified ? 'Verified: Your Profile is Public'
+                  : suspended ? 'Suspended: Your Profile is Hidden'
+                  : rejected ? 'Application Rejected'
+                  : infoRequested ? 'The Board Needs More Information'
+                  : 'Pending: Under Review by the Medical Board'}
+              </h3>
+              <span className={`text-2xs font-mono font-black uppercase tracking-wider px-2 py-0.5 border ${statusBadgeTone}`}>
+                {status || 'Pending'}
+              </span>
+            </div>
+            <p className="text-xs font-semibold text-slate-600">
+              {expiryLabel(info.council)}: <strong className="font-mono text-[color:var(--ink)]">{fmt(info.licenseExpiry)}</strong>
+              {verified ? ` · Re-verification due ${fmt(info.verifiedUntil)}` : ''}
+              {dueSoon ? ' · Renewal needed soon' : ''}
             </p>
-            <p className="text-xs text-slate-600">
-              {expiryLabel(info.council)}: {fmt(info.licenseExpiry)}{verified ? ` · re-verification due ${fmt(info.verifiedUntil)}` : ''}
-              {dueSoon ? ' · renewal needed soon' : ''}
-            </p>
-            {suspended && info.suspensionReason && <p className="text-xs font-semibold text-rose-800 mt-0.5">Reason: {info.suspensionReason}</p>}
+            {suspended && info.suspensionReason && (
+              <p className="text-xs font-bold text-rose-800 bg-rose-50 border border-rose-200 px-3 py-1.5 mt-1.5">
+                Reason: {info.suspensionReason}
+              </p>
+            )}
           </div>
         </div>
 
+        {/* Compact Event Summary Pills (10px / text-2xs) */}
         {events.length > 0 && (
-          <ul className="flex flex-wrap gap-1.5 text-xs">
+          <ul className="flex flex-wrap gap-1.5 shrink-0">
             {events.map((e: any, i: number) => (
-              <li key={i} title={e.note || undefined} className="bg-white/70 border border-white rounded-lg px-2 py-1">
-                <span className="font-bold capitalize">{e.action.replace(/_/g, ' ')}</span> · {fmt(e.ts)}
+              <li
+                key={i}
+                title={e.note || undefined}
+                className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2.5 py-1 text-2xs font-mono font-bold uppercase tracking-wider text-slate-700"
+              >
+                <span className="text-[color:var(--ink)]">{e.action.replace(/_/g, ' ')}</span> &bull; {fmt(e.ts)}
               </li>
             ))}
           </ul>
         )}
       </div>
 
+      {/* Board Audit Trail Details (Deduplicated) */}
       {events.some((e: any) => e.note) && (
-        <ul className="text-xs space-y-1">
-          {events.filter((e: any) => e.note).map((e: any, i: number) => (
-            <li key={i} className="text-slate-700"><span className="font-bold capitalize">{e.action.replace(/_/g, ' ')}:</span> {e.note}</li>
-          ))}
-        </ul>
-      )}
-
-      {(infoRequested || canRenew) && (
-        <div className="space-y-2 pt-1">
-          <textarea className={field} rows={2} value={note} onChange={e => setNote(e.target.value)} maxLength={1000}
-            placeholder={infoRequested ? 'Reply to the board (optional)' : 'Note for the board (optional)'} />
-          <div className="flex flex-wrap items-center gap-3">
-            <label className="text-xs font-bold text-slate-700">
-              {canRenew ? 'New licence expiry' : 'Updated licence expiry (if changed)'}
-              <input type="date" className={`${field} mt-1`} value={expiry} onChange={e => setExpiry(e.target.value)} />
-            </label>
-            <label className="text-xs font-bold text-slate-700 cursor-pointer inline-flex items-center gap-2 border border-dashed border-slate-300 bg-white rounded-xl px-3 py-2">
-              <Upload className="h-4 w-4" /> {file ? file.name : 'Attach renewed / additional document (PDF, JPG, PNG)'}
-              <input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={e => setFile(e.target.files?.[0] ?? null)} />
-            </label>
-          </div>
-          <button disabled={busy || (canRenew && (!expiry || !file))} onClick={canRenew ? renew : resubmit}
-            className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-extrabold px-5 py-2.5 rounded-xl cursor-pointer">
-            {busy ? 'Submitting…' : canRenew ? 'Submit renewal for review' : 'Send reply to the board'}
-          </button>
+        <div className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3.5 space-y-1.5">
+          <span className="text-2xs font-black uppercase tracking-wider text-slate-400 block">Board Governance &amp; Audit Notes</span>
+          <ul className="text-xs space-y-1">
+            {events.filter((e: any) => e.note).map((e: any, i: number) => (
+              <li key={i} className="text-slate-700 flex flex-wrap items-baseline gap-1.5">
+                <span className="text-2xs font-mono font-black uppercase tracking-wider px-1.5 py-0.5 bg-white border border-[color:var(--t-200)] text-[color:var(--t-700)]">
+                  {e.action.replace(/_/g, ' ')}
+                </span>
+                <span className="font-medium">{e.note}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
-      {msg && <p className={`text-xs font-bold ${msg.ok ? 'text-emerald-800' : 'text-rose-700'}`}>{msg.text}</p>}
+
+      {/* Unified Single-Row 44px (h-11) Renewal / Board Response Action Bar */}
+      {(infoRequested || canRenew) && (
+        <div className="pt-2 border-t border-[color:var(--t-100)] space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-end">
+            {/* 1. New Licence Expiry Date (3 cols) */}
+            <div className="lg:col-span-3">
+              <label className="block text-2xs font-black uppercase tracking-wider text-slate-500 mb-1">
+                {canRenew ? 'New licence expiry' : 'Updated licence expiry (if changed)'}
+              </label>
+              <input
+                type="date"
+                aria-label={canRenew ? 'New licence expiry' : 'Updated licence expiry (if changed)'}
+                value={expiry}
+                onChange={e => setExpiry(e.target.value)}
+                className="w-full h-11 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3 text-xs font-bold text-[color:var(--ink)] rounded-none focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
+              />
+            </div>
+
+            {/* 2. Attach Renewed Document (4 cols) */}
+            <div className="lg:col-span-4">
+              <span className="block text-2xs font-black uppercase tracking-wider text-slate-500 mb-1">
+                Supporting APC / Certificate Document
+              </span>
+              <label className="w-full h-11 text-xs font-bold text-[color:var(--t-700)] cursor-pointer flex items-center justify-center gap-2 border border-dashed border-[color:var(--t-300)] bg-[color:var(--t-50)]/40 hover:bg-[color:var(--t-50)] px-3 rounded-none transition-colors truncate">
+                <Upload className="h-4 w-4 shrink-0 text-[color:var(--t-600)]" />
+                <span className="truncate">{file ? file.name : 'Attach renewed / additional document (PDF, JPG, PNG)'}</span>
+                <input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={e => setFile(e.target.files?.[0] ?? null)} />
+              </label>
+            </div>
+
+            {/* 3. Note for the Board (5 cols) */}
+            <div className="lg:col-span-5">
+              <label className="block text-2xs font-black uppercase tracking-wider text-slate-500 mb-1">
+                Board Submission Note (Optional)
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={note}
+                  onChange={e => setNote(e.target.value)}
+                  maxLength={1000}
+                  placeholder={infoRequested ? 'Reply to the board (optional)' : 'Note for the board (optional)'}
+                  className="flex-1 h-11 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3 text-xs font-medium text-[color:var(--ink)] rounded-none focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
+                />
+                <button
+                  type="button"
+                  disabled={busy || (canRenew && (!expiry || !file))}
+                  onClick={canRenew ? renew : resubmit}
+                  className="h-11 px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-200 disabled:text-slate-500 disabled:cursor-not-allowed text-white text-xs font-extrabold uppercase tracking-wider rounded-none cursor-pointer transition-colors inline-flex items-center gap-1.5 shrink-0"
+                >
+                  <Send className="h-3.5 w-3.5" />
+                  <span>{busy ? 'Submitting…' : canRenew ? 'Submit renewal for review' : 'Send reply to the board'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {msg && (
+        <p role="status" className={`text-xs font-bold p-3 border ${msg.ok ? 'text-emerald-800 bg-emerald-50 border-emerald-200' : 'text-rose-700 bg-rose-50 border-rose-200'}`}>
+          {msg.text}
+        </p>
+      )}
     </section>
   );
 }

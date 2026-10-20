@@ -769,7 +769,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
       <main id="main-content" className="flex-grow w-full">
         {/* ─── SECTION 1: SLIDING HERO SECTION WITH AI DUAL PRACTITIONER IMAGE ─── */}
         <section
-          className="relative border-b border-[color:var(--t-200)] overflow-hidden h-[680px] sm:h-[660px] lg:h-[640px] flex items-center bg-transparent"
+          className="relative border-b border-[color:var(--t-200)] overflow-hidden py-10 sm:py-14 flex items-center bg-transparent"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
           aria-label="Practitioner Carousel"
@@ -879,7 +879,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                   </div>
                 </div>
 
-                <div className="min-h-[76px] sm:min-h-[88px] lg:min-h-[96px] flex flex-col justify-center mt-3">
+                <div className="mt-3">
                   <h1 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-[1.12] text-slate-900 transition-all">
                     <span>{activeSlide.titleLead}</span>
                     <span
@@ -896,7 +896,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                   </h1>
                 </div>
 
-                <div className="min-h-[68px] sm:min-h-[60px] flex items-center mt-2.5">
+                <div className="mt-2.5">
                   <p className="text-sm sm:text-base text-slate-700 font-medium leading-relaxed">
                     {activeSlide.sub}
                   </p>

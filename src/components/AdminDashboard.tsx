@@ -126,7 +126,7 @@ function RequestDocuments({ requestId }: { requestId: string }) {
             <FileText className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
             <span className="font-bold text-slate-800 truncate">{d.originalName}</span>
           </span>
-          <span className="text-xs bg-slate-100 border border-slate-200 text-slate-600 px-2 py-0.5 rounded-none font-mono font-bold uppercase">
+          <span className="text-2xs bg-slate-100 border border-slate-200 text-slate-600 px-2 py-0.5 rounded-none font-mono font-bold uppercase">
             {d.kind} · {Math.max(1, Math.round(d.size / 1024))} KB
           </span>
         </a>
@@ -910,7 +910,7 @@ export default function AdminDashboard({
         onClick={() => {
           window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
         }}
-        className="inline-flex items-center gap-1.5 px-3 py-3 text-xs sm:text-sm font-semibold text-slate-600 hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)] transition-colors border-b-2 border-transparent cursor-pointer"
+        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
         title="Open Support Desk & Help Center"
       >
         <LifeBuoy className="h-4 w-4 text-slate-500" />
@@ -996,7 +996,7 @@ export default function AdminDashboard({
               </div>
               <div className="space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-black uppercase tracking-wider px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">
+                  <span className="text-2xs font-black uppercase tracking-wider px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">
                     Statutory Segregation of Duties (SoD)
                   </span>
                   <span className="text-xs text-slate-500 font-mono">Malaysian Healthcare Regulatory Guard</span>
@@ -1004,14 +1004,14 @@ export default function AdminDashboard({
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                   Access Restricted — {ADMIN_GROUPS[currentGroup]?.name}
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-600 leading-relaxed">
                   Your active compliance persona, <strong className="text-slate-900 font-bold">{currentSubRoleConfig.title}</strong>, is restricted from the <strong className="text-slate-900 font-bold">{ADMIN_GROUPS[currentGroup]?.name}</strong> workspace to prevent regulatory conflicts of interest.
                 </p>
               </div>
             </div>
 
             <div className="bg-slate-50 border border-slate-200 p-4 space-y-3">
-              <h4 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+              <h4 className="text-sm font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
                 <Shield className="h-4 w-4 text-[color:var(--t-600)]" />
                 Active Persona Scope &amp; Legal Mandate
               </h4>
@@ -1032,7 +1032,7 @@ export default function AdminDashboard({
                   <span className="text-slate-500 block text-xs">Permitted Workspaces</span>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {currentSubRoleConfig.allowedGroups.map(g => (
-                      <span key={g} className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold uppercase text-xs">
+                      <span key={g} className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold uppercase text-2xs">
                         {ADMIN_GROUPS[g]?.name || g}
                       </span>
                     ))}
@@ -1091,7 +1091,7 @@ export default function AdminDashboard({
                       <h3 className="text-sm font-black text-amber-950 uppercase tracking-tight">
                         Dual-Signoff Disciplinary &amp; Sanction Inbox
                       </h3>
-                      <span className="px-2 py-0.5 text-xs font-black uppercase bg-amber-600 text-white">
+                      <span className="px-2 py-0.5 text-2xs font-black uppercase bg-amber-600 text-white">
                         {pendingSanctions.length} Countersignature{pendingSanctions.length > 1 ? 's' : ''} Required
                       </span>
                     </div>
@@ -1138,11 +1138,11 @@ export default function AdminDashboard({
                     <div key={s.id} className="p-4 bg-white border border-amber-300 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                       <div className="space-y-1.5 min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-black text-sm text-slate-900">{prof?.name || s.professional_id}</span>
-                          <span className="text-xs font-mono font-bold bg-slate-100 text-slate-700 px-2 py-0.5 border border-slate-200">
+                          <span className="font-black text-xs text-slate-900">{prof?.name || s.professional_id}</span>
+                          <span className="text-2xs font-mono font-bold bg-slate-100 text-slate-700 px-2 py-0.5 border border-slate-200">
                             Ref: {s.reference_no}
                           </span>
-                          <span className="text-xs font-bold text-amber-800 uppercase px-2 py-0.5 bg-amber-100 border border-amber-200">
+                          <span className="text-2xs font-bold text-amber-800 uppercase px-2 py-0.5 bg-amber-100 border border-amber-200">
                             {s.sanction_type.replace(/_/g, ' ')}
                           </span>
                         </div>
@@ -1232,8 +1232,8 @@ export default function AdminDashboard({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h4 className="text-xs font-black uppercase tracking-wider text-white">Statutory Credentialing SLA &amp; Cohort Telemetry</h4>
-                <span className="text-xs font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5">30-Day Rolling Window</span>
+                <h4 className="text-sm font-black uppercase tracking-wider text-white">Statutory Credentialing SLA &amp; Cohort Telemetry</h4>
+                <span className="text-2xs font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5">30-Day Rolling Window</span>
               </div>
               <p className="text-xs text-slate-400 font-semibold mt-0.5">Statutory 24-hour turnaround target under MMC &amp; LJM accreditation frameworks.</p>
             </div>
@@ -1280,16 +1280,16 @@ export default function AdminDashboard({
           <div className="space-y-1">
             <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">Active Queue SLA Health</span>
             <div className="flex items-center gap-2 pt-1">
-              <span className="inline-flex items-center gap-1 text-xs font-mono font-bold px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-800">
+              <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-800">
                 <CheckCircle2 className="h-3 w-3" />
                 {pendingRequests.filter(r => getSlaStatus(r).tone === 'normal').length} On-Track
               </span>
-              <span className="inline-flex items-center gap-1 text-xs font-mono font-bold px-2 py-0.5 bg-amber-950 text-amber-300 border border-amber-800">
+              <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold px-2 py-0.5 bg-amber-950 text-amber-300 border border-amber-800">
                 <Clock className="h-3 w-3" />
                 {pendingRequests.filter(r => getSlaStatus(r).tone === 'warning').length} Active
               </span>
               {pendingRequests.filter(r => getSlaStatus(r).tone === 'urgent').length > 0 && (
-                <span className="inline-flex items-center gap-1 text-xs font-mono font-bold px-2 py-0.5 bg-rose-950 text-rose-300 border border-rose-800 animate-pulse">
+                <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold px-2 py-0.5 bg-rose-950 text-rose-300 border border-rose-800 animate-pulse">
                   <AlertTriangle className="h-3 w-3" />
                   {pendingRequests.filter(r => getSlaStatus(r).tone === 'urgent').length} Warning
                 </span>
@@ -1360,7 +1360,7 @@ export default function AdminDashboard({
         {batchSuccessMsg && (
           <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 px-4 py-3 rounded-none text-xs font-bold flex items-center justify-between">
             <span>{batchSuccessMsg}</span>
-            <button type="button" onClick={() => setBatchSuccessMsg('')} className="text-emerald-700 hover:text-emerald-900 font-black cursor-pointer text-sm">×</button>
+            <button type="button" onClick={() => setBatchSuccessMsg('')} className="text-emerald-700 hover:text-emerald-900 font-black cursor-pointer text-xs">×</button>
           </div>
         )}
 
@@ -1442,7 +1442,7 @@ export default function AdminDashboard({
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 min-w-0">
                           <h4 className="font-sans text-sm font-black text-slate-900 truncate min-w-0">{reqName}</h4>
-                          <span className={`shrink-0 text-xs font-black uppercase px-2 py-0.5 rounded-none border ${
+                          <span className={`shrink-0 text-2xs font-black uppercase px-2 py-0.5 rounded-none border ${
                             reqRole === UserRole.DOCTOR ? "bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]" : "bg-emerald-50 text-emerald-800 border-emerald-200"
                           }`}>
                             {reqRole === UserRole.DOCTOR ? "Doctor" : "Nurse"}
@@ -1458,7 +1458,7 @@ export default function AdminDashboard({
                       {(() => {
                         const sla = getSlaStatus(req);
                         return (
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 border text-xs font-mono font-bold ${
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 border text-2xs font-mono font-bold ${
                             sla.tone === 'urgent'
                               ? 'bg-rose-50 text-rose-800 border-rose-300 animate-pulse'
                               : sla.tone === 'warning'
@@ -1516,7 +1516,7 @@ export default function AdminDashboard({
                       <div>
                         <div className="flex items-center gap-2">
                           <h4 className="text-sm font-black text-slate-900">{reqName}</h4>
-                          <span className={`text-xs font-black uppercase px-2 py-0.5 rounded-none border ${
+                          <span className={`text-2xs font-black uppercase px-2 py-0.5 rounded-none border ${
                             reqRole === UserRole.DOCTOR ? "bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]" : "bg-emerald-50 text-emerald-800 border-emerald-200"
                           }`}>
                             {reqRole === UserRole.DOCTOR ? "Doctor" : "Registered Nurse"}
@@ -1527,7 +1527,7 @@ export default function AdminDashboard({
                           {(() => {
                             const sla = getSlaStatus(req);
                             return (
-                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 border text-xs font-mono font-bold ${
+                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 border text-2xs font-mono font-bold ${
                                 sla.tone === 'urgent'
                                   ? 'bg-rose-50 text-rose-800 border-rose-300 animate-pulse'
                                   : sla.tone === 'warning'
@@ -1622,7 +1622,7 @@ export default function AdminDashboard({
                         <span className="font-bold">{r.userName || r.name}</span>
                         <div className="flex items-center gap-2 font-mono text-xs text-slate-600">
                           <span>{r.licenseNumber}</span>
-                          <span className="bg-slate-200 px-1.5 py-0.5 text-xs font-bold uppercase">{r.userType || r.role || 'Doctor'}</span>
+                          <span className="bg-slate-200 px-1.5 py-0.5 text-2xs font-bold uppercase">{r.userType || r.role || 'Doctor'}</span>
                         </div>
                       </div>
                     ))}
@@ -1720,7 +1720,7 @@ export default function AdminDashboard({
                   className="h-16 w-16 rounded-full object-cover border border-slate-300"
                 />
                 <div className="space-y-1">
-                  <span className={`text-xs font-black uppercase px-2 py-0.5 rounded-none border ${
+                  <span className={`text-2xs font-black uppercase px-2 py-0.5 rounded-none border ${
                     (selectedModalRequest.userType || selectedModalRequest.role) === UserRole.DOCTOR 
                       ? "bg-[color:var(--t-50)] text-[color:var(--t-600)] border-[color:var(--t-200)]" 
                       : "bg-emerald-50 text-emerald-850 border-emerald-200"
@@ -1741,7 +1741,7 @@ export default function AdminDashboard({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-none">
                   <span className="text-xs text-slate-500 font-black uppercase block tracking-wider mb-1">State License Key</span>
-                  <code className="font-mono text-sm font-bold text-slate-900">{selectedModalRequest.licenseNumber}</code>
+                  <code className="font-mono text-xs font-bold text-slate-900">{selectedModalRequest.licenseNumber}</code>
                 </div>
                 <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-none">
                   <span className="text-xs text-slate-500 font-black uppercase block tracking-wider mb-1">Assigned Medical Council</span>
@@ -1761,7 +1761,7 @@ export default function AdminDashboard({
                   <div className="border border-slate-250 bg-slate-50/80 p-4 space-y-3 rounded-none">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200">
                       <div className="flex items-center gap-2">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-bold uppercase ${
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-mono font-bold uppercase ${
                           statutory.isValid 
                             ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' 
                             : 'bg-amber-100 text-amber-800 border border-amber-300'
@@ -1950,7 +1950,7 @@ export default function AdminDashboard({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-[color:var(--ink-2)]">Packages</span>
+                    <span className="text-xs font-semibold text-[color:var(--ink-2)]">Packages</span>
                     <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-600)]"><Puzzle className="h-4 w-4" /></span>
                   </div>
                   <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{adminPackages.length} in total</span>
@@ -1959,7 +1959,7 @@ export default function AdminDashboard({
 
                 <div className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-[color:var(--ink-2)]">Published</span>
+                    <span className="text-xs font-semibold text-[color:var(--ink-2)]">Published</span>
                     <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--e-50)] border-[color:var(--e-200)] text-[color:var(--e-600)]"><CheckCircle2 className="h-4 w-4" /></span>
                   </div>
                   <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{adminPackages.filter(p => getPkgEnabled(p)).length} published</span>
@@ -1968,7 +1968,7 @@ export default function AdminDashboard({
 
                 <div className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-[color:var(--ink-2)]">Drafts</span>
+                    <span className="text-xs font-semibold text-[color:var(--ink-2)]">Drafts</span>
                     <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-600)]"><Download className="h-4 w-4" /></span>
                   </div>
                   <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{adminPackages.filter(p => !getPkgEnabled(p)).length === 1 ? '1 draft' : `${adminPackages.filter(p => !getPkgEnabled(p)).length} drafts`}</span>
@@ -1977,40 +1977,40 @@ export default function AdminDashboard({
               </div>
 
               {/* Search and Category Filtering Row */}
-              <div className="bg-white border border-[color:var(--t-200)] p-5 shadow-xs space-y-4">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <div className="flex-1 w-full max-w-md relative">
-                    <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+              <div className="bg-white border border-[color:var(--t-200)] p-4 shadow-xs">
+                <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <input
                       type="text"
                       placeholder="Search packages or hospitals…"
                       value={packageSearch}
                       onChange={(e) => setPackageSearch(e.target.value)}
-                      className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white h-12 pl-10 pr-4 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors"
+                      className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white h-11 pl-10 pr-4 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors"
                     />
                   </div>
 
-                </div>
-
-                {/* Category filtering tags */}
-                <div className="flex flex-wrap gap-2 pt-2 border-t border-[color:var(--t-100)]">
-                  {Array.from(new Set([
-                    'All',
-                    ...adminPackages.map(p => getPkgCategory(p)).filter(Boolean),
-                  ])).map((cat) => (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => setPackageCategoryFilter(cat)}
-                      className={`px-3 py-1.5 text-xs font-bold border transition-colors cursor-pointer ${
-                        packageCategoryFilter === cat
-                          ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white shadow-xs'
-                          : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'
-                      }`}
+                  {/* Category Dropdown List */}
+                  <label className="flex items-center h-11 border border-[color:var(--t-200)] bg-white px-3 gap-2 shrink-0 focus-within:border-[color:var(--t-600)]">
+                    <span className="text-2xs font-mono font-black uppercase tracking-wider text-slate-500 shrink-0">
+                      Category:
+                    </span>
+                    <select
+                      aria-label="Category"
+                      value={packageCategoryFilter}
+                      onChange={(e) => setPackageCategoryFilter(e.target.value)}
+                      className="h-full bg-transparent text-xs font-bold text-[color:var(--ink)] pr-2 cursor-pointer focus:outline-none"
                     >
-                      {cat}
-                    </button>
-                  ))}
+                      {Array.from(new Set([
+                        'All',
+                        ...adminPackages.map(p => getPkgCategory(p)).filter(Boolean),
+                      ])).map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat === 'All' ? 'All Categories' : cat}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                 </div>
               </div>
 
@@ -2032,7 +2032,7 @@ export default function AdminDashboard({
                 }).length === 0 ? (
                   <div className="bg-white border border-slate-200 p-12 text-center text-slate-500 rounded-none">
                     <Search className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                    <p className="text-xs font-bold text-slate-700">No packages match your search.</p>
+                    <p className="text-sm font-bold text-slate-700">No packages match your search.</p>
                     <button type="button" onClick={() => { setPackageSearch(''); setPackageCategoryFilter('All'); }} className="mt-2 text-xs font-bold text-[color:var(--t-700)] underline cursor-pointer">Reset filters</button>
                   </div>
                 ) : (
@@ -2077,13 +2077,13 @@ export default function AdminDashboard({
                                     {renderIcon(pkgIcon)}
                                   </div>
                                   <div>
-                                    <h4 className="text-xs font-black text-slate-800 leading-tight flex items-center gap-1.5 flex-wrap">
+                                    <h4 className="text-sm font-black text-slate-800 leading-tight flex items-center gap-1.5 flex-wrap">
                                       {pkgName}
-                                      <span className="bg-slate-100 border border-slate-200 text-slate-600 font-mono text-xs px-1.5 py-0.5 rounded-none font-bold">
+                                      <span className="bg-slate-100 border border-slate-200 text-slate-600 font-mono text-2xs px-1.5 py-0.5 rounded-none font-bold">
                                         {pkgVersion.startsWith('v') || pkgVersion.startsWith('Code:') ? pkgVersion : `v${pkgVersion}`}
                                       </span>
                                       {price !== undefined && price !== null && (
-                                        <span className="bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono text-xs px-1.5 py-0.5 rounded-none font-bold">
+                                        <span className="bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono text-2xs px-1.5 py-0.5 rounded-none font-bold">
                                           MYR {Number(price).toLocaleString()}
                                         </span>
                                       )}
@@ -2094,7 +2094,7 @@ export default function AdminDashboard({
                                   </div>
                                 </div>
 
-                                <span className={`text-xs font-black px-2.5 py-1 rounded-none border uppercase tracking-wider shrink-0 ${
+                                <span className={`text-2xs font-black px-2.5 py-1 rounded-none border uppercase tracking-wider shrink-0 ${
                                   isEnabled
                                     ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
                                     : 'bg-amber-50 border-amber-200 text-amber-800'
@@ -2142,7 +2142,7 @@ export default function AdminDashboard({
                                   <span>Remove</span>
                                 </button>
                               ) : (
-                                <span className="text-xs font-black text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-none uppercase tracking-wider">
+                                <span className="text-2xs font-black text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-none uppercase tracking-wider">
                                   Core Module
                                 </span>
                               )}
@@ -2229,7 +2229,7 @@ export default function AdminDashboard({
                         <tr>
                           <td colSpan={6} className="p-12 text-center text-slate-500 bg-slate-50/50">
                             <Search className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                            <p className="text-xs font-bold text-slate-700">No registered practitioners match your search criteria.</p>
+                            <p className="text-sm font-bold text-slate-700">No registered practitioners match your search criteria.</p>
                             <p className="text-xs text-slate-500 mt-1">Try adjusting your search terms or filter tabs.</p>
                             {registrySearch && (
                               <button
@@ -2268,7 +2268,7 @@ export default function AdminDashboard({
                           {prof.specialization || 'General Practice'}
                         </td>
                         <td className="p-3">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-black uppercase tracking-wider border ${
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-black uppercase tracking-wider border ${
                             prof.verificationStatus === VerificationStatus.VERIFIED
                               ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                               : 'bg-amber-50 text-amber-800 border-amber-200'
@@ -2400,14 +2400,14 @@ export default function AdminDashboard({
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="space-y-1">
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-sm font-black text-slate-900">{roleItem.title}</span>
+                            <span className="text-xs font-black text-slate-900">{roleItem.title}</span>
                             {isActive ? (
-                              <span className="px-2 py-0.5 text-xs font-black uppercase bg-emerald-600 text-white tracking-wider flex items-center gap-1">
+                              <span className="px-2 py-0.5 text-2xs font-black uppercase bg-emerald-600 text-white tracking-wider flex items-center gap-1">
                                 <Check className="h-3 w-3" />
                                 Active Mandate
                               </span>
                             ) : (
-                              <span className="px-2 py-0.5 text-xs font-bold uppercase bg-slate-100 text-slate-700 border border-slate-300">
+                              <span className="px-2 py-0.5 text-2xs font-bold uppercase bg-slate-100 text-slate-700 border border-slate-300">
                                 {roleItem.shortTitle}
                               </span>
                             )}
@@ -2438,7 +2438,7 @@ export default function AdminDashboard({
                           <span className="font-bold text-slate-700">Permitted Workspaces:</span>
                           <div className="flex flex-wrap gap-1">
                             {roleItem.allowedGroups.map(g => (
-                              <span key={g} className="px-1.5 py-0.5 bg-slate-100 text-slate-800 font-mono font-bold uppercase text-xs border border-slate-200">
+                              <span key={g} className="px-1.5 py-0.5 bg-slate-100 text-slate-800 font-mono font-bold uppercase text-2xs border border-slate-200">
                                 {ADMIN_GROUPS[g]?.name || g}
                               </span>
                             ))}
@@ -2485,7 +2485,7 @@ export default function AdminDashboard({
                 <div>
                   <h3 className="text-base font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
                     Hospital HR Webhook Event Dispatcher &amp; Telemetry
-                    <span className="text-xs font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">
+                    <span className="text-2xs font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">
                       Act 586 Compliant
                     </span>
                   </h3>
@@ -2517,7 +2517,7 @@ export default function AdminDashboard({
               </div>
               <div className="p-3 bg-slate-50 border border-slate-200">
                 <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Automated Triggers</span>
-                <span className="text-xl font-black text-slate-900 font-mono text-sm">practitioner.verified</span>
+                <span className="text-xl font-black text-slate-900 font-mono text-xs">practitioner.verified</span>
                 <span className="text-xs text-slate-600 font-semibold block mt-0.5">On council registration approval</span>
               </div>
             </div>
@@ -2552,7 +2552,7 @@ export default function AdminDashboard({
             {/* Registered Hospital Webhook Endpoints */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                <h4 className="text-sm font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
                   <Building2 className="h-4 w-4 text-emerald-600" />
                   Integrated Hospital HR Endpoints
                 </h4>
@@ -2577,7 +2577,7 @@ export default function AdminDashboard({
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <span className="font-black text-xs text-slate-900">{wh.facility_name || wh.hospital_name}</span>
-                        <span className="text-xs font-bold uppercase px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        <span className="text-2xs font-bold uppercase px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300">
                           Active Endpoint
                         </span>
                       </div>
@@ -2618,7 +2618,7 @@ export default function AdminDashboard({
 
             {/* Recent Webhook Dispatch Logs */}
             <div className="space-y-2">
-              <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+              <h4 className="text-sm font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
                 <Clock className="h-4 w-4 text-slate-500" />
                 Recent Webhook Dispatch Telemetry
               </h4>
@@ -2644,13 +2644,13 @@ export default function AdminDashboard({
                           <td className="p-2.5 font-bold text-slate-900">{log.facility_name || log.hospital_name || log.webhook_id}</td>
                           <td className="p-2.5 font-mono text-xs text-[color:var(--t-700)] font-bold">{log.event_type}</td>
                           <td className="p-2.5">
-                            <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 border border-emerald-200 text-xs">
+                            <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 border border-emerald-200 text-2xs">
                               {log.response_code || 200} OK
                             </span>
                           </td>
                           <td className="p-2.5 font-mono text-slate-500">{log.execution_time_ms || 48}ms</td>
                           <td className="p-2.5">
-                            <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300">
+                            <span className="text-2xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300">
                               {log.status || 'delivered'}
                             </span>
                           </td>

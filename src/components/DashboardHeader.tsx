@@ -131,7 +131,7 @@ export default function DashboardHeader<T extends string>({
                     tabIndex={selected ? 0 : -1}
                     onClick={() => onTabChange?.(tab.id)}
                     onKeyDown={handleKeyDown}
-                    className={`shrink-0 min-h-[48px] px-4 text-sm flex items-center gap-2 cursor-pointer border-b transition-colors ${
+                    className={`shrink-0 min-h-[48px] px-4 text-xs flex items-center gap-2 cursor-pointer border-b transition-colors ${
                       selected
                         ? 'font-semibold text-[color:var(--t-700)] border-[color:var(--t-600)]'
                         : 'font-medium text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
@@ -140,7 +140,7 @@ export default function DashboardHeader<T extends string>({
                     <tab.icon className={`h-4 w-4 ${selected ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
                     <span className="whitespace-nowrap">{tab.label}</span>
                     {tab.count !== undefined && tab.count > 0 && (
-                      <span className="tabular-nums text-xs min-w-[20px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
+                      <span className="tabular-nums text-2xs min-w-[20px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
                         {tab.count}
                       </span>
                     )}
@@ -228,7 +228,7 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
           <Heading className="text-xl sm:text-3xl font-extrabold text-[color:var(--ink)] tracking-tight shrink-0">{name}</Heading>
           {badges && <div className="inline-flex items-center gap-2 max-w-full flex-wrap sm:flex-nowrap sm:shrink-0">{badges}</div>}
         </div>
-        {description && <p className="text-sm text-[color:var(--ink-2)] leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
+        {description && <p className="text-xs font-semibold text-[color:var(--ink-2)] leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
         {meta && <div className="flex items-center gap-2.5 text-xs text-[color:var(--ink-2)] font-semibold flex-wrap">{meta}</div>}
       </div>
     </div>
@@ -238,16 +238,16 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
 /** Pill used beside the name: brand, success, neutral, or warning. */
 export function BannerBadge({ tone = 'brand', children }: { tone?: 'brand' | 'success' | 'neutral' | 'warning'; children: React.ReactNode }) {
   if (tone === 'success') {
-    return <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
+    return <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-2xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   if (tone === 'neutral') {
-    return <span className="bg-slate-50 text-slate-700 border border-slate-300 text-xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
+    return <span className="bg-slate-50 text-slate-700 border border-slate-300 text-2xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   if (tone === 'warning') {
-    return <span className="bg-amber-50 text-amber-800 border border-amber-300 text-xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
+    return <span className="bg-amber-50 text-amber-800 border border-amber-300 text-2xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   return (
-    <span className="bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>
+    <span className="bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-2xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>
   );
 }
 
@@ -265,13 +265,13 @@ export function BannerKpis({ items }: { items: { value: React.ReactNode; label: 
   );
 }
 
-/** Labelled dropdown used in filter rows (library, pharmacies). Two per row on phones. */
+/** Inline h-11 labelled dropdown used in single-row filter bars (library, pharmacies, packages). */
 export function FilterSelect({ label, value, onChange, children }: { label: string; value: string; onChange: (v: string) => void; children: React.ReactNode }) {
   return (
-    <label className="flex flex-col gap-1 min-w-0 basis-[calc(50%-8px)] sm:basis-auto sm:w-[190px]">
-      <span className="text-xs font-extrabold uppercase tracking-wider text-slate-600">{label}</span>
+    <label className="flex items-center gap-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-3 h-11 shrink-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors cursor-pointer">
+      <span className="text-2xs font-black uppercase tracking-widest text-slate-400 shrink-0">{label}:</span>
       <select value={value} onChange={e => onChange(e.target.value)}
-        className="w-full border border-[color:var(--t-200)] bg-white px-2 sm:px-3 min-h-[40px] text-sm font-semibold text-[color:var(--ink)] cursor-pointer focus:outline-none focus:border-[color:var(--t-600)]">
+        className="text-xs font-bold text-[color:var(--ink)] bg-transparent focus:outline-none cursor-pointer pr-1 min-w-[120px]">
         {children}
       </select>
     </label>

@@ -166,7 +166,7 @@ export default function DashboardDesignPreview() {
               >
                 <Video className={`h-4 w-4 shrink-0 transition-colors ${activeNav === 'consult' ? 'text-white' : 'text-white/70'}`} />
                 <span>Consult Now</span>
-                <span className="text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 bg-emerald-500 text-white">
+                <span className="text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 bg-emerald-500 text-white">
                   Live
                 </span>
               </button>
@@ -182,7 +182,7 @@ export default function DashboardDesignPreview() {
               >
                 <Pill className={`h-4 w-4 shrink-0 transition-colors ${activeNav === 'pharmacies' ? 'text-white' : 'text-white/70'}`} />
                 <span>Pharmacies</span>
-                <span className="text-xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 bg-white/20 text-white">
+                <span className="text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 bg-white/20 text-white">
                   3 Rx
                 </span>
               </button>
@@ -263,7 +263,7 @@ export default function DashboardDesignPreview() {
                   <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[color:var(--ink)]">
                     Ahmad Bin Razak
                   </h1>
-                  <span className="text-xs font-black uppercase px-2.5 py-0.5 bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] tracking-wider shadow-2xs">
+                  <span className="text-2xs font-black uppercase px-2.5 py-0.5 bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] tracking-wider shadow-2xs">
                     EHR Verified Patient &bull; Act 586
                   </span>
                 </div>
@@ -322,7 +322,7 @@ export default function DashboardDesignPreview() {
           <button className="px-4 py-3.5 border-b border-[color:var(--t-600)] text-[color:var(--t-700)] font-extrabold flex items-center gap-2 whitespace-nowrap">
             <Calendar className="h-4 w-4 text-[color:var(--t-600)]" />
             <span>My Care & Appointments</span>
-            <span className="bg-[color:var(--t-600)] text-white text-xs px-1.5 py-0.2 rounded-full">2</span>
+            <span className="bg-[color:var(--t-600)] text-white text-2xs px-1.5 py-0.2 rounded-full">2</span>
           </button>
           <button className="px-4 py-3.5 border-b border-transparent text-slate-600 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors flex items-center gap-2 whitespace-nowrap">
             <FolderHeart className="h-4 w-4 text-slate-400" />
@@ -331,7 +331,7 @@ export default function DashboardDesignPreview() {
           <button className="px-4 py-3.5 border-b-2 border-transparent text-slate-600 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors flex items-center gap-2 whitespace-nowrap">
             <Pill className="h-4 w-4 text-slate-400" />
             <span>Pharmacy & e-Prescriptions</span>
-            <span className="bg-slate-200 text-slate-700 text-xs px-1.5 py-0.2 rounded-full">3</span>
+            <span className="bg-slate-200 text-slate-700 text-2xs px-1.5 py-0.2 rounded-full">3</span>
           </button>
           <button className="px-4 py-3.5 border-b-2 border-transparent text-slate-600 hover:text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] transition-colors flex items-center gap-2 whitespace-nowrap">
             <Heart className="h-4 w-4 text-slate-400" />
@@ -405,7 +405,7 @@ export default function DashboardDesignPreview() {
                     <span className="w-3 h-3 bg-[color:var(--t-600)]"></span>
                     <h2 className="text-sm font-black uppercase tracking-wider text-slate-900">Upcoming Video Consultation</h2>
                   </div>
-                  <span className="text-xs font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 font-bold">
+                  <span className="text-2xs font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 font-bold">
                     SLOT CONFIRMED
                   </span>
                 </div>
@@ -418,7 +418,7 @@ export default function DashboardDesignPreview() {
                     <div>
                       <div className="flex items-center gap-2">
                         <h3 className="font-extrabold text-base text-slate-900">Dr. Tan Wei Lun</h3>
-                        <span className="text-xs font-mono bg-white px-1.5 py-0.2 border border-slate-300 text-slate-700">MMC #48291</span>
+                        <span className="text-2xs font-mono bg-white px-1.5 py-0.2 border border-slate-300 text-slate-700">MMC #48291</span>
                       </div>
                       <p className="text-xs text-slate-600 font-medium">Consultant Cardiologist &bull; Gleneagles Hospital KL</p>
                       <p className="text-xs font-extrabold text-[color:var(--t-700)] mt-1 flex items-center gap-1.5">
@@ -472,7 +472,7 @@ export default function DashboardDesignPreview() {
                       <div className="text-xs text-slate-600">1 Tablet Nightly &bull; Before sleep</div>
                       <div className="text-xs text-slate-500 font-bold mt-0.5">Dispatched to Caring Pharmacy Bangsar</div>
                     </div>
-                    <span className="text-xs font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200 font-bold whitespace-nowrap">
+                    <span className="text-2xs font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200 font-bold whitespace-nowrap">
                       READY FOR PICKUP
                     </span>
                   </div>
@@ -495,7 +495,7 @@ export default function DashboardDesignPreview() {
             <div className="border border-[color:var(--t-200)] shadow-xs bg-white p-6 space-y-6">
               <div className="border-b border-[color:var(--t-100)] pb-4 flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <span className="text-xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-0.5 border border-[color:var(--t-200)]">
+                  <span className="text-2xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-0.5 border border-[color:var(--t-200)]">
                     ACTIVE EPISODE OF CARE
                   </span>
                   <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-1.5">
@@ -587,7 +587,7 @@ export default function DashboardDesignPreview() {
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-black uppercase tracking-widest bg-white/20 px-2 py-0.5">RAPID TELEHEALTH</span>
+                    <span className="text-2xs font-black uppercase tracking-widest bg-white/20 px-2 py-0.5">RAPID TELEHEALTH</span>
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
                   </div>
                   <h3 className="text-xl font-black mt-3">Connect to On-Call Doctor</h3>
@@ -601,7 +601,7 @@ export default function DashboardDesignPreview() {
               {/* Bento 2: Act 586 QR Health Pass */}
               <div className="p-5 bg-white border border-[color:var(--t-200)] flex flex-col justify-between h-56 shadow-2xs">
                 <div>
-                  <span className="text-xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2 py-0.5 border border-[color:var(--t-200)]">
+                  <span className="text-2xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2 py-0.5 border border-[color:var(--t-200)]">
                     ACT 586 STATUTORY COMPLIANCE
                   </span>
                   <h3 className="text-lg font-black text-slate-900 mt-2">Hospital Check-in QR Pass</h3>
@@ -615,7 +615,7 @@ export default function DashboardDesignPreview() {
               {/* Bento 3: Records Vault */}
               <div className="p-5 bg-white border border-[color:var(--t-200)] flex flex-col justify-between h-56 shadow-2xs">
                 <div>
-                  <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+                  <span className="text-2xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
                     CONCIERGE VAULT
                   </span>
                   <h3 className="text-lg font-black text-slate-900 mt-2">Medical Records Vault</h3>

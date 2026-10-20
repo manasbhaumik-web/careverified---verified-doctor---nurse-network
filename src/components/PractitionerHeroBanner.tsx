@@ -60,6 +60,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
   const helpActive = isHelpActive ?? (groupName === 'Help & Support');
 
   const handleHelpClick = () => {
+    if (helpActive) return;
     if (onOpenHelp) {
       onOpenHelp();
     }
@@ -75,7 +76,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
         id="tab-practitioner-help"
         aria-selected={helpActive}
         onClick={handleHelpClick}
-        className={`shrink-0 min-h-[48px] px-3.5 sm:px-4 text-sm flex items-center gap-2 cursor-pointer border-b transition-colors ${
+        className={`shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer border-b transition-colors ${
           helpActive
             ? 'font-semibold text-[color:var(--t-700)] border-[color:var(--t-600)] bg-[color:var(--t-50)]/60'
             : 'font-medium text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
@@ -181,11 +182,11 @@ export default function PractitionerHeroBanner<T extends string = string>({
                   <span className="text-slate-400">&bull;</span>
                   <span className="font-mono text-[color:var(--ink-2)]">{profile.experienceYears} Years Exp.</span>
                   <span className="text-slate-400">&bull;</span>
-                  <span className="font-mono font-bold text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)] text-xs rounded-none shadow-2xs">
+                  <span className="font-mono font-bold text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)] text-2xs rounded-none shadow-2xs">
                     {profile.licenseNumber}
                   </span>
                   <span className="text-slate-400">&bull;</span>
-                  <span className="font-mono text-slate-700 text-xs bg-white px-1.5 py-0.5 border border-slate-200 rounded-none">
+                  <span className="font-mono text-slate-700 text-2xs bg-white px-1.5 py-0.5 border border-slate-200 rounded-none">
                     ID: {profile.id}
                   </span>
                   {isVerified && <span className="text-slate-400">&bull;</span>}
@@ -225,7 +226,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
                 <button
                   type="button"
                   onClick={() => {
-                    navigator.clipboard.writeText(`https://medicert.com/practitioner/${profile.id}`);
+                    navigator.clipboard.writeText(`${window.location.origin}/verify-practitioners?q=${encodeURIComponent(profile.id)}`);
                     showToast("Profile link copied to clipboard!");
                   }}
                   className={bannerOnBrandSecondaryBtn}
@@ -290,7 +291,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
                   <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Verified Clinical Credentials</span>
                   <div className="flex flex-wrap gap-1.5">
                     {((profile as any).certifications as string[]).map(cert => (
-                      <span key={cert} className="bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold px-2.5 py-1 rounded-md">
+                      <span key={cert} className="bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-2xs font-bold px-2.5 py-1 rounded-md">
                         {cert}
                       </span>
                     ))}

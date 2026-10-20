@@ -147,7 +147,7 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
             <label htmlFor="mailbox-search" className="sr-only">Search conversations</label>
             <div className="flex items-center gap-2 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 h-12 focus-within:border-[color:var(--t-600)] transition-colors">
               <Search className="h-4 w-4 text-slate-500 shrink-0" />
-              <input id="mailbox-search" placeholder="Search care team…" value={search} onChange={e => setSearch(e.target.value)} className="flex-1 min-w-0 bg-transparent text-sm text-[color:var(--ink)] outline-none placeholder-slate-500" />
+              <input id="mailbox-search" placeholder="Search care team…" value={search} onChange={e => setSearch(e.target.value)} className="flex-1 min-w-0 bg-transparent text-xs text-[color:var(--ink)] outline-none placeholder-slate-500" />
             </div>
           </div>
           <ul className="flex-1 overflow-y-auto divide-y divide-[color:var(--t-100)]">
@@ -160,7 +160,7 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
-                      <p className={`text-sm text-[color:var(--ink)] truncate ${isNew ? 'font-extrabold' : 'font-bold'}`}>{t.name}</p>
+                      <p className={`text-xs text-[color:var(--ink)] truncate ${isNew ? 'font-extrabold' : 'font-bold'}`}>{t.name}</p>
                       {last && <span className="text-xs text-slate-600 shrink-0">{ago(last.timestamp)}</span>}
                     </div>
                     <div className="flex items-center justify-between gap-2 mt-0.5">
@@ -177,7 +177,7 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
               </li>
             ))}
             {shown.length === 0 && (
-              <li className="px-4 py-12 text-sm text-[color:var(--ink-2)] text-center">
+              <li className="px-4 py-12 text-xs text-[color:var(--ink-2)] text-center">
                 <MessageSquare className="h-8 w-8 text-[color:var(--t-300)] mx-auto mb-2" />
                 {threads.length === 0 ? 'You can message practitioners after you have booked or consulted them.' : 'No conversations found.'}
               </li>
@@ -197,7 +197,7 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
                   <div className="min-w-0">
                     <h2 className="text-sm font-bold text-[color:var(--ink)] truncate flex items-center gap-2">
                       {current.name}
-                      {current.verified && <span className="text-xs font-mono uppercase tracking-wider bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-1.5 py-0.5">Verified</span>}
+                      {current.verified && <span className="text-2xs font-mono uppercase tracking-wider bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-1.5 py-0.5">Verified</span>}
                     </h2>
                     <p className="text-xs text-[color:var(--ink-2)] truncate">{current.role}</p>
                   </div>
@@ -208,7 +208,7 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
               </div>
               <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-4">
                 {thread.length === 0 && (
-                  <div className="text-center py-16 text-sm text-[color:var(--ink-2)]">
+                  <div className="text-center py-16 text-xs text-[color:var(--ink-2)]">
                     <MessageSquare className="h-8 w-8 text-[color:var(--t-400)] mx-auto mb-2" />
                     No messages yet. Send a message to start communicating with {current.name}.
                   </div>
@@ -217,7 +217,7 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
                   const mine = m.senderId === currentUserId;
                   return (
                     <div key={m.id} className={`flex flex-col max-w-[80%] ${mine ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
-                      <div className={`px-4 py-3 text-sm leading-relaxed ${mine ? 'bg-[color:var(--t-600)] text-white shadow-xs' : 'bg-white border border-[color:var(--t-200)] text-[color:var(--ink)] shadow-xs'}`}>
+                      <div className={`px-4 py-3 text-xs leading-relaxed ${mine ? 'bg-[color:var(--t-600)] text-white shadow-xs' : 'bg-white border border-[color:var(--t-200)] text-[color:var(--ink)] shadow-xs'}`}>
                         {m.text}
                       </div>
                       <span className="text-xs text-slate-600 mt-1">{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
@@ -230,16 +230,16 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
               <form onSubmit={send} className="border-t border-[color:var(--t-200)] px-3 sm:px-5 py-3 bg-white flex items-center gap-2 sm:gap-3 shrink-0">
                 <label htmlFor="mailbox-message" className="sr-only">Message</label>
                 <input id="mailbox-message" value={text} onChange={e => setText(e.target.value)} maxLength={2000} enterKeyHint="send" autoComplete="off" placeholder="Type a message to your practitioner…"
-                  className="flex-1 min-w-0 h-12 text-sm border border-[color:var(--t-200)] px-4 outline-none focus:border-[color:var(--t-600)] bg-[color:var(--t-bg)] text-[color:var(--ink)] transition-colors placeholder-slate-500" />
-                <button disabled={!text.trim()} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white h-12 px-4 sm:px-6 text-sm font-bold flex items-center gap-2 cursor-pointer transition-colors shadow-xs shrink-0" aria-label="Send">
+                  className="flex-1 min-w-0 h-12 text-xs border border-[color:var(--t-200)] px-4 outline-none focus:border-[color:var(--t-600)] bg-[color:var(--t-bg)] text-[color:var(--ink)] transition-colors placeholder-slate-500" />
+                <button disabled={!text.trim()} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white h-12 px-4 sm:px-6 text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors shadow-xs shrink-0" aria-label="Send">
                   <span className="hidden sm:inline">Send</span> <Send className="h-4 w-4" />
                 </button>
               </form>
             </>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-sm text-[color:var(--ink-2)] p-8 text-center space-y-2">
+            <div className="flex-1 flex flex-col items-center justify-center text-xs text-[color:var(--ink-2)] p-8 text-center space-y-2">
               <MessageSquare className="h-10 w-10 text-[color:var(--t-300)]" />
-              <p className="font-bold text-[color:var(--ink)]">No conversation selected</p>
+              <p className="text-sm font-bold text-[color:var(--ink)]">No conversation selected</p>
               <p className="text-xs">Select a care provider from the left panel to read and reply.</p>
             </div>
           )}

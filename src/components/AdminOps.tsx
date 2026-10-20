@@ -147,10 +147,10 @@ export default function AdminOps({
             >
               {t.label}
               {t.id === 'roster' && openSos.length > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-rose-100 text-rose-700 font-mono font-bold rounded-none">{openSos.length}</span>
+                <span className="ml-1.5 px-1.5 py-0.5 text-2xs bg-rose-100 text-rose-700 font-mono font-bold rounded-none">{openSos.length}</span>
               )}
               {t.id === 'pharmacies' && pharmacies.length > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-slate-100 text-slate-700 font-mono font-bold rounded-none">{pharmacies.length}</span>
+                <span className="ml-1.5 px-1.5 py-0.5 text-2xs bg-slate-100 text-slate-700 font-mono font-bold rounded-none">{pharmacies.length}</span>
               )}
             </button>
           ))}
@@ -215,7 +215,7 @@ export default function AdminOps({
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-extrabold text-slate-900">30-Day Shift Fill Rate &amp; Locum Telemetry</h3>
-                    <span className="text-xs font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">Rolling Window</span>
+                    <span className="text-2xs font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">Rolling Window</span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">Automated tracking of clinical shift placements across emergency departments and inpatient wards.</p>
                 </div>
@@ -257,7 +257,7 @@ export default function AdminOps({
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-slate-700">Daily Shift Fill Rate Progression (30 Days)</span>
                 {hoveredShiftDay ? (
-                  <span className="font-mono text-xs font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
+                  <span className="font-mono text-2xs font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
                     Day {hoveredShiftDay}: {SHIFT_FILL_TREND[hoveredShiftDay - 1].rate}% Fill Rate · {SHIFT_FILL_TREND[hoveredShiftDay - 1].shiftsFilled}/{SHIFT_FILL_TREND[hoveredShiftDay - 1].shiftsPosted} Shifts Filled
                   </span>
                 ) : (
@@ -340,7 +340,7 @@ export default function AdminOps({
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-extrabold text-slate-900">30-Day Rolling Escrow &amp; Settlement Telemetry</h3>
-                    <span className="text-xs font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">Audited Financials</span>
+                    <span className="text-2xs font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">Audited Financials</span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">Automated reconciliation of platform escrow holds, locum doctor wages, and 8% facilitator commissions.</p>
                 </div>
@@ -382,7 +382,7 @@ export default function AdminOps({
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-slate-700">Daily Settlement Volume (30 Days)</span>
                 {hoveredSettlementDay ? (
-                  <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5">
+                  <span className="font-mono text-2xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5">
                     Day {hoveredSettlementDay}: RM {SETTLEMENT_TREND[hoveredSettlementDay - 1].volume.toLocaleString()}.00 Gross · RM {SETTLEMENT_TREND[hoveredSettlementDay - 1].platformFee}.00 Facilitator Fee ({SETTLEMENT_TREND[hoveredSettlementDay - 1].transactions} txs)
                   </span>
                 ) : (

@@ -96,7 +96,7 @@ export default function SearchHub({
   };
 
   const labelCls = 'text-xs font-bold uppercase tracking-wider text-[color:var(--ink-2)]';
-  const selectCls = 'w-full min-h-[46px] border border-[color:var(--t-200)] bg-white px-3 text-sm text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] cursor-pointer';
+  const selectCls = 'w-full min-h-[46px] border border-[color:var(--t-200)] bg-white px-3 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] cursor-pointer';
 
   const renderCard = (prof: DoctorProfile | NurseProfile) => {
     const isDoc = prof.role === UserRole.DOCTOR;
@@ -114,8 +114,8 @@ export default function SearchHub({
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="text-lg font-bold text-[color:var(--ink)] leading-snug">{prof.name}</h3>
-            <p className="text-sm text-[color:var(--ink-2)] mt-0.5">{prof.specialization}</p>
-            <p className="mt-1.5 flex items-center gap-1 text-sm text-[color:var(--ink-2)]">
+            <p className="text-xs text-[color:var(--ink-2)] mt-0.5">{prof.specialization}</p>
+            <p className="mt-1.5 flex items-center gap-1 text-xs text-[color:var(--ink-2)]">
               <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />
               <strong className="font-bold text-[color:var(--ink)]">{rating.display}</strong>
               <span className="text-slate-600">({rating.count} review{rating.count === 1 ? '' : 's'})</span>
@@ -124,14 +124,14 @@ export default function SearchHub({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-[color:var(--e-800)] bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-2 py-1">
+          <span className="inline-flex items-center gap-1 text-2xs font-bold text-[color:var(--e-800)] bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-2 py-1">
             <Check className="h-3 w-3 text-[color:var(--e-600)]" /> {council} verified
           </span>
-          <span className="text-xs font-semibold text-[color:var(--ink-2)] bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-1">{prof.licenseNumber}</span><VerificationScopeBadge prof={prof as any} className="self-center" />
-          <span className="text-xs font-semibold text-[color:var(--ink-2)] bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-1">{prof.experienceYears} yrs experience</span>
+          <span className="text-2xs font-semibold text-[color:var(--ink-2)] bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-1">{prof.licenseNumber}</span><VerificationScopeBadge prof={prof as any} className="self-center" />
+          <span className="text-2xs font-semibold text-[color:var(--ink-2)] bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-1">{prof.experienceYears} yrs experience</span>
         </div>
 
-        <div className="flex flex-col gap-2 text-sm text-[color:var(--ink-2)]">
+        <div className="flex flex-col gap-2 text-xs text-[color:var(--ink-2)]">
           <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-slate-500 shrink-0" /><span className="truncate">{prof.practiceAddress ? `${prof.practiceAddress}, ` : ''}{prof.city}</span></div>
           {prof.consultationModes?.length > 0 && (
             <div className="flex items-center gap-2"><Activity className="h-4 w-4 text-slate-500 shrink-0" />{prof.consultationModes.join(' · ')}</div>
@@ -150,14 +150,14 @@ export default function SearchHub({
           <button
             type="button"
             onClick={() => setSelectedModalProf(prof)}
-            className="min-h-[44px] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-sm font-semibold cursor-pointer"
+            className="min-h-[44px] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-xs font-semibold cursor-pointer"
           >
             View profile
           </button>
           <button
             type="button"
             onClick={() => onSelectProfessional(prof.id)}
-            className="min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold transition-colors cursor-pointer"
+            className="min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors cursor-pointer"
           >
             Book now
           </button>
@@ -179,7 +179,7 @@ export default function SearchHub({
             placeholder="Search by name, specialty or treatment"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 min-w-0 bg-transparent text-sm text-[color:var(--ink)] outline-none placeholder-slate-500"
+            className="flex-1 min-w-0 bg-transparent text-xs text-[color:var(--ink)] outline-none placeholder-slate-500"
           />
         </div>
         <label htmlFor="directory-sort" className="sr-only">Sort by</label>
@@ -187,7 +187,7 @@ export default function SearchHub({
           id="directory-sort"
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as any)}
-          className="flex-[1_1_200px] min-h-[48px] border border-[color:var(--t-200)] bg-white px-3 text-sm font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] cursor-pointer"
+          className="flex-[1_1_200px] min-h-[48px] border border-[color:var(--t-200)] bg-white px-3 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] cursor-pointer"
         >
           <option value="rating">Sort: Highest rated</option>
           <option value="fee">Sort: Lowest fee</option>
@@ -201,9 +201,9 @@ export default function SearchHub({
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-[color:var(--ink)] flex items-center gap-2"><SlidersHorizontal className="h-4 w-4 text-[color:var(--t-600)]" /> Filters</h2>
             <div className="flex items-center gap-3">
-              <button type="button" onClick={resetFilters} className="text-sm font-semibold text-[color:var(--e-700)] hover:text-[color:var(--e-800)] min-h-[44px] cursor-pointer">Clear all</button>
+              <button type="button" onClick={resetFilters} className="text-xs font-semibold text-[color:var(--e-700)] hover:text-[color:var(--e-800)] min-h-[44px] cursor-pointer">Clear all</button>
               <button type="button" onClick={() => setFiltersOpen(o => !o)} aria-expanded={filtersOpen} aria-controls="directory-filter-body"
-                className="lg:hidden min-h-[44px] px-4 border border-[color:var(--t-200)] text-sm font-bold text-[color:var(--t-700)] cursor-pointer">{filtersOpen ? 'Hide' : 'Show'}</button>
+                className="lg:hidden min-h-[44px] px-4 border border-[color:var(--t-200)] text-xs font-bold text-[color:var(--t-700)] cursor-pointer">{filtersOpen ? 'Hide' : 'Show'}</button>
             </div>
           </div>
 
@@ -218,7 +218,7 @@ export default function SearchHub({
                   type="button"
                   onClick={() => setSelectedRole(val as any)}
                   aria-pressed={selectedRole === val}
-                  className={`flex-1 min-h-[44px] text-sm border cursor-pointer transition-colors ${i > 0 ? 'border-l-0' : ''} ${
+                  className={`flex-1 min-h-[44px] text-xs border cursor-pointer transition-colors ${i > 0 ? 'border-l-0' : ''} ${
                     selectedRole === val
                       ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white font-bold'
                       : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] font-semibold hover:bg-[color:var(--t-100)]'
@@ -254,7 +254,7 @@ export default function SearchHub({
           <fieldset className="space-y-1">
             <legend className={`${labelCls} mb-2`}>Consultation</legend>
             {Object.values(ConsultationMode).map(mode => (
-              <label key={mode} className="flex items-center gap-2.5 min-h-[40px] text-sm text-[color:var(--ink)] cursor-pointer">
+              <label key={mode} className="flex items-center gap-2.5 min-h-[40px] text-xs text-[color:var(--ink)] cursor-pointer">
                 <input
                   type="checkbox"
                   checked={selectedModes.includes(mode)}
@@ -288,7 +288,7 @@ export default function SearchHub({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3 flex-wrap">
               <h2 className="text-base font-bold text-[color:var(--ink)]">Verified practitioners</h2>
-              <span className="text-sm text-slate-600">Showing {filteredList.length} result{filteredList.length === 1 ? '' : 's'}</span>
+              <span className="text-xs text-slate-600">Showing {filteredList.length} result{filteredList.length === 1 ? '' : 's'}</span>
               {selectedSpecialtyFilter && (
                 <span className="inline-flex items-center gap-2 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-xs font-semibold pl-3">
                   {selectedSpecialtyFilter}
@@ -311,7 +311,7 @@ export default function SearchHub({
                 type="button"
                 onClick={() => setShowMap(!showMap)}
                 aria-pressed={showMap}
-                className={`min-h-[44px] px-4 border text-sm font-semibold flex items-center gap-1.5 cursor-pointer ${showMap ? 'bg-[color:var(--t-50)] border-[color:var(--t-300)] text-[color:var(--t-700)]' : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'}`}
+                className={`min-h-[44px] px-4 border text-xs font-semibold flex items-center gap-1.5 cursor-pointer ${showMap ? 'bg-[color:var(--t-50)] border-[color:var(--t-300)] text-[color:var(--t-700)]' : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'}`}
               >
                 <MapPin className="h-4 w-4 text-[color:var(--t-600)]" /> {showMap ? 'Hide map' : 'Clinic map'}
               </button>
@@ -324,8 +324,8 @@ export default function SearchHub({
                 <div className="bg-white border border-[color:var(--t-200)] p-12 text-center space-y-3">
                   <Stethoscope className="h-10 w-10 text-[color:var(--t-200)] mx-auto" />
                   <h3 className="text-sm font-bold text-[color:var(--ink)]">No practitioners match your search</h3>
-                  <p className="text-sm text-slate-600">Try broadening your budget limit, city or specialty.</p>
-                  <button type="button" onClick={resetFilters} className="mt-1 min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold cursor-pointer">Reset all filters</button>
+                  <p className="text-xs text-slate-600">Try broadening your budget limit, city or specialty.</p>
+                  <button type="button" onClick={resetFilters} className="mt-1 min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer">Reset all filters</button>
                 </div>
               ) : viewMode === 'grid' ? (
                 <section aria-label="Practitioners" className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5">
@@ -343,15 +343,15 @@ export default function SearchHub({
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
                               <h3 className="text-base font-bold text-[color:var(--ink)]">{prof.name}</h3>
-                              <span className="inline-flex items-center gap-1 text-xs font-bold text-[color:var(--e-800)] bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-2 py-0.5"><Check className="h-3 w-3 text-[color:var(--e-600)]" />{isDoc ? 'MMC' : 'LJM'} verified</span>
+                              <span className="inline-flex items-center gap-1 text-2xs font-bold text-[color:var(--e-800)] bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-2 py-0.5"><Check className="h-3 w-3 text-[color:var(--e-600)]" />{isDoc ? 'MMC' : 'LJM'} verified</span>
                             </div>
-                            <p className="text-sm text-[color:var(--ink-2)] mt-0.5">{prof.specialization} · {prof.city} · {prof.experienceYears} yrs · ★ {rating.display}</p>
+                            <p className="text-xs text-[color:var(--ink-2)] mt-0.5">{prof.specialization} · {prof.city} · {prof.experienceYears} yrs · ★ {rating.display}</p>
                           </div>
                         </div>
                         <div className="flex items-center justify-between md:justify-end gap-4 shrink-0">
                           <span className="text-base font-bold text-[color:var(--ink)] tabular-nums">RM {prof.fee}{isDoc ? '' : '/hr'}</span>
-                          <button type="button" onClick={() => setSelectedModalProf(prof)} className="min-h-[44px] px-4 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-sm font-semibold cursor-pointer">View profile</button>
-                          <button type="button" onClick={() => onSelectProfessional(prof.id)} className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold cursor-pointer">Book now</button>
+                          <button type="button" onClick={() => setSelectedModalProf(prof)} className="min-h-[44px] px-4 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-xs font-semibold cursor-pointer">View profile</button>
+                          <button type="button" onClick={() => onSelectProfessional(prof.id)} className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer">Book now</button>
                         </div>
                       </article>
                     );
@@ -382,7 +382,7 @@ export default function SearchHub({
                         className="absolute group cursor-pointer z-10"
                       >
                         <span className="block bg-[color:var(--t-600)] text-white rounded-full p-1.5 border-2 border-white shadow-md"><Stethoscope className="h-3.5 w-3.5" /></span>
-                        <span className="absolute bottom-8 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 group-focus:scale-100 transition-transform bg-[color:var(--dark)] text-white text-xs font-semibold px-2 py-1 whitespace-nowrap">{prof.name}</span>
+                        <span className="absolute bottom-8 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 group-focus:scale-100 transition-transform bg-[color:var(--dark)] text-white text-2xs font-semibold px-2 py-1 whitespace-nowrap">{prof.name}</span>
                       </button>
                     );
                   })}
@@ -410,11 +410,11 @@ export default function SearchHub({
             <div className="bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] p-5 flex gap-4 items-start">
               <img src={selectedModalProf.avatar} alt="" className="h-16 w-16 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" referrerPolicy="no-referrer" />
               <div className="min-w-0 flex-1">
-                <span className="text-xs font-bold text-[color:var(--t-700)] bg-white border border-[color:var(--t-200)] px-2.5 py-0.5 inline-block">
+                <span className="text-2xs font-bold text-[color:var(--t-700)] bg-white border border-[color:var(--t-200)] px-2.5 py-0.5 inline-block">
                   {selectedModalProf.role === UserRole.DOCTOR ? 'Medical specialist (MD)' : 'Registered nurse'}
                 </span>
                 <h3 className="text-lg font-bold text-[color:var(--ink)] mt-1.5 leading-snug">{selectedModalProf.name}</h3>
-                <p className="text-sm text-[color:var(--ink-2)]">{selectedModalProf.specialization} · {selectedModalProf.city}</p>
+                <p className="text-xs text-[color:var(--ink-2)]">{selectedModalProf.specialization} · {selectedModalProf.city}</p>
               </div>
               <button type="button" onClick={() => setSelectedModalProf(null)} aria-label="Close" className="h-11 w-11 flex items-center justify-center text-slate-600 hover:text-[color:var(--t-600)] cursor-pointer shrink-0">
                 <X className="h-5 w-5" />
@@ -422,19 +422,19 @@ export default function SearchHub({
             </div>
 
             <div className="p-5 space-y-4">
-              <div className="bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-3.5 py-3 flex items-center justify-between text-sm">
+              <div className="bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-3.5 py-3 flex items-center justify-between text-xs">
                 <span className="text-[color:var(--e-800)] font-semibold flex items-center gap-1.5"><Shield className="h-4 w-4 text-[color:var(--e-600)]" /> Medical council verification</span>
-                <span className="text-xs font-bold text-white bg-[color:var(--e-600)] px-2.5 py-1">Verified active</span>
+                <span className="text-2xs font-bold text-white bg-[color:var(--e-600)] px-2.5 py-1">Verified active</span>
               </div>
-              <p className="text-sm text-[color:var(--ink-2)] leading-relaxed bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3.5">{selectedModalProf.bio}</p>
+              <p className="text-xs text-[color:var(--ink-2)] leading-relaxed bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3.5">{selectedModalProf.bio}</p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="border border-[color:var(--t-200)] p-3">
                   <span className="text-xs text-slate-600 block">Registration code</span>
-                  <span className="text-sm font-bold text-[color:var(--ink)]">{selectedModalProf.licenseNumber}</span>
+                  <span className="text-xs font-bold text-[color:var(--ink)]">{selectedModalProf.licenseNumber}</span>
                 </div>
                 <div className="border border-[color:var(--t-200)] p-3">
                   <span className="text-xs text-slate-600 block">Experience</span>
-                  <span className="text-sm font-bold text-[color:var(--ink)]">{selectedModalProf.experienceYears} years</span>
+                  <span className="text-xs font-bold text-[color:var(--ink)]">{selectedModalProf.experienceYears} years</span>
                 </div>
               </div>
             </div>
@@ -445,11 +445,11 @@ export default function SearchHub({
                 <span className="text-lg font-bold text-[color:var(--ink)] tabular-nums">RM {selectedModalProf.fee}</span>
               </div>
               <div className="flex items-center gap-2">
-                <button type="button" onClick={() => setSelectedModalProf(null)} className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-sm font-semibold cursor-pointer">Close</button>
+                <button type="button" onClick={() => setSelectedModalProf(null)} className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-xs font-semibold cursor-pointer">Close</button>
                 <button
                   type="button"
                   onClick={() => { onSelectProfessional(selectedModalProf.id); setSelectedModalProf(null); }}
-                  className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold flex items-center gap-1.5 cursor-pointer"
+                  className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                 >
                   Book consultation <ArrowRight className="h-4 w-4" />
                 </button>

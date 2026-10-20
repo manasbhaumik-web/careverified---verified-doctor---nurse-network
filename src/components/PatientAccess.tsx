@@ -166,18 +166,18 @@ export default function PatientAccess() {
           {tx.eyebrow}
         </div>
         <h2 id="access-heading" className="font-display font-black text-2xl sm:text-3xl lg:text-4xl text-[color:var(--ink)] tracking-tight leading-tight">{tx.title}</h2>
-        <p className="text-sm sm:text-base text-slate-600 mt-2 font-medium max-w-2xl leading-relaxed">{tx.intro}</p>
+        <p className="text-xs sm:text-base text-slate-600 mt-2 font-medium max-w-2xl leading-relaxed">{tx.intro}</p>
 
         {/* Malaysian Local Payment Rails, LHDN Tax Receipts & TPA Reimbursement Strip */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-px bg-[color:var(--t-200)] border border-[color:var(--t-200)] shadow-2xs">
           {tx.localTrust.map(item => (
             <div key={item.title} className="bg-white p-4 sm:p-5 flex flex-col justify-between">
               <div>
-                <span className="inline-block text-xs font-mono font-extrabold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] mb-2">
+                <span className="inline-block text-2xs font-mono font-extrabold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] mb-2">
                   {item.badge}
                 </span>
                 <h3 className="font-display font-extrabold text-sm sm:text-base text-[color:var(--ink)]">{item.title}</h3>
-                <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed font-medium">{item.desc}</p>
+                <p className="text-xs text-slate-600 mt-1 leading-relaxed font-medium">{item.desc}</p>
               </div>
             </div>
           ))}
@@ -190,7 +190,7 @@ export default function PatientAccess() {
               <li key={c.title} className="bg-white border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] p-5 shadow-2xs">
                 <span aria-hidden="true" className="w-9 h-9 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] flex items-center justify-center mb-3"><Icon className="h-4.5 w-4.5" /></span>
                 <h3 className="font-display font-extrabold text-base text-[color:var(--ink)] leading-snug">{c.title}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed mt-1.5 font-medium">{c.text}</p>
+                <p className="text-xs text-slate-600 leading-relaxed mt-1.5 font-medium">{c.text}</p>
               </li>
             );
           })}
@@ -199,11 +199,11 @@ export default function PatientAccess() {
             <h3 className="font-display font-extrabold text-base text-[color:var(--ink)] leading-snug">{tx.support.hours}</h3>
             {hours ? (
               <>
-                <p role="status" className="text-sm font-bold mt-1.5 text-[color:var(--ink)] flex items-center gap-1.5">
+                <p role="status" className="text-xs font-bold mt-1.5 text-[color:var(--ink)] flex items-center gap-1.5">
                   <span className={`w-2 h-2 rounded-full ${hours.open ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                   {hours.open ? tx.support.online : tx.support.away(when)}
                 </p>
-                <p className="text-sm text-slate-600 mt-1 font-medium">{hours.text[L] ?? hours.text.en}</p>
+                <p className="text-xs text-slate-600 mt-1 font-medium">{hours.text[L] ?? hours.text.en}</p>
               </>
             ) : null}
             <p className="text-xs text-rose-800 font-bold mt-2.5 pt-2 border-t border-slate-100">{tx.support.emergency}</p>
@@ -211,14 +211,14 @@ export default function PatientAccess() {
         </ul>
 
         <details className="mt-8 bg-white border border-[color:var(--t-200)] group">
-          <summary className="cursor-pointer select-none px-5 py-4 flex items-center justify-between gap-3 font-display font-extrabold text-sm sm:text-base text-[color:var(--ink)]">
+          <summary className="cursor-pointer select-none px-5 py-4 flex items-center justify-between gap-3 font-display font-extrabold text-xs sm:text-base text-[color:var(--ink)]">
             <span className="flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-[color:var(--t-600)]" />
               {tx.a11y.title}
             </span>
-            <span className="text-xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)]">{tx.a11y.checked}</span>
+            <span className="text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)]">{tx.a11y.checked}</span>
           </summary>
-          <div className="px-5 pb-5 pt-2 border-t border-[color:var(--t-100)] grid md:grid-cols-2 gap-6 text-sm text-slate-700 font-medium">
+          <div className="px-5 pb-5 pt-2 border-t border-[color:var(--t-100)] grid md:grid-cols-2 gap-6 text-xs text-slate-700 font-medium">
             <div>
               <h3 className="font-extrabold text-[color:var(--ink)] mb-2">{tx.a11y.doneTitle}</h3>
               <ul className="list-disc pl-5 space-y-1.5">{tx.a11y.done.map(x => <li key={x}>{x}</li>)}</ul>

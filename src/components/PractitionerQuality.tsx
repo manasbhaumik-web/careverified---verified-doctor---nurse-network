@@ -5,7 +5,7 @@ import { BannerBadge } from './DashboardHeader';
 
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
-const field = 'border border-slate-200 bg-white px-3 py-2 text-sm w-full focus:outline-none focus:border-[color:var(--t-600)]';
+const field = 'border border-slate-200 bg-white px-3 py-2 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
 const lab = 'text-xs font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
 const day = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '—');
 
@@ -44,7 +44,7 @@ export default function PractitionerQuality({ profileId, embedded = false }: { p
           description="Log verified CPD education credits, submit peer clinical audits, and review regulatory practice compliance with the medical council."
           badges={<BannerBadge tone="brand">MMC CPD Accredited</BannerBadge>}
         />
-        <p className="bg-amber-50 border border-amber-200 text-amber-900 text-sm font-semibold p-5 max-w-2xl">
+        <p className="bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold p-5 max-w-2xl">
           Submit your credentials in the Practitioner Portal first. Quality tools open once you have a profile.
         </p>
       </div>
@@ -90,8 +90,8 @@ export default function PractitionerQuality({ profileId, embedded = false }: { p
           <p className="text-xs text-[color:var(--ink-2)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-3 leading-relaxed">Only patients who have concluded a consultation visit can submit ratings. You can report reviews that breach ethical or privacy guidelines.</p>
           </div>
           <div className="grid gap-3 lg:grid-cols-2 items-start">
-          {myReviews.length === 0 ? <p className="text-sm text-slate-500 bg-white border border-[color:var(--t-200)] p-8 text-center lg:col-span-2">No patient reviews recorded yet.</p> : myReviews.map(r => (
-            <article key={r.id} className="bg-white border border-[color:var(--t-200)] p-5 text-sm space-y-2 shadow-xs">
+          {myReviews.length === 0 ? <p className="text-xs text-slate-500 bg-white border border-[color:var(--t-200)] p-8 text-center lg:col-span-2">No patient reviews recorded yet.</p> : myReviews.map(r => (
+            <article key={r.id} className="bg-white border border-[color:var(--t-200)] p-5 text-xs space-y-2 shadow-xs">
               <p className="font-bold text-amber-500 flex items-center justify-between">
                 <span>{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span>
                 <span className="text-xs text-slate-500 font-mono font-normal">{r.date}</span>
@@ -147,17 +147,17 @@ function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say:
       <section className="bg-white border border-[color:var(--t-200)] p-6 space-y-3 shadow-xs">
         <h3 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)]">CPD Progress for {cred.year}</h3>
         <div className="h-3 bg-slate-100 border border-[color:var(--t-100)]" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}><div className="h-full bg-[color:var(--t-600)] transition-all" style={{ width: `${pct}%` }} /></div>
-        <p className="text-sm"><b className="tabular-nums font-mono text-base text-[color:var(--ink)]">{cred.pointsApproved}</b> of {cred.target} verified annual points{cred.pointsPending ? ` · ${cred.pointsPending} awaiting review` : ''}</p>
+        <p className="text-xs"><b className="tabular-nums font-mono text-base text-[color:var(--ink)]">{cred.pointsApproved}</b> of {cred.target} verified annual points{cred.pointsPending ? ` · ${cred.pointsPending} awaiting review` : ''}</p>
         <p className="text-xs text-[color:var(--ink-2)]">Annual points are audited against MMC / LJM renewal prerequisites before Annual Practising Certificate dispatch.</p>
       </section>
 
       <form onSubmit={addCpd} className="bg-white border border-[color:var(--t-200)] p-6 grid sm:grid-cols-2 gap-4 shadow-xs">
         <h3 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)] sm:col-span-2">Log Continuous Professional Development</h3>
-        <div className="sm:col-span-2"><label className={lab}>Activity Title</label><input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-sm text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.title} onChange={e => setCpd({ ...cpd, title: e.target.value })} required maxLength={150} placeholder="e.g. National Cardiology Symposium 2026" /></div>
-        <div><label className={lab}>Category</label><select className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3 text-sm text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors cursor-pointer" value={cpd.category} onChange={e => setCpd({ ...cpd, category: e.target.value })}>{['course', 'conference', 'publication', 'teaching', 'self-study'].map(c => <option key={c}>{c}</option>)}</select></div>
-        <div><label className={lab}>Points Claimed</label><input type="number" step="0.5" min="0.5" max="50" className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-sm text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.points} onChange={e => setCpd({ ...cpd, points: e.target.value })} required placeholder="e.g. 5.0" /></div>
-        <div><label className={lab}>Completion Date</label><input type="date" max={today} className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-sm text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.activityDate} onChange={e => setCpd({ ...cpd, activityDate: e.target.value })} required /></div>
-        <div><label className={lab}>Provider / Accreditor</label><input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-sm text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.provider} onChange={e => setCpd({ ...cpd, provider: e.target.value })} maxLength={120} placeholder="e.g. MMA / College of Surgeons" /></div>
+        <div className="sm:col-span-2"><label className={lab}>Activity Title</label><input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.title} onChange={e => setCpd({ ...cpd, title: e.target.value })} required maxLength={150} placeholder="e.g. National Cardiology Symposium 2026" /></div>
+        <div><label className={lab}>Category</label><select className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors cursor-pointer" value={cpd.category} onChange={e => setCpd({ ...cpd, category: e.target.value })}>{['course', 'conference', 'publication', 'teaching', 'self-study'].map(c => <option key={c}>{c}</option>)}</select></div>
+        <div><label className={lab}>Points Claimed</label><input type="number" step="0.5" min="0.5" max="50" className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.points} onChange={e => setCpd({ ...cpd, points: e.target.value })} required placeholder="e.g. 5.0" /></div>
+        <div><label className={lab}>Completion Date</label><input type="date" max={today} className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.activityDate} onChange={e => setCpd({ ...cpd, activityDate: e.target.value })} required /></div>
+        <div><label className={lab}>Provider / Accreditor</label><input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.provider} onChange={e => setCpd({ ...cpd, provider: e.target.value })} maxLength={120} placeholder="e.g. MMA / College of Surgeons" /></div>
         <label className="sm:col-span-2 text-xs font-bold border border-dashed border-[color:var(--t-200)] bg-[color:var(--t-bg)] hover:bg-slate-50 p-4 text-center cursor-pointer transition-colors block">{cpdFile ? cpdFile.name : 'Attach Certificate of Attendance (PDF, JPG, PNG up to 5 MB)'}<input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={e => setCpdFile(e.target.files?.[0] ?? null)} /></label>
         <button className="sm:col-span-2 h-12 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer transition-colors shadow-xs">Submit CPD for Verification</button>
       </form>
@@ -217,7 +217,7 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
         <h3 className="text-sm font-extrabold">Cases for you to review</h3>
         <p className="text-xs text-slate-500">Colleagues' work, with the patient and the author hidden. Treat what you read as confidential.</p>
         {tasks.length === 0 ? <p className="text-xs text-slate-500">Nothing assigned.</p> : (
-          <ul className="divide-y divide-slate-100 text-sm">{tasks.map(t => (
+          <ul className="divide-y divide-slate-100 text-xs">{tasks.map(t => (
             <li key={t.id} className="py-2 flex justify-between gap-3"><span>{t.subject_type === 'prescription' ? 'Prescription' : 'Consultation note'} · assigned {day(t.assigned_at)}</span>
               {t.status === 'pending' ? <button onClick={() => openCase(t.id)} className="text-xs font-bold text-[color:var(--t-700)] cursor-pointer">Review</button> : <span className="text-xs font-bold text-slate-500">done</span>}</li>
           ))}</ul>
@@ -227,7 +227,7 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
       {open && (
         <section className="bg-white border-2 border-[color:var(--t-200)] p-5 space-y-3 xl:col-span-2">
           <h3 className="text-sm font-extrabold">{c?.kind ?? 'Case'}</h3>
-          {c && <div className="text-sm space-y-1.5 bg-slate-50 border border-slate-200 p-3">
+          {c && <div className="text-xs space-y-1.5 bg-slate-50 border border-slate-200 p-3">
             {'subjective' in c ? (['subjective', 'objective', 'assessment', 'plan'] as const).map(k => <p key={k}><span className="text-xs font-extrabold uppercase text-slate-500 mr-2">{k}</span>{c[k]}</p>) : (
               <>
                 <p><span className="text-xs font-extrabold uppercase text-slate-500 mr-2">Diagnosis</span>{c.diagnosis}</p>
@@ -248,7 +248,7 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
       <section className="bg-white border border-slate-200 p-5 space-y-2 min-w-0">
         <h3 className="text-sm font-extrabold">Feedback on your own work</h3>
         {about.length === 0 ? <p className="text-xs text-slate-500">No peer feedback yet.</p> : about.map(a => (
-          <article key={a.id} className="border border-slate-100 p-3 text-sm"><p className="font-bold">{a.subject_type === 'prescription' ? 'Prescription' : 'Consultation note'} · score {a.score}/5 · {a.outcome.replace(/_/g, ' ')} <span className="text-xs text-slate-400 font-normal">{day(a.completed_at)}</span></p>{a.comments && <p className="text-xs mt-1">{a.comments}</p>}</article>
+          <article key={a.id} className="border border-slate-100 p-3 text-xs"><p className="font-bold">{a.subject_type === 'prescription' ? 'Prescription' : 'Consultation note'} · score {a.score}/5 · {a.outcome.replace(/_/g, ' ')} <span className="text-xs text-slate-400 font-normal">{day(a.completed_at)}</span></p>{a.comments && <p className="text-xs mt-1">{a.comments}</p>}</article>
         ))}
       </section>
     </div>
@@ -280,7 +280,7 @@ function IncidentSection({ say }: { say: (ok: boolean, t: string) => void }) {
         <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Submit report</button>
       </form>
       <section className="bg-white border border-slate-200 p-5 min-w-0"><h3 className="text-sm font-extrabold mb-2">Your reports</h3>
-        {mine.length === 0 ? <p className="text-xs text-slate-500">No reports yet.</p> : <ul className="divide-y divide-slate-100 text-sm">{mine.map(i => <li key={i.id} className="py-2"><b>{i.kind.replace(/_/g, ' ')}</b> · {i.severity} · <span className="font-bold">{i.status}</span> <span className="text-xs text-slate-400">{day(i.createdAt)}</span>{i.resolution && <p className="text-xs text-slate-600">Outcome: {i.resolution}</p>}</li>)}</ul>}</section>
+        {mine.length === 0 ? <p className="text-xs text-slate-500">No reports yet.</p> : <ul className="divide-y divide-slate-100 text-xs">{mine.map(i => <li key={i.id} className="py-2"><b>{i.kind.replace(/_/g, ' ')}</b> · {i.severity} · <span className="font-bold">{i.status}</span> <span className="text-xs text-slate-400">{day(i.createdAt)}</span>{i.resolution && <p className="text-xs text-slate-600">Outcome: {i.resolution}</p>}</li>)}</ul>}</section>
     </div>
   );
 }

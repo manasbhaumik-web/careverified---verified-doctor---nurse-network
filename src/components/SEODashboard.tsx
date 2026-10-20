@@ -197,7 +197,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                             referrerPolicy="no-referrer"
                           />
                           <div className="min-w-0">
-                            <h4 className="text-xs font-black text-slate-800 truncate">{p.name}</h4>
+                            <h4 className="text-sm font-black text-slate-800 truncate">{p.name}</h4>
                             <p className="text-xs text-slate-500 font-bold truncate">{p.specialization}</p>
                           </div>
                         </div>
@@ -356,27 +356,27 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
               <div className="border border-slate-250 hover:border-[color:var(--t-600)] p-5 rounded-none bg-white transition-all space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-xs font-black text-slate-700 uppercase tracking-wider">LCP</span>
-                  <span className="text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">1.1s</span>
+                  <span className="text-2xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">1.1s</span>
                 </div>
-                <h4 className="text-xs font-black text-slate-800">Largest Contentful Paint</h4>
+                <h4 className="text-sm font-black text-slate-800">Largest Contentful Paint</h4>
                 <p className="text-xs text-slate-500 font-semibold leading-relaxed">Pre-rendered above-the-fold content loads instantly, ensuring maximum crawlability.</p>
               </div>
 
               <div className="border border-slate-250 hover:border-[color:var(--t-600)] p-5 rounded-none bg-white transition-all space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-xs font-black text-slate-700 uppercase tracking-wider">INP</span>
-                  <span className="text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">24ms</span>
+                  <span className="text-2xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">24ms</span>
                 </div>
-                <h4 className="text-xs font-black text-slate-800">Interaction to Next Paint</h4>
+                <h4 className="text-sm font-black text-slate-800">Interaction to Next Paint</h4>
                 <p className="text-xs text-slate-500 font-semibold leading-relaxed">Fast state mutations and lightweight event hooks prevent tap/click delays.</p>
               </div>
 
               <div className="border border-slate-250 hover:border-[color:var(--t-600)] p-5 rounded-none bg-white transition-all space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-xs font-black text-slate-700 uppercase tracking-wider">CLS</span>
-                  <span className="text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">0.02</span>
+                  <span className="text-2xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">0.02</span>
                 </div>
-                <h4 className="text-xs font-black text-slate-800">Cumulative Layout Shift</h4>
+                <h4 className="text-sm font-black text-slate-800">Cumulative Layout Shift</h4>
                 <p className="text-xs text-slate-500 font-semibold leading-relaxed">Defined image dimensions and skeletal layouts prevent layout jumping during rendering.</p>
               </div>
             </div>
@@ -460,7 +460,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                   referrerPolicy="no-referrer"
                 />
                 <div>
-                  <h4 className="text-xs font-black text-slate-800">{selectedSchemaProf.name}</h4>
+                  <h4 className="text-sm font-black text-slate-800">{selectedSchemaProf.name}</h4>
                   <p className="text-xs text-slate-500 font-bold">{selectedSchemaProf.specialization} &bull; {selectedSchemaProf.city}</p>
                 </div>
               </div>

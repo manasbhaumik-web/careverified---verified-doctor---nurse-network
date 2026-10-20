@@ -49,7 +49,7 @@ export default function AdminEmail() {
                 <td className="py-2 pr-3 whitespace-nowrap">{when(r.createdAt)}</td>
                 <td className="pr-3 break-all">{r.to}</td>
                 <td className="pr-3">{r.template}<span className="block text-slate-600">{r.lang}</span></td>
-                <td className="pr-3"><span className={`px-1.5 py-0.5 text-xs font-extrabold uppercase ${TONE[r.status] ?? ''}`}>{r.status}</span>{r.attempts > 1 ? <span className="ml-1 text-slate-600">{r.attempts} tries</span> : null}</td>
+                <td className="pr-3"><span className={`px-1.5 py-0.5 text-2xs font-extrabold uppercase ${TONE[r.status] ?? ''}`}>{r.status}</span>{r.attempts > 1 ? <span className="ml-1 text-slate-600">{r.attempts} tries</span> : null}</td>
                 <td className="text-slate-700">{r.error ?? ''}</td>
               </tr>
             ))}

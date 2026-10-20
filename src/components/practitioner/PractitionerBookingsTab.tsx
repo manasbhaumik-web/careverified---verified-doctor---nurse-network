@@ -116,7 +116,7 @@ export default function PractitionerBookingsTab({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
                   <span className="text-xs text-slate-400 font-bold block uppercase">Patient Identity</span>
-                  <strong className="text-slate-800 text-sm font-extrabold">{selectedBookingForPrescribe.patientName}</strong>
+                  <strong className="text-slate-800 text-xs font-extrabold">{selectedBookingForPrescribe.patientName}</strong>
                   <p className="text-slate-500 font-semibold mt-0.5">ID Ref: {selectedBookingForPrescribe.patientId}</p>
                 </div>
                 <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
@@ -211,7 +211,7 @@ export default function PractitionerBookingsTab({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
                   <span className="text-xs text-slate-400 font-bold block uppercase">Patient Identity</span>
-                  <strong className="text-slate-800 text-sm font-extrabold">{selectedBookingForPrescribe.patientName}</strong>
+                  <strong className="text-slate-800 text-xs font-extrabold">{selectedBookingForPrescribe.patientName}</strong>
                   <p className="text-slate-500 font-semibold mt-0.5">ID Ref: {selectedBookingForPrescribe.patientId}</p>
                 </div>
                 <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
@@ -343,19 +343,19 @@ export default function PractitionerBookingsTab({
       <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-3xs space-y-4">
         <div className="border-b border-[color:var(--t-200)] pb-3 flex items-center justify-between">
           <div>
-            <h3 className="text-xs font-black text-rose-600 uppercase tracking-widest flex items-center gap-1.5">
+            <h3 className="text-sm font-black text-rose-600 uppercase tracking-widest flex items-center gap-1.5">
               <Ambulance className="h-4.5 w-4.5 text-rose-500 animate-bounce" />
               Urgent On-Call Emergency Center
             </h3>
             <p className="text-xs text-slate-500 font-medium mt-0.5">Claim active emergency dispatch tickets requested by high-risk patients nearby.</p>
           </div>
-          <span className="bg-rose-50 text-rose-700 border border-rose-100 text-xs font-bold px-2 py-0.5 rounded-none uppercase tracking-wider animate-pulse">Live Radar Active</span>
+          <span className="bg-rose-50 text-rose-700 border border-rose-100 text-2xs font-bold px-2 py-0.5 rounded-none uppercase tracking-wider animate-pulse">Live Radar Active</span>
         </div>
 
         {activeDispatches.length === 0 ? (
           <div className="text-center py-8 bg-slate-50 border border-dashed border-[color:var(--t-200)] rounded-none text-xs text-slate-500 space-y-2">
             <ShieldCheck className="h-8 w-8 text-slate-300 mx-auto" />
-            <p className="font-bold">No Urgent Emergency Dispatches Pending</p>
+            <p className="text-sm font-bold text-slate-700">No Urgent Emergency Dispatches Pending</p>
             <p className="text-xs text-slate-400 max-w-sm mx-auto">Standard municipal emergency channels are quiet. If an emergency is triggered by a nearby patient, it will instantly blink here.</p>
           </div>
         ) : (
@@ -372,11 +372,11 @@ export default function PractitionerBookingsTab({
                 }`}>
                   <div className="flex justify-between items-start">
                     <div className="space-y-0.5">
-                      <span className="bg-red-50 text-red-700 border border-red-100 text-xs font-black px-1.5 py-0.5 rounded-none uppercase tracking-wider">CRITICAL ALERT</span>
+                      <span className="bg-red-50 text-red-700 border border-red-100 text-2xs font-black px-1.5 py-0.5 rounded-none uppercase tracking-wider">CRITICAL ALERT</span>
                       <h4 className="text-sm font-black text-slate-900">{dispatch.patientName}</h4>
                       <p className="text-xs text-slate-400 font-semibold">{(dispatch as any).timestamp}</p>
                     </div>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-none ${
+                    <span className={`text-2xs font-bold px-2 py-0.5 rounded-none ${
                       dispatch.dispatchStatus === 'Pending Dispatch'
                         ? 'bg-amber-100 text-amber-800'
                         : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'
@@ -442,7 +442,7 @@ export default function PractitionerBookingsTab({
       {/* Scheduled Clinical Consultations / Nursing Visits List */}
       <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-3xs space-y-4">
         <div className="border-b border-[color:var(--t-200)] pb-3">
-          <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+          <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
             <Calendar className="h-4.5 w-4.5 text-[color:var(--t-600)]" />
             {isDoc ? `Scheduled Doctor Consultations (${myBookings.length})` : `Scheduled Home Nursing Duties (${myBookings.length})`}
           </h3>
@@ -515,7 +515,7 @@ export default function PractitionerBookingsTab({
                             <Check className="h-4 w-4 text-emerald-600" />
                             Completed Nursing Care Log
                           </span>
-                          <span className="font-mono text-xs bg-emerald-100 text-emerald-800 px-1.5 py-0.5 border border-emerald-300">
+                          <span className="font-mono text-2xs bg-emerald-100 text-emerald-800 px-1.5 py-0.5 border border-emerald-300">
                             LJM Certified
                           </span>
                         </div>
@@ -538,8 +538,8 @@ export default function PractitionerBookingsTab({
                       <span className="text-xs text-slate-400 font-bold block uppercase">
                         {isDoc ? "Consultation Fee" : "Nursing Fee"}
                       </span>
-                      <span className="text-sm font-black text-slate-900">RM {booking.fee}</span>
-                      <span className={`block text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-none text-center border mt-1 ${
+                      <span className="text-xs font-black text-slate-900">RM {booking.fee}</span>
+                      <span className={`block text-2xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-none text-center border mt-1 ${
                         isUpcoming
                           ? 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border-[color:var(--t-200)]'
                           : 'bg-emerald-50 text-emerald-700 border-emerald-100'

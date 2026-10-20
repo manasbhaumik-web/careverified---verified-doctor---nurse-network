@@ -26,7 +26,7 @@ const URGENCY: Record<string, { label: string; cls: string }> = {
   routine: { label: 'Routine', cls: 'bg-slate-100 border-slate-300 text-slate-800' },
 };
 
-const btn = 'min-h-[44px] px-3 inline-flex items-center gap-2 text-sm font-bold text-[color:var(--t-700)] border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-50)] cursor-pointer';
+const btn = 'min-h-[44px] px-3 inline-flex items-center gap-2 text-xs font-bold text-[color:var(--t-700)] border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-50)] cursor-pointer';
 const card = 'bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5';
 
 /** Print one card only (the .print-rx rules in index.css hide the rest of the page). */
@@ -45,7 +45,7 @@ function WhyNoMc({ onFindDoctors }: { onFindDoctors?: () => void }) {
   return (
     <section aria-labelledby="mc-rules" className="bg-sky-50 border border-sky-200 p-4 space-y-2">
       <h3 id="mc-rules" className="text-sm font-extrabold text-sky-950 flex items-center gap-2"><Info className="h-4 w-4" aria-hidden="true" /> When you can get a medical certificate (MC)</h3>
-      <ul className="list-disc ml-5 space-y-1 text-sm text-sky-950">
+      <ul className="list-disc ml-5 space-y-1 text-xs text-sky-950">
         <li><b>Only after a doctor sees you in person.</b> The Malaysian Medical Council does not allow an MC after a video consultation alone. This applies to doctors registered in Malaysia.</li>
         <li><b>Up to 14 days online.</b> Longer leave needs another in-person assessment.</li>
         <li><b>Not back-dated by more than 3 days.</b> An MC cannot start more than 3 days before the day it is issued.</li>
@@ -68,13 +68,13 @@ function CertCard({ c }: { c: any; key?: React.Key }) {
     <article id={cardId} className={`${card} flex flex-wrap gap-5 justify-between`}>
       <div className="space-y-3 min-w-[16rem] flex-1">
         <div>
-          <span className={`inline-flex items-center gap-1.5 border px-2.5 py-1 text-xs font-extrabold ${ph.cls}`}>
+          <span className={`inline-flex items-center gap-1.5 border px-2.5 py-1 text-2xs font-extrabold ${ph.cls}`}>
             {phaseOf(c.fromDate, c.toDate) === 'current' ? <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> : <Clock className="h-3.5 w-3.5" aria-hidden="true" />}{ph.label}
           </span>
           <p className="text-lg font-extrabold text-[color:var(--ink)] mt-2">Unfit for work: {leaveText(c.fromDate, c.toDate)}</p>
         </div>
 
-        <dl className="text-sm grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-slate-800">
+        <dl className="text-xs grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-slate-800">
           <dt className="text-slate-700">Doctor</dt>
           <dd><b>{c.doctor?.name}</b></dd>
           <dt className="text-slate-700">Registration no.</dt>
@@ -87,7 +87,7 @@ function CertCard({ c }: { c: any; key?: React.Key }) {
           {c.remarks && <><dt className="text-slate-700">Remarks</dt><dd>{c.remarks}</dd></>}
         </dl>
 
-        <p className="text-sm text-slate-700 [overflow-wrap:anywhere]">Your employer can check it at <span className="font-mono">{url}</span>. The diagnosis is not shown to them.</p>
+        <p className="text-xs text-slate-700 [overflow-wrap:anywhere]">Your employer can check it at <span className="font-mono">{url}</span>. The diagnosis is not shown to them.</p>
 
         <div className="flex flex-wrap gap-2 no-print">
           <button type="button" onClick={copy} className={btn}><Copy className="h-4 w-4" aria-hidden="true" /> {copied ? 'Link copied' : 'Copy employer link'}</button>
@@ -110,14 +110,14 @@ function ReferralCard({ r, onBookSpecialist }: { r: any; onBookSpecialist?: (pro
   return (
     <article id={cardId} className={`${card} ${r.urgency === 'urgent' ? '!border-t-rose-600' : ''} space-y-3`}>
       <div className="flex flex-wrap items-center gap-2">
-        <span className={`inline-flex items-center gap-1.5 border px-2.5 py-1 text-xs font-extrabold ${u.cls}`}>{r.urgency === 'urgent' && <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />}{u.label}</span>
+        <span className={`inline-flex items-center gap-1.5 border px-2.5 py-1 text-2xs font-extrabold ${u.cls}`}>{r.urgency === 'urgent' && <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />}{u.label}</span>
       </div>
       <p className="text-lg font-extrabold text-[color:var(--ink)] flex items-center gap-2"><Stethoscope className="h-5 w-5 text-[color:var(--t-600)]" aria-hidden="true" /> Referral to {r.toProfessional?.name ? `${r.toProfessional.name} (${r.toSpecialty})` : r.toSpecialty}</p>
-      <p className="text-sm text-slate-800"><b>Reason:</b> {r.reason}</p>
-      <p className="text-sm text-slate-700">From {r.from}{r.fromLicence ? ` (registration no. ${r.fromLicence})` : ''} · issued {fmtDate(r.issuedAt)}</p>
+      <p className="text-xs text-slate-800"><b>Reason:</b> {r.reason}</p>
+      <p className="text-xs text-slate-700">From {r.from}{r.fromLicence ? ` (registration no. ${r.fromLicence})` : ''} · issued {fmtDate(r.issuedAt)}</p>
       <div className="flex flex-wrap gap-2 no-print">
         {onBookSpecialist && (
-          <button type="button" onClick={() => onBookSpecialist(r.toProfessional?.id ?? null, r.toSpecialty)} className="min-h-[44px] px-4 inline-flex items-center gap-2 text-sm font-bold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer">
+          <button type="button" onClick={() => onBookSpecialist(r.toProfessional?.id ?? null, r.toSpecialty)} className="min-h-[44px] px-4 inline-flex items-center gap-2 text-xs font-bold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer">
             <CalendarCheck className="h-4 w-4" aria-hidden="true" /> {r.toProfessional?.id ? `Book ${r.toProfessional.name}` : `Find a ${r.toSpecialty}`}
           </button>
         )}
@@ -148,7 +148,7 @@ export default function CertificatesPanel({ certificates, referrals, scope, onFi
           <WhyNoMc onFindDoctors={onFindDoctors} />
           {scope === 'both' && <h3 className="text-sm font-extrabold">Medical certificates</h3>}
           {certs.length === 0
-            ? <p className="py-6 px-5 bg-white border border-dashed border-[color:var(--t-200)] text-sm text-slate-800 text-center">You have no medical certificates. If you need one, see a doctor in person. The certificate appears here once the doctor issues it.</p>
+            ? <p className="py-6 px-5 bg-white border border-dashed border-[color:var(--t-200)] text-xs text-slate-800 text-center">You have no medical certificates. If you need one, see a doctor in person. The certificate appears here once the doctor issues it.</p>
             : certs.map(c => <CertCard key={c.id} c={c} />)}
         </section>
       )}
@@ -156,7 +156,7 @@ export default function CertificatesPanel({ certificates, referrals, scope, onFi
         <section aria-label="Referral letters" className="space-y-3">
           {scope === 'both' && <h3 className="text-sm font-extrabold flex items-center gap-2"><HeartHandshake className="h-4 w-4" aria-hidden="true" /> Referrals</h3>}
           {referrals.length === 0
-            ? <p className="py-6 px-5 bg-white border border-dashed border-[color:var(--t-200)] text-sm text-slate-800 text-center">You have no referral letters. When a doctor refers you to a specialist, it appears here.</p>
+            ? <p className="py-6 px-5 bg-white border border-dashed border-[color:var(--t-200)] text-xs text-slate-800 text-center">You have no referral letters. When a doctor refers you to a specialist, it appears here.</p>
             : referrals.map(r => <ReferralCard key={r.id} r={r} onBookSpecialist={onBookSpecialist} />)}
         </section>
       )}

@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking, PatientProfile, UserRole, Article, ConsultationMode } from '../types';
 import { INITIAL_ARTICLES } from '../data';
-import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from './DashboardHeader';
+import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, FilterSelect, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from './DashboardHeader';
 import PatientRecords, { RecordSubTab } from './PatientRecords';
 import SavedTab from './patient/SavedTab';
 import PaymentDialog from './PaymentDialog';
@@ -192,7 +192,16 @@ export default function PatientDashboard({
   const onCall = useOnCallStatus();
   const [savedSubTab, setSavedSubTab] = useState<'all' | 'doctors' | 'nurses'>('all');
   const [registrySubTab, setRegistrySubTab] = useState<'all' | 'telehealth' | 'specialists'>('all');
+  const [registryQuery, setRegistryQuery] = useState('');
+  const [registrySpecialty, setRegistrySpecialty] = useState('all');
+  const [registryCity, setRegistryCity] = useState('all');
+  const [registrySort, setRegistrySort] = useState<'rating' | 'experience' | 'fee_asc' | 'fee_desc'>('rating');
+
   const [nursesSubTab, setNursesSubTab] = useState<'all' | 'homecare' | 'clinic'>('all');
+  const [nursesQuery, setNursesQuery] = useState('');
+  const [nursesSpecialty, setNursesSpecialty] = useState('all');
+  const [nursesCity, setNursesCity] = useState('all');
+  const [nursesSort, setNursesSort] = useState<'rating' | 'experience' | 'fee_asc' | 'fee_desc'>('rating');
   const [pharmaciesSubTab, setPharmaciesSubTab] = useState<'all' | 'delivery' | 'open24'>('all');
   const [packagesSubTab, setPackagesSubTab] = useState<'packages' | 'promotions' | 'facilities'>('packages');
   const [assistanceSubTab, setAssistanceSubTab] = useState<'enquiry' | 'cases' | 'guide' | 'track'>('enquiry');
@@ -435,13 +444,13 @@ export default function PatientDashboard({
           if (onOpenHelp) onOpenHelp();
           else window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
         }}
-        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-sm flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
+        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
         title="Patient Help & Concierge Support Desk"
       >
         <LifeBuoy className="h-4 w-4 text-slate-500" />
         <span className="whitespace-nowrap font-medium sm:font-semibold">Help & Support</span>
         {openTickets.length > 0 && (
-          <span className="tabular-nums text-xs min-w-[18px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
+          <span className="tabular-nums text-2xs min-w-[18px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
             {openTickets.length}
           </span>
         )}
@@ -486,7 +495,6 @@ export default function PatientDashboard({
           setConsultSubTab('triage');
         }}
         onOpenRecords={() => { setActiveTab('records'); setRecordsSubTab('overview'); }}
-        compact={activeTab === 'consult' || activeTab === 'messages'}
       />
 
       {/* 3. MAIN WORKSPACE CONTENT CONTAINER */}
@@ -499,7 +507,7 @@ export default function PatientDashboard({
         >
           <div className="flex items-center gap-2.5 min-w-0">
             <CheckCircle2 className="h-4.5 w-4.5 text-[color:var(--t-600)] shrink-0" />
-            <span className="text-xs sm:text-sm font-bold leading-snug">{msg}</span>
+            <span className="text-xs font-bold leading-snug">{msg}</span>
           </div>
           <button
             type="button"
@@ -523,14 +531,6 @@ export default function PatientDashboard({
             badges={<BannerBadge tone="brand">MOH Protocol</BannerBadge>}
             aside={
               <div className="flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  onClick={onConsultNow}
-                  className="px-3.5 py-2 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <Video className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                  <span>Instant Video Consult</span>
-                </button>
                 {onFindDoctors && (
                   <button
                     type="button"
@@ -564,7 +564,7 @@ export default function PatientDashboard({
                 </div>
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-mono font-black uppercase tracking-wider px-2 py-0.5 bg-emerald-600 text-white">
+                    <span className="text-2xs font-mono font-black uppercase tracking-wider px-2 py-0.5 bg-emerald-600 text-white">
                       {activeConsult.status === 'active'
                         ? 'Live Room Open'
                         : activeConsult.status === 'queued'
@@ -621,7 +621,7 @@ export default function PatientDashboard({
                       <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
                         Upcoming Consultations
                       </h2>
-                      <span className="text-xs font-mono font-extrabold bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-2 py-0.5">
+                      <span className="text-2xs font-mono font-extrabold bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-2 py-0.5">
                         {upcoming.length} Scheduled
                       </span>
                     </div>
@@ -658,10 +658,10 @@ export default function PatientDashboard({
                   <div className="w-14 h-14 bg-white border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center mb-3.5 shadow-2xs">
                     <Calendar className="h-6 w-6 text-[color:var(--t-600)]" />
                   </div>
-                  <h3 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] mb-1">
+                  <h3 className="font-display font-black text-sm text-[color:var(--ink)] mb-1">
                     No Consultations Currently Scheduled
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 max-w-md font-medium leading-relaxed mb-6">
+                  <p className="text-xs text-slate-600 max-w-md font-medium leading-relaxed mb-6">
                     Maintain your proactive care schedule. Connect immediately with an on-call triage doctor or book a future consultation with a council-verified practitioner.
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-3">
@@ -686,7 +686,7 @@ export default function PatientDashboard({
                     {onOpenTriage && (
                       <button
                         type="button"
-                        onClick={onOpenTriage}
+                        onClick={() => { setActiveTab('consult'); setConsultSubTab('triage'); }}
                         className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] border border-[color:var(--t-200)] text-xs font-bold shadow-2xs transition-all cursor-pointer"
                       >
                         <Sparkles className="h-4 w-4 text-[color:var(--t-600)]" />
@@ -726,24 +726,24 @@ export default function PatientDashboard({
                               <button
                                 type="button"
                                 onClick={() => onSelectProfessional(b.professionalId)}
-                                className="font-display font-black text-sm sm:text-base text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left transition-colors cursor-pointer"
+                                className="font-display font-black text-xs sm:text-base text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left transition-colors cursor-pointer"
                               >
                                 {b.professionalName}
                               </button>
-                              <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
+                              <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
                                 <ShieldCheck className="h-3 w-3 text-emerald-600" />
                                 {isNurse ? 'LJM Board Verified' : 'MMC Council Verified'}
                               </span>
                               {isVideo ? (
-                                <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
+                                <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
                                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> WebRTC Audio/Video Encrypted
                                 </span>
                               ) : isHomeVisit ? (
-                                <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-cyan-800 bg-cyan-50 border border-cyan-200 px-2 py-0.5">
+                                <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-cyan-800 bg-cyan-50 border border-cyan-200 px-2 py-0.5">
                                   <MapPin className="h-3 w-3 text-cyan-600" /> Home Care Visit
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5">
+                                <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5">
                                   <MapPin className="h-3 w-3 text-slate-600" /> In-Clinic Consultation
                                 </span>
                               )}
@@ -779,12 +779,12 @@ export default function PatientDashboard({
                               </span>
                               <span className="text-slate-300">&bull;</span>
                               {isPending ? (
-                                <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5">
+                                <span className="inline-flex items-center gap-1 text-2xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5">
                                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
                                   Awaiting Payment
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
+                                <span className="inline-flex items-center gap-1 text-2xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
                                   <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                                   Confirmed &amp; Paid
                                 </span>
@@ -865,13 +865,13 @@ export default function PatientDashboard({
               <div className="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2.5 border-b border-[color:var(--t-100)]">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <h2 className="font-display font-black text-sm sm:text-base text-[color:var(--ink)] leading-tight">
+                  <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
                     Immediate Medical Assistance
                   </h2>
                   <span className="hidden sm:inline text-xs text-slate-400">&bull;</span>
                   <span className="hidden sm:inline text-xs text-slate-500 font-medium">On-demand video doctor, clinical AI triage &amp; dispensary routing</span>
                 </div>
-                <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
+                <span className="text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
                   {onCallStatus && onCallStatus.onlineDoctors > 0 ? `${onCallStatus.onlineDoctors} Doctors Online` : '24/7 Care Triage'}
                 </span>
               </div>
@@ -886,7 +886,7 @@ export default function PatientDashboard({
                           <Video className="h-3.5 w-3.5" />
                         </div>
                         <div className="min-w-0">
-                          <h3 className="font-display font-black text-xs sm:text-sm text-[color:var(--ink)] leading-tight truncate">
+                          <h3 className="font-display font-black text-sm text-[color:var(--ink)] leading-tight truncate">
                             On-Call Video Doctor
                           </h3>
                           <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
@@ -894,15 +894,15 @@ export default function PatientDashboard({
                           </p>
                         </div>
                       </div>
-                      <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 shrink-0">
+                      <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 shrink-0">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
                       </span>
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-2.5">
-                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Digital MC</span>
-                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">e-Prescription</span>
-                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">WebRTC HD</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Digital MC</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">e-Prescription</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">WebRTC HD</span>
                     </div>
                   </div>
 
@@ -926,7 +926,7 @@ export default function PatientDashboard({
                           <Stethoscope className="h-3.5 w-3.5" />
                         </div>
                         <div className="min-w-0">
-                          <h3 className="font-display font-black text-xs sm:text-sm text-[color:var(--ink)] leading-tight truncate">
+                          <h3 className="font-display font-black text-sm text-[color:var(--ink)] leading-tight truncate">
                             AI Symptom Triage
                           </h3>
                           <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
@@ -934,21 +934,21 @@ export default function PatientDashboard({
                           </p>
                         </div>
                       </div>
-                      <span className="text-xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-1.5 py-0.2 shrink-0">
+                      <span className="text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-1.5 py-0.2 shrink-0">
                         Triage
                       </span>
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-2.5">
-                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">180+ Conditions</span>
-                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Red-Flag Check</span>
-                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Dept Route</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">180+ Conditions</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Red-Flag Check</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Dept Route</span>
                     </div>
                   </div>
 
                   <button
                     type="button"
-                    onClick={onOpenTriage ? onOpenTriage : onConsultNow}
+                    onClick={() => { setActiveTab('consult'); setConsultSubTab('triage'); }}
                     className="w-full min-h-[34px] px-3 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Stethoscope className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
@@ -966,7 +966,7 @@ export default function PatientDashboard({
                           <Pill className="h-3.5 w-3.5" />
                         </div>
                         <div className="min-w-0">
-                          <h3 className="font-display font-black text-xs sm:text-sm text-[color:var(--ink)] leading-tight truncate">
+                          <h3 className="font-display font-black text-sm text-[color:var(--ink)] leading-tight truncate">
                             Pharmacy Dispensary
                           </h3>
                           <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
@@ -974,15 +974,15 @@ export default function PatientDashboard({
                           </p>
                         </div>
                       </div>
-                      <span className="text-xs font-mono font-bold text-cyan-800 bg-cyan-50 border border-cyan-200 px-1.5 py-0.2 shrink-0">
+                      <span className="text-2xs font-mono font-bold text-cyan-800 bg-cyan-50 border border-cyan-200 px-1.5 py-0.2 shrink-0">
                         Dispensary
                       </span>
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-2.5">
-                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">50+ Retail Branches</span>
-                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">QR Verified</span>
-                      <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Home Courier</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">50+ Retail Branches</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">QR Verified</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Home Courier</span>
                     </div>
                   </div>
 
@@ -1013,7 +1013,7 @@ export default function PatientDashboard({
                       <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
                         Consultation History &amp; Encounter Archive
                       </h2>
-                      <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 border border-slate-200">
+                      <span className="text-2xs font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 border border-slate-200">
                         {past.length} Encounters
                       </span>
                     </div>
@@ -1055,7 +1055,7 @@ export default function PatientDashboard({
                               <button
                                 type="button"
                                 onClick={() => onSelectProfessional(b.professionalId)}
-                                className="font-display font-extrabold text-sm text-[color:var(--ink)] hover:text-[color:var(--t-600)] transition-colors cursor-pointer text-left"
+                                className="font-display font-extrabold text-xs text-[color:var(--ink)] hover:text-[color:var(--t-600)] transition-colors cursor-pointer text-left"
                               >
                                 {b.professionalName}
                               </button>
@@ -1063,7 +1063,7 @@ export default function PatientDashboard({
                                 {prof?.specialization || 'Clinical Specialist'}
                               </span>
                               <span
-                                className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-bold border ${
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-mono font-bold border ${
                                   isCancelled
                                     ? 'bg-slate-100 text-slate-600 border-slate-200'
                                     : 'bg-emerald-50 text-emerald-800 border-emerald-200'
@@ -1121,7 +1121,7 @@ export default function PatientDashboard({
               ) : (
                 <div className="py-8 text-center bg-[color:var(--t-50)]/30 border border-dashed border-[color:var(--t-200)] my-1">
                   <Calendar className="h-6 w-6 text-slate-400 mx-auto mb-1.5" />
-                  <p className="text-xs font-bold text-slate-700">No Past Consultations Yet</p>
+                  <p className="text-sm font-bold text-slate-700">No Past Consultations Yet</p>
                   <p className="text-xs text-slate-500 mt-0.5 max-w-xs mx-auto">
                     Completed consultations and clinical visits will be archived here for your permanent record.
                   </p>
@@ -1139,7 +1139,7 @@ export default function PatientDashboard({
               <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[color:var(--t-100)]">
                 <div className="flex items-center gap-2">
                   <HeartPulse className="h-4 w-4 text-[color:var(--t-600)]" />
-                  <h2 className="font-display font-black text-sm sm:text-base text-[color:var(--ink)]">
+                  <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
                     Pre-Consultation Vitals &amp; Safety Snapshot
                   </h2>
                   <span className="hidden sm:inline text-xs text-slate-600">&bull;</span>
@@ -1149,7 +1149,7 @@ export default function PatientDashboard({
                 </div>
                 <div className="flex items-center gap-3">
                   <span
-                    className={`text-xs font-mono font-bold px-2 py-0.5 border ${
+                    className={`text-2xs font-mono font-bold px-2 py-0.5 border ${
                       patientAllergies.length > 0
                         ? 'bg-rose-50 text-rose-800 border-rose-200'
                         : recordsData?.allergyStatement?.kind === 'none_known'
@@ -1185,7 +1185,7 @@ export default function PatientDashboard({
                       <HeartPulse className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                       Blood Pressure
                     </span>
-                    <span className={`text-xs font-bold px-1.5 py-0.2 border ${classifyBp(summary?.bp?.value1 || 120, summary?.bp?.value2 || 78).badgeClass}`}>
+                    <span className={`text-2xs font-bold px-1.5 py-0.2 border ${classifyBp(summary?.bp?.value1 || 120, summary?.bp?.value2 || 78).badgeClass}`}>
                       {classifyBp(summary?.bp?.value1 || 120, summary?.bp?.value2 || 78).label.split('/')[0].trim()}
                     </span>
                   </div>
@@ -1208,7 +1208,7 @@ export default function PatientDashboard({
                       <Activity className="h-3.5 w-3.5 text-emerald-600" />
                       Heart Rate
                     </span>
-                    <span className="text-xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span className="text-2xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
                       Normal
                     </span>
                   </div>
@@ -1231,7 +1231,7 @@ export default function PatientDashboard({
                       <Sparkles className="h-3.5 w-3.5 text-amber-600" />
                       Blood Glucose
                     </span>
-                    <span className="text-xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span className="text-2xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
                       {summary?.glucose?.value1 ? (summary.glucose.value1 > 6.0 ? 'Elevated' : 'Target') : 'Target'}
                     </span>
                   </div>
@@ -1254,7 +1254,7 @@ export default function PatientDashboard({
                       <ShieldCheck className="h-3.5 w-3.5 text-cyan-600" />
                       Oxygen (SpO₂)
                     </span>
-                    <span className="text-xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span className="text-2xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
                       Optimal
                     </span>
                   </div>
@@ -1282,7 +1282,7 @@ export default function PatientDashboard({
                         <Pill className="h-4 w-4" />
                       </span>
                       <div>
-                        <h3 className="font-display font-black text-base text-[color:var(--ink)] leading-tight">
+                        <h3 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
                           Active Doctor E-Prescriptions
                         </h3>
                         <p className="text-xs text-slate-500 font-medium mt-0.5">
@@ -1291,7 +1291,7 @@ export default function PatientDashboard({
                       </div>
                     </div>
 
-                    <span className="text-xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)]">
+                    <span className="text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)]">
                       {activePrescriptions.length} Active
                     </span>
                   </div>
@@ -1299,7 +1299,7 @@ export default function PatientDashboard({
                   {activePrescriptions.length === 0 ? (
                     <div className="py-7 px-4 text-center bg-[color:var(--t-50)]/30 border border-dashed border-[color:var(--t-200)] my-2">
                       <Pill className="h-7 w-7 text-slate-400 mx-auto mb-2" />
-                      <p className="text-xs font-bold text-[color:var(--ink)] mb-0.5">
+                      <p className="text-sm font-bold text-[color:var(--ink)] mb-0.5">
                         No Active Prescriptions Requiring Refill
                       </p>
                       <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
@@ -1314,7 +1314,7 @@ export default function PatientDashboard({
                           <div key={rx.id} className="p-3.5 border border-[color:var(--t-200)] bg-white hover:border-[color:var(--t-600)] transition-colors shadow-2xs">
                             <div className="flex items-start justify-between gap-2 mb-2">
                               <div>
-                                <span className="inline-block text-xs font-mono font-black text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
+                                <span className="inline-block text-2xs font-mono font-black text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
                                   RX CODE: {rx.code}
                                 </span>
                                 <h4 className="font-display font-black text-sm text-[color:var(--ink)] mt-1">
@@ -1329,15 +1329,15 @@ export default function PatientDashboard({
 
                               <div className="text-right shrink-0">
                                 {rx.fillStatus === 'ready' ? (
-                                  <span className="inline-block text-xs font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5">
+                                  <span className="inline-block text-2xs font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5">
                                     Ready for Pickup
                                   </span>
                                 ) : rx.fillStatus === 'preparing' ? (
-                                  <span className="inline-block text-xs font-mono font-bold bg-[color:var(--t-50)] text-[color:var(--t-800)] border border-[color:var(--t-200)] px-2 py-0.5">
+                                  <span className="inline-block text-2xs font-mono font-bold bg-[color:var(--t-50)] text-[color:var(--t-800)] border border-[color:var(--t-200)] px-2 py-0.5">
                                     Being Prepared
                                   </span>
                                 ) : rx.pharmacyName ? (
-                                  <span className="inline-block text-xs font-mono font-bold bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 truncate max-w-[130px]">
+                                  <span className="inline-block text-2xs font-mono font-bold bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 truncate max-w-[130px]">
                                     {rx.pharmacyName}
                                   </span>
                                 ) : (
@@ -1362,16 +1362,7 @@ export default function PatientDashboard({
                               <span className="text-slate-500 font-medium">
                                 Doctor: <strong className="text-slate-700">{rx.doctor?.name || 'Verified Physician'}</strong>
                               </span>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setDispatchingRx(rx);
-                                  if (pharmacies.length > 0) setSelectedPharmacyId(pharmacies[0].id);
-                                }}
-                                className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
-                              >
-                                Transfer or View Details &rarr;
-                              </button>
+                              <button type="button" onClick={() => { setRxSubTab('active'); setActiveTab('prescriptions'); }} className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer">View Full Prescription &rarr;</button>
                             </div>
                           </div>
                         );
@@ -1409,7 +1400,7 @@ export default function PatientDashboard({
                         <Stethoscope className="h-4 w-4" />
                       </span>
                       <div>
-                        <h3 className="font-display font-black text-base text-[color:var(--ink)] leading-tight">
+                        <h3 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
                           Recommended Specialists for You
                         </h3>
                         <p className="text-xs text-slate-500 font-medium mt-0.5">
@@ -1446,7 +1437,7 @@ export default function PatientDashboard({
                             <button
                               type="button"
                               onClick={() => onSelectProfessional(prof.id)}
-                              className="font-display font-extrabold text-xs sm:text-sm text-[color:var(--ink)] hover:text-[color:var(--t-600)] transition-colors text-left truncate block cursor-pointer"
+                              className="font-display font-extrabold text-xs text-[color:var(--ink)] hover:text-[color:var(--t-600)] transition-colors text-left truncate block cursor-pointer"
                             >
                               {prof.name}
                             </button>
@@ -1624,7 +1615,7 @@ export default function PatientDashboard({
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1" /> {onCallLabel(onCall)}
                 </BannerBadge>
               ) : (
-                <span className="bg-amber-50 text-amber-900 border border-amber-300 text-xs font-black uppercase px-2.5 py-0.5">{onCallLabel(onCall)}</span>
+                <span className="bg-amber-50 text-amber-900 border border-amber-300 text-2xs font-black uppercase px-2.5 py-0.5">{onCallLabel(onCall)}</span>
               )
             }
             aside={
@@ -1704,8 +1695,8 @@ export default function PatientDashboard({
         <div id="panel-saved" role="tabpanel" aria-labelledby="tab-saved" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={Heart}
-            eyebrow="Care team"
-            title="Your care team"
+            eyebrow="Personal Care Team · Saved Practitioners"
+            title="Your Care Team & Saved Specialists"
             description="The doctors and nurses you have seen, and others you saved to book later."
             badges={<BannerBadge tone="brand">{careTeam.length} seen · {savedIds.length} saved</BannerBadge>}
             aside={
@@ -1713,24 +1704,33 @@ export default function PatientDashboard({
                 <button
                   type="button"
                   onClick={onFindDoctors}
-                  className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                  className="px-3.5 h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <Search className="h-3.5 w-3.5" />
                   <span>Find a doctor or nurse</span>
                 </button>
               )
             }
-            tabs={savedIds.length > 6 ? [
-              { id: 'all', label: 'All saved', count: savedIds.length },
-              { id: 'doctors', label: 'Doctors' },
-              { id: 'nurses', label: 'Nurses' },
-            ] : undefined}
+            tabs={[
+              { id: 'all', label: 'All Care Team', count: careTeam.length + savedIds.length },
+              { id: 'doctors', label: 'Doctors & Specialists', count: professionals.filter(p => (savedIds.includes(p.id) || careTeam.some(c => c.id === p.id)) && p.role === UserRole.DOCTOR).length },
+              { id: 'nurses', label: 'Clinical Nurses', count: professionals.filter(p => (savedIds.includes(p.id) || careTeam.some(c => c.id === p.id)) && p.role === UserRole.NURSE).length },
+            ]}
             activeTab={savedSubTab}
             onTabChange={setSavedSubTab}
           />
           <SavedTab
             hideHeader={true}
-            careTeam={careTeam}
+            careTeam={careTeam.filter(p => {
+              if (savedSubTab === 'doctors' && p.role !== UserRole.DOCTOR) return false;
+              if (savedSubTab === 'nurses' && p.role !== UserRole.NURSE) return false;
+              return true;
+            })}
+            allProfessionals={professionals.filter(p => {
+              if (savedSubTab === 'doctors' && p.role !== UserRole.DOCTOR) return false;
+              if (savedSubTab === 'nurses' && p.role !== UserRole.NURSE) return false;
+              return true;
+            })}
             onFindProviders={onFindDoctors}
             savedProfessionals={professionals.filter(p => {
               if (!savedIds.includes(p.id)) return false;
@@ -1877,155 +1877,481 @@ export default function PatientDashboard({
       )}
 
       {/* 13. REGISTRY / DOCTORS TAB */}
-      {activeTab === 'registry' && (
-        <div id="panel-registry" role="tabpanel" tabIndex={0} className="space-y-4">
-          <WorkspaceHeader
-            icon={Search}
-            eyebrow="National Medical Registry · Doctor Directory"
-            title="Verified Malaysian Doctors & Specialists"
-            description="Directory of registered physicians verified directly against the Malaysian Medical Council (MMC) database with active Annual Practising Certificates (APC)."
-            badges={<BannerBadge tone="success"><CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" /> MMC Verified</BannerBadge>}
-            aside={
-              onFindDoctors && (
-                <button
-                  type="button"
-                  onClick={onFindDoctors}
-                  className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <Search className="h-3.5 w-3.5" />
-                  <span>Full Interactive Directory</span>
-                </button>
-              )
+      {activeTab === 'registry' && (() => {
+        const allDoctors = professionals.filter((p): p is DoctorProfile => p.role === UserRole.DOCTOR);
+        const doctorSpecialties = Array.from(new Set(allDoctors.map(d => d.specialization).filter(Boolean))).sort();
+        const doctorCities = Array.from(new Set(allDoctors.map(d => d.city).filter(Boolean))).sort();
+        const effectiveSpecialty = selectedSpecialtyFilter || (registrySpecialty !== 'all' ? registrySpecialty : '');
+
+        const filteredDoctors = allDoctors
+          .filter(d => {
+            if (registrySubTab === 'telehealth' && !d.consultationModes?.includes(ConsultationMode.VIDEO)) return false;
+            if (registrySubTab === 'specialists' && d.specialization?.toLowerCase() === 'general physician') return false;
+            if (effectiveSpecialty && !d.specialization?.toLowerCase().includes(effectiveSpecialty.toLowerCase())) return false;
+            if (registryCity !== 'all' && d.city !== registryCity) return false;
+            if (registryQuery.trim()) {
+              const q = registryQuery.trim().toLowerCase();
+              const hay = `${d.name} ${d.specialization} ${d.city || ''} ${d.practiceAddress || ''} ${d.licenseNumber || ''}`.toLowerCase();
+              if (!hay.includes(q)) return false;
             }
-            tabs={[
-              { id: 'all', label: 'All Specialists', count: professionals.filter(p => p.role === UserRole.DOCTOR).length },
-              { id: 'telehealth', label: 'Available for Telehealth' },
-              { id: 'specialists', label: 'Consultant Physicians' },
-            ]}
-            activeTab={registrySubTab}
-            onTabChange={setRegistrySubTab}
-          />
+            return true;
+          })
+          .sort((a, b) => {
+            if (registrySort === 'fee_asc') return (a.fee || 0) - (b.fee || 0);
+            if (registrySort === 'fee_desc') return (b.fee || 0) - (a.fee || 0);
+            if (registrySort === 'experience') return (b.experienceYears || 0) - (a.experienceYears || 0);
+            return (b.rating || 0) - (a.rating || 0);
+          });
 
-          {selectedSpecialtyFilter && (
-            <div className="bg-emerald-50 border border-emerald-200 p-3 flex items-center justify-between text-xs animate-fade-in">
-              <div className="flex items-center gap-2">
-                <span className="font-mono font-bold text-emerald-800 uppercase text-xs bg-emerald-100 border border-emerald-200 px-2 py-0.5">
-                  AI Triage Matched
-                </span>
-                <span className="font-extrabold text-[color:var(--ink)]">
-                  Filtering for: <span className="text-[color:var(--t-700)]">{selectedSpecialtyFilter}</span>
-                </span>
+        const hasDoctorFilters = Boolean(registryQuery.trim() || effectiveSpecialty || registryCity !== 'all' || registrySubTab !== 'all');
+
+        return (
+          <div id="panel-registry" role="tabpanel" tabIndex={0} className="space-y-4">
+            <WorkspaceHeader
+              icon={Search}
+              eyebrow="National Medical Registry · Doctor Directory"
+              title="Verified Malaysian Doctors & Specialists"
+              description="Directory of registered physicians verified directly against the Malaysian Medical Council (MMC) database with active Annual Practising Certificates (APC)."
+              badges={<BannerBadge tone="success"><CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" /> MMC Verified</BannerBadge>}
+              aside={
+                onFindDoctors && (
+                  <button
+                    type="button"
+                    onClick={onFindDoctors}
+                    className="px-3.5 h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Search className="h-3.5 w-3.5" />
+                    <span>Full Interactive Directory</span>
+                  </button>
+                )
+              }
+              tabs={[
+                { id: 'all', label: 'All Specialists', count: allDoctors.length },
+                { id: 'telehealth', label: 'Available for Telehealth', count: allDoctors.filter(d => d.consultationModes?.includes(ConsultationMode.VIDEO)).length },
+                { id: 'specialists', label: 'Consultant Physicians', count: allDoctors.filter(d => d.specialization?.toLowerCase() !== 'general physician').length },
+              ]}
+              activeTab={registrySubTab}
+              onTabChange={setRegistrySubTab}
+            />
+
+            {/* Unified Single-Row Filter Control Bar */}
+            <section aria-label="Filter doctors" className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
+              <div className="flex flex-col xl:flex-row xl:items-center gap-3">
+                {/* Search Input */}
+                <div className="relative flex-1 min-w-[240px]">
+                  <label htmlFor="registry-doctor-search" className="sr-only">Search doctors</label>
+                  <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    id="registry-doctor-search"
+                    type="text"
+                    placeholder="Search by doctor name, specialty, hospital, city, or MMC number…"
+                    value={registryQuery}
+                    onChange={e => setRegistryQuery(e.target.value)}
+                    className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
+                  />
+                  {registryQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setRegistryQuery('')}
+                      aria-label="Clear search query"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Inline Dropdown Controls */}
+                <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                  <FilterSelect
+                    label="Specialty"
+                    value={selectedSpecialtyFilter ? selectedSpecialtyFilter : registrySpecialty}
+                    onChange={val => {
+                      if (selectedSpecialtyFilter && onClearSpecialtyFilter) onClearSpecialtyFilter();
+                      setRegistrySpecialty(val);
+                    }}
+                  >
+                    <option value="all">All Specialties ({doctorSpecialties.length})</option>
+                    {doctorSpecialties.map(spec => (
+                      <option key={spec} value={spec}>{spec}</option>
+                    ))}
+                  </FilterSelect>
+
+                  <FilterSelect label="City" value={registryCity} onChange={setRegistryCity}>
+                    <option value="all">All Cities ({doctorCities.length})</option>
+                    {doctorCities.map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </FilterSelect>
+
+                  <FilterSelect label="Sort by" value={registrySort} onChange={v => setRegistrySort(v as any)}>
+                    <option value="rating">Highest Rated</option>
+                    <option value="experience">Most Experienced</option>
+                    <option value="fee_asc">Fee: Low to High</option>
+                    <option value="fee_desc">Fee: High to Low</option>
+                  </FilterSelect>
+                </div>
               </div>
-              {onClearSpecialtyFilter && (
-                <button
-                  type="button"
-                  onClick={onClearSpecialtyFilter}
-                  className="font-bold text-xs text-slate-600 hover:text-slate-900 underline cursor-pointer"
-                >
-                  Clear filter
-                </button>
-              )}
-            </div>
-          )}
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {professionals
-              .filter(p => {
-                if (p.role !== UserRole.DOCTOR) return false;
-                if (registrySubTab === 'telehealth' && !p.consultationModes?.includes(ConsultationMode.VIDEO)) return false;
-                if (selectedSpecialtyFilter) {
-                  return p.specialization?.toLowerCase().includes(selectedSpecialtyFilter.toLowerCase());
-                }
-                return true;
-              })
-              .slice(0, 6)
-              .map(prof => (
-                <div key={prof.id} className="p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all bg-white flex flex-col justify-between shadow-2xs group">
-                  <div>
-                    <div className="flex items-start gap-3 mb-3">
-                      <UserAvatar src={prof.avatar} role="doctor" alt={prof.name} className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" />
-                      <div className="min-w-0">
-                        <button type="button" onClick={() => onSelectProfessional(prof.id)} className="font-display font-extrabold text-sm text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left truncate block w-full cursor-pointer">
-                          {prof.name}
-                        </button>
-                        <p className="text-xs text-[color:var(--t-700)] font-bold">{prof.specialization}</p>
-                        <span className="inline-block mt-1 text-xs font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200">
-                          MMC Verified · Active
-                        </span>
+              {/* Active Filter Summary & Result Counter Footer */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[color:var(--t-100)]">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-bold text-slate-600 tabular-nums" aria-live="polite">
+                    Showing <strong className="font-black text-[color:var(--ink)]">{filteredDoctors.length}</strong> of {allDoctors.length} verified doctor{allDoctors.length === 1 ? '' : 's'}
+                  </span>
+                  {effectiveSpecialty && (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                      {selectedSpecialtyFilter ? 'AI Triage: ' : 'Specialty: '}{effectiveSpecialty}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (selectedSpecialtyFilter && onClearSpecialtyFilter) onClearSpecialtyFilter();
+                          setRegistrySpecialty('all');
+                        }}
+                        className="hover:text-slate-900 cursor-pointer"
+                        aria-label="Clear specialty filter"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  )}
+                  {registryCity !== 'all' && (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                      City: {registryCity}
+                      <button type="button" onClick={() => setRegistryCity('all')} className="hover:text-slate-900 cursor-pointer" aria-label="Clear city filter">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  )}
+                </div>
+
+                {hasDoctorFilters && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRegistryQuery('');
+                      setRegistrySpecialty('all');
+                      setRegistryCity('all');
+                      setRegistrySubTab('all');
+                      if (selectedSpecialtyFilter && onClearSpecialtyFilter) onClearSpecialtyFilter();
+                    }}
+                    className="text-xs font-bold text-[color:var(--t-700)] hover:text-[color:var(--dark)] underline underline-offset-2 cursor-pointer"
+                  >
+                    Reset Filters
+                  </button>
+                )}
+              </div>
+            </section>
+
+            {filteredDoctors.length === 0 ? (
+              <div className="bg-white border border-[color:var(--t-200)] p-10 text-center space-y-2.5">
+                <Search className="h-8 w-8 text-[color:var(--t-300)] mx-auto" />
+                <p className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)]">No doctors match your current filter criteria</p>
+                <p className="text-xs text-slate-500">Try clearing your specialty or city filter to see all registered practitioners.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {filteredDoctors.map(prof => (
+                  <article key={prof.id} className="p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all bg-white flex flex-col justify-between gap-3 shadow-2xs group">
+                    <div className="space-y-2.5">
+                      <div className="flex items-start gap-3">
+                        <UserAvatar src={prof.avatar} role="doctor" alt={prof.name} className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start justify-between gap-2">
+                            <button type="button" onClick={() => onSelectProfessional(prof.id)} className="font-display font-extrabold text-xs text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left truncate block cursor-pointer">
+                              {prof.name}
+                            </button>
+                            {prof.rating > 0 && (
+                              <span className="shrink-0 inline-flex items-center gap-0.5 text-2xs font-mono font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5">
+                                <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-500" /> {prof.rating.toFixed(1)}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-[color:var(--t-700)] font-bold mt-0.5">{prof.specialization}</p>
+                          <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                            <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+                              MMC Verified · Active
+                            </span>
+                            {prof.licenseNumber && (
+                              <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-2 py-0.5">
+                                {prof.licenseNumber}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-[color:var(--t-100)] text-xs text-slate-600 space-y-1">
+                        {(prof.practiceAddress || prof.city) && (
+                          <p className="flex items-center gap-1.5 truncate">
+                            <MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
+                            <span className="truncate">{prof.practiceAddress ? `${prof.practiceAddress}${prof.city && !prof.practiceAddress.includes(prof.city) ? `, ${prof.city}` : ''}` : prof.city}</span>
+                          </p>
+                        )}
+                        <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                          <span className="text-2xs font-bold uppercase tracking-wider text-slate-600 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-0.5">
+                            {prof.experienceYears} yrs exp
+                          </span>
+                          {prof.consultationModes?.map(mode => (
+                            <span key={mode} className="text-2xs font-bold uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
+                              {mode}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="pt-2 border-t border-[color:var(--t-100)] flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-slate-700">RM {prof.fee}</span>
-                    <button type="button" onClick={() => onSelectProfessional(prof.id)} className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer">
-                      Book Visit &rarr;
-                    </button>
-                  </div>
-                </div>
-              ))}
+
+                    <div className="pt-2.5 border-t border-[color:var(--t-100)] flex items-center justify-between mt-auto">
+                      <div>
+                        <span className="text-2xs font-bold uppercase tracking-wider text-slate-400 block">Consultation Fee</span>
+                        <span className="font-mono text-xs font-extrabold text-[color:var(--ink)]">RM {prof.fee}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onSelectProfessional(prof.id)}
+                        className="h-9 px-3.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                      >
+                        <span>Book Visit</span>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* 14. CLINICAL NURSES TAB */}
-      {activeTab === 'nurses' && (
-        <div id="panel-nurses" role="tabpanel" tabIndex={0} className="space-y-4">
-          <WorkspaceHeader
-            icon={UserCheck}
-            eyebrow="National Nursing Registry · Clinical Nurses"
-            title="LJM Registered Staff Nurses & Care Providers"
-            description="Verified professional nurses registered with the Lembaga Jururawat Malaysia (LJM) for clinic care, home nursing, and wound dressing."
-            badges={<BannerBadge tone="success"><CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" /> LJM Verified</BannerBadge>}
-            aside={
-              onFindDoctors && (
-                <button
-                  type="button"
-                  onClick={onFindDoctors}
-                  className="px-3.5 py-2 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <Search className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                  <span>Search All Providers</span>
-                </button>
-              )
+      {activeTab === 'nurses' && (() => {
+        const allNurses = professionals.filter((p): p is NurseProfile => p.role === UserRole.NURSE);
+        const nurseSpecialties = Array.from(new Set(allNurses.map(n => n.specialization).filter(Boolean))).sort();
+        const nurseCities = Array.from(new Set(allNurses.map(n => n.city).filter(Boolean))).sort();
+
+        const filteredNurses = allNurses
+          .filter(n => {
+            if (nursesSubTab === 'homecare' && !n.consultationModes?.includes(ConsultationMode.HOME_VISIT)) return false;
+            if (nursesSubTab === 'clinic' && !n.consultationModes?.includes(ConsultationMode.IN_PERSON)) return false;
+            if (nursesSpecialty !== 'all' && n.specialization !== nursesSpecialty) return false;
+            if (nursesCity !== 'all' && n.city !== nursesCity) return false;
+            if (nursesQuery.trim()) {
+              const q = nursesQuery.trim().toLowerCase();
+              const hay = `${n.name} ${n.specialization || ''} ${n.city || ''} ${n.practiceAddress || ''} ${n.licenseNumber || ''}`.toLowerCase();
+              if (!hay.includes(q)) return false;
             }
-            tabs={[
-              { id: 'all', label: 'All Registered Nurses', count: professionals.filter(p => p.role === UserRole.NURSE).length },
-              { id: 'homecare', label: 'Home Care & Private Nursing' },
-              { id: 'clinic', label: 'Clinical & Hospital' },
-            ]}
-            activeTab={nursesSubTab}
-            onTabChange={setNursesSubTab}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {professionals
-              .filter(p => p.role === UserRole.NURSE)
-              .map(prof => (
-                <div key={prof.id} className="p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all bg-white flex flex-col justify-between shadow-2xs group">
-                  <div>
-                    <div className="flex items-start gap-3 mb-3">
-                      <UserAvatar src={prof.avatar} role="nurse" alt={prof.name} className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" />
-                      <div className="min-w-0">
-                        <button type="button" onClick={() => onSelectProfessional(prof.id)} className="font-display font-extrabold text-sm text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left truncate block w-full cursor-pointer">
-                          {prof.name}
-                        </button>
-                        <p className="text-xs text-[color:var(--t-700)] font-bold">{prof.specialization || 'Clinical Staff Nurse'}</p>
-                        <span className="inline-block mt-1 text-xs font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200">
-                          LJM Verified · Active
-                        </span>
+            return true;
+          })
+          .sort((a, b) => {
+            if (nursesSort === 'fee_asc') return (a.fee || 0) - (b.fee || 0);
+            if (nursesSort === 'fee_desc') return (b.fee || 0) - (a.fee || 0);
+            if (nursesSort === 'experience') return (b.experienceYears || 0) - (a.experienceYears || 0);
+            return (b.rating || 0) - (a.rating || 0);
+          });
+
+        const hasNurseFilters = Boolean(nursesQuery.trim() || nursesSpecialty !== 'all' || nursesCity !== 'all' || nursesSubTab !== 'all');
+
+        return (
+          <div id="panel-nurses" role="tabpanel" tabIndex={0} className="space-y-4">
+            <WorkspaceHeader
+              icon={UserCheck}
+              eyebrow="National Nursing Registry · Clinical Nurses"
+              title="LJM Registered Staff Nurses & Care Providers"
+              description="Verified professional nurses registered with the Lembaga Jururawat Malaysia (LJM) for clinic care, home nursing, and wound dressing."
+              badges={<BannerBadge tone="success"><CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" /> LJM Verified</BannerBadge>}
+              aside={
+                onFindDoctors && (
+                  <button
+                    type="button"
+                    onClick={onFindDoctors}
+                    className="px-3.5 h-10 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Search className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                    <span>Search All Providers</span>
+                  </button>
+                )
+              }
+              tabs={[
+                { id: 'all', label: 'All Registered Nurses', count: allNurses.length },
+                { id: 'homecare', label: 'Home Care & Private Nursing', count: allNurses.filter(n => n.consultationModes?.includes(ConsultationMode.HOME_VISIT)).length },
+                { id: 'clinic', label: 'Clinical & Hospital', count: allNurses.filter(n => n.consultationModes?.includes(ConsultationMode.IN_PERSON)).length },
+              ]}
+              activeTab={nursesSubTab}
+              onTabChange={setNursesSubTab}
+            />
+
+            {/* Unified Single-Row Filter Control Bar */}
+            <section aria-label="Filter nurses" className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
+              <div className="flex flex-col xl:flex-row xl:items-center gap-3">
+                {/* Search Input */}
+                <div className="relative flex-1 min-w-[240px]">
+                  <label htmlFor="registry-nurse-search" className="sr-only">Search nurses</label>
+                  <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    id="registry-nurse-search"
+                    type="text"
+                    placeholder="Search by nurse name, nursing specialty, city, or LJM number…"
+                    value={nursesQuery}
+                    onChange={e => setNursesQuery(e.target.value)}
+                    className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
+                  />
+                  {nursesQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setNursesQuery('')}
+                      aria-label="Clear nurse search"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Inline Dropdown Controls */}
+                <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                  <FilterSelect label="Specialty" value={nursesSpecialty} onChange={setNursesSpecialty}>
+                    <option value="all">All Specialties ({nurseSpecialties.length})</option>
+                    {nurseSpecialties.map(spec => (
+                      <option key={spec} value={spec}>{spec}</option>
+                    ))}
+                  </FilterSelect>
+
+                  <FilterSelect label="City" value={nursesCity} onChange={setNursesCity}>
+                    <option value="all">All Cities ({nurseCities.length})</option>
+                    {nurseCities.map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </FilterSelect>
+
+                  <FilterSelect label="Sort by" value={nursesSort} onChange={v => setNursesSort(v as any)}>
+                    <option value="rating">Highest Rated</option>
+                    <option value="experience">Most Experienced</option>
+                    <option value="fee_asc">Rate: Low to High</option>
+                    <option value="fee_desc">Rate: High to Low</option>
+                  </FilterSelect>
+                </div>
+              </div>
+
+              {/* Active Filter Summary & Result Counter Footer */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[color:var(--t-100)]">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-bold text-slate-600 tabular-nums" aria-live="polite">
+                    Showing <strong className="font-black text-[color:var(--ink)]">{filteredNurses.length}</strong> of {allNurses.length} registered nurse{allNurses.length === 1 ? '' : 's'}
+                  </span>
+                  {nursesSpecialty !== 'all' && (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                      Specialty: {nursesSpecialty}
+                      <button type="button" onClick={() => setNursesSpecialty('all')} className="hover:text-slate-900 cursor-pointer" aria-label="Clear nurse specialty filter">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  )}
+                  {nursesCity !== 'all' && (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                      City: {nursesCity}
+                      <button type="button" onClick={() => setNursesCity('all')} className="hover:text-slate-900 cursor-pointer" aria-label="Clear nurse city filter">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  )}
+                </div>
+
+                {hasNurseFilters && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNursesQuery('');
+                      setNursesSpecialty('all');
+                      setNursesCity('all');
+                      setNursesSubTab('all');
+                    }}
+                    className="text-xs font-bold text-[color:var(--t-700)] hover:text-[color:var(--dark)] underline underline-offset-2 cursor-pointer"
+                  >
+                    Reset Filters
+                  </button>
+                )}
+              </div>
+            </section>
+
+            {filteredNurses.length === 0 ? (
+              <div className="bg-white border border-[color:var(--t-200)] p-10 text-center space-y-2.5">
+                <UserCheck className="h-8 w-8 text-[color:var(--t-300)] mx-auto" />
+                <p className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)]">No clinical nurses match your filter criteria</p>
+                <p className="text-xs text-slate-500">Try resetting your specialty or city filter to browse all registered nurses.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {filteredNurses.map(prof => (
+                  <article key={prof.id} className="p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all bg-white flex flex-col justify-between gap-3 shadow-2xs group">
+                    <div className="space-y-2.5">
+                      <div className="flex items-start gap-3">
+                        <UserAvatar src={prof.avatar} role="nurse" alt={prof.name} className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start justify-between gap-2">
+                            <button type="button" onClick={() => onSelectProfessional(prof.id)} className="font-display font-extrabold text-xs text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left truncate block cursor-pointer">
+                              {prof.name}
+                            </button>
+                            {prof.rating > 0 && (
+                              <span className="shrink-0 inline-flex items-center gap-0.5 text-2xs font-mono font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5">
+                                <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-500" /> {prof.rating.toFixed(1)}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-[color:var(--t-700)] font-bold mt-0.5">{prof.specialization || 'Clinical Staff Nurse'}</p>
+                          <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                            <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+                              LJM Verified · Active
+                            </span>
+                            {prof.licenseNumber && (
+                              <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-2 py-0.5">
+                                {prof.licenseNumber}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-[color:var(--t-100)] text-xs text-slate-600 space-y-1">
+                        {(prof.practiceAddress || prof.city) && (
+                          <p className="flex items-center gap-1.5 truncate">
+                            <MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
+                            <span className="truncate">{prof.practiceAddress ? `${prof.practiceAddress}${prof.city && !prof.practiceAddress.includes(prof.city) ? `, ${prof.city}` : ''}` : prof.city}</span>
+                          </p>
+                        )}
+                        <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                          <span className="text-2xs font-bold uppercase tracking-wider text-slate-600 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-0.5">
+                            {prof.experienceYears} yrs exp
+                          </span>
+                          {prof.consultationModes?.map(mode => (
+                            <span key={mode} className="text-2xs font-bold uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
+                              {mode}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="pt-2 border-t border-[color:var(--t-100)] flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-slate-700">RM {prof.fee || 60} / hr</span>
-                    <button type="button" onClick={() => onSelectProfessional(prof.id)} className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer">
-                      Book Nurse &rarr;
-                    </button>
-                  </div>
-                </div>
-              ))}
+
+                    <div className="pt-2.5 border-t border-[color:var(--t-100)] flex items-center justify-between mt-auto">
+                      <div>
+                        <span className="text-2xs font-bold uppercase tracking-wider text-slate-400 block">Care Rate</span>
+                        <span className="font-mono text-xs font-extrabold text-[color:var(--ink)]">RM {prof.fee || 60} / hr</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onSelectProfessional(prof.id)}
+                        className="h-9 px-3.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                      >
+                        <span>Book Nurse</span>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* INLINE PHARMACY DISPATCH MODAL */}
       {dispatchingRx && (
@@ -2109,7 +2435,7 @@ export default function PatientDashboard({
                             {p.services.length > 0 && (
                               <div className="flex flex-wrap gap-1 mt-1.5">
                                 {p.services.map((s, idx) => (
-                                  <span key={idx} className="text-xs font-bold uppercase bg-white border border-[color:var(--t-200)] px-1.5 py-0.2 text-slate-700">
+                                  <span key={idx} className="text-2xs font-bold uppercase bg-white border border-[color:var(--t-200)] px-1.5 py-0.2 text-slate-700">
                                     {s}
                                   </span>
                                 ))}

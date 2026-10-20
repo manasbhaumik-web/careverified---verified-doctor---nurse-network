@@ -4,7 +4,8 @@ import {
   CheckCircle2, Loader, Tag, Users, ShieldCheck, LayoutGrid, List, Eye, X, Clock 
 } from 'lucide-react';
 import { JobPost, Professional, Review, Booking } from '../types';
-import DashboardHeader, { BannerBadge } from './DashboardHeader';
+import DashboardHeader, { BannerBadge, FilterSelect } from './DashboardHeader';
+import { MY_STATES } from '../identity';
 import PractitionerHeroBanner from './PractitionerHeroBanner';
 import WorkspaceHeader from './WorkspaceHeader';
 import { JobFormFields, JobFilters, JobBadges, JobDetailExtras, EligibilityInfo, LocumBoard, blankExtras, blankFilter, extrasPayload, matchesFilter, type JobExtras, type JobFilter } from './JobMarketMy';
@@ -64,7 +65,8 @@ export default function JobMarket({
   const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
 
   const [activeTab, setActiveTab] = useState<'open' | 'applied' | 'locums' | 'eligibility'>('open');
-  const myApplications = jobs.filter(j => appliedJobs.includes(j.id) || (j.appliedUserIds?.length ?? 0) > 0);
+  const isJobApplied = (j: JobPost) => Boolean(j.myApplication) || appliedJobs.includes(j.id) || (j.appliedUserIds?.length ?? 0) > 0;
+  const myApplications = jobs.filter(isJobApplied);
   const baseJobs = activeTab === 'applied' ? myApplications : jobs;
   const licensedEmployers = new Set(jobs.filter(j => j.employer?.licenceOk).map(j => j.hospitalName)).size;
   const shiftBasedCount = jobs.filter(j => j.type === 'Shift-based').length;
@@ -211,17 +213,17 @@ export default function JobMarket({
         <div className="flex items-center justify-between gap-2">
           <span className="font-bold text-[color:var(--ink)]">Application:</span>
           {isAccepted && (
-            <span className="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5">
+            <span className="inline-flex items-center gap-1 text-2xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5">
               <CheckCircle2 className="h-3 w-3 text-emerald-600" /> Accepted & Escrow Secured
             </span>
           )}
           {isDeclined && (
-            <span className="inline-flex items-center gap-1 font-bold text-rose-800 bg-rose-100 border border-rose-300 px-2 py-0.5">
+            <span className="inline-flex items-center gap-1 text-2xs font-black uppercase tracking-wider text-rose-800 bg-rose-100 border border-rose-300 px-2 py-0.5">
               <X className="h-3 w-3 text-rose-600" /> Declined
             </span>
           )}
           {isPending && (
-            <span className="inline-flex items-center gap-1 font-bold text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5">
+            <span className="inline-flex items-center gap-1 text-2xs font-black uppercase tracking-wider text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5">
               <Clock className="h-3 w-3 text-amber-600" /> Under Hospital Review
             </span>
           )}
@@ -341,7 +343,7 @@ export default function JobMarket({
             (role === 'facility' || role === 'admin') ? (
               <button
                 onClick={() => setShowForm(!showForm)}
-                className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold transition-colors cursor-pointer flex items-center gap-2"
+                className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-2"
               >
                 <PlusCircle className="h-4 w-4" />
                 {showForm ? 'View Active Shifts' : 'Post Hospital Vacancy'}
@@ -540,212 +542,341 @@ export default function JobMarket({
 
       {activeTab === 'eligibility' && <EligibilityInfo />}
       {activeTab === 'locums' && <LocumBoard role={role} jobs={jobs} />}
-      {(activeTab === 'open' || activeTab === 'applied') && <JobFilters value={filter} onChange={setFilter} />}
       {applyMsg && <p role="alert" className="text-xs font-bold text-rose-800 bg-rose-50 border border-rose-200 p-3">{applyMsg}</p>}
 
-      {/* FILTER CONTROLS */}
-      <section aria-label="Filters" className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-wrap gap-4 items-center">
-        <label htmlFor="job-search" className="sr-only">Search shifts</label>
-        <div className="flex-[2_1_300px] flex items-center gap-3 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-4 h-12 focus-within:border-[color:var(--t-600)] transition-colors">
-          <Search className="h-4 w-4 text-slate-500 shrink-0" />
-          <input
-            id="job-search"
-            type="text"
-            placeholder="Search clinical shifts by role, hospital name, or ward (e.g. ICU, Neonatal, Emergency)…"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 min-w-0 bg-transparent text-sm text-[color:var(--ink)] outline-none placeholder-slate-500"
-          />
-        </div>
+      {(activeTab === 'open' || activeTab === 'applied') && (() => {
+        const distinctCities = Array.from(new Set(jobs.map(j => j.city).filter(Boolean))).sort();
+        const hasActiveFilters =
+          searchTerm.trim() !== '' ||
+          selectedType !== 'all' ||
+          selectedCity !== 'all' ||
+          filter.state !== 'all' ||
+          filter.sector !== 'all' ||
+          filter.role !== 'all' ||
+          filter.foreign;
 
-        <label htmlFor="job-type" className="sr-only">Contract type</label>
-        <select
-          id="job-type"
-          value={selectedType}
-          onChange={(e) => setSelectedType(e.target.value)}
-          className="flex-[1_1_180px] h-12 border border-[color:var(--t-200)] bg-white px-3 text-sm font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] cursor-pointer"
-        >
-          <option value="all">All contract types</option>
-          <option value="Full-time">Full-time</option>
-          <option value="Part-time">Part-time</option>
-          <option value="Contract">Contract</option>
-          <option value="Shift-based">Shift-based</option>
-        </select>
+        const resetAllFilters = () => {
+          setSearchTerm('');
+          setSelectedType('all');
+          setSelectedCity('all');
+          setFilter(blankFilter);
+        };
 
-        <label htmlFor="job-city" className="sr-only">City</label>
-        <select
-          id="job-city"
-          value={selectedCity}
-          onChange={(e) => setSelectedCity(e.target.value)}
-          className="flex-[1_1_180px] h-12 border border-[color:var(--t-200)] bg-white px-3 text-sm font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] cursor-pointer"
-        >
-          <option value="all">All cities</option>
-          <option value="Kuala Lumpur">Kuala Lumpur</option>
-          <option value="Petaling Jaya">Petaling Jaya</option>
-          <option value="Penang">Penang</option>
-          <option value="Johor Bahru">Johor Bahru</option>
-        </select>
+        return (
+          <>
+            {/* UNIFIED SINGLE-ROW h-11 FILTER CONTROL BAR */}
+            <section aria-label="Filters" className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
+              <div className="flex flex-col xl:flex-row xl:items-center gap-3">
+                {/* Search Input */}
+                <div className="relative flex-1 min-w-[240px]">
+                  <label htmlFor="job-search" className="sr-only">Search shifts</label>
+                  <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    id="job-search"
+                    type="text"
+                    placeholder="Search clinical shifts by role, hospital name, or ward (e.g. ICU, Neonatal, Emergency)…"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
+                  />
+                  {searchTerm && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchTerm('')}
+                      aria-label="Clear search query"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
 
-        <div className="flex border border-[color:var(--t-200)]">
-          <button
-            type="button"
-            onClick={() => setViewMode('grid')}
-            aria-label="Grid view"
-            aria-pressed={viewMode === 'grid'}
-            id="toggle-job-grid-view"
-            className={`h-11 w-11 flex items-center justify-center cursor-pointer ${viewMode === 'grid' ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)]' : 'bg-white text-slate-500 hover:bg-[color:var(--t-50)]'}`}
-          >
-            <LayoutGrid className="h-[18px] w-[18px]" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode('list')}
-            aria-label="List view"
-            aria-pressed={viewMode === 'list'}
-            id="toggle-job-list-view"
-            className={`h-11 w-11 flex items-center justify-center border-l border-[color:var(--t-200)] cursor-pointer ${viewMode === 'list' ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)]' : 'bg-white text-slate-500 hover:bg-[color:var(--t-50)]'}`}
-          >
-            <List className="h-[18px] w-[18px]" />
-          </button>
-        </div>
-      </section>
+                {/* Inline Dropdowns & Grid/List View Toggle */}
+                <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                  <FilterSelect label="Role" value={filter.role} onChange={v => setFilter({ ...filter, role: v })}>
+                    <option value="all">Doctors &amp; Nurses</option>
+                    <option value="doctor">Doctors Only</option>
+                    <option value="nurse">Nurses Only</option>
+                  </FilterSelect>
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-base font-bold text-[color:var(--ink)]">{activeTab === 'applied' ? 'Your applications' : 'Open shifts & vacancies'}</h2>
-        <span className="text-sm text-slate-600">Showing {filteredJobs.length} listing{filteredJobs.length === 1 ? '' : 's'}</span>
-      </div>
+                  <FilterSelect label="Contract" value={selectedType} onChange={setSelectedType}>
+                    <option value="all">All Contracts</option>
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Shift-based">Shift-based</option>
+                    <option value="Locum">Locum</option>
+                  </FilterSelect>
 
-      {/* ACTIVE SHIFTS CONTAINER */}
-      <div
-        id={activeTab === 'applied' ? 'panel-applied' : 'panel-open'}
-        role="tabpanel"
-        aria-labelledby={activeTab === 'applied' ? 'tab-applied' : 'tab-open'}
-        className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5' : 'flex flex-col gap-4'}
-      >
-        {filteredJobs.length === 0 ? (
-          <div className="col-span-full bg-white border border-[color:var(--t-200)] p-12 text-center space-y-3">
-            <Briefcase className="h-12 w-12 text-[color:var(--t-200)] mx-auto" />
-            <h4 className="text-sm font-bold text-[color:var(--ink)]">
-              {activeTab === 'applied' ? 'You have not applied to any shifts yet' : 'No shift posts match active filters'}
-            </h4>
-            <p className="text-sm text-slate-600">
-              {activeTab === 'applied' ? 'Apply to an open shift and it will appear here.' : 'Modify filters to explore other contract categories.'}
-            </p>
-          </div>
-        ) : (
-          filteredJobs.map((job) => {
-            const hasApplied = appliedJobs.includes(job.id) || (job.appliedUserIds?.length ?? 0) > 0;
-            const typePill = job.type === 'Shift-based'
-              ? 'bg-[color:var(--e-50)] border-[color:var(--e-200)] text-[color:var(--e-800)]'
-              : 'bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-700)]';
-            const applyButton = (
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); handleApply(job.id); }}
-                disabled={hasApplied || !!job.applyBlockedReason}
-                title={job.applyBlockedReason ?? undefined}
-                className={`min-h-[44px] px-5 text-sm font-bold transition-colors flex items-center justify-center gap-1.5 ${
-                  hasApplied
-                    ? 'bg-[color:var(--e-50)] border border-[color:var(--e-200)] text-[color:var(--e-800)] cursor-not-allowed'
-                    : job.applyBlockedReason ? 'bg-slate-100 border border-slate-300 text-slate-500 cursor-not-allowed'
-                    : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer'
-                }`}
-              >
-                {hasApplied ? (<><CheckCircle2 className="h-4 w-4 text-[color:var(--e-600)]" />Applied</>) : job.applyBlockedReason ? 'Not eligible' : 'Apply for shift'}
-              </button>
-            );
+                  <FilterSelect label="City" value={selectedCity} onChange={setSelectedCity}>
+                    <option value="all">All Cities ({distinctCities.length})</option>
+                    {distinctCities.map(c => <option key={c} value={c}>{c}</option>)}
+                  </FilterSelect>
 
-            if (viewMode === 'list') {
-              return (
-                <article
-                  key={job.id}
-                  onClick={() => setSelectedModalJob(job)}
-                  className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-300)] shadow-xs p-4 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer"
-                >
-                  <div className="flex items-center gap-4 flex-1 min-w-0">
-                    <div className="h-12 w-12 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center text-lg shrink-0">{job.hospitalLogo}</div>
-                    <div className="min-w-0">
-                      <h3 className="text-base font-bold text-[color:var(--ink)] truncate">{job.title}</h3>
-                      <p className="text-sm text-[color:var(--ink-2)] truncate">{job.hospitalName}</p>
-                    </div>
+                  <FilterSelect label="State" value={filter.state} onChange={v => setFilter({ ...filter, state: v })}>
+                    <option value="all">All States</option>
+                    {MY_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </FilterSelect>
+
+                  <FilterSelect label="Sector" value={filter.sector} onChange={v => setFilter({ ...filter, sector: v })}>
+                    <option value="all">Public &amp; Private</option>
+                    <option value="private">Private Sector</option>
+                    <option value="public">Public Sector</option>
+                    <option value="other">Other Sector</option>
+                  </FilterSelect>
+
+                  <div className="flex border border-[color:var(--t-200)] h-11 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setViewMode('grid')}
+                      aria-label="Grid view"
+                      aria-pressed={viewMode === 'grid'}
+                      id="toggle-job-grid-view"
+                      className={`h-full w-11 flex items-center justify-center cursor-pointer transition-colors ${viewMode === 'grid' ? 'bg-[color:var(--t-600)] text-white' : 'bg-[color:var(--t-bg)] text-slate-500 hover:bg-[color:var(--t-50)]'}`}
+                    >
+                      <LayoutGrid className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewMode('list')}
+                      aria-label="List view"
+                      aria-pressed={viewMode === 'list'}
+                      id="toggle-job-list-view"
+                      className={`h-full w-11 flex items-center justify-center border-l border-[color:var(--t-200)] cursor-pointer transition-colors ${viewMode === 'list' ? 'bg-[color:var(--t-600)] text-white' : 'bg-[color:var(--t-bg)] text-slate-500 hover:bg-[color:var(--t-50)]'}`}
+                    >
+                      <List className="h-4 w-4" />
+                    </button>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2 flex-1 text-xs text-[color:var(--ink-2)]">
-                    <span className={`border text-xs font-bold px-2.5 py-1 ${typePill}`}>{job.type}</span>
-                    <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5 text-slate-500" />{job.city}</span>
-                    <span className="inline-flex items-center gap-1"><Tag className="h-3.5 w-3.5 text-slate-500" />{job.specialtyRequired}</span>
-                  </div>
-                  <div className="flex items-center justify-between md:justify-end gap-4 shrink-0">
-                    <span className="text-base font-bold text-[color:var(--ink)]">{job.salaryRange}</span>
-                    <JobBadges job={job} />
-                    <div className="flex items-center gap-2">
+                </div>
+              </div>
+
+              {/* Active Filter Summary, Foreign Registration Toggle & Result Counter Footer */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2.5 border-t border-[color:var(--t-100)]">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-bold text-slate-600 tabular-nums" aria-live="polite">
+                    {activeTab === 'applied' ? 'Your applications: ' : 'Open shifts & vacancies: '}
+                    Showing <strong className="font-black text-[color:var(--ink)]">{filteredJobs.length}</strong> of {baseJobs.length} listing{baseJobs.length === 1 ? '' : 's'}
+                  </span>
+                  {filter.role !== 'all' && (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                      Role: {filter.role}
+                      <button type="button" onClick={() => setFilter({ ...filter, role: 'all' })} className="hover:text-slate-900 cursor-pointer"><X className="h-3 w-3" /></button>
+                    </span>
+                  )}
+                  {selectedType !== 'all' && (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                      Contract: {selectedType}
+                      <button type="button" onClick={() => setSelectedType('all')} className="hover:text-slate-900 cursor-pointer"><X className="h-3 w-3" /></button>
+                    </span>
+                  )}
+                  {selectedCity !== 'all' && (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                      City: {selectedCity}
+                      <button type="button" onClick={() => setSelectedCity('all')} className="hover:text-slate-900 cursor-pointer"><X className="h-3 w-3" /></button>
+                    </span>
+                  )}
+                  {filter.state !== 'all' && (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                      State: {filter.state}
+                      <button type="button" onClick={() => setFilter({ ...filter, state: 'all' })} className="hover:text-slate-900 cursor-pointer"><X className="h-3 w-3" /></button>
+                    </span>
+                  )}
+                  {filter.sector !== 'all' && (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                      Sector: {filter.sector}
+                      <button type="button" onClick={() => setFilter({ ...filter, sector: 'all' })} className="hover:text-slate-900 cursor-pointer"><X className="h-3 w-3" /></button>
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4">
+                  <label className="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={filter.foreign}
+                      onChange={e => setFilter({ ...filter, foreign: e.target.checked })}
+                      className="h-3.5 w-3.5 accent-[color:var(--t-600)] rounded-none cursor-pointer"
+                    />
+                    <span>Considers practitioners registered abroad</span>
+                  </label>
+                  {hasActiveFilters && (
+                    <button
+                      type="button"
+                      onClick={resetAllFilters}
+                      className="text-xs font-bold text-[color:var(--t-700)] hover:text-[color:var(--dark)] underline underline-offset-2 cursor-pointer"
+                    >
+                      Reset Filters
+                    </button>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* ACTIVE SHIFTS CONTAINER */}
+            <div
+              id={activeTab === 'applied' ? 'panel-applied' : 'panel-open'}
+              role="tabpanel"
+              aria-labelledby={activeTab === 'applied' ? 'tab-applied' : 'tab-open'}
+              className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5' : 'flex flex-col gap-4'}
+            >
+              {filteredJobs.length === 0 ? (
+                <div className="col-span-full bg-white border border-[color:var(--t-200)] p-12 text-center space-y-3">
+                  <Briefcase className="h-10 w-10 text-[color:var(--t-200)] mx-auto" />
+                  <h4 className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)]">
+                    {activeTab === 'applied' ? 'You have not applied to any shifts yet' : 'No shift posts match active filters'}
+                  </h4>
+                  <p className="text-xs text-slate-600">
+                    {activeTab === 'applied' ? 'Apply to an open shift and it will appear here.' : 'Modify filters to explore other contract categories.'}
+                  </p>
+                  {hasActiveFilters && (
+                    <div className="pt-1">
                       <button
                         type="button"
-                        onClick={(e) => { e.stopPropagation(); setSelectedModalJob(job); }}
-                        className="min-h-[44px] px-4 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-sm font-semibold flex items-center gap-1.5 cursor-pointer"
+                        onClick={resetAllFilters}
+                        className="h-10 px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer transition-colors"
                       >
-                        <Eye className="h-3.5 w-3.5" /> Details
+                        Reset All Filters
                       </button>
-                      {applyButton}
-                    </div>
-                  </div>
-                  {activeTab === 'applied' && (
-                    <div className="w-full mt-2">
-                      {renderApplicationStatus(job)}
                     </div>
                   )}
-                </article>
-              );
-            }
-
-            return (
-              <article
-                key={job.id}
-                className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-300)] shadow-xs hover:shadow-md p-5 transition-all flex flex-col gap-4"
-              >
-                <div className="flex gap-3.5 items-start">
-                  <div className="h-12 w-12 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center text-lg shrink-0">{job.hospitalLogo}</div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-base font-bold text-[color:var(--ink)] leading-snug">{job.title}</h3>
-                    <p className="text-sm text-[color:var(--ink-2)] mt-0.5">{job.hospitalName}</p>
-                  </div>
-                  <span className={`border text-xs font-bold px-2.5 py-1 shrink-0 ${typePill}`}>{job.type}</span>
                 </div>
+              ) : (
+                filteredJobs.map((job) => {
+                  const hasApplied = isJobApplied(job);
+                  const blockedReason = hasApplied ? null : job.applyBlockedReason;
+                  const blockedShortLabel = blockedReason?.includes('for nurses')
+                    ? 'Nurses Only'
+                    : blockedReason?.includes('for doctors')
+                    ? 'Doctors Only'
+                    : 'Not eligible';
 
-                <div className="flex flex-col gap-2 text-sm text-[color:var(--ink-2)]">
-                  <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-slate-500 shrink-0" />{job.location}, {job.city}</div>
-                  <div className="flex items-center gap-2"><Tag className="h-4 w-4 text-slate-500 shrink-0" />{job.specialtyRequired}</div>
-                </div>
+                  const typePill = job.type === 'Shift-based'
+                    ? 'bg-[color:var(--e-50)] border-[color:var(--e-200)] text-[color:var(--e-800)]'
+                    : 'bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-700)]';
 
-                <p className="text-sm text-slate-600 leading-relaxed line-clamp-2">{job.description}</p>
+                  const applyButton = (
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); handleApply(job.id); }}
+                      disabled={hasApplied || !!blockedReason}
+                      title={blockedReason ?? undefined}
+                      className={`min-h-[40px] px-4 text-xs font-bold transition-colors flex items-center justify-center gap-1.5 ${
+                        hasApplied
+                          ? 'bg-emerald-50 border border-emerald-300 text-emerald-800 cursor-not-allowed'
+                          : blockedReason
+                          ? 'bg-slate-100 border border-slate-300 text-slate-500 cursor-not-allowed'
+                          : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer'
+                      }`}
+                    >
+                      {hasApplied ? (
+                        <><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />Applied</>
+                      ) : blockedReason ? (
+                        blockedShortLabel
+                      ) : (
+                        'Apply for shift'
+                      )}
+                    </button>
+                  );
 
-                <div className="border-t border-[color:var(--t-100)] pt-3.5 flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-base font-bold text-[color:var(--ink)]">{job.salaryRange}</span>
-                    <JobBadges job={job} />
-                  <span className="text-xs text-slate-600 inline-flex items-center gap-1.5"><Users className="h-3.5 w-3.5" /><span className="tabular-nums">{job.applicantsCount}</span> applicants</span>
-                </div>
+                  if (viewMode === 'list') {
+                    return (
+                      <article
+                        key={job.id}
+                        onClick={() => setSelectedModalJob(job)}
+                        className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs p-4 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-3.5 flex-1 min-w-0">
+                          <div className="h-11 w-11 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center text-base shrink-0">{job.hospitalLogo}</div>
+                          <div className="min-w-0">
+                            <h3 className="text-base font-bold text-[color:var(--ink)] truncate">{job.title}</h3>
+                            <p className="text-xs text-[color:var(--ink-2)] truncate">{job.hospitalName}</p>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 flex-1 text-xs text-[color:var(--ink-2)]">
+                          <span className={`border text-2xs font-black uppercase tracking-wider px-2 py-0.5 ${typePill}`}>{job.type}</span>
+                          <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)]" />{job.city}</span>
+                          <span className="inline-flex items-center gap-1"><Tag className="h-3.5 w-3.5 text-[color:var(--t-600)]" />{job.specialtyRequired}</span>
+                        </div>
+                        <div className="flex items-center justify-between md:justify-end gap-4 shrink-0">
+                          <span className="text-base font-bold font-mono text-[color:var(--ink)]">{job.salaryRange}</span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); setSelectedModalJob(job); }}
+                              className="min-h-[40px] px-4 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <Eye className="h-3.5 w-3.5" /> Details
+                            </button>
+                            {applyButton}
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  }
 
-                {renderApplicationStatus(job)}
+                  return (
+                    <article
+                      key={job.id}
+                      className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs p-5 transition-all flex flex-col gap-3.5"
+                    >
+                      {/* Header Row */}
+                      <div className="flex gap-3 items-start">
+                        <div className="h-11 w-11 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center text-base shrink-0">{job.hospitalLogo}</div>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-base font-bold text-[color:var(--ink)] leading-snug">{job.title}</h3>
+                          <p className="text-xs text-[color:var(--ink-2)] font-medium mt-0.5">{job.hospitalName}</p>
+                        </div>
+                        <span className={`border text-2xs font-black uppercase tracking-wider px-2 py-0.5 shrink-0 ${typePill}`}>{job.type}</span>
+                      </div>
 
-                <div className="grid grid-cols-2 gap-2.5 mt-auto">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedModalJob(job)}
-                    className="min-h-[44px] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-sm font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
-                  >
-                    <Eye className="h-3.5 w-3.5" /> View details
-                  </button>
-                  {applyButton}
-                </div>
-              </article>
-            );
-          })
-        )}
-      </div>
+                      {/* Location & Specialty Metadata */}
+                      <div className="flex flex-col gap-1.5 text-xs text-[color:var(--ink-2)] font-medium">
+                        <div className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" /><span>{job.location}, {job.city}</span></div>
+                        <div className="flex items-center gap-2"><Tag className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" /><span>{job.specialtyRequired}</span></div>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">{job.description}</p>
+
+                      {/* Salary, Applicants & Compliance Pill Badges */}
+                      <div className="border-t border-[color:var(--t-100)] pt-3 space-y-2.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-base font-extrabold font-mono text-[color:var(--ink)]">{job.salaryRange}</span>
+                          <span className="text-2xs font-mono font-bold text-slate-600 bg-slate-50 border border-slate-200 px-2 py-0.5 inline-flex items-center gap-1 shrink-0">
+                            <Users className="h-3 w-3 text-slate-500" />
+                            <span className="tabular-nums">{job.applicantsCount}</span> applicant{job.applicantsCount === 1 ? '' : 's'}
+                          </span>
+                        </div>
+                        <JobBadges job={job} />
+                      </div>
+
+                      {/* Bottom-Aligned Application Status & Action Buttons */}
+                      <div className="mt-auto pt-3 border-t border-[color:var(--t-100)] space-y-3">
+                        {renderApplicationStatus(job)}
+                        <div className="grid grid-cols-2 gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedModalJob(job)}
+                            className="min-h-[40px] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                          >
+                            <Eye className="h-3.5 w-3.5" /> View details
+                          </button>
+                          {applyButton}
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })
+              )}
+            </div>
+          </>
+        );
+      })()}
 
       {/* Trust note */}
       <section className="bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-5 py-4 flex flex-wrap items-center gap-3.5">
         <ShieldCheck className="h-5 w-5 text-[color:var(--e-600)] shrink-0" />
-        <p className="flex-1 min-w-[260px] text-sm leading-relaxed text-[color:var(--e-800)]">
+        <p className="flex-1 min-w-[260px] text-xs leading-relaxed text-[color:var(--e-800)]">
           <strong className="font-bold">Credential-verified only.</strong> Every applicant is checked against MMC and LJM registries before a hospital sees the application.
         </p>
       </section>
@@ -795,7 +926,7 @@ export default function JobMarket({
                   <span className="text-xs text-[color:var(--t-700)] block font-black uppercase tracking-wider">Estimated Allowance</span>
                   <span className="font-mono text-base font-extrabold text-[color:var(--ink)] leading-tight block">{selectedModalJob.salaryRange}</span>
                 </div>
-                <span className="bg-[color:var(--t-600)] text-white text-xs font-black uppercase px-3 py-1.5 rounded-lg tracking-wider">
+                <span className="bg-[color:var(--t-600)] text-white text-2xs font-black uppercase px-3 py-1.5 rounded-lg tracking-wider">
                   {selectedModalJob.type}
                 </span>
               </div>
@@ -849,7 +980,7 @@ export default function JobMarket({
                   <Users className="h-4 w-4 text-slate-400" />
                   {selectedModalJob.applicantsCount} Practitioners applied
                 </span>
-                <span className={`px-2 py-0.5 rounded text-xs font-extrabold uppercase border ${selectedModalJob.employer?.licenceOk ? 'text-emerald-700 bg-emerald-50 border-emerald-100' : 'text-amber-800 bg-amber-50 border-amber-200'}`}>
+                <span className={`px-2 py-0.5 rounded text-2xs font-extrabold uppercase border ${selectedModalJob.employer?.licenceOk ? 'text-emerald-700 bg-emerald-50 border-emerald-100' : 'text-amber-800 bg-amber-50 border-amber-200'}`}>
                   {selectedModalJob.employer?.licenceOk ? 'Facility licence checked' : 'Employer not checked'}
                 </span>
               </div>
@@ -871,16 +1002,16 @@ export default function JobMarket({
                     handleApply(selectedModalJob.id);
                     setSelectedModalJob(null);
                   }}
-                  disabled={appliedJobs.includes(selectedModalJob.id) || !!selectedModalJob.applyBlockedReason || role === 'patient'}
+                  disabled={isJobApplied(selectedModalJob) || !!selectedModalJob.applyBlockedReason || role === 'patient'}
                   className={`w-full text-xs font-bold py-2.5 transition-all flex items-center justify-center gap-1.5 ${
-                    appliedJobs.includes(selectedModalJob.id)
+                    isJobApplied(selectedModalJob)
                       ? "bg-emerald-50 border border-emerald-200 text-emerald-800 cursor-not-allowed" 
                       : selectedModalJob.applyBlockedReason || role === 'patient'
                       ? "bg-slate-100 border border-slate-300 text-slate-500 cursor-not-allowed"
                       : "bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer"
                   }`}
                 >
-                  {appliedJobs.includes(selectedModalJob.id) ? (
+                  {isJobApplied(selectedModalJob) ? (
                     <>
                       <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                       Applied
@@ -893,7 +1024,7 @@ export default function JobMarket({
                     "Apply for Shift"
                   )}
                 </button>
-                {selectedModalJob.applyBlockedReason && (
+                {!isJobApplied(selectedModalJob) && selectedModalJob.applyBlockedReason && (
                   <span className="text-xs text-rose-600 font-semibold text-center leading-tight">
                     {selectedModalJob.applyBlockedReason}
                   </span>

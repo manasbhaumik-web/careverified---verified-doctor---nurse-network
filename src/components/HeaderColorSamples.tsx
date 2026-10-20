@@ -15,13 +15,13 @@ export default function HeaderColorSamples() {
       <div className="max-w-7xl mx-auto bg-white p-6 border border-slate-300 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <span className="text-xs font-black uppercase tracking-widest text-[color:var(--t-600)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)]">
+            <span className="text-2xs font-black uppercase tracking-widest text-[color:var(--t-600)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)]">
               Interactive Design Samples
             </span>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
               User Dashboard Header: Lighter Shades Exploration
             </h1>
-            <p className="text-sm text-slate-600 mt-1 max-w-2xl">
+            <p className="text-xs text-slate-600 mt-1 max-w-2xl">
               Previewing 4 lighter, calmer shades derived directly from the application theme and landing page palette.
             </p>
           </div>
@@ -37,7 +37,7 @@ export default function HeaderColorSamples() {
       {/* SAMPLE 1 */}
       <section className="max-w-7xl mx-auto space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-800 bg-white px-2 py-0.5 border border-slate-300">
+          <span className="text-2xs font-mono font-bold uppercase tracking-wider text-slate-800 bg-white px-2 py-0.5 border border-slate-300">
             Sample 1: Clinical High-Key White & Cyan Hairline
           </span>
           <span className="text-xs font-mono text-slate-500">Pure White bg-white + Cyan-600 accent</span>
@@ -51,7 +51,7 @@ export default function HeaderColorSamples() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-xl sm:text-2xl font-black text-slate-900">Ahmad Bin Razak</h2>
-                  <span className="text-xs font-black uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  <span className="text-2xs font-black uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
                     EHR Verified Patient
                   </span>
                 </div>
@@ -77,7 +77,7 @@ export default function HeaderColorSamples() {
       {/* SAMPLE 2 */}
       <section className="max-w-7xl mx-auto space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-[color:var(--t-800)] bg-[color:var(--t-100)] px-2 py-0.5 border border-[color:var(--t-300)]">
+          <span className="text-2xs font-mono font-bold uppercase tracking-wider text-[color:var(--t-800)] bg-[color:var(--t-100)] px-2 py-0.5 border border-[color:var(--t-300)]">
             Sample 2: Soft Ice-Cyan Morning Glow (--t-50 / #ECFEFF)
           </span>
           <span className="text-xs font-mono text-slate-500">Lightest tint of the application theme color + Cyan-200 border</span>
@@ -91,7 +91,7 @@ export default function HeaderColorSamples() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-xl sm:text-2xl font-black text-[color:var(--ink)]">Ahmad Bin Razak</h2>
-                  <span className="text-xs font-black uppercase px-2 py-0.5 bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] shadow-2xs">
+                  <span className="text-2xs font-black uppercase px-2 py-0.5 bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] shadow-2xs">
                     EHR Verified Patient
                   </span>
                 </div>
@@ -117,7 +117,7 @@ export default function HeaderColorSamples() {
       {/* SAMPLE 3 */}
       <section className="max-w-7xl mx-auto space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-[color:var(--t-800)] bg-[color:var(--t-200)] px-2 py-0.5 border border-[color:var(--t-400)]">
+          <span className="text-2xs font-mono font-bold uppercase tracking-wider text-[color:var(--t-800)] bg-[color:var(--t-200)] px-2 py-0.5 border border-[color:var(--t-400)]">
             Sample 3: Mid-Tone Aqua Wash (--t-100 / #CFFAFE)
           </span>
           <span className="text-xs font-mono text-slate-500">Medium-light wash with vibrant cyan border</span>
@@ -131,7 +131,7 @@ export default function HeaderColorSamples() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-xl sm:text-2xl font-black text-[color:var(--ink)]">Ahmad Bin Razak</h2>
-                  <span className="text-xs font-black uppercase px-2 py-0.5 bg-white text-[color:var(--t-700)] border border-[color:var(--t-300)] shadow-2xs">
+                  <span className="text-2xs font-black uppercase px-2 py-0.5 bg-white text-[color:var(--t-700)] border border-[color:var(--t-300)] shadow-2xs">
                     EHR Verified Patient
                   </span>
                 </div>
@@ -157,7 +157,7 @@ export default function HeaderColorSamples() {
       {/* SAMPLE 4 */}
       <section className="max-w-7xl mx-auto space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-800 bg-white px-2 py-0.5 border border-slate-300">
+          <span className="text-2xs font-mono font-bold uppercase tracking-wider text-slate-800 bg-white px-2 py-0.5 border border-slate-300">
             Sample 4: Dual-Tone Air (--t-bg / #F2FDFF Landing Page Canvas)
           </span>
           <span className="text-xs font-mono text-slate-500">Landing Page body background (--t-bg / #F2FDFF)</span>
@@ -171,7 +171,7 @@ export default function HeaderColorSamples() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-xl sm:text-2xl font-black text-slate-900">Ahmad Bin Razak</h2>
-                  <span className="text-xs font-black uppercase px-2 py-0.5 bg-white text-[color:var(--t-600)] border border-[color:var(--t-200)]">
+                  <span className="text-2xs font-black uppercase px-2 py-0.5 bg-white text-[color:var(--t-600)] border border-[color:var(--t-200)]">
                     EHR Verified Patient
                   </span>
                 </div>

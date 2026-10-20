@@ -63,7 +63,7 @@ export default function SecurityCard({ twoFactor, email, onChanged }: { twoFacto
             {setup.qr && <img src={setup.qr} alt="QR code to add MedCred to your authenticator app" width={140} height={140} className="border border-slate-300 bg-white rounded-none" />}
             <div className="text-xs text-slate-600 min-w-0 space-y-1">
               <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Manual Configuration Key:</span>
-              <span className="font-mono font-bold text-xs text-[color:var(--ink)] bg-slate-100 border border-slate-300 px-2 py-1 block [overflow-wrap:anywhere]">{setup.secret}</span>
+              <span className="font-mono font-bold text-2xs text-[color:var(--ink)] bg-slate-100 border border-slate-300 px-2 py-1 block [overflow-wrap:anywhere]">{setup.secret}</span>
             </div>
           </div>
           <label className="block"><span className={fieldLabel}>Verification 6-Digit Code</span>

@@ -269,7 +269,7 @@ export default function DischargeSummaryDialog({
               <CheckCircle2 className="h-6 w-6" />
             </div>
             <div>
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-none">
+              <span className="text-2xs font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-none">
                 Consultation Concluded · MMC Attested
               </span>
               <h2 id="discharge-dialog-title" className="text-base font-black text-[color:var(--ink)] mt-1">
@@ -277,7 +277,7 @@ export default function DischargeSummaryDialog({
               </h2>
             </div>
           </div>
-          <span className="text-xs font-mono font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-none">
+          <span className="text-2xs font-mono font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-none">
             Encounter: {data.consultId}
           </span>
         </div>
@@ -303,7 +303,7 @@ export default function DischargeSummaryDialog({
 
         {/* PHYSICIAN NOTES & CARE INSTRUCTIONS */}
         <div className="space-y-2">
-          <h3 className="text-xs font-black uppercase tracking-wider text-[color:var(--ink)] flex items-center gap-1.5">
+          <h3 className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)] flex items-center gap-1.5">
             <Stethoscope className="h-4 w-4 text-[color:var(--t-600)]" />
             Physician Clinical Notes &amp; Care Guidance
           </h3>
@@ -318,12 +318,12 @@ export default function DischargeSummaryDialog({
         {hasPrescriptions && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-black uppercase tracking-wider text-[color:var(--ink)] flex items-center gap-1.5">
+              <h3 className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)] flex items-center gap-1.5">
                 <Pill className="h-4 w-4 text-cyan-600" />
                 Prescribed Medication ({primaryRx?.items.length || 0} item{primaryRx?.items.length === 1 ? '' : 's'})
               </h3>
               {requiresColdChain && (
-                <span className="text-xs font-bold text-sky-900 bg-sky-50 border border-sky-300 px-2 py-0.5 inline-flex items-center gap-1 rounded-none">
+                <span className="text-2xs font-bold text-sky-900 bg-sky-50 border border-sky-300 px-2 py-0.5 inline-flex items-center gap-1 rounded-none">
                   <Snowflake className="h-3 w-3 text-sky-600" /> Cold-Chain Required (2-8 °C)
                 </span>
               )}
@@ -334,7 +334,7 @@ export default function DischargeSummaryDialog({
                 <span className="font-mono font-extrabold text-cyan-900 flex items-center gap-1.5">
                   <FileText className="h-3.5 w-3.5 text-cyan-700" /> Rx Code: {primaryRx?.code}
                 </span>
-                <span className="text-xs font-mono font-bold text-cyan-800 bg-cyan-100 border border-cyan-200 px-2 py-0.5 rounded-none">
+                <span className="text-2xs font-mono font-bold text-cyan-800 bg-cyan-100 border border-cyan-200 px-2 py-0.5 rounded-none">
                   Poisons Act 1952 Compliant
                 </span>
               </div>
@@ -363,7 +363,7 @@ export default function DischargeSummaryDialog({
           <div className="border-2 border-[color:var(--t-600)] bg-[color:var(--t-bg)] p-5 space-y-4 rounded-none">
             <div className="flex items-start justify-between">
               <div>
-                <span className="text-xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 rounded-none">
+                <span className="text-2xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 rounded-none">
                   Smart Pharmacy Dispatch Loop
                 </span>
                 <h3 className="text-sm font-black text-slate-900 mt-1 flex items-center gap-1.5">
@@ -379,7 +379,7 @@ export default function DischargeSummaryDialog({
             {/* IF DISPATCHED SUCCESSFULLY */}
             {dispatchSuccess ? (
               <div role="status" className="bg-emerald-50 border border-emerald-300 p-4 space-y-3 rounded-none">
-                <div className="flex items-center gap-2 text-emerald-900 font-black text-sm">
+                <div className="flex items-center gap-2 text-emerald-900 font-black text-xs">
                   <CheckCircle2 className="h-5 w-5 text-emerald-700" />
                   <span>Prescription Successfully Routed!</span>
                 </div>
@@ -658,7 +658,7 @@ export default function DischargeSummaryDialog({
         {/* MEDICAL CERTIFICATES (MC) */}
         {hasCertificates && (
           <div className="space-y-2">
-            <h3 className="text-xs font-black uppercase tracking-wider text-[color:var(--ink)] flex items-center gap-1.5">
+            <h3 className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)] flex items-center gap-1.5">
               <Award className="h-4 w-4 text-amber-600" />
               Statutory Medical Certificate (Digital MC)
             </h3>

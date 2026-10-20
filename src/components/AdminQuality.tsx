@@ -92,11 +92,11 @@ function Support({ say }: { say: (t: string) => void }) {
         ))}</div>}
       <div className="flex gap-2 text-xs font-bold">{(['active', 'resolved'] as const).map(v => <button key={v} onClick={() => setView(v)} className={`px-3 py-1.5 cursor-pointer ${view === v ? 'bg-[color:var(--t-600)] text-white' : 'bg-slate-100'}`}>{v}</button>)}</div>
       <div className="grid lg:grid-cols-[1fr_1fr] gap-4">
-        <ul className="bg-white border border-slate-200 divide-y divide-slate-100 text-sm max-h-[480px] overflow-y-auto">
+        <ul className="bg-white border border-slate-200 divide-y divide-slate-100 text-xs max-h-[480px] overflow-y-auto">
           {(data?.tickets ?? []).length === 0 && <li className="p-4 text-xs text-slate-500">No tickets.</li>}
           {(data?.tickets ?? []).map((t: any) => (
             <li key={t.id}><button onClick={() => openT(t.id)} className="w-full text-left p-3 cursor-pointer hover:bg-slate-50">
-              <p className="font-bold truncate">{t.subject} {t.overdue && <span className="text-xs bg-rose-100 text-rose-800 px-1.5 py-0.5 ml-1">OVERDUE</span>}</p>
+              <p className="font-bold truncate">{t.subject} {t.overdue && <span className="text-2xs bg-rose-100 text-rose-800 px-1.5 py-0.5 ml-1">OVERDUE</span>}</p>
               <p className="text-xs text-slate-500">{t.requester} · {t.category} · {t.priority} · {t.firstResponseAt ? 'replied' : `reply due ${when(t.firstResponseDue)}`}</p></button></li>
           ))}
         </ul>
@@ -106,7 +106,7 @@ function Support({ say }: { say: (t: string) => void }) {
               <div className="flex justify-between gap-2"><div><h3 className="text-sm font-extrabold">{open.subject}</h3><p className="text-xs text-slate-500">{open.requester} · {open.category}{open.target ? ` · about: ${open.target}` : ''}</p></div>
                 <select aria-label="Priority" className="border border-slate-200 text-xs px-2 h-fit" value={open.priority} onChange={async e => { await jreq(`/api/admin/support/tickets/${open.id}/priority`, 'POST', { priority: e.target.value }); openT(open.id); load(); }}>
                   {['urgent', 'high', 'normal', 'low'].map(p => <option key={p}>{p}</option>)}</select></div>
-              <ul className="space-y-2 max-h-64 overflow-y-auto">{open.messages.map((m: any) => <li key={m.id} className={`text-sm p-2.5 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}><p className="text-xs font-extrabold uppercase text-slate-500">{m.fromStaff ? 'Staff' : 'User'} · {when(m.ts)}</p>{m.body}</li>)}</ul>
+              <ul className="space-y-2 max-h-64 overflow-y-auto">{open.messages.map((m: any) => <li key={m.id} className={`text-xs p-2.5 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}><p className="text-xs font-extrabold uppercase text-slate-500">{m.fromStaff ? 'Staff' : 'User'} · {when(m.ts)}</p>{m.body}</li>)}</ul>
               <div className="flex flex-wrap gap-2 items-center text-xs">
                 <label className="font-bold text-slate-600" htmlFor="macro-lang">Reply template</label>
                 <select id="macro-lang" aria-label="Template language" className="border border-slate-200 px-2 h-9" value={macroLang} onChange={e => setMacroLang(e.target.value as MacroLang)}>
@@ -184,7 +184,7 @@ function Reviews({ say }: { say: (t: string) => void }) {
           </div>
           {list.length === 0 && <p className="text-xs text-slate-500 bg-white border border-slate-200 rounded-none p-4">Nothing to moderate.</p>}
           {list.map(r => (
-            <article key={r.id} className="bg-white border border-slate-200 rounded-none p-4 text-sm space-y-1">
+            <article key={r.id} className="bg-white border border-slate-200 rounded-none p-4 text-xs space-y-1">
               <p className="font-bold">{r.professionalName} · {'★'.repeat(r.rating)} <span className="text-xs text-slate-500 font-normal">by {r.patientName} · {r.date} · {r.status ?? 'published'}</span></p>
               {r.comment && <p>{r.comment}</p>}
               {r.reportedAt && <p className="text-xs bg-amber-50 border border-amber-200 rounded-none p-2">Reported: {r.reportReason}</p>}
@@ -215,8 +215,8 @@ function Incidents({ say }: { say: (t: string) => void }) {
     <div className="space-y-3">
       {list.length === 0 && <p className="text-xs text-slate-500 bg-white border border-slate-200 p-4">No incidents reported.</p>}
       {list.map(i => (
-        <article key={i.id} className="bg-white border border-slate-200 p-4 text-sm space-y-1.5">
-          <p className="font-bold"><span className={`text-xs px-1.5 py-0.5 mr-2 uppercase ${tone[i.severity]}`}>{i.severity}</span>{i.kind.replace(/_/g, ' ')} <span className="text-xs text-slate-500 font-normal">· {i.status} · by {i.reporter} · {when(i.createdAt)}</span></p>
+        <article key={i.id} className="bg-white border border-slate-200 p-4 text-xs space-y-1.5">
+          <p className="font-bold"><span className={`text-2xs px-1.5 py-0.5 mr-2 uppercase ${tone[i.severity]}`}>{i.severity}</span>{i.kind.replace(/_/g, ' ')} <span className="text-xs text-slate-500 font-normal">· {i.status} · by {i.reporter} · {when(i.createdAt)}</span></p>
           <p>{i.description}</p>
           {i.relatedType && <p className="text-xs text-slate-500">Related {i.relatedType}: {i.relatedId}</p>}
           <details className="text-xs"><summary className="cursor-pointer font-bold">Timeline ({i.events.length})</summary><ul className="mt-1 space-y-1">{i.events.map((e: any, k: number) => <li key={k}>{when(e.ts)} · <b>{e.action}</b>{e.actor ? ` · ${e.actor}` : ''}{e.note ? ` · ${e.note}` : ''}</li>)}</ul></details>

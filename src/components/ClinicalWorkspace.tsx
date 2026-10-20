@@ -117,7 +117,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
     setOk('Saved.'); done(); load();
   };
 
-  if (!ctx) return <p className="text-sm text-slate-600 p-4">{error || 'Loading clinical workspace…'}</p>;
+  if (!ctx) return <p className="text-xs text-slate-600 p-4">{error || 'Loading clinical workspace…'}</p>;
 
   const tabs = [
     ['notes', 'Notes', Stethoscope], ['rx', 'Prescribe', Pill], ['mc', 'Certificate', FilePlus2], ['refer', 'Refer & labs', Plus], ['record', 'Patient record', Lock],
@@ -129,7 +129,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
   return (
     <div className="space-y-3 text-slate-800">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-extrabold">{ctx.patient.name}</p>
+        <p className="text-xs font-extrabold">{ctx.patient.name}</p>
         <p className={`text-xs font-bold px-2 py-1 border ${ctx.recordShared ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
           {ctx.recordShared ? 'Patient shared their health record with you' : 'Patient has not shared their health record'}
         </p>

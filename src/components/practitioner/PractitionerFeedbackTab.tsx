@@ -38,7 +38,7 @@ export default function PractitionerFeedbackTab({
       {/* Reviews Metric Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-sm font-semibold text-[color:var(--ink-2)] block">Overall Clinical Rating</span>
+          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">Overall Clinical Rating</span>
           <div className="flex items-center gap-2">
             <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{avgOverall ?? "—"}</span>
             <div className="flex text-amber-400 shrink-0">
@@ -51,7 +51,7 @@ export default function PractitionerFeedbackTab({
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-sm font-semibold text-[color:var(--ink-2)] block">Bedside Manners</span>
+          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">Bedside Manners</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgComm} / 5.0` : '—'}</span>
           <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
             <div className="bg-[color:var(--t-600)] h-full rounded-none" style={{ width: `${hasReviews ? (Number(avgComm)/5)*100 : 0}%` }}></div>
@@ -59,7 +59,7 @@ export default function PractitionerFeedbackTab({
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-sm font-semibold text-[color:var(--ink-2)] block">Clinic Punctuality</span>
+          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">Clinic Punctuality</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgPunct} / 5.0` : '—'}</span>
           <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
             <div className="bg-[color:var(--t-600)] h-full rounded-none" style={{ width: `${hasReviews ? (Number(avgPunct)/5)*100 : 0}%` }}></div>
@@ -67,7 +67,7 @@ export default function PractitionerFeedbackTab({
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-sm font-semibold text-[color:var(--ink-2)] block">Care Satisfaction</span>
+          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">Care Satisfaction</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgSatis} / 5.0` : '—'}</span>
           <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
             <div className="bg-[color:var(--t-600)] h-full rounded-none" style={{ width: `${hasReviews ? (Number(avgSatis)/5)*100 : 0}%` }}></div>
@@ -105,7 +105,7 @@ export default function PractitionerFeedbackTab({
                         <div className="flex items-center gap-2">
                           <h4 className="text-sm font-extrabold text-slate-800">{rev.patientName}</h4>
                           {rev.isVerifiedPatient && (
-                            <span className="bg-[color:var(--t-50)]/50 text-[color:var(--t-600)] border border-[color:var(--t-200)] text-xs font-bold px-1.5 py-0.5 rounded-none uppercase tracking-wider">Verified Patient</span>
+                            <span className="bg-[color:var(--t-50)]/50 text-[color:var(--t-600)] border border-[color:var(--t-200)] text-2xs font-bold px-1.5 py-0.5 rounded-none uppercase tracking-wider">Verified Patient</span>
                           )}
                         </div>
                         <p className="text-xs text-slate-400 font-semibold font-mono tabular-nums">{rev.date}</p>

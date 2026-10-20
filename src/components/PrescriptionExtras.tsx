@@ -11,7 +11,7 @@ const STATUS_LABEL: Record<string, string> = {
   requested: 'Requested', arranged: 'Arranged', out_for_delivery: 'Out for delivery', delivered: 'Delivered', failed: 'Failed', cancelled: 'Cancelled',
 };
 const GL_LABEL: Record<string, string> = { requested: 'Waiting for the pharmacy', approved: 'Guarantee letter approved', declined: 'Not covered by the guarantee letter' };
-const input = 'border border-slate-300 px-2 min-h-[44px] text-sm';
+const input = 'border border-slate-300 px-2 min-h-[44px] text-xs';
 const link = 'min-h-[44px] px-2 inline-flex items-center font-bold underline cursor-pointer';
 
 interface Props {

@@ -9,7 +9,7 @@ import { useLocale } from '../locale/store';
 
 const jpost = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
-const field = 'border border-slate-200 bg-white px-3 py-2 text-sm w-full focus:outline-none focus:border-[color:var(--t-600)]';
+const field = 'border border-slate-200 bg-white px-3 py-2 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString() : '');
 
 interface SupportDeskProps {
@@ -128,21 +128,21 @@ export default function SupportDesk({
 
       <form onSubmit={create} className="bg-white border border-[color:var(--t-200)] p-6 space-y-4 shadow-xs">
         <h2 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)]">Open a Support Ticket</h2>
-        <select className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3 text-sm text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors cursor-pointer" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} required aria-label="Category">
+        <select className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3 text-xs text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors cursor-pointer" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} required aria-label="Category">
           <option value="">Select ticket category…</option>
           {cats.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
         </select>
         {chosen && <p className="text-xs text-[color:var(--ink-2)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-2.5">Target resolution window: <b className="text-[color:var(--ink)]">{chosen.respondWithinHours} hour{chosen.respondWithinHours === 1 ? '' : 's'}</b>.</p>}
-        {form.category === 'Report a user' && <input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 text-sm text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors" placeholder="Who are you reporting? (Practitioner or Pharmacy name)" value={form.target} onChange={e => setForm({ ...form, target: e.target.value })} maxLength={100} />}
-        <input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 text-sm text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors" placeholder="Ticket Subject (summary)" value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} required minLength={3} maxLength={120} />
-        <textarea className="w-full border border-[color:var(--t-200)] bg-[color:var(--t-bg)] p-3 text-sm text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors" rows={4} placeholder="Detailed explanation of the issue or clinical question…" value={form.body} onChange={e => setForm({ ...form, body: e.target.value })} required minLength={10} maxLength={3000} />
+        {form.category === 'Report a user' && <input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 text-xs text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors" placeholder="Who are you reporting? (Practitioner or Pharmacy name)" value={form.target} onChange={e => setForm({ ...form, target: e.target.value })} maxLength={100} />}
+        <input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 text-xs text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors" placeholder="Ticket Subject (summary)" value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} required minLength={3} maxLength={120} />
+        <textarea className="w-full border border-[color:var(--t-200)] bg-[color:var(--t-bg)] p-3 text-xs text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors" rows={4} placeholder="Detailed explanation of the issue or clinical question…" value={form.body} onChange={e => setForm({ ...form, body: e.target.value })} required minLength={10} maxLength={3000} />
         {msg && <p role="status" className={`text-xs font-bold p-3 border ${msg.ok ? 'text-emerald-800 bg-emerald-50 border-emerald-200' : 'text-rose-800 bg-rose-50 border-rose-200'}`}>{msg.text}</p>}
         <button className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold h-12 flex items-center justify-center cursor-pointer transition-colors shadow-xs">Submit Ticket to Care Operations</button>
       </form>
 
       {cats.length > 0 && (
         <section className="bg-white border border-[color:var(--t-200)] p-5 shadow-xs">
-          <h2 className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--ink)] mb-3">Service Level Agreement (SLA)</h2>
+          <h2 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)] mb-3">Service Level Agreement (SLA)</h2>
           <ul className="divide-y divide-[color:var(--t-100)] text-xs">
             {cats.map(c => (
               <li key={c.name} className="py-2 flex justify-between items-center gap-3">
@@ -162,20 +162,20 @@ export default function SupportDesk({
             <ul className="divide-y divide-slate-100">
               {tickets.map(t => (
                 <li key={t.id}><button onClick={() => openTicket(t.id)} className={`w-full text-left py-2.5 cursor-pointer ${open?.id === t.id ? 'font-bold' : ''}`}>
-                  <p className="text-sm truncate">{t.subject}</p><p className="text-xs text-slate-500">{t.category} · {t.status}</p>
+                  <p className="text-xs truncate">{t.subject}</p><p className="text-xs text-slate-500">{t.category} · {t.status}</p>
                 </button></li>
               ))}
             </ul>
           )}
         </section>
         <section className="bg-white border border-slate-200 p-4">
-          {!open ? <p className="text-sm text-slate-500">Select a ticket to read the conversation.</p> : (
+          {!open ? <p className="text-xs text-slate-500">Select a ticket to read the conversation.</p> : (
             <div className="space-y-3">
               <div className="flex justify-between gap-3"><div><h3 className="text-sm font-extrabold">{open.subject}</h3><p className="text-xs text-slate-500">{open.category} · {open.status} · opened {when(open.createdAt)}</p></div>
                 {open.status !== 'resolved' && <button onClick={resolve} className="text-xs font-bold border border-slate-200 px-3 py-1.5 h-fit cursor-pointer">Mark resolved</button>}</div>
               <ul className="space-y-2 max-h-80 overflow-y-auto">
                 {open.messages.map((m: any) => (
-                  <li key={m.id} className={`text-sm p-3 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}>
+                  <li key={m.id} className={`text-xs p-3 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}>
                     <p className="text-xs font-extrabold uppercase text-slate-500 mb-1">{m.fromStaff ? 'MedCred support' : 'You'} · {when(m.ts)}</p>{m.body}
                   </li>
                 ))}

@@ -3,7 +3,7 @@ import { BookOpenCheck, ExternalLink, RefreshCw, Search, FileText, Sparkles, Che
 
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
-const field = 'border border-slate-200 bg-white px-3 py-2 text-sm w-full focus:outline-none focus:border-[color:var(--t-600)]';
+const field = 'border border-slate-200 bg-white px-3 py-2 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
 const lab = 'text-xs font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '—');
 
@@ -178,7 +178,7 @@ export default function AdminLiterature({
                   }`}
                 >
                   <span>{text}</span>
-                  <span className={`ml-1.5 px-1.5 py-0.5 rounded-none text-xs font-mono tabular-nums ${
+                  <span className={`ml-1.5 px-1.5 py-0.5 rounded-none text-2xs font-mono tabular-nums ${
                     tab === id ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
                   }`}>
                     {counts[id] ?? 0}
@@ -189,7 +189,7 @@ export default function AdminLiterature({
           </div>
 
           {items.length === 0 ? (
-            <div className="bg-white border border-slate-200 p-12 text-sm text-slate-500 text-center flex flex-col items-center justify-center gap-3 rounded-none">
+            <div className="bg-white border border-slate-200 p-12 text-xs text-slate-500 text-center flex flex-col items-center justify-center gap-3 rounded-none">
               <BookOpenCheck className="h-10 w-10 text-slate-300" />
               <div className="space-y-1">
                 <h4 className="text-sm font-bold text-slate-700">
@@ -297,8 +297,8 @@ export default function AdminLiterature({
               {sheets.map(s => (
                 <li key={s.id} className="bg-white border border-slate-200 p-5 space-y-3 text-xs min-w-0 rounded-none shadow-none hover:border-[color:var(--t-200)] transition-colors">
                   <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
-                    <b className="text-sm font-black text-slate-900">{s.title}</b>
-                    <span className={`font-black uppercase text-xs px-2.5 py-0.5 border rounded-none ${
+                    <b className="text-xs font-black text-slate-900">{s.title}</b>
+                    <span className={`font-black uppercase text-2xs px-2.5 py-0.5 border rounded-none ${
                       s.status === 'approved' ? 'text-emerald-700 border-emerald-200 bg-emerald-50' : 'text-slate-600 border-slate-200 bg-slate-50'
                     }`}>
                       {s.status} · {s.topic}
@@ -364,7 +364,7 @@ export default function AdminLiterature({
                 <li key={t.condition} className="inline-flex items-center gap-2 border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold rounded-none">
                   <b className="text-slate-800">{t.condition}</b>
                   <span className="text-slate-500 text-xs font-mono">{t.lastRunAt ? `last synced ${when(t.lastRunAt)}, +${t.lastAdded ?? 0}` : 'pending initial sync'}</span>
-                  <button onClick={() => removeTopic(t.condition)} aria-label={`Stop tracking ${t.condition}`} className="text-slate-400 hover:text-rose-700 cursor-pointer font-bold text-sm">×</button>
+                  <button onClick={() => removeTopic(t.condition)} aria-label={`Stop tracking ${t.condition}`} className="text-slate-400 hover:text-rose-700 cursor-pointer font-bold text-xs">×</button>
                 </li>
               ))}
             </ul>

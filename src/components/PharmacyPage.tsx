@@ -649,7 +649,7 @@ export default function PharmacyPage() {
       <main id="main-content" className="flex-grow w-full">
         {/* ─── SECTION 1: HERO SECTION WITH AI PHARMACY IMAGE AT 70% OPACITY ─── */}
         <section
-          className="relative border-b border-[color:var(--t-200)] overflow-hidden h-[660px] sm:h-[640px] lg:h-[620px] flex items-center bg-transparent"
+          className="relative border-b border-[color:var(--t-200)] overflow-hidden py-10 sm:py-14 flex items-center bg-transparent"
           aria-label="Community Pharmacies Hero"
         >
           <div
@@ -671,14 +671,14 @@ export default function PharmacyPage() {
                   </div>
                 </div>
 
-                <div className="min-h-[84px] sm:min-h-[96px] flex flex-col justify-center mt-3">
+                <div className="mt-3">
                   <h1 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-[1.12] text-slate-900">
                     <span>{tx.hero.titleLead}</span>
                     <span className="text-[color:var(--t-600)]">{tx.hero.titleAccent}</span>
                   </h1>
                 </div>
 
-                <div className="min-h-[64px] flex items-center mt-2.5">
+                <div className="mt-2.5">
                   <p className="text-sm sm:text-base text-slate-700 font-medium leading-relaxed">
                     {tx.hero.sub}
                   </p>

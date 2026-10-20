@@ -155,7 +155,7 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
       {result?.emergency && (
         <div role="alert" className="mt-5 bg-rose-50 border-2 border-rose-400 p-4 text-rose-900 space-y-1">
           <p className="font-black">This may be an emergency: {result.emergency.reasons.join(', ')}.</p>
-          <p className="text-sm font-bold">Call {result.emergency.numbers.map((n: any) => n.number).join(' or ')} now instead of waiting for an appointment.</p>
+          <p className="text-xs font-bold">Call {result.emergency.numbers.map((n: any) => n.number).join(' or ')} now instead of waiting for an appointment.</p>
         </div>
       )}
 
@@ -179,7 +179,7 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
 
             <div className="flex justify-between items-center p-3 border border-[color:var(--t-200)] bg-[color:var(--t-bg)]">
               <span className="font-bold text-[color:var(--ink)]">Triage Urgency:</span>
-              <span className={`px-2.5 py-1 font-mono font-bold text-xs uppercase tracking-wider ${result.data.symptomSeverity === 'High/Urgent'
+              <span className={`px-2.5 py-1 font-mono font-bold text-2xs uppercase tracking-wider ${result.data.symptomSeverity === 'High/Urgent'
                   ? 'bg-rose-50 text-rose-800 border border-rose-200'
                   : result.data.symptomSeverity === 'Medium'
                     ? 'bg-amber-50 text-amber-800 border border-amber-200'

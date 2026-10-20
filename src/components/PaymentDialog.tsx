@@ -98,7 +98,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
             <dd className="tabular-nums font-semibold">{formatMoney(b.tax)}</dd>
           </>
         )}
-        <dt className="font-extrabold text-sm text-[color:var(--ink)] pt-1 border-t border-[color:var(--t-200)]">Total Payable (MYR)</dt>
+        <dt className="font-extrabold text-xs text-[color:var(--ink)] pt-1 border-t border-[color:var(--t-200)]">Total Payable (MYR)</dt>
         <dd className="text-xl font-black tabular-nums text-[color:var(--ink)] pt-1 border-t border-[color:var(--t-200)]">{formatMoney(b.amount)}</dd>
       </dl>
       {b.indicative.length > 0 && (
@@ -218,7 +218,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
               <div className="space-y-3 p-3.5 bg-slate-50 border border-slate-200 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-slate-800">Direct FPX Online Banking</span>
-                  <span className="text-xs font-mono text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.2">
+                  <span className="text-2xs font-mono text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.2">
                     17 Banks Connected
                   </span>
                 </div>
@@ -274,7 +274,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                     <span className="h-2 w-2 rounded-full bg-rose-600 animate-ping" />
                     <span className="font-black text-rose-950">DuitNow National QR Standard</span>
                   </div>
-                  <span className="text-xs font-mono font-bold text-rose-800 bg-rose-100 border border-rose-300 px-1.5 py-0.2">
+                  <span className="text-2xs font-mono font-bold text-rose-800 bg-rose-100 border border-rose-300 px-1.5 py-0.2">
                     Instant Clearance
                   </span>
                 </div>
@@ -308,9 +308,9 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                   Accepts Malaysian MyDebit, Visa, and Mastercard with OTP authentication.
                 </p>
                 <div className="flex gap-2">
-                  <span className="px-2 py-1 bg-white border border-slate-300 font-bold text-xs text-slate-700">Visa</span>
-                  <span className="px-2 py-1 bg-white border border-slate-300 font-bold text-xs text-slate-700">Mastercard</span>
-                  <span className="px-2 py-1 bg-white border border-slate-300 font-bold text-xs text-slate-700">MyDebit</span>
+                  <span className="px-2 py-1 bg-white border border-slate-300 font-bold text-2xs text-slate-700">Visa</span>
+                  <span className="px-2 py-1 bg-white border border-slate-300 font-bold text-2xs text-slate-700">Mastercard</span>
+                  <span className="px-2 py-1 bg-white border border-slate-300 font-bold text-2xs text-slate-700">MyDebit</span>
                 </div>
               </div>
             )}
@@ -357,7 +357,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
 
         {state === 'paid' && (
           <div className="space-y-4">
-            <div className="flex items-center gap-2 text-emerald-700 font-black text-sm bg-emerald-50 border border-emerald-200 p-3">
+            <div className="flex items-center gap-2 text-emerald-700 font-black text-xs bg-emerald-50 border border-emerald-200 p-3">
               <CheckCircle2 className="h-5 w-5 shrink-0" />
               <span>Payment Successfully Settled &amp; Escrowed</span>
             </div>

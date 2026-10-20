@@ -7,7 +7,7 @@ const jget = (url: string) => fetch(url).then(r => r.json());
 const jput = (url: string, body: unknown) => fetch(url, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json());
 const BANKS = ['Maybank', 'CIMB Bank', 'Public Bank', 'RHB Bank', 'Hong Leong Bank', 'AmBank', 'Bank Islam', 'Bank Rakyat', 'BSN', 'Affin Bank', 'Alliance Bank', 'OCBC Bank', 'HSBC Bank Malaysia', 'UOB Malaysia', 'Standard Chartered Malaysia', 'MBSB Bank', 'Agrobank'];
 const label = 'text-xs font-extrabold uppercase tracking-wider text-slate-700 block mb-1.5';
-const input = 'w-full bg-white border border-[color:var(--t-200)] px-3 h-11 text-sm font-medium focus:outline-none focus:border-[color:var(--t-600)]';
+const input = 'w-full bg-white border border-[color:var(--t-200)] px-3 h-11 text-xs font-medium focus:outline-none focus:border-[color:var(--t-600)]';
 
 interface Data {
   terms: { schedule: string; holdDays: number; minimumPayout: number; method: string; runBy: string };
@@ -39,8 +39,8 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
     else setMsg({ ok: false, text: r.message || 'Could not save.' });
   };
 
-  if (error) return <p role="alert" className="text-sm text-rose-800 p-4">{error}</p>;
-  if (!d) return <p role="status" className="text-sm text-slate-600 p-4">Loading…</p>;
+  if (error) return <p role="alert" className="text-xs text-rose-800 p-4">{error}</p>;
+  if (!d) return <p role="status" className="text-xs text-slate-600 p-4">Loading…</p>;
   const t = d.terms, s = d.summary;
   const bankStatus = d.bank?.status;
 
@@ -56,7 +56,7 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
       )}
 
       <div className={embedded ? "space-y-6" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
-        {!s && <p className="text-sm bg-amber-50 border border-amber-200 text-amber-900 p-3 font-semibold">Finish your practitioner registration to see earnings.</p>}
+        {!s && <p className="text-xs bg-amber-50 border border-amber-200 text-amber-900 p-3 font-semibold">Finish your practitioner registration to see earnings.</p>}
 
         {s && (
           <section aria-label="Balances" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -80,7 +80,7 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
         <h2 id="bank-h" className="text-sm font-extrabold flex items-center gap-2"><Landmark className="h-4 w-4" aria-hidden="true" />Bank account for payouts</h2>
         {!d.bankAvailable && <p className="text-xs bg-amber-50 border border-amber-200 text-amber-900 p-3 font-semibold">Bank details cannot be saved yet because the server has no encryption key. Ask the board.</p>}
         {d.bank && !editing && (
-          <div className="space-y-2 text-sm">
+          <div className="space-y-2 text-xs">
             <p className="font-bold">{d.bank.bankName} ••••{d.bank.last4}</p>
             <p className="text-slate-700">Account holder: {d.bank.accountName}</p>
             {bankStatus === 'verified' && <p className="inline-flex items-center gap-1.5 text-emerald-900 bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-xs font-bold"><CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />Verified by the board</p>}
@@ -111,8 +111,8 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
               <input id="pb-pw" type="password" className={input} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required autoComplete="current-password" />
             </div>
             <div className="sm:col-span-2 flex flex-wrap gap-2">
-              <button type="submit" disabled={busy} className="min-h-[44px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] cursor-pointer disabled:opacity-60">{busy ? 'Saving…' : 'Save bank details'}</button>
-              {editing && <button type="button" onClick={() => { setEditing(false); setMsg(null); }} className="min-h-[44px] px-5 text-sm font-bold border border-slate-300 cursor-pointer">Cancel</button>}
+              <button type="submit" disabled={busy} className="min-h-[44px] px-6 text-xs font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] cursor-pointer disabled:opacity-60">{busy ? 'Saving…' : 'Save bank details'}</button>
+              {editing && <button type="button" onClick={() => { setEditing(false); setMsg(null); }} className="min-h-[44px] px-5 text-xs font-bold border border-slate-300 cursor-pointer">Cancel</button>}
             </div>
           </form>
         )}

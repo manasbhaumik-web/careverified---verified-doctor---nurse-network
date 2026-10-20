@@ -116,7 +116,7 @@ export default function WorkspaceHeader<T extends string = string>({
                   <span>{tab.label}</span>
                   {tab.count !== undefined && (
                     <span
-                      className={`text-xs font-mono font-bold px-1.5 py-0.2 leading-none ${
+                      className={`text-2xs font-mono font-bold px-1.5 py-0.2 leading-none ${
                         isActive
                           ? 'bg-white/20 text-white'
                           : 'bg-white text-slate-700 border border-[color:var(--t-200)]'
@@ -126,7 +126,7 @@ export default function WorkspaceHeader<T extends string = string>({
                     </span>
                   )}
                   {tab.badge && (
-                    <span className="text-xs font-mono font-bold uppercase tracking-wider px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span className="text-2xs font-mono font-bold uppercase tracking-wider px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
                       {tab.badge}
                     </span>
                   )}

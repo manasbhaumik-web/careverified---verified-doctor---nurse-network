@@ -122,7 +122,7 @@ export default function Footer({
 
           {/* Column 2: Portals & Navigation (2 Cols) */}
           <div className="hidden md:block lg:col-span-2 space-y-3">
-            <h4 className="text-xs font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
+            <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
               Portal Lounges
             </h4>
             
@@ -167,7 +167,7 @@ export default function Footer({
 
           {/* Column 3: Verification & Registers (2 Cols) */}
           <div className="hidden md:block lg:col-span-2 space-y-3">
-            <h4 className="text-xs font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
+            <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
               Verification Hub
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
@@ -206,7 +206,7 @@ export default function Footer({
 
           {/* Column 4: Compliance & Medical Governance (2 Cols) */}
           <div className="hidden md:block lg:col-span-2 space-y-3">
-            <h4 className="text-xs font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
+            <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
               Governance & Law
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
@@ -221,7 +221,7 @@ export default function Footer({
 
           {/* Column 5: Headquarters & Session Desk (2 Cols) */}
           <div className="hidden md:block lg:col-span-2 space-y-3">
-            <h4 className="text-xs font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
+            <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
               Operational HQ
             </h4>
             <div className="text-xs text-slate-400 space-y-2.5">

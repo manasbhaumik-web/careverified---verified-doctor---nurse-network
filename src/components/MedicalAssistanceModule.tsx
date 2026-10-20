@@ -496,13 +496,13 @@ export default function MedicalAssistanceModule({
                   <FileText className="h-5 w-5 text-[color:var(--t-600)]" aria-hidden="true" />
                   Request a treatment quote
                 </h2>
-                <p className="text-sm text-slate-700 mt-1">
+                <p className="text-xs text-slate-700 mt-1">
                   Tell a hospital what you need and it replies with an itemised quote. Sending this request is free and does not commit you.
                 </p>
               </div>
 
               {formSuccessMessage && (
-                <div role="status" className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-950 text-sm space-y-2">
+                <div role="status" className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs space-y-2">
                   <div className="flex items-center gap-2 font-extrabold text-base">
                     <CheckCircle2 className="h-5 w-5 text-emerald-700 shrink-0" aria-hidden="true" />
                     Request sent. Your reference is <span className="font-mono">{formSuccessMessage.trackingCode}</span>
@@ -513,7 +513,7 @@ export default function MedicalAssistanceModule({
                   <button
                     type="button"
                     onClick={() => { if (me) setOpenCaseId(formSuccessMessage.id); setActiveTab('cases'); }}
-                    className="min-h-[44px] px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white font-bold text-sm cursor-pointer"
+                    className="min-h-[44px] px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white font-bold text-xs cursor-pointer"
                   >
                     View my request
                   </button>
@@ -521,13 +521,13 @@ export default function MedicalAssistanceModule({
               )}
 
               {formError && (
-                <div role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-sm flex items-start gap-2">
+                <div role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-xs flex items-start gap-2">
                   <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
                   <span>{formError}</span>
                 </div>
               )}
 
-              <ol aria-label="Steps" className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+              <ol aria-label="Steps" className="flex flex-wrap gap-x-5 gap-y-1 text-xs">
                 {['About you', 'What you need', 'Extras and consent'].map((t, i) => (
                   <li key={t} aria-current={step === i + 1 ? 'step' : undefined} className={step === i + 1 ? 'font-extrabold text-[color:var(--t-700)]' : step > i + 1 ? 'font-semibold text-slate-800' : 'text-slate-700'}>
                     {i + 1}. {t}{step > i + 1 ? ' (done)' : ''}
@@ -539,7 +539,7 @@ export default function MedicalAssistanceModule({
                 {/* STEP 1: who */}
                 <div data-step="1" hidden={step !== 1} className="space-y-4">
                   <fieldset className="space-y-2">
-                    <legend className="text-sm font-bold text-slate-800 block">Where do you live? *</legend>
+                    <legend className="text-xs font-bold text-slate-800 block">Where do you live? *</legend>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {[
                         { id: 'local_malaysian', title: 'Malaysian citizen', text: 'You hold a MyKad.', home: 'MY' },
@@ -548,7 +548,7 @@ export default function MedicalAssistanceModule({
                       ].map(o => (
                         <label key={o.id} className={`flex items-start gap-3 p-3 min-h-[44px] border cursor-pointer ${patientType === o.id ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)]' : 'border-slate-300 bg-white hover:bg-slate-50'}`}>
                           <input type="radio" name="patientType" className="mt-1 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" checked={patientType === o.id} onChange={() => { setPatientType(o.id as any); setHomeCountry(o.home); }} />
-                          <span><span className="block text-sm font-bold text-slate-900">{o.title}</span><span className="block text-xs text-slate-700">{o.text}</span></span>
+                          <span><span className="block text-xs font-bold text-slate-900">{o.title}</span><span className="block text-xs text-slate-700">{o.text}</span></span>
                         </label>
                       ))}
                     </div>
@@ -556,25 +556,25 @@ export default function MedicalAssistanceModule({
 
                   {patientType !== 'local_malaysian' && (
                     <div className="space-y-1 sm:max-w-xs">
-                      <label htmlFor="aq-country" className="text-sm font-bold text-slate-800 block">Country you live in</label>
-                      <select id="aq-country" value={homeCountry} onChange={(e) => setHomeCountry(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
+                      <label htmlFor="aq-country" className="text-xs font-bold text-slate-800 block">Country you live in</label>
+                      <select id="aq-country" value={homeCountry} onChange={(e) => setHomeCountry(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
                         {[['ID', 'Indonesia'], ['SG', 'Singapore'], ['CN', 'China'], ['IN', 'India'], ['AU', 'Australia'], ['GB', 'United Kingdom'], ['US', 'United States'], ['SA', 'Saudi Arabia'], ['AE', 'United Arab Emirates'], ['JP', 'Japan'], ['MY', 'Malaysia'], ['XX', 'Other']].map(([c, n]) => <option key={c} value={c}>{n}</option>)}
                       </select>
                     </div>
                   )}
 
                   <div className="space-y-1">
-                    <label htmlFor="aq-name" className="text-sm font-bold text-slate-800 block">Full name *</label>
-                    <input id="aq-name" type="text" required autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="e.g. Fatimah binti Ali" className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                    <label htmlFor="aq-name" className="text-xs font-bold text-slate-800 block">Full name *</label>
+                    <input id="aq-name" type="text" required autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="e.g. Fatimah binti Ali" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="aq-email" className="text-sm font-bold text-slate-800 block">Email *</label>
-                      <input id="aq-email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                      <label htmlFor="aq-email" className="text-xs font-bold text-slate-800 block">Email *</label>
+                      <input id="aq-email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="aq-phone" className="text-sm font-bold text-slate-800 block">Phone or WhatsApp (helps the hospital reach you)</label>
-                      <input id="aq-phone" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+60 12-345 6789" className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                      <label htmlFor="aq-phone" className="text-xs font-bold text-slate-800 block">Phone or WhatsApp (helps the hospital reach you)</label>
+                      <input id="aq-phone" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+60 12-345 6789" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                     </div>
                   </div>
                 </div>
@@ -583,8 +583,8 @@ export default function MedicalAssistanceModule({
                 <div data-step="2" hidden={step !== 2} className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="aq-type" className="text-sm font-bold text-slate-800 block">What do you need? *</label>
-                      <select id="aq-type" value={assistanceType} onChange={(e) => setAssistanceType(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
+                      <label htmlFor="aq-type" className="text-xs font-bold text-slate-800 block">What do you need? *</label>
+                      <select id="aq-type" value={assistanceType} onChange={(e) => setAssistanceType(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
                         <option value="elective_surgery">A procedure and hospital stay</option>
                         <option value="specialist_consult">A specialist consultation or second opinion</option>
                         <option value="urgent_evacuation">Transfer between hospitals</option>
@@ -594,8 +594,8 @@ export default function MedicalAssistanceModule({
                       </select>
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="aq-specialty" className="text-sm font-bold text-slate-800 block">Medical specialty *</label>
-                      <select id="aq-specialty" value={specialty} onChange={(e) => setSpecialty(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
+                      <label htmlFor="aq-specialty" className="text-xs font-bold text-slate-800 block">Medical specialty *</label>
+                      <select id="aq-specialty" value={specialty} onChange={(e) => setSpecialty(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
                         <option value="Cardiology & Interventional">Cardiology and heart surgery</option>
                         <option value="Orthopaedics & Joint Reconstruction">Orthopaedics (knee, hip, joints)</option>
                         <option value="Oncology & Surgical Oncology">Oncology and radiotherapy</option>
@@ -609,7 +609,7 @@ export default function MedicalAssistanceModule({
                   </div>
 
                   <fieldset className="space-y-2">
-                    <legend className="text-sm font-bold text-slate-800 block">How soon do you need a reply? *</legend>
+                    <legend className="text-xs font-bold text-slate-800 block">How soon do you need a reply? *</legend>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {[
                         { id: 'routine', title: 'Routine', text: 'Within a few weeks' },
@@ -618,14 +618,14 @@ export default function MedicalAssistanceModule({
                       ].map(o => (
                         <label key={o.id} className={`flex items-start gap-3 p-3 min-h-[44px] border cursor-pointer ${urgency === o.id ? (o.id === 'urgent' ? 'border-red-700 bg-red-50' : 'border-[color:var(--t-600)] bg-[color:var(--t-50)]') : 'border-slate-300 bg-white hover:bg-slate-50'}`}>
                           <input type="radio" name="urgency" className="mt-1 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" checked={urgency === o.id} onChange={() => setUrgency(o.id as any)} />
-                          <span><span className="block text-sm font-bold text-slate-900">{o.title}</span><span className="block text-xs text-slate-700">{o.text}</span></span>
+                          <span><span className="block text-xs font-bold text-slate-900">{o.title}</span><span className="block text-xs text-slate-700">{o.text}</span></span>
                         </label>
                       ))}
                     </div>
                   </fieldset>
 
                   {(urgency === 'urgent' || assistanceType === 'urgent_evacuation') && (
-                    <div role="alert" className="p-4 bg-red-50 border-2 border-red-300 text-red-950 text-sm space-y-1">
+                    <div role="alert" className="p-4 bg-red-50 border-2 border-red-300 text-red-950 text-xs space-y-1">
                       <p className="font-extrabold flex items-center gap-2"><AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" /> If someone is in danger now, do not wait for this request.</p>
                       <p>Call <strong>999</strong> (Malaysia) or go to the nearest emergency department. This form is not an emergency service and may not be read straight away.</p>
                     </div>
@@ -633,24 +633,24 @@ export default function MedicalAssistanceModule({
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="aq-facility" className="text-sm font-bold text-slate-800 block">Hospital *</label>
+                      <label htmlFor="aq-facility" className="text-xs font-bold text-slate-800 block">Hospital *</label>
                       {facilities.length <= 1 ? (
-                        <p className={`min-h-[44px] flex items-center text-sm font-semibold ${facilities[0] ? 'text-slate-900' : 'text-rose-900'}`}>{facilities[0] ? `${facilities[0].name}${facilities[0].city ? `, ${facilities[0].city}` : ''}` : 'No hospital is available right now. Please try again later.'}</p>
+                        <p className={`min-h-[44px] flex items-center text-xs font-semibold ${facilities[0] ? 'text-slate-900' : 'text-rose-900'}`}>{facilities[0] ? `${facilities[0].name}${facilities[0].city ? `, ${facilities[0].city}` : ''}` : 'No hospital is available right now. Please try again later.'}</p>
                       ) : (
-                        <select id="aq-facility" value={facilityId} onChange={(e) => setFacilityId(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
+                        <select id="aq-facility" value={facilityId} onChange={(e) => setFacilityId(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
                           {facilities.map(f => <option key={f.id} value={f.id}>{f.name}{f.city ? ` (${f.city})` : ''}</option>)}
                         </select>
                       )}
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="aq-from" className="text-sm font-bold text-slate-800 block">Earliest date you could start</label>
-                      <input id="aq-from" type="date" value={preferredFrom} min={new Date().toISOString().slice(0, 10)} onChange={(e) => setPreferredFrom(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                      <label htmlFor="aq-from" className="text-xs font-bold text-slate-800 block">Earliest date you could start</label>
+                      <input id="aq-from" type="date" value={preferredFrom} min={new Date().toISOString().slice(0, 10)} onChange={(e) => setPreferredFrom(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="aq-summary" className="text-sm font-bold text-slate-800 block">Describe your condition or the treatment you want *</label>
-                    <textarea id="aq-summary" rows={5} required minLength={15} value={summary} onChange={(e) => setSummary(e.target.value)} placeholder="Symptoms, any diagnosis you have been given, past operations, the procedure you are asking about…" className="w-full px-3 py-2 border border-slate-300 text-sm bg-white leading-relaxed focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                    <label htmlFor="aq-summary" className="text-xs font-bold text-slate-800 block">Describe your condition or the treatment you want *</label>
+                    <textarea id="aq-summary" rows={5} required minLength={15} value={summary} onChange={(e) => setSummary(e.target.value)} placeholder="Symptoms, any diagnosis you have been given, past operations, the procedure you are asking about…" className="w-full px-3 py-2 border border-slate-300 text-xs bg-white leading-relaxed focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                     <p className="text-xs text-slate-700">At least 15 characters. Do not put passport, card or bank numbers here. You can share reports later in Messages.</p>
                   </div>
                 </div>
@@ -659,17 +659,17 @@ export default function MedicalAssistanceModule({
                 <div data-step="3" hidden={step !== 3} className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="aq-insurer" className="text-sm font-bold text-slate-800 block">Insurance provider (optional)</label>
-                      <input id="aq-insurer" type="text" value={insuranceCarrier} onChange={(e) => setInsuranceCarrier(e.target.value)} placeholder="e.g. Great Eastern, Bupa, Cigna, Allianz" className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                      <label htmlFor="aq-insurer" className="text-xs font-bold text-slate-800 block">Insurance provider (optional)</label>
+                      <input id="aq-insurer" type="text" value={insuranceCarrier} onChange={(e) => setInsuranceCarrier(e.target.value)} placeholder="e.g. Great Eastern, Bupa, Cigna, Allianz" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                     </div>
-                    <label className="flex items-center gap-3 min-h-[44px] sm:mt-7 px-3 border border-slate-300 bg-white cursor-pointer text-sm font-semibold text-slate-900">
+                    <label className="flex items-center gap-3 min-h-[44px] sm:mt-7 px-3 border border-slate-300 bg-white cursor-pointer text-xs font-semibold text-slate-900">
                       <input type="checkbox" checked={guaranteeLetter} onChange={(e) => setGuaranteeLetter(e.target.checked)} className="h-5 w-5 shrink-0 accent-[color:var(--t-600)]" />
                       Ask the hospital about a guarantee letter from my insurer
                     </label>
                   </div>
 
                   <fieldset className="space-y-2">
-                    <legend className="text-sm font-bold text-slate-800 block">Help you would like arranged (optional)</legend>
+                    <legend className="text-xs font-bold text-slate-800 block">Help you would like arranged (optional)</legend>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {[
                         { label: 'A medical interpreter', v: needsInterpreter, set: setNeedsInterpreter },
@@ -679,7 +679,7 @@ export default function MedicalAssistanceModule({
                         { label: 'A hotel for family', v: needsAccommodation, set: setNeedsAccommodation },
                         { label: 'Halal meals', v: needsHalalFood, set: setNeedsHalalFood },
                       ].map(o => (
-                        <label key={o.label} className="flex items-center gap-3 min-h-[44px] px-3 border border-slate-300 bg-white cursor-pointer text-sm font-semibold text-slate-900">
+                        <label key={o.label} className="flex items-center gap-3 min-h-[44px] px-3 border border-slate-300 bg-white cursor-pointer text-xs font-semibold text-slate-900">
                           <input type="checkbox" checked={o.v} onChange={(e) => o.set(e.target.checked)} className="h-5 w-5 shrink-0 accent-[color:var(--t-600)]" />
                           {o.label}
                         </label>
@@ -687,8 +687,8 @@ export default function MedicalAssistanceModule({
                     </div>
                     {needsInterpreter && (
                       <div className="space-y-1 sm:max-w-xs">
-                        <label htmlFor="aq-lang" className="text-sm font-bold text-slate-800 block">Language</label>
-                        <select id="aq-lang" value={interpreterLanguage} onChange={(e) => setInterpreterLanguage(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
+                        <label htmlFor="aq-lang" className="text-xs font-bold text-slate-800 block">Language</label>
+                        <select id="aq-lang" value={interpreterLanguage} onChange={(e) => setInterpreterLanguage(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
                           <option value="Arabic">Arabic</option>
                           <option value="Mandarin">Mandarin</option>
                           <option value="Bahasa Indonesia">Bahasa Indonesia</option>
@@ -700,22 +700,22 @@ export default function MedicalAssistanceModule({
                     )}
                   </fieldset>
 
-                  <label className="flex items-start gap-3 cursor-pointer text-sm text-slate-800">
+                  <label className="flex items-start gap-3 cursor-pointer text-xs text-slate-800">
                     <input type="checkbox" required checked={shareDocuments} onChange={(e) => setShareDocuments(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" />
                     <span>I agree that MedCred and the hospital I chose may read what I have written here, only to assess my request and prepare a quote (Personal Data Protection Act 2010). *</span>
                   </label>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-200">
-                  <button type="button" onClick={goBack} disabled={step === 1} className="min-h-[44px] px-5 border border-slate-300 bg-white text-slate-800 text-sm font-bold hover:bg-slate-50 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                  <button type="button" onClick={goBack} disabled={step === 1} className="min-h-[44px] px-5 border border-slate-300 bg-white text-slate-800 text-xs font-bold hover:bg-slate-50 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
                     Back
                   </button>
                   {step < 3 ? (
-                    <button type="button" onClick={goNext} className="min-h-[44px] px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold cursor-pointer">
+                    <button type="button" onClick={goNext} className="min-h-[44px] px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer">
                       Next
                     </button>
                   ) : (
-                    <button type="submit" disabled={formSubmitting} className="min-h-[44px] px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold cursor-pointer flex items-center gap-2 disabled:opacity-60">
+                    <button type="submit" disabled={formSubmitting} className="min-h-[44px] px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer flex items-center gap-2 disabled:opacity-60">
                       {formSubmitting ? (<><RefreshCw className="h-4 w-4 animate-spin" aria-hidden="true" /> Sending…</>) : (<><Send className="h-4 w-4" aria-hidden="true" /> Send request</>)}
                     </button>
                   )}
@@ -730,7 +730,7 @@ export default function MedicalAssistanceModule({
                   <Shield className="h-4 w-4 text-[color:var(--t-600)]" aria-hidden="true" />
                   What happens next
                 </h3>
-                <ol className="space-y-3 text-sm text-slate-800 list-decimal ml-5">
+                <ol className="space-y-3 text-xs text-slate-800 list-decimal ml-5">
                   <li><strong>The hospital reads your request.</strong> Reply times differ between hospitals.</li>
                   <li><strong>You get an itemised quote</strong> with what is included, what is not, and how long the price is valid.</li>
                   <li><strong>You decide.</strong> Accept it, ask for changes, or ask questions. Accepting does not charge you.</li>
@@ -738,7 +738,7 @@ export default function MedicalAssistanceModule({
                 </ol>
               </div>
 
-              <div role="note" className="bg-red-50 border border-red-200 p-4 text-sm text-red-950 space-y-1">
+              <div role="note" className="bg-red-50 border border-red-200 p-4 text-xs text-red-950 space-y-1">
                 <p className="font-extrabold">In an emergency, call 999.</p>
                 <p>This service is for planned and urgent-but-stable care. It is not an emergency line.</p>
               </div>
@@ -756,13 +756,13 @@ export default function MedicalAssistanceModule({
         {activeTab === 'cases' && meLoaded && !me && (
           <div className="space-y-4">
           {cases.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 text-sm">
+            <div className="flex flex-wrap items-center gap-2 text-xs">
               <label htmlFor="currency-select" className="font-bold text-slate-800">Show prices in</label>
               <select
                 id="currency-select"
                 value={selectedCurrency}
                 onChange={(e) => setSelectedCurrency(e.target.value)}
-                className="border border-slate-300 bg-white text-sm font-semibold px-3 min-h-[44px] cursor-pointer focus:outline-none focus:border-[color:var(--t-600)]"
+                className="border border-slate-300 bg-white text-xs font-semibold px-3 min-h-[44px] cursor-pointer focus:outline-none focus:border-[color:var(--t-600)]"
               >
                 {Object.entries(CURRENCY_RATES).map(([code, item]) => (
                   <option key={code} value={code}>{code} - {item.label}</option>
@@ -771,7 +771,7 @@ export default function MedicalAssistanceModule({
               <span className="text-xs text-slate-700">Other currencies are a rough guide only. The hospital bills in ringgit (RM).</span>
             </div>
           )}
-          {actionError && <p role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-sm">{actionError}</p>}
+          {actionError && <p role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-xs">{actionError}</p>}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Column: Cases List */}
             <div className="lg:col-span-5 space-y-3">
@@ -795,12 +795,12 @@ export default function MedicalAssistanceModule({
               {!loadingCases && cases.length === 0 && (
                 <div className="bg-white border border-dashed border-slate-300 p-8 text-center text-xs text-slate-500 space-y-2">
                   <FileText className="h-8 w-8 text-slate-600 mx-auto" aria-hidden="true" />
-                  <p className="font-bold text-sm text-slate-900">You have no requests yet.</p>
-                  <p className="text-sm text-slate-700">{me ? 'Ask a hospital for a quote and it will appear here.' : 'If you already sent a request, use "Track a request" with your reference and email.'}</p>
+                  <p className="text-sm font-bold text-slate-900">You have no requests yet.</p>
+                  <p className="text-xs text-slate-700">{me ? 'Ask a hospital for a quote and it will appear here.' : 'If you already sent a request, use "Track a request" with your reference and email.'}</p>
                   <button
                     type="button"
                     onClick={() => setActiveTab('enquiry')}
-                    className="mt-2 min-h-[44px] px-4 bg-[color:var(--t-600)] text-white text-sm font-bold cursor-pointer"
+                    className="mt-2 min-h-[44px] px-4 bg-[color:var(--t-600)] text-white text-xs font-bold cursor-pointer"
                   >
                     Request a quote
                   </button>
@@ -825,13 +825,13 @@ export default function MedicalAssistanceModule({
                         <div>
                           <div className="flex items-center gap-1.5">
                             <span className="font-mono text-xs font-black text-slate-900">{c.trackingCode}</span>
-                            <span className="text-xs uppercase font-extrabold px-1.5 py-0.2 bg-slate-100 text-slate-700">
+                            <span className="text-2xs uppercase font-extrabold px-1.5 py-0.2 bg-slate-100 text-slate-700">
                               {c.patientType === 'local_malaysian' ? '🇲🇾 Local' : c.patientType === 'expat_resident' ? '🌏 Expat' : '✈️ Int’l'}
                             </span>
                           </div>
                           <p className="text-xs font-bold text-slate-800 mt-1 line-clamp-1">{c.summary}</p>
                         </div>
-                        <span className={`px-2 py-0.5 text-xs font-black uppercase border shrink-0 ${st.bg} ${st.color} ${st.border}`}>
+                        <span className={`px-2 py-0.5 text-2xs font-black uppercase border shrink-0 ${st.bg} ${st.color} ${st.border}`}>
                           {st.label}
                         </span>
                       </div>
@@ -861,7 +861,7 @@ export default function MedicalAssistanceModule({
                         <span className="text-base font-black text-slate-900 tracking-tight">
                           Case {selectedCase.trackingCode}
                         </span>
-                        <span className={`px-2 py-0.5 text-xs font-black uppercase border ${
+                        <span className={`px-2 py-0.5 text-2xs font-black uppercase border ${
                           STATUS_DISPLAY[selectedCase.status]?.bg || 'bg-slate-50'
                         } ${STATUS_DISPLAY[selectedCase.status]?.color || 'text-slate-700'} ${
                           STATUS_DISPLAY[selectedCase.status]?.border || 'border-slate-300'
@@ -997,10 +997,10 @@ export default function MedicalAssistanceModule({
                                   </tr>
                                 )}
                                 <tr>
-                                  <td colSpan={2} className="pt-2 text-right text-sm font-black text-slate-900">
+                                  <td colSpan={2} className="pt-2 text-right text-xs font-black text-slate-900">
                                     Grand Total:
                                   </td>
-                                  <td className="pt-2 text-right text-sm font-black font-mono text-emerald-800">
+                                  <td className="pt-2 text-right text-xs font-black font-mono text-emerald-800">
                                     {formatCur(selectedCase.latestQuote.total)}
                                   </td>
                                 </tr>
@@ -1031,14 +1031,14 @@ export default function MedicalAssistanceModule({
                           {/* Quotation Action Buttons */}
                           {selectedCase.status === 'quoted' && (
                             <div className="p-4 bg-white border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
-                              <span className="text-sm text-slate-700">
+                              <span className="text-xs text-slate-700">
                                 The hospital is waiting for your answer.
                               </span>
                               <div className="flex items-center gap-2">
                                 <button
                                   type="button"
                                   onClick={() => setShowRevisionModal(true)}
-                                  className="px-3 min-h-[44px] border border-slate-300 hover:bg-slate-100 text-slate-800 text-sm font-bold cursor-pointer"
+                                  className="px-3 min-h-[44px] border border-slate-300 hover:bg-slate-100 text-slate-800 text-xs font-bold cursor-pointer"
                                 >
                                   Ask for changes
                                 </button>
@@ -1046,7 +1046,7 @@ export default function MedicalAssistanceModule({
                                   type="button"
                                   onClick={() => { setActionError(''); setShowAcceptConfirm(true); }}
                                   disabled={decisionSubmitting}
-                                  className="px-4 min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-sm font-bold cursor-pointer flex items-center gap-1.5 shadow-xs"
+                                  className="px-4 min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer flex items-center gap-1.5 shadow-xs"
                                 >
                                   <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
                                   Accept this quote
@@ -1065,7 +1065,7 @@ export default function MedicalAssistanceModule({
                       ) : (
                         <div className="p-8 bg-slate-50 border border-dashed border-slate-300 text-center text-xs text-slate-500 space-y-2">
                           <Clock className="h-6 w-6 text-slate-400 mx-auto" />
-                          <p className="font-bold text-slate-700">Quotation formulation in progress.</p>
+                          <p className="text-sm font-bold text-slate-700">Quotation formulation in progress.</p>
                           <p>The facility clinical team is reviewing your intake notes. Once ready, an itemized quote will appear here.</p>
                         </div>
                       )}
@@ -1078,7 +1078,7 @@ export default function MedicalAssistanceModule({
                       {selectedCase.itinerary.length === 0 ? (
                         <div className="p-8 bg-slate-50 border border-dashed border-slate-300 text-center text-xs text-slate-500 space-y-1">
                           <Calendar className="h-6 w-6 text-slate-400 mx-auto" />
-                          <p className="font-bold text-slate-700">No scheduled itinerary items yet.</p>
+                          <p className="text-sm font-bold text-slate-700">No scheduled itinerary items yet.</p>
                           <p>The hospital coordinator will schedule your admission, consultations, and discharge timeline upon quotation confirmation.</p>
                         </div>
                       ) : (
@@ -1090,7 +1090,7 @@ export default function MedicalAssistanceModule({
                               </div>
                               <div className="space-y-0.5">
                                 <span className="text-xs font-black text-slate-900">{it.title}</span>
-                                <span className="ml-2 text-xs font-extrabold uppercase px-1.5 py-0.2 bg-slate-100 text-slate-600">
+                                <span className="ml-2 text-2xs font-extrabold uppercase px-1.5 py-0.2 bg-slate-100 text-slate-600">
                                   {it.kind}
                                 </span>
                                 {it.note && <p className="text-xs text-slate-600">{it.note}</p>}
@@ -1150,7 +1150,7 @@ export default function MedicalAssistanceModule({
                   )}
                 </div>
               ) : cases.length > 0 ? (
-                <div className="p-12 bg-white border border-dashed border-slate-300 text-center text-sm text-slate-700">
+                <div className="p-12 bg-white border border-dashed border-slate-300 text-center text-xs text-slate-700">
                   Choose a request from the list to see its quote, itinerary and messages.
                 </div>
               ) : null}
@@ -1244,7 +1244,7 @@ export default function MedicalAssistanceModule({
                   placeholder="e.g. MED-MY-AB12CD34"
                   value={trackCode}
                   onChange={(e) => setTrackCode(e.target.value)}
-                  className="w-full border border-slate-300 px-3 min-h-[44px] text-sm font-mono uppercase bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="w-full border border-slate-300 px-3 min-h-[44px] text-xs font-mono uppercase bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                 />
               </div>
 
@@ -1258,7 +1258,7 @@ export default function MedicalAssistanceModule({
                   placeholder="The email you used during enquiry submission"
                   value={trackEmail}
                   onChange={(e) => setTrackEmail(e.target.value)}
-                  className="w-full border border-slate-300 px-3 min-h-[44px] text-sm bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="w-full border border-slate-300 px-3 min-h-[44px] text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                 />
               </div>
 
@@ -1315,7 +1315,7 @@ export default function MedicalAssistanceModule({
                   {[proformaData.facility.licenceNo && `Licence: ${proformaData.facility.licenceNo}`, proformaData.facility.phone && `Tel: ${proformaData.facility.phone}`].filter(Boolean).join(' · ')}
                 </p>
                 {proformaData.facility.mhtcMember && (
-                  <span className="inline-block mt-1 text-xs font-black uppercase px-2 py-0.5 bg-sky-50 text-sky-800 border border-sky-300">
+                  <span className="inline-block mt-1 text-2xs font-black uppercase px-2 py-0.5 bg-sky-50 text-sky-800 border border-sky-300">
                     Malaysia Healthcare Travel Council (MHTC) Endorsed
                   </span>
                 )}
@@ -1392,7 +1392,7 @@ export default function MedicalAssistanceModule({
                       </td>
                     </tr>
                   )}
-                  <tr className="border-t border-slate-300 text-sm font-black text-slate-900">
+                  <tr className="border-t border-slate-300 text-xs font-black text-slate-900">
                     <td colSpan={2} className="p-2.5 text-right">TOTAL PAYABLE:</td>
                     <td className="p-2.5 text-right font-mono text-emerald-800">
                       RM {proformaData.totalMYR.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
@@ -1424,18 +1424,18 @@ export default function MedicalAssistanceModule({
         <div className="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="accept-title">
           <div className="bg-white border border-slate-300 max-w-md w-full p-6 space-y-4 shadow-xl">
             <h3 id="accept-title" className="font-extrabold text-lg text-slate-900">Accept this quote?</h3>
-            <dl className="text-sm grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
+            <dl className="text-xs grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
               <dt className="text-slate-700">Hospital</dt><dd className="font-bold text-slate-900">{selectedCase.facility?.name || 'The hospital'}</dd>
               <dt className="text-slate-700">Total</dt><dd className="font-extrabold text-slate-900 tabular-nums">RM {selectedCase.latestQuote.total.toLocaleString('en-MY', { minimumFractionDigits: 2 })}{selectedCurrency !== 'MYR' ? ` (about ${formatCur(selectedCase.latestQuote.total)})` : ''}</dd>
               {selectedCase.latestQuote.validUntil && <><dt className="text-slate-700">Valid until</dt><dd className="font-bold text-slate-900">{new Date(selectedCase.latestQuote.validUntil).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</dd></>}
             </dl>
-            <p className="text-sm text-slate-800">
+            <p className="text-xs text-slate-800">
               Accepting tells the hospital you want to go ahead at this price. <strong>It does not charge you.</strong> The hospital will contact you about dates and how to pay. Check what is not included and the cancellation terms first.
             </p>
-            {actionError && <p role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-sm">{actionError}</p>}
+            {actionError && <p role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-xs">{actionError}</p>}
             <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
-              <button type="button" onClick={() => setShowAcceptConfirm(false)} className="min-h-[44px] px-4 border border-slate-300 text-slate-800 text-sm font-bold cursor-pointer">Not yet</button>
-              <button type="button" disabled={decisionSubmitting} onClick={() => handleQuoteDecision('accept')} className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold cursor-pointer disabled:opacity-60">
+              <button type="button" onClick={() => setShowAcceptConfirm(false)} className="min-h-[44px] px-4 border border-slate-300 text-slate-800 text-xs font-bold cursor-pointer">Not yet</button>
+              <button type="button" disabled={decisionSubmitting} onClick={() => handleQuoteDecision('accept')} className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer disabled:opacity-60">
                 {decisionSubmitting ? 'Saving…' : 'Yes, accept this quote'}
               </button>
             </div>
@@ -1463,10 +1463,10 @@ export default function MedicalAssistanceModule({
               </button>
             </div>
 
-            <p className="text-sm text-slate-800">
+            <p className="text-xs text-slate-800">
               Say what you would like changed, for example a different room type or a different date.
             </p>
-            {actionError && <p role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-sm">{actionError}</p>}
+            {actionError && <p role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-xs">{actionError}</p>}
 
             <textarea
               rows={4}

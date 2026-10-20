@@ -7,7 +7,7 @@ import { Activity, AlertTriangle, ClipboardList, FileText, FlaskConical, Pill, S
 const jpost = (url: string, body?: unknown, method = 'POST') =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
 const fmt = fmtDate;
-const field = 'border border-[color:var(--t-200)] bg-white px-3.5 h-11 text-sm font-medium text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all';
+const field = 'border border-[color:var(--t-200)] bg-white px-3.5 h-11 text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all';
 
 /** A <input type="datetime-local"> value for "now", in the person's own time zone. */
 const localNow = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };
@@ -82,7 +82,7 @@ export default function PatientRecords({
   // sharing
   const [shareWith, setShareWith] = useState('');
 
-  if (!data) return <p className="text-sm text-slate-600 p-6">Loading your health record…</p>;
+  if (!data) return <p className="text-xs text-slate-600 p-6">Loading your health record…</p>;
 
   const removeItem = async (i: any) => {
     if (i.type === 'allergy' && !window.confirm(`Remove the ${i.name} allergy from your record? Doctors and pharmacists use this to keep you safe.`)) return;
@@ -148,7 +148,7 @@ export default function PatientRecords({
       )}
 
       {undo && (
-        <div role="status" className="fixed bottom-20 lg:bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white text-sm font-semibold pl-4 pr-1 min-h-[48px] flex items-center gap-3 shadow-lg max-w-[calc(100vw-2rem)]">
+        <div role="status" className="fixed bottom-20 lg:bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white text-xs font-semibold pl-4 pr-1 min-h-[48px] flex items-center gap-3 shadow-lg max-w-[calc(100vw-2rem)]">
           <span className="truncate">Removed {undo.label}.</span>
           <button
             type="button"
@@ -170,11 +170,11 @@ export default function PatientRecords({
                 <div className="flex items-center justify-between pb-2 mb-2 border-b border-[color:var(--t-100)]">
                   <div className="flex items-center gap-1.5">
                     <AlertTriangle className="h-3.5 w-3.5 text-rose-600" />
-                    <h3 className="font-display font-extrabold text-xs text-[color:var(--ink)] uppercase tracking-wider">
+                    <h3 className="font-display font-extrabold text-sm text-[color:var(--ink)] uppercase tracking-wider">
                       Documented Allergies
                     </h3>
                   </div>
-                  <span className={`text-xs font-mono font-bold px-1.5 py-0.2 border ${
+                  <span className={`text-2xs font-mono font-bold px-1.5 py-0.2 border ${
                     data.items.filter((i: any) => i.type === 'allergy').length > 0
                       ? 'bg-rose-50 text-rose-800 border-rose-200'
                       : saidNoAllergies
@@ -188,13 +188,13 @@ export default function PatientRecords({
                 {data.items.filter((i: any) => i.type === 'allergy').length === 0 ? (
                   saidNoAllergies ? (
                     <div className="py-3 px-3 bg-emerald-50 border border-emerald-200 my-1 space-y-1">
-                      <p className="text-xs text-emerald-900 font-bold">You told us you have no known allergies.</p>
+                      <p className="text-sm text-emerald-900 font-bold">You told us you have no known allergies.</p>
                       <p className="text-xs text-slate-700">Said on {new Date(data.allergyStatement.recorded_at).toLocaleDateString()}.</p>
                       <button type="button" onClick={clearNoKnownAllergies} className="min-h-[44px] text-xs font-bold underline text-emerald-900 cursor-pointer">Change this</button>
                     </div>
                   ) : (
                     <div className="py-3 px-3 bg-slate-50 border border-dashed border-slate-300 my-1 space-y-2">
-                      <p className="text-xs text-slate-800 font-bold">No allergies recorded yet.</p>
+                      <p className="text-sm text-slate-800 font-bold">No allergies recorded yet.</p>
                       <p className="text-xs text-slate-700 leading-snug">Doctors and pharmacists cannot tell "none" from "not filled in". Add an allergy, or tell us you have none.</p>
                       <div className="flex flex-wrap gap-2">
                         <button type="button" onClick={addAnAllergy} className="min-h-[44px] px-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer">Add an allergy</button>
@@ -231,11 +231,11 @@ export default function PatientRecords({
                 <div className="flex items-center justify-between pb-2 mb-2 border-b border-[color:var(--t-100)]">
                   <div className="flex items-center gap-1.5">
                     <Activity className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                    <h3 className="font-display font-extrabold text-xs text-[color:var(--ink)] uppercase tracking-wider">
+                    <h3 className="font-display font-extrabold text-sm text-[color:var(--ink)] uppercase tracking-wider">
                       Chronic Conditions
                     </h3>
                   </div>
-                  <span className="text-xs font-mono font-bold px-1.5 py-0.2 border bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]">
+                  <span className="text-2xs font-mono font-bold px-1.5 py-0.2 border bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]">
                     {data.items.filter((i: any) => i.type === 'condition').length}
                   </span>
                 </div>
@@ -273,11 +273,11 @@ export default function PatientRecords({
                 <div className="flex items-center justify-between pb-2 mb-2 border-b border-[color:var(--t-100)]">
                   <div className="flex items-center gap-1.5">
                     <Pill className="h-3.5 w-3.5 text-cyan-600" />
-                    <h3 className="font-display font-extrabold text-xs text-[color:var(--ink)] uppercase tracking-wider">
+                    <h3 className="font-display font-extrabold text-sm text-[color:var(--ink)] uppercase tracking-wider">
                       Active Medications
                     </h3>
                   </div>
-                  <span className="text-xs font-mono font-bold px-1.5 py-0.2 border bg-cyan-50 text-cyan-800 border-cyan-200">
+                  <span className="text-2xs font-mono font-bold px-1.5 py-0.2 border bg-cyan-50 text-cyan-800 border-cyan-200">
                     {data.items.filter((i: any) => i.type === 'medication').length + prescribed.length}
                   </span>
                 </div>
@@ -399,14 +399,14 @@ export default function PatientRecords({
             <label className="text-xs font-bold text-slate-700 flex-1 min-w-[200px]">{vital.kind === 'bp' ? 'Top number (systolic)' : 'Value'}
               <span className="flex items-center gap-2 mt-1.5">
                 <input type="number" step="any" inputMode="decimal" className={`${field} block w-full min-w-0 flex-1`} value={vital.value1} onChange={e => setVital({ ...vital, value1: e.target.value })} min={vitalSpec?.min} max={vitalSpec?.max} required />
-                <span className="text-sm font-semibold text-slate-700">{vitalSpec?.unit}</span>
+                <span className="text-xs font-semibold text-slate-700">{vitalSpec?.unit}</span>
               </span>
               {vitalSpec && <span className="block font-normal text-slate-700 mt-1">Between {vitalSpec.min} and {vitalSpec.max}</span>}
             </label>
             {vital.kind === 'bp' && <label className="text-xs font-bold text-slate-700 flex-1 min-w-[200px]">Bottom number (diastolic)
               <span className="flex items-center gap-2 mt-1.5">
                 <input type="number" inputMode="decimal" className={`${field} block w-full min-w-0 flex-1`} value={vital.value2} onChange={e => setVital({ ...vital, value2: e.target.value })} min={vitalSpec?.min2} max={vitalSpec?.max2} required />
-                <span className="text-sm font-semibold text-slate-700">{vitalSpec?.unit}</span>
+                <span className="text-xs font-semibold text-slate-700">{vitalSpec?.unit}</span>
               </span>
               {vitalSpec && <span className="block font-normal text-slate-700 mt-1">Between {vitalSpec.min2} and {vitalSpec.max2}</span>}
             </label>}
@@ -419,7 +419,7 @@ export default function PatientRecords({
               <button className="mt-1.5 h-11 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer border border-[color:var(--t-700)] shadow-xs transition-all">Save Reading</button>
             </div>
           </form>
-          {vitalFlag && <p role="alert" className="bg-rose-50 border-2 border-rose-300 text-rose-900 text-sm font-bold p-3 flex gap-2"><AlertTriangle className="h-5 w-5 shrink-0" />{vitalFlag}</p>}
+          {vitalFlag && <p role="alert" className="bg-rose-50 border-2 border-rose-300 text-rose-900 text-xs font-bold p-3 flex gap-2"><AlertTriangle className="h-5 w-5 shrink-0" />{vitalFlag}</p>}
           {/* Trend and the list of readings sit side by side on wide screens, stacked on narrow ones */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
           <section aria-labelledby="trend-heading" className="min-w-0 bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 space-y-3">
@@ -508,9 +508,9 @@ export default function PatientRecords({
 
       {tab === 'labs' && (
         <div className="space-y-3">
-          {data.labOrders.length === 0 && <p className="text-sm text-slate-600 bg-white border border-slate-200 p-4">No lab tests have been requested.</p>}
+          {data.labOrders.length === 0 && <p className="text-xs text-slate-600 bg-white border border-slate-200 p-4">No lab tests have been requested.</p>}
           {data.labOrders.map((o: any) => (
-            <article key={o.id} className="bg-white border border-slate-200 p-4 text-sm space-y-1.5">
+            <article key={o.id} className="bg-white border border-slate-200 p-4 text-xs space-y-1.5">
               <p><b>{o.tests}</b> <span className="text-xs text-slate-600">requested by {o.doctor} · {fmt(o.orderedAt)}</span></p>
               {o.notes && <p className="text-xs">{o.notes}</p>}
               {o.status === 'resulted'
@@ -530,9 +530,9 @@ export default function PatientRecords({
 
       {tab === 'notes' && (
         <div className="space-y-3">
-          {data.encounters.length === 0 && <p className="text-sm text-slate-600 bg-white border border-slate-200 p-4">Your doctors' consultation summaries will appear here.</p>}
+          {data.encounters.length === 0 && <p className="text-xs text-slate-600 bg-white border border-slate-200 p-4">Your doctors' consultation summaries will appear here.</p>}
           {data.encounters.map((e: any) => (
-            <article key={e.id} className="bg-white border border-slate-200 p-4 text-sm space-y-1">
+            <article key={e.id} className="bg-white border border-slate-200 p-4 text-xs space-y-1">
               <p className="font-extrabold">{e.professionalName} · {fmt(e.signed_at)}</p>
               {(['subjective', 'objective', 'assessment', 'plan'] as const).map(k => e[k] ? <p key={k}><span className="text-xs font-extrabold uppercase text-slate-600 mr-2">{k}</span>{e[k]}</p> : null)}
             </article>
@@ -542,11 +542,11 @@ export default function PatientRecords({
 
       {tab === 'sharing' && (
         <div className="space-y-4">
-          <p className="text-sm text-slate-700 bg-white border border-slate-200 p-4">Doctors can read your allergies, conditions, medicines, readings and lab results only while you share them. You can stop sharing at any time. Every time a doctor opens your record it is logged.</p>
+          <p className="text-xs text-slate-700 bg-white border border-slate-200 p-4">Doctors can read your allergies, conditions, medicines, readings and lab results only while you share them. You can stop sharing at any time. Every time a doctor opens your record it is logged.</p>
           <section className="bg-white border border-slate-200 p-4 space-y-2">
             <h3 className="text-sm font-extrabold">Currently sharing with</h3>
             {data.grants.length === 0 ? <p className="text-xs text-slate-600">Nobody.</p> : data.grants.map((g: any) => (
-              <div key={g.id} className="flex items-center justify-between gap-3 text-sm border-t border-slate-100 pt-2">
+              <div key={g.id} className="flex items-center justify-between gap-3 text-xs border-t border-slate-100 pt-2">
                 <span><b>{g.professionalName}</b> <span className="text-xs text-slate-600">until {fmt(g.expires_at)}</span></span>
                 <button onClick={() => act(() => jpost(`/api/records/grants/${g.id}`, undefined, 'DELETE'), 'Sharing stopped.')} className="text-xs font-bold text-rose-700 cursor-pointer">Stop sharing</button>
               </div>

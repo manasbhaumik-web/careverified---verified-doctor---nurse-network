@@ -230,7 +230,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
     );
   }
 
-  if (!consult) return <p className="text-sm text-slate-600 p-6">Connecting to your consultation…</p>;
+  if (!consult) return <p className="text-xs text-slate-600 p-6">Connecting to your consultation…</p>;
 
   const other = isDoctor ? `${consult.patientName ?? 'Patient'}` : consult.professional?.name ?? 'Doctor';
 
@@ -254,7 +254,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                 {isVideo && (
                   <span
                     role="status"
-                    className={`text-xs font-mono font-bold px-2 py-0.5 rounded-none inline-flex items-center gap-1 ${
+                    className={`text-2xs font-mono font-bold px-2 py-0.5 rounded-none inline-flex items-center gap-1 ${
                       videoState === 'connected'
                         ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
                         : videoState === 'connecting'
@@ -384,11 +384,11 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                 <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
                   <span className="font-extrabold uppercase tracking-wider text-xs text-slate-500">Patient Triage Intake</span>
                   {consult.redFlags && consult.redFlags.length > 0 ? (
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-800 bg-rose-50 border border-rose-300 px-2 py-0.5">
+                    <span className="inline-flex items-center gap-1 text-2xs font-bold text-rose-800 bg-rose-50 border border-rose-300 px-2 py-0.5">
                       <AlertTriangle className="h-3 w-3 text-rose-600" /> Red Flags ({consult.redFlags.length})
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
+                    <span className="inline-flex items-center gap-1 text-2xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
                       <CheckCircle2 className="h-3 w-3 text-emerald-600" /> No Urgent Red Flags
                     </span>
                   )}
@@ -423,7 +423,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                   <span className="flex items-center gap-2">
                     <MessageSquare className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                     <span>In-Call Patient Chat</span>
-                    <span className="px-1.5 py-0.2 bg-slate-100 text-slate-700 text-xs font-mono font-bold">
+                    <span className="px-1.5 py-0.2 bg-slate-100 text-slate-700 text-2xs font-mono font-bold">
                       {messages.length}
                     </span>
                   </span>
@@ -459,7 +459,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
               <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200">
                 <div className="flex items-center gap-2">
                   <Stethoscope className="h-4 w-4 text-[color:var(--t-600)]" />
-                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-700">
+                  <h3 className="text-sm font-black uppercase tracking-wider text-slate-700">
                     Clinician Charting & Prescription Cockpit
                   </h3>
                 </div>
@@ -527,11 +527,11 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
       <header className="flex items-center justify-between gap-3 px-5 py-3 border-b border-slate-100">
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-sm font-extrabold text-slate-900">Consultation with {other}</p>
+            <p className="text-xs font-extrabold text-slate-900">Consultation with {other}</p>
             {isVideo && (
               <span
                 role="status"
-                className={`text-xs font-mono font-bold px-2 py-0.5 rounded-none inline-flex items-center gap-1 ${
+                className={`text-2xs font-mono font-bold px-2 py-0.5 rounded-none inline-flex items-center gap-1 ${
                   videoState === 'connected'
                     ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
                     : videoState === 'connecting'
@@ -604,7 +604,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
           <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-[color:var(--t-bg)]">
             <p className="text-xs text-slate-500 bg-white border border-slate-100 p-2">Reason for consultation: {consult.symptoms}</p>
             {messages.map(m => (
-              <div key={m.id} className={`max-w-[85%] text-sm px-3 py-2 ${m.senderUserId === myUserId ? 'ml-auto bg-[color:var(--t-600)] text-white' : 'bg-white border border-slate-200 text-slate-800'}`}>
+              <div key={m.id} className={`max-w-[85%] text-xs px-3 py-2 ${m.senderUserId === myUserId ? 'ml-auto bg-[color:var(--t-600)] text-white' : 'bg-white border border-slate-200 text-slate-800'}`}>
                 {m.text}
               </div>
             ))}
@@ -613,7 +613,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
           {error && <p className="text-xs font-bold text-rose-700 px-4 py-2 bg-rose-50">{error}</p>}
           <form onSubmit={send} className="flex gap-2 p-3 border-t border-slate-100">
             <input value={text} onChange={e => setText(e.target.value)} maxLength={2000} placeholder="Type a message…"
-              className="flex-1 border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--t-600)]" aria-label="Message" />
+              className="flex-1 border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:border-[color:var(--t-600)]" aria-label="Message" />
             <button className="bg-[color:var(--t-600)] text-white px-4 cursor-pointer" aria-label="Send"><Send className="h-4 w-4" /></button>
           </form>
         </div>

@@ -45,6 +45,7 @@
    *   text-3xl  30px  hero headings (phones)
    *   text-4xl  36px  hero headings (desktop)
    * One line height per step, set here so every use of a step looks the same. */
+  --text-2xs: 0.625rem; --text-2xs--line-height: 0.875rem;
   --text-xs: 0.75rem;   --text-xs--line-height: 1rem;
   --text-sm: 0.875rem;  --text-sm--line-height: 1.25rem;
   --text-base: 1rem;    --text-base--line-height: 1.5rem;

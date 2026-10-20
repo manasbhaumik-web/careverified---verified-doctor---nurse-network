@@ -254,7 +254,7 @@ export default function ProfessionalProfile({
             <p className="text-base font-black text-[color:var(--ink)] tabular-nums leading-tight">{formatMoney(prof.fee)}</p>
           </div>
           <button type="button" onClick={() => document.getElementById('booking-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-            className="min-h-[44px] px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-extrabold cursor-pointer">Book</button>
+            className="min-h-[44px] px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer">Book</button>
         </div>
       )}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -272,13 +272,13 @@ export default function ProfessionalProfile({
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
                     <h2 className="text-xl font-extrabold text-[color:var(--ink)]">{prof.name}</h2>
-                    <span className="bg-emerald-50 text-emerald-800 text-xs font-extrabold px-2 py-0.5 border border-emerald-200 flex items-center gap-1 shadow-2xs">
+                    <span className="bg-emerald-50 text-emerald-800 text-2xs font-extrabold px-2 py-0.5 border border-emerald-200 flex items-center gap-1 shadow-2xs">
                       <BadgeCheck className="h-3.5 w-3.5 text-emerald-600" />
                       Verified
                     </span>
                   </div>
 
-                  <span className="inline-block text-xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
+                  <span className="inline-block text-2xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
                     {isDoc ? "Doctor (MMC Registered)" : "Registered Nurse (LJM Registered)"}
                   </span>
 
@@ -319,7 +319,7 @@ export default function ProfessionalProfile({
 
             {/* Doctor Bio */}
             <div className="space-y-2">
-              <h3 className="text-xs font-bold text-[color:var(--ink)] uppercase tracking-wider flex items-center gap-1.5">
+              <h3 className="text-sm font-bold text-[color:var(--ink)] uppercase tracking-wider flex items-center gap-1.5">
                 <Activity className="h-4 w-4 text-[color:var(--t-600)]" />
                 Clinical Overview & Experience
               </h3>
@@ -341,7 +341,7 @@ export default function ProfessionalProfile({
             {/* Education & Achievements */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
-                <h4 className="text-xs font-bold text-[color:var(--ink)] uppercase tracking-wider flex items-center gap-1">
+                <h4 className="text-sm font-bold text-[color:var(--ink)] uppercase tracking-wider flex items-center gap-1">
                   <GraduationCap className="h-4 w-4 text-[color:var(--t-600)]" />
                   Degrees & Certifications
                 </h4>
@@ -356,19 +356,19 @@ export default function ProfessionalProfile({
               </div>
 
               <div className="space-y-3">
-                <h4 className="text-xs font-bold text-[color:var(--ink)] uppercase tracking-wider flex items-center gap-1">
+                <h4 className="text-sm font-bold text-[color:var(--ink)] uppercase tracking-wider flex items-center gap-1">
                   <Languages className="h-4 w-4 text-[color:var(--t-600)]" />
                   Languages & Spoken Dialects
                 </h4>
                 <div className="flex flex-wrap gap-1.5">
                   {prof.languages.map((lang: string, i: number) => (
-                    <span key={i} className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-xs font-bold py-1 px-2.5">
+                    <span key={i} className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-bold py-1 px-2.5">
                       {lang}
                     </span>
                   ))}
                 </div>
 
-                <h4 className="text-xs font-bold text-[color:var(--ink)] uppercase tracking-wider flex items-center gap-1 mt-4">
+                <h4 className="text-sm font-bold text-[color:var(--ink)] uppercase tracking-wider flex items-center gap-1 mt-4">
                   <Award className="h-4 w-4 text-[color:var(--t-600)]" />
                   Clinical Seniority
                 </h4>
@@ -390,7 +390,7 @@ export default function ProfessionalProfile({
                 <p className="font-extrabold text-slate-800">Primary Outpatient Ward</p>
                 <p className="text-slate-500 mt-1 font-medium">{prof.practiceAddress}</p>
               </div>
-              <span className="bg-emerald-50 text-emerald-800 text-xs font-extrabold px-2.5 py-1 rounded-lg border border-emerald-100">
+              <span className="bg-emerald-50 text-emerald-800 text-2xs font-extrabold px-2.5 py-1 rounded-lg border border-emerald-100">
                 Active Now
               </span>
             </div>
@@ -439,7 +439,7 @@ export default function ProfessionalProfile({
                       <div>
                         <span className="font-bold text-xs text-slate-800">{rev.patientName}</span>
                         {rev.isVerifiedPatient && (
-                          <span className="bg-emerald-50 text-emerald-800 text-xs font-extrabold ml-2 px-1.5 py-0.5 rounded border border-emerald-100">
+                          <span className="bg-emerald-50 text-emerald-800 text-2xs font-extrabold ml-2 px-1.5 py-0.5 rounded border border-emerald-100">
                             Verified Patient
                           </span>
                         )}
@@ -660,7 +660,7 @@ export default function ProfessionalProfile({
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)]">Consultation Notes (Optional)</label>
                     {prefilledSymptoms && symptoms === prefilledSymptoms && (
-                      <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5">
+                      <span className="text-2xs font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5">
                         Pre-filled from AI Triage
                       </span>
                     )}

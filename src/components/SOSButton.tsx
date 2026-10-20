@@ -75,7 +75,7 @@ export default function SOSButton() {
             {!result ? (
               <>
                 {error && <p className="text-xs font-bold text-rose-700">{error}</p>}
-                <button onClick={alertTeam} disabled={busy} className="w-full border-2 border-rose-300 text-rose-800 font-extrabold text-sm py-2.5 hover:bg-rose-50 disabled:opacity-60 cursor-pointer">
+                <button onClick={alertTeam} disabled={busy} className="w-full border-2 border-rose-300 text-rose-800 font-extrabold text-xs py-2.5 hover:bg-rose-50 disabled:opacity-60 cursor-pointer">
                   {busy ? 'Sending…' : 'Also alert the MedCred on-call team (shares your location)'}
                 </button>
               </>

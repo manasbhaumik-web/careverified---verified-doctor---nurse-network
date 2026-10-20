@@ -23,8 +23,8 @@ export default function SharedSummary({ token }: { token: string }) {
               <dt className="text-slate-500">Discharged</dt><dd>{formatDate(d.dischargedAt)}</dd>
               <dt className="text-slate-500">Treatment</dt><dd>{d.treatment}</dd>
             </dl>
-            <section><h2 className="text-xs font-black uppercase tracking-wide">Summary</h2><p className="whitespace-pre-wrap text-xs mt-1">{d.dischargeSummary}</p></section>
-            {d.followUpPlan && <section><h2 className="text-xs font-black uppercase tracking-wide">Follow-up plan</h2><p className="whitespace-pre-wrap text-xs mt-1">{d.followUpPlan}</p></section>}
+            <section><h2 className="text-sm font-black uppercase tracking-wide">Summary</h2><p className="whitespace-pre-wrap text-xs mt-1">{d.dischargeSummary}</p></section>
+            {d.followUpPlan && <section><h2 className="text-sm font-black uppercase tracking-wide">Follow-up plan</h2><p className="whitespace-pre-wrap text-xs mt-1">{d.followUpPlan}</p></section>}
             <p className="text-xs text-slate-500">This link expires {formatDate(d.expiresAt)}.</p>
           </>
         )}

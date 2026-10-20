@@ -61,7 +61,7 @@ export default function TourismDesk({
           />
         )}
         {tab === 'cases' && (me && me.facilities.length === 0
-          ? <p className="text-sm bg-white border border-dashed border-slate-300 p-6 text-center text-slate-600">You are not assigned to a facility yet. An admin adds you from Global Patient Services &gt; Facilities.</p>
+          ? <p className="text-xs bg-white border border-dashed border-slate-300 p-6 text-center text-slate-600">You are not assigned to a facility yet. An admin adds you from Global Patient Services &gt; Facilities.</p>
           : open ? <StaffCase id={open} onBack={() => setOpen(null)} /> : <CaseQueue onOpen={setOpen} />)}
         {tab === 'facilities' && isAdmin && <FacilityAdmin />}
       </div>
@@ -95,7 +95,7 @@ export default function TourismDesk({
       )}
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {tab === 'cases' && (me && me.facilities.length === 0
-          ? <p className="text-sm bg-white border border-dashed border-slate-300 p-6 text-center text-slate-600">You are not assigned to a facility yet. An admin adds you from Global Patient Services &gt; Facilities.</p>
+          ? <p className="text-xs bg-white border border-dashed border-slate-300 p-6 text-center text-slate-600">You are not assigned to a facility yet. An admin adds you from Global Patient Services &gt; Facilities.</p>
           : open ? <StaffCase id={open} onBack={() => setOpen(null)} /> : <CaseQueue onOpen={setOpen} />)}
         {tab === 'facilities' && isAdmin && <FacilityAdmin />}
       </div>
@@ -110,7 +110,7 @@ function CaseQueue({ onOpen }: { onOpen: (id: string) => void }) {
   return (
     <div className="space-y-3">
       <select className={input} value={status} onChange={e => setStatus(e.target.value)} aria-label="Status filter"><option value="">All open and closed</option>{Object.entries(STATUS_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
-      {list && list.length === 0 && <p className="text-sm text-slate-500">No cases.</p>}
+      {list && list.length === 0 && <p className="text-xs text-slate-500">No cases.</p>}
       <ul className="space-y-2">{list?.map(c => (
         <li key={c.id}><button onClick={() => onOpen(c.id)} className="w-full text-left bg-white border border-slate-200 hover:border-[color:var(--t-600)] p-3 cursor-pointer text-xs">
           <b>{c.patient}</b> ({c.country ?? '—'}) · {c.facility} · <span className="text-[color:var(--t-700)] font-bold">{STATUS_LABEL[c.status] ?? c.status}</span>
@@ -126,7 +126,7 @@ function StaffCase({ id, onBack }: { id: string; onBack: () => void }) {
   const load = useCallback(() => { jget(`/api/tourism/cases/${id}`).then(d => d.status === 'success' && setC(d.data)).catch(() => {}); }, [id]);
   useEffect(() => { load(); }, [load]);
   const say = (d: any, ok = 'Saved.') => { setMsg(d.status === 'success' ? ok : d.message); if (d.status === 'success') load(); return d; };
-  if (!c) return <p className="text-sm text-slate-500">Loading…</p>;
+  if (!c) return <p className="text-xs text-slate-500">Loading…</p>;
   const n = c.needs ?? {};
   return (
     <div className="space-y-4">
@@ -134,7 +134,7 @@ function StaffCase({ id, onBack }: { id: string; onBack: () => void }) {
       {msg && <p className="text-xs font-bold text-sky-900 bg-sky-50 border border-sky-200 p-2" role="status">{msg}</p>}
       <section className="bg-white border border-slate-200 p-5 text-xs space-y-1">
         <h2 className="font-extrabold text-base">{c.patient.name} · {c.homeCountry ?? '—'} · <span className="text-[color:var(--t-700)]">{STATUS_LABEL[c.status] ?? c.status}</span></h2>
-        <p>{c.patient.email}</p><p className="text-sm">{c.summary}</p>
+        <p>{c.patient.email}</p><p className="text-xs">{c.summary}</p>
         <p>Dates: {c.preferredFrom ?? '—'} to {c.preferredTo ?? '—'} · Needs: {['interpreter', 'airportPickup', 'halalFood', 'prayerRoom', 'accommodation'].filter(k => n[k]).join(', ') || 'none'}{n.interpreterLanguage ? ` (${n.interpreterLanguage})` : ''}</p>
         <p>Documents: {c.files.length ? c.files.map((f: any) => <a key={f.id} className="underline font-bold mr-3 inline-flex items-center gap-1" href={`/api/tourism/cases/${id}/files/${f.id}`}><Download className="h-3 w-3" />{f.kind} · {f.name}</a>) : c.filesHidden ? 'the patient has not agreed to share their files' : 'none uploaded'}</p>
       </section>

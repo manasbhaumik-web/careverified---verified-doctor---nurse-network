@@ -238,7 +238,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
                     <td className="pr-3">{fmt(p.verifiedUntil)}</td>
                     <td className="pr-3">
                       <span className="font-bold">{p.verificationStatus}</span>
-                      {p.flag && <span className={`ml-1.5 px-1.5 py-0.5 rounded-none text-xs font-bold ${FLAG_LABEL[p.flag].cls}`}>{FLAG_LABEL[p.flag].text}</span>}
+                      {p.flag && <span className={`ml-1.5 px-1.5 py-0.5 rounded-none text-2xs font-bold ${FLAG_LABEL[p.flag].cls}`}>{FLAG_LABEL[p.flag].text}</span>}
                       {p.suspensionReason && <span className="block text-slate-500">{p.suspensionReason}</span>}
                     </td>
                     <td className="text-right">
@@ -268,7 +268,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
               <div>
                 <h3 className="text-sm font-black text-amber-950 uppercase tracking-tight flex items-center gap-2">
                   Dual-Signoff Disciplinary Sanctions Pending Countersignature
-                  <span className="px-2 py-0.5 text-xs font-black uppercase bg-amber-600 text-white">
+                  <span className="px-2 py-0.5 text-2xs font-black uppercase bg-amber-600 text-white">
                     {sanctions.filter(s => s.status === 'pending_countersign').length} Pending
                   </span>
                 </h3>
@@ -290,10 +290,10 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-black text-xs text-slate-900">{prof?.name || s.professional_id}</span>
-                      <span className="text-xs font-mono font-bold bg-slate-100 text-slate-700 px-1.5 py-0.5 border border-slate-200">
+                      <span className="text-2xs font-mono font-bold bg-slate-100 text-slate-700 px-1.5 py-0.5 border border-slate-200">
                         {s.reference_no}
                       </span>
-                      <span className="text-xs font-bold text-amber-800 uppercase px-1.5 py-0.5 bg-amber-100 border border-amber-200">
+                      <span className="text-2xs font-bold text-amber-800 uppercase px-1.5 py-0.5 bg-amber-100 border border-amber-200">
                         {s.sanction_type}
                       </span>
                     </div>
@@ -353,7 +353,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
                 <li key={c.id} className="border border-slate-200 rounded-none p-3 text-xs space-y-1.5 bg-white">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-bold">{c.professionalName || c.professional_id} · {c.category}</span>
-                    <span className="px-2 py-0.5 rounded-none bg-slate-100 border border-slate-200 font-bold uppercase text-xs">{c.status}</span>
+                    <span className="px-2 py-0.5 rounded-none bg-slate-100 border border-slate-200 font-bold uppercase text-2xs">{c.status}</span>
                   </div>
                   <p className="text-slate-600">{c.description}</p>
                   <p className="text-slate-400">From {c.complainantName || 'patient'} · {fmt(c.created_at)}{c.resolution ? ` · Resolution: ${c.resolution}` : ''}</p>

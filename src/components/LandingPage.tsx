@@ -1211,7 +1211,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     <div className="font-display font-black text-2xl sm:text-3xl text-[color:var(--ink)] group-hover:text-[color:var(--t-600)] tracking-tight leading-none mb-1.5 transition-colors">
                       {qm.valueComponent}
                     </div>
-                    <h4 className="font-display font-extrabold text-xs sm:text-sm text-[color:var(--ink)] leading-snug mb-1">
+                    <h4 className="font-display font-extrabold text-sm text-[color:var(--ink)] leading-snug mb-1">
                       {qm.label}
                     </h4>
                     <p className="text-xs text-slate-500 font-medium leading-relaxed">

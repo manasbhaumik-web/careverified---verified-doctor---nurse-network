@@ -123,7 +123,7 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-black uppercase tracking-wider px-2 py-0.5 bg-slate-900 text-amber-300 border border-slate-800">
+                <span className="text-2xs font-black uppercase tracking-wider px-2 py-0.5 bg-slate-900 text-amber-300 border border-slate-800">
                   Statutory Audit Log (WAL Mode)
                 </span>
                 <span className="text-xs text-slate-500 font-mono">SQLite careverified.db</span>
@@ -179,12 +179,12 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
           </div>
           <div className="p-3 bg-slate-50 border border-slate-200">
             <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Integrity Mode</span>
-            <span className="text-xl font-black text-slate-900 font-mono text-sm">WAL PRAGMA</span>
+            <span className="text-xl font-black text-slate-900 font-mono text-xs">WAL PRAGMA</span>
             <span className="text-xs text-emerald-700 font-bold block mt-0.5">Crash-proof ACID log</span>
           </div>
           <div className="p-3 bg-slate-50 border border-slate-200">
             <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Statutory Scope</span>
-            <span className="text-xl font-black text-slate-900 font-mono text-sm">Act 50 / 586</span>
+            <span className="text-xl font-black text-slate-900 font-mono text-xs">Act 50 / 586</span>
             <span className="text-xs text-slate-600 block mt-0.5 font-semibold">Retention compliance</span>
           </div>
         </div>
@@ -266,7 +266,7 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
                       </span>
                     </td>
                     <td className="p-2.5">
-                      <span className={`text-xs font-bold uppercase px-2 py-0.5 border ${getActionTone(log.action)}`}>
+                      <span className={`text-2xs font-bold uppercase px-2 py-0.5 border ${getActionTone(log.action)}`}>
                         {log.action}
                       </span>
                     </td>

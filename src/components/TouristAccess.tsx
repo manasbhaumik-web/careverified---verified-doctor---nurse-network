@@ -299,7 +299,7 @@ const T: Record<Lang, {
 
 const SERVICE_ICON: Record<string, React.ComponentType<{ className?: string }>> = { interpreter: Languages, airportPickup: Car, halalFood: Utensils, prayerRoom: HeartHandshake };
 const CARD_ICONS = [FileText, Building2, BadgeCheck, ShieldCheck, Plane, Plane];
-const field = 'border border-slate-300 bg-white px-3 h-11 text-sm w-full focus:outline-none focus:border-[color:var(--t-600)]';
+const field = 'border border-slate-300 bg-white px-3 h-11 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
 const HUB_CITIES = ['', 'Kuala Lumpur', 'Penang', 'Johor Bahru', 'Melaka'];
 
 export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
@@ -337,7 +337,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
         <h2 id="tourist-heading" className="font-display font-black text-2xl sm:text-3xl lg:text-4xl text-[color:var(--ink)] tracking-tight leading-tight">
           {tx.title}
         </h2>
-        <p className="text-sm sm:text-base text-slate-600 mt-2 font-medium max-w-2xl leading-relaxed">{tx.intro}</p>
+        <p className="text-xs sm:text-base text-slate-600 mt-2 font-medium max-w-2xl leading-relaxed">{tx.intro}</p>
 
         {/* 3-Stage Cross-Border Care Pathway */}
         <div className="mt-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-5 sm:p-6">
@@ -352,7 +352,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
                   {idx < 2 && <ArrowRight className="hidden md:block h-3.5 w-3.5 text-slate-400" aria-hidden="true" />}
                 </div>
                 <h4 className="font-display font-extrabold text-base text-[color:var(--ink)]">{p.title}</h4>
-                <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed font-medium">{p.text}</p>
+                <p className="text-xs text-slate-600 mt-1 leading-relaxed font-medium">{p.text}</p>
               </div>
             ))}
           </div>
@@ -367,7 +367,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
                 Verified Hospital Packages · Multi-Currency Benchmarks
               </div>
               <h3 className="font-display font-black text-lg sm:text-xl text-[color:var(--ink)]">{tx.fxTitle}</h3>
-              <p className="text-xs sm:text-sm text-slate-600 font-medium mt-0.5">{tx.fxSubtitle}</p>
+              <p className="text-xs text-slate-600 font-medium mt-0.5">{tx.fxSubtitle}</p>
             </div>
             <div role="group" aria-label="Indicative currency selector" className="flex flex-wrap items-center gap-1.5">
               {(Object.keys(FX_RATES) as FxCurrency[]).map(curr => (
@@ -409,7 +409,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
 
                       {/* Accreditation Pill Overlay */}
                       <div className="absolute top-2.5 left-2.5">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-extrabold tracking-wide uppercase border backdrop-blur-md ${pkg.badgeClass}`}>
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-mono font-extrabold tracking-wide uppercase border backdrop-blur-md ${pkg.badgeClass}`}>
                           <ShieldCheck className="h-3 w-3 shrink-0" />
                           {pkg.accreditation}
                         </span>
@@ -457,7 +457,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
                           </span>
                         </div>
                         {fx !== 'MYR' && (
-                          <span className="font-mono font-bold text-xs text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)] shadow-2xs">
+                          <span className="font-mono font-bold text-2xs text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)] shadow-2xs">
                             ~{formatFx(pkg.myr, fx)}
                           </span>
                         )}
@@ -499,13 +499,13 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
               <li key={c.title} className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] p-5 shadow-2xs">
                 <span aria-hidden="true" className="w-9 h-9 bg-white border border-[color:var(--t-200)] text-[color:var(--t-700)] flex items-center justify-center mb-3"><Icon className="h-4.5 w-4.5" /></span>
                 <h3 className="font-display font-extrabold text-base text-[color:var(--ink)] leading-snug">{c.title}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed mt-1.5 font-medium">{c.text}</p>
+                <p className="text-xs text-slate-600 leading-relaxed mt-1.5 font-medium">{c.text}</p>
               </li>
             );
           })}
         </ul>
 
-        <div className="mt-6 p-4 bg-[color:var(--t-50)]/60 border border-[color:var(--t-200)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm text-slate-700 font-medium">
+        <div className="mt-6 p-4 bg-[color:var(--t-50)]/60 border border-[color:var(--t-200)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-700 font-medium">
           <div>
             <p className="font-bold text-[color:var(--ink)]">{tx.scopeNote}</p>
             <p className="text-xs text-slate-600 mt-1">{tx.langNote}</p>
@@ -517,7 +517,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
             <div>
               <h3 className="font-display font-black text-xl sm:text-2xl text-[color:var(--ink)] tracking-tight">{tx.browse.title}</h3>
-              <p className="text-sm text-slate-600 mt-1 font-medium">{tx.browse.note}</p>
+              <p className="text-xs text-slate-600 mt-1 font-medium">{tx.browse.note}</p>
             </div>
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-xs font-bold text-slate-500 mr-1">{tx.browse.hubsLabel}</span>
@@ -555,30 +555,30 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
           </div>
 
           <div className="mt-4" aria-live="polite">
-            {list === null && <p className="text-sm text-slate-600">{tx.browse.loading}</p>}
-            {list !== null && list.length === 0 && <p className="text-sm text-slate-700 bg-[color:var(--t-50)] border border-dashed border-[color:var(--t-200)] p-6 text-center font-medium">{tx.browse.empty}</p>}
+            {list === null && <p className="text-xs text-slate-600">{tx.browse.loading}</p>}
+            {list !== null && list.length === 0 && <p className="text-xs text-slate-700 bg-[color:var(--t-50)] border border-dashed border-[color:var(--t-200)] p-6 text-center font-medium">{tx.browse.empty}</p>}
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {(list ?? []).map(fac => (
                 <li key={fac.id} className="border border-[color:var(--t-200)] bg-white p-5 flex flex-col gap-3 shadow-2xs">
                   <div>
                     <h4 className="font-display font-extrabold text-lg text-[color:var(--ink)] leading-snug">{fac.name}</h4>
-                    <p className="text-sm text-slate-600 font-medium">{[fac.city, fac.state].filter(Boolean).join(', ')}</p>
+                    <p className="text-xs text-slate-600 font-medium">{[fac.city, fac.state].filter(Boolean).join(', ')}</p>
                   </div>
-                  {fac.description && <p className="text-sm text-slate-700 leading-relaxed">{fac.description}</p>}
+                  {fac.description && <p className="text-xs text-slate-700 leading-relaxed">{fac.description}</p>}
                   <div className="flex flex-wrap gap-1.5 text-xs font-bold">
                     {fac.licenceChecked && <span className="bg-emerald-50 text-emerald-900 border border-emerald-200 px-2 py-0.5">{tx.browse.licence}</span>}
                     {fac.mhtcMember && <span className="bg-[color:var(--t-50)] text-[color:var(--t-800)] border border-[color:var(--t-200)] px-2 py-0.5">{tx.browse.mhtc}</span>}
                     {fac.accreditations.map((a: any) => <span key={a.body} className="bg-emerald-50 text-emerald-900 border border-emerald-200 px-2 py-0.5">{tx.browse.acc(a.body, a.validUntil)}</span>)}
                   </div>
-                  {fac.specialties.length > 0 && <p className="text-sm text-slate-700"><span className="font-bold">{fac.specialties.join(', ')}</span></p>}
-                  {fac.languages.length > 0 && <p className="text-sm text-slate-600"><Languages className="inline h-4 w-4 mr-1 -mt-0.5" aria-hidden="true" />{fac.languages.join(', ')}</p>}
-                  <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-700">
+                  {fac.specialties.length > 0 && <p className="text-xs text-slate-700"><span className="font-bold">{fac.specialties.join(', ')}</span></p>}
+                  {fac.languages.length > 0 && <p className="text-xs text-slate-600"><Languages className="inline h-4 w-4 mr-1 -mt-0.5" aria-hidden="true" />{fac.languages.join(', ')}</p>}
+                  <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-700">
                     {Object.entries(tx.browse.services).filter(([k]) => fac.services?.[k]).map(([k, v]) => {
                       const Icon = SERVICE_ICON[k];
                       return <li key={k} className="inline-flex items-center gap-1.5"><Icon className="h-4 w-4 text-[color:var(--t-700)]" aria-hidden="true" />{v}</li>;
                     })}
                   </ul>
-                  <button type="button" onClick={onSignUp} className="mt-auto self-start min-h-[48px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none cursor-pointer inline-flex items-center gap-2 shadow-xs transition-all duration-200">
+                  <button type="button" onClick={onSignUp} className="mt-auto self-start min-h-[48px] px-6 text-xs font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none cursor-pointer inline-flex items-center gap-2 shadow-xs transition-all duration-200">
                     <Search className="h-4 w-4" aria-hidden="true" />{tx.browse.cta}
                   </button>
                 </li>
@@ -589,8 +589,8 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
 
         {info && (
           <details className="mt-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)]">
-            <summary className="cursor-pointer select-none px-5 py-4 font-display font-extrabold text-sm sm:text-base text-[color:var(--ink)]">{tx.info.title}</summary>
-            <div className="px-5 pb-5 pt-2 border-t border-[color:var(--t-200)] space-y-4 text-sm text-slate-700 font-medium">
+            <summary className="cursor-pointer select-none px-5 py-4 font-display font-extrabold text-xs sm:text-base text-[color:var(--ink)]">{tx.info.title}</summary>
+            <div className="px-5 pb-5 pt-2 border-t border-[color:var(--t-200)] space-y-4 text-xs text-slate-700 font-medium">
               {info.draft && <p className="font-semibold text-slate-800 bg-white border border-[color:var(--t-200)] p-3.5 text-xs leading-relaxed">{tx.info.advisory}</p>}
               {info.sections.map(s => (
                 <div key={s.heading}>

@@ -80,13 +80,13 @@ export default function AdminPayouts() {
 
       {/* Bank accounts */}
       <div>
-        <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2">Bank accounts</h4>
+        <h4 className="text-sm font-extrabold uppercase tracking-wider text-slate-600 mb-2">Bank accounts</h4>
         {o.accounts.length === 0 ? <p className="text-xs text-slate-600">No practitioner has added bank details yet.</p> : (
           <ul className="divide-y divide-slate-100 text-xs border border-slate-200">
             {o.accounts.map(a => (
               <li key={a.professionalId} className="p-3 flex flex-wrap items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-bold">{a.practitionerName} <span className={`ml-1 px-1.5 py-0.5 text-xs font-extrabold uppercase ${a.status === 'verified' ? 'bg-emerald-100 text-emerald-900' : a.status === 'rejected' ? 'bg-rose-100 text-rose-900' : 'bg-amber-100 text-amber-900'}`}>{a.status}</span></p>
+                  <p className="font-bold">{a.practitionerName} <span className={`ml-1 px-1.5 py-0.5 text-2xs font-extrabold uppercase ${a.status === 'verified' ? 'bg-emerald-100 text-emerald-900' : a.status === 'rejected' ? 'bg-rose-100 text-rose-900' : 'bg-amber-100 text-amber-900'}`}>{a.status}</span></p>
                   <p className="text-slate-700">{a.bankName} ••••{a.last4} · holder: <b>{a.accountName}</b> {a.nameMatches ? <span className="text-emerald-800">(same as the practitioner&apos;s name)</span> : <span className="text-amber-900 font-bold">(differs from the practitioner&apos;s name: check)</span>}</p>
                   {a.note && <p className="text-slate-600">Note: {a.note}</p>}
                 </div>
@@ -104,7 +104,7 @@ export default function AdminPayouts() {
 
       {/* Ready */}
       <div>
-        <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2">Ready for the next batch</h4>
+        <h4 className="text-sm font-extrabold uppercase tracking-wider text-slate-600 mb-2">Ready for the next batch</h4>
         {o.preview.length === 0 ? <p className="text-xs text-slate-600">Nothing is waiting to be paid.</p> : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
@@ -112,7 +112,7 @@ export default function AdminPayouts() {
               <tbody>
                 {o.preview.map(p => (
                   <tr key={p.professionalId} className="border-t border-slate-100">
-                    <td className="py-2 pr-3 font-bold">{p.name}{p.sandbox ? <span className="ml-1 text-xs text-amber-900 bg-amber-100 px-1">test payments</span> : null}</td>
+                    <td className="py-2 pr-3 font-bold">{p.name}{p.sandbox ? <span className="ml-1 text-2xs text-amber-900 bg-amber-100 px-1">test payments</span> : null}</td>
                     <td className="pr-3 text-right tabular-nums">{sen(p.readySen)}</td>
                     <td className="pr-3 text-right tabular-nums">{p.adjustmentsSen ? sen(p.adjustmentsSen) : '–'}</td>
                     <td className="pr-3 text-right tabular-nums font-bold">{sen(p.netSen)}</td>
@@ -133,13 +133,13 @@ export default function AdminPayouts() {
 
       {/* Batches */}
       <div>
-        <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2">Batches</h4>
+        <h4 className="text-sm font-extrabold uppercase tracking-wider text-slate-600 mb-2">Batches</h4>
         {o.batches.length === 0 ? <p className="text-xs text-slate-600">No batches yet.</p> : (
           <ul className="divide-y divide-slate-100 border border-slate-200 text-xs">
             {o.batches.map(b => (
               <li key={b.id}>
                 <button type="button" aria-expanded={open === b.id} onClick={() => setOpen(open === b.id ? null : b.id)} className="w-full text-left p-3 cursor-pointer hover:bg-slate-50 flex flex-wrap justify-between gap-2">
-                  <span><b className="font-mono">{b.id}</b> <span className="ml-1 px-1.5 py-0.5 text-xs font-extrabold uppercase bg-[color:var(--t-50)] text-[color:var(--t-800)]">{b.status}</span> {b.note ? <span className="text-slate-600">· {b.note}</span> : null}</span>
+                  <span><b className="font-mono">{b.id}</b> <span className="ml-1 px-1.5 py-0.5 text-2xs font-extrabold uppercase bg-[color:var(--t-50)] text-[color:var(--t-800)]">{b.status}</span> {b.note ? <span className="text-slate-600">· {b.note}</span> : null}</span>
                   <span className="tabular-nums">{b.count} payout{b.count === 1 ? '' : 's'} · <b>{sen(b.totalSen)}</b> · {when(b.createdAt)}</span>
                 </button>
                 {open === b.id && batch && batch.id === b.id && (

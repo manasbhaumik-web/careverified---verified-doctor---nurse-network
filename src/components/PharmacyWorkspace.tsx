@@ -131,7 +131,7 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
     });
 
   if (error && !me) {
-    return <div className="bg-white border border-rose-200 p-8 text-center text-sm font-semibold text-rose-700" role="alert">{error}</div>;
+    return <div className="bg-white border border-rose-200 p-8 text-center text-xs font-semibold text-rose-700" role="alert">{error}</div>;
   }
 
   if (gated && me) {
@@ -151,7 +151,7 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
           />
         </DashboardHeader>
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
-          <div role="alert" className="bg-amber-50 border border-amber-200 text-amber-900 p-4 flex items-center gap-3 text-sm font-semibold">
+          <div role="alert" className="bg-amber-50 border border-amber-200 text-amber-900 p-4 flex items-center gap-3 text-xs font-semibold">
             <ShieldAlert className="h-5 w-5 shrink-0" />
             Pharmacy accounts handle patients' health information, so two-factor sign-in is required. Set it up below to continue.
           </div>
@@ -169,7 +169,7 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
         onClick={() => {
           window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
         }}
-        className="inline-flex items-center gap-1.5 px-3 py-3 text-xs sm:text-sm font-semibold text-slate-600 hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)] transition-colors border-b-2 border-transparent"
+        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
         title="Open Support Desk & Help Center"
       >
         <LifeBuoy className="h-4 w-4 text-slate-500" />
@@ -224,14 +224,14 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
 
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {me?.account.mustChangePassword && (
-          <div role="alert" className="bg-amber-50 border border-amber-200 text-amber-900 p-4 flex flex-wrap items-center gap-3 text-sm">
+          <div role="alert" className="bg-amber-50 border border-amber-200 text-amber-900 p-4 flex flex-wrap items-center gap-3 text-xs">
             <KeyRound className="h-5 w-5 shrink-0" />
             <span className="flex-1 min-w-[220px] font-semibold">You are using a temporary password. Please set your own password now.</span>
             <button type="button" onClick={() => setTab('profile')} className={btnPlain}>Change password</button>
           </div>
         )}
         {counts && counts.waitingOver24h > 0 && (
-          <div role="status" className="bg-rose-50 border border-rose-200 text-rose-800 p-4 flex items-center gap-3 text-sm font-semibold">
+          <div role="status" className="bg-rose-50 border border-rose-200 text-rose-800 p-4 flex items-center gap-3 text-xs font-semibold">
             <AlertTriangle className="h-5 w-5 shrink-0" />
             {counts.waitingOver24h} prescription{counts.waitingOver24h === 1 ? ' has' : 's have'} been waiting over 24 hours without a response.
           </div>
@@ -359,7 +359,7 @@ function InboxTab({ counts, onChanged, tick }: { counts?: Counts; onChanged: () 
               onChange={e => setCode(e.target.value.toUpperCase())} 
               placeholder="e.g. DCLHAS7GS3" 
               maxLength={20} 
-              className="h-12 w-full border border-slate-300 rounded-none px-3.5 bg-white font-mono font-bold text-sm text-slate-900 outline-none focus:border-[color:var(--t-600)]" 
+              className="h-12 w-full border border-slate-300 rounded-none px-3.5 bg-white font-mono font-bold text-xs text-slate-900 outline-none focus:border-[color:var(--t-600)]" 
             />
           </label>
           <button type="submit" className={bannerPrimaryBtn}>Look up code</button>
@@ -373,7 +373,7 @@ function InboxTab({ counts, onChanged, tick }: { counts?: Counts; onChanged: () 
           <Search className="h-4 w-4 text-slate-400 shrink-0" />
           <label htmlFor="inbox-search" className="sr-only">Search the inbox</label>
           <input id="inbox-search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search by prescription code, patient name, or medicine..."
-            className="flex-1 min-w-0 bg-transparent text-sm text-slate-900 outline-none placeholder-slate-400 font-medium" />
+            className="flex-1 min-w-0 bg-transparent text-xs text-slate-900 outline-none placeholder-slate-400 font-medium" />
         </div>
         <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
           <FilterSelect label="Status" value={filter} onChange={setFilter}>
@@ -383,16 +383,16 @@ function InboxTab({ counts, onChanged, tick }: { counts?: Counts; onChanged: () 
           {(filter !== ALL || query) && (
             <button type="button" onClick={() => { setFilter(ALL); setQuery(''); }} className="h-10 px-4 text-xs font-bold uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] cursor-pointer transition-colors rounded-none">Clear filters</button>
           )}
-          <span className="ml-auto self-center text-xs font-mono font-bold text-slate-600 tabular-nums bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-none" aria-live="polite">{shown.length} result{shown.length === 1 ? '' : 's'}</span>
+          <span className="ml-auto self-center text-2xs font-mono font-bold text-slate-600 tabular-nums bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-none" aria-live="polite">{shown.length} result{shown.length === 1 ? '' : 's'}</span>
         </div>
       </section>
 
       {list === null ? (
-        <p className="text-sm text-slate-600 font-semibold">Loading your inbox…</p>
+        <p className="text-xs text-slate-600 font-semibold">Loading your inbox…</p>
       ) : shown.length === 0 ? (
         <div className="bg-white border border-[color:var(--t-200)] rounded-none p-12 text-center space-y-3">
           <Inbox className="h-10 w-10 text-[color:var(--t-300)] mx-auto" />
-          <h2 className="text-base font-black text-slate-900 uppercase tracking-wide">{list.length === 0 ? 'No prescriptions yet' : 'Nothing matches your filters'}</h2>
+          <h2 className="text-sm font-black text-slate-900 uppercase tracking-wide">{list.length === 0 ? 'No prescriptions yet' : 'Nothing matches your filters'}</h2>
           <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">{list.length === 0 ? 'When a patient sends you a prescription it will appear here and you will be notified.' : 'Try a different status or search filter.'}</p>
         </div>
       ) : (
@@ -453,15 +453,15 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
     <article className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-3 min-w-0">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="font-mono text-sm font-extrabold text-[color:var(--t-700)] tracking-wide">{rx.code}</p>
+          <p className="font-mono text-xs font-extrabold text-[color:var(--t-700)] tracking-wide">{rx.code}</p>
           <h3 className="text-base font-bold text-[color:var(--ink)] flex items-center gap-1.5 [overflow-wrap:anywhere]"><UserRound className="h-4 w-4 shrink-0 text-[color:var(--t-600)]" />{rx.patientName}</h3>
         </div>
-        <span className={`text-xs font-bold px-2.5 py-0.5 border ${BUCKET_STYLE[rx.bucket]}`}>{BUCKET_LABEL[rx.bucket]}{rx.bucket === 'in_progress' && rx.fillStatus ? ` · ${rx.fillStatus === 'received' ? 'Received' : 'Preparing'}` : ''}</span>
+        <span className={`text-2xs font-bold px-2.5 py-0.5 border ${BUCKET_STYLE[rx.bucket]}`}>{BUCKET_LABEL[rx.bucket]}{rx.bucket === 'in_progress' && rx.fillStatus ? ` · ${rx.fillStatus === 'received' ? 'Received' : 'Preparing'}` : ''}</span>
       </div>
 
       <ul className="space-y-1.5">
         {rx.items.map((i, k) => (
-          <li key={k} className="text-sm text-slate-800 flex gap-2 [overflow-wrap:anywhere]">
+          <li key={k} className="text-xs text-slate-800 flex gap-2 [overflow-wrap:anywhere]">
             <Pill className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" />
             <span><strong>{i.name}</strong> {[i.strength, i.form].filter(Boolean).join(' ')} · {i.dose}, {i.frequency} for {i.durationDays} days · qty {i.quantity}{i.instructions ? ` · ${i.instructions}` : ''}</span>
           </li>
@@ -650,20 +650,20 @@ function ActivityTab() {
     setLoadingMore(false);
   };
 
-  if (items === null) return <p className="text-sm text-slate-600">Loading activity…</p>;
+  if (items === null) return <p className="text-xs text-slate-600">Loading activity…</p>;
   if (items.length === 0) {
     return (
       <div className="bg-white border border-[color:var(--t-200)] p-10 text-center space-y-2">
         <Activity className="h-10 w-10 text-[color:var(--t-200)] mx-auto" />
         <h2 className="text-sm font-extrabold">No activity yet</h2>
-        <p className="text-sm text-slate-600">Everything your pharmacy does here is recorded in this timeline.</p>
+        <p className="text-xs text-slate-600">Everything your pharmacy does here is recorded in this timeline.</p>
       </div>
     );
   }
   return (
     <section aria-label="Activity log" className="bg-white border border-[color:var(--t-200)] rounded-none">
       <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-        <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
+        <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
           <Activity className="h-4 w-4 text-[color:var(--t-600)]" />
           <span>Operational Audit Trail ({items.length})</span>
         </h3>
@@ -672,7 +672,7 @@ function ActivityTab() {
       <ol className="divide-y divide-slate-200">
         {items.map(e => (
           <li key={e.id} className="p-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 hover:bg-slate-50 transition-colors">
-            <span className="text-sm font-semibold text-slate-800 min-w-0 [overflow-wrap:anywhere]">{(EVENT_TEXT[e.type] ?? (() => e.type))(e)}</span>
+            <span className="text-xs font-semibold text-slate-800 min-w-0 [overflow-wrap:anywhere]">{(EVENT_TEXT[e.type] ?? (() => e.type))(e)}</span>
             <time dateTime={e.ts} className="text-xs font-mono font-bold text-slate-500 tabular-nums">{fmtTime(e.ts)}</time>
           </li>
         ))}
@@ -716,7 +716,7 @@ function ReportsTab() {
         <a href={`/api/pharmacy/reports?days=${days}&format=csv`} className={`${bannerSecondaryBtn} ml-auto`}><Download className="h-4 w-4" /> Download Audited CSV</a>
       </section>
 
-      {!r ? <p className="text-sm text-slate-600 font-semibold">Loading report…</p> : (
+      {!r ? <p className="text-xs text-slate-600 font-semibold">Loading report…</p> : (
         <>
           <section aria-label="Key figures" className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
             {tile('Received', r.received, 'sent to pharmacy')}
@@ -749,10 +749,10 @@ function ReportsTab() {
 
             <section aria-label="Most prescribed medicines" className="bg-white border border-[color:var(--t-200)] rounded-none p-5 min-w-0">
               <h2 className="text-sm font-black uppercase tracking-wider text-slate-800 mb-4 border-b border-slate-100 pb-3">Top Formulations Dispensed</h2>
-              {r.topMedicines.length === 0 ? <p className="text-sm text-slate-600 font-semibold">Nothing in this period yet.</p> : (
+              {r.topMedicines.length === 0 ? <p className="text-xs text-slate-600 font-semibold">Nothing in this period yet.</p> : (
                 <ol className="divide-y divide-slate-100">
                   {r.topMedicines.map(m => (
-                    <li key={m.name} className="py-2.5 flex items-center justify-between gap-3 text-sm">
+                    <li key={m.name} className="py-2.5 flex items-center justify-between gap-3 text-xs">
                       <span className="min-w-0 [overflow-wrap:anywhere] font-bold text-slate-800 capitalize">{m.name}</span>
                       <span className="font-mono font-black tabular-nums text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">{m.count} units</span>
                     </li>
@@ -826,7 +826,7 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
           <legend className="text-xs font-black uppercase tracking-wider text-slate-700 px-1.5 bg-white border border-slate-200">Dispensing Services Available</legend>
           <div className="flex flex-wrap gap-x-5 gap-y-2.5 pt-1">
             {SERVICES.map(s => (
-              <label key={s} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-800 cursor-pointer">
+              <label key={s} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer">
                 <input type="checkbox" checked={services.includes(s)} onChange={e => setServices(prev => e.target.checked ? [...prev, s] : prev.filter(x => x !== s))} className="h-4 w-4 rounded-none accent-[color:var(--t-600)]" />
                 {s}
               </label>
@@ -837,13 +837,13 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
           <legend className="text-xs font-black uppercase tracking-wider text-slate-700 px-1.5 bg-white border border-slate-200">Home delivery partners (Malaysia)</legend>
           <div className="flex flex-wrap gap-x-5 gap-y-2.5 pt-1">
             {([['pharmacy_courier', 'Own rider'], ['grab', 'Grab'], ['lalamove', 'Lalamove'], ['other_courier', 'Other courier']] as const).map(([id, label]) => (
-              <label key={id} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-800 cursor-pointer">
+              <label key={id} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer">
                 <input type="checkbox" checked={deliveryMethods.includes(id)} onChange={e => setDeliveryMethods(prev => e.target.checked ? [...prev, id] : prev.filter(x => x !== id))} className="h-4 w-4 rounded-none accent-[color:var(--t-600)]" />
                 {label}
               </label>
             ))}
           </div>
-          <label className="inline-flex items-center gap-2 text-sm font-semibold text-slate-800 cursor-pointer mt-3">
+          <label className="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer mt-3">
             <input type="checkbox" checked={coldChain} onChange={e => setColdChain(e.target.checked)} className="h-4 w-4 rounded-none accent-[color:var(--t-600)]" />
             We can deliver refrigerated (cold-chain) medicines such as insulin
           </label>

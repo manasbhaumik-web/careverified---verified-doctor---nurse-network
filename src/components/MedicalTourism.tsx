@@ -25,10 +25,10 @@ const CATEGORY_LABEL: Record<string, string> = {
 const SERVICE_LABEL: Record<string, string> = { interpreter: 'Interpreter', airportPickup: 'Airport pickup', halalFood: 'Halal food', prayerRoom: 'Prayer room' };
 const COUNTRIES: [string, string][] = [['MY', 'Malaysia'], ['ID', 'Indonesia'], ['SG', 'Singapore'], ['CN', 'China'], ['IN', 'India'], ['AU', 'Australia'], ['GB', 'United Kingdom'], ['US', 'United States'], ['SA', 'Saudi Arabia'], ['AE', 'United Arab Emirates'], ['JP', 'Japan'], ['XX', 'Other']];
 
-const field = 'w-full border border-slate-300 bg-white px-3 min-h-[44px] text-sm text-slate-900 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]';
-const label = 'block text-sm font-bold text-slate-800';
-const primaryBtn = 'min-h-[44px] px-4 inline-flex items-center justify-center gap-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 disabled:text-slate-700 text-white text-sm font-bold cursor-pointer';
-const plainBtn = 'min-h-[44px] px-4 inline-flex items-center justify-center gap-2 border border-slate-300 bg-white hover:bg-slate-50 text-slate-900 text-sm font-bold cursor-pointer';
+const field = 'w-full border border-slate-300 bg-white px-3 min-h-[44px] text-xs text-slate-900 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]';
+const label = 'block text-xs font-bold text-slate-800';
+const primaryBtn = 'min-h-[44px] px-4 inline-flex items-center justify-center gap-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 disabled:text-slate-700 text-white text-xs font-bold cursor-pointer';
+const plainBtn = 'min-h-[44px] px-4 inline-flex items-center justify-center gap-2 border border-slate-300 bg-white hover:bg-slate-50 text-slate-900 text-xs font-bold cursor-pointer';
 const card = 'bg-white border border-[color:var(--t-200)] p-5';
 
 interface MedicalTourismProps {
@@ -96,7 +96,7 @@ function Facilities({ onSent }: { onSent: (caseId: string) => void }) {
     (!f.abroad || x.acceptsInternational)), [all, f]);
   const filtering = Object.values(f).some(Boolean);
 
-  if (!all) return <p className="text-sm text-slate-700">Loading hospitals…</p>;
+  if (!all) return <p className="text-xs text-slate-700">Loading hospitals…</p>;
   return (
     <div className="space-y-4">
       {all.length > 0 && (
@@ -120,21 +120,21 @@ function Facilities({ onSent }: { onSent: (caseId: string) => void }) {
             </label>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p role="status" className="text-sm font-bold text-slate-800">{shown.length} {shown.length === 1 ? 'hospital' : 'hospitals'}</p>
-            {filtering && <button type="button" className="min-h-[44px] px-3 text-sm font-bold underline cursor-pointer" onClick={() => setF({ q: '', specialty: '', language: '', accreditation: '', service: '', abroad: '' })}>Clear filters</button>}
+            <p role="status" className="text-xs font-bold text-slate-800">{shown.length} {shown.length === 1 ? 'hospital' : 'hospitals'}</p>
+            {filtering && <button type="button" className="min-h-[44px] px-3 text-xs font-bold underline cursor-pointer" onClick={() => setF({ q: '', specialty: '', language: '', accreditation: '', service: '', abroad: '' })}>Clear filters</button>}
           </div>
         </div>
       )}
 
       {all.length === 0 && (
         <div className="bg-white border border-dashed border-slate-300 p-8 text-center space-y-2">
-          <p className="text-base font-bold text-slate-900">No hospitals are listed right now.</p>
-          <p className="text-sm text-slate-700">We list a hospital only while it is switched on and its licence is current, so this list can change. Please check again later, or contact support if you expected to see one.</p>
+          <p className="text-sm font-bold text-slate-900">No hospitals are listed right now.</p>
+          <p className="text-xs text-slate-700">We list a hospital only while it is switched on and its licence is current, so this list can change. Please check again later, or contact support if you expected to see one.</p>
         </div>
       )}
       {all.length > 0 && shown.length === 0 && (
         <div className="bg-white border border-dashed border-slate-300 p-8 text-center space-y-2">
-          <p className="text-base font-bold text-slate-900">No hospital matches these filters.</p>
+          <p className="text-sm font-bold text-slate-900">No hospital matches these filters.</p>
           <button type="button" className={plainBtn} onClick={() => setF({ q: '', specialty: '', language: '', accreditation: '', service: '', abroad: '' })}>Clear filters</button>
         </div>
       )}
@@ -144,22 +144,22 @@ function Facilities({ onSent }: { onSent: (caseId: string) => void }) {
           <article key={fa.id} className={`${card} space-y-3 flex flex-col`}>
             <div>
               <h3 className="font-extrabold text-lg flex items-center gap-2 text-slate-900"><Building2 className="h-5 w-5 text-[color:var(--t-600)]" aria-hidden="true" />{fa.name}</h3>
-              <p className="text-sm text-slate-700">{[fa.city, fa.state].filter(Boolean).join(', ')}</p>
+              <p className="text-xs text-slate-700">{[fa.city, fa.state].filter(Boolean).join(', ')}</p>
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {fa.licenceChecked && <span className="text-xs font-bold px-2 py-0.5 border border-emerald-300 bg-emerald-50 text-emerald-900 inline-flex items-center gap-1"><BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />Licence checked</span>}
-              {fa.accreditations.map((a: any) => <span key={a.body} className="text-xs font-bold px-2 py-0.5 border border-emerald-300 bg-emerald-50 text-emerald-900">{a.body} checked, valid to {formatDate(a.validUntil)}</span>)}
-              {fa.mhtcMember && <span className="text-xs font-bold px-2 py-0.5 border border-sky-300 bg-sky-50 text-sky-900">MHTC member</span>}
-              {fa.acceptsInternational && <span className="text-xs font-bold px-2 py-0.5 border border-slate-300 bg-slate-50 text-slate-800">Welcomes international patients</span>}
+              {fa.licenceChecked && <span className="text-2xs font-bold px-2 py-0.5 border border-emerald-300 bg-emerald-50 text-emerald-900 inline-flex items-center gap-1"><BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />Licence checked</span>}
+              {fa.accreditations.map((a: any) => <span key={a.body} className="text-2xs font-bold px-2 py-0.5 border border-emerald-300 bg-emerald-50 text-emerald-900">{a.body} checked, valid to {formatDate(a.validUntil)}</span>)}
+              {fa.mhtcMember && <span className="text-2xs font-bold px-2 py-0.5 border border-sky-300 bg-sky-50 text-sky-900">MHTC member</span>}
+              {fa.acceptsInternational && <span className="text-2xs font-bold px-2 py-0.5 border border-slate-300 bg-slate-50 text-slate-800">Welcomes international patients</span>}
               {fa.accreditations.length === 0 && <span className="text-xs text-slate-700 py-0.5">No accreditation checked by us yet</span>}
             </div>
-            {fa.description && <p className="text-sm text-slate-800 leading-relaxed">{fa.description}</p>}
-            <dl className="text-sm text-slate-800 space-y-1">
+            {fa.description && <p className="text-xs text-slate-800 leading-relaxed">{fa.description}</p>}
+            <dl className="text-xs text-slate-800 space-y-1">
               <div className="flex gap-2"><dt className="font-bold shrink-0">Specialties</dt><dd>{fa.specialties.join(', ') || 'Not listed'}</dd></div>
               <div className="flex gap-2"><dt className="font-bold shrink-0 inline-flex items-center gap-1"><Languages className="h-3.5 w-3.5" aria-hidden="true" />Languages</dt><dd>{fa.languages.join(', ') || 'Not listed'}</dd></div>
               {fa.practitioners.length > 0 && <div className="flex gap-2"><dt className="font-bold shrink-0">Doctors</dt><dd>{fa.practitioners.map((p: any) => `${p.name} (${p.specialization})`).join(' · ')}</dd></div>}
             </dl>
-            <div className="text-sm text-slate-800 flex flex-wrap gap-x-4 gap-y-1">
+            <div className="text-xs text-slate-800 flex flex-wrap gap-x-4 gap-y-1">
               {Object.entries(SERVICE_LABEL).filter(([k]) => fa.services[k]).map(([k, l]) => <span key={k} className="inline-flex items-center gap-1">{k === 'halalFood' ? <Utensils className="h-4 w-4" aria-hidden="true" /> : k === 'airportPickup' ? <Car className="h-4 w-4" aria-hidden="true" /> : <HeartHandshake className="h-4 w-4" aria-hidden="true" />}{l}</span>)}
               {fa.services.accommodationPartners?.length > 0 && <span>Stay: {fa.services.accommodationPartners.join(', ')}</span>}
             </div>
@@ -194,7 +194,7 @@ function EnquiryForm({ facility, onClose, onSent }: { facility: any; onClose: ()
       <form onSubmit={submit} className="bg-white w-full max-w-lg max-h-[92vh] overflow-y-auto p-5 space-y-4 border border-slate-300 shadow-2xl">
         <div>
           <h3 id="enq-title" className="text-lg font-extrabold text-slate-900">Request a quote from {facility.name}</h3>
-          <p className="text-sm text-slate-700">Free, and it does not commit you. The hospital replies with an itemised quote.</p>
+          <p className="text-xs text-slate-700">Free, and it does not commit you. The hospital replies with an itemised quote.</p>
         </div>
         <label className={label}>What treatment are you looking for? *
           <textarea className={`${field} mt-1 py-2`} rows={4} required minLength={20} maxLength={2000} autoFocus placeholder="Your diagnosis, any previous treatment, and what you want to ask the hospital." value={v.summary} onChange={e => setV({ ...v, summary: e.target.value })} />
@@ -213,7 +213,7 @@ function EnquiryForm({ facility, onClose, onSent }: { facility: any; onClose: ()
         </div>
 
         <details className="border border-slate-200 p-3">
-          <summary className="min-h-[44px] flex items-center text-sm font-bold text-slate-900 cursor-pointer">More options (specialty, dates, doctor, help you need)</summary>
+          <summary className="min-h-[44px] flex items-center text-xs font-bold text-slate-900 cursor-pointer">More options (specialty, dates, doctor, help you need)</summary>
           <div className="space-y-3 pt-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <label className={label}>Specialty
@@ -237,16 +237,16 @@ function EnquiryForm({ facility, onClose, onSent }: { facility: any; onClose: ()
             <fieldset className="space-y-1">
               <legend className={label}>Help you would like arranged</legend>
               {[['interpreter', 'Interpreter'], ['airportPickup', 'Airport pickup'], ['halalFood', 'Halal food'], ['prayerRoom', 'Prayer room'], ['accommodation', 'Help finding accommodation']].map(([k, l]) => (
-                <label key={k} className="flex items-center gap-3 min-h-[44px] text-sm text-slate-900 cursor-pointer"><input type="checkbox" className="h-5 w-5 accent-[color:var(--t-600)]" checked={!!needs[k]} onChange={e => setNeeds({ ...needs, [k]: e.target.checked })} />{l}</label>
+                <label key={k} className="flex items-center gap-3 min-h-[44px] text-xs text-slate-900 cursor-pointer"><input type="checkbox" className="h-5 w-5 accent-[color:var(--t-600)]" checked={!!needs[k]} onChange={e => setNeeds({ ...needs, [k]: e.target.checked })} />{l}</label>
               ))}
               {needs.interpreter && <input className={field} aria-label="Interpreter language" placeholder="Language" value={v.interpreterLanguage} onChange={e => setV({ ...v, interpreterLanguage: e.target.value })} />}
             </fieldset>
           </div>
         </details>
 
-        <label className="flex items-start gap-3 text-sm text-slate-900 cursor-pointer"><input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" checked={v.shareDocuments} onChange={e => setV({ ...v, shareDocuments: e.target.checked })} /><span>The hospital may open the passport copy and medical records I upload for this request. I can change this later.</span></label>
-        <label className="flex items-start gap-3 text-sm text-slate-900 cursor-pointer"><input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" required checked={v.consent} onChange={e => setV({ ...v, consent: e.target.checked })} /><span>I agree that MedCred sends this request, with my name, email and country, to {facility.name}. It is not a booking and does not create a doctor-patient relationship. *</span></label>
-        {err && <p role="alert" className="text-sm font-bold text-rose-900 bg-rose-50 border border-rose-200 p-3">{err}</p>}
+        <label className="flex items-start gap-3 text-xs text-slate-900 cursor-pointer"><input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" checked={v.shareDocuments} onChange={e => setV({ ...v, shareDocuments: e.target.checked })} /><span>The hospital may open the passport copy and medical records I upload for this request. I can change this later.</span></label>
+        <label className="flex items-start gap-3 text-xs text-slate-900 cursor-pointer"><input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" required checked={v.consent} onChange={e => setV({ ...v, consent: e.target.checked })} /><span>I agree that MedCred sends this request, with my name, email and country, to {facility.name}. It is not a booking and does not create a doctor-patient relationship. *</span></label>
+        {err && <p role="alert" className="text-xs font-bold text-rose-900 bg-rose-50 border border-rose-200 p-3">{err}</p>}
         <div className="flex flex-wrap gap-3 justify-end">
           <button type="button" onClick={onClose} className={plainBtn}>Cancel</button>
           <button disabled={busy} className={primaryBtn}>{busy ? 'Sending…' : 'Send request'}</button>
@@ -266,11 +266,11 @@ export function MyCases({ openId, onOpen, onOpenProfessional, onFind }: { openId
 function CaseList({ onOpen, onFind }: { onOpen: (id: string) => void; onFind?: () => void }) {
   const [list, setList] = useState<any[] | null>(null);
   useEffect(() => { jget('/api/tourism/cases').then(d => setList(d.status === 'success' ? d.data : [])).catch(() => setList([])); }, []);
-  if (!list) return <p className="text-sm text-slate-700">Loading…</p>;
+  if (!list) return <p className="text-xs text-slate-700">Loading…</p>;
   if (list.length === 0) return (
     <div className="bg-white border border-dashed border-slate-300 p-8 text-center space-y-3">
-      <p className="text-base font-bold text-slate-900">You have no requests yet.</p>
-      <p className="text-sm text-slate-700">Pick a hospital and ask it for a quote. Your request and its quote appear here.</p>
+      <p className="text-sm font-bold text-slate-900">You have no requests yet.</p>
+      <p className="text-xs text-slate-700">Pick a hospital and ask it for a quote. Your request and its quote appear here.</p>
       {onFind && <button type="button" onClick={onFind} className={primaryBtn}>Find a hospital</button>}
     </div>
   );
@@ -279,9 +279,9 @@ function CaseList({ onOpen, onFind }: { onOpen: (id: string) => void; onFind?: (
       {list.map(c => (
         <li key={c.id}>
           <button onClick={() => onOpen(c.id)} className={`w-full text-left bg-white border hover:border-[color:var(--t-600)] p-4 cursor-pointer min-h-[44px] ${c.status === 'quoted' ? 'border-amber-400' : 'border-slate-200'}`}>
-            <p className="text-base font-bold text-slate-900">{c.facility} <span className="text-[color:var(--t-700)] text-sm font-bold">· {CASE_STATUS_LABEL[c.status] ?? c.status}</span></p>
-            {c.status === 'quoted' && <p className="text-sm font-bold text-amber-900">A quote is waiting for your answer</p>}
-            <p className="text-sm text-slate-800">{c.summary}</p>
+            <p className="text-base font-bold text-slate-900">{c.facility} <span className="text-[color:var(--t-700)] text-xs font-bold">· {CASE_STATUS_LABEL[c.status] ?? c.status}</span></p>
+            {c.status === 'quoted' && <p className="text-xs font-bold text-amber-900">A quote is waiting for your answer</p>}
+            <p className="text-xs text-slate-800">{c.summary}</p>
             <p className="text-xs text-slate-700 mt-1">Updated {formatDate(c.updatedAt)}</p>
           </button>
         </li>
@@ -306,7 +306,7 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
   useEffect(() => { load(); }, [load]);
   const say = (d: any, ok = 'Done.') => { setMsg({ ok: d.status === 'success', text: (d.status === 'success' ? d.message || ok : d.message) || 'Something went wrong.' }); if (d.status === 'success') load(); };
 
-  if (!c) return <p className="text-sm text-slate-700">Loading…</p>;
+  if (!c) return <p className="text-xs text-slate-700">Loading…</p>;
   const open = ['enquiry', 'quoted', 'accepted', 'in_treatment'].includes(c.status);
   const active: CaseTab = tab ?? (c.status === 'completed' && c.discharge ? 'discharge' : 'quotes');
   const upload = async (file: File) => {
@@ -326,24 +326,24 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
 
   return (
     <div className="space-y-4">
-      <button onClick={onBack} className="min-h-[44px] px-1 text-sm font-bold underline cursor-pointer">← All requests</button>
+      <button onClick={onBack} className="min-h-[44px] px-1 text-xs font-bold underline cursor-pointer">← All requests</button>
 
       {/* Where it stands and what to do next */}
       <section className={`border p-5 space-y-1.5 ${c.status === 'quoted' ? 'bg-amber-50 border-amber-300' : 'bg-white border-slate-200'}`}>
         <h2 className="text-xl font-extrabold text-slate-900">{c.facility?.name}</h2>
         <p className="text-base font-bold text-[color:var(--t-700)]">{CASE_STATUS_LABEL[c.status] ?? c.status}</p>
-        <p className="text-sm text-slate-900">{NEXT_STEP[c.status]}</p>
-        <p className="text-sm text-slate-800"><b>Your request:</b> {c.summary}</p>
-        <p className="text-sm text-slate-700">{[c.facility?.phone, c.facility?.email].filter(Boolean).join(' · ')}{c.practitioner ? ` · Doctor: ${c.practitioner.name}` : ''}</p>
-        {c.practitioner && onOpenProfessional && <button className="min-h-[44px] text-sm font-bold underline cursor-pointer" onClick={() => onOpenProfessional(c.practitioner.id)}>Book a video consultation with {c.practitioner.name}</button>}
+        <p className="text-xs text-slate-900">{NEXT_STEP[c.status]}</p>
+        <p className="text-xs text-slate-800"><b>Your request:</b> {c.summary}</p>
+        <p className="text-xs text-slate-700">{[c.facility?.phone, c.facility?.email].filter(Boolean).join(' · ')}{c.practitioner ? ` · Doctor: ${c.practitioner.name}` : ''}</p>
+        {c.practitioner && onOpenProfessional && <button className="min-h-[44px] text-xs font-bold underline cursor-pointer" onClick={() => onOpenProfessional(c.practitioner.id)}>Book a video consultation with {c.practitioner.name}</button>}
       </section>
 
-      {msg && <p role="status" className={`text-sm font-bold border p-3 ${msg.ok ? 'text-sky-950 bg-sky-50 border-sky-200' : 'text-rose-900 bg-rose-50 border-rose-200'}`}>{msg.text}</p>}
+      {msg && <p role="status" className={`text-xs font-bold border p-3 ${msg.ok ? 'text-sky-950 bg-sky-50 border-sky-200' : 'text-rose-900 bg-rose-50 border-rose-200'}`}>{msg.text}</p>}
 
       <div role="tablist" aria-label="Request sections" className="flex flex-wrap gap-1.5">
         {tabs.map(t => (
           <button key={t.id} role="tab" aria-selected={active === t.id} onClick={() => { setTab(t.id); setConfirm(null); }}
-            className={`min-h-[44px] px-4 text-sm font-bold cursor-pointer border ${active === t.id ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]' : 'bg-white text-slate-900 border-slate-300 hover:bg-slate-50'}`}>
+            className={`min-h-[44px] px-4 text-xs font-bold cursor-pointer border ${active === t.id ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]' : 'bg-white text-slate-900 border-slate-300 hover:bg-slate-50'}`}>
             {t.text}{t.count !== undefined && t.count > 0 ? ` (${t.count})` : ''}
           </button>
         ))}
@@ -351,9 +351,9 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
 
       {active === 'quotes' && (
         <section className={`${card} space-y-3`}>
-          {c.quotes.length === 0 && <p className="text-sm text-slate-800">No quote yet. The hospital will send an itemised price.</p>}
+          {c.quotes.length === 0 && <p className="text-xs text-slate-800">No quote yet. The hospital will send an itemised price.</p>}
           {c.quotes.map((q: any) => (
-            <div key={q.id} className={`border p-4 text-sm space-y-3 ${q.status === 'sent' ? 'border-[color:var(--t-600)]' : 'border-slate-200 bg-slate-50'}`}>
+            <div key={q.id} className={`border p-4 text-xs space-y-3 ${q.status === 'sent' ? 'border-[color:var(--t-600)]' : 'border-slate-200 bg-slate-50'}`}>
               <p className="font-bold text-slate-900">Quote {q.version} · {q.status === 'sent' ? 'waiting for your answer' : q.status} · valid until {formatDate(q.validUntil)}</p>
               <table className="w-full"><tbody>
                 {q.items.map((i: any, k: number) => <tr key={k} className="border-b border-slate-100"><td className="py-1.5">{i.label} <span className="text-slate-700">({CATEGORY_LABEL[i.category] ?? i.category})</span></td><td className="text-right tabular-nums">{formatMoney(i.amountSen / 100)}</td></tr>)}
@@ -367,18 +367,18 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
               {q.status === 'sent' && c.status === 'quoted' && <QuoteDecision caseId={id} quoteId={q.id} total={formatMoney(q.total)} onDone={d => say(d, 'Recorded.')} />}
             </div>
           ))}
-          <p className="text-sm text-slate-700">Payment is arranged directly with the hospital. MedCred does not take your package payment.</p>
+          <p className="text-xs text-slate-700">Payment is arranged directly with the hospital. MedCred does not take your package payment.</p>
         </section>
       )}
 
       {active === 'itinerary' && (
         <section className={card}>
-          <ol className="space-y-2 text-sm text-slate-900">{c.itinerary.map((i: any) => <li key={i.id}><b>{formatDate(i.date)}</b> · {i.title}{i.note ? ` — ${i.note}` : ''}</li>)}</ol>
+          <ol className="space-y-2 text-xs text-slate-900">{c.itinerary.map((i: any) => <li key={i.id}><b>{formatDate(i.date)}</b> · {i.title}{i.note ? ` — ${i.note}` : ''}</li>)}</ol>
         </section>
       )}
 
       {active === 'documents' && (
-        <section className={`${card} space-y-3 text-sm`}>
+        <section className={`${card} space-y-3 text-xs`}>
           {c.files.length === 0 && <p className="text-slate-800">No documents yet.</p>}
           <ul className="space-y-1">{c.files.map((f: any) => (
             <li key={f.id} className="flex flex-wrap items-center gap-x-4 gap-y-1">
@@ -398,7 +398,7 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
           {open && (
             <div className="flex flex-wrap items-center gap-2">
               <select className={`${field} sm:w-64`} value={kind} onChange={e => setKind(e.target.value)} aria-label="Document type"><option value="passport">Passport copy</option><option value="medical_records">Medical records</option><option value="visa_letter">Visa / support letter</option><option value="other">Other</option></select>
-              <input type="file" accept="application/pdf,image/jpeg,image/png" aria-label="Choose a file" className="text-sm min-h-[44px]" onChange={e => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = ''; }} />
+              <input type="file" accept="application/pdf,image/jpeg,image/png" aria-label="Choose a file" className="text-xs min-h-[44px]" onChange={e => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = ''; }} />
             </div>
           )}
           <label className="flex items-start gap-3 cursor-pointer"><input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" checked={c.shareDocuments} onChange={async e => say(await jsend('POST', `/api/tourism/cases/${id}/sharing`, { shareDocuments: e.target.checked }), 'Updated.')} /><span className="text-slate-900">The hospital may open these files. Untick to stop sharing at any time.</span></label>
@@ -406,7 +406,7 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
       )}
 
       {active === 'messages' && (
-        <section className={`${card} space-y-3 text-sm`}>
+        <section className={`${card} space-y-3 text-xs`}>
           {c.messages.length === 0 && <p className="text-slate-800">No messages yet.</p>}
           <ul className="space-y-2">{c.messages.map((m: any) => <li key={m.id} className={`p-3 border ${m.mine ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}><b>{m.mine ? 'You' : m.senderName}</b> <span className="text-slate-700">· {formatDate(m.ts)}</span><br />{m.text}</li>)}</ul>
           {c.status !== 'closed' && (
@@ -419,7 +419,7 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
       )}
 
       {active === 'discharge' && c.discharge && (
-        <section className="bg-white border border-emerald-300 p-5 space-y-3 text-sm">
+        <section className="bg-white border border-emerald-300 p-5 space-y-3 text-xs">
           <h3 className="text-base font-extrabold text-slate-900">Discharge summary</h3>
           <p className="whitespace-pre-wrap text-slate-900">{c.discharge.summary}</p>
           {c.discharge.followUpPlan && <p><b>Follow-up plan:</b> {c.discharge.followUpPlan}</p>}
@@ -443,7 +443,7 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
       )}
 
       {active === 'help' && (
-        <section className={`${card} space-y-4 text-sm`}>
+        <section className={`${card} space-y-4 text-xs`}>
           <p className="text-slate-800">A video consultation with a Malaysian doctor from your home country is possible before or after treatment. The doctor cannot give emergency care or issue e-prescriptions to you abroad.</p>
           <details open={false}>
             <summary className="min-h-[44px] flex items-center font-bold text-slate-900 cursor-pointer">Report a problem with this hospital or package</summary>
@@ -475,7 +475,7 @@ function QuoteDecision({ caseId, quoteId, total, onDone }: { caseId: string; quo
   return (
     <div className="space-y-2 pt-1">
       <label className="flex items-start gap-3 min-h-[44px] cursor-pointer"><input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" checked={ack} onChange={e => setAck(e.target.checked)} /><span className="text-slate-900">I have read what is included, what is not included, and the cancellation terms.</span></label>
-      <p className="text-sm text-slate-800">Accepting {total} tells the hospital you want to go ahead. It does not charge you.</p>
+      <p className="text-xs text-slate-800">Accepting {total} tells the hospital you want to go ahead. It does not charge you.</p>
       <div className="flex flex-wrap gap-2"><button disabled={!ack} onClick={() => decide('accept')} className={primaryBtn}>Accept quote</button><button onClick={() => decide('decline')} className={plainBtn}>Decline</button></div>
     </div>
   );
@@ -486,8 +486,8 @@ function TravelInfo() {
   useEffect(() => { jget('/api/tourism/info').then(d => d.status === 'success' && setInfo(d.data)).catch(() => {}); }, []);
   return (
     <div className={`${card} space-y-4`}>
-      {info?.draft && <p className="text-sm bg-amber-50 border border-amber-200 text-amber-950 p-3 font-semibold flex gap-2"><AlertCircle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />Draft information for legal review. Entry rules change: always confirm with the Malaysian embassy or Immigration.</p>}
-      {info?.sections.map((s: any) => <section key={s.heading}><h3 className="text-base font-extrabold text-slate-900">{s.heading}</h3><p className="text-sm text-slate-800 leading-relaxed mt-1">{s.body}</p></section>)}
+      {info?.draft && <p className="text-xs bg-amber-50 border border-amber-200 text-amber-950 p-3 font-semibold flex gap-2"><AlertCircle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />Draft information for legal review. Entry rules change: always confirm with the Malaysian embassy or Immigration.</p>}
+      {info?.sections.map((s: any) => <section key={s.heading}><h3 className="text-base font-extrabold text-slate-900">{s.heading}</h3><p className="text-xs text-slate-800 leading-relaxed mt-1">{s.body}</p></section>)}
     </div>
   );
 }

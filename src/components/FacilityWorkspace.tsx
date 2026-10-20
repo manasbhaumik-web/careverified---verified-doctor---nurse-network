@@ -1124,7 +1124,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         onClick={() => {
           window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
         }}
-        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-sm flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
+        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
         title="Facility Help & Support Desk"
       >
         <LifeBuoy className="h-4 w-4 text-slate-500" />
@@ -1155,7 +1155,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                 badges={
                   <div className="flex flex-wrap items-center gap-1.5">
                     <BannerBadge tone="brand">{FACILITY_GROUPS[currentGroup].name}</BannerBadge>
-                    <span className="text-xs uppercase font-bold tracking-wider px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200">
+                    <span className="bg-slate-50 text-slate-700 border border-slate-300 text-2xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">
                       {facility?.kind || 'Medical Centre'}
                     </span>
                     {facility?.isLicenceValid && (
@@ -1273,7 +1273,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
               tabs={embedded && displayedTabs.length > 1 ? displayedTabs : undefined}
               activeTab={tab}
               onTabChange={setTab}
-              aside={
+              aside={embedded ? (
                 <button
                   type="button"
                   onClick={() => setShowNewJobModal(true)}
@@ -1282,7 +1282,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                   <Plus className="h-3.5 w-3.5" />
                   <span>Post Job Vacancy</span>
                 </button>
-              }
+              ) : undefined}
             />
             {/* Filter & Search Bar */}
             <div className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap items-center justify-between gap-4">
@@ -1293,7 +1293,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                   placeholder="Search job postings by title, specialty, ward or location…"
                   value={jobSearch}
                   onChange={e => setJobSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 border border-[color:var(--t-200)] text-sm rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="w-full pl-9 pr-4 py-2 border border-[color:var(--t-200)] text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
                 />
               </div>
 
@@ -1370,7 +1370,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
             {filteredJobs.length === 0 ? (
               <div className="bg-white border border-[color:var(--t-200)] p-12 text-center text-xs text-slate-500 space-y-3">
                 <Calendar className="h-10 w-10 text-slate-400 mx-auto" />
-                <p className="font-bold text-slate-700 text-sm">No job openings found matching your filter criteria.</p>
+                <p className="text-sm font-bold text-slate-700">No job openings found matching your filter criteria.</p>
                 <p>Create a new clinical vacancy to invite verified doctors and nurses across Malaysia.</p>
                 <button
                   type="button"
@@ -1395,17 +1395,17 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                       <div className="p-5 flex flex-col md:flex-row md:items-start justify-between gap-4 border-b border-slate-100">
                         <div className="space-y-2 flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className={`text-xs uppercase font-black tracking-wider px-2 py-0.5 border ${
+                            <span className={`text-2xs uppercase font-black tracking-wider px-2 py-0.5 border ${
                               job.status === 'Active'
                                 ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                                 : 'bg-slate-100 text-slate-600 border-slate-300'
                             }`}>
                               {job.status}
                             </span>
-                            <span className="text-xs uppercase font-black tracking-wider px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200">
+                            <span className="text-2xs uppercase font-black tracking-wider px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200">
                               {job.type}
                             </span>
-                            <span className="text-xs uppercase font-black tracking-wider px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200">
+                            <span className="text-2xs uppercase font-black tracking-wider px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200">
                               {job.roleRequired === 'doctor' ? 'Doctor' : job.roleRequired === 'nurse' ? 'Nurse' : 'Specialist'}
                             </span>
                             <span className="text-xs font-bold text-[color:var(--t-700)]">
@@ -1461,7 +1461,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                       {isExpanded && (
                         <div className="p-5 bg-slate-50/70 space-y-3 border-t border-slate-100">
                           <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-                            <h4 className="text-xs font-black uppercase tracking-wider text-slate-800">
+                            <h4 className="text-sm font-black uppercase tracking-wider text-slate-800">
                               Applications for this Vacancy ({applications.length})
                             </h4>
                             <span className="text-xs text-slate-500">
@@ -1483,11 +1483,11 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                                     <div className="space-y-1">
                                       <div className="flex items-center gap-2">
-                                        <span className="text-sm font-black text-slate-900">{app.applicantName}</span>
-                                        <span className="px-1.5 py-0.5 bg-slate-100 text-slate-700 text-xs font-extrabold uppercase">
+                                        <span className="text-xs font-black text-slate-900">{app.applicantName}</span>
+                                        <span className="px-1.5 py-0.5 bg-slate-100 text-slate-700 text-2xs font-extrabold uppercase">
                                           {app.applicantRole}
                                         </span>
-                                        <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 text-xs font-black uppercase border border-emerald-200">
+                                        <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 text-2xs font-black uppercase border border-emerald-200">
                                           APC Active
                                         </span>
                                       </div>
@@ -1525,22 +1525,22 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                                           </div>
                                         ) : app.status === 'accepted' ? (
                                           <div className="flex flex-wrap items-center gap-2">
-                                            <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black uppercase border border-emerald-300 flex items-center gap-1">
+                                            <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-2xs font-black uppercase border border-emerald-300 flex items-center gap-1">
                                               <CheckCircle2 className="h-3.5 w-3.5" />
                                               Accepted & Confirmed
                                             </span>
                                             {app.paymentStatus === 'escrow_held' ? (
-                                              <span className="px-2 py-0.5 bg-blue-50 text-blue-800 text-xs font-bold border border-blue-300 flex items-center gap-1">
+                                              <span className="px-2 py-0.5 bg-blue-50 text-blue-800 text-2xs font-bold border border-blue-300 flex items-center gap-1">
                                                 <Lock className="h-3 w-3 text-blue-600" />
                                                 Escrow Held: RM {app.totalBillingMyr ? app.totalBillingMyr.toFixed(2) : '---'}
                                               </span>
                                             ) : app.paymentStatus === 'released' ? (
-                                              <span className="px-2 py-0.5 bg-emerald-50 text-emerald-900 text-xs font-bold border border-emerald-300 flex items-center gap-1">
+                                              <span className="px-2 py-0.5 bg-emerald-50 text-emerald-900 text-2xs font-bold border border-emerald-300 flex items-center gap-1">
                                                 <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                                                 Escrow Released (Paid)
                                               </span>
                                             ) : app.paymentStatus === 'invoiced' ? (
-                                              <span className="px-2 py-0.5 bg-purple-50 text-purple-900 text-xs font-bold border border-purple-300 flex items-center gap-1">
+                                              <span className="px-2 py-0.5 bg-purple-50 text-purple-900 text-2xs font-bold border border-purple-300 flex items-center gap-1">
                                                 <FileText className="h-3 w-3 text-purple-600" />
                                                 Net-30 Invoiced ({app.invoiceNumber || 'Pending'})
                                               </span>
@@ -1555,7 +1555,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                                             </button>
                                           </div>
                                         ) : (
-                                          <span className="px-2.5 py-1 bg-slate-100 text-slate-500 text-xs font-bold">
+                                          <span className="px-2.5 py-1 bg-slate-100 text-slate-500 text-2xs font-bold">
                                             Declined
                                           </span>
                                         )}
@@ -1635,7 +1635,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                   placeholder="Search practitioners by doctor name, specialty, state, or city…"
                   value={locumSearch}
                   onChange={e => setLocumSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 border border-[color:var(--t-200)] text-sm rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="w-full pl-9 pr-4 py-2 border border-[color:var(--t-200)] text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
                 />
               </div>
 
@@ -1692,8 +1692,8 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-sm font-black text-slate-900">{loc.name}</span>
-                            <span className="px-1.5 py-0.5 bg-slate-100 text-slate-700 text-xs font-extrabold uppercase">
+                            <span className="text-xs font-black text-slate-900">{loc.name}</span>
+                            <span className="px-1.5 py-0.5 bg-slate-100 text-slate-700 text-2xs font-extrabold uppercase">
                               {loc.role}
                             </span>
                           </div>
@@ -1701,7 +1701,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                             {loc.specialization}
                           </span>
                         </div>
-                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-black uppercase tracking-wider border border-emerald-300 shrink-0">
+                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-2xs font-black uppercase tracking-wider border border-emerald-300 shrink-0">
                           APC Active
                         </span>
                       </div>
@@ -1786,7 +1786,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                   {filteredCases.length === 0 ? (
                     <div className="p-12 bg-slate-50 text-center text-xs text-slate-500 space-y-2 border border-dashed border-slate-200">
                       <FileText className="h-8 w-8 text-slate-400 mx-auto" />
-                      <p className="font-bold text-slate-700">No active patient referral cases found.</p>
+                      <p className="text-sm font-bold text-slate-700">No active patient referral cases found.</p>
                       <p className="text-xs text-slate-500">Inbound clinical referral inquiries and cross-border consultations will appear here automatically.</p>
                     </div>
                   ) : (
@@ -1795,13 +1795,13 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                         <div key={c.id} className="p-4 flex flex-col md:flex-row md:items-start justify-between gap-4 hover:bg-slate-50/80 transition-colors">
                           <div className="space-y-2 flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                              <span className="text-sm font-black text-slate-900">{c.patient}</span>
+                              <span className="text-xs font-black text-slate-900">{c.patient}</span>
                               {c.trackingCode && (
-                                <span className="font-mono text-xs font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5">
+                                <span className="font-mono text-2xs font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5">
                                   {c.trackingCode}
                                 </span>
                               )}
-                              <span className={`px-2 py-0.5 text-xs font-extrabold uppercase border ${
+                              <span className={`px-2 py-0.5 text-2xs font-extrabold uppercase border ${
                                 c.patientType === 'international_traveler'
                                   ? 'bg-sky-50 text-sky-800 border-sky-300'
                                   : c.patientType === 'expat_resident'
@@ -1810,25 +1810,25 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                               }`}>
                                 {c.patientType === 'international_traveler' ? '✈️ Int’l Traveler' : c.patientType === 'expat_resident' ? '🌏 Expat Resident' : '🇲🇾 Local Citizen'}
                               </span>
-                              <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-xs font-extrabold uppercase">
+                              <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-2xs font-extrabold uppercase">
                                 Origin: {c.country}
                               </span>
                               {c.urgency && c.urgency !== 'routine' && (
-                                <span className="px-2 py-0.5 bg-red-50 text-red-700 border border-red-300 text-xs font-black uppercase">
+                                <span className="px-2 py-0.5 bg-red-50 text-red-700 border border-red-300 text-2xs font-black uppercase">
                                   {c.urgency === 'urgent' ? '🚨 Urgent' : '⚡ Priority'}
                                 </span>
                               )}
                               {c.guaranteeLetter && (
-                                <span className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 text-xs font-black uppercase">
+                                <span className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 text-2xs font-black uppercase">
                                   LOG / Direct Billing
                                 </span>
                               )}
                               {c.specialty && (
-                                <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] text-xs font-black uppercase border border-[color:var(--t-200)]">
+                                <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] text-2xs font-black uppercase border border-[color:var(--t-200)]">
                                   {c.specialty}
                                 </span>
                               )}
-                              <span className={`px-2 py-0.5 text-xs font-black uppercase border ${
+                              <span className={`px-2 py-0.5 text-2xs font-black uppercase border ${
                                 c.status === 'quoted'
                                   ? 'bg-sky-50 text-sky-800 border-sky-300'
                                   : c.status === 'accepted'
@@ -1865,7 +1865,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                             {c.latestQuote && (
                               <div className="p-2.5 bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs">
                                 <span className="font-bold text-emerald-900">Current Treatment Quotation (v{c.latestQuote.version}):</span>
-                                <span className="font-mono font-black text-emerald-800 text-sm">
+                                <span className="font-mono font-black text-emerald-800 text-xs">
                                   RM {c.latestQuote.total.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
                                 </span>
                               </div>
@@ -1882,7 +1882,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                                   <span className="text-xs text-slate-300">
                                     Success Fee (8%): <strong>RM {c.referralCommissionMyr?.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</strong>
                                   </span>
-                                  <span className={`text-xs font-black uppercase px-2 py-0.5 ${
+                                  <span className={`text-2xs font-black uppercase px-2 py-0.5 ${
                                     c.commissionStatus === 'settled' ? 'bg-emerald-500 text-white' : 'bg-amber-400 text-slate-950'
                                   }`}>
                                     {c.commissionStatus || 'Invoiced'}
@@ -1970,7 +1970,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                   <div className="p-4 bg-slate-900 text-white space-y-1.5 shadow-2xs">
                     <div className="flex items-center gap-2">
                       <ShieldCheck className="h-5 w-5 text-emerald-400 shrink-0" />
-                      <h4 className="font-black text-xs uppercase tracking-wider text-emerald-300">
+                      <h4 className="font-black text-sm uppercase tracking-wider text-emerald-300">
                         Malaysian Medical Act 1971 & MMC Ethical Code Compliance Notice
                       </h4>
                     </div>
@@ -2033,7 +2033,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                     {!referralLedger || referralLedger.cases.length === 0 ? (
                       <div className="p-12 bg-slate-50 text-center text-xs text-slate-500 border border-dashed border-slate-200 space-y-2">
                         <Receipt className="h-8 w-8 text-slate-400 mx-auto" />
-                        <p className="font-bold text-slate-700">No discharged patient referral records in the ledger yet.</p>
+                        <p className="text-sm font-bold text-slate-700">No discharged patient referral records in the ledger yet.</p>
                         <p className="text-xs text-slate-500">
                           When a patient completes treatment and the facility admissions desk clicks "Complete & Discharge", the 8% facilitator commission and official invoice number will be generated here automatically.
                         </p>
@@ -2061,7 +2061,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                                   <span className="text-xs text-slate-500">{lc.country}</span>
                                 </td>
                                 <td className="p-3">
-                                  <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] text-xs font-black uppercase border border-[color:var(--t-200)]">
+                                  <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] text-2xs font-black uppercase border border-[color:var(--t-200)]">
                                     {lc.specialty || 'General Care'}
                                   </span>
                                 </td>
@@ -2080,7 +2080,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                                   </code>
                                 </td>
                                 <td className="p-3">
-                                  <span className={`px-2 py-0.5 text-xs font-black uppercase ${
+                                  <span className={`px-2 py-0.5 text-2xs font-black uppercase ${
                                     lc.commissionStatus === 'settled'
                                       ? 'bg-emerald-100 text-emerald-800'
                                       : 'bg-amber-100 text-amber-900'
@@ -2227,15 +2227,15 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                                 className="w-full h-full object-cover"
                               />
                               <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 flex-wrap">
-                                <span className="text-xs font-mono font-bold uppercase px-2 py-0.5 bg-slate-900/90 text-white">
+                                <span className="text-2xs font-mono font-bold uppercase px-2 py-0.5 bg-slate-900/90 text-white">
                                   {pkg.code}
                                 </span>
-                                <span className="text-xs font-bold uppercase px-2 py-0.5 bg-[color:var(--t-600)] text-white">
+                                <span className="text-2xs font-bold uppercase px-2 py-0.5 bg-[color:var(--t-600)] text-white">
                                   {pkg.category}
                                 </span>
                               </div>
                               <div className="absolute top-2.5 right-2.5">
-                                <span className={`text-xs font-black uppercase px-2 py-0.5 ${
+                                <span className={`text-2xs font-black uppercase px-2 py-0.5 ${
                                   pkg.status === 'published'
                                     ? 'bg-emerald-500 text-white'
                                     : 'bg-amber-400 text-amber-950'
@@ -2259,7 +2259,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                                   {pkg.duration}
                                 </span>
                                 {pkg.fastingRequired && (
-                                  <span className="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.2">
+                                  <span className="text-2xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.2">
                                     Fasting Required
                                   </span>
                                 )}
@@ -2287,7 +2287,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                                   RM {pkg.originalPriceMyr.toLocaleString()}
                                 </span>
                               )}
-                              <span className="text-sm font-extrabold text-slate-900 tabular-nums">
+                              <span className="text-xs font-extrabold text-slate-900 tabular-nums">
                                 RM {pkg.priceMyr.toLocaleString()}
                               </span>
                             </div>
@@ -2343,10 +2343,10 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                       >
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-black uppercase px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">
+                            <span className="text-2xs font-black uppercase px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">
                               {pr.badge_text || (pr.discount_type === 'percentage' ? `${pr.discount_value}% OFF` : `RM ${pr.discountValueMyr} OFF`)}
                             </span>
-                            <span className={`text-xs font-black uppercase px-1.5 py-0.2 ${
+                            <span className={`text-2xs font-black uppercase px-1.5 py-0.2 ${
                               pr.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'
                             }`}>
                               {pr.status}
@@ -2478,7 +2478,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                   {packageOrders.length === 0 ? (
                     <div className="p-12 text-center text-xs text-slate-500 border border-dashed border-slate-200 space-y-2">
                       <CreditCard className="h-8 w-8 text-slate-300 mx-auto" />
-                      <p className="font-bold text-slate-700">No package reservation orders received yet.</p>
+                      <p className="text-sm font-bold text-slate-700">No package reservation orders received yet.</p>
                       <p className="text-xs text-slate-500">
                         When local or international patients reserve your published packages and pay the 10% advance deposit, their booking vouchers will appear here.
                       </p>
@@ -2532,7 +2532,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                                   </code>
                                 </td>
                                 <td className="p-3">
-                                  <span className={`px-2 py-0.5 text-xs font-black uppercase ${
+                                  <span className={`px-2 py-0.5 text-2xs font-black uppercase ${
                                     ord.hospital_confirmation_status === 'confirmed'
                                       ? 'bg-emerald-100 text-emerald-800'
                                       : ord.hospital_confirmation_status === 'completed'
@@ -2634,7 +2634,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                         <strong className="text-slate-900 block">MSQH 6th Edition Hospital Accreditation</strong>
                         <span className="text-slate-500 text-xs">Malaysian Society for Quality in Health</span>
                       </div>
-                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-black uppercase border border-emerald-300">
+                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-2xs font-black uppercase border border-emerald-300">
                         Valid
                       </span>
                     </div>
@@ -2644,7 +2644,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                           <strong className="text-blue-900 block">MHTC Elite Healthcare Member</strong>
                           <span className="text-blue-700 text-xs">Malaysia Healthcare Travel Council</span>
                         </div>
-                        <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-black uppercase border border-blue-300">
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-2xs font-black uppercase border border-blue-300">
                           Certified
                         </span>
                       </div>
@@ -2674,7 +2674,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                     ]).map((sp, idx) => (
                       <span
                         key={idx}
-                        className="px-2.5 py-1 bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200"
+                        className="px-2.5 py-1 bg-slate-100 text-slate-800 text-2xs font-bold border border-slate-200"
                       >
                         {sp}
                       </span>
@@ -2751,7 +2751,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                   {equipmentList.map((eq, i) => (
                     <span
                       key={i}
-                      className="px-3 py-1.5 bg-slate-100 text-slate-800 text-xs font-bold border border-slate-300 flex items-center gap-2"
+                      className="px-3 py-1.5 bg-slate-100 text-slate-800 text-2xs font-bold border border-slate-300 flex items-center gap-2"
                     >
                       <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
                       <span>{eq}</span>
@@ -2802,7 +2802,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                   {amenitiesList.map((am, i) => (
                     <span
                       key={i}
-                      className="px-3 py-1.5 bg-amber-50 text-amber-900 text-xs font-bold border border-amber-300 flex items-center gap-2"
+                      className="px-3 py-1.5 bg-amber-50 text-amber-900 text-2xs font-bold border border-amber-300 flex items-center gap-2"
                     >
                       <Sparkles className="h-3.5 w-3.5 text-amber-600 shrink-0" />
                       <span>{am}</span>
@@ -2886,7 +2886,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                     }`}
                   >
                     <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2 font-bold text-sm text-slate-900">
+                      <div className="flex items-center gap-2 font-bold text-xs text-slate-900">
                         <Lock className="h-4 w-4 text-blue-600" />
                         <span>Upfront Escrow Deposit (Recommended for Clinics)</span>
                       </div>
@@ -2921,7 +2921,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                     }`}
                   >
                     <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2 font-bold text-sm text-slate-900">
+                      <div className="flex items-center gap-2 font-bold text-xs text-slate-900">
                         <FileText className="h-4 w-4 text-purple-600" />
                         <span>Corporate Net-30 Invoicing (Tertiary Hospitals)</span>
                       </div>
@@ -3010,7 +3010,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
 
             <div className="space-y-2 text-xs text-slate-600">
               <p>
-                Applicant: <strong className="text-slate-900 text-sm">{decisionModal.applicant.applicantName}</strong> ({decisionModal.applicant.applicantRole})
+                Applicant: <strong className="text-slate-900 text-xs">{decisionModal.applicant.applicantName}</strong> ({decisionModal.applicant.applicantRole})
               </p>
               <p>
                 Credential Verification: <strong className="text-slate-800">{decisionModal.applicant.applicantLicense}</strong> (APC Valid)
@@ -3039,7 +3039,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                           <Lock className="h-4 w-4 text-blue-700" />
                           <span>Upfront Escrow Deposit (Protected Shift)</span>
                         </div>
-                        <span className="px-2 py-0.5 bg-blue-200/60 text-blue-900 font-mono font-bold text-xs">
+                        <span className="px-2 py-0.5 bg-blue-200/60 text-blue-900 font-mono font-bold text-2xs">
                           Pre-Authorization Hold
                         </span>
                       </div>
@@ -3400,7 +3400,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
               ) : chatMessages.length === 0 ? (
                 <div className="text-center py-12 text-slate-400 text-xs space-y-1">
                   <MessageSquare className="h-8 w-8 mx-auto text-slate-300 mb-2" />
-                  <div className="font-bold text-slate-600">No messages exchanged yet</div>
+                  <div className="text-sm font-bold text-slate-700">No messages exchanged yet</div>
                   <p>Send reporting details, ward unit instructions, or timing confirmations below.</p>
                 </div>
               ) : (
@@ -3746,7 +3746,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                   {pkgInclusions.map((inc, i) => (
                     <span
                       key={i}
-                      className="px-2.5 py-1 bg-white text-slate-800 text-xs font-medium border border-slate-300 flex items-center gap-1.5"
+                      className="px-2.5 py-1 bg-white text-slate-800 text-2xs font-medium border border-slate-300 flex items-center gap-1.5"
                     >
                       <Check className="h-3 w-3 text-emerald-600 shrink-0" />
                       <span>{inc}</span>
@@ -4053,7 +4053,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                 <strong className="text-slate-900">
                   {selectedInvoice.commissionInvoicedAt ? new Date(selectedInvoice.commissionInvoicedAt).toLocaleDateString('en-MY') : new Date().toLocaleDateString('en-MY')}
                 </strong>
-                <span className={`text-xs font-black uppercase px-1.5 py-0.2 inline-block mt-0.5 ${
+                <span className={`text-2xs font-black uppercase px-1.5 py-0.2 inline-block mt-0.5 ${
                   selectedInvoice.commissionStatus === 'settled' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'
                 }`}>
                   Status: {selectedInvoice.commissionStatus}

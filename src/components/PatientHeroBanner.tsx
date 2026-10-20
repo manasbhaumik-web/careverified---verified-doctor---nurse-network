@@ -30,7 +30,7 @@ export interface PatientHeroBannerProps<T extends string = string> {
   onConsultNow?: () => void;
   onOpenTriage?: () => void;
   onOpenRecords?: () => void;
-  /** Name and tabs only: for a page where the visitor has one job to do and the form should be on the first screen. */
+  /** Retained for backward-compatibility; banner always renders full identity & KPIs for cross-page consistency. */
   compact?: boolean;
 }
 
@@ -58,11 +58,11 @@ export default function PatientHeroBanner<T extends string = string>({
   onConsultNow,
   onOpenTriage,
   onOpenRecords,
-  compact = false,
 }: PatientHeroBannerProps<T>) {
   const helpActive = isHelpActive ?? (groupName === 'Help & Support');
 
   const handleHelpClick = () => {
+    if (helpActive) return;
     if (onOpenHelp) {
       onOpenHelp();
     }
@@ -78,7 +78,7 @@ export default function PatientHeroBanner<T extends string = string>({
         id="tab-patient-help"
         aria-selected={helpActive}
         onClick={handleHelpClick}
-        className={`shrink-0 min-h-[48px] px-3.5 sm:px-4 text-sm flex items-center gap-2 cursor-pointer border-b transition-colors ${
+        className={`shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer border-b transition-colors ${
           helpActive
             ? 'font-semibold text-[color:var(--t-700)] border-[color:var(--t-600)] bg-[color:var(--t-50)]/60'
             : 'font-medium text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
@@ -88,7 +88,7 @@ export default function PatientHeroBanner<T extends string = string>({
         <LifeBuoy className={`h-4 w-4 ${helpActive ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
         <span className="whitespace-nowrap font-medium sm:font-semibold">Help & Support</span>
         {openTicketsCount > 0 && (
-          <span className="tabular-nums text-xs min-w-[18px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
+          <span className="tabular-nums text-2xs min-w-[18px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
             {openTicketsCount}
           </span>
         )}
@@ -119,7 +119,7 @@ export default function PatientHeroBanner<T extends string = string>({
                 </BannerBadge>
               </>
             }
-            meta={compact ? undefined : (
+            meta={
               <>
                 <span className="font-extrabold text-[color:var(--ink)]">{greeting}</span>
                 <span className="text-slate-400">&bull;</span>
@@ -130,8 +130,8 @@ export default function PatientHeroBanner<T extends string = string>({
                     <span
                       className={
                         bpSummary.flag?.level === 'urgent'
-                          ? 'text-white font-bold bg-red-700 px-1.5'
-                          : 'font-mono font-bold text-[color:var(--t-700)] bg-white px-1.5 py-0.5 border border-[color:var(--t-200)] shadow-2xs'
+                          ? 'text-2xs text-white font-bold bg-red-700 px-1.5 py-0.5'
+                          : 'text-2xs font-mono font-bold text-[color:var(--t-700)] bg-white px-1.5 py-0.5 border border-[color:var(--t-200)] shadow-2xs'
                       }
                     >
                       BP: {bpSummary.value1}/{bpSummary.value2} mmHg
@@ -139,10 +139,10 @@ export default function PatientHeroBanner<T extends string = string>({
                   </>
                 )}
               </>
-            )}
+            }
           />
         }
-        aside={compact ? undefined : (
+        aside={
           <>
             <BannerKpis
               items={[
@@ -172,7 +172,7 @@ export default function PatientHeroBanner<T extends string = string>({
               )}
             </div>
           </>
-        )}
+        }
       />
     </DashboardHeader>
   );

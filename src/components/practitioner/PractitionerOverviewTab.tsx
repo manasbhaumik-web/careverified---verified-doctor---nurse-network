@@ -14,6 +14,8 @@ interface PractitionerOverviewTabProps {
   completedDispatchesCount: number;
   avgOverall: string | null;
   onViewBookings: () => void;
+  onViewAnalytics?: () => void;
+  onViewOnCall?: () => void;
 }
 
 export default function PractitionerOverviewTab({
@@ -21,7 +23,9 @@ export default function PractitionerOverviewTab({
   isDoc = true,
   isVerified,
   pendingDispatchesCount,
-  onViewBookings
+  onViewBookings,
+  onViewAnalytics,
+  onViewOnCall
 }: PractitionerOverviewTabProps) {
   return (
     <div id="panel-home" role="tabpanel" aria-labelledby="tab-home" tabIndex={0} className="space-y-6 animate-fade-in font-sans">
@@ -30,7 +34,7 @@ export default function PractitionerOverviewTab({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-[color:var(--ink-2)]">
+            <span className="text-xs font-semibold text-[color:var(--ink-2)]">
               {isDoc ? "Response SLA Speed" : "Home Care Arrival SLA"}
             </span>
             <Clock className="h-4 w-4 text-[color:var(--t-600)]" />
@@ -47,7 +51,7 @@ export default function PractitionerOverviewTab({
 
         <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-[color:var(--ink-2)]">
+            <span className="text-xs font-semibold text-[color:var(--ink-2)]">
               {isDoc ? "E-Prescription Compliance" : "Aseptic Procedure Protocol"}
             </span>
             <FileText className="h-4 w-4 text-emerald-600" />
@@ -64,7 +68,7 @@ export default function PractitionerOverviewTab({
 
         <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-[color:var(--ink-2)]">
+            <span className="text-xs font-semibold text-[color:var(--ink-2)]">
               {isDoc ? "Diagnostic Accuracy" : "Patient Comfort & Care"}
             </span>
             <ShieldCheck className="h-4 w-4 text-[color:var(--t-600)]" />
@@ -105,7 +109,7 @@ export default function PractitionerOverviewTab({
 
           <button
             type="button"
-            onClick={onViewBookings}
+            onClick={onViewAnalytics || onViewBookings}
             className="p-4 bg-white hover:bg-slate-50 border border-[color:var(--t-200)] text-slate-900 text-left transition-colors cursor-pointer flex flex-col justify-between gap-3"
           >
             <span className="font-black text-sm">
@@ -120,7 +124,7 @@ export default function PractitionerOverviewTab({
 
           <button
             type="button"
-            onClick={onViewBookings}
+            onClick={onViewOnCall || onViewBookings}
             className="p-4 bg-white hover:bg-slate-50 border border-[color:var(--t-200)] text-slate-900 text-left transition-colors cursor-pointer flex flex-col justify-between gap-3"
           >
             <span className="font-black text-sm">

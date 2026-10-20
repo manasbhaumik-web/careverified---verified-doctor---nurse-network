@@ -68,7 +68,7 @@ export default function PrescriptionCancelModal({
               <Ban className="h-5 w-5" />
             </div>
             <div>
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-rose-800 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-none">
+              <span className="text-2xs font-mono font-bold uppercase tracking-wider text-rose-800 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-none">
                 Poisons Act 1952 Audit Revocation
               </span>
               <h2 id="cancel-rx-modal-title" className="text-sm font-black text-slate-900 mt-1">

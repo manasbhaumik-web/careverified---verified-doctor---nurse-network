@@ -24,7 +24,7 @@ export default function TrendChart({ readings, label, unit, twoValues = false }:
   const pts = [...readings].sort((a, b) => a.ts.localeCompare(b.ts)).slice(-30);
   if (pts.length < 2) {
     return (
-      <p className="text-sm text-slate-700 bg-slate-50 border border-dashed border-slate-300 p-4">
+      <p className="text-xs text-slate-700 bg-slate-50 border border-dashed border-slate-300 p-4">
         {pts.length === 0 ? `No ${label.toLowerCase()} readings yet.` : `One ${label.toLowerCase()} reading so far.`} Add at least two to see a trend.
       </p>
     );
@@ -65,7 +65,7 @@ export default function TrendChart({ readings, label, unit, twoValues = false }:
         <text x={PAD.l} y={H - 10} fontSize="12" fill="#334155">{dateShort(first.ts)}</text>
         <text x={W - PAD.r} y={H - 10} textAnchor="end" fontSize="12" fill="#334155">{dateShort(last.ts)}</text>
       </svg>
-      <figcaption className="text-sm text-slate-700 mt-2 flex flex-wrap gap-x-4 gap-y-1">
+      <figcaption className="text-xs text-slate-700 mt-2 flex flex-wrap gap-x-4 gap-y-1">
         <span><strong>Latest:</strong> {show(last)} {unit}</span>
         <span><strong>Range:</strong> {num(Math.min(...all))} to {num(Math.max(...all))} {unit}</span>
         <span>{pts.length} readings{twoValues ? ' · solid line is the top number, dashed the bottom' : ''}</span>

@@ -142,7 +142,7 @@ export default function PrivacyCentre() {
               {(tab === 'terms' ? terms : notice)?.draft && <p className="text-xs bg-amber-50 border border-amber-200 text-amber-900 p-2 font-semibold">Draft for legal review. This text must be checked by Malaysian counsel before launch.</p>}
               <h3 className="font-extrabold">{(tab === 'terms' ? terms : notice)?.title}</h3>
               {(tab === 'terms' ? terms : notice)?.sections.map((s: any) => (
-                <section key={s.heading}><h4 className="text-xs font-black uppercase tracking-wide text-slate-700">{s.heading}</h4><p className="text-xs text-slate-700 leading-relaxed mt-1">{s.body}</p></section>
+                <section key={s.heading}><h4 className="text-sm font-black uppercase tracking-wide text-slate-700">{s.heading}</h4><p className="text-xs text-slate-700 leading-relaxed mt-1">{s.body}</p></section>
               ))}
             </>
           )}
@@ -150,7 +150,7 @@ export default function PrivacyCentre() {
           {tab === 'mine' && currentUser && (
             <>
               <section>
-                <h3 className="text-xs font-black uppercase tracking-wide text-slate-700 mb-2">My consents</h3>
+                <h3 className="text-sm font-black uppercase tracking-wide text-slate-700 mb-2">My consents</h3>
                 {consents?.outdated && (
                   <div className="text-xs bg-amber-50 border border-amber-200 text-amber-900 p-2 mb-2 font-semibold space-y-1.5">
                     <p>The privacy notice changed since you last accepted it. Please read it (Privacy notice tab), then accept.</p>
@@ -168,7 +168,7 @@ export default function PrivacyCentre() {
                 </ul>
               </section>
               <section>
-                <h3 className="text-xs font-black uppercase tracking-wide text-slate-700 mb-2">Ask us about my data</h3>
+                <h3 className="text-sm font-black uppercase tracking-wide text-slate-700 mb-2">Ask us about my data</h3>
                 <a href="/api/me/export" className="inline-flex items-center gap-1.5 text-xs font-bold text-[color:var(--t-700)] hover:underline mb-3"><Download className="h-3.5 w-3.5" /> Download my data now (JSON)</a>
                 <form onSubmit={submit} className="space-y-2">
                   <select value={kind} onChange={e => setKind(e.target.value)} className="w-full border border-slate-300 p-2 text-xs font-bold">
@@ -191,14 +191,14 @@ export default function PrivacyCentre() {
             <>
               {status && (
                 <section>
-                  <h3 className="text-xs font-black uppercase tracking-wide text-slate-700 mb-2">Readiness (notice v{status.consentVersion})</h3>
+                  <h3 className="text-sm font-black uppercase tracking-wide text-slate-700 mb-2">Readiness (notice v{status.consentVersion})</h3>
                   <ul className="space-y-1">{status.checklist.map((c: any) => <li key={c.item} className="text-xs flex gap-2"><span className={c.done ? 'text-emerald-700' : 'text-rose-700'}>{c.done ? '✓' : '✗'}</span>{c.item}{c.note ? ` (${c.note})` : ''}</li>)}</ul>
                   <p className="text-xs mt-2">Open requests: <b>{status.openRequests}</b> · overdue: <b className={status.overdueRequests ? 'text-rose-700' : ''}>{status.overdueRequests}</b> · retention: {status.retentionYears} years</p>
                 </section>
               )}
               <PrivacyAdmin onMessage={setMsg} />
               <section>
-                <h3 className="text-xs font-black uppercase tracking-wide text-slate-700 mb-2">Data requests</h3>
+                <h3 className="text-sm font-black uppercase tracking-wide text-slate-700 mb-2">Data requests</h3>
                 <ul className="space-y-1.5">
                   {adminReqs.map(r => (
                     <li key={r.id} className="border border-slate-200 p-2 text-xs space-y-1">
