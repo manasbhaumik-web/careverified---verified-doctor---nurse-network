@@ -13,8 +13,8 @@ dotenv.config();
 const BASE = (process.env.SEED_BASE_URL || "http://localhost:3000").replace(/\/$/, "");
 const DEMO_PASSWORD = "DemoPass123";
 const ACCOUNTS = {
-  patient: { email: "demo.patient@careverified.test", name: "Demo Patient" },
-  doctor: { email: "demo.doctor@careverified.test", name: "Dr Demo Physician" },
+  patient: { email: "demo.patient@careverified.test", name: "Aisyah Rahman" },
+  doctor: { email: "demo.doctor@careverified.test", name: "Dr. Arjun Menon" },
 };
 const PHARMACY_EMAIL = "demo.pharmacy@careverified.test";
 

@@ -197,7 +197,6 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
               name={me?.pharmacy.name ?? 'Pharmacy workspace'}
               badges={
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <BannerBadge tone="brand">{PHARMACY_GROUPS[currentGroup].name}</BannerBadge>
                   <BannerBadge>Type A Poison Licence</BannerBadge>
                   <BannerBadge tone="success">LFM Accredited</BannerBadge>
                 </div>

@@ -76,10 +76,10 @@ export default function PractitionerHeroBanner<T extends string = string>({
         id="tab-practitioner-help"
         aria-selected={helpActive}
         onClick={handleHelpClick}
-        className={`shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer border-b transition-colors ${
+        className={`shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer transition-colors ${
           helpActive
-            ? 'font-semibold text-[color:var(--t-700)] border-[color:var(--t-600)] bg-[color:var(--t-50)]/60'
-            : 'font-medium text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
+            ? 'font-semibold text-[color:var(--t-700)] bg-[color:var(--t-50)]'
+            : 'font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
         }`}
         title="Practitioner Help & Support Desk"
       >
@@ -167,7 +167,6 @@ export default function PractitionerHeroBanner<T extends string = string>({
               )}
               badges={
                 <>
-                  {groupName && <BannerBadge tone="brand">{groupName}</BannerBadge>}
                   <BannerBadge>{isDoc ? "Physician Account" : "Nurse Account"}</BannerBadge>
                   {isVerified && (
                     <BannerBadge tone="success">

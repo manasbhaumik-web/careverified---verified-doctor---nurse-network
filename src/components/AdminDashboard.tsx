@@ -963,7 +963,6 @@ export default function AdminDashboard({
                       </button>
                     </div>
                   )}
-                  <BannerBadge tone="brand">{ADMIN_GROUPS[currentGroup]?.name || 'Audit Terminal'}</BannerBadge>
                   <button
                     type="button"
                     onClick={() => setRbacModalOpen(true)}
