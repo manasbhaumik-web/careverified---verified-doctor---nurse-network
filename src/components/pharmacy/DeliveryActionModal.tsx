@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Truck, CheckCircle2, AlertTriangle, Snowflake, X, ShieldCheck } from 'lucide-react';
+import { useTr } from '../../locale';
 import { btnPlain, btnPrimary, btnDanger, fieldLabel } from './shared';
 
 export interface DeliveryActionModalProps {
@@ -38,6 +39,7 @@ export default function DeliveryActionModal({
   onSubmit,
   busy,
 }: DeliveryActionModalProps) {
+  const tx = useTr();
   const [partnerRef, setPartnerRef] = useState(delivery.partnerRef || '');
   const [trackingUrl, setTrackingUrl] = useState(delivery.trackingUrl || '');
   const [temperature, setTemperature] = useState('');
@@ -68,7 +70,7 @@ export default function DeliveryActionModal({
 
     if (status === 'arranged') {
       if (delivery.method !== 'pharmacy_courier' && !partnerRef.trim()) {
-        setError('Booking reference from delivery partner is required.');
+        setError(tx('Booking reference from delivery partner is required.'));
         return;
       }
       const body: Record<string, unknown> = {
@@ -79,7 +81,7 @@ export default function DeliveryActionModal({
       if (delivery.coldChain && temperature.trim()) {
         const t = parseFloat(temperature);
         if (isNaN(t) || t < 0 || t > 25) {
-          setError('Enter a valid departure temperature (e.g. 2.0 to 8.0 °C).');
+          setError(tx('Enter a valid departure temperature (e.g. 2.0 to 8.0 °C).'));
           return;
         }
         body.temperatureCelsius = t;
@@ -87,11 +89,11 @@ export default function DeliveryActionModal({
       onSubmit(body);
     } else if (status === 'delivered') {
       if (!recipientName.trim()) {
-        setError('Recipient name is required for statutory medication handover.');
+        setError(tx('Recipient name is required for statutory medication handover.'));
         return;
       }
       if (!idVerified) {
-        setError('You must confirm recipient identity verification.');
+        setError(tx('You must confirm recipient identity verification.'));
         return;
       }
       const body: Record<string, unknown> = {
@@ -101,7 +103,7 @@ export default function DeliveryActionModal({
       if (delivery.coldChain && temperature.trim()) {
         const t = parseFloat(temperature);
         if (isNaN(t)) {
-          setError('Enter a valid delivery arrival temperature.');
+          setError(tx('Enter a valid delivery arrival temperature.'));
           return;
         }
         body.temperatureCelsius = t;
@@ -161,7 +163,7 @@ export default function DeliveryActionModal({
             type="button"
             onClick={onClose}
             disabled={busy}
-            aria-label="Close dialog"
+            aria-label={tx('Close dialog')}
             className="p-1 text-slate-400 hover:text-slate-700 cursor-pointer rounded-none"
           >
             <X className="h-4 w-4" />
@@ -181,7 +183,7 @@ export default function DeliveryActionModal({
             <div className="space-y-3.5">
               <div>
                 <label htmlFor="partner-ref" className={fieldLabel}>
-                  {delivery.method === 'pharmacy_courier' ? 'Internal Rider Batch / Trip ID' : 'Courier Booking Reference *'}
+                  {delivery.method === 'pharmacy_courier' ? tx('Internal Rider Batch / Trip ID') : tx('Courier Booking Reference *')}
                 </label>
                 <input
                   id="partner-ref"
@@ -196,7 +198,7 @@ export default function DeliveryActionModal({
 
               <div>
                 <label htmlFor="tracking-url" className={fieldLabel}>
-                  Live Tracking URL (Optional)
+                  {tx('Live Tracking URL (Optional)')}
                 </label>
                 <input
                   id="tracking-url"
@@ -212,14 +214,14 @@ export default function DeliveryActionModal({
                 <div className="bg-sky-50 border border-sky-300 p-3 space-y-2 rounded-none">
                   <div className="flex items-center gap-1.5 text-sky-900 font-black text-xs uppercase tracking-wide">
                     <Snowflake className="h-4 w-4 text-sky-700" />
-                    <span>NPRA GDP Cold-Chain Departure Check</span>
+                    <span>{tx('NPRA GDP Cold-Chain Departure Check')}</span>
                   </div>
                   <p className="text-xs text-sky-800">
-                    Insulin or biologics must depart between 2.0 °C and 8.0 °C with certified insulated ice-pack packaging.
+                    {tx('Insulin or biologics must depart between 2.0 °C and 8.0 °C with certified insulated ice-pack packaging.')}
                   </p>
                   <div>
                     <label htmlFor="departure-temp" className="text-xs font-bold text-sky-950 uppercase block mb-1">
-                      Departure Box Temperature (°C)
+                      {tx('Departure Box Temperature (°C)')}
                     </label>
                     <input
                       id="departure-temp"
@@ -249,7 +251,7 @@ export default function DeliveryActionModal({
                   required
                   value={recipientName}
                   onChange={e => setRecipientName(e.target.value)}
-                  placeholder="e.g. Ahmad bin Razak (Patient or authorized proxy)"
+                  placeholder={tx('e.g. Ahmad bin Razak (Patient or authorized proxy)')}
                   className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)]"
                 />
               </div>
@@ -258,11 +260,11 @@ export default function DeliveryActionModal({
                 <div className="bg-sky-50 border border-sky-300 p-3 space-y-2 rounded-none">
                   <div className="flex items-center gap-1.5 text-sky-900 font-black text-xs uppercase tracking-wide">
                     <Snowflake className="h-4 w-4 text-sky-700" />
-                    <span>Handover Temperature Verification</span>
+                    <span>{tx('Handover Temperature Verification')}</span>
                   </div>
                   <div>
                     <label htmlFor="arrival-temp" className="text-xs font-bold text-sky-950 uppercase block mb-1">
-                      Handover Arrival Temperature (°C)
+                      {tx('Handover Arrival Temperature (°C)')}
                     </label>
                     <input
                       id="arrival-temp"
@@ -286,7 +288,7 @@ export default function DeliveryActionModal({
                 />
                 <span className="text-xs text-slate-800 font-semibold leading-relaxed">
                   <ShieldCheck className="h-3.5 w-3.5 text-emerald-700 inline mr-1" />
-                  I confirm that the courier verified recipient identity (NRIC / Passport or proxy authorization) in accordance with the Malaysian Poisons Regulations.
+                  {tx('I confirm that the courier verified recipient identity (NRIC / Passport or proxy authorization) in accordance with the Malaysian Poisons Regulations.')}
                 </span>
               </label>
             </div>
@@ -315,20 +317,20 @@ export default function DeliveryActionModal({
 
               <div>
                 <label htmlFor="failure-notes" className={fieldLabel}>
-                  Investigative Notes / Action Taken
+                  {tx('Investigative Notes / Action Taken')}
                 </label>
                 <textarea
                   id="failure-notes"
                   rows={3}
                   value={failureNotes}
                   onChange={e => setFailureNotes(e.target.value)}
-                  placeholder="e.g. Called patient 3 times; no answer at premises. Cold-chain medicine returned safely to dispensary refrigerator at 14:35."
+                  placeholder={tx('e.g. Called patient 3 times; no answer at premises. Cold-chain medicine returned safely to dispensary refrigerator at 14:35.')}
                   className="w-full border border-slate-300 bg-white p-3 text-xs font-semibold rounded-none outline-none focus:border-rose-600"
                 />
               </div>
 
               <p className="text-xs text-slate-500 font-medium">
-                The patient will be immediately notified of the delivery failure and prompted to arrange redelivery or counter pickup.
+                {tx('The patient will be immediately notified of the delivery failure and prompted to arrange redelivery or counter pickup.')}
               </p>
             </div>
           )}
@@ -340,7 +342,7 @@ export default function DeliveryActionModal({
               disabled={busy}
               className={status === 'failed' ? btnDanger : btnPrimary}
             >
-              {busy ? 'Processing…' : status === 'arranged' ? 'Dispatch Courier' : status === 'delivered' ? 'Confirm Delivery Handover' : 'Record Delivery Failure'}
+              {busy ? 'Processing…' : status === 'arranged' ? 'Dispatch Courier' : status === 'delivered' ? tx('Confirm Delivery Handover') : tx('Record Delivery Failure')}
             </button>
             <button
               type="button"

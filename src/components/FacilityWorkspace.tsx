@@ -7,6 +7,7 @@ import {
   Trash2, Edit3, Copy, HeartPulse, AlertCircle, BadgeCheck, Receipt,
   Printer, Download, CreditCard, LifeBuoy
 } from 'lucide-react';
+import { useTr } from '../locale';
 import DashboardHeader, {
   BannerRow, BannerIdentity, BannerBadge, BannerKpis, DashboardTab, bannerPrimaryBtn
 } from './DashboardHeader';
@@ -313,6 +314,7 @@ interface FacilityMessage {
 }
 
 export default function FacilityWorkspace({ activeGroup, initialTab, currentUser, embedded = false }: FacilityWorkspaceProps = {}) {
+  const tx = useTr();
   const currentGroup: FacilityTabGroup = activeGroup || (
     initialTab ? (
       (['cases', 'packages'].includes(initialTab)) ? 'care' :
@@ -485,7 +487,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
           setSstNo(data.data.facility.sstRegistrationNo);
         }
       } else {
-        setError(data.message || 'Unable to load facility profile');
+        setError(data.message || tx('Unable to load facility profile'));
       }
 
       const jobsRes = await fetch('/api/facility/jobs');
@@ -546,7 +548,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         setAmenitiesList(infraData.data.amenities || []);
       }
     } catch {
-      setError('Server communication error. Please try again.');
+      setError(tx('Server communication error. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -581,10 +583,10 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         setDecisionNotes('');
         loadFacilityData();
       } else {
-        setNotificationMsg({ type: 'error', text: data.message || 'Could not process decision.' });
+        setNotificationMsg({ type: 'error', text: data.message || tx('Could not process decision.') });
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error. Please try again.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error. Please try again.') });
     } finally {
       setActionSubmitting(false);
     }
@@ -603,10 +605,10 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         setNotificationMsg({ type: 'success', text: `Job listing status updated to "${nextStatus}".` });
         loadFacilityData();
       } else {
-        setNotificationMsg({ type: 'error', text: data.message || 'Could not update job status.' });
+        setNotificationMsg({ type: 'error', text: data.message || tx('Could not update job status.') });
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error. Please try again.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error. Please try again.') });
     }
   };
 
@@ -614,7 +616,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
   const handleCreateJob = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newJobTitle.trim() || !newJobSpecialty.trim()) {
-      setNotificationMsg({ type: 'error', text: 'Please fill in all mandatory job fields.' });
+      setNotificationMsg({ type: 'error', text: tx('Please fill in all mandatory job fields.') });
       return;
     }
     setNewJobSubmitting(true);
@@ -623,7 +625,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          hospitalName: facility?.name || 'Medical Centre',
+          hospitalName: facility?.name || tx('Medical Centre'),
           title: newJobTitle.trim(),
           type: newJobType,
           sector: 'private',
@@ -633,8 +635,8 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
           salaryMax: Number(newJobSalaryMax) || null,
           salaryPeriod: newJobSalaryPeriod,
           location: newJobLocation.trim(),
-          city: facility?.city || 'Kuala Lumpur',
-          state: facility?.state || 'Kuala Lumpur',
+          city: facility?.city || tx('Kuala Lumpur'),
+          state: facility?.state || tx('Kuala Lumpur'),
           description: newJobDesc.trim() || `Licensed clinical facility seeking credentialed ${newJobRole} for medical coverage.`,
           facilityId: facility?.id,
           acceptsForeign: false,
@@ -650,10 +652,10 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         setNewJobDesc('');
         loadFacilityData();
       } else {
-        setNotificationMsg({ type: 'error', text: data.message || 'Could not publish job opening.' });
+        setNotificationMsg({ type: 'error', text: data.message || tx('Could not publish job opening.') });
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error. Please try again.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error. Please try again.') });
     } finally {
       setNewJobSubmitting(false);
     }
@@ -681,10 +683,10 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
           setInviteModal(null);
         }, 1800);
       } else {
-        setNotificationMsg({ type: 'error', text: data.message || 'Could not send invitation.' });
+        setNotificationMsg({ type: 'error', text: data.message || tx('Could not send invitation.') });
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error.') });
     } finally {
       setInviteSubmitting(false);
     }
@@ -729,7 +731,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         setChatInput('');
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Failed to send message.' });
+      setNotificationMsg({ type: 'error', text: tx('Failed to send message.') });
     } finally {
       setChatSending(false);
     }
@@ -760,10 +762,10 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         setQuoteAmount('');
         loadFacilityData();
       } else {
-        setNotificationMsg({ type: 'error', text: data.message || 'Could not issue quote.' });
+        setNotificationMsg({ type: 'error', text: data.message || tx('Could not issue quote.') });
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error.') });
     } finally {
       setQuoteSubmitting(false);
     }
@@ -782,7 +784,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         loadFacilityData();
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error.') });
     }
   };
 
@@ -799,10 +801,10 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         setNotificationMsg({ type: 'success', text: data.message || `Package reservation updated to ${status}.` });
         loadFacilityData();
       } else {
-        setNotificationMsg({ type: 'error', text: data.message || 'Could not update package reservation.' });
+        setNotificationMsg({ type: 'error', text: data.message || tx('Could not update package reservation.') });
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error updating package order.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error updating package order.') });
     }
   };
 
@@ -844,10 +846,10 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         resetPackageForm();
         loadFacilityData();
       } else {
-        setNotificationMsg({ type: 'error', text: data.message || 'Error saving package.' });
+        setNotificationMsg({ type: 'error', text: data.message || tx('Error saving package.') });
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error.') });
     } finally {
       setPkgSubmitting(false);
     }
@@ -904,12 +906,12 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         loadFacilityData();
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error.') });
     }
   };
 
   const handleDeletePackage = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this medical package?')) return;
+    if (!confirm(tx('Are you sure you want to delete this medical package?'))) return;
     try {
       const res = await fetch(`/api/packages/${id}`, { method: 'DELETE' });
       const data = await res.json();
@@ -918,7 +920,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         loadFacilityData();
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error.') });
     }
   };
 
@@ -956,10 +958,10 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         resetPromoForm();
         loadFacilityData();
       } else {
-        setNotificationMsg({ type: 'error', text: data.message || 'Error saving promotion.' });
+        setNotificationMsg({ type: 'error', text: data.message || tx('Error saving promotion.') });
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error.') });
     } finally {
       setPromoSubmitting(false);
     }
@@ -1007,12 +1009,12 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         loadFacilityData();
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error.') });
     }
   };
 
   const handleDeletePromo = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this promotion?')) return;
+    if (!confirm(tx('Are you sure you want to delete this promotion?'))) return;
     try {
       const res = await fetch(`/api/promotions/${id}`, { method: 'DELETE' });
       const data = await res.json();
@@ -1021,7 +1023,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         loadFacilityData();
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error.') });
     }
   };
 
@@ -1042,10 +1044,10 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         setNotificationMsg({ type: 'success', text: data.message });
         loadFacilityData();
       } else {
-        setNotificationMsg({ type: 'error', text: data.message || 'Could not save infrastructure.' });
+        setNotificationMsg({ type: 'error', text: data.message || tx('Could not save infrastructure.') });
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error.') });
     } finally {
       setInfraSaving(false);
     }
@@ -1069,10 +1071,10 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         setNotificationMsg({ type: 'success', text: data.message });
         loadFacilityData();
       } else {
-        setNotificationMsg({ type: 'error', text: data.message || 'Could not update billing settings.' });
+        setNotificationMsg({ type: 'error', text: data.message || tx('Could not update billing settings.') });
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Network error. Please try again.' });
+      setNotificationMsg({ type: 'error', text: tx('Network error. Please try again.') });
     } finally {
       setBillingSaving(false);
     }
@@ -1088,15 +1090,15 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
       });
       const data = await res.json();
       if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: data.message || 'Timesheet approved.' });
+        setNotificationMsg({ type: 'success', text: data.message || tx('Timesheet approved.') });
         loadFacilityData();
       }
     } catch {
-      setNotificationMsg({ type: 'error', text: 'Failed to approve timesheet.' });
+      setNotificationMsg({ type: 'error', text: tx('Failed to approve timesheet.') });
     }
   };
 
-  const displayedTabs: DashboardTab<Tab>[] = FACILITY_GROUPS[currentGroup].tabs.map(t => {
+  const displayedTabs: DashboardTab<Tab>[] = FACILITY_GROUPS[currentGroup].tabs.map(t => ({ ...t, label: tx(t.label) })).map(t => {
     if (t.id === 'shifts') return { ...t, count: stats.activeVacancies };
     if (t.id === 'locums') return { ...t, count: locums.length };
     if (t.id === 'cases') return { ...t, count: stats.patientCases };
@@ -1149,10 +1151,10 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
           window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
         }}
         className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
-        title="Facility Help & Support Desk"
+        title={tx('Facility Help & Support Desk')}
       >
         <LifeBuoy className="h-4 w-4 text-slate-500" />
-        <span className="whitespace-nowrap font-medium sm:font-semibold">Help & Support</span>
+        <span className="whitespace-nowrap font-medium sm:font-semibold">{tx('Help & Support')}</span>
       </button>
     </div>
   );
@@ -1166,7 +1168,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
           tabs={displayedTabs}
           activeTab={tab}
           onTabChange={setTab}
-          tabsLabel={`${FACILITY_GROUPS[currentGroup].name} sections`}
+          tabsLabel={tx('{name} sections', { name: tx(FACILITY_GROUPS[currentGroup].name) })}
           tabsRight={facilityHelpTab}
         >
           <BannerRow
@@ -1175,28 +1177,28 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                 as="h1"
                 avatarUrl={currentUser?.avatarUrl || '/assets/facility_director_male.jpg'}
                 role="facility"
-                name={facility?.name || 'Healthcare Facility & Clinic'}
+                name={facility?.name || tx('Healthcare Facility & Clinic')}
                 badges={
                   <div className="flex flex-wrap items-center gap-1.5">
                     <span className="bg-slate-50 text-slate-700 border border-slate-300 text-2xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">
-                      {facility?.kind || 'Medical Centre'}
+                      {facility?.kind || tx('Medical Centre')}
                     </span>
                     {facility?.isLicenceValid && (
                       <BannerBadge tone="success">
                         <ShieldCheck className="h-3 w-3 inline mr-1" />
-                        Act 586 Licensed
+                        {tx('Act 586 Licensed')}
                       </BannerBadge>
                     )}
                     {facility?.mhtcMember && (
                       <BannerBadge tone="brand">
-                        MHTC Medical Travel
+                        {tx('MHTC Medical Travel')}
                       </BannerBadge>
                     )}
                   </div>
                 }
                 description={
                   <span>
-                    {facility?.city || 'Kuala Lumpur'}, {facility?.state || 'Malaysia'} • Licence: {facility?.licenceNo || 'Act 586 Verified'} • {facility?.phone || '+60 3-2296 0888'}
+                    {facility?.city || tx('Kuala Lumpur')}, {facility?.state || tx('Malaysia')} • Licence: {facility?.licenceNo || tx('Act 586 Verified')} • {facility?.phone || '+60 3-2296 0888'}
                   </span>
                 }
               />
@@ -1205,10 +1207,10 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <BannerKpis
                   items={[
-                    { label: 'Active Jobs', value: stats.activeVacancies },
-                    { label: 'Applicants', value: stats.pendingApplicants },
-                    { label: 'Confirmed', value: stats.acceptedLocums },
-                    { label: 'Referrals', value: stats.patientCases },
+                    { label: tx('Active Jobs'), value: stats.activeVacancies },
+                    { label: tx('Applicants'), value: stats.pendingApplicants },
+                    { label: tx('Confirmed'), value: stats.acceptedLocums },
+                    { label: tx('Referrals'), value: stats.patientCases },
                   ]}
                 />
                 <div className="flex items-center gap-2">
@@ -1217,7 +1219,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                     onClick={loadFacilityData}
                     disabled={loading}
                     className="p-2 text-slate-600 hover:text-slate-900 border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer disabled:opacity-50 h-11 w-11 flex items-center justify-center"
-                    title="Refresh Data"
+                    title={tx('Refresh Data')}
                   >
                     <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                   </button>
@@ -1227,7 +1229,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                     className={bannerPrimaryBtn}
                   >
                     <Plus className="h-4 w-4" />
-                    Post Job Vacancy
+                    {tx('Post Job Vacancy')}
                   </button>
                 </div>
               </div>
@@ -1270,7 +1272,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         {loading && !facility && (
           <div className="p-12 text-center text-slate-500 text-xs flex items-center justify-center gap-2 bg-white border border-[color:var(--t-200)] shadow-xs">
             <RefreshCw className="h-4 w-4 animate-spin text-[color:var(--t-600)]" />
-            Loading clinical network workspace…
+            {tx('Loading clinical network workspace…')}
           </div>
         )}
 

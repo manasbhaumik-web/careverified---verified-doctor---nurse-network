@@ -14,6 +14,7 @@ import {
   Lock,
   FileText,
 } from 'lucide-react';
+import { useTr } from '../../locale';
 import WorkspaceHeader from '../WorkspaceHeader';
 import { BannerBadge } from '../DashboardHeader';
 import { FacilityProfile } from './types';
@@ -63,14 +64,15 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
   billingSaving,
   setNotificationMsg,
 }) => {
+  const tx = useTr();
   return (
           <div className="space-y-6">
             <WorkspaceHeader
               icon={Building2}
-              eyebrow="Statutory Licensing · Act 586 Compliance"
-              title="Facility Operating Profile & Infrastructure Capacity"
-              description="Maintain official hospital licensing, MSQH/JCI accreditations, intensive care bed counts, and specialized operating theatre capacity."
-              badges={<BannerBadge tone="success"><ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" /> Act 586 Licensed</BannerBadge>}
+              eyebrow={tx('Statutory Licensing · Act 586 Compliance')}
+              title={tx('Facility Operating Profile & Infrastructure Capacity')}
+              description={tx('Maintain official hospital licensing, MSQH/JCI accreditations, intensive care bed counts, and specialized operating theatre capacity.')}
+              badges={<BannerBadge tone="success"><ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" /> {tx('Act 586 Licensed')}</BannerBadge>}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Facility Identity & Licensing */}
@@ -78,46 +80,46 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                 <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
                   <ShieldCheck className="h-5 w-5 text-emerald-600" />
                   <h2 className="text-base font-black text-slate-900">
-                    KKM Act 586 Statutory Licence
+                    {tx('KKM Act 586 Statutory Licence')}
                   </h2>
                 </div>
 
                 <div className="space-y-3 text-xs text-slate-700">
                   <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 border border-slate-200">
                     <div>
-                      <span className="text-xs text-slate-400 uppercase font-bold block">Facility Name</span>
-                      <strong className="text-slate-900">{facility?.name || 'Healthcare Facility'}</strong>
+                      <span className="text-xs text-slate-400 uppercase font-bold block">{tx('Facility Name')}</span>
+                      <strong className="text-slate-900">{facility?.name || tx('Healthcare Facility')}</strong>
                     </div>
                     <div>
-                      <span className="text-xs text-slate-400 uppercase font-bold block">Operating Category</span>
-                      <strong className="text-slate-900 uppercase">{facility?.kind || 'Medical Centre'}</strong>
+                      <span className="text-xs text-slate-400 uppercase font-bold block">{tx('Operating Category')}</span>
+                      <strong className="text-slate-900 uppercase">{facility?.kind || tx('Medical Centre')}</strong>
                     </div>
                     <div>
-                      <span className="text-xs text-slate-400 uppercase font-bold block">Statutory Licence No.</span>
+                      <span className="text-xs text-slate-400 uppercase font-bold block">{tx('Statutory Licence No.')}</span>
                       <strong className="font-mono text-slate-900">{facility?.licenceNo || 'KKM/JKA/586-90412'}</strong>
                     </div>
                     <div>
-                      <span className="text-xs text-slate-400 uppercase font-bold block">Licence Expiry</span>
+                      <span className="text-xs text-slate-400 uppercase font-bold block">{tx('Licence Expiry')}</span>
                       <strong className="text-slate-900">{facility?.licenceExpiry || '2029-12-31'}</strong>
                     </div>
                   </div>
 
                   <p className="text-slate-500 leading-relaxed">
-                    Registered under the Private Healthcare Facilities and Services Act 1998 (Act 586).
-                    Authorised for inpatient specialist medicine, daycare surgery, outpatient consultations, and verified locum practitioner staffing.
+                    {tx('Registered under the Private Healthcare Facilities and Services Act 1998 (Act 586).')}
+                    {tx('Authorised for inpatient specialist medicine, daycare surgery, outpatient consultations, and verified locum practitioner staffing.')}
                   </p>
                 </div>
 
                 {/* Accreditations */}
                 <div className="pt-3 border-t border-slate-100 space-y-2">
                   <span className="text-xs font-black uppercase tracking-wider text-slate-800 block">
-                    Accreditation Credentials
+                    {tx('Accreditation Credentials')}
                   </span>
                   <div className="space-y-2">
                     <div className="p-3 bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
                       <div>
-                        <strong className="text-slate-900 block">MSQH 6th Edition Hospital Accreditation</strong>
-                        <span className="text-slate-500 text-xs">Malaysian Society for Quality in Health</span>
+                        <strong className="text-slate-900 block">{tx('MSQH 6th Edition Hospital Accreditation')}</strong>
+                        <span className="text-slate-500 text-xs">{tx('Malaysian Society for Quality in Health')}</span>
                       </div>
                       <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-2xs font-black uppercase border border-emerald-300">
                         Valid
@@ -126,8 +128,8 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                     {facility?.mhtcMember && (
                       <div className="p-3 bg-blue-50/50 border border-blue-200 flex items-center justify-between text-xs">
                         <div>
-                          <strong className="text-blue-900 block">MHTC Elite Healthcare Member</strong>
-                          <span className="text-blue-700 text-xs">Malaysia Healthcare Travel Council</span>
+                          <strong className="text-blue-900 block">{tx('MHTC Elite Healthcare Member')}</strong>
+                          <span className="text-blue-700 text-xs">{tx('Malaysia Healthcare Travel Council')}</span>
                         </div>
                         <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-2xs font-black uppercase border border-blue-300">
                           Certified
@@ -143,13 +145,13 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                 <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
                   <Stethoscope className="h-5 w-5 text-[color:var(--t-600)]" />
                   <h2 className="text-base font-black text-slate-900">
-                    Clinical Specialties & Network Contact
+                    {tx('Clinical Specialties & Network Contact')}
                   </h2>
                 </div>
 
                 <div className="space-y-3">
                   <span className="text-xs font-black uppercase tracking-wider text-slate-800 block">
-                    Offered Specialties
+                    {tx('Offered Specialties')}
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {(facility?.specialties || [
@@ -169,7 +171,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
 
                 <div className="pt-4 border-t border-slate-100 space-y-3 text-xs text-slate-600">
                   <span className="text-xs font-black uppercase tracking-wider text-slate-800 block">
-                    Facility Address & Liaison
+                    {tx('Facility Address & Liaison')}
                   </span>
                   <div className="space-y-2">
                     <div className="flex items-start gap-2">
@@ -209,10 +211,10 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                   <HeartPulse className="h-5 w-5 text-[color:var(--t-600)]" />
                   <div>
                     <h3 className="text-base font-black text-slate-900">
-                      Diagnostic Equipment & Medical Infrastructure
+                      {tx('Diagnostic Equipment & Medical Infrastructure')}
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Showcase high-precision clinical equipment (CT, MRI, Cath Lab, Robotic Surgery) to referring clinicians & patients.
+                      {tx('Showcase high-precision clinical equipment (CT, MRI, Cath Lab, Robotic Surgery) to referring clinicians & patients.')}
                     </p>
                   </div>
                 </div>
@@ -223,14 +225,14 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                   className="px-4 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shrink-0 shadow-xs"
                 >
                   <Check className="h-4 w-4 text-emerald-400" />
-                  {infraSaving ? 'Saving…' : 'Save Infrastructure'}
+                  {infraSaving ? tx('Saving…') : tx('Save Infrastructure')}
                 </button>
               </div>
 
               {/* Equipment list */}
               <div className="space-y-3">
                 <label className="text-xs font-black uppercase text-slate-700 block">
-                  Active Clinical & Diagnostic Equipment:
+                  {tx('Active Clinical & Diagnostic Equipment:')}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {equipmentList.map((eq, i) => (
@@ -250,7 +252,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                     </span>
                   ))}
                   {equipmentList.length === 0 && (
-                    <span className="text-xs text-slate-400 italic">No equipment listed yet. Add items below.</span>
+                    <span className="text-xs text-slate-400 italic">{tx('No equipment listed yet. Add items below.')}</span>
                   )}
                 </div>
 
@@ -260,7 +262,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                     type="text"
                     value={newEquipmentInput}
                     onChange={e => setNewEquipmentInput(e.target.value)}
-                    placeholder="e.g. 3T High-Field MRI Scanner"
+                    placeholder={tx('e.g. 3T High-Field MRI Scanner')}
                     className="p-2 border border-slate-300 text-xs flex-1 bg-slate-50 focus:bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                   />
                   <button
@@ -281,7 +283,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
               {/* Patient Amenities list */}
               <div className="space-y-3 pt-4 border-t border-slate-100">
                 <label className="text-xs font-black uppercase text-slate-700 block">
-                  Patient Care Amenities & Specialized Services:
+                  {tx('Patient Care Amenities & Specialized Services:')}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {amenitiesList.map((am, i) => (
@@ -301,7 +303,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                     </span>
                   ))}
                   {amenitiesList.length === 0 && (
-                    <span className="text-xs text-slate-400 italic">No amenities listed yet. Add items below.</span>
+                    <span className="text-xs text-slate-400 italic">{tx('No amenities listed yet. Add items below.')}</span>
                   )}
                 </div>
 
@@ -311,7 +313,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                     type="text"
                     value={newAmenityInput}
                     onChange={e => setNewAmenityInput(e.target.value)}
-                    placeholder="e.g. JAKIM Halal-Certified Dietary Kitchen"
+                    placeholder={tx('e.g. JAKIM Halal-Certified Dietary Kitchen')}
                     className="p-2 border border-slate-300 text-xs flex-1 bg-slate-50 focus:bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                   />
                   <button
@@ -337,10 +339,10 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                   <DollarSign className="h-5 w-5 text-[color:var(--t-600)]" />
                   <div>
                     <h3 className="text-base font-black text-slate-900">
-                      Settlement & Billing Protocol (Escrow vs. Corporate Invoicing)
+                      {tx('Settlement & Billing Protocol (Escrow vs. Corporate Invoicing)')}
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Configure how clinical shifts and locum wages are settled between your facility, practitioners, and the platform.
+                      {tx('Configure how clinical shifts and locum wages are settled between your facility, practitioners, and the platform.')}
                     </p>
                   </div>
                 </div>
@@ -351,7 +353,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                   className="px-4 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shrink-0"
                 >
                   <Check className="h-4 w-4" />
-                  {billingSaving ? 'Saving…' : 'Save Billing Settings'}
+                  {billingSaving ? tx('Saving…') : tx('Save Billing Settings')}
                 </button>
               </div>
 
@@ -359,7 +361,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                 {/* Mode Selection */}
                 <div className="space-y-3">
                   <label className="text-xs font-black uppercase text-slate-700 block">
-                    Default Payment Settlement Mode:
+                    {tx('Default Payment Settlement Mode:')}
                   </label>
                   
                   <div
@@ -373,7 +375,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2 font-bold text-xs text-slate-900">
                         <Lock className="h-4 w-4 text-blue-600" />
-                        <span>Upfront Escrow Deposit (Recommended for Clinics)</span>
+                        <span>{tx('Upfront Escrow Deposit (Recommended for Clinics)')}</span>
                       </div>
                       <input
                         type="radio"
@@ -384,7 +386,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                       />
                     </div>
                     <p className="text-xs text-slate-600 mt-2">
-                      Funds for accepted shifts (Wage + RM 40 platform fee) are pre-authorized upon application acceptance and held in escrow. Payout is released to the practitioner after verified timesheet completion. Zero bad debt.
+                      {tx('Funds for accepted shifts (Wage + RM 40 platform fee) are pre-authorized upon application acceptance and held in escrow. Payout is released to the practitioner after verified timesheet completion. Zero bad debt.')}
                     </p>
                   </div>
 
@@ -395,7 +397,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                       } else {
                         setNotificationMsg({
                           type: 'error',
-                          text: 'Corporate Net-30 Invoicing requires a verified MOH private hospital licence and credit review.'
+                          text: tx('Corporate Net-30 Invoicing requires a verified MOH private hospital licence and credit review.')
                         });
                       }
                     }}
@@ -408,7 +410,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2 font-bold text-xs text-slate-900">
                         <FileText className="h-4 w-4 text-purple-600" />
-                        <span>Corporate Net-30 Invoicing (Tertiary Hospitals)</span>
+                        <span>{tx('Corporate Net-30 Invoicing (Tertiary Hospitals)')}</span>
                       </div>
                       <input
                         type="radio"
@@ -420,14 +422,14 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                       />
                     </div>
                     <p className="text-xs text-slate-600 mt-2">
-                      No upfront charges at booking. All completed shifts are consolidated onto a monthly corporate tax invoice payable via Corporate GIRO/PO within 30 days.
+                      {tx('No upfront charges at booking. All completed shifts are consolidated onto a monthly corporate tax invoice payable via Corporate GIRO/PO within 30 days.')}
                     </p>
                     <div className="mt-2 text-xs flex items-center gap-2">
-                      <span className="font-semibold text-purple-800">Status:</span>
+                      <span className="font-semibold text-purple-800">{tx('Status:')}</span>
                       {facility?.corporateCreditApproved ? (
                         <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold">Approved (Limit: RM {facility.corporateCreditLimitMyr?.toLocaleString() || '50,000'})</span>
                       ) : (
-                        <span className="px-2 py-0.5 bg-amber-100 text-amber-800 font-bold">Requires MOH Hospital Licence Review</span>
+                        <span className="px-2 py-0.5 bg-amber-100 text-amber-800 font-bold">{tx('Requires MOH Hospital Licence Review')}</span>
                       )}
                     </div>
                   </div>
@@ -436,22 +438,22 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                 {/* Billing Details & Tax Info */}
                 <div className="space-y-4">
                   <label className="text-xs font-black uppercase text-slate-700 block">
-                    Accounting & Tax Credentials:
+                    {tx('Accounting & Tax Credentials:')}
                   </label>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-600">Accounts Payable Billing Email</label>
+                    <label className="text-xs font-semibold text-slate-600">{tx('Accounts Payable Billing Email')}</label>
                     <input
                       type="email"
                       value={billingEmail}
                       onChange={e => setBillingEmail(e.target.value)}
-                      placeholder="finance.locum@hospital.com.my"
+                      placeholder={tx('finance.locum@hospital.com.my')}
                       className="w-full p-2 border border-slate-300 text-xs focus:outline-none focus:border-[color:var(--t-600)]"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-600">SST / Tax Registration Number</label>
+                    <label className="text-xs font-semibold text-slate-600">{tx('SST / Tax Registration Number')}</label>
                     <input
                       type="text"
                       value={sstNo}
@@ -462,9 +464,9 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                   </div>
 
                   <div className="p-3 bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
-                    <div className="font-black text-slate-800 uppercase tracking-wide">Regulatory & Compliance Policy:</div>
-                    <p>• Medical practitioners (doctors/nurses) are <strong>never charged</strong> recruitment fees on this platform (Act 586 & MMC compliant).</p>
-                    <p>• Platform fees (RM 40/shift) and clinical wages are exclusively invoiced or escrowed through the hiring healthcare facility.</p>
+                    <div className="font-black text-slate-800 uppercase tracking-wide">{tx('Regulatory & Compliance Policy:')}</div>
+                    <p>{tx('• Medical practitioners (doctors/nurses) are')} <strong>{tx('never charged')}</strong> {tx('recruitment fees on this platform (Act 586 & MMC compliant).')}</p>
+                    <p>{tx('• Platform fees (RM 40/shift) and clinical wages are exclusively invoiced or escrowed through the hiring healthcare facility.')}</p>
                   </div>
                 </div>
               </div>

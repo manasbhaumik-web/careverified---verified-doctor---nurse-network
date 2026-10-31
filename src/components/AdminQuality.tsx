@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ShieldAlert } from 'lucide-react';
+import { useTr } from '../locale';
 import { MACROS, MACRO_LANGS, fillMacro, type MacroLang, type SupportHours } from '../supportMy';
 import AdminPartners from './AdminPartners';
 import { TestimonialAdmin } from './TestimonialPanels';
@@ -73,6 +74,7 @@ export default function AdminQuality({
 }
 
 function Support({ say }: { say: (t: string) => void }) {
+  const tx = useTr();
   const [data, setData] = useState<any | null>(null);
   const [view, setView] = useState<'active' | 'resolved'>('active');
   const [open, setOpen] = useState<any | null>(null);
@@ -93,30 +95,30 @@ function Support({ say }: { say: (t: string) => void }) {
       <div className="flex gap-2 text-xs font-bold">{(['active', 'resolved'] as const).map(v => <button key={v} onClick={() => setView(v)} className={`px-3 py-1.5 cursor-pointer ${view === v ? 'bg-[color:var(--t-600)] text-white' : 'bg-slate-100'}`}>{v}</button>)}</div>
       <div className="grid lg:grid-cols-[1fr_1fr] gap-4">
         <ul className="bg-white border border-slate-200 divide-y divide-slate-100 text-xs max-h-[480px] overflow-y-auto">
-          {(data?.tickets ?? []).length === 0 && <li className="p-4 text-xs text-slate-500">No tickets.</li>}
+          {(data?.tickets ?? []).length === 0 && <li className="p-4 text-xs text-slate-500">{tx('No tickets.')}</li>}
           {(data?.tickets ?? []).map((t: any) => (
             <li key={t.id}><button onClick={() => openT(t.id)} className="w-full text-left p-3 cursor-pointer hover:bg-slate-50">
-              <p className="font-bold truncate">{t.subject} {t.overdue && <span className="text-2xs bg-rose-100 text-rose-800 px-1.5 py-0.5 ml-1">OVERDUE</span>}</p>
+              <p className="font-bold truncate">{t.subject} {t.overdue && <span className="text-2xs bg-rose-100 text-rose-800 px-1.5 py-0.5 ml-1">{tx('OVERDUE')}</span>}</p>
               <p className="text-xs text-slate-500">{t.requester} · {t.category} · {t.priority} · {t.firstResponseAt ? 'replied' : `reply due ${when(t.firstResponseDue)}`}</p></button></li>
           ))}
         </ul>
         <div className="bg-white border border-slate-200 p-4 space-y-3">
-          {!open ? <p className="text-xs text-slate-500">Select a ticket.</p> : (
+          {!open ? <p className="text-xs text-slate-500">{tx('Select a ticket.')}</p> : (
             <>
               <div className="flex justify-between gap-2"><div><h3 className="text-sm font-extrabold">{open.subject}</h3><p className="text-xs text-slate-500">{open.requester} · {open.category}{open.target ? ` · about: ${open.target}` : ''}</p></div>
-                <select aria-label="Priority" className="border border-slate-200 text-xs px-2 h-fit" value={open.priority} onChange={async e => { await jreq(`/api/admin/support/tickets/${open.id}/priority`, 'POST', { priority: e.target.value }); openT(open.id); load(); }}>
+                <select aria-label={tx('Priority')} className="border border-slate-200 text-xs px-2 h-fit" value={open.priority} onChange={async e => { await jreq(`/api/admin/support/tickets/${open.id}/priority`, 'POST', { priority: e.target.value }); openT(open.id); load(); }}>
                   {['urgent', 'high', 'normal', 'low'].map(p => <option key={p}>{p}</option>)}</select></div>
-              <ul className="space-y-2 max-h-64 overflow-y-auto">{open.messages.map((m: any) => <li key={m.id} className={`text-xs p-2.5 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}><p className="text-xs font-extrabold uppercase text-slate-500">{m.fromStaff ? 'Staff' : 'User'} · {when(m.ts)}</p>{m.body}</li>)}</ul>
+              <ul className="space-y-2 max-h-64 overflow-y-auto">{open.messages.map((m: any) => <li key={m.id} className={`text-xs p-2.5 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}><p className="text-xs font-extrabold uppercase text-slate-500">{m.fromStaff ? tx('Staff') : tx('User')} · {when(m.ts)}</p>{m.body}</li>)}</ul>
               <div className="flex flex-wrap gap-2 items-center text-xs">
-                <label className="font-bold text-slate-600" htmlFor="macro-lang">Reply template</label>
-                <select id="macro-lang" aria-label="Template language" className="border border-slate-200 px-2 h-9" value={macroLang} onChange={e => setMacroLang(e.target.value as MacroLang)}>
+                <label className="font-bold text-slate-600" htmlFor="macro-lang">{tx('Reply template')}</label>
+                <select id="macro-lang" aria-label={tx('Template language')} className="border border-slate-200 px-2 h-9" value={macroLang} onChange={e => setMacroLang(e.target.value as MacroLang)}>
                   {MACRO_LANGS.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}</select>
-                <select aria-label="Reply template" className="border border-slate-200 px-2 h-9 min-w-0 flex-1" value="" onChange={e => { const m = MACROS.find(x => x.id === e.target.value); if (m) setReply(fillMacro(m, macroLang, { name: open.requester, hours: hoursCfg })); }}>
-                  <option value="">Insert a template…</option>
+                <select aria-label={tx('Reply template')} className="border border-slate-200 px-2 h-9 min-w-0 flex-1" value="" onChange={e => { const m = MACROS.find(x => x.id === e.target.value); if (m) setReply(fillMacro(m, macroLang, { name: open.requester, hours: hoursCfg })); }}>
+                  <option value="">{tx('Insert a template…')}</option>
                   {MACROS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}</select>
               </div>
-              <div className="flex gap-2"><textarea rows={3} className={field} value={reply} onChange={e => setReply(e.target.value)} placeholder="Reply" aria-label="Reply" maxLength={3000} /><button onClick={send} disabled={!reply.trim()} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 cursor-pointer">Send</button></div>
-              {open.status !== 'resolved' && <button onClick={async () => { await jreq(`/api/support/tickets/${open.id}/resolve`); openT(open.id); load(); }} className={`${btn} text-emerald-700`}>Mark resolved</button>}
+              <div className="flex gap-2"><textarea rows={3} className={field} value={reply} onChange={e => setReply(e.target.value)} placeholder={tx('Reply')} aria-label={tx('Reply')} maxLength={3000} /><button onClick={send} disabled={!reply.trim()} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 cursor-pointer">{tx('Send')}</button></div>
+              {open.status !== 'resolved' && <button onClick={async () => { await jreq(`/api/support/tickets/${open.id}/resolve`); openT(open.id); load(); }} className={`${btn} text-emerald-700`}>{tx('Mark resolved')}</button>}
             </>
           )}
         </div>
@@ -126,6 +128,7 @@ function Support({ say }: { say: (t: string) => void }) {
 }
 
 function Reviews({ say }: { say: (t: string) => void }) {
+  const tx = useTr();
   const [mode, setMode] = useState<'practitioner_reviews' | 'testimonials'>('practitioner_reviews');
   const [filter, setFilter] = useState<'reported' | 'all'>('reported');
   const [list, setList] = useState<any[]>([]);
@@ -148,7 +151,7 @@ function Reviews({ say }: { say: (t: string) => void }) {
               : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
           }`}
         >
-          Practitioner Reviews Moderation
+          {tx('Practitioner Reviews Moderation')}
         </button>
         <button
           type="button"
@@ -159,7 +162,7 @@ function Reviews({ say }: { say: (t: string) => void }) {
               : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
           }`}
         >
-          Patient Testimonials (Landing Page)
+          {tx('Patient Testimonials (Landing Page)')}
         </button>
       </div>
 
@@ -178,11 +181,11 @@ function Reviews({ say }: { say: (t: string) => void }) {
                     : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                {v === 'reported' ? 'Reported by practitioners' : 'All reviews'}
+                {v === 'reported' ? tx('Reported by practitioners') : tx('All reviews')}
               </button>
             ))}
           </div>
-          {list.length === 0 && <p className="text-xs text-slate-500 bg-white border border-slate-200 rounded-none p-4">Nothing to moderate.</p>}
+          {list.length === 0 && <p className="text-xs text-slate-500 bg-white border border-slate-200 rounded-none p-4">{tx('Nothing to moderate.')}</p>}
           {list.map(r => (
             <article key={r.id} className="bg-white border border-slate-200 rounded-none p-4 text-xs space-y-1">
               <p className="font-bold">{r.professionalName} · {'★'.repeat(r.rating)} <span className="text-xs text-slate-500 font-normal">by {r.patientName} · {r.date} · {r.status ?? 'published'}</span></p>
@@ -190,9 +193,9 @@ function Reviews({ say }: { say: (t: string) => void }) {
               {r.reportedAt && <p className="text-xs bg-amber-50 border border-amber-200 rounded-none p-2">Reported: {r.reportReason}</p>}
               {r.moderatedAt && <p className="text-xs text-slate-500">Decided: {r.moderationReason}</p>}
               <div className="flex gap-4 pt-1">
-                {r.status !== 'hidden' && <button className={`${btn} text-rose-700`} onClick={() => decide(r.id, 'hide')}>Remove</button>}
-                {r.reportedAt && !r.moderatedAt && <button className={btn} onClick={() => decide(r.id, 'keep')}>Keep</button>}
-                {r.status === 'hidden' && <button className={`${btn} text-emerald-700`} onClick={() => decide(r.id, 'restore')}>Restore</button>}
+                {r.status !== 'hidden' && <button className={`${btn} text-rose-700`} onClick={() => decide(r.id, 'hide')}>{tx('Remove')}</button>}
+                {r.reportedAt && !r.moderatedAt && <button className={btn} onClick={() => decide(r.id, 'keep')}>{tx('Keep')}</button>}
+                {r.status === 'hidden' && <button className={`${btn} text-emerald-700`} onClick={() => decide(r.id, 'restore')}>{tx('Restore')}</button>}
               </div>
             </article>
           ))}
@@ -203,17 +206,18 @@ function Reviews({ say }: { say: (t: string) => void }) {
 }
 
 function Incidents({ say }: { say: (t: string) => void }) {
+  const tx = useTr();
   const [list, setList] = useState<any[]>([]);
   const load = useCallback(() => fetch('/api/admin/incidents').then(r => r.json()).then(d => d.status === 'success' && setList(d.data)), []);
   useEffect(() => { load(); }, [load]);
   const update = async (id: string, status: 'investigating' | 'resolved' | 'closed') => {
-    const note = window.prompt(status === 'investigating' ? 'Note (optional)' : 'Outcome / actions taken (required)') ?? ''; if (status !== 'investigating' && !note) return;
+    const note = window.prompt(status === 'investigating' ? tx('Note (optional)') : tx('Outcome / actions taken (required)')) ?? ''; if (status !== 'investigating' && !note) return;
     const d = await jreq(`/api/admin/incidents/${id}/update`, 'POST', { status, note }); say(d.status === 'success' ? 'Updated.' : d.message); load();
   };
   const tone: Record<string, string> = { critical: 'bg-rose-200 text-rose-900', high: 'bg-rose-100 text-rose-800', medium: 'bg-amber-100 text-amber-800', low: 'bg-slate-100 text-slate-700' };
   return (
     <div className="space-y-3">
-      {list.length === 0 && <p className="text-xs text-slate-500 bg-white border border-slate-200 p-4">No incidents reported.</p>}
+      {list.length === 0 && <p className="text-xs text-slate-500 bg-white border border-slate-200 p-4">{tx('No incidents reported.')}</p>}
       {list.map(i => (
         <article key={i.id} className="bg-white border border-slate-200 p-4 text-xs space-y-1.5">
           <p className="font-bold"><span className={`text-2xs px-1.5 py-0.5 mr-2 uppercase ${tone[i.severity]}`}>{i.severity}</span>{i.kind.replace(/_/g, ' ')} <span className="text-xs text-slate-500 font-normal">· {i.status} · by {i.reporter} · {when(i.createdAt)}</span></p>
@@ -223,9 +227,9 @@ function Incidents({ say }: { say: (t: string) => void }) {
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
             {(i.status === 'new' || i.status === 'investigating') ? (
               <div className="flex items-center gap-3">
-                {i.status === 'new' && <button className={`${btn} text-[color:var(--t-700)] hover:underline`} onClick={() => update(i.id, 'investigating')}>Start investigation</button>}
-                <button className={`${btn} text-emerald-700 hover:underline`} onClick={() => update(i.id, 'resolved')}>Resolve</button>
-                <button className={`${btn} text-slate-600 hover:underline`} onClick={() => update(i.id, 'closed')}>Close</button>
+                {i.status === 'new' && <button className={`${btn} text-[color:var(--t-700)] hover:underline`} onClick={() => update(i.id, 'investigating')}>{tx('Start investigation')}</button>}
+                <button className={`${btn} text-emerald-700 hover:underline`} onClick={() => update(i.id, 'resolved')}>{tx('Resolve')}</button>
+                <button className={`${btn} text-slate-600 hover:underline`} onClick={() => update(i.id, 'closed')}>{tx('Close')}</button>
               </div>
             ) : <div />}
             <button
@@ -243,10 +247,10 @@ function Incidents({ say }: { say: (t: string) => void }) {
                 }));
               }}
               className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold uppercase tracking-wider rounded-none cursor-pointer transition-colors"
-              title="Escalate incident directly to Trust Watchlist & Complaints"
+              title={tx('Escalate incident directly to Trust Watchlist & Complaints')}
             >
               <ShieldAlert className="h-3.5 w-3.5 text-amber-700" />
-              <span>Escalate to Trust Watchlist</span>
+              <span>{tx('Escalate to Trust Watchlist')}</span>
             </button>
           </div>
         </article>
@@ -256,6 +260,7 @@ function Incidents({ say }: { say: (t: string) => void }) {
 }
 
 function Peer({ say }: { say: (t: string) => void }) {
+  const tx = useTr();
   const [list, setList] = useState<any[]>([]);
   const [sample, setSample] = useState({ subjectType: 'prescription', days: 30, count: 5 });
   const load = useCallback(() => fetch('/api/admin/peer-reviews').then(r => r.json()).then(d => d.status === 'success' && setList(d.data)), []);
@@ -267,19 +272,19 @@ function Peer({ say }: { say: (t: string) => void }) {
   return (
     <div className="space-y-4">
       <section className="bg-white border border-[color:var(--t-200)] p-4 space-y-2">
-        <h3 className="text-sm font-extrabold">Random case audit</h3>
-        <p className="text-xs text-slate-600">Picks signed work at random from recent days and assigns each case to the verified doctor with the fewest open reviews (never the author). Reviewers see cases without patient or author names.</p>
+        <h3 className="text-sm font-extrabold">{tx('Random case audit')}</h3>
+        <p className="text-xs text-slate-600">{tx('Picks signed work at random from recent days and assigns each case to the verified doctor with the fewest open reviews (never the author). Reviewers see cases without patient or author names.')}</p>
         <div className="flex flex-wrap items-end gap-2 text-xs">
-          <label>Type<select className={`${field} mt-1`} value={sample.subjectType} onChange={e => setSample({ ...sample, subjectType: e.target.value })}><option value="prescription">Prescriptions</option><option value="encounter">Consultation notes</option></select></label>
-          <label>Last days<input type="number" min={1} max={90} className={`${field} mt-1 w-24`} value={sample.days} onChange={e => setSample({ ...sample, days: Number(e.target.value) })} /></label>
-          <label>How many<input type="number" min={1} max={50} className={`${field} mt-1 w-24`} value={sample.count} onChange={e => setSample({ ...sample, count: Number(e.target.value) })} /></label>
-          <button onClick={run} className="bg-[color:var(--t-600)] text-white font-extrabold px-4 py-2.5 cursor-pointer">Draw sample</button>
+          <label>{tx('Type')}<select className={`${field} mt-1`} value={sample.subjectType} onChange={e => setSample({ ...sample, subjectType: e.target.value })}><option value="prescription">{tx('Prescriptions')}</option><option value="encounter">{tx('Consultation notes')}</option></select></label>
+          <label>{tx('Last days')}<input type="number" min={1} max={90} className={`${field} mt-1 w-24`} value={sample.days} onChange={e => setSample({ ...sample, days: Number(e.target.value) })} /></label>
+          <label>{tx('How many')}<input type="number" min={1} max={50} className={`${field} mt-1 w-24`} value={sample.count} onChange={e => setSample({ ...sample, count: Number(e.target.value) })} /></label>
+          <button onClick={run} className="bg-[color:var(--t-600)] text-white font-extrabold px-4 py-2.5 cursor-pointer">{tx('Draw sample')}</button>
         </div>
       </section>
       <section className="bg-white border border-slate-200 p-4">
-        <h3 className="text-sm font-extrabold mb-2">All peer reviews</h3>
-        {list.length === 0 ? <p className="text-xs text-slate-500">None.</p> : (
-          <table className="w-full text-xs"><thead><tr className="text-left text-xs uppercase text-slate-500"><th className="py-1">Case</th><th>Author</th><th>Reviewer</th><th>Status</th><th>Outcome</th></tr></thead>
+        <h3 className="text-sm font-extrabold mb-2">{tx('All peer reviews')}</h3>
+        {list.length === 0 ? <p className="text-xs text-slate-500">{tx('None.')}</p> : (
+          <table className="w-full text-xs"><thead><tr className="text-left text-xs uppercase text-slate-500"><th className="py-1">{tx('Case')}</th><th>{tx('Author')}</th><th>{tx('Reviewer')}</th><th>{tx('Status')}</th><th>{tx('Outcome')}</th></tr></thead>
             <tbody>{list.map(r => (
               <tr key={r.id} className="border-t border-slate-100 align-top"><td className="py-1.5">{r.subjectType} · {r.source}</td><td>{r.author}</td><td>{r.reviewer}</td><td className="font-bold">{r.status}</td>
                 <td>{r.outcome ? `${r.outcome.replace(/_/g, ' ')} (${r.score}/5)` : '—'}{r.comments ? <span className="block text-slate-600">{r.comments}</span> : null}</td></tr>
@@ -291,6 +296,7 @@ function Peer({ say }: { say: (t: string) => void }) {
 }
 
 function Credentials({ say }: { say: (t: string) => void }) {
+  const tx = useTr();
   const [data, setData] = useState<any | null>(null);
   const load = useCallback(() => fetch('/api/admin/credentials').then(r => r.json()).then(d => d.status === 'success' && setData(d.data)), []);
   useEffect(() => { load(); }, [load]);
@@ -299,22 +305,22 @@ function Credentials({ say }: { say: (t: string) => void }) {
     if (decision === 'rejected' && !note) return;
     const d = await jreq(`/api/admin/${kind}/${id}/review`, 'POST', { decision, note }); say(d.status === 'success' ? 'Recorded.' : d.message); load();
   };
-  if (!data) return <p className="text-xs text-slate-500">Loading…</p>;
-  const evidence = (id?: string | null) => id ? <a className="underline font-bold" href={`/api/documents/${id}/download`}>evidence</a> : <span className="text-slate-400">no evidence</span>;
+  if (!data) return <p className="text-xs text-slate-500">{tx('Loading…')}</p>;
+  const evidence = (id?: string | null) => id ? <a className="underline font-bold" href={`/api/documents/${id}/download`}>{tx('evidence')}</a> : <span className="text-slate-400">{tx('no evidence')}</span>;
   return (
     <div className="space-y-4">
       <section className="bg-white border border-slate-200 p-4 space-y-2">
         <h3 className="text-sm font-extrabold">CPD entries to verify ({data.pendingCpd.length})</h3>
         {data.pendingCpd.map((e: any) => (
           <div key={e.id} className="flex flex-wrap justify-between gap-2 text-xs border-t border-slate-100 pt-2"><span><b>{e.professionalName}</b> · {e.title} · {e.points} pts · {e.activity_date} · {evidence(e.document_id)}</span>
-            <span className="flex gap-3"><button className={`${btn} text-emerald-700`} onClick={() => decide('cpd', e.id, 'approved')}>Approve</button><button className={`${btn} text-rose-700`} onClick={() => decide('cpd', e.id, 'rejected')}>Reject</button></span></div>
+            <span className="flex gap-3"><button className={`${btn} text-emerald-700`} onClick={() => decide('cpd', e.id, 'approved')}>{tx('Approve')}</button><button className={`${btn} text-rose-700`} onClick={() => decide('cpd', e.id, 'rejected')}>{tx('Reject')}</button></span></div>
         ))}
       </section>
       <section className="bg-white border border-slate-200 p-4 space-y-2">
         <h3 className="text-sm font-extrabold">Specialty certificates to verify ({data.pendingCerts.length})</h3>
         {data.pendingCerts.map((c: any) => (
           <div key={c.id} className="flex flex-wrap justify-between gap-2 text-xs border-t border-slate-100 pt-2"><span><b>{c.professionalName}</b> · {c.name} · {c.issuer} · {c.expiry_date ? `expires ${c.expiry_date}` : 'no expiry'} · {evidence(c.document_id)}</span>
-            <span className="flex gap-3"><button className={`${btn} text-emerald-700`} onClick={() => decide('specialty-certs', c.id, 'approved')}>Approve</button><button className={`${btn} text-rose-700`} onClick={() => decide('specialty-certs', c.id, 'rejected')}>Reject</button></span></div>
+            <span className="flex gap-3"><button className={`${btn} text-emerald-700`} onClick={() => decide('specialty-certs', c.id, 'approved')}>{tx('Approve')}</button><button className={`${btn} text-rose-700`} onClick={() => decide('specialty-certs', c.id, 'rejected')}>{tx('Reject')}</button></span></div>
         ))}
       </section>
       <section className="bg-white border border-slate-200 p-4">

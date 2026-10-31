@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { formatMoney } from '../locale';
+import { formatMoney, useTr } from '../locale';
 
 const jreq = (url: string, method = 'GET', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -22,6 +22,7 @@ interface Batch {
 
 /** The board's payout desk: verify bank accounts, prepare a batch, approve it, download the bank file, record each transfer. */
 export default function AdminPayouts() {
+  const tx = useTr();
   const [o, setO] = useState<Overview | null>(null);
   const [open, setOpen] = useState<string | null>(null);
   const [batch, setBatch] = useState<Batch | null>(null);
@@ -37,7 +38,7 @@ export default function AdminPayouts() {
   const say = (ok: boolean, text: string) => setMsg({ ok, text });
   const act = async (fn: () => Promise<any>, okText?: string) => {
     setBusy(true); const d = await fn(); setBusy(false);
-    if (d.status === 'success') { if (okText) say(true, okText); } else say(false, d.message || 'That did not work.');
+    if (d.status === 'success') { if (okText) say(true, okText); } else say(false, d.message || tx('That did not work.'));
     await load(); if (open) await loadBatch(open);
     return d;
   };
@@ -48,7 +49,7 @@ export default function AdminPayouts() {
   };
   const verify = (pid: string, verified: boolean) => {
     if (verified) {
-      if (!window.confirm('Confirm you have checked that the account holder name matches the practitioner\'s name.')) return;
+      if (!window.confirm(tx('Confirm you have checked that the account holder name matches the practitioner\'s name.'))) return;
       return act(() => jreq(`/api/admin/payout-accounts/${pid}/verify`, 'POST', { verified: true, nameChecked: true }), 'Account verified.');
     }
     const note = window.prompt('Why can this account not be verified? The practitioner will see this.');
@@ -66,22 +67,22 @@ export default function AdminPayouts() {
     await act(() => jreq(`/api/admin/payouts/${id}/failed`, 'POST', { reason }), 'Marked failed. The earnings are released for the next batch.');
   };
 
-  if (!o) return <p role="status" className="text-xs text-slate-600">Loading payouts…</p>;
+  if (!o) return <p role="status" className="text-xs text-slate-600">{tx('Loading payouts…')}</p>;
   const payable = o.preview.filter(p => p.willBePaid);
 
   return (
     <section aria-labelledby="payouts-h" className="bg-white border border-[color:var(--t-200)] p-5 space-y-6">
       <div>
-        <h3 id="payouts-h" className="text-sm font-extrabold">Practitioner payouts</h3>
+        <h3 id="payouts-h" className="text-sm font-extrabold">{tx('Practitioner payouts')}</h3>
         <p className="text-xs text-slate-700 mt-1 max-w-3xl">Paid by bank transfer, {o.terms.schedule}. Earnings are payable {o.terms.holdDays} days after a visit is completed; balances under {formatMoney(o.terms.minimumPayout)} roll over. Nothing is sent automatically: you prepare a batch, approve it{o.fourEyes ? ' (a different admin must approve)' : ''}, download the bank file, send the transfers in your bank, then record each bank reference here.</p>
-        {!o.bankAvailable && <p className="mt-2 text-xs bg-rose-50 border border-rose-200 text-rose-900 font-bold p-2">PAYOUT_ENCRYPTION_KEY is not set, so bank details cannot be stored or paid. Set it before using payouts in production.</p>}
+        {!o.bankAvailable && <p className="mt-2 text-xs bg-rose-50 border border-rose-200 text-rose-900 font-bold p-2">{tx('PAYOUT_ENCRYPTION_KEY is not set, so bank details cannot be stored or paid. Set it before using payouts in production.')}</p>}
         {msg && <p role={msg.ok ? 'status' : 'alert'} className={`mt-2 text-xs font-bold p-2 border ${msg.ok ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'}`}>{msg.text}</p>}
       </div>
 
       {/* Bank accounts */}
       <div>
-        <h4 className="text-sm font-extrabold uppercase tracking-wider text-slate-600 mb-2">Bank accounts</h4>
-        {o.accounts.length === 0 ? <p className="text-xs text-slate-600">No practitioner has added bank details yet.</p> : (
+        <h4 className="text-sm font-extrabold uppercase tracking-wider text-slate-600 mb-2">{tx('Bank accounts')}</h4>
+        {o.accounts.length === 0 ? <p className="text-xs text-slate-600">{tx('No practitioner has added bank details yet.')}</p> : (
           <ul className="divide-y divide-slate-100 text-xs border border-slate-200">
             {o.accounts.map(a => (
               <li key={a.professionalId} className="p-3 flex flex-wrap items-center justify-between gap-3">
@@ -92,8 +93,8 @@ export default function AdminPayouts() {
                 </div>
                 {a.status !== 'verified' && (
                   <div className="flex gap-2 shrink-0">
-                    <button type="button" className={btnPrimary} disabled={busy} onClick={() => verify(a.professionalId, true)}>Verify</button>
-                    <button type="button" className={btn} disabled={busy} onClick={() => verify(a.professionalId, false)}>Reject</button>
+                    <button type="button" className={btnPrimary} disabled={busy} onClick={() => verify(a.professionalId, true)}>{tx('Verify')}</button>
+                    <button type="button" className={btn} disabled={busy} onClick={() => verify(a.professionalId, false)}>{tx('Reject')}</button>
                   </div>
                 )}
               </li>
@@ -104,20 +105,20 @@ export default function AdminPayouts() {
 
       {/* Ready */}
       <div>
-        <h4 className="text-sm font-extrabold uppercase tracking-wider text-slate-600 mb-2">Ready for the next batch</h4>
-        {o.preview.length === 0 ? <p className="text-xs text-slate-600">Nothing is waiting to be paid.</p> : (
+        <h4 className="text-sm font-extrabold uppercase tracking-wider text-slate-600 mb-2">{tx('Ready for the next batch')}</h4>
+        {o.preview.length === 0 ? <p className="text-xs text-slate-600">{tx('Nothing is waiting to be paid.')}</p> : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead><tr className="text-left text-xs uppercase text-slate-600"><th className="py-2 pr-3">Practitioner</th><th className="pr-3 text-right">Ready</th><th className="pr-3 text-right">Adjustments</th><th className="pr-3 text-right">To pay</th><th className="pr-3 text-right">Still waiting</th><th>Status</th></tr></thead>
+              <thead><tr className="text-left text-xs uppercase text-slate-600"><th className="py-2 pr-3">{tx('Practitioner')}</th><th className="pr-3 text-right">{tx('Ready')}</th><th className="pr-3 text-right">{tx('Adjustments')}</th><th className="pr-3 text-right">{tx('To pay')}</th><th className="pr-3 text-right">{tx('Still waiting')}</th><th>{tx('Status')}</th></tr></thead>
               <tbody>
                 {o.preview.map(p => (
                   <tr key={p.professionalId} className="border-t border-slate-100">
-                    <td className="py-2 pr-3 font-bold">{p.name}{p.sandbox ? <span className="ml-1 text-2xs text-amber-900 bg-amber-100 px-1">test payments</span> : null}</td>
+                    <td className="py-2 pr-3 font-bold">{p.name}{p.sandbox ? <span className="ml-1 text-2xs text-amber-900 bg-amber-100 px-1">{tx('test payments')}</span> : null}</td>
                     <td className="pr-3 text-right tabular-nums">{sen(p.readySen)}</td>
                     <td className="pr-3 text-right tabular-nums">{p.adjustmentsSen ? sen(p.adjustmentsSen) : '–'}</td>
                     <td className="pr-3 text-right tabular-nums font-bold">{sen(p.netSen)}</td>
                     <td className="pr-3 text-right tabular-nums text-slate-600">{sen(p.waitingSen)}</td>
-                    <td>{p.willBePaid ? <span className="font-bold text-emerald-800">Will be paid</span> : <span className="text-slate-700">{p.reason}</span>}</td>
+                    <td>{p.willBePaid ? <span className="font-bold text-emerald-800">{tx('Will be paid')}</span> : <span className="text-slate-700">{p.reason}</span>}</td>
                   </tr>
                 ))}
               </tbody>
@@ -125,16 +126,16 @@ export default function AdminPayouts() {
           </div>
         )}
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <label className="sr-only" htmlFor="batch-note">Batch note</label>
-          <input id="batch-note" value={note} onChange={e => setNote(e.target.value)} maxLength={300} placeholder="Note, e.g. October run" className="border border-slate-300 px-3 h-9 text-xs min-w-[220px]" />
+          <label className="sr-only" htmlFor="batch-note">{tx('Batch note')}</label>
+          <input id="batch-note" value={note} onChange={e => setNote(e.target.value)} maxLength={300} placeholder={tx('Note, e.g. October run')} className="border border-slate-300 px-3 h-9 text-xs min-w-[220px]" />
           <button type="button" className={btnPrimary} disabled={busy || payable.length === 0 || !o.bankAvailable} onClick={prepare}>Prepare batch ({payable.length} payout{payable.length === 1 ? '' : 's'}, {sen(payable.reduce((s, p) => s + p.netSen, 0))})</button>
         </div>
       </div>
 
       {/* Batches */}
       <div>
-        <h4 className="text-sm font-extrabold uppercase tracking-wider text-slate-600 mb-2">Batches</h4>
-        {o.batches.length === 0 ? <p className="text-xs text-slate-600">No batches yet.</p> : (
+        <h4 className="text-sm font-extrabold uppercase tracking-wider text-slate-600 mb-2">{tx('Batches')}</h4>
+        {o.batches.length === 0 ? <p className="text-xs text-slate-600">{tx('No batches yet.')}</p> : (
           <ul className="divide-y divide-slate-100 border border-slate-200 text-xs">
             {o.batches.map(b => (
               <li key={b.id}>
@@ -146,13 +147,13 @@ export default function AdminPayouts() {
                   <div className="px-3 pb-4 space-y-3">
                     {batch.refunded > 0 && <p role="alert" className="bg-rose-50 border border-rose-200 text-rose-900 font-bold p-2">{batch.refunded} payment(s) in this batch were refunded since it was prepared. Cancel it and prepare a new one.</p>}
                     <div className="flex flex-wrap gap-2">
-                      {batch.status === 'draft' && <button type="button" className={btnPrimary} disabled={busy} onClick={() => act(() => jreq(`/api/admin/payout-batches/${b.id}/approve`, 'POST'), 'Batch approved.')}>Approve</button>}
-                      {['approved', 'exported'].includes(batch.status) && <a className={`${btnPrimary} inline-flex items-center`} href={`/api/admin/payout-batches/${b.id}/export.csv`} onClick={() => setTimeout(() => { load(); loadBatch(b.id); }, 1200)}>Download bank file (contains account numbers)</a>}
-                      {['draft', 'approved', 'exported'].includes(batch.status) && <button type="button" className={btn} disabled={busy} onClick={() => window.confirm('Cancel this batch? Its earnings go back to the next run.') && act(() => jreq(`/api/admin/payout-batches/${b.id}/cancel`, 'POST'), 'Batch cancelled.')}>Cancel batch</button>}
+                      {batch.status === 'draft' && <button type="button" className={btnPrimary} disabled={busy} onClick={() => act(() => jreq(`/api/admin/payout-batches/${b.id}/approve`, 'POST'), 'Batch approved.')}>{tx('Approve')}</button>}
+                      {['approved', 'exported'].includes(batch.status) && <a className={`${btnPrimary} inline-flex items-center`} href={`/api/admin/payout-batches/${b.id}/export.csv`} onClick={() => setTimeout(() => { load(); loadBatch(b.id); }, 1200)}>{tx('Download bank file (contains account numbers)')}</a>}
+                      {['draft', 'approved', 'exported'].includes(batch.status) && <button type="button" className={btn} disabled={busy} onClick={() => window.confirm(tx('Cancel this batch? Its earnings go back to the next run.')) && act(() => jreq(`/api/admin/payout-batches/${b.id}/cancel`, 'POST'), 'Batch cancelled.')}>{tx('Cancel batch')}</button>}
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full">
-                        <thead><tr className="text-left text-xs uppercase text-slate-600"><th className="py-1.5 pr-3">Practitioner</th><th className="pr-3">To</th><th className="pr-3 text-right">Amount</th><th className="pr-3">Status</th><th><span className="sr-only">Actions</span></th></tr></thead>
+                        <thead><tr className="text-left text-xs uppercase text-slate-600"><th className="py-1.5 pr-3">{tx('Practitioner')}</th><th className="pr-3">{tx('To')}</th><th className="pr-3 text-right">{tx('Amount')}</th><th className="pr-3">{tx('Status')}</th><th><span className="sr-only">{tx('Actions')}</span></th></tr></thead>
                         <tbody>
                           {batch.payouts.map(p => (
                             <tr key={p.id} className="border-t border-slate-100 align-top">
@@ -162,7 +163,7 @@ export default function AdminPayouts() {
                               <td className="pr-3">{p.status}{p.reference ? <><br /><span className="font-mono">{p.reference}</span></> : null}{p.failureReason ? <><br /><span className="text-rose-800">{p.failureReason}</span></> : null}</td>
                               <td className="text-right">
                                 {p.status === 'pending' && ['approved', 'exported'].includes(batch.status) && (
-                                  <span className="inline-flex gap-1.5"><button type="button" className={btnPrimary} disabled={busy} onClick={() => markPaid(p.id)}>Mark paid</button><button type="button" className={btn} disabled={busy} onClick={() => markFailed(p.id)}>Failed</button></span>
+                                  <span className="inline-flex gap-1.5"><button type="button" className={btnPrimary} disabled={busy} onClick={() => markPaid(p.id)}>{tx('Mark paid')}</button><button type="button" className={btn} disabled={busy} onClick={() => markFailed(p.id)}>{tx('Failed')}</button></span>
                                 )}
                               </td>
                             </tr>

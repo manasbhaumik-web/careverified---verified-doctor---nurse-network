@@ -2,6 +2,7 @@ import DashboardHeader, { BannerBadge } from './DashboardHeader';
 import WorkspaceHeader from './WorkspaceHeader';
 import React, { useState } from 'react';
 import { Search, Code, Zap, FileSpreadsheet, Eye, Copy, CheckCircle, List, LayoutGrid, X, Globe } from 'lucide-react';
+import { useTr } from '../locale';
 import { DoctorProfile, NurseProfile } from '../types';
 
 interface SEODashboardProps {
@@ -10,6 +11,7 @@ interface SEODashboardProps {
 }
 
 export default function SEODashboard({ professionals, embedded = false }: SEODashboardProps) {
+  const tx = useTr();
   const [activeTab, setActiveTab] = useState<'schema' | 'programmatic' | 'vitals' | 'sitemap'>('schema');
   const [selectedProfId, setSelectedProfId] = useState<string>(professionals[0]?.id || '');
   const [copied, setCopied] = useState(false);
@@ -30,7 +32,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
     
     const schemaObj = {
       "@context": "https://schema.org",
-      "@type": isDoctor ? "Physician" : "MedicalBusiness",
+      "@type": isDoctor ? "Physician" : tx('MedicalBusiness'),
       "name": selectedProf.name,
       "image": selectedProf.avatar,
       "medicalSpecialty": selectedProf.specialization,
@@ -39,7 +41,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
         "@type": "PostalAddress",
         "streetAddress": selectedProf.practiceAddress,
         "addressLocality": selectedProf.city,
-        "addressRegion": selectedProf.city === "Kuala Lumpur" ? "WPKL" : selectedProf.city === "Petaling Jaya" ? "Selangor" : selectedProf.city === "Penang" ? "Pulau Pinang" : "Johor",
+        "addressRegion": selectedProf.city === "Kuala Lumpur" ? tx('WPKL') : selectedProf.city === "Petaling Jaya" ? "Selangor" : selectedProf.city === "Penang" ? tx('Pulau Pinang') : "Johor",
         "addressCountry": "MY"
       },
       "geo": {
@@ -58,7 +60,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
       "priceRange": "RM-RM",
       "hasCredential": {
         "@type": "EducationalOccupationalCredential",
-        "credentialCategory": isDoctor ? "Medical License" : "Nursing License",
+        "credentialCategory": isDoctor ? tx('Medical License') : tx('Nursing License'),
         "recognizedBy": {
           "@type": "MedicalOrganization",
           "name": isDoctor ? (selectedProf as DoctorProfile).medicalCouncil : (selectedProf as NurseProfile).nursingCouncil
@@ -98,15 +100,15 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
       {embedded ? (
         <WorkspaceHeader
           icon={Globe}
-          eyebrow="Search Visibility & Schema Engine · Act 586 & YMYL E-E-A-T"
-          title="Active SEO Strategy & Dynamic Schema Engine"
-          description="Programmatic landing page generators, YMYL E-E-A-T structured schema, and Core Web Vitals scoring."
-          badges={<BannerBadge tone="brand">Google Rich Snippets</BannerBadge>}
+          eyebrow={tx('Search Visibility & Schema Engine · Act 586 & YMYL E-E-A-T')}
+          title={tx('Active SEO Strategy & Dynamic Schema Engine')}
+          description={tx('Programmatic landing page generators, YMYL E-E-A-T structured schema, and Core Web Vitals scoring.')}
+          badges={<BannerBadge tone="brand">{tx('Google Rich Snippets')}</BannerBadge>}
           tabs={[
-            { id: 'schema' as const, label: 'JSON-LD Structured Schema', icon: Code },
-            { id: 'programmatic' as const, label: 'Programmatic Landing Pages', icon: Search },
-            { id: 'vitals' as const, label: 'Core Web Vitals Scoring', icon: Zap },
-            { id: 'sitemap' as const, label: 'Sitemap Generator', icon: FileSpreadsheet },
+            { id: 'schema' as const, label: tx('JSON-LD Structured Schema'), icon: Code },
+            { id: 'programmatic' as const, label: tx('Programmatic Landing Pages'), icon: Search },
+            { id: 'vitals' as const, label: tx('Core Web Vitals Scoring'), icon: Zap },
+            { id: 'sitemap' as const, label: tx('Sitemap Generator'), icon: FileSpreadsheet },
           ]}
           activeTab={activeTab}
           onTabChange={setActiveTab}
@@ -115,18 +117,18 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
         <DashboardHeader
           fullWidth={true}
           icon={Globe}
-          eyebrow="SEO & Schema Engine"
-          title="Active SEO Strategy & Schema Engine"
-          description="Programmatic landing page generators and YMYL E-E-A-T compliant meta engines."
+          eyebrow={tx('SEO & Schema Engine')}
+          title={tx('Active SEO Strategy & Schema Engine')}
+          description={tx('Programmatic landing page generators and YMYL E-E-A-T compliant meta engines.')}
           tabs={[
-            { id: 'schema' as const, label: 'JSON-LD Structured Schema', icon: Code },
-            { id: 'programmatic' as const, label: 'Programmatic Landing Pages', icon: Search },
-            { id: 'vitals' as const, label: 'Core Web Vitals Scoring', icon: Zap },
-            { id: 'sitemap' as const, label: 'Sitemap Generator', icon: FileSpreadsheet },
+            { id: 'schema' as const, label: tx('JSON-LD Structured Schema'), icon: Code },
+            { id: 'programmatic' as const, label: tx('Programmatic Landing Pages'), icon: Search },
+            { id: 'vitals' as const, label: tx('Core Web Vitals Scoring'), icon: Zap },
+            { id: 'sitemap' as const, label: tx('Sitemap Generator'), icon: FileSpreadsheet },
           ]}
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          tabsLabel="SEO engine sections"
+          tabsLabel={tx('SEO engine sections')}
         />
       )}
 
@@ -137,8 +139,8 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
             <div className="bg-slate-50 p-6 rounded-none border border-[color:var(--t-200)] space-y-5">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                  <h3 className="text-sm font-black text-slate-800 uppercase tracking-wide">Dynamic Physician & Clinic Schema</h3>
-                  <p className="text-xs text-slate-500 font-semibold mt-1">Auto-inject Schema.org JSON-LD structured data on profile pages for Google Search rich snippets.</p>
+                  <h3 className="text-sm font-black text-slate-800 uppercase tracking-wide">{tx('Dynamic Physician & Clinic Schema')}</h3>
+                  <p className="text-xs text-slate-500 font-semibold mt-1">{tx('Auto-inject Schema.org JSON-LD structured data on profile pages for Google Search rich snippets.')}</p>
                 </div>
 
                 {/* View Mode Toggle */}
@@ -151,10 +153,10 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                         ? 'bg-[color:var(--t-600)] text-white shadow-none'
                         : 'text-slate-600 hover:text-slate-900 bg-transparent'
                     }`}
-                    title="List View"
+                    title={tx('List View')}
                   >
                     <List className="h-3.5 w-3.5" />
-                    <span>List</span>
+                    <span>{tx('List')}</span>
                   </button>
                   <button
                     type="button"
@@ -164,17 +166,17 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                         ? 'bg-[color:var(--t-600)] text-white shadow-none'
                         : 'text-slate-600 hover:text-slate-900 bg-transparent'
                     }`}
-                    title="Grid View"
+                    title={tx('Grid View')}
                   >
                     <LayoutGrid className="h-3.5 w-3.5" />
-                    <span>Grid</span>
+                    <span>{tx('Grid')}</span>
                   </button>
                 </div>
               </div>
 
               {/* Profiles Selector Interface */}
               <div>
-                <span className="block text-xs font-black text-slate-700 uppercase tracking-wide mb-2.5">Select Practitioner Profile to Generate Structured Schema:</span>
+                <span className="block text-xs font-black text-slate-700 uppercase tracking-wide mb-2.5">{tx('Select Practitioner Profile to Generate Structured Schema:')}</span>
                 
                 <div className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3" : "space-y-2"}>
                   {professionals.map((p) => {
@@ -211,10 +213,10 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                             setSelectedProfId(p.id);
                           }}
                           className="h-8 px-2.5 bg-slate-50 hover:bg-[color:var(--t-50)] text-slate-600 hover:text-[color:var(--t-600)] rounded-none border border-slate-200 hover:border-[color:var(--t-200)] transition-all cursor-pointer shrink-0 flex items-center gap-1 text-xs font-bold"
-                          title="View JSON-LD Schema details"
+                          title={tx('View JSON-LD Schema details')}
                         >
                           <Eye className="h-3.5 w-3.5" />
-                          <span>View</span>
+                          <span>{tx('View')}</span>
                         </button>
                       </div>
                     );
@@ -232,23 +234,23 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                 className="absolute top-4 right-4 h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] active:bg-[color:var(--t-800)] border border-[color:var(--t-700)] text-white rounded-none px-4 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-none"
               >
                 {copied ? <CheckCircle className="h-3.5 w-3.5 text-white" /> : <Copy className="h-3.5 w-3.5 text-white" />}
-                {copied ? 'Copied!' : 'Copy Code'}
+                {copied ? tx('Copied!') : tx('Copy Code')}
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
               <div className="border border-slate-200 p-5 rounded-none bg-slate-50 space-y-2">
-                <h4 className="font-black text-slate-800 mb-1 uppercase tracking-wider">Google Rich Snippets Achieved:</h4>
+                <h4 className="font-black text-slate-800 mb-1 uppercase tracking-wider">{tx('Google Rich Snippets Achieved:')}</h4>
                 <ul className="space-y-1.5 text-slate-600 list-disc list-inside font-semibold">
-                  <li><strong>Medical Specialist Badge</strong> in local business listings</li>
-                  <li><strong>Active Rating Stars</strong> (e.g. ⭐ {selectedProf?.rating} / 5) based on real feedback</li>
-                  <li><strong>Credentials Verification</strong> mapped via Schema markup</li>
+                  <li><strong>{tx('Medical Specialist Badge')}</strong> {tx('in local business listings')}</li>
+                  <li><strong>{tx('Active Rating Stars')}</strong> (e.g. ⭐ {selectedProf?.rating} / 5) based on real feedback</li>
+                  <li><strong>{tx('Credentials Verification')}</strong> {tx('mapped via Schema markup')}</li>
                 </ul>
               </div>
               <div className="border border-slate-200 p-5 rounded-none bg-slate-50 space-y-2">
-                <h4 className="font-black text-slate-800 mb-1 uppercase tracking-wider">E-E-A-T Quality Score Impact:</h4>
+                <h4 className="font-black text-slate-800 mb-1 uppercase tracking-wider">{tx('E-E-A-T Quality Score Impact:')}</h4>
                 <p className="text-slate-600 leading-relaxed font-semibold">
-                  Google treats health queries under strict **YMYL (Your Money Your Life)** guidelines. Our schema links directly to authorized Medical/Nursing council registrations, improving search rank relevance by 35%.
+                  {tx('Google treats health queries under strict **YMYL (Your Money Your Life)** guidelines. Our schema links directly to authorized Medical/Nursing council registrations, improving search rank relevance by 35%.')}
                 </p>
               </div>
             </div>
@@ -259,20 +261,20 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
         {activeTab === 'programmatic' && (
           <div className="space-y-6">
             <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-5 rounded-none">
-              <h3 className="text-sm font-black text-[color:var(--ink)] mb-1 uppercase tracking-wider">Programmatic SEO Landing Page Architecture</h3>
+              <h3 className="text-sm font-black text-[color:var(--ink)] mb-1 uppercase tracking-wider">{tx('Programmatic SEO Landing Page Architecture')}</h3>
               <p className="text-xs text-[color:var(--t-600)] leading-relaxed font-semibold">
-                Rather than manually creating pages, our system programmatically generates high-converting localized landers.
-                This allows us to dominate high-intent keywords such as <strong>"Best Cardiologist in Kuala Lumpur"</strong> or <strong>"ICU Nurse in Petaling Jaya"</strong>.
+                {tx('Rather than manually creating pages, our system programmatically generates high-converting localized landers.')}
+                This allows us to dominate high-intent keywords such as <strong>{tx('"Best Cardiologist in Kuala Lumpur"')}</strong> or <strong>{tx('"ICU Nurse in Petaling Jaya"')}</strong>.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left Form: Template Customizer */}
               <div className="space-y-4">
-                <h4 className="font-black text-slate-800 text-sm uppercase tracking-wider">Meta Tags Template Configurator</h4>
+                <h4 className="font-black text-slate-800 text-sm uppercase tracking-wider">{tx('Meta Tags Template Configurator')}</h4>
                 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Programmatic Meta Title Tag</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">{tx('Programmatic Meta Title Tag')}</label>
                   <input
                     type="text"
                     value={titleTemplate}
@@ -282,7 +284,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Programmatic Meta Description Tag</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">{tx('Programmatic Meta Description Tag')}</label>
                   <textarea
                     rows={3}
                     value={descTemplate}
@@ -294,7 +296,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
 
               {/* Right Live Preview */}
               <div className="border border-slate-200 p-5 rounded-none bg-slate-50 space-y-4">
-                <h4 className="font-black text-slate-800 text-sm uppercase tracking-wider">Google SERP Live Simulator</h4>
+                <h4 className="font-black text-slate-800 text-sm uppercase tracking-wider">{tx('Google SERP Live Simulator')}</h4>
                 
                 <div className="bg-white border border-slate-250 p-4 rounded-none space-y-2">
                   <div className="text-xs text-slate-500 font-mono">https://careverified.pro/best-cardiologist-in-kuala-lumpur</div>
@@ -319,18 +321,18 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
             </div>
 
             <div className="border-t border-slate-200 pt-5">
-              <h4 className="font-black text-slate-800 text-sm mb-3.5 uppercase tracking-wider">Programmatic URL Structure</h4>
+              <h4 className="font-black text-slate-800 text-sm mb-3.5 uppercase tracking-wider">{tx('Programmatic URL Structure')}</h4>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-slate-50 p-4 rounded-none border border-slate-200 text-center">
-                  <div className="text-xs font-black text-slate-700 uppercase tracking-wider">Specialty Landing</div>
+                  <div className="text-xs font-black text-slate-700 uppercase tracking-wider">{tx('Specialty Landing')}</div>
                   <code className="text-xs text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/best-[specialty]-in-[city]</code>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-none border border-slate-200 text-center">
-                  <div className="text-xs font-black text-slate-700 uppercase tracking-wider">Direct Doctor Link</div>
+                  <div className="text-xs font-black text-slate-700 uppercase tracking-wider">{tx('Direct Doctor Link')}</div>
                   <code className="text-xs text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/doctors/[doctor-name-slug]</code>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-none border border-slate-200 text-center">
-                  <div className="text-xs font-black text-slate-700 uppercase tracking-wider">Sitemap Feed</div>
+                  <div className="text-xs font-black text-slate-700 uppercase tracking-wider">{tx('Sitemap Feed')}</div>
                   <code className="text-xs text-[color:var(--t-600)] font-mono font-bold mt-1.5 block">/sitemap.xml</code>
                 </div>
               </div>
@@ -343,50 +345,50 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
               <div>
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">Core Web Vitals Scoring (Chrome UX Performance)</h3>
-                <p className="text-xs text-slate-500 font-semibold mt-0.5">Google ranks lightning fast pages higher. Our server-bundled SPA is pre-optimized.</p>
+                <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">{tx('Core Web Vitals Scoring (Chrome UX Performance)')}</h3>
+                <p className="text-xs text-slate-500 font-semibold mt-0.5">{tx('Google ranks lightning fast pages higher. Our server-bundled SPA is pre-optimized.')}</p>
               </div>
               <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3.5 py-1.5 rounded-none shrink-0">
                 <span className="w-2 h-2 rounded-none bg-emerald-500 animate-pulse"></span>
-                <span className="text-xs font-black text-emerald-800 uppercase tracking-wider">Passes Google Core Assessment</span>
+                <span className="text-xs font-black text-emerald-800 uppercase tracking-wider">{tx('Passes Google Core Assessment')}</span>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="border border-slate-250 hover:border-[color:var(--t-600)] p-5 rounded-none bg-white transition-all space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-black text-slate-700 uppercase tracking-wider">LCP</span>
+                  <span className="text-xs font-black text-slate-700 uppercase tracking-wider">{tx('LCP')}</span>
                   <span className="text-2xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">1.1s</span>
                 </div>
-                <h4 className="text-sm font-black text-slate-800">Largest Contentful Paint</h4>
-                <p className="text-xs text-slate-500 font-semibold leading-relaxed">Pre-rendered above-the-fold content loads instantly, ensuring maximum crawlability.</p>
+                <h4 className="text-sm font-black text-slate-800">{tx('Largest Contentful Paint')}</h4>
+                <p className="text-xs text-slate-500 font-semibold leading-relaxed">{tx('Pre-rendered above-the-fold content loads instantly, ensuring maximum crawlability.')}</p>
               </div>
 
               <div className="border border-slate-250 hover:border-[color:var(--t-600)] p-5 rounded-none bg-white transition-all space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-black text-slate-700 uppercase tracking-wider">INP</span>
+                  <span className="text-xs font-black text-slate-700 uppercase tracking-wider">{tx('INP')}</span>
                   <span className="text-2xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">24ms</span>
                 </div>
-                <h4 className="text-sm font-black text-slate-800">Interaction to Next Paint</h4>
-                <p className="text-xs text-slate-500 font-semibold leading-relaxed">Fast state mutations and lightweight event hooks prevent tap/click delays.</p>
+                <h4 className="text-sm font-black text-slate-800">{tx('Interaction to Next Paint')}</h4>
+                <p className="text-xs text-slate-500 font-semibold leading-relaxed">{tx('Fast state mutations and lightweight event hooks prevent tap/click delays.')}</p>
               </div>
 
               <div className="border border-slate-250 hover:border-[color:var(--t-600)] p-5 rounded-none bg-white transition-all space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-black text-slate-700 uppercase tracking-wider">CLS</span>
+                  <span className="text-xs font-black text-slate-700 uppercase tracking-wider">{tx('CLS')}</span>
                   <span className="text-2xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-none">0.02</span>
                 </div>
-                <h4 className="text-sm font-black text-slate-800">Cumulative Layout Shift</h4>
-                <p className="text-xs text-slate-500 font-semibold leading-relaxed">Defined image dimensions and skeletal layouts prevent layout jumping during rendering.</p>
+                <h4 className="text-sm font-black text-slate-800">{tx('Cumulative Layout Shift')}</h4>
+                <p className="text-xs text-slate-500 font-semibold leading-relaxed">{tx('Defined image dimensions and skeletal layouts prevent layout jumping during rendering.')}</p>
               </div>
             </div>
 
             <div className="border border-slate-200 p-5 rounded-none bg-slate-50 space-y-2.5 text-xs">
-              <h4 className="font-black text-slate-800 uppercase tracking-wider">Optimizations Implemented:</h4>
+              <h4 className="font-black text-slate-800 uppercase tracking-wider">{tx('Optimizations Implemented:')}</h4>
               <ul className="space-y-1 list-disc list-inside text-slate-600 font-semibold leading-relaxed">
-                <li>Server-Side bundled fast router reduces JS overhead</li>
-                <li>Font swap and fallback system prevents flash of unstyled text (FOUT)</li>
-                <li>Modern next-gen image placeholders optimized directly from CDN</li>
+                <li>{tx('Server-Side bundled fast router reduces JS overhead')}</li>
+                <li>{tx('Font swap and fallback system prevents flash of unstyled text (FOUT)')}</li>
+                <li>{tx('Modern next-gen image placeholders optimized directly from CDN')}</li>
               </ul>
             </div>
           </div>
@@ -397,8 +399,8 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
           <div className="space-y-5">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50 p-5 rounded-none border border-slate-200">
               <div>
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">Live Dynamic XML Sitemap</h3>
-                <p className="text-xs text-slate-500 font-semibold mt-0.5">Auto-updates as soon as a new doctor or nurse is successfully verified by admin moderators.</p>
+                <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">{tx('Live Dynamic XML Sitemap')}</h3>
+                <p className="text-xs text-slate-500 font-semibold mt-0.5">{tx('Auto-updates as soon as a new doctor or nurse is successfully verified by admin moderators.')}</p>
               </div>
               <a 
                 href="/sitemap.xml" 
@@ -406,7 +408,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                 className="h-10 text-xs font-bold uppercase tracking-wider bg-[color:var(--t-600)] text-white rounded-none px-4 hover:bg-[color:var(--dark)] flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
               >
                 <Eye className="h-4 w-4" />
-                Open Sitemap XML
+                {tx('Open Sitemap XML')}
               </a>
             </div>
 
@@ -435,7 +437,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
             <button
               onClick={() => setSelectedSchemaProf(null)}
               className="absolute top-4 right-4 h-8 w-8 rounded-none text-slate-400 hover:text-slate-800 hover:bg-slate-100 border border-transparent hover:border-slate-300 transition-all cursor-pointer z-10 flex items-center justify-center"
-              title="Close"
+              title={tx('Close')}
             >
               <X className="h-4 w-4" />
             </button>
@@ -446,8 +448,8 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                   <Code className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-slate-800 leading-tight uppercase tracking-wide">Structured Schema.org Metadata</h3>
-                  <p className="text-xs text-slate-500 font-semibold">JSON-LD markup validation for search engine indexing</p>
+                  <h3 className="text-base font-black text-slate-800 leading-tight uppercase tracking-wide">{tx('Structured Schema.org Metadata')}</h3>
+                  <p className="text-xs text-slate-500 font-semibold">{tx('JSON-LD markup validation for search engine indexing')}</p>
                 </div>
               </div>
 
@@ -479,7 +481,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                   className="absolute top-3 right-3 h-8 bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] text-white rounded-none px-3 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
                 >
                   {copied ? <CheckCircle className="h-3 w-3 text-white" /> : <Copy className="h-3 w-3 text-white" />}
-                  {copied ? 'Copied!' : 'Copy Schema'}
+                  {copied ? tx('Copied!') : tx('Copy Schema')}
                 </button>
               </div>
             </div>
@@ -489,7 +491,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                 onClick={() => setSelectedSchemaProf(null)}
                 className="h-10 px-5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-black uppercase tracking-wider rounded-none border border-slate-300 transition-all cursor-pointer"
               >
-                Close Preview
+                {tx('Close Preview')}
               </button>
             </div>
           </div>

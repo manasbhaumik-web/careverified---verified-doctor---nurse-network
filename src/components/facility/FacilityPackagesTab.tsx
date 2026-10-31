@@ -10,6 +10,7 @@ import {
   Trash2,
   CreditCard,
 } from 'lucide-react';
+import { useTr } from '../../locale';
 import WorkspaceHeader from '../WorkspaceHeader';
 import { BannerBadge } from '../DashboardHeader';
 import { MedicalPackage, MedicalPromotion, PackageOrder } from './types';
@@ -43,6 +44,7 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
   onTogglePromoStatus,
   onConfirmPackageOrder,
 }) => {
+  const tx = useTr();
   const [packageSubTab, setPackageSubTab] = useState<'packages' | 'promotions' | 'orders'>('packages');
   const [packageSearch, setPackageSearch] = useState('');
   const [packageCategoryFilter, setPackageCategoryFilter] = useState('All');
@@ -62,10 +64,10 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
           <div className="space-y-6">
             <WorkspaceHeader
               icon={PackagePlus}
-              eyebrow="Direct Hospital Care · Public Directory"
-              title="Medical Packages & Promotional Offers"
-              description="Publish clinical health checkups, surgical packages, and seasonal promotional codes across the care network."
-              badges={<BannerBadge tone="brand">MOH Approved</BannerBadge>}
+              eyebrow={tx('Direct Hospital Care · Public Directory')}
+              title={tx('Medical Packages & Promotional Offers')}
+              description={tx('Publish clinical health checkups, surgical packages, and seasonal promotional codes across the care network.')}
+              badges={<BannerBadge tone="brand">{tx('MOH Approved')}</BannerBadge>}
               aside={
                 <div className="flex items-center gap-2">
                   <button
@@ -74,7 +76,7 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                     className="px-3.5 py-2 text-xs font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer shadow-xs flex items-center gap-1.5"
                   >
                     <Plus className="h-4 w-4" />
-                    <span>Publish Medical Package</span>
+                    <span>{tx('Publish Medical Package')}</span>
                   </button>
                   <button
                     type="button"
@@ -82,14 +84,14 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                     className="px-3.5 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 text-slate-800 cursor-pointer flex items-center gap-1.5"
                   >
                     <Tag className="h-3.5 w-3.5 text-amber-600" />
-                    <span>Create Promotion</span>
+                    <span>{tx('Create Promotion')}</span>
                   </button>
                 </div>
               }
               tabs={[
-                { id: 'packages', label: 'Medical Packages', count: packages.length },
-                { id: 'promotions', label: 'Promotions & Campaign Codes', count: promotions.length },
-                { id: 'orders', label: 'Package requests', count: packageOrders.length },
+                { id: 'packages', label: tx('Medical Packages'), count: packages.length },
+                { id: 'promotions', label: tx('Promotions & Campaign Codes'), count: promotions.length },
+                { id: 'orders', label: tx('Package requests'), count: packageOrders.length },
               ]}
               activeTab={packageSubTab}
               onTabChange={(t) => setPackageSubTab(t as any)}
@@ -106,7 +108,7 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                       type="text"
                       value={packageSearch}
                       onChange={e => setPackageSearch(e.target.value)}
-                      placeholder="Search packages by title or code…"
+                      placeholder={tx('Search packages by title or code…')}
                       className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                     />
                   </div>
@@ -126,9 +128,9 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                     onChange={e => setPackageStatusFilter(e.target.value as any)}
                     className="p-1.5 text-xs border border-slate-200 bg-white"
                   >
-                    <option value="all">All Publishing Statuses</option>
-                    <option value="published">Published (Live to Patients)</option>
-                    <option value="draft">Draft / Unpublished</option>
+                    <option value="all">{tx('All Publishing Statuses')}</option>
+                    <option value="published">{tx('Published (Live to Patients)')}</option>
+                    <option value="draft">{tx('Draft / Unpublished')}</option>
                   </select>
                 </div>
 
@@ -136,7 +138,7 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                 {packages.length === 0 ? (
                   <div className="p-12 text-center bg-white border border-dashed border-slate-300 space-y-3">
                     <PackagePlus className="h-8 w-8 text-slate-300 mx-auto" />
-                    <p className="text-xs text-slate-500">No medical packages created yet. Click "Publish Medical Package" to get started.</p>
+                    <p className="text-xs text-slate-500">{tx('No medical packages created yet. Click "Publish Medical Package" to get started.')}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -197,7 +199,7 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                                 </span>
                                 {pkg.fastingRequired && (
                                   <span className="text-2xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.2">
-                                    Fasting Required
+                                    {tx('Fasting Required')}
                                   </span>
                                 )}
                               </div>
@@ -234,15 +236,15 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                                 type="button"
                                 onClick={() => handleTogglePackageStatus(pkg)}
                                 className="px-2 py-1 text-xs font-bold border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer"
-                                title="Toggle Live / Draft"
+                                title={tx('Toggle Live / Draft')}
                               >
-                                {pkg.status === 'published' ? 'Unpublish' : 'Publish'}
+                                {pkg.status === 'published' ? tx('Unpublish') : tx('Publish')}
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleEditPackage(pkg)}
                                 className="p-1.5 text-slate-600 hover:text-slate-900 border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer"
-                                title="Edit Package"
+                                title={tx('Edit Package')}
                               >
                                 <Edit3 className="h-3.5 w-3.5" />
                               </button>
@@ -250,7 +252,7 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                                 type="button"
                                 onClick={() => handleDeletePackage(pkg.id)}
                                 className="p-1.5 text-rose-600 hover:text-rose-800 border border-slate-200 bg-white hover:bg-rose-50 cursor-pointer"
-                                title="Delete Package"
+                                title={tx('Delete Package')}
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
                               </button>
@@ -269,7 +271,7 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                 {promotions.length === 0 ? (
                   <div className="p-12 text-center bg-white border border-dashed border-slate-300 space-y-3">
                     <Tag className="h-8 w-8 text-slate-300 mx-auto" />
-                    <p className="text-xs text-slate-500">No active promotions. Click "Create Promotion" to set up a discount code or seasonal offer.</p>
+                    <p className="text-xs text-slate-500">{tx('No active promotions. Click "Create Promotion" to set up a discount code or seasonal offer.')}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -320,7 +322,7 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                               onClick={() => handleTogglePromoStatus(pr)}
                               className="px-2.5 py-1 text-xs font-bold border border-slate-200 hover:bg-slate-50 cursor-pointer"
                             >
-                              {pr.status === 'active' ? 'Pause' : 'Activate'}
+                              {pr.status === 'active' ? tx('Pause') : tx('Activate')}
                             </button>
                             <button
                               type="button"
@@ -351,35 +353,35 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                 {/* Orders Financial Summary Cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="p-4 bg-slate-50 border border-slate-200">
-                    <span className="text-xs font-mono font-bold uppercase text-slate-400 block">Package requests</span>
+                    <span className="text-xs font-mono font-bold uppercase text-slate-400 block">{tx('Package requests')}</span>
                     <div className="text-2xl font-black text-slate-900 mt-1">
                       {packageOrders.length}
                     </div>
-                    <span className="text-xs text-slate-500 mt-0.5 block">Patients who asked for a package</span>
+                    <span className="text-xs text-slate-500 mt-0.5 block">{tx('Patients who asked for a package')}</span>
                   </div>
 
                   <div className="p-4 bg-emerald-50 border border-emerald-200">
-                    <span className="text-xs font-mono font-bold uppercase text-emerald-700 block">Deposits to collect (10%)</span>
+                    <span className="text-xs font-mono font-bold uppercase text-emerald-700 block">{tx('Deposits to collect (10%)')}</span>
                     <div className="text-2xl font-black text-emerald-900 mt-1 tabular-nums">
                       RM {packageOrders.reduce((sum, o) => sum + (o.deposit_amount_myr || 0), 0).toLocaleString('en-MY', { minimumFractionDigits: 2 })}
                     </div>
-                    <span className="text-xs text-emerald-700 mt-0.5 block">Not paid online: you confirm and collect it</span>
+                    <span className="text-xs text-emerald-700 mt-0.5 block">{tx('Not paid online: you confirm and collect it')}</span>
                   </div>
 
                   <div className="p-4 bg-white border-2 border-slate-900">
-                    <span className="text-xs font-mono font-bold uppercase text-slate-400 block">Balance after the deposit</span>
+                    <span className="text-xs font-mono font-bold uppercase text-slate-400 block">{tx('Balance after the deposit')}</span>
                     <div className="text-2xl font-black text-slate-900 mt-1 tabular-nums">
                       RM {packageOrders.reduce((sum, o) => sum + (o.remaining_payable_myr || 0), 0).toLocaleString('en-MY', { minimumFractionDigits: 2 })}
                     </div>
-                    <span className="text-xs text-slate-500 mt-0.5 block">Collected by the hospital</span>
+                    <span className="text-xs text-slate-500 mt-0.5 block">{tx('Collected by the hospital')}</span>
                   </div>
 
                   <div className="p-4 bg-sky-50 border border-sky-200">
-                    <span className="text-xs font-mono font-bold uppercase text-sky-800 block">Deposit policy</span>
+                    <span className="text-xs font-mono font-bold uppercase text-sky-800 block">{tx('Deposit policy')}</span>
                     <div className="text-base font-black text-sky-950 mt-1">
                       10% on confirmation
                     </div>
-                    <span className="text-xs text-sky-700 mt-0.5 block">You tell the patient how to pay</span>
+                    <span className="text-xs text-sky-700 mt-0.5 block">{tx('You tell the patient how to pay')}</span>
                   </div>
                 </div>
 
@@ -389,12 +391,12 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                     <div className="flex items-center gap-2">
                       <CreditCard className="h-4 w-4 text-[color:var(--t-600)]" />
                       <h3 className="font-extrabold text-sm text-slate-900">
-                        Package requests from patients
+                        {tx('Package requests from patients')}
                       </h3>
                     </div>
 
                     <div className="flex items-center gap-1">
-                      <span className="text-xs text-slate-400 font-bold uppercase mr-1">Status:</span>
+                      <span className="text-xs text-slate-400 font-bold uppercase mr-1">{tx('Status:')}</span>
                       {['all', 'pending', 'confirmed', 'completed'].map(st => (
                         <button
                           key={st}
@@ -415,9 +417,9 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                   {packageOrders.length === 0 ? (
                     <div className="p-12 text-center text-xs text-slate-500 border border-dashed border-slate-200 space-y-2">
                       <CreditCard className="h-8 w-8 text-slate-300 mx-auto" />
-                      <p className="text-sm font-bold text-slate-700">No package reservation orders received yet.</p>
+                      <p className="text-sm font-bold text-slate-700">{tx('No package reservation orders received yet.')}</p>
                       <p className="text-xs text-slate-500">
-                        When local or international patients reserve your published packages and pay the 10% advance deposit, their booking vouchers will appear here.
+                        {tx('When local or international patients reserve your published packages and pay the 10% advance deposit, their booking vouchers will appear here.')}
                       </p>
                     </div>
                   ) : (
@@ -425,15 +427,15 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                       <table className="w-full text-left text-xs border-collapse">
                         <thead>
                           <tr className="bg-slate-100 text-slate-600 border-b border-slate-200 font-extrabold text-xs uppercase tracking-wider">
-                            <th className="p-3">Patient & Country</th>
-                            <th className="p-3">Package Title & Code</th>
-                            <th className="p-3">Preferred Date</th>
-                            <th className="p-3 text-right">Total (MYR)</th>
-                            <th className="p-3 text-right">10% Deposit (MYR)</th>
-                            <th className="p-3 text-right">Balance Due (MYR)</th>
-                            <th className="p-3">Deposit Ref</th>
-                            <th className="p-3">Admission Status</th>
-                            <th className="p-3 text-right">Action</th>
+                            <th className="p-3">{tx('Patient & Country')}</th>
+                            <th className="p-3">{tx('Package Title & Code')}</th>
+                            <th className="p-3">{tx('Preferred Date')}</th>
+                            <th className="p-3 text-right">{tx('Total (MYR)')}</th>
+                            <th className="p-3 text-right">{tx('10% Deposit (MYR)')}</th>
+                            <th className="p-3 text-right">{tx('Balance Due (MYR)')}</th>
+                            <th className="p-3">{tx('Deposit Ref')}</th>
+                            <th className="p-3">{tx('Admission Status')}</th>
+                            <th className="p-3 text-right">{tx('Action')}</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -452,7 +454,7 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                                   <code className="text-xs font-mono text-slate-500">{ord.package_code}</code>
                                 </td>
                                 <td className="p-3 font-mono text-slate-600 text-xs">
-                                  {ord.preferred_date || 'Flexible'}
+                                  {ord.preferred_date || tx('Flexible')}
                                 </td>
                                 <td className="p-3 text-right font-mono font-bold text-slate-900 tabular-nums">
                                   RM {ord.total_price_myr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
@@ -486,7 +488,7 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                                       onClick={() => handleConfirmPackageOrder(ord.id, 'confirmed')}
                                       className="px-2.5 py-1 text-xs font-bold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white cursor-pointer shadow-xs"
                                     >
-                                      Confirm Slot
+                                      {tx('Confirm Slot')}
                                     </button>
                                   ) : ord.hospital_confirmation_status === 'confirmed' ? (
                                     <button
@@ -494,10 +496,10 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                                       onClick={() => handleConfirmPackageOrder(ord.id, 'completed')}
                                       className="px-2.5 py-1 text-xs font-bold bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-200)] cursor-pointer"
                                     >
-                                      Check In
+                                      {tx('Check In')}
                                     </button>
                                   ) : (
-                                    <span className="text-xs font-bold text-slate-400">Checked In</span>
+                                    <span className="text-xs font-bold text-slate-400">{tx('Checked In')}</span>
                                   )}
                                 </td>
                               </tr>

@@ -3,6 +3,7 @@ import {
   Calendar, ShieldCheck, Plus, Search, MapPin, ChevronDown, ChevronUp,
   CheckCircle2, Clock, Check, FileText, MessageSquare
 } from 'lucide-react';
+import { useTr } from '../../locale';
 import WorkspaceHeader from '../WorkspaceHeader';
 import { BannerBadge, DashboardTab } from '../DashboardHeader';
 import { FacilityJob, Application } from './types';
@@ -48,14 +49,15 @@ export default function FacilityShiftsTab({
   onApproveTimesheet,
   onOpenChat,
 }: FacilityShiftsTabProps) {
+  const tx = useTr();
   return (
     <div className="space-y-4">
       <WorkspaceHeader
         icon={Calendar}
-        eyebrow="Clinical Human Capital · Act 586 Staffing"
-        title="Clinical Job Postings, Locum Shifts & Applications"
-        description="Recruit credentialed doctors, staff nurses, and allied healthcare practitioners with automated regulatory license checks."
-        badges={<BannerBadge tone="success"><ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" /> Act 586 Staffing Compliant</BannerBadge>}
+        eyebrow={tx('Clinical Human Capital · Act 586 Staffing')}
+        title={tx('Clinical Job Postings, Locum Shifts & Applications')}
+        description={tx('Recruit credentialed doctors, staff nurses, and allied healthcare practitioners with automated regulatory license checks.')}
+        badges={<BannerBadge tone="success"><ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" /> {tx('Act 586 Staffing Compliant')}</BannerBadge>}
         tabs={embedded && displayedTabs.length > 1 ? displayedTabs : undefined}
         activeTab={tab}
         onTabChange={setTab}
@@ -66,7 +68,7 @@ export default function FacilityShiftsTab({
             className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
           >
             <Plus className="h-3.5 w-3.5" />
-            <span>Post Job Vacancy</span>
+            <span>{tx('Post Job Vacancy')}</span>
           </button>
         ) : undefined}
       />
@@ -76,7 +78,7 @@ export default function FacilityShiftsTab({
           <Search className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search job postings by title, specialty, ward or location…"
+            placeholder={tx('Search job postings by title, specialty, ward or location…')}
             value={jobSearch}
             onChange={e => setJobSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2 border border-[color:var(--t-200)] text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -84,7 +86,7 @@ export default function FacilityShiftsTab({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-black uppercase tracking-wider text-slate-500">Role:</span>
+          <span className="text-xs font-black uppercase tracking-wider text-slate-500">{tx('Role:')}</span>
           <button
             type="button"
             onClick={() => setJobFilter('all')}
@@ -121,7 +123,7 @@ export default function FacilityShiftsTab({
 
           <div className="h-4 w-px bg-slate-200 mx-1" />
 
-          <span className="text-xs font-black uppercase tracking-wider text-slate-500">Status:</span>
+          <span className="text-xs font-black uppercase tracking-wider text-slate-500">{tx('Status:')}</span>
           <button
             type="button"
             onClick={() => setStatusFilter('all')}
@@ -156,8 +158,8 @@ export default function FacilityShiftsTab({
       {filteredJobs.length === 0 ? (
         <div className="bg-white border border-[color:var(--t-200)] p-12 text-center text-xs text-slate-500 space-y-3">
           <Calendar className="h-10 w-10 text-slate-400 mx-auto" />
-          <p className="text-sm font-bold text-slate-700">No job openings found matching your filter criteria.</p>
-          <p>Create a new clinical vacancy to invite verified doctors and nurses across Malaysia.</p>
+          <p className="text-sm font-bold text-slate-700">{tx('No job openings found matching your filter criteria.')}</p>
+          <p>{tx('Create a new clinical vacancy to invite verified doctors and nurses across Malaysia.')}</p>
           <button
             type="button"
             onClick={onPostJob}
@@ -192,7 +194,7 @@ export default function FacilityShiftsTab({
                         {job.type}
                       </span>
                       <span className="text-2xs uppercase font-black tracking-wider px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200">
-                        {job.roleRequired === 'doctor' ? 'Doctor' : job.roleRequired === 'nurse' ? 'Nurse' : 'Specialist'}
+                        {job.roleRequired === 'doctor' ? tx('Doctor') : job.roleRequired === 'nurse' ? tx('Nurse') : tx('Specialist')}
                       </span>
                       <span className="text-xs font-bold text-[color:var(--t-700)]">
                         {job.specialtyRequired}
@@ -230,7 +232,7 @@ export default function FacilityShiftsTab({
                       onClick={() => onUpdateJobStatus(job.id, job.status === 'Active' ? 'Closed' : 'Active')}
                       className="px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer"
                     >
-                      {job.status === 'Active' ? 'Close Listing' : 'Reopen Listing'}
+                      {job.status === 'Active' ? tx('Close Listing') : tx('Reopen Listing')}
                     </button>
                     <button
                       type="button"
@@ -257,7 +259,7 @@ export default function FacilityShiftsTab({
 
                     {applications.length === 0 ? (
                       <div className="p-8 text-center text-xs text-slate-500 bg-white border border-dashed border-slate-200">
-                        No practitioners have applied for this vacancy yet. You can invite qualified doctors and nurses directly from the Practitioner Network tab.
+                        {tx('No practitioners have applied for this vacancy yet. You can invite qualified doctors and nurses directly from the Practitioner Network tab.')}
                       </div>
                     ) : (
                       <div className="space-y-3">
@@ -274,15 +276,15 @@ export default function FacilityShiftsTab({
                                     {app.applicantRole}
                                   </span>
                                   <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 text-2xs font-black uppercase border border-emerald-300">
-                                    APC Active
+                                    {tx('APC Active')}
                                   </span>
                                 </div>
                                 <div className="text-xs text-slate-600 flex flex-wrap gap-x-3 gap-y-1">
-                                  <span>Specialty: <strong className="text-slate-800">{app.specialization}</strong></span>
-                                  <span>Reg: <strong className="font-mono text-slate-800">{app.applicantLicense || 'MMC/LJM Verified'}</strong></span>
-                                  <span>Exp: <strong className="text-slate-800">{app.experienceYears || 5} Years</strong></span>
+                                  <span>{tx('Specialty:')} <strong className="text-slate-800">{app.specialization}</strong></span>
+                                  <span>{tx('Reg:')} <strong className="font-mono text-slate-800">{app.applicantLicense || tx('MMC/LJM Verified')}</strong></span>
+                                  <span>{tx('Exp:')} <strong className="text-slate-800">{app.experienceYears || 5} Years</strong></span>
                                   {app.applicantRate && (
-                                    <span>Rate: <strong className="text-emerald-700 font-bold">RM {app.applicantRate}/hr</strong></span>
+                                    <span>{tx('Rate:')} <strong className="text-emerald-700 font-bold">RM {app.applicantRate}/hr</strong></span>
                                   )}
                                   <span>Applied: {new Date(app.appliedAt).toLocaleDateString('en-MY')}</span>
                                 </div>
@@ -324,7 +326,7 @@ export default function FacilityShiftsTab({
                                           type="button"
                                           onClick={() => onApproveTimesheet(job.id, app)}
                                           className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white text-2xs font-black uppercase border border-blue-700 cursor-pointer flex items-center gap-1"
-                                          title="Verify shift completion & trigger payment release"
+                                          title={tx('Verify shift completion & trigger payment release')}
                                         >
                                           <Clock className="h-3 w-3" />
                                           Approve Timesheet ({app.actualHours} hrs)
@@ -334,17 +336,17 @@ export default function FacilityShiftsTab({
                                     {app.paymentStatus === 'escrow_held' ? (
                                       <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-2xs font-bold border border-emerald-200 flex items-center gap-1">
                                         <Check className="h-3 w-3 text-emerald-600" />
-                                        Escrow Held
+                                        {tx('Escrow Held')}
                                       </span>
                                     ) : app.paymentStatus === 'released' ? (
                                       <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-2xs font-bold border border-emerald-300 flex items-center gap-1">
                                         <CheckCircle2 className="h-3 w-3 text-emerald-600" />
-                                        Payout Dispatched
+                                        {tx('Payout Dispatched')}
                                       </span>
                                     ) : app.paymentStatus === 'invoiced' ? (
                                       <span className="px-2 py-0.5 bg-purple-50 text-purple-800 text-2xs font-bold border border-purple-200 flex items-center gap-1">
                                         <FileText className="h-3 w-3 text-purple-600" />
-                                        Net-30 Invoiced ({app.invoiceNumber || 'Pending'})
+                                        Net-30 Invoiced ({app.invoiceNumber || tx('Pending')})
                                       </span>
                                     ) : null}
                                     <button
@@ -353,7 +355,7 @@ export default function FacilityShiftsTab({
                                       className="px-3 py-1 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 flex items-center gap-1 cursor-pointer"
                                     >
                                       <MessageSquare className="h-3.5 w-3.5 text-blue-600" />
-                                      Direct Message
+                                      {tx('Direct Message')}
                                     </button>
                                   </div>
                                 ) : (
@@ -369,20 +371,20 @@ export default function FacilityShiftsTab({
                               <div className="bg-slate-50 border border-slate-200 p-2.5 flex flex-wrap items-center justify-between text-xs gap-3">
                                 <div className="flex flex-wrap items-center gap-4 text-slate-700">
                                   <div>
-                                    <span className="text-slate-500 font-medium">Billing Mode: </span>
-                                    <strong className="text-slate-900 uppercase font-black">{app.billingMode === 'invoice' ? 'Corporate Net-30 Invoice' : 'Upfront Escrow Deposit'}</strong>
+                                    <span className="text-slate-500 font-medium">{tx('Billing Mode:')} </span>
+                                    <strong className="text-slate-900 uppercase font-black">{app.billingMode === 'invoice' ? tx('Corporate Net-30 Invoice') : tx('Upfront Escrow Deposit')}</strong>
                                   </div>
                                   <div>
-                                    <span className="text-slate-500 font-medium">Practitioner Wage: </span>
+                                    <span className="text-slate-500 font-medium">{tx('Practitioner Wage:')} </span>
                                     <strong className="text-emerald-700 font-mono font-bold">RM {app.shiftWageMyr ? app.shiftWageMyr.toFixed(2) : ((app.applicantRate || 80) * (app.scheduledHours || 8)).toFixed(2)}</strong>
                                   </div>
                                   <div>
-                                    <span className="text-slate-500 font-medium">Platform Fee: </span>
+                                    <span className="text-slate-500 font-medium">{tx('Platform Fee:')} </span>
                                     <strong className="text-slate-800 font-mono font-bold">RM {app.platformFeeMyr ? app.platformFeeMyr.toFixed(2) : '40.00'}</strong>
                                   </div>
                                   {app.paymentRef && (
                                     <div>
-                                      <span className="text-slate-500 font-medium">Payment Ref: </span>
+                                      <span className="text-slate-500 font-medium">{tx('Payment Ref:')} </span>
                                       <span className="font-mono text-slate-700">{app.paymentRef}</span>
                                     </div>
                                   )}

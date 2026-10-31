@@ -9,6 +9,7 @@ import {
   Check,
   Printer,
 } from 'lucide-react';
+import { useTr } from '../../locale';
 import {
   FacilityJob,
   Application,
@@ -276,6 +277,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
   selectedInvoice,
   setSelectedInvoice,
 }) => {
+  const tx = useTr();
   return (
     <>
       {/* ========================================================================= */}
@@ -286,7 +288,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
           <div className="bg-white border border-slate-300 max-w-lg w-full p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h3 className="text-base font-black text-slate-900">
-                {decisionModal.action === 'accepted' ? 'Accept Job Application' : 'Decline Job Application'}
+                {decisionModal.action === 'accepted' ? tx('Accept Job Application') : tx('Decline Job Application')}
               </h3>
               <button
                 type="button"
@@ -307,7 +309,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               {decisionModal.action === 'accepted' ? (
                 <div className="space-y-3">
                   <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900">
-                    <p className="font-bold">Accepting this application locks in this clinical position and notifies the practitioner immediately.</p>
+                    <p className="font-bold">{tx('Accepting this application locks in this clinical position and notifies the practitioner immediately.')}</p>
                   </div>
 
                   {/* Payment Mode Notice */}
@@ -315,7 +317,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     <div className="p-3 bg-purple-50 border border-purple-200 text-purple-950 space-y-1.5">
                       <div className="flex items-center gap-1.5 font-black text-xs uppercase tracking-wider text-purple-900">
                         <FileText className="h-4 w-4 text-purple-700" />
-                        <span>Corporate Net-30 Invoicing (Enterprise Hospital)</span>
+                        <span>{tx('Corporate Net-30 Invoicing (Enterprise Hospital)')}</span>
                       </div>
                       <p className="text-xs text-purple-800">
                         Shift fee of <strong>RM {((decisionModal.applicant.applicantRate || 80) * 8).toFixed(2)}</strong> + platform fulfillment fee (RM 40.00) will be consolidated onto your hospital's monthly corporate invoice (Credit Limit: RM {facility.corporateCreditLimitMyr?.toLocaleString() || '50,000'}).
@@ -326,10 +328,10 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5 font-black text-xs uppercase tracking-wider text-blue-900">
                           <Lock className="h-4 w-4 text-blue-700" />
-                          <span>Upfront Escrow Deposit (Protected Shift)</span>
+                          <span>{tx('Upfront Escrow Deposit (Protected Shift)')}</span>
                         </div>
                         <span className="px-2 py-0.5 bg-blue-200/60 text-blue-900 font-mono font-bold text-2xs">
-                          Pre-Authorization Hold
+                          {tx('Pre-Authorization Hold')}
                         </span>
                       </div>
                       <p className="text-xs text-blue-800">
@@ -340,26 +342,26 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                         <strong className="font-mono text-emerald-700">RM {((decisionModal.applicant.applicantRate || 80) * 8).toFixed(2)}</strong>
                       </div>
                       <div className="bg-white/80 p-2 border border-blue-100 flex items-center justify-between text-xs">
-                        <span>Platform Match & Credentialing Fee:</span>
-                        <strong className="font-mono text-slate-800">RM 40.00</strong>
+                        <span>{tx('Platform Match & Credentialing Fee:')}</span>
+                        <strong className="font-mono text-slate-800">{tx('RM 40.00')}</strong>
                       </div>
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="p-3 bg-rose-50 border border-rose-200 text-rose-900">
-                  Declining this application will notify the applicant that the vacancy is proceeding with other candidates. No charges or escrow holds will occur.
+                  {tx('Declining this application will notify the applicant that the vacancy is proceeding with other candidates. No charges or escrow holds will occur.')}
                 </div>
               )}
             </div>
 
             <div className="space-y-1">
               <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                Internal Notes (Optional)
+                {tx('Internal Notes (Optional)')}
               </label>
               <textarea
                 rows={3}
-                placeholder="e.g. Briefing with department unit manager upon arrival."
+                placeholder={tx('e.g. Briefing with department unit manager upon arrival.')}
                 value={decisionNotes}
                 onChange={e => setDecisionNotes(e.target.value)}
                 className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -384,7 +386,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     : 'bg-rose-600 hover:bg-rose-700 border-rose-700'
                 }`}
               >
-                {actionSubmitting ? 'Processing…' : decisionModal.action === 'accepted' ? 'Confirm Acceptance' : 'Confirm Decline'}
+                {actionSubmitting ? 'Processing…' : decisionModal.action === 'accepted' ? tx('Confirm Acceptance') : tx('Confirm Decline')}
               </button>
             </div>
           </div>
@@ -400,10 +402,10 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
                 <h3 className="text-base font-black text-slate-900">
-                  Post Clinical Job Vacancy
+                  {tx('Post Clinical Job Vacancy')}
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Publish openings for doctors, nurses, and medical specialists across the network.
+                  {tx('Publish openings for doctors, nurses, and medical specialists across the network.')}
                 </p>
               </div>
               <button
@@ -423,7 +425,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Medical Officer (Emergency Department Locum)"
+                  placeholder={tx('e.g. Medical Officer (Emergency Department Locum)')}
                   value={newJobTitle}
                   onChange={e => setNewJobTitle(e.target.value)}
                   className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -440,9 +442,9 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     onChange={e => setNewJobRole(e.target.value as any)}
                     className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                   >
-                    <option value="doctor">Doctor / Medical Officer</option>
-                    <option value="nurse">Nurse / Staff Nurse</option>
-                    <option value="any">Specialist / Clinical Consultant</option>
+                    <option value="doctor">{tx('Doctor / Medical Officer')}</option>
+                    <option value="nurse">{tx('Nurse / Staff Nurse')}</option>
+                    <option value="any">{tx('Specialist / Clinical Consultant')}</option>
                   </select>
                 </div>
 
@@ -455,9 +457,9 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     onChange={e => setNewJobType(e.target.value)}
                     className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                   >
-                    <option value="Locum">Locum (Shift Cover)</option>
-                    <option value="Sessional">Sessional / Part-Time</option>
-                    <option value="Permanent">Permanent Position</option>
+                    <option value="Locum">{tx('Locum (Shift Cover)')}</option>
+                    <option value="Sessional">{tx('Sessional / Part-Time')}</option>
+                    <option value="Permanent">{tx('Permanent Position')}</option>
                   </select>
                 </div>
               </div>
@@ -470,7 +472,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Emergency Medicine, ICU, Paediatrics"
+                    placeholder={tx('e.g. Emergency Medicine, ICU, Paediatrics')}
                     value={newJobSpecialty}
                     onChange={e => setNewJobSpecialty(e.target.value)}
                     className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -479,11 +481,11 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
                 <div className="space-y-1">
                   <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                    Facility Ward / Location
+                    {tx('Facility Ward / Location')}
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Emergency Department / Ward 4B"
+                    placeholder={tx('e.g. Emergency Department / Ward 4B')}
                     value={newJobLocation}
                     onChange={e => setNewJobLocation(e.target.value)}
                     className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -494,7 +496,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1">
                   <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                    Min Rate (MYR)
+                    {tx('Min Rate (MYR)')}
                   </label>
                   <input
                     type="number"
@@ -507,7 +509,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
                 <div className="space-y-1">
                   <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                    Max Rate (MYR)
+                    {tx('Max Rate (MYR)')}
                   </label>
                   <input
                     type="number"
@@ -527,20 +529,20 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     onChange={e => setNewJobSalaryPeriod(e.target.value)}
                     className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                   >
-                    <option value="hour">Per Hour</option>
-                    <option value="shift">Per Shift</option>
-                    <option value="month">Per Month</option>
+                    <option value="hour">{tx('Per Hour')}</option>
+                    <option value="shift">{tx('Per Shift')}</option>
+                    <option value="month">{tx('Per Month')}</option>
                   </select>
                 </div>
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                  Description & Clinical Scope
+                  {tx('Description & Clinical Scope')}
                 </label>
                 <textarea
                   rows={3}
-                  placeholder="Outline key clinical duties, patient triage scope, required certifications (e.g. ACLS, NSR, LJM registration)."
+                  placeholder={tx('Outline key clinical duties, patient triage scope, required certifications (e.g. ACLS, NSR, LJM registration).')}
                   value={newJobDesc}
                   onChange={e => setNewJobDesc(e.target.value)}
                   className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -560,7 +562,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   disabled={newJobSubmitting}
                   className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white border border-[color:var(--t-700)] cursor-pointer disabled:opacity-50"
                 >
-                  {newJobSubmitting ? 'Publishing…' : 'Publish Job Vacancy'}
+                  {newJobSubmitting ? tx('Publishing…') : tx('Publish Job Vacancy')}
                 </button>
               </div>
             </form>
@@ -576,7 +578,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
           <div className="bg-white border border-slate-300 max-w-lg w-full p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h3 className="text-base font-black text-slate-900">
-                Invite Practitioner to Vacancy
+                {tx('Invite Practitioner to Vacancy')}
               </h3>
               <button
                 type="button"
@@ -588,9 +590,9 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             </div>
 
             <div className="p-3 bg-slate-50 border border-slate-200 text-xs space-y-1">
-              <div>Inviting: <strong className="text-slate-900">{inviteModal.name}</strong> ({inviteModal.role})</div>
-              <div>Specialty: <strong className="text-slate-800">{inviteModal.specialization}</strong></div>
-              <div>Registration: <strong className="font-mono text-slate-800">{inviteModal.registry || 'MMC/LJM Verified'}</strong></div>
+              <div>{tx('Inviting:')} <strong className="text-slate-900">{inviteModal.name}</strong> ({inviteModal.role})</div>
+              <div>{tx('Specialty:')} <strong className="text-slate-800">{inviteModal.specialization}</strong></div>
+              <div>{tx('Registration:')} <strong className="font-mono text-slate-800">{inviteModal.registry || tx('MMC/LJM Verified')}</strong></div>
             </div>
 
             {inviteSuccess && (
@@ -602,14 +604,14 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             <form onSubmit={handleInviteSubmit} className="space-y-4">
               <div className="space-y-1">
                 <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                  Select Shift / Vacancy (Optional)
+                  {tx('Select Shift / Vacancy (Optional)')}
                 </label>
                 <select
                   value={inviteJobId}
                   onChange={e => setInviteJobId(e.target.value)}
                   className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                 >
-                  <option value="">General Facility Clinical Invitation</option>
+                  <option value="">{tx('General Facility Clinical Invitation')}</option>
                   {jobs.filter(j => j.status === 'Active').map(j => (
                     <option key={j.id} value={j.id}>
                       {j.title} ({j.specialtyRequired} - {j.salaryRange})
@@ -620,7 +622,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="space-y-1">
                 <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                  Personalised Invitation Message
+                  {tx('Personalised Invitation Message')}
                 </label>
                 <textarea
                   rows={3}
@@ -644,7 +646,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white border border-[color:var(--t-700)] cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
                 >
                   <Send className="h-3.5 w-3.5" />
-                  {inviteSubmitting ? 'Sending…' : 'Send Invitation'}
+                  {inviteSubmitting ? tx('Sending…') : tx('Send Invitation')}
                 </button>
               </div>
             </form>
@@ -663,7 +665,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 <div className="flex items-center gap-2">
                   <MessageSquare className="h-5 w-5 text-[color:var(--t-600)]" />
                   <h3 className="font-black text-slate-900 text-base">
-                    Practitioner Direct Messaging
+                    {tx('Practitioner Direct Messaging')}
                   </h3>
                 </div>
                 <p className="text-xs text-slate-500">
@@ -684,13 +686,13 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               {chatLoading ? (
                 <div className="flex items-center justify-center py-12 text-slate-400 text-xs gap-2">
                   <RefreshCw className="h-4 w-4 animate-spin text-[color:var(--t-600)]" />
-                  Loading messages…
+                  {tx('Loading messages…')}
                 </div>
               ) : chatMessages.length === 0 ? (
                 <div className="text-center py-12 text-slate-400 text-xs space-y-1">
                   <MessageSquare className="h-8 w-8 mx-auto text-slate-300 mb-2" />
-                  <div className="text-sm font-bold text-slate-700">No messages exchanged yet</div>
-                  <p>Send reporting details, ward unit instructions, or timing confirmations below.</p>
+                  <div className="text-sm font-bold text-slate-700">{tx('No messages exchanged yet')}</div>
+                  <p>{tx('Send reporting details, ward unit instructions, or timing confirmations below.')}</p>
                 </div>
               ) : (
                 chatMessages.map(msg => (
@@ -724,7 +726,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 type="text"
                 value={chatInput}
                 onChange={e => setChatInput(e.target.value)}
-                placeholder="Type your message to practitioner…"
+                placeholder={tx('Type your message to practitioner…')}
                 className="flex-1 border border-[color:var(--t-200)] px-3 py-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
               />
               <button
@@ -733,7 +735,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shadow-xs"
               >
                 <Send className="h-3.5 w-3.5" />
-                {chatSending ? 'Sending…' : 'Send'}
+                {chatSending ? tx('Sending…') : tx('Send')}
               </button>
             </form>
           </div>
@@ -749,7 +751,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
                 <h3 className="text-base font-black text-slate-900">
-                  Generate Treatment Quotation
+                  {tx('Generate Treatment Quotation')}
                 </h3>
                 <p className="text-xs text-slate-500">
                   Official clinical package estimate for referral patient: <strong className="text-slate-800">{quoteModal.patient}</strong>
@@ -772,7 +774,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Total Knee Arthroplasty (TKA) Package"
+                  placeholder={tx('e.g. Total Knee Arthroplasty (TKA) Package')}
                   value={quoteProcedure}
                   onChange={e => setQuoteProcedure(e.target.value)}
                   className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -797,7 +799,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
                 <div className="space-y-1">
                   <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                    Est. Stay (Days)
+                    {tx('Est. Stay (Days)')}
                   </label>
                   <input
                     type="number"
@@ -811,11 +813,11 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="space-y-1">
                 <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                  Clinical Inclusions
+                  {tx('Clinical Inclusions')}
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="e.g. Surgeon fee, anaesthetist, operating theatre, 2 nights single room, routine lab tests."
+                  placeholder={tx('e.g. Surgeon fee, anaesthetist, operating theatre, 2 nights single room, routine lab tests.')}
                   value={quoteInclusions}
                   onChange={e => setQuoteInclusions(e.target.value)}
                   className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -824,7 +826,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="space-y-1">
                 <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                  Exclusions & Conditions
+                  {tx('Exclusions & Conditions')}
                 </label>
                 <textarea
                   rows={2}
@@ -848,7 +850,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shadow-xs"
                 >
                   <DollarSign className="h-3.5 w-3.5" />
-                  {quoteSubmitting ? 'Dispatching…' : 'Dispatch Treatment Quote'}
+                  {quoteSubmitting ? tx('Dispatching…') : tx('Dispatch Treatment Quote')}
                 </button>
               </div>
             </form>
@@ -865,10 +867,10 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
                 <h3 className="text-base font-black text-slate-900">
-                  {editingPackageId ? 'Edit Medical Package' : 'Publish New Medical Package'}
+                  {editingPackageId ? tx('Edit Medical Package') : tx('Publish New Medical Package')}
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Configure procedure details, clinical inclusions, fasting rules, and pricing in Malaysian Ringgit.
+                  {tx('Configure procedure details, clinical inclusions, fasting rules, and pricing in Malaysian Ringgit.')}
                 </p>
               </div>
               <button
@@ -889,7 +891,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Executive Full-Body Health Screening"
+                    placeholder={tx('e.g. Executive Full-Body Health Screening')}
                     value={pkgTitle}
                     onChange={e => setPkgTitle(e.target.value)}
                     className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -898,11 +900,11 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
                 <div className="space-y-1">
                   <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                    Package Code
+                    {tx('Package Code')}
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. PKG-EXEC-01"
+                    placeholder={tx('e.g. PKG-EXEC-01')}
                     value={pkgCode}
                     onChange={e => setPkgCode(e.target.value.toUpperCase())}
                     className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none font-mono focus:outline-none focus:border-[color:var(--t-600)]"
@@ -928,11 +930,11 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
                 <div className="space-y-1">
                   <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                    Duration / Stay
+                    {tx('Duration / Stay')}
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. 1 Day Outpatient (4 hrs)"
+                    placeholder={tx('e.g. 1 Day Outpatient (4 hrs)')}
                     value={pkgDuration}
                     onChange={e => setPkgDuration(e.target.value)}
                     className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -941,16 +943,16 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
                 <div className="space-y-1">
                   <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                    Target Audience
+                    {tx('Target Audience')}
                   </label>
                   <select
                     value={pkgAudience}
                     onChange={e => setPkgAudience(e.target.value as any)}
                     className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                   >
-                    <option value="all">All Patients</option>
-                    <option value="local">Malaysian Residents Only</option>
-                    <option value="international">Medical Tourism (MHTC)</option>
+                    <option value="all">{tx('All Patients')}</option>
+                    <option value="local">{tx('Malaysian Residents Only')}</option>
+                    <option value="international">{tx('Medical Tourism (MHTC)')}</option>
                   </select>
                 </div>
               </div>
@@ -973,12 +975,12 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
                 <div className="space-y-1">
                   <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                    Original Price (MYR)
+                    {tx('Original Price (MYR)')}
                   </label>
                   <input
                     type="number"
                     min="1"
-                    placeholder="e.g. 1600 (optional)"
+                    placeholder={tx('e.g. 1600 (optional)')}
                     value={pkgOriginalPrice}
                     onChange={e => setPkgOriginalPrice(e.target.value)}
                     className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)] text-slate-500"
@@ -987,15 +989,15 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
                 <div className="space-y-1">
                   <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                    Publishing Status
+                    {tx('Publishing Status')}
                   </label>
                   <select
                     value={pkgStatus}
                     onChange={e => setPkgStatus(e.target.value as any)}
                     className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                   >
-                    <option value="published">Published (Live to public)</option>
-                    <option value="draft">Draft (Private)</option>
+                    <option value="published">{tx('Published (Live to public)')}</option>
+                    <option value="draft">{tx('Draft (Private)')}</option>
                   </select>
                 </div>
               </div>
@@ -1009,17 +1011,17 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   className="rounded-none cursor-pointer"
                 />
                 <label htmlFor="fastingCheck" className="text-xs font-bold text-slate-800 cursor-pointer">
-                  Requires Clinical Fasting (8–10 hours fasting prior to appointment)
+                  {tx('Requires Clinical Fasting (8–10 hours fasting prior to appointment)')}
                 </label>
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                  Package Overview & Clinical Rationale
+                  {tx('Package Overview & Clinical Rationale')}
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="Outline who this package is recommended for and primary clinical diagnostic objectives."
+                  placeholder={tx('Outline who this package is recommended for and primary clinical diagnostic objectives.')}
                   value={pkgDescription}
                   onChange={e => setPkgDescription(e.target.value)}
                   className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -1049,7 +1051,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     </span>
                   ))}
                   {pkgInclusions.length === 0 && (
-                    <span className="text-xs text-slate-400 italic">No inclusion items added yet.</span>
+                    <span className="text-xs text-slate-400 italic">{tx('No inclusion items added yet.')}</span>
                   )}
                 </div>
 
@@ -1067,7 +1069,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                         }
                       }
                     }}
-                    placeholder="e.g. Ultrasound Abdomen & Pelvis"
+                    placeholder={tx('e.g. Ultrasound Abdomen & Pelvis')}
                     className="p-2 border border-slate-300 text-xs flex-1 bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                   />
                   <button
@@ -1087,11 +1089,11 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="space-y-1">
                 <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                  Exclusions & Pre-Procedure Instructions
+                  {tx('Exclusions & Pre-Procedure Instructions')}
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="e.g. Strict 10-hour fasting. Medication adjustments. Additional pathology charged separately."
+                  placeholder={tx('e.g. Strict 10-hour fasting. Medication adjustments. Additional pathology charged separately.')}
                   value={pkgPreparation}
                   onChange={e => setPkgPreparation(e.target.value)}
                   className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -1111,7 +1113,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   disabled={pkgSubmitting}
                   className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white border border-[color:var(--t-700)] cursor-pointer disabled:opacity-50"
                 >
-                  {pkgSubmitting ? 'Saving Package…' : editingPackageId ? 'Update Package' : 'Publish Package'}
+                  {pkgSubmitting ? 'Saving Package…' : editingPackageId ? tx('Update Package') : tx('Publish Package')}
                 </button>
               </div>
             </form>
@@ -1128,10 +1130,10 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
                 <h3 className="text-base font-black text-slate-900">
-                  {editingPromoId ? 'Edit Promotion Campaign' : 'Create Promotion Campaign'}
+                  {editingPromoId ? tx('Edit Promotion Campaign') : tx('Create Promotion Campaign')}
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Issue promo codes, percentage discounts, or fixed Malaysian Ringgit rebates.
+                  {tx('Issue promo codes, percentage discounts, or fixed Malaysian Ringgit rebates.')}
                 </p>
               </div>
               <button
@@ -1152,7 +1154,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   <input
                     type="text"
                     required
-                    placeholder="e.g. CAREMERDEKA"
+                    placeholder={tx('e.g. CAREMERDEKA')}
                     value={promoCode}
                     onChange={e => setPromoCode(e.target.value.toUpperCase())}
                     className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none font-mono font-bold focus:outline-none focus:border-[color:var(--t-600)] uppercase"
@@ -1161,11 +1163,11 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
                 <div className="space-y-1">
                   <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                    Badge Highlight
+                    {tx('Badge Highlight')}
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. 20% OFF National Special"
+                    placeholder={tx('e.g. 20% OFF National Special')}
                     value={promoBadge}
                     onChange={e => setPromoBadge(e.target.value)}
                     className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -1180,7 +1182,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Merdeka National Wellness Special 2026"
+                  placeholder={tx('e.g. Merdeka National Wellness Special 2026')}
                   value={promoTitle}
                   onChange={e => setPromoTitle(e.target.value)}
                   className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -1197,8 +1199,8 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     onChange={e => setPromoType(e.target.value as any)}
                     className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                   >
-                    <option value="percentage">Percentage (%) Discount</option>
-                    <option value="fixed">Fixed Amount (RM) Rebate</option>
+                    <option value="percentage">{tx('Percentage (%) Discount')}</option>
+                    <option value="fixed">{tx('Fixed Amount (RM) Rebate')}</option>
                   </select>
                 </div>
 
@@ -1220,14 +1222,14 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="space-y-1">
                 <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                  Applicable Package
+                  {tx('Applicable Package')}
                 </label>
                 <select
                   value={promoPkgId}
                   onChange={e => setPromoPkgId(e.target.value)}
                   className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
                 >
-                  <option value="">All Facility Packages (Universal Promo)</option>
+                  <option value="">{tx('All Facility Packages (Universal Promo)')}</option>
                   {packages.map(p => (
                     <option key={p.id} value={p.id}>
                       {p.code} - {p.title}
@@ -1239,7 +1241,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                    Valid From
+                    {tx('Valid From')}
                   </label>
                   <input
                     type="date"
@@ -1265,11 +1267,11 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="space-y-1">
                 <label className="text-xs font-extrabold uppercase text-slate-700 block">
-                  Campaign Description & Terms
+                  {tx('Campaign Description & Terms')}
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="Terms and conditions, eligible age groups, or resident requirements."
+                  placeholder={tx('Terms and conditions, eligible age groups, or resident requirements.')}
                   value={promoDesc}
                   onChange={e => setPromoDesc(e.target.value)}
                   className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -1289,7 +1291,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   disabled={promoSubmitting}
                   className="px-4 py-2 text-xs font-black uppercase tracking-wider bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white cursor-pointer disabled:opacity-50 shadow-xs"
                 >
-                  {promoSubmitting ? 'Saving Promo…' : editingPromoId ? 'Update Promotion' : 'Publish Promotion'}
+                  {promoSubmitting ? 'Saving Promo…' : editingPromoId ? tx('Update Promotion') : tx('Publish Promotion')}
                 </button>
               </div>
             </form>
@@ -1306,7 +1308,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             {/* Invoice Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-200">
               <div>
-                <span className="text-xs font-mono font-bold uppercase text-slate-400">Institutional Facilitator Invoice</span>
+                <span className="text-xs font-mono font-bold uppercase text-slate-400">{tx('Institutional Facilitator Invoice')}</span>
                 <h3 className="text-lg font-black text-slate-900 mt-0.5">
                   Invoice {selectedInvoice.commissionInvoiceNo || 'DRAFT'}
                 </h3>
@@ -1323,22 +1325,22 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             {/* Invoice Meta Grid */}
             <div className="grid grid-cols-2 gap-4 text-xs bg-slate-50 p-4 border border-slate-200">
               <div>
-                <span className="text-xs text-slate-400 font-bold uppercase block">Billed Hospital Facility</span>
-                <strong className="text-slate-900">{facility?.name || 'Accredited Healthcare Facility'}</strong>
-                <span className="text-xs text-slate-500 block">Licence: {facility?.licenceNo || 'Act 586 Verified'}</span>
+                <span className="text-xs text-slate-400 font-bold uppercase block">{tx('Billed Hospital Facility')}</span>
+                <strong className="text-slate-900">{facility?.name || tx('Accredited Healthcare Facility')}</strong>
+                <span className="text-xs text-slate-500 block">Licence: {facility?.licenceNo || tx('Act 586 Verified')}</span>
               </div>
               <div>
-                <span className="text-xs text-slate-400 font-bold uppercase block">Facilitator / Billing Entity</span>
-                <strong className="text-slate-900">CareVerified Healthcare Network</strong>
-                <span className="text-xs text-slate-500 block">Kuala Lumpur, Malaysia · Act 586 Compliant</span>
+                <span className="text-xs text-slate-400 font-bold uppercase block">{tx('Facilitator / Billing Entity')}</span>
+                <strong className="text-slate-900">{tx('CareVerified Healthcare Network')}</strong>
+                <span className="text-xs text-slate-500 block">{tx('Kuala Lumpur, Malaysia · Act 586 Compliant')}</span>
               </div>
               <div>
-                <span className="text-xs text-slate-400 font-bold uppercase block">Admitted Referral Patient</span>
+                <span className="text-xs text-slate-400 font-bold uppercase block">{tx('Admitted Referral Patient')}</span>
                 <strong className="text-slate-900">{selectedInvoice.patient}</strong>
                 <span className="text-xs text-slate-500 block">Origin: {selectedInvoice.country}</span>
               </div>
               <div>
-                <span className="text-xs text-slate-400 font-bold uppercase block">Invoiced / Discharge Date</span>
+                <span className="text-xs text-slate-400 font-bold uppercase block">{tx('Invoiced / Discharge Date')}</span>
                 <strong className="text-slate-900">
                   {selectedInvoice.commissionInvoicedAt ? new Date(selectedInvoice.commissionInvoicedAt).toLocaleDateString('en-MY') : new Date().toLocaleDateString('en-MY')}
                 </strong>
@@ -1353,13 +1355,13 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             {/* Financial Line Items */}
             <div className="border border-slate-200 divide-y divide-slate-100 text-xs">
               <div className="p-3 bg-slate-100 font-bold text-slate-700 flex justify-between">
-                <span>Description</span>
-                <span>Amount (MYR)</span>
+                <span>{tx('Description')}</span>
+                <span>{tx('Amount (MYR)')}</span>
               </div>
               <div className="p-3 flex justify-between text-slate-800">
                 <div>
-                  <div className="font-bold">Total Patient Treatment Billing</div>
-                  <div className="text-xs text-slate-500">{selectedInvoice.specialty || 'Clinical Treatment Package'}</div>
+                  <div className="font-bold">{tx('Total Patient Treatment Billing')}</div>
+                  <div className="text-xs text-slate-500">{selectedInvoice.specialty || tx('Clinical Treatment Package')}</div>
                 </div>
                 <div className="font-mono font-bold tabular-nums">
                   RM {selectedInvoice.finalQuotationMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
@@ -1367,21 +1369,21 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
               <div className="p-3 flex justify-between text-emerald-900 bg-emerald-50/50">
                 <div>
-                  <div className="font-black">Institutional Facilitator Success Fee (8.0%)</div>
-                  <div className="text-xs text-emerald-700">Non-doctor splitting institutional coordination fee</div>
+                  <div className="font-black">{tx('Institutional Facilitator Success Fee (8.0%)')}</div>
+                  <div className="text-xs text-emerald-700">{tx('Non-doctor splitting institutional coordination fee')}</div>
                 </div>
                 <div className="font-mono font-black tabular-nums">
                   RM {selectedInvoice.referralCommissionMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
                 </div>
               </div>
               <div className="p-3 flex justify-between text-slate-600">
-                <span>Malaysian Service Tax (SST 8.0%)</span>
+                <span>{tx('Malaysian Service Tax (SST 8.0%)')}</span>
                 <span className="font-mono tabular-nums">
                   RM {(selectedInvoice.referralCommissionMyr * 0.08).toLocaleString('en-MY', { minimumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="p-3 flex justify-between text-base font-black text-slate-900 bg-slate-50">
-                <span>Total Payable Facilitator Invoice:</span>
+                <span>{tx('Total Payable Facilitator Invoice:')}</span>
                 <span className="font-mono tabular-nums text-[color:var(--t-700)]">
                   RM {(selectedInvoice.referralCommissionMyr * 1.08).toLocaleString('en-MY', { minimumFractionDigits: 2 })}
                 </span>
@@ -1390,10 +1392,10 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
             {/* Remittance & Compliance */}
             <div className="p-3 bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
-              <strong className="text-slate-800 block">Bank Remittance & Regulatory Assurance:</strong>
-              <div>Bank: Maybank Berhad · Acc No: 5140-8891-2300 · Acc Name: CareVerified Network Sdn Bhd</div>
+              <strong className="text-slate-800 block">{tx('Bank Remittance & Regulatory Assurance:')}</strong>
+              <div>{tx('Bank: Maybank Berhad · Acc No: 5140-8891-2300 · Acc Name: CareVerified Network Sdn Bhd')}</div>
               <div className="text-xs text-slate-500 pt-1">
-                Issued in full compliance with Malaysian Medical Council (MMC) Guidelines on Medical Tourism & Referrals.
+                {tx('Issued in full compliance with Malaysian Medical Council (MMC) Guidelines on Medical Tourism & Referrals.')}
               </div>
             </div>
 
@@ -1405,7 +1407,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 className="px-4 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 text-slate-800 cursor-pointer flex items-center gap-1.5"
               >
                 <Printer className="h-4 w-4" />
-                Print Invoice
+                {tx('Print Invoice')}
               </button>
               <button
                 type="button"
