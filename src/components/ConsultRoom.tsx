@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useTr } from '../locale';
 import { 
   PhoneOff, Send, Video, VideoOff, Mic, MicOff, Stethoscope, ShieldCheck,
   Columns, Maximize2, MessageSquare, Clock, AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Radio
@@ -19,6 +20,7 @@ const jpost = (url: string, body?: unknown) =>
 
 /** Live consultation: text chat for everyone, plus peer-to-peer video when the consult is a video one. */
 export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, onNavigateToPrescriptions }: Props) {
+  const tx = useTr();
   const [consult, setConsult] = useState<any>(null);
   const [messages, setMessages] = useState<{ id: number; senderUserId: string; text: string; ts: string }[]>([]);
   const [text, setText] = useState('');
@@ -103,7 +105,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
     if (!t) return;
     setText('');
     const d = await jpost(`/api/consults/${consultId}/messages`, { text: t });
-    if (d.status !== 'success') setError(d.message || 'Message not sent.');
+    if (d.status !== 'success') setError(d.message || tx('Message not sent.'));
   };
 
   // ---- WebRTC ----
@@ -161,7 +163,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
       await sendSignal('offer', peer.localDescription);
     } catch (e: any) {
       setVideoState('failed');
-      setError(e?.name === 'NotAllowedError' ? 'Camera or microphone permission was denied.' : 'Could not start video.');
+      setError(e?.name === 'NotAllowedError' ? tx('Camera or microphone permission was denied.') : tx('Could not start video.'));
     }
   };
 
@@ -178,7 +180,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
           setVideoState(v => (v === 'idle' ? 'connecting' : v));
           try { await handleSignal(s); } catch (e: any) {
             setVideoState('failed');
-            setError(e?.name === 'NotAllowedError' ? 'Camera or microphone permission was denied.' : 'Video connection error.');
+            setError(e?.name === 'NotAllowedError' ? tx('Camera or microphone permission was denied.') : tx('Video connection error.'));
           }
         }
       } catch { /* retry */ }
@@ -194,7 +196,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
   };
 
   const end = async () => {
-    if (!window.confirm(isDoctor ? 'End this consultation for both of you?' : 'End this consultation?')) return;
+    if (!window.confirm(isDoctor ? tx('End this consultation for both of you?') : tx('End this consultation?'))) return;
     if (isVideo) sendSignal('hangup', null);
     teardown();
     await jpost(`/api/consults/${consultId}/end`);
@@ -230,7 +232,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
     );
   }
 
-  if (!consult) return <p className="text-xs text-slate-600 p-6">Connecting to your consultation…</p>;
+  if (!consult) return <p className="text-xs text-slate-600 p-6">{tx('Connecting to your consultation…')}</p>;
 
   const other = isDoctor ? `${consult.patientName ?? 'Patient'}` : consult.professional?.name ?? 'Doctor';
 
@@ -239,7 +241,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
   // =========================================================================
   if (isDoctor) {
     return (
-      <section className="bg-slate-50 border border-[color:var(--t-200)] shadow-xs rounded-none" aria-label="Clinician Consultation HUD">
+      <section className="bg-slate-50 border border-[color:var(--t-200)] shadow-xs rounded-none" aria-label={tx('Clinician Consultation HUD')}>
         {/* Clinician HUD Master Header */}
         <header className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 bg-white border-b border-slate-200">
           <div className="flex items-center gap-3 flex-wrap">
@@ -249,7 +251,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-extrabold text-slate-900 leading-tight">
-                  Consultation HUD · {other}
+                  {tx('Consultation HUD')} · {other}
                 </h2>
                 {isVideo && (
                   <span
@@ -265,7 +267,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                     }`}
                   >
                     <ShieldCheck className="h-3 w-3" />
-                    {videoState === 'connected' ? 'P2P Encrypted · Live' : videoState === 'connecting' ? 'Connecting Video…' : videoState === 'failed' ? 'Connection Error' : 'Standby'}
+                    {videoState === 'connected' ? tx('P2P Encrypted · Live') : videoState === 'connecting' ? tx('Connecting Video…') : videoState === 'failed' ? tx('Connection Error') : tx('Standby')}
                   </span>
                 )}
               </div>
@@ -290,10 +292,10 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                 className={`px-2.5 py-1 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
                   hudMode === 'split' ? 'bg-white text-[color:var(--t-700)] shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
-                title="Split HUD (Video & Charting side-by-side)"
+                title={tx('Split HUD (Video & Charting side-by-side)')}
               >
                 <Columns className="h-3.5 w-3.5" />
-                <span>Split HUD</span>
+                <span>{tx('Split HUD')}</span>
               </button>
               <button
                 type="button"
@@ -301,10 +303,10 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                 className={`px-2.5 py-1 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
                   hudMode === 'video-focus' ? 'bg-white text-[color:var(--t-700)] shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
-                title="Video Focus (Expanded video)"
+                title={tx('Video Focus (Expanded video)')}
               >
                 <Maximize2 className="h-3.5 w-3.5" />
-                <span>Video Focus</span>
+                <span>{tx('Video Focus')}</span>
               </button>
             </div>
 
@@ -314,7 +316,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
               className="inline-flex items-center gap-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold px-3.5 py-2 cursor-pointer transition-colors shadow-xs rounded-none"
             >
               <PhoneOff className="h-3.5 w-3.5" />
-              <span>End & Finalize</span>
+              <span>{tx('End & Finalize')}</span>
             </button>
           </div>
         </header>
@@ -333,15 +335,15 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 text-white text-xs font-semibold text-center p-4 bg-slate-950/90">
                       {videoState === 'idle' && (
                         <button onClick={startVideo} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white px-4 py-2 font-extrabold cursor-pointer rounded-none">
-                          Start Video Call
+                          {tx('Start Video Call')}
                         </button>
                       )}
-                      {videoState === 'connecting' && <span className="bg-amber-900/80 border border-amber-500/50 px-3 py-1.5 text-amber-200">Connecting encrypted video…</span>}
+                      {videoState === 'connecting' && <span className="bg-amber-900/80 border border-amber-500/50 px-3 py-1.5 text-amber-200">{tx('Connecting encrypted video…')}</span>}
                       {videoState === 'failed' && (
                         <div className="bg-rose-950/90 border border-rose-500 p-3 space-y-2 max-w-xs">
-                          <p className="text-rose-200 font-bold">Video connection interrupted.</p>
+                          <p className="text-rose-200 font-bold">{tx('Video connection interrupted.')}</p>
                           <button onClick={startVideo} className="bg-rose-700 hover:bg-rose-600 text-white px-3 py-1 font-bold text-xs cursor-pointer rounded-none">
-                            Retry Call Setup
+                            {tx('Retry Call Setup')}
                           </button>
                         </div>
                       )}
@@ -354,25 +356,25 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                         type="button"
                         onClick={() => toggle('audio')}
                         aria-pressed={micOn}
-                        aria-label={micOn ? 'Mute microphone' : 'Unmute microphone'}
+                        aria-label={micOn ? tx('Mute microphone') : tx('Unmute microphone')}
                         className={`h-8 px-2.5 flex items-center gap-1 text-xs font-bold rounded-none cursor-pointer transition-colors ${
                           micOn ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-rose-600 text-white hover:bg-rose-700'
                         }`}
                       >
                         {micOn ? <Mic className="h-3.5 w-3.5 text-emerald-400" /> : <MicOff className="h-3.5 w-3.5 text-white" />}
-                        <span>{micOn ? 'Mute' : 'Muted'}</span>
+                        <span>{micOn ? tx('Mute') : tx('Muted')}</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => toggle('video')}
                         aria-pressed={camOn}
-                        aria-label={camOn ? 'Turn off camera' : 'Turn on camera'}
+                        aria-label={camOn ? tx('Turn off camera') : tx('Turn on camera')}
                         className={`h-8 px-2.5 flex items-center gap-1 text-xs font-bold rounded-none cursor-pointer transition-colors ${
                           camOn ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-rose-600 text-white hover:bg-rose-700'
                         }`}
                       >
                         {camOn ? <Video className="h-3.5 w-3.5 text-emerald-400" /> : <VideoOff className="h-3.5 w-3.5 text-white" />}
-                        <span>{camOn ? 'Stop Cam' : 'Cam Off'}</span>
+                        <span>{camOn ? tx('Stop Cam') : tx('Cam Off')}</span>
                       </button>
                     </div>
                   )}
@@ -382,20 +384,20 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
               {/* Triage Telemetry & Intake Info */}
               <div className="bg-white border border-slate-200 p-3.5 shadow-xs space-y-2 text-xs">
                 <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
-                  <span className="font-extrabold uppercase tracking-wider text-xs text-slate-500">Patient Triage Intake</span>
+                  <span className="font-extrabold uppercase tracking-wider text-xs text-slate-500">{tx('Patient Triage Intake')}</span>
                   {consult.redFlags && consult.redFlags.length > 0 ? (
                     <span className="inline-flex items-center gap-1 text-2xs font-bold text-rose-800 bg-rose-50 border border-rose-300 px-2 py-0.5">
-                      <AlertTriangle className="h-3 w-3 text-rose-600" /> Red Flags ({consult.redFlags.length})
+                      <AlertTriangle className="h-3 w-3 text-rose-600" /> {tx('Red Flags ({n})', { n: consult.redFlags.length })}
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 text-2xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
-                      <CheckCircle2 className="h-3 w-3 text-emerald-600" /> No Urgent Red Flags
+                      <CheckCircle2 className="h-3 w-3 text-emerald-600" /> {tx('No Urgent Red Flags')}
                     </span>
                   )}
                 </div>
 
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-0.5">Reported Symptoms</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-0.5">{tx('Reported Symptoms')}</p>
                   <p className="text-slate-800 font-medium bg-slate-50 border border-slate-100 p-2 text-xs leading-relaxed max-h-20 overflow-y-auto">
                     {consult.symptoms}
                   </p>
@@ -403,12 +405,12 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
 
                 <div className="grid grid-cols-2 gap-2 text-xs pt-1">
                   <div className="bg-slate-50 p-2 border border-slate-100">
-                    <p className="text-xs uppercase font-bold text-slate-500">Jurisdiction</p>
-                    <p className="font-semibold text-slate-800">{consult.patientCountry === 'MY' || !consult.patientCountry ? 'Malaysia (Domestic)' : `${consult.patientCountry} (Cross-Border)`}</p>
+                    <p className="text-xs uppercase font-bold text-slate-500">{tx('Jurisdiction')}</p>
+                    <p className="font-semibold text-slate-800">{consult.patientCountry === 'MY' || !consult.patientCountry ? tx('Malaysia (Domestic)') : `${consult.patientCountry} (${tx('Cross-Border')})`}</p>
                   </div>
                   <div className="bg-slate-50 p-2 border border-slate-100">
-                    <p className="text-xs uppercase font-bold text-slate-500">Health Record</p>
-                    <p className="font-semibold text-slate-800">{consult.shareRecord ? 'Consent Active (30d)' : 'Not Shared'}</p>
+                    <p className="text-xs uppercase font-bold text-slate-500">{tx('Health Record')}</p>
+                    <p className="font-semibold text-slate-800">{consult.shareRecord ? tx('Consent Active (30d)') : tx('Not Shared')}</p>
                   </div>
                 </div>
               </div>
@@ -422,7 +424,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                 >
                   <span className="flex items-center gap-2">
                     <MessageSquare className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                    <span>In-Call Patient Chat</span>
+                    <span>{tx('In-Call Patient Chat')}</span>
                     <span className="px-1.5 py-0.2 bg-slate-100 text-slate-700 text-2xs font-mono font-bold">
                       {messages.length}
                     </span>
@@ -434,7 +436,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                   <div className="flex flex-col h-60 border-t border-slate-100">
                     <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-[color:var(--t-bg)] text-xs">
                       {messages.length === 0 && (
-                        <p className="text-xs text-slate-400 italic text-center py-4">No chat messages yet during this call.</p>
+                        <p className="text-xs text-slate-400 italic text-center py-4">{tx('No chat messages yet during this call.')}</p>
                       )}
                       {messages.map(m => (
                         <div key={m.id} className={`max-w-[85%] text-xs px-2.5 py-1.5 ${m.senderUserId === myUserId ? 'ml-auto bg-[color:var(--t-600)] text-white' : 'bg-white border border-slate-200 text-slate-800'}`}>
@@ -445,9 +447,9 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                     </div>
                     {error && <p className="text-xs font-bold text-rose-700 px-3 py-1 bg-rose-50">{error}</p>}
                     <form onSubmit={send} className="flex gap-1.5 p-2 border-t border-slate-100 bg-white">
-                      <input value={text} onChange={e => setText(e.target.value)} maxLength={2000} placeholder="Type a message…"
-                        className="flex-1 border border-slate-200 px-2.5 py-1.5 text-xs focus:outline-none focus:border-[color:var(--t-600)]" aria-label="Message" />
-                      <button className="bg-[color:var(--t-600)] text-white px-3 cursor-pointer" aria-label="Send"><Send className="h-3.5 w-3.5" /></button>
+                      <input value={text} onChange={e => setText(e.target.value)} maxLength={2000} placeholder={tx('Type a message…')}
+                        className="flex-1 border border-slate-200 px-2.5 py-1.5 text-xs focus:outline-none focus:border-[color:var(--t-600)]" aria-label={tx('Message')} />
+                      <button className="bg-[color:var(--t-600)] text-white px-3 cursor-pointer" aria-label={tx('Send')}><Send className="h-3.5 w-3.5" /></button>
                     </form>
                   </div>
                 )}
@@ -460,11 +462,11 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                 <div className="flex items-center gap-2">
                   <Stethoscope className="h-4 w-4 text-[color:var(--t-600)]" />
                   <h3 className="text-sm font-black uppercase tracking-wider text-slate-700">
-                    Clinician Charting & Prescription Cockpit
+                    {tx('Clinician Charting & Prescription Cockpit')}
                   </h3>
                 </div>
                 <span className="text-xs font-bold text-slate-500">
-                  SOAP Notes · e-Prescribe · MCs · Labs
+                  {tx('SOAP Notes · e-Prescribe · MCs · Labs')}
                 </span>
               </div>
               <ClinicalWorkspace kind="consult" refId={consultId} />
@@ -483,25 +485,25 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                     type="button"
                     onClick={() => toggle('audio')}
                     aria-pressed={micOn}
-                    aria-label={micOn ? 'Mute microphone' : 'Unmute microphone'}
+                    aria-label={micOn ? tx('Mute microphone') : tx('Unmute microphone')}
                     className={`h-9 px-3 flex items-center gap-1.5 text-xs font-bold rounded-none cursor-pointer transition-colors ${
                       micOn ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-rose-600 text-white hover:bg-rose-700'
                     }`}
                   >
                     {micOn ? <Mic className="h-4 w-4 text-emerald-400" /> : <MicOff className="h-4 w-4 text-white" />}
-                    <span>{micOn ? 'Mute' : 'Muted'}</span>
+                    <span>{micOn ? tx('Mute') : tx('Muted')}</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => toggle('video')}
                     aria-pressed={camOn}
-                    aria-label={camOn ? 'Turn off camera' : 'Turn on camera'}
+                    aria-label={camOn ? tx('Turn off camera') : tx('Turn on camera')}
                     className={`h-9 px-3 flex items-center gap-1.5 text-xs font-bold rounded-none cursor-pointer transition-colors ${
                       camOn ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-rose-600 text-white hover:bg-rose-700'
                     }`}
                   >
                     {camOn ? <Video className="h-4 w-4 text-emerald-400" /> : <VideoOff className="h-4 w-4 text-white" />}
-                    <span>{camOn ? 'Stop Cam' : 'Cam Off'}</span>
+                    <span>{camOn ? tx('Stop Cam') : tx('Cam Off')}</span>
                   </button>
                 </div>
               )}
@@ -523,11 +525,11 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
   // Patient View: Focused Video & Chat Interface
   // =========================================================================
   return (
-    <section className="bg-white border border-[color:var(--t-200)] shadow-xs rounded-none" aria-label="Consultation room">
+    <section className="bg-white border border-[color:var(--t-200)] shadow-xs rounded-none" aria-label={tx('Consultation room')}>
       <header className="flex items-center justify-between gap-3 px-5 py-3 border-b border-slate-100">
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-xs font-extrabold text-slate-900">Consultation with {other}</p>
+            <p className="text-xs font-extrabold text-slate-900">{tx('Consultation with {name}', { name: other })}</p>
             {isVideo && (
               <span
                 role="status"
@@ -542,14 +544,14 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                 }`}
               >
                 <ShieldCheck className="h-3 w-3" />
-                {videoState === 'connected' ? 'P2P Encrypted · Live' : videoState === 'connecting' ? 'Connecting Video…' : videoState === 'failed' ? 'Connection Error' : 'Standby'}
+                {videoState === 'connected' ? tx('P2P Encrypted · Live') : videoState === 'connecting' ? tx('Connecting Video…') : videoState === 'failed' ? tx('Connection Error') : tx('Standby')}
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">{isVideo ? 'Encrypted Video Consult' : 'Encrypted Text Chat'} · started {consult.acceptedAt ? new Date(consult.acceptedAt).toLocaleTimeString() : ''}</p>
+          <p className="text-xs text-slate-500 mt-0.5">{isVideo ? tx('Encrypted Video Consult') : tx('Encrypted Text Chat')} · {tx('started {time}', { time: consult.acceptedAt ? new Date(consult.acceptedAt).toLocaleTimeString() : '' })}</p>
         </div>
         <button onClick={end} className="inline-flex items-center gap-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold px-4 py-2 cursor-pointer rounded-none">
-          <PhoneOff className="h-4 w-4" /> End
+          <PhoneOff className="h-4 w-4" /> {tx('End')}
         </button>
       </header>
 
@@ -560,11 +562,11 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
             <video ref={localVideo} autoPlay playsInline muted className="absolute bottom-3 right-3 w-28 h-20 object-cover border-2 border-white/70 bg-black" />
             {videoState !== 'connected' && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-white text-xs font-semibold text-center p-4">
-                {videoState === 'idle' && <span>Waiting for the doctor to start the video call. You can chat in the meantime.</span>}
-                {videoState === 'connecting' && <span className="bg-amber-900/80 border border-amber-500/50 px-3 py-1.5 text-amber-200">Connecting encrypted video…</span>}
+                {videoState === 'idle' && <span>{tx('Waiting for the doctor to start the video call. You can chat in the meantime.')}</span>}
+                {videoState === 'connecting' && <span className="bg-amber-900/80 border border-amber-500/50 px-3 py-1.5 text-amber-200">{tx('Connecting encrypted video…')}</span>}
                 {videoState === 'failed' && (
                   <div className="bg-rose-950/90 border border-rose-500 p-3 space-y-2 max-w-xs">
-                    <p className="text-rose-200 font-bold">Video could not connect. Use the chat, or reconnect.</p>
+                    <p className="text-rose-200 font-bold">{tx('Video could not connect. Use the chat, or reconnect.')}</p>
                   </div>
                 )}
               </div>
@@ -575,25 +577,25 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                   type="button"
                   onClick={() => toggle('audio')}
                   aria-pressed={micOn}
-                  aria-label={micOn ? 'Mute microphone' : 'Unmute microphone'}
+                  aria-label={micOn ? tx('Mute microphone') : tx('Unmute microphone')}
                   className={`h-9 px-3 flex items-center gap-1.5 text-xs font-bold rounded-none cursor-pointer transition-colors ${
                     micOn ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-rose-600 text-white hover:bg-rose-700'
                   }`}
                 >
                   {micOn ? <Mic className="h-4 w-4 text-emerald-400" /> : <MicOff className="h-4 w-4 text-white" />}
-                  <span>{micOn ? 'Mute' : 'Muted'}</span>
+                  <span>{micOn ? tx('Mute') : tx('Muted')}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => toggle('video')}
                   aria-pressed={camOn}
-                  aria-label={camOn ? 'Turn off camera' : 'Turn on camera'}
+                  aria-label={camOn ? tx('Turn off camera') : tx('Turn on camera')}
                   className={`h-9 px-3 flex items-center gap-1.5 text-xs font-bold rounded-none cursor-pointer transition-colors ${
                     camOn ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-rose-600 text-white hover:bg-rose-700'
                   }`}
                 >
                   {camOn ? <Video className="h-4 w-4 text-emerald-400" /> : <VideoOff className="h-4 w-4 text-white" />}
-                  <span>{camOn ? 'Stop Cam' : 'Cam Off'}</span>
+                  <span>{camOn ? tx('Stop Cam') : tx('Cam Off')}</span>
                 </button>
               </div>
             )}
@@ -602,7 +604,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
 
         <div className="flex flex-col h-[420px]">
           <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-[color:var(--t-bg)]">
-            <p className="text-xs text-slate-500 bg-white border border-slate-100 p-2">Reason for consultation: {consult.symptoms}</p>
+            <p className="text-xs text-slate-500 bg-white border border-slate-100 p-2">{tx('Reason for consultation: ')}{consult.symptoms}</p>
             {messages.map(m => (
               <div key={m.id} className={`max-w-[85%] text-xs px-3 py-2 ${m.senderUserId === myUserId ? 'ml-auto bg-[color:var(--t-600)] text-white' : 'bg-white border border-slate-200 text-slate-800'}`}>
                 {m.text}
@@ -612,9 +614,9 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
           </div>
           {error && <p className="text-xs font-bold text-rose-700 px-4 py-2 bg-rose-50">{error}</p>}
           <form onSubmit={send} className="flex gap-2 p-3 border-t border-slate-100">
-            <input value={text} onChange={e => setText(e.target.value)} maxLength={2000} placeholder="Type a message…"
-              className="flex-1 border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:border-[color:var(--t-600)]" aria-label="Message" />
-            <button className="bg-[color:var(--t-600)] text-white px-4 cursor-pointer" aria-label="Send"><Send className="h-4 w-4" /></button>
+            <input value={text} onChange={e => setText(e.target.value)} maxLength={2000} placeholder={tx('Type a message…')}
+              className="flex-1 border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:border-[color:var(--t-600)]" aria-label={tx('Message')} />
+            <button className="bg-[color:var(--t-600)] text-white px-4 cursor-pointer" aria-label={tx('Send')}><Send className="h-4 w-4" /></button>
           </form>
         </div>
       </div>

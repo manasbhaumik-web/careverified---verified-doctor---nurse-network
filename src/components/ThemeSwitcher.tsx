@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Settings, Check } from 'lucide-react';
+import { useTr } from '../locale';
 
 export type ThemeName = 'light-cyan' | 'sky' | 'crimson';
 
@@ -32,6 +33,7 @@ interface Props {
 }
 
 export default function ThemeSwitcher({ className = '', tone = 'light' }: Props) {
+  const tx = useTr();
   const [theme, setTheme] = useState<ThemeName>(readTheme);
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -80,8 +82,8 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
         onClick={() => setOpen(o => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label="Settings: application theme"
-        title="Settings"
+        aria-label={tx('Settings: application theme')}
+        title={tx('Settings')}
         className={`h-11 w-11 flex items-center justify-center border rounded-none transition-colors cursor-pointer ${buttonTone}`}
       >
         <Settings className="h-[18px] w-[18px]" />
@@ -90,9 +92,9 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
       {open && (
         <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white border border-[color:var(--t-200)] shadow-xl text-slate-800 rounded-none overflow-hidden panel-edge">
           <p className="px-3 pt-3 pb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Application theme
+            {tx('Application theme')}
           </p>
-          <ul role="listbox" aria-label="Application theme" className="pb-1.5">
+          <ul role="listbox" aria-label={tx('Application theme')} className="pb-1.5">
             {THEMES.map(t => (
               <li key={t.id} role="option" aria-selected={theme === t.id}>
                 <button
@@ -101,7 +103,7 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
                   className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-left hover:bg-[color:var(--t-50)] cursor-pointer"
                 >
                   <span className="h-4 w-4 rounded-full border-0 shadow-xs shrink-0" style={{ backgroundColor: t.swatch }} />
-                  <span className="flex-1 font-medium">{t.label}</span>
+                  <span className="flex-1 font-medium">{tx(t.label)}</span>
                   {theme === t.id && <Check className="h-4 w-4 text-[color:var(--t-600)]" />}
                 </button>
               </li>

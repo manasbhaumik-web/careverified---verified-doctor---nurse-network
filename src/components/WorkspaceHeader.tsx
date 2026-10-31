@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTr } from '../locale';
 
 export interface WorkspaceHeaderTab<T extends string = string> {
   id: T;
@@ -42,6 +43,7 @@ export default function WorkspaceHeader<T extends string = string>({
   className = '',
   children,
 }: WorkspaceHeaderProps<T>) {
+  const tx = useTr();
   return (
     <div
       className={`bg-white border border-[color:var(--t-200)] border-l-4 border-l-[color:var(--t-600)] p-4 sm:p-5 shadow-2xs ${className}`}
@@ -91,7 +93,7 @@ export default function WorkspaceHeader<T extends string = string>({
         <div className="border-t border-[color:var(--t-100)] pt-3 mt-3.5 flex flex-wrap items-center justify-between gap-2.5">
           <div
             role="tablist"
-            aria-label={tabsLabel || 'Workspace section tabs'}
+            aria-label={tabsLabel || tx('Workspace section tabs')}
             className="flex flex-wrap items-center gap-1.5"
           >
             {tabs.map((tab) => {

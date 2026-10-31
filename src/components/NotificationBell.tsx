@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useTr } from '../locale';
 import { Bell } from 'lucide-react';
 
 interface Item { id: string; ts: string; title: string; body: string; isRead: number }
 
 /** In-app notifications (verification decisions, expiry warnings, complaint updates). */
 export default function NotificationBell() {
+  const tx = useTr();
   const [items, setItems] = useState<Item[]>([]);
   const [open, setOpen] = useState(false);
 
@@ -34,8 +36,8 @@ export default function NotificationBell() {
       <button
         onClick={toggle}
         className="relative h-11 w-11 flex items-center justify-center text-white bg-white/15 border-0 hover:bg-white/25 rounded-none transition-colors cursor-pointer"
-        title="Notifications"
-        aria-label={`Notifications${unread ? `, ${unread} unread` : ''}`}
+        title={tx('Notifications')}
+        aria-label={unread ? tx('Notifications, {n} unread', { n: unread }) : tx('Notifications')}
         aria-expanded={open}
       >
         <Bell className="h-[18px] w-[18px]" />

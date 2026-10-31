@@ -1,3 +1,4 @@
+import { useTr } from '../locale';
 import React, { useState } from 'react';
 import { Activity, Loader, ChevronRight, AlertTriangle, HelpCircle } from 'lucide-react';
 
@@ -7,6 +8,7 @@ interface AISymptomMatcherProps {
 }
 
 export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: AISymptomMatcherProps) {
+  const tx = useTr();
   const [symptoms, setSymptoms] = useState('');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('any');
@@ -80,19 +82,19 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
         </div>
         <div>
           <h3 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)] flex items-center gap-1.5">
-            Symptom-to-Specialty Triage
+            {tx('Symptom-to-Specialty Triage')}
           </h3>
-          <p className="text-xs text-[color:var(--ink-2)]">Evaluate clinical complaints to find recommended medical specialties</p>
+          <p className="text-xs text-[color:var(--ink-2)]">{tx('Evaluate clinical complaints to find recommended medical specialties')}</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">Describe your symptoms (e.g. chest pressure, rash, migraine):</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">{tx('Describe your symptoms (e.g. chest pressure, rash, migraine):')}</label>
           <textarea
             value={symptoms}
             onChange={(e) => setSymptoms(e.target.value)}
-            placeholder="Describe symptoms... (e.g. A persistent dry cough and light fever since yesterday)"
+            placeholder={tx('Describe symptoms... (e.g. A persistent dry cough and light fever since yesterday)')}
             rows={2}
             className="w-full text-xs border border-[color:var(--t-200)] p-3 bg-[color:var(--t-bg)] focus:bg-white outline-none focus:border-[color:var(--t-600)] font-medium text-[color:var(--ink)] placeholder-slate-400 transition-colors"
             required
@@ -101,7 +103,7 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">Age (Optional)</label>
+            <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">{tx('Age (Optional)')}</label>
             <input
               type="number"
               value={age}
@@ -113,15 +115,15 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
             />
           </div>
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">Gender</label>
+            <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">{tx('Gender')}</label>
             <select
               value={gender}
               onChange={(e) => setGender(e.target.value)}
               className="w-full h-12 text-xs border border-[color:var(--t-200)] px-3 bg-[color:var(--t-bg)] focus:bg-white outline-none focus:border-[color:var(--t-600)] font-semibold text-[color:var(--ink)] cursor-pointer transition-colors"
             >
-              <option value="any">Any Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
+              <option value="any">{tx('Any Gender')}</option>
+              <option value="Male">{tx('Male')}</option>
+              <option value="Female">{tx('Female')}</option>
             </select>
           </div>
         </div>
@@ -134,12 +136,12 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
           {loading ? (
             <>
               <Loader className="h-4 w-4 animate-spin" />
-              Evaluating Symptoms…
+              {tx('Evaluating Symptoms…')}
             </>
           ) : (
             <>
               <Activity className="h-4 w-4" />
-              Evaluate Clinical Symptoms
+              {tx('Evaluate Clinical Symptoms')}
             </>
           )}
         </button>
@@ -154,8 +156,8 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
 
       {result?.emergency && (
         <div role="alert" className="mt-5 bg-rose-50 border-2 border-rose-400 p-4 text-rose-900 space-y-1">
-          <p className="font-black">This may be an emergency: {result.emergency.reasons.join(', ')}.</p>
-          <p className="text-xs font-bold">Call {result.emergency.numbers.map((n: any) => n.number).join(' or ')} now instead of waiting for an appointment.</p>
+          <p className="font-black">{tx('This may be an emergency: {list}.', { list: result.emergency.reasons.join(', ') })}</p>
+          <p className="text-xs font-bold">{tx('Call {numbers} now instead of waiting for an appointment.', { numbers: result.emergency.numbers.map((n: any) => n.number).join(' or ') })}</p>
         </div>
       )}
 
@@ -163,22 +165,22 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
         <div className="mt-5 bg-white border border-[color:var(--t-200)] p-5 shadow-xs space-y-4 animate-fade-in">
           <div className="flex justify-between items-center border-b border-[color:var(--t-100)] pb-3">
             <div>
-              <span className="text-xs font-mono font-bold text-[color:var(--t-700)] uppercase tracking-wider">Suggested Specialty</span>
+              <span className="text-xs font-mono font-bold text-[color:var(--t-700)] uppercase tracking-wider">{tx('Suggested Specialty')}</span>
               <h4 className="text-sm font-extrabold text-[color:var(--ink)]">{result.data.recommendedSpecialty}</h4>
             </div>
             <div className="text-right max-w-[12rem]">
-              <span className="text-xs text-slate-500 block font-medium">Algorithmic matching · Non-diagnostic</span>
+              <span className="text-xs text-slate-500 block font-medium">{tx('Algorithmic matching · Non-diagnostic')}</span>
             </div>
           </div>
 
           <div className="space-y-3 text-xs">
             <div>
-              <span className="font-bold uppercase tracking-wider text-[color:var(--ink)] block mb-1">Clinical Justification:</span>
+              <span className="font-bold uppercase tracking-wider text-[color:var(--ink)] block mb-1">{tx('Clinical Justification:')}</span>
               <p className="text-[color:var(--ink-2)] leading-relaxed bg-[color:var(--t-bg)] p-3 border border-[color:var(--t-200)]">{result.data.clinicalJustification}</p>
             </div>
 
             <div className="flex justify-between items-center p-3 border border-[color:var(--t-200)] bg-[color:var(--t-bg)]">
-              <span className="font-bold text-[color:var(--ink)]">Triage Urgency:</span>
+              <span className="font-bold text-[color:var(--ink)]">{tx('Triage Urgency:')}</span>
               <span className={`px-2.5 py-1 font-mono font-bold text-2xs uppercase tracking-wider ${result.data.symptomSeverity === 'High/Urgent'
                   ? 'bg-rose-50 text-rose-800 border border-rose-200'
                   : result.data.symptomSeverity === 'Medium'
@@ -190,7 +192,7 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
             </div>
 
             <div>
-              <span className="font-bold uppercase tracking-wider text-[color:var(--ink)] block mb-1">Recommended Action:</span>
+              <span className="font-bold uppercase tracking-wider text-[color:var(--ink)] block mb-1">{tx('Recommended Action:')}</span>
               <p className="text-[color:var(--ink-2)] leading-relaxed">{result.data.recommendedAction}</p>
             </div>
           </div>

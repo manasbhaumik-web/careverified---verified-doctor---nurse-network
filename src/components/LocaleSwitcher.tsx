@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Globe, Check } from 'lucide-react';
-import { LANGUAGES, REGIONS, setLocale, useLocale, useT, type RegionCode } from '../locale';
+import { LANGUAGES, REGIONS, setLocale, useLocale, useT, useTr, type RegionCode } from '../locale';
 
 interface Props {
   className?: string;
@@ -11,6 +11,7 @@ interface Props {
 export default function LocaleSwitcher({ className = '', tone = 'light' }: Props) {
   const { lang, region } = useLocale();
   const t = useT();
+  const tx = useTr();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -34,8 +35,8 @@ export default function LocaleSwitcher({ className = '', tone = 'light' }: Props
         onClick={() => setOpen(o => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label="Language and region"
-        title="Switch language or audience region (Malaysia / International)"
+        aria-label={tx('Language and region')}
+        title={tx('Switch language or audience region (Malaysia / International)')}
         className={`h-11 px-3 flex items-center gap-1.5 border rounded-none transition-colors cursor-pointer text-xs font-extrabold uppercase tracking-wider ${buttonTone}`}
       >
         <Globe className="h-4 w-4 shrink-0" />

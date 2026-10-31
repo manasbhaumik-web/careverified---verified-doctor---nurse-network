@@ -24,7 +24,7 @@ import NotificationBell from './components/NotificationBell';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import OnCallChip from './components/OnCallChip';
 import LocaleSwitcher from './components/LocaleSwitcher';
-import { useLocale } from './locale';
+import { useLocale, useTr } from './locale';
 import SOSButton from './components/SOSButton';
 import SupportDesk from './components/SupportDesk';
 import PractitionerQuality from './components/PractitionerQuality';
@@ -81,6 +81,7 @@ export default function App() {
   const route = useLocation();
   // Emails to a signed-in person are sent in the language they use in the app
   const { lang: appLang } = useLocale();
+  const tt = useTr();
   useEffect(() => {
     if (currentUser) fetch('/api/me/language', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lang: appLang }) }).catch(() => {});
   }, [currentUser?.id, appLang]);
@@ -506,7 +507,7 @@ export default function App() {
       {notice && (
         <div role="status" className="fixed top-[calc(0.75rem+env(safe-area-inset-top))] left-3 right-3 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[120] bg-slate-900 text-white text-xs font-semibold px-4 sm:px-5 py-3 shadow-lg flex items-center justify-between sm:justify-start gap-4">
           {notice}
-          <button onClick={() => setNotice(null)} className="underline text-xs cursor-pointer">Dismiss</button>
+          <button onClick={() => setNotice(null)} className="underline text-xs cursor-pointer">{tt('Dismiss')}</button>
         </div>
       )}
 
@@ -534,7 +535,7 @@ export default function App() {
                 MedCred<span className="text-white/80">.</span>
               </span>
               <span className="text-xs font-mono font-bold text-white/90 uppercase tracking-[0.14em] block mt-1">
-                {currentUser.role === 'admin' ? 'Board Console' : currentUser.role === 'practitioner' ? 'Practitioner Hub' : currentUser.role === 'pharmacy' ? 'Pharmacy Workspace' : 'Member Portal'}
+                {currentUser.role === 'admin' ? tt('Board Console') : currentUser.role === 'practitioner' ? tt('Practitioner Hub') : currentUser.role === 'pharmacy' ? tt('Pharmacy Workspace') : tt('Member Portal')}
               </span>
             </div>
           </div>
@@ -544,7 +545,7 @@ export default function App() {
             <div className="flex items-center gap-2 bg-white/15 border-0 shadow-none px-3 py-1.5 rounded-none text-xs font-bold text-white">
               <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true"></span>
               <ShieldCheck className="h-3.5 w-3.5 text-white" aria-hidden="true" />
-              <span>Council-Verified Network (Act 586)</span>
+              <span>{tt('Council-Verified Network (Act 586)')}</span>
             </div>
 
             <LocaleSwitcher tone="onColor" />
@@ -564,14 +565,14 @@ export default function App() {
                 <div className="text-left hidden xl:block leading-tight">
                   <p className="text-xs font-black text-white leading-none truncate max-w-[140px]">{currentUser.name}</p>
                   <p className="text-xs text-white/80 font-bold uppercase tracking-wider mt-0.5">
-                    {currentUser.role === 'admin' ? 'Board Admin' : currentUser.role === 'practitioner' ? 'Practitioner' : currentUser.role === 'pharmacy' ? 'Pharmacy' : 'Member'}
+                    {currentUser.role === 'admin' ? tt('Board Admin') : currentUser.role === 'practitioner' ? tt('Practitioner') : currentUser.role === 'pharmacy' ? tt('Pharmacy') : tt('Member')}
                   </p>
                 </div>
                 <button
                   onClick={handleLogout}
                   className="h-7 w-7 text-white/80 hover:text-white hover:bg-white/20 bg-transparent border-0 rounded-none transition-colors cursor-pointer ml-1 flex items-center justify-center"
-                  title="Close Session"
-                  aria-label="Close session"
+                  title={tt('Close Session')}
+                  aria-label={tt('Close session')}
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -586,7 +587,7 @@ export default function App() {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="min-h-11 min-w-11 flex items-center justify-center rounded-none border border-transparent text-white hover:bg-white/15 cursor-pointer"
-              aria-label="Toggle navigation"
+              aria-label={tt('Toggle navigation')}
               aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -621,32 +622,32 @@ export default function App() {
                     >
                       <div className="flex items-center gap-3">
                         <Icon className={`h-5 w-5 shrink-0 ${isActive ? 'text-white' : 'text-[color:var(--t-600)]'}`} />
-                        <span>{item.name}</span>
+                        <span>{tt(item.name)}</span>
                       </div>
 
                       {item.id === 'patient_care' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          Live Care
+                          {tt('Live Care')}
                         </span>
                       )}
                       {item.id === 'patient_records' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          EHR
+                          {tt('EHR')}
                         </span>
                       )}
                       {item.id === 'patient_services' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          Packages
+                          {tt('Packages')}
                         </span>
                       )}
                       {item.id === 'facility_staffing' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          Shifts
+                          {tt('Shifts')}
                         </span>
                       )}
                       {item.id === 'pharmacy_dispensing' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          Rx Live
+                          {tt('Rx Live')}
                         </span>
                       )}
                       {item.id === 'admin_registry' && (
@@ -686,7 +687,7 @@ export default function App() {
                       )}
                       {item.id === 'articles' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          Library
+                          {tt('Library')}
                         </span>
                       )}
                       {item.id === 'tourism_desk' && (
@@ -718,8 +719,8 @@ export default function App() {
                   <button
                     onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
                     className="p-2 bg-transparent text-[color:var(--t-600)] hover:bg-[color:var(--t-50)] rounded-full border-0 transition-colors cursor-pointer shrink-0"
-                    title="Close Session"
-                    aria-label="Close session"
+                    title={tt('Close Session')}
+                    aria-label={tt('Close session')}
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -753,31 +754,31 @@ export default function App() {
                     }`}
                   >
                     <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-white/70'}`} />
-                    <span>{item.name}</span>
+                    <span>{tt(item.name)}</span>
 
                     {item.id === 'patient_care' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        Live Care
+                        {tt('Live Care')}
                       </span>
                     )}
                     {item.id === 'patient_records' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        EHR
+                        {tt('EHR')}
                       </span>
                     )}
                     {item.id === 'patient_services' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        Packages
+                        {tt('Packages')}
                       </span>
                     )}
                     {item.id === 'facility_staffing' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        Shifts
+                        {tt('Shifts')}
                       </span>
                     )}
                     {item.id === 'pharmacy_dispensing' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        Rx Live
+                        {tt('Rx Live')}
                       </span>
                     )}
                     {item.id === 'admin_registry' && (
@@ -817,7 +818,7 @@ export default function App() {
                     )}
                     {item.id === 'articles' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        Library
+                        {tt('Library')}
                       </span>
                     )}
                     {item.id === 'tourism_desk' && (
@@ -1236,7 +1237,7 @@ export default function App() {
 
 
       {/* Mobile bottom tab bar: the few places used most, plus a menu for the rest */}
-      <nav aria-label="Primary" className="bottom-nav lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-[color:var(--t-200)] shadow-[0_-2px_10px_rgba(15,23,42,0.08)]">
+      <nav aria-label={tt('Primary')} className="bottom-nav lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-[color:var(--t-200)] shadow-[0_-2px_10px_rgba(15,23,42,0.08)]">
         <ul className="grid" style={{ gridTemplateColumns: `repeat(${mobileTabs.length + 1}, minmax(0, 1fr))` }}>
           {mobileTabs.map((item) => {
             const Icon = item.icon;
@@ -1250,7 +1251,7 @@ export default function App() {
                   className={`w-full h-16 flex flex-col items-center justify-center gap-1 text-xs font-bold cursor-pointer ${isActive ? 'text-[color:var(--t-700)]' : 'text-slate-500'}`}
                 >
                   <span className={`h-7 w-12 rounded-full flex items-center justify-center transition-colors ${isActive ? 'bg-[color:var(--t-100)]' : ''}`}><Icon className="h-5 w-5" /></span>
-                  <span className="max-w-full truncate px-1">{SHORT_LABEL[item.id] ?? item.name}</span>
+                  <span className="max-w-full truncate px-1">{tt(SHORT_LABEL[item.id] ?? item.name)}</span>
                 </button>
               </li>
             );
@@ -1263,7 +1264,7 @@ export default function App() {
               className={`w-full h-16 flex flex-col items-center justify-center gap-1 text-xs font-bold cursor-pointer ${mobileMenuOpen ? 'text-[color:var(--t-700)]' : 'text-slate-500'}`}
             >
               <span className={`h-7 w-12 rounded-full flex items-center justify-center ${mobileMenuOpen ? 'bg-[color:var(--t-100)]' : ''}`}>{mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</span>
-              <span>{mobileMenuOpen ? 'Close' : 'More'}</span>
+              <span>{mobileMenuOpen ? tt('Close') : tt('More')}</span>
             </button>
           </li>
         </ul>
