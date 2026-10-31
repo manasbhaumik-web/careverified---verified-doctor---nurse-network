@@ -1,13 +1,14 @@
 import { useLocale } from './store';
 import type { LangCode } from './config';
 import { MEMBER_PHRASES } from './phrases.member';
+import { PRACTITIONER_PHRASES } from './phrases.practitioner';
 
 /** One row per phrase: English text (also the lookup key), Bahasa Malaysia, Simplified Chinese. */
 export type PhraseRow = readonly [en: string, ms: string, zh: string];
 
 const MS = new Map<string, string>();
 const ZH = new Map<string, string>();
-for (const [en, ms, zh] of MEMBER_PHRASES) { MS.set(en, ms); ZH.set(en, zh); }
+for (const [en, ms, zh] of [...MEMBER_PHRASES, ...PRACTITIONER_PHRASES]) { MS.set(en, ms); ZH.set(en, zh); }
 
 type Vars = Record<string, string | number>;
 
@@ -23,3 +24,6 @@ export function useTr() {
   const { lang } = useLocale();
   return (text: string, vars?: Vars) => tr(lang, text, vars);
 }
+
+/** BCP 47 tag for formatting dates and numbers in the chosen language. */
+export const dateLocaleOf = (lang: LangCode) => (lang === 'zh' ? 'zh-CN' : lang === 'ms' ? 'ms-MY' : 'en-MY');

@@ -7,6 +7,7 @@ import {
   X, Send, Check, Calendar, TrendingUp, Eye, LayoutGrid, Wallet, Radio,
   Star, SlidersHorizontal, Globe, ArrowRight
 } from 'lucide-react';
+import { useTr, useLocale, dateLocaleOf } from '../locale';
 import { UserRole, DoctorProfile, NurseProfile, Review, VerificationStatus, Booking, OnCallDispatch } from '../types';
 import PractitionerOverviewTab from './practitioner/PractitionerOverviewTab';
 import PractitionerAccreditationTab from './practitioner/PractitionerAccreditationTab';
@@ -85,6 +86,8 @@ export default function VerificationTerminal({
   activeGroup,
   onOpenHelp,
 }: VerificationTerminalProps) {
+  const tx = useTr();
+  const { lang } = useLocale();
   // Try to match logged in practitioner with an existing registry profile
   const matchedProfile = professionals.find(p => 
     p.name.toLowerCase() === currentUser?.name?.toLowerCase()
@@ -412,6 +415,7 @@ export default function VerificationTerminal({
 
     const currentGroupTabs = PRACTITIONER_GROUPS[currentGroup].tabs.map(tab => ({
       ...tab,
+      label: tx(tab.label),
       count: tab.id === 'bookings' ? upcomingBookingsCount : undefined,
     }));
 
@@ -443,11 +447,11 @@ export default function VerificationTerminal({
           professionals={professionals}
           reviews={reviews}
           bookings={bookings}
-          groupName={PRACTITIONER_GROUPS[currentGroup].name}
+          groupName={tx(PRACTITIONER_GROUPS[currentGroup].name)}
           tabs={currentGroupTabs}
           activeTab={activeDashboardTab}
           onTabChange={setActiveDashboardTab}
-          tabsLabel={`${PRACTITIONER_GROUPS[currentGroup].name} sections`}
+          tabsLabel={tx('{name} sections', { name: tx(PRACTITIONER_GROUPS[currentGroup].name) })}
           onOpenHelp={onOpenHelp}
         />
 
@@ -461,12 +465,12 @@ export default function VerificationTerminal({
                 <h3 className="font-sans text-2xl font-semibold text-slate-900 tracking-tight">
                   {(() => {
                     const hour = new Date().getHours();
-                    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+                    const greeting = hour < 12 ? tx('Good morning') : hour < 18 ? tx('Good afternoon') : tx('Good evening');
                     return `${greeting}, ${matchedProfile.name}.`;
                   })()}
                 </h3>
                 <span className="text-xs font-mono font-semibold text-slate-400 tabular-nums">
-                  {new Date().toLocaleDateString('en-MY', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                  {new Date().toLocaleDateString(dateLocaleOf(lang), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
               </div>
 
@@ -474,17 +478,17 @@ export default function VerificationTerminal({
           <div id="panel-home" role="tabpanel" aria-labelledby="tab-home" tabIndex={0} className="space-y-6 animate-fade-in">
             <WorkspaceHeader
               icon={LayoutGrid}
-              eyebrow="Clinical Practice Command · Active Roster"
-              title="Practitioner Clinical Command & Consultation Summary"
-              description="Real-time clinical queue overview, upcoming patient consultations, emergency dispatches, and key practice metrics."
+              eyebrow={tx('Clinical Practice Command · Active Roster')}
+              title={tx('Practitioner Clinical Command & Consultation Summary')}
+              description={tx('Real-time clinical queue overview, upcoming patient consultations, emergency dispatches, and key practice metrics.')}
               badges={
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <BannerBadge tone={isVerified ? "success" : "brand"}>
                     <ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" />
-                    {isVerified ? "MMC / LJM Active" : "Pending Verification"}
+                    {isVerified ? tx('MMC / LJM Active') : tx('Pending Verification')}
                   </BannerBadge>
                   <BannerBadge tone="brand">
-                    APC {matchedProfile.licenseExpiry ? `Valid to ${matchedProfile.licenseExpiry}` : '2026/2027'}
+                    APC {matchedProfile.licenseExpiry ? tx('Valid to {date}', { date: matchedProfile.licenseExpiry }) : '2026/2027'}
                   </BannerBadge>
                 </div>
               }
@@ -495,7 +499,7 @@ export default function VerificationTerminal({
                   className="px-4 py-2.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5 border border-[color:var(--t-700)]"
                 >
                   <Calendar className="h-3.5 w-3.5" />
-                  <span>Manage Consultation Schedule ({upcomingBookingsCount})</span>
+                  <span>{tx('Manage Consultation Schedule ({n})', { n: upcomingBookingsCount })}</span>
                   <ArrowRight className="h-3.5 w-3.5 ml-0.5" />
                 </button>
               }
@@ -509,11 +513,11 @@ export default function VerificationTerminal({
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-0.5">
                       <span className="text-2xs font-black uppercase tracking-widest text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)]">
-                        Next Patient Queue
+                        {tx('Next Patient Queue')}
                       </span>
                       <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 text-2xs font-extrabold flex items-center gap-1.5">
                         <span className="w-2 h-2 bg-emerald-500 rounded-full inline-block animate-pulse shrink-0 shadow-xs" />
-                        Live Telehealth Ready
+                        {tx('Live Telehealth Ready')}
                       </span>
                     </div>
                     {nextUpcomingBooking ? (
@@ -525,14 +529,14 @@ export default function VerificationTerminal({
                         <span className="text-[color:var(--t-600)] font-semibold">{nextUpcomingBooking.mode}</span>
                       </p>
                     ) : (
-                      <p className="text-xs text-slate-600 font-medium">No immediate patient consultations queued for today.</p>
+                      <p className="text-xs text-slate-600 font-medium">{tx('No immediate patient consultations queued for today.')}</p>
                     )}
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                   <span className="text-xs font-bold text-slate-500 font-mono">
-                    {upcomingBookingsCount} Scheduled
+                    {tx('{n} Scheduled', { n: upcomingBookingsCount })}
                   </span>
                 </div>
               </div>
@@ -560,16 +564,16 @@ export default function VerificationTerminal({
           <div id="panel-accreditation" role="tabpanel" aria-labelledby="tab-accreditation" tabIndex={0} className="space-y-6 animate-fade-in">
             <WorkspaceHeader
               icon={ShieldCheck}
-              eyebrow="Medical Council Governance · Regulatory Compliance"
-              title="Practitioner Accreditation & Statutory Licensing Status"
-              description="Official statutory credentials, council registration verification, primary medical qualifications, and annual practicing certificate validity."
+              eyebrow={tx('Medical Council Governance · Regulatory Compliance')}
+              title={tx('Practitioner Accreditation & Statutory Licensing Status')}
+              description={tx('Official statutory credentials, council registration verification, primary medical qualifications, and annual practicing certificate validity.')}
               badges={
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <BannerBadge tone="success">
                     <ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" />
-                    Statutory Council Verified
+                    {tx('Statutory Council Verified')}
                   </BannerBadge>
-                  <BannerBadge tone="brand">{isDoc ? 'MMC Medical Registry' : 'LJM Nursing Registry'}</BannerBadge>
+                  <BannerBadge tone="brand">{isDoc ? tx('MMC Medical Registry') : tx('LJM Nursing Registry')}</BannerBadge>
                 </div>
               }
               aside={
@@ -577,10 +581,10 @@ export default function VerificationTerminal({
                   type="button"
                   onClick={onRefreshData}
                   className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-300 transition-colors cursor-pointer flex items-center gap-1.5"
-                  title="Re-verify Credentials"
+                  title={tx('Re-verify Credentials')}
                 >
                   <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                  <span>Verify Status</span>
+                  <span>{tx('Verify Status')}</span>
                 </button>
               }
             />
@@ -599,10 +603,10 @@ export default function VerificationTerminal({
           <div id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" tabIndex={0} className="space-y-6 animate-fade-in">
             <WorkspaceHeader
               icon={SlidersHorizontal}
-              eyebrow="Public Directory Profile · Practice Availability"
-              title="Practitioner Registry Profile & Practice Schedule"
-              description="Configure your public practitioner bio, consultation fees, clinical specialties, and weekly consultation availability."
-              badges={<BannerBadge tone="brand">Public Directory Profile</BannerBadge>}
+              eyebrow={tx('Public Directory Profile · Practice Availability')}
+              title={tx('Practitioner Registry Profile & Practice Schedule')}
+              description={tx('Configure your public practitioner bio, consultation fees, clinical specialties, and weekly consultation availability.')}
+              badges={<BannerBadge tone="brand">{tx('Public Directory Profile')}</BannerBadge>}
             />
             <PractitionerSettingsTab
               matchedProfile={matchedProfile}
@@ -641,21 +645,21 @@ export default function VerificationTerminal({
           <div id="panel-reviews" role="tabpanel" aria-labelledby="tab-reviews" tabIndex={0} className="space-y-6 animate-fade-in">
             <WorkspaceHeader
               icon={Star}
-              eyebrow="Patient Experience & Clinical Feedback · Verified Reviews"
-              title="Patient Reviews, Bedside Rating & Official Replies"
-              description="Review verified patient feedback across bedside manner, punctuality, and clinical communication, and publish practitioner replies."
+              eyebrow={tx('Patient Experience & Clinical Feedback · Verified Reviews')}
+              title={tx('Patient Reviews, Bedside Rating & Official Replies')}
+              description={tx('Review verified patient feedback across bedside manner, punctuality, and clinical communication, and publish practitioner replies.')}
               badges={
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <BannerBadge tone="brand">Verified Patient Feedback</BannerBadge>
+                  <BannerBadge tone="brand">{tx('Verified Patient Feedback')}</BannerBadge>
                   <BannerBadge tone="success">
                     <Star className="h-3 w-3 inline mr-1 fill-amber-400 text-amber-500" />
-                    {avgOverall ?? "5.0"} Overall Rating
+                    {avgOverall ?? "5.0"} {tx('Overall Rating')}
                   </BannerBadge>
                 </div>
               }
               aside={
                 <span className="text-2xs font-mono font-bold text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5">
-                  {myReviews.length} Verified Reviews
+                  {myReviews.length} {tx('Verified Reviews')}
                 </span>
               }
             />
@@ -685,21 +689,21 @@ export default function VerificationTerminal({
           <div id="panel-bookings" role="tabpanel" aria-labelledby="tab-bookings" tabIndex={0} className="space-y-6 animate-fade-in">
             <WorkspaceHeader
               icon={Calendar}
-              eyebrow="Patient Consultations & House Calls · Medical Act 1971"
-              title="Consultation Schedule, Bookings & Emergency Dispatches"
-              description="Manage scheduled telehealth sessions, in-person clinic visits, home care dispatches, and digitally signed clinical notes."
+              eyebrow={tx('Patient Consultations & House Calls · Medical Act 1971')}
+              title={tx('Consultation Schedule, Bookings & Emergency Dispatches')}
+              description={tx('Manage scheduled telehealth sessions, in-person clinic visits, home care dispatches, and digitally signed clinical notes.')}
               badges={
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <BannerBadge tone="brand">Active Patient Queue</BannerBadge>
+                  <BannerBadge tone="brand">{tx('Active Patient Queue')}</BannerBadge>
                   <BannerBadge tone="success">
                     <ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" />
-                    Poisons Act 1952 Compliant
+                    {tx('Poisons Act 1952 Compliant')}
                   </BannerBadge>
                 </div>
               }
               aside={
                 <span className="text-2xs font-mono font-bold text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5">
-                  {myBookings.length} Total Consults
+                  {tx('{n} Total Consults', { n: myBookings.length })}
                 </span>
               }
             />
@@ -738,7 +742,7 @@ export default function VerificationTerminal({
                   selectedBookingForPrescribe.status = 'Completed';
                   setIssuingPrescription(false);
                   setSelectedBookingForPrescribe(null);
-                  showToast("Doctor E-Prescription issued and digitally signed!");
+                  showToast(tx('Doctor E-Prescription issued and digitally signed!'));
                   if (onRefreshData) onRefreshData();
                 }, 400);
               }}
@@ -759,9 +763,9 @@ export default function VerificationTerminal({
           <div id="panel-messages" role="tabpanel" aria-labelledby="tab-messages" tabIndex={0} className="space-y-4 animate-fade-in">
             <WorkspaceHeader
               icon={MessageSquare}
-              eyebrow="Patient messages"
-              title="Secure Clinical Mailbox & Patient Inquiries"
-              description="Private messages with patients you have treated. Patients are told replies can take time and not to use messages for emergencies."
+              eyebrow={tx('Patient messages')}
+              title={tx('Secure Clinical Mailbox & Patient Inquiries')}
+              description={tx('Private messages with patients you have treated. Patients are told replies can take time and not to use messages for emergencies.')}
             />
             <SecureMessenger currentUserId={currentUser?.profileId || currentUser?.id || matchedProfile.id} embedded={true} />
           </div>
@@ -772,10 +776,10 @@ export default function VerificationTerminal({
           <div id="panel-global" role="tabpanel" aria-labelledby="tab-global" tabIndex={0} className="space-y-4 animate-fade-in">
             <WorkspaceHeader
               icon={Globe}
-              eyebrow="Malaysia Healthcare Travel Council · Cross-Border Care"
-              title="Global Patient Services & Medical Travel Desk"
-              description="Manage international patient referrals, provide specialist pro-forma treatment quotes, and coordinate cross-border hospital care."
-              badges={<BannerBadge tone="brand">MHTC Specialist Network</BannerBadge>}
+              eyebrow={tx('Malaysia Healthcare Travel Council · Cross-Border Care')}
+              title={tx('Global Patient Services & Medical Travel Desk')}
+              description={tx('Manage international patient referrals, provide specialist pro-forma treatment quotes, and coordinate cross-border hospital care.')}
+              badges={<BannerBadge tone="brand">{tx('MHTC Specialist Network')}</BannerBadge>}
             />
             <TourismDesk
               isAdmin={currentUser?.role === 'admin'}
@@ -794,10 +798,10 @@ export default function VerificationTerminal({
           <div id="panel-earnings" role="tabpanel" aria-labelledby="tab-earnings" tabIndex={0} className="space-y-4 animate-fade-in">
             <WorkspaceHeader
               icon={Wallet}
-              eyebrow="Practice Financials · Bank Payouts"
-              title="Consultation Earnings & Automated Disbursements"
-              description="Track verified consultation fee disbursements, digital tax receipts, and direct bank settlement schedules."
-              badges={<BannerBadge tone="brand">Direct FPX / DuitNow Settlement</BannerBadge>}
+              eyebrow={tx('Practice Financials · Bank Payouts')}
+              title={tx('Consultation Earnings & Automated Disbursements')}
+              description={tx('Track verified consultation fee disbursements, digital tax receipts, and direct bank settlement schedules.')}
+              badges={<BannerBadge tone="brand">{tx('Direct FPX / DuitNow Settlement')}</BannerBadge>}
             />
             <PractitionerEarnings embedded={true} />
           </div>
@@ -833,9 +837,9 @@ export default function VerificationTerminal({
   return (
     <div className="bg-white border border-slate-200 rounded-2xl shadow-xs p-6 max-w-3xl mx-auto" id="verification-terminal-wizard">
       <PageBanner
-        eyebrow="Licensed Practitioners"
-        title="National Credential Onboarding"
-        description="Register as a licensed physician or certified registered nurse."
+        eyebrow={tx('Licensed Practitioners')}
+        title={tx('National Credential Onboarding')}
+        description={tx('Register as a licensed physician or certified registered nurse.')}
         className="mb-6"
       />
 
@@ -844,7 +848,7 @@ export default function VerificationTerminal({
         <div className="flex items-center justify-between px-1">
           <span className="text-xs font-black uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
             <Award className="h-4 w-4 text-[color:var(--t-600)]" />
-            Onboarding Progress Guide
+            {tx('Onboarding Progress Guide')}
           </span>
           <span className="text-xs text-slate-500 font-mono font-bold">Step {step > 3 ? 3 : step} of 3</span>
         </div>
@@ -861,7 +865,7 @@ export default function VerificationTerminal({
             }`}>
               {step > 1 ? <Check className="h-3.5 w-3.5 stroke-[3]" /> : <span className="text-xs font-black">1</span>}
             </div>
-            <span className={`text-xs font-black uppercase hidden sm:inline ${step === 1 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Professional Info</span>
+            <span className={`text-xs font-black uppercase hidden sm:inline ${step === 1 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>{tx('Professional Info')}</span>
           </div>
 
           <div className={`flex-1 h-0.5 mx-3 transition-all ${step > 1 ? 'bg-[color:var(--t-600)]' : 'bg-slate-200'}`}></div>
@@ -877,7 +881,7 @@ export default function VerificationTerminal({
             }`}>
               {step > 2 ? <Check className="h-3.5 w-3.5 stroke-[3]" /> : <span className="text-xs font-black">2</span>}
             </div>
-            <span className={`text-xs font-black uppercase hidden sm:inline ${step === 2 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Licensing Credentials</span>
+            <span className={`text-xs font-black uppercase hidden sm:inline ${step === 2 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>{tx('Licensing Credentials')}</span>
           </div>
 
           <div className={`flex-1 h-0.5 mx-3 transition-all ${step > 2 ? 'bg-[color:var(--t-600)]' : 'bg-slate-200'}`}></div>
@@ -893,7 +897,7 @@ export default function VerificationTerminal({
             }`}>
               {step > 3 ? <Check className="h-3.5 w-3.5 stroke-[3]" /> : <span className="text-xs font-black">3</span>}
             </div>
-            <span className={`text-xs font-black uppercase hidden sm:inline ${step === 3 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Certificate Upload</span>
+            <span className={`text-xs font-black uppercase hidden sm:inline ${step === 3 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>{tx('Certificate Upload')}</span>
           </div>
         </div>
       </div>
@@ -903,10 +907,10 @@ export default function VerificationTerminal({
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Full Professional Title & Name</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1">{tx('Full Professional Title & Name')}</label>
               <input
                 type="text"
-                placeholder="Dr. Ahmad Ridzuan / Sister Nurul Ain"
+                placeholder={tx('Dr. Ahmad Ridzuan / Sister Nurul Ain')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-750"
@@ -915,7 +919,7 @@ export default function VerificationTerminal({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Medical Category</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1">{tx('Medical Category')}</label>
               <select
                 value={role}
                 onChange={(e) => {
@@ -927,24 +931,24 @@ export default function VerificationTerminal({
                 }}
                 className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-extrabold text-slate-700"
               >
-                <option value={UserRole.DOCTOR}>Doctor (MD / MBBS)</option>
-                <option value={UserRole.NURSE}>Registered Nurse (RN)</option>
+                <option value={UserRole.DOCTOR}>{tx('Doctor (MD / MBBS)')}</option>
+                <option value={UserRole.NURSE}>{tx('Registered Nurse (RN)')}</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Specialization / Department Focus</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1">{tx('Specialization / Department Focus')}</label>
               {role === UserRole.DOCTOR ? (
                 <select
                   value={specialization}
                   onChange={(e) => setSpecialization(e.target.value)}
                   className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
                 >
-                  <option value="Cardiologist">Cardiologist</option>
-                  <option value="Pediatrician">Pediatrician</option>
-                  <option value="Neurologist">Neurologist</option>
-                  <option value="Dermatologist">Dermatologist</option>
-                  <option value="General Physician">General Physician</option>
+                  <option value="Cardiologist">{tx('Cardiologist')}</option>
+                  <option value="Pediatrician">{tx('Pediatrician')}</option>
+                  <option value="Neurologist">{tx('Neurologist')}</option>
+                  <option value="Dermatologist">{tx('Dermatologist')}</option>
+                  <option value="General Physician">{tx('General Physician')}</option>
                 </select>
               ) : (
                 <select
@@ -952,15 +956,15 @@ export default function VerificationTerminal({
                   onChange={(e) => setSpecialization(e.target.value)}
                   className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
                 >
-                  <option value="ICU & Critical Care">ICU & Critical Care</option>
-                  <option value="Geriatric & Eldercare">Geriatric & Eldercare</option>
-                  <option value="Pediatric & Neonatal Care">Pediatric & Neonatal Care</option>
+                  <option value="ICU & Critical Care">{tx('ICU & Critical Care')}</option>
+                  <option value="Geriatric & Eldercare">{tx('Geriatric & Eldercare')}</option>
+                  <option value="Pediatric & Neonatal Care">{tx('Pediatric & Neonatal Care')}</option>
                 </select>
               )}
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Total Years of Experience</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1">{tx('Total Years of Experience')}</label>
               <input
                 type="number"
                 placeholder="e.g. 10"
@@ -973,9 +977,9 @@ export default function VerificationTerminal({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1">Professional Bio & Clinical Philosophy</label>
+            <label className="block text-xs font-bold text-slate-600 mb-1">{tx('Professional Bio & Clinical Philosophy')}</label>
             <textarea
-              placeholder="Give details about your clinical specialty, values, treatments, and approach..."
+              placeholder={tx('Give details about your clinical specialty, values, treatments, and approach...')}
               rows={3}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
@@ -989,7 +993,7 @@ export default function VerificationTerminal({
               disabled={!name || !experienceYears}
               className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer"
             >
-              Continue to Credentials
+              {tx('Continue to Credentials')}
             </button>
           </div>
         </div>
@@ -1001,7 +1005,7 @@ export default function VerificationTerminal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1">
-                {role === UserRole.DOCTOR ? "Medical Council Registry" : "Nursing Council Registry"}
+                {role === UserRole.DOCTOR ? tx('Medical Council Registry') : tx('Nursing Council Registry')}
               </label>
               <select
                 value={registryId}
@@ -1014,28 +1018,28 @@ export default function VerificationTerminal({
                 }}
                 className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
               >
-                {role === UserRole.DOCTOR ? <option value="MMC">Malaysian Medical Council (MMC)</option> : <option value="LJM">Malaysian Nursing Board (LJM)</option>}
-                <option value="OTHER">Another country's regulator (international)</option>
+                {role === UserRole.DOCTOR ? <option value="MMC">{tx('Malaysian Medical Council (MMC)')}</option> : <option value="LJM">{tx('Malaysian Nursing Board (LJM)')}</option>}
+                <option value="OTHER">{tx('Another country\'s regulator (international)')}</option>
               </select>
               {registryId === "OTHER" && (
-                <input type="text" required maxLength={100} placeholder="Regulator name and country, e.g. General Medical Council (UK)" value={medicalCouncil} onChange={(e) => setMedicalCouncil(e.target.value)} className="mt-2 w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-800" />
+                <input type="text" required maxLength={100} placeholder={tx('Regulator name and country, e.g. General Medical Council (UK)')} value={medicalCouncil} onChange={(e) => setMedicalCouncil(e.target.value)} className="mt-2 w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-800" />
               )}
-              <label className="block text-xs font-bold text-slate-600 mt-3 mb-1">Registration type</label>
+              <label className="block text-xs font-bold text-slate-600 mt-3 mb-1">{tx('Registration type')}</label>
               <select value={registrationType} onChange={(e) => setRegistrationType(e.target.value)} className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705">
-                <option value="full">Full registration</option>
-                <option value="provisional">Provisional registration</option>
-                {registryId !== "LJM" && <option value="specialist">Specialist register</option>}
+                <option value="full">{tx('Full registration')}</option>
+                <option value="provisional">{tx('Provisional registration')}</option>
+                {registryId !== "LJM" && <option value="specialist">{tx('Specialist register')}</option>}
               </select>
               {registrationType === "specialist" && (
-                <input type="text" required maxLength={50} placeholder="Specialist register number" value={specialistRegNo} onChange={(e) => setSpecialistRegNo(e.target.value)} className="mt-2 w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-mono font-bold text-slate-800" />
+                <input type="text" required maxLength={50} placeholder={tx('Specialist register number')} value={specialistRegNo} onChange={(e) => setSpecialistRegNo(e.target.value)} className="mt-2 w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-mono font-bold text-slate-800" />
               )}
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Active Registration License Number</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1">{tx('Active Registration License Number')}</label>
               <input
                 type="text"
-                placeholder={role === UserRole.DOCTOR ? "MMC-REG-XXXXX" : "LJM-REG-XXXXX"}
+                placeholder={role === UserRole.DOCTOR ? tx('MMC-REG-XXXXX') : tx('LJM-REG-XXXXX')}
                 value={licenseNumber}
                 onChange={(e) => setLicenseNumber(e.target.value)}
                 className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-black font-mono text-slate-850"
@@ -1056,10 +1060,10 @@ export default function VerificationTerminal({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Primary Degree & Qualifications</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1">{tx('Primary Degree & Qualifications')}</label>
               <input
                 type="text"
-                placeholder="e.g. MBBS (Malaya), M.Med (UKM) / Diploma in Nursing"
+                placeholder={tx('e.g. MBBS (Malaya), M.Med (UKM) / Diploma in Nursing')}
                 value={education}
                 onChange={(e) => setEducation(e.target.value)}
                 className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-705"
@@ -1068,7 +1072,7 @@ export default function VerificationTerminal({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Consultation Charge (RM)</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1">{tx('Consultation Charge (RM)')}</label>
               <input
                 type="number"
                 placeholder="e.g. 150"
@@ -1080,24 +1084,24 @@ export default function VerificationTerminal({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Active Practice City</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1">{tx('Active Practice City')}</label>
               <select
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-extrabold text-slate-700"
               >
-                <option value="Kuala Lumpur">Kuala Lumpur</option>
-                <option value="Petaling Jaya">Petaling Jaya</option>
-                <option value="Penang">Penang</option>
-                <option value="Johor Bahru">Johor Bahru</option>
+                <option value="Kuala Lumpur">{tx('Kuala Lumpur')}</option>
+                <option value="Petaling Jaya">{tx('Petaling Jaya')}</option>
+                <option value="Penang">{tx('Penang')}</option>
+                <option value="Johor Bahru">{tx('Johor Bahru')}</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Practice / Clinic Address</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1">{tx('Practice / Clinic Address')}</label>
               <input
                 type="text"
-                placeholder="Jalan Kiara, Mont Kiara"
+                placeholder={tx('Jalan Kiara, Mont Kiara')}
                 value={practiceAddress}
                 onChange={(e) => setPracticeAddress(e.target.value)}
                 className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-705"
@@ -1111,14 +1115,14 @@ export default function VerificationTerminal({
               onClick={() => setStep(1)}
               className="border border-slate-200 text-slate-600 text-xs font-bold px-6 py-2.5 rounded-xl hover:bg-slate-50 cursor-pointer"
             >
-              Previous Step
+              {tx('Previous Step')}
             </button>
             <button
               onClick={() => setStep(3)}
               disabled={!licenseNumber || !licenseExpiry || !education || !fee || !practiceAddress}
               className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-colors cursor-pointer"
             >
-              Continue to Documentation
+              {tx('Continue to Documentation')}
             </button>
           </div>
         </div>
@@ -1137,13 +1141,13 @@ export default function VerificationTerminal({
             />
             <FileText className="h-10 w-10 text-slate-400 mx-auto" />
             <div>
-              <p className="text-xs font-bold text-slate-800">Drag & Drop Degree Certificate or Council Practicing Slip</p>
-              <p className="text-xs text-slate-500 mt-1">Supports PDF, JPG or PNG formats up to 5MB</p>
+              <p className="text-xs font-bold text-slate-800">{tx('Drag & Drop Degree Certificate or Council Practicing Slip')}</p>
+              <p className="text-xs text-slate-500 mt-1">{tx('Supports PDF, JPG or PNG formats up to 5MB')}</p>
             </div>
             {fileAttached && (
               <div className="bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs font-bold py-2 px-4 rounded-xl inline-flex items-center gap-2 mx-auto animate-pulse">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                Attached: {fileAttached}
+                {tx('Attached: ')}{fileAttached}
               </div>
             )}
           </div>
@@ -1151,7 +1155,7 @@ export default function VerificationTerminal({
           <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-4 rounded-xl text-xs text-[color:var(--t-700)] leading-relaxed font-semibold flex gap-2">
             <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
             <div>
-              Our medical board reviews your documents and checks your licence against the council's register by hand. You will be notified in the app when a decision is made. Your profile is not public until you are approved.
+              {tx('Our medical board reviews your documents and checks your licence against the council\'s register by hand. You will be notified in the app when a decision is made. Your profile is not public until you are approved.')}
             </div>
           </div>
 
@@ -1165,7 +1169,7 @@ export default function VerificationTerminal({
               onClick={() => setStep(2)}
               className="border border-slate-200 text-slate-600 text-xs font-bold px-6 py-2.5 rounded-xl hover:bg-slate-50 cursor-pointer"
             >
-              Previous Step
+              {tx('Previous Step')}
             </button>
             <button
               type="submit"
@@ -1175,7 +1179,7 @@ export default function VerificationTerminal({
               {loading ? (
                 <>
                   <Loader className="h-3.5 w-3.5 animate-spin" />
-                  Registering Credentials...
+                  {tx('Registering Credentials...')}
                 </>
               ) : (
                 "Submit Application"
@@ -1193,27 +1197,27 @@ export default function VerificationTerminal({
           </div>
 
           <div className="space-y-1.5">
-            <h3 className="text-base font-black text-slate-900">Application Lodged Successfully!</h3>
+            <h3 className="text-base font-black text-slate-900">{tx('Application Lodged Successfully!')}</h3>
             <p className="text-xs text-slate-500 font-medium max-w-md mx-auto leading-relaxed">
               Dr./Sister {name}, your registry profile has been established on MedCred. 
-              Admin moderators will complete verification of your state license number <strong>{licenseNumber}</strong> shortly.
+              {tx('Admin moderators will complete verification of your state license number')} <strong>{licenseNumber}</strong> {tx('shortly.')}
             </p>
           </div>
 
           <div className="bg-slate-50 border border-slate-100 max-w-sm mx-auto p-4 rounded-xl text-xs text-left space-y-2">
             <div className="flex justify-between font-bold text-slate-755">
-              <span>Onboarding Ref ID:</span>
+              <span>{tx('Onboarding Ref ID:')}</span>
               <code className="font-mono text-[color:var(--t-700)]">{success?.id}</code>
             </div>
             <div className="flex justify-between font-semibold text-slate-600">
-              <span>SEO Slug Allocated:</span>
+              <span>{tx('SEO Slug Allocated:')}</span>
               <code className="text-xs text-[color:var(--t-600)] font-mono">{success?.seoSlug}</code>
             </div>
             <div className="flex justify-between font-semibold text-slate-600">
-              <span>Verification Status:</span>
+              <span>{tx('Verification Status:')}</span>
               <span className="text-amber-600 font-bold flex items-center gap-1">
                 <Loader className="h-3 w-3 animate-spin" />
-                Pending Review
+                {tx('Pending Review')}
               </span>
             </div>
           </div>
@@ -1222,7 +1226,7 @@ export default function VerificationTerminal({
             onClick={() => setStep(1)}
             className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-colors shadow-sm cursor-pointer"
           >
-            Submit Another Application
+            {tx('Submit Another Application')}
           </button>
         </div>
       )}

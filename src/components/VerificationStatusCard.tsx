@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { expiryLabel } from '../registries';
 import { AlertCircle, CheckCircle2, Clock, ShieldOff, Upload, Send } from 'lucide-react';
+import { useTr } from '../locale';
 
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '—');
 const daysUntil = (iso?: string | null) => (iso ? Math.ceil((Date.parse(iso) - Date.now()) / 86400_000) : null);
 
 /** Practitioner's own verification status, reviewer messages, and the actions that follow from them. */
 export default function VerificationStatusCard({ onChanged }: { onChanged?: () => void }) {
+  const tx = useTr();
   const [info, setInfo] = useState<any | null>(null);
   const [note, setNote] = useState('');
   const [expiry, setExpiry] = useState('');
@@ -35,7 +37,7 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
     form.append('kind', 'license');
     form.append('verificationRequestId', requestId);
     const d = await fetch('/api/documents', { method: 'POST', body: form }).then(r => r.json());
-    if (d.status !== 'success') { setMsg({ ok: false, text: d.message || 'Upload failed.' }); return false; }
+    if (d.status !== 'success') { setMsg({ ok: false, text: d.message || tx('Upload failed.') }); return false; }
     return true;
   };
 
@@ -43,7 +45,7 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
     setBusy(true); setMsg(null);
     try {
       const err = await fn();
-      if (!err) { setMsg({ ok: true, text: 'Submitted. The medical board will review it.' }); setNote(''); setFile(null); await load(); onChanged?.(); }
+      if (!err) { setMsg({ ok: true, text: tx('Submitted. The medical board will review it.') }); setNote(''); setFile(null); await load(); onChanged?.(); }
       else setMsg({ ok: false, text: err });
     } catch { setMsg({ ok: false, text: 'Server connection error.' }); }
     finally { setBusy(false); }
@@ -53,14 +55,14 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
     fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json());
 
   const resubmit = () => run(async () => {
-    if (!(await upload(info.requestId))) return 'Upload failed.';
+    if (!(await upload(info.requestId))) return tx('Upload failed.');
     const d = await post('/api/my-verification/resubmit', { note, licenseExpiry: expiry || undefined });
     return d.status === 'success' ? null : d.message;
   });
   const renew = () => run(async () => {
     const d = await post('/api/my-verification/renew', { note, licenseExpiry: expiry });
     if (d.status !== 'success') return d.message;
-    return (await upload(d.data.verificationRequestId)) ? null : 'Renewal opened, but the document upload failed. Upload it again.';
+    return (await upload(d.data.verificationRequestId)) ? null : tx('Renewal opened, but the document upload failed. Upload it again.');
   });
 
   const toneBorder = verified
@@ -89,7 +91,7 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
   }
 
   return (
-    <section className={`rounded-none p-5 shadow-2xs space-y-4 ${toneBorder}`} aria-label="Verification status">
+    <section className={`rounded-none p-5 shadow-2xs space-y-4 ${toneBorder}`} aria-label={tx('Verification status')}>
       {/* Header Row: Status Identity + APC Expiry Pill Badges */}
       <div className="flex flex-wrap items-start justify-between gap-3 pb-3.5 border-b border-[color:var(--t-100)]">
         <div className="flex items-start gap-3 min-w-0 flex-1">
@@ -99,20 +101,20 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
           <div className="min-w-0 space-y-1">
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="text-base font-black text-[color:var(--ink)] uppercase tracking-wide leading-tight">
-                {verified ? 'Verified: Your Profile is Public'
-                  : suspended ? 'Suspended: Your Profile is Hidden'
-                  : rejected ? 'Application Rejected'
-                  : infoRequested ? 'The Board Needs More Information'
-                  : 'Pending: Under Review by the Medical Board'}
+                {verified ? tx('Verified: Your Profile is Public')
+                  : suspended ? tx('Suspended: Your Profile is Hidden')
+                  : rejected ? tx('Application Rejected')
+                  : infoRequested ? tx('The Board Needs More Information')
+                  : tx('Pending: Under Review by the Medical Board')}
               </h3>
               <span className={`text-2xs font-mono font-black uppercase tracking-wider px-2 py-0.5 border ${statusBadgeTone}`}>
-                {status || 'Pending'}
+                {tx(status || 'Pending')}
               </span>
             </div>
             <p className="text-xs font-semibold text-slate-600">
-              {expiryLabel(info.council)}: <strong className="font-mono text-[color:var(--ink)]">{fmt(info.licenseExpiry)}</strong>
-              {verified ? ` · Re-verification due ${fmt(info.verifiedUntil)}` : ''}
-              {dueSoon ? ' · Renewal needed soon' : ''}
+              {tx(expiryLabel(info.council))}: <strong className="font-mono text-[color:var(--ink)]">{fmt(info.licenseExpiry)}</strong>
+              {verified ? ` · ${tx('Re-verification due {date}', { date: fmt(info.verifiedUntil) })}` : ''}
+              {dueSoon ? ` · ${tx('Renewal needed soon')}` : ''}
             </p>
             {suspended && info.suspensionReason && (
               <p className="text-xs font-bold text-rose-800 bg-rose-50 border border-rose-200 px-3 py-1.5 mt-1.5">
@@ -162,11 +164,11 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
             {/* 1. New Licence Expiry Date (3 cols) */}
             <div className="lg:col-span-3">
               <label className="block text-2xs font-black uppercase tracking-wider text-slate-500 mb-1">
-                {canRenew ? 'New licence expiry' : 'Updated licence expiry (if changed)'}
+                {canRenew ? tx('New licence expiry') : tx('Updated licence expiry (if changed)')}
               </label>
               <input
                 type="date"
-                aria-label={canRenew ? 'New licence expiry' : 'Updated licence expiry (if changed)'}
+                aria-label={canRenew ? tx('New licence expiry') : tx('Updated licence expiry (if changed)')}
                 value={expiry}
                 onChange={e => setExpiry(e.target.value)}
                 className="w-full h-11 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3 text-xs font-bold text-[color:var(--ink)] rounded-none focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
@@ -176,7 +178,7 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
             {/* 2. Attach Renewed Document (4 cols) */}
             <div className="lg:col-span-4">
               <span className="block text-2xs font-black uppercase tracking-wider text-slate-500 mb-1">
-                Supporting APC / Certificate Document
+                {tx('Supporting APC / Certificate Document')}
               </span>
               <label className="w-full h-11 text-xs font-bold text-[color:var(--t-700)] cursor-pointer flex items-center justify-center gap-2 border border-dashed border-[color:var(--t-300)] bg-[color:var(--t-50)]/40 hover:bg-[color:var(--t-50)] px-3 rounded-none transition-colors truncate">
                 <Upload className="h-4 w-4 shrink-0 text-[color:var(--t-600)]" />
@@ -188,7 +190,7 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
             {/* 3. Note for the Board (5 cols) */}
             <div className="lg:col-span-5">
               <label className="block text-2xs font-black uppercase tracking-wider text-slate-500 mb-1">
-                Board Submission Note (Optional)
+                {tx('Board Submission Note (Optional)')}
               </label>
               <div className="flex items-center gap-2">
                 <input

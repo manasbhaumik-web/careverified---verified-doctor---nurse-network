@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Award, ClipboardCheck, Flag, GraduationCap, ShieldAlert, Star } from 'lucide-react';
+import { useTr } from '../locale';
 import WorkspaceHeader from './WorkspaceHeader';
 import { BannerBadge } from './DashboardHeader';
 
@@ -17,6 +18,7 @@ async function uploadEvidence(file: File, kind: 'cpd' | 'certificate'): Promise<
 
 /** Practitioner quality hub: ratings, CPD, specialty certificates, peer review, incidents. */
 export default function PractitionerQuality({ profileId, embedded = false }: { profileId: string | null; embedded?: boolean }) {
+  const tx = useTr();
   const [tab, setTab] = useState<'reviews' | 'cpd' | 'peer' | 'incidents'>('reviews');
   const [cred, setCred] = useState<any | null>(null);
   const [myReviews, setMyReviews] = useState<any[]>([]);
@@ -39,13 +41,13 @@ export default function PractitionerQuality({ profileId, embedded = false }: { p
       <div className={embedded ? "space-y-6 w-full" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
         <WorkspaceHeader
           icon={Award}
-          eyebrow="Continuous Professional Development · Audit"
-          title="Quality Assurance, CPD Points & Peer Reviews"
-          description="Log verified CPD education credits, submit peer clinical audits, and review regulatory practice compliance with the medical council."
-          badges={<BannerBadge tone="brand">MMC CPD Accredited</BannerBadge>}
+          eyebrow={tx('Continuous Professional Development · Audit')}
+          title={tx('Quality Assurance, CPD Points & Peer Reviews')}
+          description={tx('Log verified CPD education credits, submit peer clinical audits, and review regulatory practice compliance with the medical council.')}
+          badges={<BannerBadge tone="brand">{tx('MMC CPD Accredited')}</BannerBadge>}
         />
         <p className="bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold p-5 max-w-2xl">
-          Submit your credentials in the Practitioner Portal first. Quality tools open once you have a profile.
+          {tx('Submit your credentials in the Practitioner Portal first. Quality tools open once you have a profile.')}
         </p>
       </div>
     );
@@ -55,28 +57,28 @@ export default function PractitionerQuality({ profileId, embedded = false }: { p
     <div className={embedded ? "space-y-6 w-full" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
       <WorkspaceHeader
         icon={Award}
-        eyebrow="Continuous Professional Development · Audit"
-        title="Quality Assurance, CPD Points & Peer Reviews"
-        description="Log verified CPD education credits, submit peer clinical audits, and review regulatory practice compliance with the medical council."
+        eyebrow={tx('Continuous Professional Development · Audit')}
+        title={tx('Quality Assurance, CPD Points & Peer Reviews')}
+        description={tx('Log verified CPD education credits, submit peer clinical audits, and review regulatory practice compliance with the medical council.')}
         badges={
           <div className="flex items-center gap-1.5 flex-wrap">
-            <BannerBadge tone="brand">MMC CPD Accredited</BannerBadge>
+            <BannerBadge tone="brand">{tx('MMC CPD Accredited')}</BannerBadge>
             {cred && (
               <BannerBadge tone="success">
-                {cred.pointsApproved ?? 0} / {cred.target ?? 50} CPD Points
+                {cred.pointsApproved ?? 0} / {cred.target ?? 50} {tx('CPD Points')}
               </BannerBadge>
             )}
           </div>
         }
         tabs={[
-          { id: 'reviews', label: 'Ratings & Reviews', icon: Star, count: cred?.reviews?.count },
-          { id: 'cpd', label: 'CPD & Certificates', icon: GraduationCap },
-          { id: 'peer', label: 'Peer Review', icon: ClipboardCheck },
-          { id: 'incidents', label: 'Report Incident', icon: ShieldAlert },
+          { id: 'reviews', label: tx('Ratings & Reviews'), icon: Star, count: cred?.reviews?.count },
+          { id: 'cpd', label: tx('CPD & Certificates'), icon: GraduationCap },
+          { id: 'peer', label: tx('Peer Review'), icon: ClipboardCheck },
+          { id: 'incidents', label: tx('Report Incident'), icon: ShieldAlert },
         ]}
         activeTab={tab}
         onTabChange={(id) => { setTab(id as any); setMsg(null); }}
-        tabsLabel="Quality Assurance and CPD Sections"
+        tabsLabel={tx('Quality Assurance and CPD Sections')}
       />
       {msg && <p role="status" className={`text-xs font-bold p-3 border ${msg.ok ? 'text-emerald-800 bg-emerald-50 border-emerald-200' : 'text-rose-800 bg-rose-50 border-rose-200'}`}>{msg.text}</p>}
 
@@ -84,24 +86,24 @@ export default function PractitionerQuality({ profileId, embedded = false }: { p
         <section className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)] items-start">
           <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white border border-[color:var(--t-200)] p-4 shadow-xs"><p className={lab}>Average Rating</p><p className="text-3xl font-black tabular-nums text-[color:var(--ink)]">{cred?.reviews.average ?? '—'}</p></div>
-            <div className="bg-white border border-[color:var(--t-200)] p-4 shadow-xs"><p className={lab}>Published Reviews</p><p className="text-3xl font-black tabular-nums text-[color:var(--ink)]">{cred?.reviews.count ?? 0}</p></div>
+            <div className="bg-white border border-[color:var(--t-200)] p-4 shadow-xs"><p className={lab}>{tx('Average Rating')}</p><p className="text-3xl font-black tabular-nums text-[color:var(--ink)]">{cred?.reviews.average ?? '—'}</p></div>
+            <div className="bg-white border border-[color:var(--t-200)] p-4 shadow-xs"><p className={lab}>{tx('Published Reviews')}</p><p className="text-3xl font-black tabular-nums text-[color:var(--ink)]">{cred?.reviews.count ?? 0}</p></div>
           </div>
-          <p className="text-xs text-[color:var(--ink-2)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-3 leading-relaxed">Only patients who have concluded a consultation visit can submit ratings. You can report reviews that breach ethical or privacy guidelines.</p>
+          <p className="text-xs text-[color:var(--ink-2)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-3 leading-relaxed">{tx('Only patients who have concluded a consultation visit can submit ratings. You can report reviews that breach ethical or privacy guidelines.')}</p>
           </div>
           <div className="grid gap-3 lg:grid-cols-2 items-start">
-          {myReviews.length === 0 ? <p className="text-xs text-slate-500 bg-white border border-[color:var(--t-200)] p-8 text-center lg:col-span-2">No patient reviews recorded yet.</p> : myReviews.map(r => (
+          {myReviews.length === 0 ? <p className="text-xs text-slate-500 bg-white border border-[color:var(--t-200)] p-8 text-center lg:col-span-2">{tx('No patient reviews recorded yet.')}</p> : myReviews.map(r => (
             <article key={r.id} className="bg-white border border-[color:var(--t-200)] p-5 text-xs space-y-2 shadow-xs">
               <p className="font-bold text-amber-500 flex items-center justify-between">
                 <span>{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span>
                 <span className="text-xs text-slate-500 font-mono font-normal">{r.date}</span>
               </p>
               {r.comment && <p className="text-xs text-[color:var(--ink)] leading-relaxed font-medium">"{r.comment}"</p>}
-              {r.replyText && <p className="text-xs bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-2.5 text-[color:var(--ink-2)]"><b>Your response:</b> {r.replyText}</p>}
+              {r.replyText && <p className="text-xs bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-2.5 text-[color:var(--ink-2)]"><b>{tx('Your response:')}</b> {r.replyText}</p>}
               <button onClick={async () => {
-                const reason = window.prompt('Why does this review break the rules?'); if (!reason) return;
-                const d = await jreq(`/api/reviews/${r.id}/report`, 'POST', { reason }); say(d.status === 'success', d.message || 'Could not report.');
-              }} className="text-xs font-bold text-slate-600 hover:text-rose-700 flex items-center gap-1.5 cursor-pointer pt-1"><Flag className="h-3 w-3" /> Report review to board</button>
+                const reason = window.prompt(tx('Why does this review break the rules?')); if (!reason) return;
+                const d = await jreq(`/api/reviews/${r.id}/report`, 'POST', { reason }); say(d.status === 'success', d.message || tx('Could not report.'));
+              }} className="text-xs font-bold text-slate-600 hover:text-rose-700 flex items-center gap-1.5 cursor-pointer pt-1"><Flag className="h-3 w-3" /> {tx('Report review to board')}</button>
             </article>
           ))}
           </div>
@@ -116,6 +118,7 @@ export default function PractitionerQuality({ profileId, embedded = false }: { p
 }
 
 function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say: (ok: boolean, t: string) => void }) {
+  const tx = useTr();
   const today = new Date().toISOString().slice(0, 10);
   const [cpd, setCpd] = useState({ title: '', category: 'course', points: '', activityDate: today, provider: '' });
   const [cpdFile, setCpdFile] = useState<File | null>(null);
@@ -126,18 +129,18 @@ function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say:
   const addCpd = async (e: React.FormEvent) => {
     e.preventDefault();
     const documentId = cpdFile ? await uploadEvidence(cpdFile, 'cpd') : undefined;
-    if (cpdFile && !documentId) return say(false, 'The evidence file could not be uploaded (PDF, JPG or PNG, up to 5 MB).');
+    if (cpdFile && !documentId) return say(false, tx('The evidence file could not be uploaded (PDF, JPG or PNG, up to 5 MB).'));
     const d = await jreq('/api/me/cpd', 'POST', { ...cpd, points: Number(cpd.points), documentId });
-    say(d.status === 'success', d.status === 'success' ? 'Submitted for verification.' : d.message);
+    say(d.status === 'success', d.status === 'success' ? tx('Submitted for verification.') : d.message);
     if (d.status === 'success') { setCpd({ ...cpd, title: '', points: '', provider: '' }); setCpdFile(null); reload(); }
   };
   const addCert = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!certFile) return say(false, 'Attach a copy of the certificate.');
+    if (!certFile) return say(false, tx('Attach a copy of the certificate.'));
     const documentId = await uploadEvidence(certFile, 'certificate');
-    if (!documentId) return say(false, 'The file could not be uploaded (PDF, JPG or PNG, up to 5 MB).');
+    if (!documentId) return say(false, tx('The file could not be uploaded (PDF, JPG or PNG, up to 5 MB).'));
     const d = await jreq('/api/me/specialty-certs', 'POST', { ...cert, expiryDate: cert.expiryDate || undefined, documentId });
-    say(d.status === 'success', d.status === 'success' ? 'Submitted for verification.' : d.message);
+    say(d.status === 'success', d.status === 'success' ? tx('Submitted for verification.') : d.message);
     if (d.status === 'success') { setCert({ name: '', issuer: '', issuedDate: '', expiryDate: '' }); setCertFile(null); reload(); }
   };
 
@@ -148,42 +151,42 @@ function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say:
         <h3 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)]">CPD Progress for {cred.year}</h3>
         <div className="h-3 bg-slate-100 border border-[color:var(--t-100)]" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}><div className="h-full bg-[color:var(--t-600)] transition-all" style={{ width: `${pct}%` }} /></div>
         <p className="text-xs"><b className="tabular-nums font-mono text-base text-[color:var(--ink)]">{cred.pointsApproved}</b> of {cred.target} verified annual points{cred.pointsPending ? ` · ${cred.pointsPending} awaiting review` : ''}</p>
-        <p className="text-xs text-[color:var(--ink-2)]">Annual points are audited against MMC / LJM renewal prerequisites before Annual Practising Certificate dispatch.</p>
+        <p className="text-xs text-[color:var(--ink-2)]">{tx('Annual points are audited against MMC / LJM renewal prerequisites before Annual Practising Certificate dispatch.')}</p>
       </section>
 
       <form onSubmit={addCpd} className="bg-white border border-[color:var(--t-200)] p-6 grid sm:grid-cols-2 gap-4 shadow-xs">
-        <h3 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)] sm:col-span-2">Log Continuous Professional Development</h3>
-        <div className="sm:col-span-2"><label className={lab}>Activity Title</label><input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.title} onChange={e => setCpd({ ...cpd, title: e.target.value })} required maxLength={150} placeholder="e.g. National Cardiology Symposium 2026" /></div>
-        <div><label className={lab}>Category</label><select className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors cursor-pointer" value={cpd.category} onChange={e => setCpd({ ...cpd, category: e.target.value })}>{['course', 'conference', 'publication', 'teaching', 'self-study'].map(c => <option key={c}>{c}</option>)}</select></div>
-        <div><label className={lab}>Points Claimed</label><input type="number" step="0.5" min="0.5" max="50" className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.points} onChange={e => setCpd({ ...cpd, points: e.target.value })} required placeholder="e.g. 5.0" /></div>
-        <div><label className={lab}>Completion Date</label><input type="date" max={today} className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.activityDate} onChange={e => setCpd({ ...cpd, activityDate: e.target.value })} required /></div>
-        <div><label className={lab}>Provider / Accreditor</label><input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.provider} onChange={e => setCpd({ ...cpd, provider: e.target.value })} maxLength={120} placeholder="e.g. MMA / College of Surgeons" /></div>
+        <h3 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)] sm:col-span-2">{tx('Log Continuous Professional Development')}</h3>
+        <div className="sm:col-span-2"><label className={lab}>{tx('Activity Title')}</label><input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.title} onChange={e => setCpd({ ...cpd, title: e.target.value })} required maxLength={150} placeholder={tx('e.g. National Cardiology Symposium 2026')} /></div>
+        <div><label className={lab}>{tx('Category')}</label><select className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors cursor-pointer" value={cpd.category} onChange={e => setCpd({ ...cpd, category: e.target.value })}>{['course', 'conference', 'publication', 'teaching', 'self-study'].map(c => <option key={c}>{c}</option>)}</select></div>
+        <div><label className={lab}>{tx('Points Claimed')}</label><input type="number" step="0.5" min="0.5" max="50" className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.points} onChange={e => setCpd({ ...cpd, points: e.target.value })} required placeholder="e.g. 5.0" /></div>
+        <div><label className={lab}>{tx('Completion Date')}</label><input type="date" max={today} className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.activityDate} onChange={e => setCpd({ ...cpd, activityDate: e.target.value })} required /></div>
+        <div><label className={lab}>{tx('Provider / Accreditor')}</label><input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.provider} onChange={e => setCpd({ ...cpd, provider: e.target.value })} maxLength={120} placeholder={tx('e.g. MMA / College of Surgeons')} /></div>
         <label className="sm:col-span-2 text-xs font-bold border border-dashed border-[color:var(--t-200)] bg-[color:var(--t-bg)] hover:bg-slate-50 p-4 text-center cursor-pointer transition-colors block">{cpdFile ? cpdFile.name : 'Attach Certificate of Attendance (PDF, JPG, PNG up to 5 MB)'}<input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={e => setCpdFile(e.target.files?.[0] ?? null)} /></label>
-        <button className="sm:col-span-2 h-12 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer transition-colors shadow-xs">Submit CPD for Verification</button>
+        <button className="sm:col-span-2 h-12 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer transition-colors shadow-xs">{tx('Submit CPD for Verification')}</button>
       </form>
       </div>
       <div className="space-y-5 min-w-0">
 
       <section className="bg-white border border-slate-200 p-5">
-        <h3 className="text-sm font-extrabold mb-2">Your CPD entries</h3>
-        {cred.entries.length === 0 ? <p className="text-xs text-slate-500">None yet.</p> : (
-          <table className="w-full text-xs"><thead><tr className="text-left text-xs uppercase text-slate-500"><th className="py-1">Date</th><th>Activity</th><th>Points</th><th>Status</th><th /></tr></thead>
+        <h3 className="text-sm font-extrabold mb-2">{tx('Your CPD entries')}</h3>
+        {cred.entries.length === 0 ? <p className="text-xs text-slate-500">{tx('None yet.')}</p> : (
+          <table className="w-full text-xs"><thead><tr className="text-left text-xs uppercase text-slate-500"><th className="py-1">{tx('Date')}</th><th>{tx('Activity')}</th><th>{tx('Points')}</th><th>{tx('Status')}</th><th /></tr></thead>
             <tbody>{cred.entries.map((e: any) => (
               <tr key={e.id} className="border-t border-slate-100"><td className="py-1.5">{e.activity_date}</td><td>{e.title}<span className="text-slate-400"> · {e.category}</span>{e.review_note ? <span className="block text-rose-700">{e.review_note}</span> : null}</td><td className="tabular-nums">{e.points}</td>
                 <td className="font-bold">{e.status}</td>
-                <td>{e.status === 'pending' && <button className="text-rose-700 font-bold cursor-pointer" onClick={async () => { await jreq(`/api/me/cpd/${e.id}`, 'DELETE'); reload(); }}>Remove</button>}</td></tr>
+                <td>{e.status === 'pending' && <button className="text-rose-700 font-bold cursor-pointer" onClick={async () => { await jreq(`/api/me/cpd/${e.id}`, 'DELETE'); reload(); }}>{tx('Remove')}</button>}</td></tr>
             ))}</tbody></table>
         )}
       </section>
 
       <form onSubmit={addCert} className="bg-white border border-slate-200 p-5 grid sm:grid-cols-2 gap-3">
-        <h3 className="text-sm font-extrabold sm:col-span-2 flex items-center gap-2"><Award className="h-4 w-4 text-[color:var(--t-600)]" /> Specialty certificates</h3>
-        <div><label className={lab}>Certificate</label><input className={field} value={cert.name} onChange={e => setCert({ ...cert, name: e.target.value })} required placeholder="e.g. MRCP (UK)" maxLength={150} /></div>
-        <div><label className={lab}>Issued by</label><input className={field} value={cert.issuer} onChange={e => setCert({ ...cert, issuer: e.target.value })} required maxLength={150} /></div>
-        <div><label className={lab}>Issued</label><input type="date" className={field} value={cert.issuedDate} onChange={e => setCert({ ...cert, issuedDate: e.target.value })} required /></div>
-        <div><label className={lab}>Expires (if it does)</label><input type="date" className={field} value={cert.expiryDate} onChange={e => setCert({ ...cert, expiryDate: e.target.value })} /></div>
+        <h3 className="text-sm font-extrabold sm:col-span-2 flex items-center gap-2"><Award className="h-4 w-4 text-[color:var(--t-600)]" /> {tx('Specialty certificates')}</h3>
+        <div><label className={lab}>{tx('Certificate')}</label><input className={field} value={cert.name} onChange={e => setCert({ ...cert, name: e.target.value })} required placeholder={tx('e.g. MRCP (UK)')} maxLength={150} /></div>
+        <div><label className={lab}>{tx('Issued by')}</label><input className={field} value={cert.issuer} onChange={e => setCert({ ...cert, issuer: e.target.value })} required maxLength={150} /></div>
+        <div><label className={lab}>{tx('Issued')}</label><input type="date" className={field} value={cert.issuedDate} onChange={e => setCert({ ...cert, issuedDate: e.target.value })} required /></div>
+        <div><label className={lab}>{tx('Expires (if it does)')}</label><input type="date" className={field} value={cert.expiryDate} onChange={e => setCert({ ...cert, expiryDate: e.target.value })} /></div>
         <label className="sm:col-span-2 text-xs font-bold border border-dashed border-slate-300 px-3 py-2 cursor-pointer">{certFile ? certFile.name : 'Attach a copy of the certificate (required)'}<input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={e => setCertFile(e.target.files?.[0] ?? null)} /></label>
-        <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer w-fit">Submit for verification</button>
+        <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer w-fit">{tx('Submit for verification')}</button>
         <ul className="sm:col-span-2 text-xs divide-y divide-slate-100">{cred.certs.map((c: any) => (
           <li key={c.id} className="py-2 flex justify-between gap-3"><span><b>{c.name}</b> · {c.issuer}{c.expiry_date ? ` · expires ${c.expiry_date}` : ''}{c.review_note ? <span className="block text-rose-700">{c.review_note}</span> : null}</span><span className="font-bold">{c.status === 'approved' ? 'Shown on your profile' : c.status}</span></li>
         ))}</ul>
@@ -194,6 +197,7 @@ function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say:
 }
 
 function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
+  const tx = useTr();
   const [tasks, setTasks] = useState<any[]>([]);
   const [about, setAbout] = useState<any[]>([]);
   const [open, setOpen] = useState<any | null>(null);
@@ -207,19 +211,19 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
   const openCase = async (id: string) => { const d = await fetch(`/api/peer-reviews/${id}`).then(r => r.json()); if (d.status === 'success') { setOpen(d.data); setForm({ outcome: 'no_concerns', score: 4, comments: '' }); } };
   const submit = async () => {
     const d = await jreq(`/api/peer-reviews/${open.id}/submit`, 'POST', form);
-    say(d.status === 'success', d.status === 'success' ? 'Review submitted. Thank you.' : d.message);
+    say(d.status === 'success', d.status === 'success' ? tx('Review submitted. Thank you.') : d.message);
     if (d.status === 'success') { setOpen(null); load(); }
   };
   const c = open?.content;
   return (
     <div className="grid gap-5 xl:grid-cols-2 items-start">
       <section className="bg-white border border-slate-200 p-5 space-y-2 min-w-0">
-        <h3 className="text-sm font-extrabold">Cases for you to review</h3>
-        <p className="text-xs text-slate-500">Colleagues' work, with the patient and the author hidden. Treat what you read as confidential.</p>
-        {tasks.length === 0 ? <p className="text-xs text-slate-500">Nothing assigned.</p> : (
+        <h3 className="text-sm font-extrabold">{tx('Cases for you to review')}</h3>
+        <p className="text-xs text-slate-500">{tx('Colleagues\' work, with the patient and the author hidden. Treat what you read as confidential.')}</p>
+        {tasks.length === 0 ? <p className="text-xs text-slate-500">{tx('Nothing assigned.')}</p> : (
           <ul className="divide-y divide-slate-100 text-xs">{tasks.map(t => (
             <li key={t.id} className="py-2 flex justify-between gap-3"><span>{t.subject_type === 'prescription' ? 'Prescription' : 'Consultation note'} · assigned {day(t.assigned_at)}</span>
-              {t.status === 'pending' ? <button onClick={() => openCase(t.id)} className="text-xs font-bold text-[color:var(--t-700)] cursor-pointer">Review</button> : <span className="text-xs font-bold text-slate-500">done</span>}</li>
+              {t.status === 'pending' ? <button onClick={() => openCase(t.id)} className="text-xs font-bold text-[color:var(--t-700)] cursor-pointer">{tx('Review')}</button> : <span className="text-xs font-bold text-slate-500">done</span>}</li>
           ))}</ul>
         )}
       </section>
@@ -230,24 +234,24 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
           {c && <div className="text-xs space-y-1.5 bg-slate-50 border border-slate-200 p-3">
             {'subjective' in c ? (['subjective', 'objective', 'assessment', 'plan'] as const).map(k => <p key={k}><span className="text-xs font-extrabold uppercase text-slate-500 mr-2">{k}</span>{c[k]}</p>) : (
               <>
-                <p><span className="text-xs font-extrabold uppercase text-slate-500 mr-2">Diagnosis</span>{c.diagnosis}</p>
+                <p><span className="text-xs font-extrabold uppercase text-slate-500 mr-2">{tx('Diagnosis')}</span>{c.diagnosis}</p>
                 <ul className="list-disc ml-5">{c.items.map((i: any, k: number) => <li key={k}>{i.name} {i.strength} · {i.dose}, {i.frequency}, {i.durationDays} days, qty {i.quantity}</li>)}</ul>
                 <p className="text-xs">Patient record was {c.patientRecordWasShared ? 'shared' : 'NOT shared'} with the prescriber. Warnings raised: {c.safetyWarnings?.length ? c.safetyWarnings.map((w: any) => `${w.severity}: ${w.message}`).join(' | ') : 'none'}. {Object.keys(c.overrideReasons ?? {}).length ? `Override reasons: ${Object.values(c.overrideReasons).join(' | ')}` : ''}</p>
               </>
             )}
           </div>}
           <div className="grid sm:grid-cols-2 gap-3">
-            <div><label className={lab}>Outcome</label><select className={field} value={form.outcome} onChange={e => setForm({ ...form, outcome: e.target.value })}><option value="no_concerns">No concerns</option><option value="minor_concerns">Minor concerns</option><option value="significant_concerns">Significant concerns</option></select></div>
-            <div><label className={lab}>Quality score (1 low, 5 high)</label><select className={field} value={form.score} onChange={e => setForm({ ...form, score: Number(e.target.value) })}>{[1, 2, 3, 4, 5].map(n => <option key={n}>{n}</option>)}</select></div>
+            <div><label className={lab}>{tx('Outcome')}</label><select className={field} value={form.outcome} onChange={e => setForm({ ...form, outcome: e.target.value })}><option value="no_concerns">{tx('No concerns')}</option><option value="minor_concerns">{tx('Minor concerns')}</option><option value="significant_concerns">{tx('Significant concerns')}</option></select></div>
+            <div><label className={lab}>{tx('Quality score (1 low, 5 high)')}</label><select className={field} value={form.score} onChange={e => setForm({ ...form, score: Number(e.target.value) })}>{[1, 2, 3, 4, 5].map(n => <option key={n}>{n}</option>)}</select></div>
           </div>
           <div><label className={lab}>Comments {form.outcome !== 'no_concerns' ? '(required)' : '(optional)'}</label><textarea className={field} rows={3} value={form.comments} onChange={e => setForm({ ...form, comments: e.target.value })} maxLength={3000} /></div>
-          <div className="flex gap-2"><button onClick={submit} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Submit review</button><button onClick={() => setOpen(null)} className="border border-slate-200 text-xs font-bold px-4 py-2.5 cursor-pointer">Cancel</button></div>
+          <div className="flex gap-2"><button onClick={submit} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">{tx('Submit review')}</button><button onClick={() => setOpen(null)} className="border border-slate-200 text-xs font-bold px-4 py-2.5 cursor-pointer">{tx('Cancel')}</button></div>
         </section>
       )}
 
       <section className="bg-white border border-slate-200 p-5 space-y-2 min-w-0">
-        <h3 className="text-sm font-extrabold">Feedback on your own work</h3>
-        {about.length === 0 ? <p className="text-xs text-slate-500">No peer feedback yet.</p> : about.map(a => (
+        <h3 className="text-sm font-extrabold">{tx('Feedback on your own work')}</h3>
+        {about.length === 0 ? <p className="text-xs text-slate-500">{tx('No peer feedback yet.')}</p> : about.map(a => (
           <article key={a.id} className="border border-slate-100 p-3 text-xs"><p className="font-bold">{a.subject_type === 'prescription' ? 'Prescription' : 'Consultation note'} · score {a.score}/5 · {a.outcome.replace(/_/g, ' ')} <span className="text-xs text-slate-400 font-normal">{day(a.completed_at)}</span></p>{a.comments && <p className="text-xs mt-1">{a.comments}</p>}</article>
         ))}
       </section>
@@ -256,6 +260,7 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
 }
 
 function IncidentSection({ say }: { say: (ok: boolean, t: string) => void }) {
+  const tx = useTr();
   const [form, setForm] = useState({ kind: 'near_miss', severity: 'low', description: '' });
   const [mine, setMine] = useState<any[]>([]);
   const load = useCallback(() => fetch('/api/incidents/mine').then(r => r.json()).then(d => d.status === 'success' && setMine(d.data)).catch(() => {}), []);
@@ -263,24 +268,24 @@ function IncidentSection({ say }: { say: (ok: boolean, t: string) => void }) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const d = await jreq('/api/incidents', 'POST', form);
-    say(d.status === 'success', d.status === 'success' ? 'Reported. The board has been notified.' : d.message);
+    say(d.status === 'success', d.status === 'success' ? tx('Reported. The board has been notified.') : d.message);
     if (d.status === 'success') { setForm({ ...form, description: '' }); load(); }
   };
   return (
     <div className="grid gap-5 xl:grid-cols-2 items-start">
       <form onSubmit={submit} className="bg-white border border-slate-200 p-5 space-y-3">
-        <h3 className="text-sm font-extrabold">Report a patient-safety incident or near miss</h3>
+        <h3 className="text-sm font-extrabold">{tx('Report a patient-safety incident or near miss')}</h3>
         <p className="text-xs text-slate-500">Reporting is how we learn. Do not include patient names; describe what happened. For anyone in immediate danger call 999 first.</p>
         <div className="grid sm:grid-cols-2 gap-3">
-          <div><label className={lab}>Type</label><select className={field} value={form.kind} onChange={e => setForm({ ...form, kind: e.target.value })}>
-            <option value="near_miss">Near miss</option><option value="adverse_drug_event">Adverse drug event</option><option value="patient_harm">Patient harm</option><option value="misconduct">Misconduct</option><option value="privacy">Privacy or data issue</option><option value="system">Platform problem</option><option value="other">Other</option></select></div>
-          <div><label className={lab}>Severity</label><select className={field} value={form.severity} onChange={e => setForm({ ...form, severity: e.target.value })}><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="critical">Critical</option></select></div>
+          <div><label className={lab}>{tx('Type')}</label><select className={field} value={form.kind} onChange={e => setForm({ ...form, kind: e.target.value })}>
+            <option value="near_miss">{tx('Near miss')}</option><option value="adverse_drug_event">{tx('Adverse drug event')}</option><option value="patient_harm">{tx('Patient harm')}</option><option value="misconduct">{tx('Misconduct')}</option><option value="privacy">{tx('Privacy or data issue')}</option><option value="system">{tx('Platform problem')}</option><option value="other">{tx('Other')}</option></select></div>
+          <div><label className={lab}>{tx('Severity')}</label><select className={field} value={form.severity} onChange={e => setForm({ ...form, severity: e.target.value })}><option value="low">{tx('Low')}</option><option value="medium">{tx('Medium')}</option><option value="high">{tx('High')}</option><option value="critical">{tx('Critical')}</option></select></div>
         </div>
-        <textarea className={field} rows={4} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="What happened? (at least 20 characters)" required minLength={20} maxLength={4000} aria-label="Description" />
-        <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Submit report</button>
+        <textarea className={field} rows={4} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder={tx('What happened? (at least 20 characters)')} required minLength={20} maxLength={4000} aria-label={tx('Description')} />
+        <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">{tx('Submit report')}</button>
       </form>
-      <section className="bg-white border border-slate-200 p-5 min-w-0"><h3 className="text-sm font-extrabold mb-2">Your reports</h3>
-        {mine.length === 0 ? <p className="text-xs text-slate-500">No reports yet.</p> : <ul className="divide-y divide-slate-100 text-xs">{mine.map(i => <li key={i.id} className="py-2"><b>{i.kind.replace(/_/g, ' ')}</b> · {i.severity} · <span className="font-bold">{i.status}</span> <span className="text-xs text-slate-400">{day(i.createdAt)}</span>{i.resolution && <p className="text-xs text-slate-600">Outcome: {i.resolution}</p>}</li>)}</ul>}</section>
+      <section className="bg-white border border-slate-200 p-5 min-w-0"><h3 className="text-sm font-extrabold mb-2">{tx('Your reports')}</h3>
+        {mine.length === 0 ? <p className="text-xs text-slate-500">{tx('No reports yet.')}</p> : <ul className="divide-y divide-slate-100 text-xs">{mine.map(i => <li key={i.id} className="py-2"><b>{i.kind.replace(/_/g, ' ')}</b> · {i.severity} · <span className="font-bold">{i.status}</span> <span className="text-xs text-slate-400">{day(i.createdAt)}</span>{i.resolution && <p className="text-xs text-slate-600">Outcome: {i.resolution}</p>}</li>)}</ul>}</section>
     </div>
   );
 }

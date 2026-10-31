@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { AlertTriangle, Ban, FilePlus2, Lock, Pill, Plus, Stethoscope, Trash2 } from 'lucide-react';
+import { useTr } from '../locale';
 import PrescriptionCancelModal from './clinical/PrescriptionCancelModal';
 
 type Kind = 'booking' | 'consult';
@@ -19,6 +20,7 @@ const label = 'text-xs font-extrabold uppercase tracking-wider text-slate-500 bl
 
 /** The doctor's clinical tools for one booking or consultation: record, notes, prescriptions, certificates, referrals, labs. */
 export default function ClinicalWorkspace({ kind, refId }: Props) {
+  const tx = useTr();
   const [ctx, setCtx] = useState<any | null>(null);
   const [tab, setTab] = useState<'record' | 'notes' | 'rx' | 'mc' | 'refer'>('notes');
   const [error, setError] = useState('');
@@ -27,7 +29,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
   const load = useCallback(async () => {
     const d = await fetch(`/api/clinical/context/${kind}/${refId}`).then(r => r.json());
     if (d.status === 'success') { setCtx(d.data); if (d.data.encounter?.subjective !== undefined) setNote(n => ({ ...n, ...pick(d.data.encounter) })); }
-    else setError(d.message || 'Could not load the clinical workspace.');
+    else setError(d.message || tx('Could not load the clinical workspace.'));
   }, [kind, refId]);
   useEffect(() => { load(); }, [load]);
 
@@ -40,11 +42,11 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
     const d = await jpost(`/api/encounters/${kind}/${refId}`, note, 'PUT');
     if (d.status !== 'success') return setError(d.message);
     if (andSign) {
-      if (!window.confirm('Sign this note? It cannot be edited afterwards and the patient will see it.')) return;
+      if (!window.confirm(tx('Sign this note? It cannot be edited afterwards and the patient will see it.'))) return;
       const s = await jpost(`/api/encounters/${kind}/${refId}/sign`);
       if (s.status !== 'success') return setError(s.message);
     }
-    setOk(andSign ? 'Note signed.' : 'Draft saved.');
+    setOk(andSign ? tx('Note signed.') : tx('Draft saved.'));
     load();
   };
 
@@ -78,13 +80,13 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
     const d = await jpost('/api/prescriptions', rxBody());
     setBusy(false);
     if (d.status === 'success') {
-      setOk(`Prescription issued. Verification code: ${d.data.code}`);
+      setOk(tx('Prescription issued. Verification code: {code}', { code: d.data.code }));
       setItems([blankItem()]); setDiagnosis(''); setRxNotes(''); setWarnings(null); setPolicyBlock(null); setOverrides({}); setAttested(false);
       return load();
     }
     if (d.data?.warnings) setWarnings(d.data.warnings);
     if (d.data?.policyBlock) { setPolicyBlock(d.data.policyBlock); if (!d.data?.warnings) setWarnings([]); }
-    setError(d.message || 'Could not issue the prescription.');
+    setError(d.message || tx('Could not issue the prescription.'));
   };
 
   const [cancelModalRx, setCancelModalRx] = useState<{ id: string; code: string; medications: string } | null>(null);
@@ -96,10 +98,10 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
     const d = await jpost(`/api/prescriptions/${cancelModalRx.id}/cancel`, { reason });
     setCancelBusy(false);
     if (d.status !== 'success') {
-      setError(d.message || 'Could not cancel prescription.');
+      setError(d.message || tx('Could not cancel prescription.'));
     } else {
       setCancelModalRx(null);
-      setOk('Prescription cancelled.');
+      setOk(tx('Prescription cancelled.'));
       load();
     }
   };
@@ -117,10 +119,10 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
     setOk('Saved.'); done(); load();
   };
 
-  if (!ctx) return <p className="text-xs text-slate-600 p-4">{error || 'Loading clinical workspace…'}</p>;
+  if (!ctx) return <p className="text-xs text-slate-600 p-4">{error || tx('Loading clinical workspace…')}</p>;
 
   const tabs = [
-    ['notes', 'Notes', Stethoscope], ['rx', 'Prescribe', Pill], ['mc', 'Certificate', FilePlus2], ['refer', 'Refer & labs', Plus], ['record', 'Patient record', Lock],
+    ['notes', tx('Notes'), Stethoscope], ['rx', tx('Prescribe'), Pill], ['mc', tx('Certificate'), FilePlus2], ['refer', tx('Refer & labs'), Plus], ['record', tx('Patient record'), Lock],
   ] as const;
   const needOverride = (warnings ?? []).filter(w => w.severity === 'major');
   const blocked = (warnings ?? []).some(w => w.severity === 'contraindicated');
@@ -131,7 +133,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-extrabold">{ctx.patient.name}</p>
         <p className={`text-xs font-bold px-2 py-1 border ${ctx.recordShared ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
-          {ctx.recordShared ? 'Patient shared their health record with you' : 'Patient has not shared their health record'}
+          {ctx.recordShared ? tx('Patient shared their health record with you') : tx('Patient has not shared their health record')}
         </p>
       </div>
 
@@ -149,19 +151,19 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
       {tab === 'record' && (
         ctx.record ? (
           <div className="space-y-4 text-xs bg-white border border-[color:var(--t-200)] p-5 shadow-xs">
-            <section><h4 className={label}>Allergies & Sensitivities</h4>{ctx.record.allergies.length ? ctx.record.allergies.map((a: any, i: number) => <p key={i} className="font-bold text-rose-700 bg-rose-50 border border-rose-200 p-2 my-1">{a.name}{a.severity ? ` (${a.severity})` : ''}{a.detail ? ` — ${a.detail}` : ''}</p>) : <p className="text-slate-500">None recorded.</p>}</section>
-            <section><h4 className={label}>Chronic Medical Conditions</h4>{ctx.record.conditions.length ? ctx.record.conditions.map((c: any, i: number) => <p key={i} className="font-semibold text-slate-800 py-0.5">{c.name}{c.detail ? ` — ${c.detail}` : ''}</p>) : <p className="text-slate-500">None recorded.</p>}</section>
-            <section><h4 className={label}>Current Active Medications</h4>{ctx.record.medications.length ? ctx.record.medications.map((m: any, i: number) => <p key={i} className="font-semibold text-slate-800 py-0.5">{m.name}{m.detail ? ` — ${m.detail}` : ''}</p>) : <p className="text-slate-500">None recorded.</p>}</section>
-            <section><h4 className={label}>Vitals & Physiological Readings</h4>{ctx.record.vitals.length ? ctx.record.vitals.slice(0, 8).map((v: any, i: number) => <p key={i} className="tabular-nums font-mono py-0.5">{new Date(v.ts).toLocaleDateString()} · {v.kind.replace('_', ' ')}: <b className="text-[color:var(--t-700)]">{v.value1}{v.value2 ? `/${v.value2}` : ''} {v.unit}</b></p>) : <p className="text-slate-500">None.</p>}</section>
-            <section><h4 className={label}>Active Prescriptions</h4>{ctx.record.activePrescriptions.length ? ctx.record.activePrescriptions.map((p: any, i: number) => <p key={i} className="py-0.5 font-medium">{p.items.join(', ')}</p>) : <p className="text-slate-500">None.</p>}</section>
-            <section><h4 className={label}>Verified Diagnostic Lab Results</h4>{ctx.record.labResults.length ? ctx.record.labResults.map((l: any) => <p key={l.id} className="py-1 flex items-center justify-between">{l.tests} <a className="underline font-bold text-[color:var(--t-700)]" href={`/api/documents/${l.result_document_id}/download`}>Download verified report</a></p>) : <p className="text-slate-500">None.</p>}</section>
+            <section><h4 className={label}>{tx('Allergies & Sensitivities')}</h4>{ctx.record.allergies.length ? ctx.record.allergies.map((a: any, i: number) => <p key={i} className="font-bold text-rose-700 bg-rose-50 border border-rose-200 p-2 my-1">{a.name}{a.severity ? ` (${a.severity})` : ''}{a.detail ? ` — ${a.detail}` : ''}</p>) : <p className="text-slate-500">{tx('None recorded.')}</p>}</section>
+            <section><h4 className={label}>{tx('Chronic Medical Conditions')}</h4>{ctx.record.conditions.length ? ctx.record.conditions.map((c: any, i: number) => <p key={i} className="font-semibold text-slate-800 py-0.5">{c.name}{c.detail ? ` — ${c.detail}` : ''}</p>) : <p className="text-slate-500">{tx('None recorded.')}</p>}</section>
+            <section><h4 className={label}>{tx('Current Active Medications')}</h4>{ctx.record.medications.length ? ctx.record.medications.map((m: any, i: number) => <p key={i} className="font-semibold text-slate-800 py-0.5">{m.name}{m.detail ? ` — ${m.detail}` : ''}</p>) : <p className="text-slate-500">{tx('None recorded.')}</p>}</section>
+            <section><h4 className={label}>{tx('Vitals & Physiological Readings')}</h4>{ctx.record.vitals.length ? ctx.record.vitals.slice(0, 8).map((v: any, i: number) => <p key={i} className="tabular-nums font-mono py-0.5">{new Date(v.ts).toLocaleDateString()} · {v.kind.replace('_', ' ')}: <b className="text-[color:var(--t-700)]">{v.value1}{v.value2 ? `/${v.value2}` : ''} {v.unit}</b></p>) : <p className="text-slate-500">{tx('None.')}</p>}</section>
+            <section><h4 className={label}>{tx('Active Prescriptions')}</h4>{ctx.record.activePrescriptions.length ? ctx.record.activePrescriptions.map((p: any, i: number) => <p key={i} className="py-0.5 font-medium">{p.items.join(', ')}</p>) : <p className="text-slate-500">{tx('None.')}</p>}</section>
+            <section><h4 className={label}>{tx('Verified Diagnostic Lab Results')}</h4>{ctx.record.labResults.length ? ctx.record.labResults.map((l: any) => <p key={l.id} className="py-1 flex items-center justify-between">{l.tests} <a className="underline font-bold text-[color:var(--t-700)]" href={`/api/documents/${l.result_document_id}/download`}>{tx('Download verified report')}</a></p>) : <p className="text-slate-500">{tx('None.')}</p>}</section>
           </div>
-        ) : <div className="p-6 bg-white border border-[color:var(--t-200)] text-xs text-slate-600">The patient has not enabled health record access for this consultation session. Ask the patient to confirm key drug allergies verbally.</div>
+        ) : <div className="p-6 bg-white border border-[color:var(--t-200)] text-xs text-slate-600">{tx('The patient has not enabled health record access for this consultation session. Ask the patient to confirm key drug allergies verbally.')}</div>
       )}
 
       {tab === 'notes' && (
         <div className="space-y-4 bg-white border border-[color:var(--t-200)] p-5 shadow-xs">
-          {([['subjective', 'Subjective (Patient narrative, reported history, onset)'], ['objective', 'Objective (Vital signs, physical exam, camera inspection)'], ['assessment', 'Assessment (Working clinical diagnosis, ICD-10 provisional)'], ['plan', 'Plan (Treatment protocol, lifestyle, next follow-up)']] as const).map(([k, l]) => (
+          {([['subjective', tx('Subjective (Patient narrative, reported history, onset)')], ['objective', tx('Objective (Vital signs, physical exam, camera inspection)')], ['assessment', tx('Assessment (Working clinical diagnosis, ICD-10 provisional)')], ['plan', tx('Plan (Treatment protocol, lifestyle, next follow-up)')]] as const).map(([k, l]) => (
             <div key={k}>
               <label className={label} htmlFor={`soap-${k}`}>{l}</label>
               <textarea id={`soap-${k}`} rows={k === 'assessment' || k === 'plan' ? 2 : 3}
@@ -172,12 +174,12 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
           ))}
           {signed ? (
             <p className="text-xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 p-3">
-              Digitally signed on {new Date(ctx.encounter.signedAt).toLocaleString()}. Encounter note is locked and archived.
+              {tx('Digitally signed on {date}. Encounter note is locked and archived.', { date: new Date(ctx.encounter.signedAt).toLocaleString() })}
             </p>
           ) : (
             <div className="flex gap-3 pt-2">
-              <button onClick={() => saveNote(false)} className="h-10 border border-slate-300 hover:bg-slate-50 text-xs font-bold px-5 cursor-pointer transition-colors">Save Working Draft</button>
-              <button onClick={() => saveNote(true)} className="h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-6 cursor-pointer transition-colors shadow-xs">Sign & Lock Note</button>
+              <button onClick={() => saveNote(false)} className="h-10 border border-slate-300 hover:bg-slate-50 text-xs font-bold px-5 cursor-pointer transition-colors">{tx('Save Working Draft')}</button>
+              <button onClick={() => saveNote(true)} className="h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-6 cursor-pointer transition-colors shadow-xs">{tx('Sign & Lock Note')}</button>
             </div>
           )}
         </div>
@@ -185,72 +187,72 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
 
       {tab === 'rx' && (
         <div className="space-y-3">
-          <div><label className={label} htmlFor="rx-dx">Diagnosis</label><input id="rx-dx" className={field} value={diagnosis} onChange={e => setDiagnosis(e.target.value)} maxLength={300} /></div>
+          <div><label className={label} htmlFor="rx-dx">{tx('Diagnosis')}</label><input id="rx-dx" className={field} value={diagnosis} onChange={e => setDiagnosis(e.target.value)} maxLength={300} /></div>
           {items.map((it, i) => (
             <fieldset key={i} className="border border-slate-200 p-3 space-y-2">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <div className="col-span-2"><label className={label}>Medicine</label><input className={field} value={it.name} onChange={e => setItem(i, { name: e.target.value })} placeholder="Generic name" /></div>
-                <div><label className={label}>Strength</label><input className={field} value={it.strength} onChange={e => setItem(i, { strength: e.target.value })} placeholder="500 mg" /></div>
-                <div><label className={label}>Form</label><input className={field} value={it.form} onChange={e => setItem(i, { form: e.target.value })} /></div>
-                <div><label className={label}>Dose</label><input className={field} value={it.dose} onChange={e => setItem(i, { dose: e.target.value })} placeholder="1 tablet" /></div>
-                <div><label className={label}>Frequency</label><input className={field} value={it.frequency} onChange={e => setItem(i, { frequency: e.target.value })} placeholder="twice daily" /></div>
-                <div><label className={label}>Days</label><input type="number" min={1} max={90} className={field} value={it.durationDays} onChange={e => setItem(i, { durationDays: e.target.value })} /></div>
-                <div><label className={label}>Quantity</label><input type="number" min={1} max={999} className={field} value={it.quantity} onChange={e => setItem(i, { quantity: e.target.value })} /></div>
-                <div className="col-span-2 sm:col-span-4"><label className={label}>Instructions</label><input className={field} value={it.instructions} onChange={e => setItem(i, { instructions: e.target.value })} placeholder="After meals" maxLength={200} /></div>
-                <div className="col-span-2 sm:col-span-4"><label className={label}>NPRA registration no. (optional)</label><input className={`${field} font-mono`} value={it.npraReg ?? ''} onChange={e => setItem(i, { npraReg: e.target.value.toUpperCase() })} placeholder="MAL12345678A" maxLength={20} /></div>
+                <div className="col-span-2"><label className={label}>{tx('Medicine')}</label><input className={field} value={it.name} onChange={e => setItem(i, { name: e.target.value })} placeholder={tx('Generic name')} /></div>
+                <div><label className={label}>{tx('Strength')}</label><input className={field} value={it.strength} onChange={e => setItem(i, { strength: e.target.value })} placeholder={tx('500 mg')} /></div>
+                <div><label className={label}>{tx('Form')}</label><input className={field} value={it.form} onChange={e => setItem(i, { form: e.target.value })} /></div>
+                <div><label className={label}>{tx('Dose')}</label><input className={field} value={it.dose} onChange={e => setItem(i, { dose: e.target.value })} placeholder={tx('1 tablet')} /></div>
+                <div><label className={label}>{tx('Frequency')}</label><input className={field} value={it.frequency} onChange={e => setItem(i, { frequency: e.target.value })} placeholder={tx('twice daily')} /></div>
+                <div><label className={label}>{tx('Days')}</label><input type="number" min={1} max={90} className={field} value={it.durationDays} onChange={e => setItem(i, { durationDays: e.target.value })} /></div>
+                <div><label className={label}>{tx('Quantity')}</label><input type="number" min={1} max={999} className={field} value={it.quantity} onChange={e => setItem(i, { quantity: e.target.value })} /></div>
+                <div className="col-span-2 sm:col-span-4"><label className={label}>{tx('Instructions')}</label><input className={field} value={it.instructions} onChange={e => setItem(i, { instructions: e.target.value })} placeholder={tx('After meals')} maxLength={200} /></div>
+                <div className="col-span-2 sm:col-span-4"><label className={label}>{tx('NPRA registration no. (optional)')}</label><input className={`${field} font-mono`} value={it.npraReg ?? ''} onChange={e => setItem(i, { npraReg: e.target.value.toUpperCase() })} placeholder={tx('MAL12345678A')} maxLength={20} /></div>
               </div>
-              {items.length > 1 && <button onClick={() => { setItems(items.filter((_, x) => x !== i)); setWarnings(null); }} className="text-xs font-bold text-rose-700 flex items-center gap-1 cursor-pointer"><Trash2 className="h-3 w-3" /> Remove</button>}
+              {items.length > 1 && <button onClick={() => { setItems(items.filter((_, x) => x !== i)); setWarnings(null); }} className="text-xs font-bold text-rose-700 flex items-center gap-1 cursor-pointer"><Trash2 className="h-3 w-3" /> {tx('Remove')}</button>}
             </fieldset>
           ))}
-          <button onClick={() => { setItems([...items, blankItem()]); setWarnings(null); }} disabled={items.length >= 12} className="text-xs font-bold border border-slate-300 px-3 py-1.5 cursor-pointer">+ Add medicine</button>
+          <button onClick={() => { setItems([...items, blankItem()]); setWarnings(null); }} disabled={items.length >= 12} className="text-xs font-bold border border-slate-300 px-3 py-1.5 cursor-pointer">{tx('+ Add medicine')}</button>
           <div className="grid grid-cols-2 gap-2">
-            <div><label className={label}>Valid for (days)</label><input type="number" min={1} max={90} className={field} value={validDays} onChange={e => setValidDays(Number(e.target.value))} /></div>
-            <div><label className={label}>Note to pharmacist</label><input className={field} value={rxNotes} onChange={e => setRxNotes(e.target.value)} maxLength={500} /></div>
+            <div><label className={label}>{tx('Valid for (days)')}</label><input type="number" min={1} max={90} className={field} value={validDays} onChange={e => setValidDays(Number(e.target.value))} /></div>
+            <div><label className={label}>{tx('Note to pharmacist')}</label><input className={field} value={rxNotes} onChange={e => setRxNotes(e.target.value)} maxLength={500} /></div>
           </div>
 
           {!ctx.recordShared && (
             <label className="flex items-start gap-2 text-xs bg-amber-50 border border-amber-200 p-2.5 cursor-pointer">
               <input type="checkbox" className="mt-0.5" checked={attested} onChange={e => setAttested(e.target.checked)} />
-              <span>The patient has not shared their record. I confirm I have asked about allergies and current medicines. Automatic checks use only what I enter, so they will not catch the patient's recorded allergies.</span>
+              <span>{tx('The patient has not shared their record. I confirm I have asked about allergies and current medicines. Automatic checks use only what I enter, so they will not catch the patient\'s recorded allergies.')}</span>
             </label>
           )}
 
-          <button onClick={runCheck} disabled={busy} className="border border-slate-300 text-xs font-bold px-4 py-2 cursor-pointer">Check safety</button>
+          <button onClick={runCheck} disabled={busy} className="border border-slate-300 text-xs font-bold px-4 py-2 cursor-pointer">{tx('Check safety')}</button>
 
           {warnings && (
             <div className="space-y-2" aria-live="polite">
               {policyBlock && (
                 <div role="alert" className="border border-rose-300 bg-rose-50 text-rose-900 p-2.5 text-xs space-y-1">
-                  <p className="font-extrabold flex items-center gap-1.5"><Ban className="h-3.5 w-3.5" /> NOT ALLOWED FOR THIS CONSULTATION</p>
+                  <p className="font-extrabold flex items-center gap-1.5"><Ban className="h-3.5 w-3.5" /> {tx('NOT ALLOWED FOR THIS CONSULTATION')}</p>
                   <p>{policyBlock}</p>
-                  <p className="font-bold">Cannot be issued.</p>
+                  <p className="font-bold">{tx('Cannot be issued.')}</p>
                 </div>
               )}
-              {warnings.length === 0 && unknown.length === 0 && !policyBlock && <p className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 p-2.5">No issues found by the built-in checks.</p>}
+              {warnings.length === 0 && unknown.length === 0 && !policyBlock && <p className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 p-2.5">{tx('No issues found by the built-in checks.')}</p>}
               {warnings.map(w => (
                 <div key={w.key} className={`border p-2.5 text-xs space-y-1.5 ${SEV[w.severity]}`}>
                   <p className="font-extrabold flex items-center gap-1.5">{w.severity === 'contraindicated' ? <Ban className="h-3.5 w-3.5" /> : <AlertTriangle className="h-3.5 w-3.5" />} {w.severity.toUpperCase()} · {w.drugs.join(' + ')}</p>
                   <p>{w.message}</p>
                   {w.severity === 'major' && (
-                    <input className={field} placeholder="Reason for proceeding (required)" value={overrides[w.key] ?? ''} onChange={e => setOverrides(o => ({ ...o, [w.key]: e.target.value }))} />
+                    <input className={field} placeholder={tx('Reason for proceeding (required)')} value={overrides[w.key] ?? ''} onChange={e => setOverrides(o => ({ ...o, [w.key]: e.target.value }))} />
                   )}
-                  {w.severity === 'contraindicated' && <p className="font-bold">Cannot be issued.</p>}
+                  {w.severity === 'contraindicated' && <p className="font-bold">{tx('Cannot be issued.')}</p>}
                 </div>
               ))}
-              <p className="text-xs text-slate-500">Built-in checks cover a limited formulary and common interactions. They support, not replace, your clinical judgement.</p>
+              <p className="text-xs text-slate-500">{tx('Built-in checks cover a limited formulary and common interactions. They support, not replace, your clinical judgement.')}</p>
             </div>
           )}
 
           <button onClick={issue} disabled={busy || !diagnosis || (warnings === null) || !canIssue} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">
-            {warnings === null ? 'Run the safety check first' : 'Sign and issue prescription'}
+            {warnings === null ? tx('Run the safety check first') : tx('Sign and issue prescription')}
           </button>
 
           {ctx.prescriptions.length > 0 && (
             <section className="pt-3 border-t border-slate-200 space-y-2">
-              <h4 className={label}>Issued for this visit</h4>
+              <h4 className={label}>{tx('Issued for this visit')}</h4>
               {ctx.prescriptions.map((p: any) => (
                 <div key={p.id} className="border border-slate-200 p-2.5 text-xs flex flex-wrap justify-between gap-2">
-                  <span><b>{p.items.map((i: any) => i.name).join(', ')}</b> · code <span className="font-mono font-bold">{p.code}</span> · {p.status}</span>
+                  <span><b>{p.items.map((i: any) => i.name).join(', ')}</b> {tx('· code')} <span className="font-mono font-bold">{p.code}</span> · {p.status}</span>
                   {p.status === 'active' && (
                     <button
                       type="button"
@@ -277,21 +279,21 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
             <div role="alert" className="border-2 border-amber-300 bg-amber-50 text-amber-900 p-3.5 text-xs space-y-1.5 shadow-xs">
               <div className="flex items-center gap-2 font-black text-amber-950">
                 <AlertTriangle className="h-4 w-4 text-amber-700 shrink-0" />
-                <span>MMC Regulatory Restriction · Virtual Teleconsultation</span>
+                <span>{tx('MMC Regulatory Restriction · Virtual Teleconsultation')}</span>
               </div>
               <p className="leading-relaxed font-medium">
-                Under MMC Ethical Guidelines, medical certificates cannot be issued for virtual teleconsultations alone. If the patient requires medical leave, refer them for an in-person physical assessment.
+                {tx('Under MMC Ethical Guidelines, medical certificates cannot be issued for virtual teleconsultations alone. If the patient requires medical leave, refer them for an in-person physical assessment.')}
               </p>
             </div>
           ) : (
             <p className="text-xs text-slate-600">
-              Medical certificates do not state the diagnosis. In-clinic digital certificates are limited to 14 days.
+              {tx('Medical certificates do not state the diagnosis. In-clinic digital certificates are limited to 14 days.')}
             </p>
           )}
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className={label}>From</label>
+              <label className={label}>{tx('From')}</label>
               <input
                 type="date"
                 className={`${field} disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed`}
@@ -301,7 +303,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
               />
             </div>
             <div>
-              <label className={label}>To</label>
+              <label className={label}>{tx('To')}</label>
               <input
                 type="date"
                 className={`${field} disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed`}
@@ -313,7 +315,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
           </div>
 
           <div>
-            <label className={label}>Remarks (optional)</label>
+            <label className={label}>{tx('Remarks (optional)')}</label>
             <input
               className={`${field} disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed`}
               value={mc.remarks}
@@ -328,9 +330,9 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
             onClick={() => submit('/api/certificates', mc, () => setMc({ ...mc, remarks: '' }))}
             disabled={busy || kind === 'consult'}
             className="bg-[color:var(--t-600)] disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer transition-colors shadow-xs"
-            title={kind === 'consult' ? 'Under MMC Ethical Guidelines, medical certificates cannot be issued for virtual teleconsultations alone.' : 'Sign and issue certificate'}
+            title={kind === 'consult' ? tx('Under MMC Ethical Guidelines, medical certificates cannot be issued for virtual teleconsultations alone.') : tx('Sign and issue certificate')}
           >
-            {kind === 'consult' ? 'Certificate Disabled for Teleconsult (MMC Rule)' : 'Sign and issue certificate'}
+            {kind === 'consult' ? tx('Certificate Disabled for Teleconsult (MMC Rule)') : tx('Sign and issue certificate')}
           </button>
 
           {ctx.certificates.length > 0 && (
@@ -348,20 +350,20 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
       {tab === 'refer' && (
         <div className="space-y-5">
           <div className="space-y-2 max-w-md">
-            <h4 className={label}>Referral</h4>
-            <input className={field} placeholder="Specialty (e.g. Cardiologist)" value={ref.toSpecialty} onChange={e => setRef({ ...ref, toSpecialty: e.target.value })} maxLength={100} />
-            <textarea className={field} rows={3} placeholder="Reason for referral" value={ref.reason} onChange={e => setRef({ ...ref, reason: e.target.value })} maxLength={1000} />
-            <select className={field} value={ref.urgency} onChange={e => setRef({ ...ref, urgency: e.target.value })}><option value="routine">Routine</option><option value="soon">Soon</option><option value="urgent">Urgent</option></select>
-            <button onClick={() => submit('/api/referrals', ref, () => setRef({ toSpecialty: '', reason: '', urgency: 'routine' }))} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Issue referral</button>
+            <h4 className={label}>{tx('Referral')}</h4>
+            <input className={field} placeholder={tx('Specialty (e.g. Cardiologist)')} value={ref.toSpecialty} onChange={e => setRef({ ...ref, toSpecialty: e.target.value })} maxLength={100} />
+            <textarea className={field} rows={3} placeholder={tx('Reason for referral')} value={ref.reason} onChange={e => setRef({ ...ref, reason: e.target.value })} maxLength={1000} />
+            <select className={field} value={ref.urgency} onChange={e => setRef({ ...ref, urgency: e.target.value })}><option value="routine">{tx('Routine')}</option><option value="soon">{tx('Soon')}</option><option value="urgent">{tx('Urgent')}</option></select>
+            <button onClick={() => submit('/api/referrals', ref, () => setRef({ toSpecialty: '', reason: '', urgency: 'routine' }))} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">{tx('Issue referral')}</button>
             {ctx.referrals.length > 0 && <ul className="text-xs space-y-1 pt-2 border-t border-slate-200">{ctx.referrals.map((r: any) => <li key={r.id}>{r.toSpecialty} · {r.urgency}</li>)}</ul>}
           </div>
           <div className="space-y-2 max-w-md">
-            <h4 className={label}>Lab tests</h4>
-            <input className={field} placeholder="Tests (e.g. FBC, HbA1c)" value={lab.tests} onChange={e => setLab({ ...lab, tests: e.target.value })} maxLength={500} />
-            <input className={field} placeholder="Notes for the patient or lab" value={lab.notes} onChange={e => setLab({ ...lab, notes: e.target.value })} maxLength={300} />
-            <button onClick={() => submit('/api/lab-orders', lab, () => setLab({ tests: '', notes: '' }))} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Request tests</button>
+            <h4 className={label}>{tx('Lab tests')}</h4>
+            <input className={field} placeholder={tx('Tests (e.g. FBC, HbA1c)')} value={lab.tests} onChange={e => setLab({ ...lab, tests: e.target.value })} maxLength={500} />
+            <input className={field} placeholder={tx('Notes for the patient or lab')} value={lab.notes} onChange={e => setLab({ ...lab, notes: e.target.value })} maxLength={300} />
+            <button onClick={() => submit('/api/lab-orders', lab, () => setLab({ tests: '', notes: '' }))} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">{tx('Request tests')}</button>
             {ctx.labOrders.length > 0 && <ul className="text-xs space-y-1 pt-2 border-t border-slate-200">{ctx.labOrders.map((o: any) => (
-              <li key={o.id}>{o.tests} · {o.status}{o.resultDocumentId && ctx.recordShared ? <> · <a className="underline font-bold" href={`/api/documents/${o.resultDocumentId}/download`}>download result</a></> : ''}</li>
+              <li key={o.id}>{o.tests} · {o.status}{o.resultDocumentId && ctx.recordShared ? <> · <a className="underline font-bold" href={`/api/documents/${o.resultDocumentId}/download`}>{tx('download result')}</a></> : ''}</li>
             ))}</ul>}
           </div>
         </div>

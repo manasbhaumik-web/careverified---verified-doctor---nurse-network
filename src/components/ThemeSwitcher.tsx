@@ -84,7 +84,7 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
         aria-expanded={open}
         aria-label={tx('Settings: application theme')}
         title={tx('Settings')}
-        className={`h-11 w-11 flex items-center justify-center border rounded-none transition-colors cursor-pointer ${buttonTone}`}
+        className={`h-11 w-11 flex items-center justify-center ${tone === 'onColor' ? 'border-0' : 'border'} rounded-none transition-colors cursor-pointer ${buttonTone}`}
       >
         <Settings className="h-[18px] w-[18px]" />
       </button>

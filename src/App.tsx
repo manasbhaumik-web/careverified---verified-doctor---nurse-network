@@ -586,7 +586,7 @@ export default function App() {
             <NotificationBell />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="min-h-11 min-w-11 flex items-center justify-center rounded-none border border-transparent text-white hover:bg-white/15 cursor-pointer"
+              className="min-h-11 min-w-11 flex items-center justify-center rounded-none border-0 text-white hover:bg-white/15 cursor-pointer"
               aria-label={tt('Toggle navigation')}
               aria-expanded={mobileMenuOpen}
             >
@@ -652,37 +652,37 @@ export default function App() {
                       )}
                       {item.id === 'admin_registry' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          Audit
+                          {tt('Audit')}
                         </span>
                       )}
                       {item.id === 'admin_ops' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          Ops
+                          {tt('Ops')}
                         </span>
                       )}
                       {item.id === 'messages' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-100)] text-[color:var(--t-600)]'}`}>
-                          2 new
+                          {tt('2 new')}
                         </span>
                       )}
                       {item.id === 'recruitment' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          9 Open
+                          {tt('9 Open')}
                         </span>
                       )}
                       {item.id === 'onboard' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          Clinical
+                          {tt('Clinical')}
                         </span>
                       )}
                       {item.id === 'practice_compliance' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          MMC/LJM
+                          {tt('MMC/LJM')}
                         </span>
                       )}
                       {item.id === 'performance_profile' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          Profile
+                          {tt('Profile')}
                         </span>
                       )}
                       {item.id === 'articles' && (
@@ -692,7 +692,7 @@ export default function App() {
                       )}
                       {item.id === 'tourism_desk' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          Global
+                          {tt('Global')}
                         </span>
                       )}
                     </button>
@@ -783,37 +783,37 @@ export default function App() {
                     )}
                     {item.id === 'admin_registry' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        Audit
+                        {tt('Audit')}
                       </span>
                     )}
                     {item.id === 'admin_ops' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        Ops
+                        {tt('Ops')}
                       </span>
                     )}
                     {item.id === 'messages' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        2 new
+                        {tt('2 new')}
                       </span>
                     )}
                     {item.id === 'recruitment' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        9 Open
+                        {tt('9 Open')}
                       </span>
                     )}
                     {item.id === 'onboard' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        Clinical
+                        {tt('Clinical')}
                       </span>
                     )}
                     {item.id === 'practice_compliance' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        MMC/LJM
+                        {tt('MMC/LJM')}
                       </span>
                     )}
                     {item.id === 'performance_profile' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        Profile
+                        {tt('Profile')}
                       </span>
                     )}
                     {item.id === 'articles' && (
@@ -823,7 +823,7 @@ export default function App() {
                     )}
                     {item.id === 'tourism_desk' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
-                        Global
+                        {tt('Global')}
                       </span>
                     )}
                     {item.id === 'seo' && (
