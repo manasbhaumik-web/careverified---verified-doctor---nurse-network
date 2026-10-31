@@ -586,7 +586,7 @@ export default function App() {
             <NotificationBell />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="min-h-11 min-w-11 flex items-center justify-center rounded-none border border-transparent text-white hover:bg-white/15 cursor-pointer"
+              className="min-h-11 min-w-11 flex items-center justify-center rounded-none border-0 text-white hover:bg-white/15 cursor-pointer"
               aria-label={tt('Toggle navigation')}
               aria-expanded={mobileMenuOpen}
             >
