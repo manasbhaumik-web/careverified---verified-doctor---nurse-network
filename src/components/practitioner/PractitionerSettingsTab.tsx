@@ -3,6 +3,7 @@ import {
   Edit, Bold, Italic, List, Quote, X, Plus, Calendar, CheckCircle2, Loader, Save,
   Shield, MapPin, DollarSign
 } from 'lucide-react';
+import { useTr } from '../../locale';
 import { DoctorProfile, NurseProfile } from '../../types';
 
 interface PractitionerSettingsTabProps {
@@ -64,15 +65,16 @@ export default function PractitionerSettingsTab({
   onSubmit,
   showToast
 }: PractitionerSettingsTabProps) {
+  const tx = useTr();
   const addCertification = () => {
     const trimmed = newCert.trim();
     if (trimmed) {
       if (certifications.includes(trimmed)) {
-        showToast("Certification already exists!");
+        showToast(tx('Certification already exists!'));
       } else {
         setCertifications([...certifications, trimmed]);
         setNewCert('');
-        showToast(`Added certification: ${trimmed}`);
+        showToast(tx('Added certification: {name}', { name: trimmed }));
       }
     }
   };
@@ -82,7 +84,7 @@ export default function PractitionerSettingsTab({
     if (trimmed && !editSlots.includes(trimmed)) {
       setEditSlots([...editSlots, trimmed]);
       setNewTimeSlot('');
-      showToast(`Added timeslot: ${trimmed}`);
+      showToast(tx('Added timeslot: {name}', { name: trimmed }));
     }
   };
 
@@ -94,9 +96,9 @@ export default function PractitionerSettingsTab({
         <div className="border-b border-[color:var(--t-200)] pb-3.5 mb-6">
           <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
             <Edit className="h-4.5 w-4.5 text-[color:var(--t-600)]" />
-            Registry Listing Configuration
+            {tx('Registry Listing Configuration')}
           </h3>
-          <p className="text-xs text-slate-500 font-medium">Update the public information patients find when searching the registry.</p>
+          <p className="text-xs text-slate-500 font-medium">{tx('Update the public information patients find when searching the registry.')}</p>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-6">
@@ -104,7 +106,7 @@ export default function PractitionerSettingsTab({
           {/* Biography & Philosophy with formatting tools */}
           <div className="space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <label className="block text-xs font-black text-slate-700">Clinical Biography & Care Philosophy</label>
+              <label className="block text-xs font-black text-slate-700">{tx('Clinical Biography & Care Philosophy')}</label>
 
               {/* Formatting Tools */}
               <div className="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-none">
@@ -112,63 +114,63 @@ export default function PractitionerSettingsTab({
                   type="button"
                   onClick={() => {
                     setEditBio(prev => prev + " **Clinical Focus:** ");
-                    showToast("Added Bold template");
+                    showToast(tx('Added Bold template'));
                   }}
                   className="p-1 hover:bg-white text-slate-600 hover:text-slate-900 rounded-none text-xs font-bold transition-colors flex items-center gap-0.5 cursor-pointer"
-                  title="Add Bold section header"
+                  title={tx('Add Bold section header')}
                 >
                   <Bold className="h-3 w-3" />
-                  <span>Bold</span>
+                  <span>{tx('Bold')}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => {
                     setEditBio(prev => prev + " *[Patient Centered care]* ");
-                    showToast("Added Italic template");
+                    showToast(tx('Added Italic template'));
                   }}
                   className="p-1 hover:bg-white text-slate-600 hover:text-slate-900 rounded-none text-xs font-bold transition-colors flex items-center gap-0.5 cursor-pointer"
-                  title="Add Italic emphasis"
+                  title={tx('Add Italic emphasis')}
                 >
                   <Italic className="h-3 w-3" />
-                  <span>Italic</span>
+                  <span>{tx('Italic')}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => {
                     setEditBio(prev => prev + "\n- Pediatric Primary Care\n- Child Development Milestones");
-                    showToast("Added Bullet List template");
+                    showToast(tx('Added Bullet List template'));
                   }}
                   className="p-1 hover:bg-white text-slate-600 hover:text-slate-900 rounded-none text-xs font-bold transition-colors flex items-center gap-0.5 cursor-pointer"
-                  title="Add Bullet Points"
+                  title={tx('Add Bullet Points')}
                 >
                   <List className="h-3 w-3" />
-                  <span>List</span>
+                  <span>{tx('List')}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => {
                     setEditBio(prev => prev + '\n> "My clinical philosophy is pediatric wellness."');
-                    showToast("Added Quote template");
+                    showToast(tx('Added Quote template'));
                   }}
                   className="p-1 hover:bg-white text-slate-600 hover:text-slate-900 rounded-none text-xs font-bold transition-colors flex items-center gap-0.5 cursor-pointer"
-                  title="Add Blockquote Quote"
+                  title={tx('Add Blockquote Quote')}
                 >
                   <Quote className="h-3 w-3" />
-                  <span>Quote</span>
+                  <span>{tx('Quote')}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => {
                     setEditBio('');
-                    showToast("Cleared biography");
+                    showToast(tx('Cleared biography'));
                   }}
                   className="p-1 hover:bg-rose-50 text-rose-600 hover:text-rose-700 rounded-none text-xs font-extrabold transition-colors cursor-pointer"
                 >
-                  Clear
+                  {tx('Clear')}
                 </button>
               </div>
             </div>
@@ -178,25 +180,25 @@ export default function PractitionerSettingsTab({
               value={editBio}
               onChange={(e) => setEditBio(e.target.value)}
               className="w-full text-xs border border-[color:var(--t-200)] rounded-none p-3.5 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 leading-relaxed bg-white"
-              placeholder="Explain your approach to care, clinical experience, and focus areas..."
+              placeholder={tx('Explain your approach to care, clinical experience, and focus areas...')}
               required
             />
           </div>
 
           {/* Medical Certifications Tag Manager */}
           <div className="space-y-2 pt-2 border-t border-[color:var(--t-200)]">
-            <label className="block text-xs font-black text-slate-700">Active Medical Certifications</label>
-            <p className="text-xs text-slate-500 font-semibold">Verify specialized training tags displayed on your public patient card.</p>
+            <label className="block text-xs font-black text-slate-700">{tx('Active Medical Certifications')}</label>
+            <p className="text-xs text-slate-500 font-semibold">{tx('Verify specialized training tags displayed on your public patient card.')}</p>
 
             <div className="flex flex-wrap gap-1.5 mb-2">
               {certifications.map(cert => (
                 <span key={cert} className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] font-extrabold text-2xs px-3 py-1.5 rounded-none flex items-center gap-1.5 shadow-3xs">
-                  <span>{cert}</span>
+                  <span>{tx(cert)}</span>
                   <button
                     type="button"
                     onClick={() => {
                       setCertifications(certifications.filter(c => c !== cert));
-                      showToast(`Removed certification: ${cert}`);
+                      showToast(tx('Removed certification: {name}', { name: cert }));
                     }}
                     className="text-rose-500 hover:text-rose-600 font-black cursor-pointer p-0.5 rounded-none transition-colors"
                   >
@@ -205,14 +207,14 @@ export default function PractitionerSettingsTab({
                 </span>
               ))}
               {certifications.length === 0 && (
-                <span className="text-xs text-slate-400 italic">No certifications listed. Add tags below.</span>
+                <span className="text-xs text-slate-400 italic">{tx('No certifications listed. Add tags below.')}</span>
               )}
             </div>
 
             <div className="flex gap-2 max-w-sm">
               <input
                 type="text"
-                placeholder="e.g. Advanced Pediatric Life Support"
+                placeholder={tx('e.g. Advanced Pediatric Life Support')}
                 value={newCert}
                 onChange={(e) => setNewCert(e.target.value)}
                 className="text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 flex-1 min-w-0 bg-white"
@@ -229,7 +231,7 @@ export default function PractitionerSettingsTab({
                 className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-4 py-2 rounded-none transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap"
               >
                 <Plus className="h-3.5 w-3.5" />
-                Add Tag
+                {tx('Add Tag')}
               </button>
             </div>
           </div>
@@ -238,10 +240,10 @@ export default function PractitionerSettingsTab({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-[color:var(--t-200)]">
             <div>
               <label className="block text-xs font-black text-slate-700 mb-1.5">
-                {isDoc ? "Standard Co-Pay Fee (RM)" : "Hourly Clinical Service Fee (RM)"}
+                {isDoc ? tx('Standard Co-Pay Fee (RM)') : tx('Hourly Clinical Service Fee (RM)')}
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-black">RM</span>
+                <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-black">{tx('RM')}</span>
                 <input
                   type="number"
                   value={editFee}
@@ -254,28 +256,28 @@ export default function PractitionerSettingsTab({
             </div>
 
             <div>
-              <label className="block text-xs font-black text-slate-700 mb-1.5">Registered Practice City</label>
+              <label className="block text-xs font-black text-slate-700 mb-1.5">{tx('Registered Practice City')}</label>
               <select
                 value={editCity}
                 onChange={(e) => setEditCity(e.target.value)}
                 className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-700 bg-white"
               >
-                <option value="Kuala Lumpur">Kuala Lumpur</option>
-                <option value="Petaling Jaya">Petaling Jaya</option>
-                <option value="Penang">Penang</option>
-                <option value="Johor Bahru">Johor Bahru</option>
+                <option value="Kuala Lumpur">{tx('Kuala Lumpur')}</option>
+                <option value="Petaling Jaya">{tx('Petaling Jaya')}</option>
+                <option value="Penang">{tx('Penang')}</option>
+                <option value="Johor Bahru">{tx('Johor Bahru')}</option>
               </select>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-black text-slate-700 mb-1.5">Practice Address / Clinical Center</label>
+            <label className="block text-xs font-black text-slate-700 mb-1.5">{tx('Practice Address / Clinical Center')}</label>
             <input
               type="text"
               value={editAddress}
               onChange={(e) => setEditAddress(e.target.value)}
               className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 bg-white"
-              placeholder="e.g. Metropolitan Specialist Center, 8 Bukit Pantai"
+              placeholder={tx('e.g. Metropolitan Specialist Center, 8 Bukit Pantai')}
               required
             />
           </div>
@@ -285,13 +287,13 @@ export default function PractitionerSettingsTab({
             <div>
               <h4 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 mb-1">
                 <Calendar className="h-4 w-4 text-[color:var(--t-600)]" />
-                Availability & Timeslot Configuration
+                {tx('Availability & Timeslot Configuration')}
               </h4>
-              <p className="text-xs text-slate-500 font-semibold mb-3">Define the days and times patients are allowed to book consultations with you.</p>
+              <p className="text-xs text-slate-500 font-semibold mb-3">{tx('Define the days and times patients are allowed to book consultations with you.')}</p>
             </div>
 
             <div>
-              <label className="block text-xs font-black text-slate-700 mb-2">Practice Days of the Week</label>
+              <label className="block text-xs font-black text-slate-700 mb-2">{tx('Practice Days of the Week')}</label>
               <div className="flex flex-wrap gap-1.5">
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
                   const isActive = editDays.includes(day);
@@ -312,7 +314,7 @@ export default function PractitionerSettingsTab({
                           : 'bg-white text-slate-600 border-[color:var(--t-200)] hover:bg-slate-50'
                       }`}
                     >
-                      {day.substring(0, 3)}
+                      {tx(day.substring(0, 3))}
                     </button>
                   );
                 })}
@@ -320,11 +322,11 @@ export default function PractitionerSettingsTab({
             </div>
 
             <div>
-              <label className="block text-xs font-black text-slate-700 mb-2">Configure Time Slots</label>
+              <label className="block text-xs font-black text-slate-700 mb-2">{tx('Configure Time Slots')}</label>
               <div className="flex gap-2 mb-3 max-w-sm">
                 <input
                   type="text"
-                  placeholder="e.g. 10:00 AM"
+                  placeholder={tx('e.g. 10:00 AM')}
                   value={newTimeSlot}
                   onChange={(e) => setNewTimeSlot(e.target.value)}
                   className="text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-700 flex-1 min-w-0 bg-white"
@@ -335,13 +337,13 @@ export default function PractitionerSettingsTab({
                   className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-bold px-4 py-2 rounded-none transition-all cursor-pointer flex items-center gap-1 shrink-0"
                 >
                   <Plus className="h-3.5 w-3.5" />
-                  Add Slot
+                  {tx('Add Slot')}
                 </button>
               </div>
 
               <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto p-1.5 bg-slate-50 border border-[color:var(--t-200)] rounded-none">
                 {editSlots.length === 0 ? (
-                  <span className="text-xs text-slate-400 font-semibold p-2">No custom scheduling slots configured. Click 'Add Slot' above.</span>
+                  <span className="text-xs text-slate-400 font-semibold p-2">{tx('No custom scheduling slots configured. Click \'Add Slot\' above.')}</span>
                 ) : (
                   editSlots.map(slot => (
                     <span key={slot} className="bg-white border border-[color:var(--t-200)] rounded-none px-2.5 py-1 text-2xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-3xs font-mono">
@@ -350,7 +352,7 @@ export default function PractitionerSettingsTab({
                         type="button"
                         onClick={() => {
                           setEditSlots(editSlots.filter(s => s !== slot));
-                          showToast(`Removed timeslot: ${slot}`);
+                          showToast(tx('Removed timeslot: {name}', { name: slot }));
                         }}
                         className="text-slate-400 hover:text-rose-600 cursor-pointer p-0.5 rounded-none transition-colors"
                       >
@@ -365,7 +367,7 @@ export default function PractitionerSettingsTab({
             {!isDoc && (
               <div className="pt-3 border-t border-[color:var(--t-200)]/60">
                 <label className="block text-xs font-black text-slate-700 mb-1.5">
-                  Clinical Nursing Duty Shift Coverage
+                  {tx('Clinical Nursing Duty Shift Coverage')}
                 </label>
                 <div className="flex flex-wrap gap-2 text-xs">
                   {['Morning Shift (07:00 - 15:00)', 'Evening Shift (14:00 - 22:00)', 'Night Shift (21:00 - 07:00)', '24-Hour In-Home Nursing'].map((shift) => (
@@ -374,7 +376,7 @@ export default function PractitionerSettingsTab({
                     </span>
                   ))}
                 </div>
-                <p className="text-xs text-slate-500 font-medium mt-1">Available shift types are broadcasted to private hospitals, clinics, and home care patients across your registered city.</p>
+                <p className="text-xs text-slate-500 font-medium mt-1">{tx('Available shift types are broadcasted to private hospitals, clinics, and home care patients across your registered city.')}</p>
               </div>
             )}
           </div>
@@ -382,7 +384,7 @@ export default function PractitionerSettingsTab({
           {settingsSuccess && (
             <div className="bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs font-bold py-2.5 px-4 rounded-none flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-              <span>Public registry file updated successfully. Updates are now live nationwide.</span>
+              <span>{tx('Public registry file updated successfully. Updates are now live nationwide.')}</span>
             </div>
           )}
 
@@ -395,12 +397,12 @@ export default function PractitionerSettingsTab({
               {savingSettings ? (
                 <>
                   <Loader className="h-3.5 w-3.5 animate-spin" />
-                  <span>Saving changes...</span>
+                  <span>{tx('Saving changes...')}</span>
                 </>
               ) : (
                 <>
                   <Save className="h-4 w-4" />
-                  <span>Save Profile Updates</span>
+                  <span>{tx('Save Profile Updates')}</span>
                 </>
               )}
             </button>
@@ -413,7 +415,7 @@ export default function PractitionerSettingsTab({
         <div className="bg-white border-2 border-dashed border-[color:var(--t-200)] rounded-none p-5 shadow-xs relative overflow-hidden space-y-4">
           <div className="bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)] text-xs font-black uppercase py-1 px-3 rounded-full flex items-center gap-1.5 w-max">
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
-            Live Patient Search Card Preview
+            {tx('Live Patient Search Card Preview')}
           </div>
 
           <div className="border border-[color:var(--t-200)] rounded-none p-4 shadow-3xs space-y-4 bg-white relative">
@@ -431,25 +433,25 @@ export default function PractitionerSettingsTab({
                 </div>
 
                 <p className="text-xs text-[color:var(--t-600)] font-extrabold uppercase tracking-wide">
-                  {matchedProfile.specialization}
+                  {tx(matchedProfile.specialization)}
                 </p>
 
                 <div className="flex items-center gap-1 text-xs font-extrabold text-slate-500">
                   <span className="text-amber-500">â˜…</span>
-                  <span className="text-slate-800">{avgOverall ?? "New"}</span>
-                  <span>({reviewCount} Patient Review{reviewCount === 1 ? '' : 's'})</span>
+                  <span className="text-slate-800">{avgOverall ?? tx("New")}</span>
+                  <span>({tx(reviewCount === 1 ? '{n} Patient Review' : '{n} Patient Reviews', { n: reviewCount })})</span>
                 </div>
               </div>
             </div>
 
             <p className="text-xs text-slate-500 font-medium leading-relaxed italic bg-slate-50 p-2.5 rounded-none border border-[color:var(--t-200)] line-clamp-3">
-              {editBio || "No clinical biography provided. Please write a description to engage patients..."}
+              {editBio || tx('No clinical biography provided. Please write a description to engage patients...')}
             </p>
 
             {/* Certifications displayed as patient-facing badges */}
             {certifications.length > 0 && (
               <div className="space-y-1">
-                <span className="text-xs text-slate-400 font-bold block uppercase">Clinical Credentials</span>
+                <span className="text-xs text-slate-400 font-bold block uppercase">{tx('Clinical Credentials')}</span>
                 <div className="flex flex-wrap gap-1">
                   {certifications.map(cert => (
                     <span key={cert} className="bg-slate-100 text-slate-700 text-2xs font-bold px-2 py-0.5 rounded-none">
@@ -463,22 +465,22 @@ export default function PractitionerSettingsTab({
             <div className="pt-3 border-t border-[color:var(--t-200)] flex flex-col gap-1.5 text-xs text-slate-600 font-semibold">
               <div className="flex items-center gap-1.5">
                 <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                <span className="truncate">{editAddress || "Metropolitan Specialist Center"}, {editCity}</span>
+                <span className="truncate">{editAddress || tx('Metropolitan Specialist Center')}, {editCity}</span>
               </div>
               <div className="flex items-center gap-1.5 justify-between">
                 <div className="flex items-center gap-1">
                   <DollarSign className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                  <span>Base consultation co-pay:</span>
+                  <span>{tx('Base consultation co-pay:')}</span>
                 </div>
                 <strong className="text-slate-800 text-xs font-black">RM {editFee || 120}</strong>
               </div>
             </div>
 
-            <div className="w-full py-2 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-mono font-bold uppercase tracking-wider text-center mt-2">Public Directory Card Preview</div>
+            <div className="w-full py-2 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-mono font-bold uppercase tracking-wider text-center mt-2">{tx('Public Directory Card Preview')}</div>
           </div>
 
           <p className="text-xs text-slate-400 font-medium text-center italic">
-            Changes above reflect instantly in the live doctor directory.
+            {tx('Changes above reflect instantly in the live doctor directory.')}
           </p>
         </div>
       </div>

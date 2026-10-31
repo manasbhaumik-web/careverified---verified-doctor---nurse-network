@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AlertTriangle, Power, Radio, CheckCircle2 } from 'lucide-react';
 import ConsultRoom from './ConsultRoom';
-import { formatMoney } from '../locale';
+import { formatMoney, useTr } from '../locale';
 import WorkspaceHeader from './WorkspaceHeader';
 import { BannerBadge } from './DashboardHeader';
 
@@ -13,6 +13,7 @@ const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 /** Doctor's console for 24/7 cover: go online, take instant consultations, manage the on-call roster, see earnings. */
 export default function PractitionerOnCall({ myUserId, embedded = false }: { myUserId: string; embedded?: boolean }) {
+  const tx = useTr();
   const [me, setMe] = useState<{ online: boolean; canGoOnline: boolean } | null>(null);
   const [offers, setOffers] = useState<any[]>([]);
   const [mine, setMine] = useState<any[]>([]);
@@ -50,14 +51,14 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
   const setOnline = async (online: boolean) => {
     setMsg('');
     const d = await jpost('/api/presence', { online });
-    if (d.status !== 'success') setMsg(d.message || 'Could not change status.');
+    if (d.status !== 'success') setMsg(d.message || tx('Could not change status.'));
     await refresh();
   };
 
   const accept = async (id: string) => {
     setMsg('');
     const d = await jpost(`/api/consults/${id}/accept`);
-    if (d.status !== 'success') setMsg(d.message || 'Could not accept.');
+    if (d.status !== 'success') setMsg(d.message || tx('Could not accept.'));
     await refresh();
   };
   const decline = async (id: string) => { await jpost(`/api/consults/${id}/decline`); await refresh(); };
@@ -77,7 +78,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
   const saveRoster = async () => {
     const cells = [...roster].map(k => { const [day, hour] = k.split('-').map(Number); return { day, hour }; });
     const d = await fetch('/api/roster', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cells }) }).then(r => r.json());
-    setMsg(d.status === 'success' ? 'Roster saved.' : d.message || 'Could not save the roster.');
+    setMsg(d.status === 'success' ? tx('Roster saved.') : d.message || tx('Could not save the roster.'));
     if (d.status === 'success') setRosterDirty(false);
   };
 
@@ -89,13 +90,13 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
       <div className={embedded ? "space-y-6 w-full" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
         <WorkspaceHeader
           icon={Radio}
-          eyebrow="On-Call Telehealth · Real-Time Radar"
-          title="On-Call Duty Radar & Live Queue"
-          description="Manage your active on-call shift status, accept live patient triage calls, and conduct urgent video consultations."
-          badges={<BannerBadge tone="neutral">Verification Required</BannerBadge>}
+          eyebrow={tx('On-Call Telehealth · Real-Time Radar')}
+          title={tx('On-Call Duty Radar & Live Queue')}
+          description={tx('Manage your active on-call shift status, accept live patient triage calls, and conduct urgent video consultations.')}
+          badges={<BannerBadge tone="neutral">{tx('Verification Required')}</BannerBadge>}
         />
         <p className="bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold p-5 max-w-2xl">
-          On-call consultations are available to verified doctors. Once the medical board verifies your profile you can go online here.
+          {tx('On-call consultations are available to verified doctors. Once the medical board verifies your profile you can go online here.')}
         </p>
       </div>
     );
@@ -110,18 +111,18 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
       {/* Unified Institutional Inner Workspace Header with Telemetry Sub-bar */}
       <WorkspaceHeader
         icon={Radio}
-        eyebrow="On-Call Telehealth · Real-Time Radar"
-        title="On-Call Duty Radar & Live Queue"
-        description="Manage your active on-call shift status, accept live patient triage calls, and conduct urgent video consultations."
+        eyebrow={tx('On-Call Telehealth · Real-Time Radar')}
+        title={tx('On-Call Duty Radar & Live Queue')}
+        description={tx('Manage your active on-call shift status, accept live patient triage calls, and conduct urgent video consultations.')}
         badges={
           <div className="flex items-center gap-1.5 flex-wrap">
             <BannerBadge tone={me?.online ? 'success' : 'neutral'}>
               <span className={`w-2 h-2 rounded-full inline-block mr-1.5 ${me?.online ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
-              {me?.online ? 'On Call & Accepting Patients' : 'Currently Offline'}
+              {me?.online ? tx('On Call & Accepting Patients') : tx('Currently Offline')}
             </BannerBadge>
             <BannerBadge tone="success">
               <CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" />
-              MMC Compliant Shift
+              {tx('MMC Compliant Shift')}
             </BannerBadge>
           </div>
         }
@@ -138,12 +139,12 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
             {me?.online ? (
               <>
                 <Power className="h-3.5 w-3.5 text-rose-600" />
-                <span>Go Offline</span>
+                <span>{tx('Go Offline')}</span>
               </>
             ) : (
               <>
                 <Radio className="h-3.5 w-3.5 text-white animate-pulse" />
-                <span>Go Online Now</span>
+                <span>{tx('Go Online Now')}</span>
               </>
             )}
           </button>
@@ -159,13 +160,13 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                 <span className="text-xs font-black text-[color:var(--ink)] tracking-tight whitespace-nowrap">
-                  {me?.online ? 'On Call & Accepting Patients' : 'You are Currently Offline'}
+                  {me?.online ? tx('On Call & Accepting Patients') : tx('You are Currently Offline')}
                 </span>
                 <span className="hidden sm:inline text-xs text-slate-400">·</span>
                 <span className="text-xs text-[color:var(--ink-2)] truncate">
                   {me?.online
-                    ? 'Incoming consults dispatch automatically. Keep this tab open.'
-                    : 'While online, you are dispatched incoming telehealth consults. Keep this tab open for audio chimes.'}
+                    ? tx('Incoming consults dispatch automatically. Keep this tab open.')
+                    : tx('While online, you are dispatched incoming telehealth consults. Keep this tab open for audio chimes.')}
                 </span>
               </div>
             </div>
@@ -175,25 +176,25 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
           <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 w-full sm:w-auto sm:shrink-0">
             <dl className="grid grid-cols-2 w-full sm:w-auto sm:flex items-center divide-x divide-[color:var(--t-200)] border border-[color:var(--t-200)] bg-[color:var(--t-50)]/70 shadow-2xs">
               <div className="px-3 py-1.5 text-center min-w-[68px]">
-                <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">Waiting</dt>
+                <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">{tx('Waiting')}</dt>
                 <dd className="font-mono text-xs font-black text-[color:var(--ink)] leading-tight">
                   {me?.online ? String(offers.length) : '—'}
                 </dd>
               </div>
               <div className="px-3 py-1.5 text-center min-w-[82px]">
-                <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">Committed</dt>
+                <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">{tx('Committed')}</dt>
                 <dd className="font-mono text-xs font-black text-[color:var(--ink)] leading-tight">
                   {roster.size}h / wk
                 </dd>
               </div>
               <div className="px-3 py-1.5 text-center min-w-[92px]">
-                <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">Daily Window</dt>
+                <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">{tx('Daily Window')}</dt>
                 <dd className="font-mono text-xs font-black text-[color:var(--ink)] leading-tight">
-                  {coveredHours} / 24 hrs
+                  {coveredHours} {tx('/ 24 hrs')}
                 </dd>
               </div>
               <div className="px-3 py-1.5 text-center min-w-[92px]">
-                <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">Accrued Net</dt>
+                <dt className="text-xs uppercase font-bold text-slate-500 tracking-wider">{tx('Accrued Net')}</dt>
                 <dd className="font-mono text-xs font-black text-[color:var(--t-700)] leading-tight">
                   {earnings ? fmtRM(earnings.totals.net) : '—'}
                 </dd>
@@ -209,13 +210,13 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)] flex items-center gap-2">
               <span className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse"></span>
-              Live Consultation Queue ({offers.length} waiting)
+              {tx('Live Consultation Queue ({n} waiting)', { n: offers.length })}
             </h3>
-            <span className="text-xs font-mono text-slate-500 font-semibold">Auto-refreshes every 4s</span>
+            <span className="text-xs font-mono text-slate-500 font-semibold">{tx('Auto-refreshes every 4s')}</span>
           </div>
           {offers.length === 0 ? (
             <div className="p-8 text-center border border-dashed border-[color:var(--t-200)] bg-[color:var(--t-bg)]">
-              <p className="text-sm font-bold text-slate-700">No patients waiting in queue right now.</p>
+              <p className="text-sm font-bold text-slate-700">{tx('No patients waiting in queue right now.')}</p>
               <p className="text-xs text-slate-500 mt-1">Keep this tab open; newly queued consults will alert immediately.</p>
             </div>
           ) : (
@@ -231,8 +232,8 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
                     <p>Queued: {new Date(o.queuedAt).toLocaleTimeString()} · Payout: <b className="text-[color:var(--t-700)]">{formatMoney(o.fee)}</b></p>
                   </div>
                   <div className="grid grid-cols-2 gap-2 pt-1">
-                    <button onClick={() => accept(o.id)} className="h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer transition-colors shadow-2xs">Accept Consult</button>
-                    <button onClick={() => decline(o.id)} className="h-10 border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 cursor-pointer transition-colors">Decline</button>
+                    <button onClick={() => accept(o.id)} className="h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer transition-colors shadow-2xs">{tx('Accept Consult')}</button>
+                    <button onClick={() => decline(o.id)} className="h-10 border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 cursor-pointer transition-colors">{tx('Decline')}</button>
                   </div>
                 </div>
               ))}
@@ -245,24 +246,24 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
         <section className="bg-white border border-slate-200 p-5 space-y-4 min-w-0">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h3 className="text-sm font-extrabold">On-call roster</h3>
-              <p className="text-xs text-slate-600 mt-1">Tick the hours you commit to be available. The board uses this to make sure every hour of the day is covered.</p>
+              <h3 className="text-sm font-extrabold">{tx('On-call roster')}</h3>
+              <p className="text-xs text-slate-600 mt-1">{tx('Tick the hours you commit to be available. The board uses this to make sure every hour of the day is covered.')}</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-              <button onClick={() => applyPreset('weekdays')} className="border border-slate-200 text-xs font-bold px-3 py-2 cursor-pointer hover:bg-slate-50">Weekdays 08–20</button>
+              <button onClick={() => applyPreset('weekdays')} className="border border-slate-200 text-xs font-bold px-3 py-2 cursor-pointer hover:bg-slate-50">{tx('Weekdays 08–20')}</button>
               <button onClick={() => applyPreset('all')} className="border border-slate-200 text-xs font-bold px-3 py-2 cursor-pointer hover:bg-slate-50">24/7</button>
-              <button onClick={() => applyPreset('clear')} className="border border-slate-200 text-xs font-bold px-3 py-2 cursor-pointer hover:bg-slate-50">Clear</button>
-              <button onClick={saveRoster} disabled={!rosterDirty} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-5 py-2 cursor-pointer">Save roster</button>
+              <button onClick={() => applyPreset('clear')} className="border border-slate-200 text-xs font-bold px-3 py-2 cursor-pointer hover:bg-slate-50">{tx('Clear')}</button>
+              <button onClick={saveRoster} disabled={!rosterDirty} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-5 py-2 cursor-pointer">{tx('Save roster')}</button>
             </div>
           </div>
 
           {/* Phones: one day at a time with large hour buttons */}
           <div className="sm:hidden space-y-3">
-            <div role="tablist" aria-label="Day of the week" className="grid grid-cols-7 gap-1">
+            <div role="tablist" aria-label={tx('Day of the week')} className="grid grid-cols-7 gap-1">
               {DAYS.map((d, day) => (
                 <button key={d} role="tab" aria-selected={mobileDay === day} onClick={() => setMobileDay(day)}
                   className={`h-12 flex flex-col items-center justify-center text-xs font-bold border cursor-pointer ${mobileDay === day ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-600)]' : 'bg-white text-slate-700 border-slate-200'}`}>
-                  <span>{d.slice(0, 3)}</span><span className="tabular-nums opacity-80">{dayCount(day)}h</span>
+                  <span>{tx(d)}</span><span className="tabular-nums opacity-80">{dayCount(day)}h</span>
                 </button>
               ))}
             </div>
@@ -270,7 +271,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
               {Array.from({ length: 24 }, (_, h) => {
                 const on = roster.has(`${mobileDay}-${h}`);
                 return (
-                  <button key={h} onClick={() => toggleCell(mobileDay, h)} aria-pressed={on} aria-label={`${DAYS[mobileDay]} ${h}:00`}
+                  <button key={h} onClick={() => toggleCell(mobileDay, h)} aria-pressed={on} aria-label={`${tx(DAYS[mobileDay])} ${h}:00`}
                     className={`h-12 text-xs font-bold tabular-nums cursor-pointer border ${on ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-600)]' : 'bg-slate-50 text-slate-700 border-slate-200'}`}>
                     {String(h).padStart(2, '0')}:00
                   </button>
@@ -283,10 +284,10 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
             <div className="min-w-[640px] grid gap-[3px] items-center" style={{ gridTemplateColumns: 'auto repeat(24, minmax(0, 1fr)) auto' }}>
               <span />
               {Array.from({ length: 24 }, (_, h) => <span key={h} className="text-xs font-semibold text-slate-500 text-center">{h}</span>)}
-              <span className="text-xs font-semibold text-slate-500 pl-2">Hrs</span>
+              <span className="text-xs font-semibold text-slate-500 pl-2">{tx('Hrs')}</span>
               {DAYS.map((d, day) => (
                 <React.Fragment key={d}>
-                  <span className="pr-2 text-right text-xs font-bold text-slate-600">{d}</span>
+                  <span className="pr-2 text-right text-xs font-bold text-slate-600">{tx(d)}</span>
                   {Array.from({ length: 24 }, (_, h) => {
                     const on = roster.has(`${day}-${h}`);
                     return (
@@ -300,21 +301,21 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
             </div>
           </div>
           <div className="flex items-center gap-4 text-xs text-slate-500">
-            <span className="inline-flex items-center gap-1.5"><i className="inline-block h-3 w-3 bg-[color:var(--t-600)]" /> On call</span>
-            <span className="inline-flex items-center gap-1.5"><i className="inline-block h-3 w-3 bg-slate-100 border border-slate-200" /> Not scheduled</span>
-            {rosterDirty && <span className="font-bold text-amber-700">Unsaved changes</span>}
+            <span className="inline-flex items-center gap-1.5"><i className="inline-block h-3 w-3 bg-[color:var(--t-600)]" /> {tx('On call')}</span>
+            <span className="inline-flex items-center gap-1.5"><i className="inline-block h-3 w-3 bg-slate-100 border border-slate-200" /> {tx('Not scheduled')}</span>
+            {rosterDirty && <span className="font-bold text-amber-700">{tx('Unsaved changes')}</span>}
           </div>
         </section>
 
         {earnings && (
           <section className="bg-white border border-slate-200 p-5 space-y-4 min-w-0">
-            <h3 className="text-sm font-extrabold">Earnings</h3>
+            <h3 className="text-sm font-extrabold">{tx('Earnings')}</h3>
             <div className="grid grid-cols-3 gap-2 text-center">
-              {[['Gross', earnings.totals.gross], [`Fee (${earnings.commissionPct}%)`, earnings.totals.fee], ['Net', earnings.totals.net]].map(([l, v]) => (
+              {[[tx('Gross'), earnings.totals.gross], [tx('Fee ({pct}%)', { pct: earnings.commissionPct }), earnings.totals.fee], [tx('Net'), earnings.totals.net]].map(([l, v]) => (
                 <div key={l as string} className="bg-slate-50 border border-slate-100 p-2.5"><p className="text-xs uppercase font-bold text-slate-500">{l}</p><p className="text-xs font-black tabular-nums">{fmtRM(v as number)}</p></div>
               ))}
             </div>
-            <p className="text-xs text-slate-500">Payouts are not automated yet; the board settles earnings manually.</p>
+            <p className="text-xs text-slate-500">{tx('Payouts are not automated yet; the board settles earnings manually.')}</p>
             {earnings.rows.length > 0 ? (
               <ul className="divide-y divide-slate-100 text-xs">
                 {earnings.rows.slice(0, 10).map((r: any) => (
@@ -324,7 +325,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
                   </li>
                 ))}
               </ul>
-            ) : <p className="text-xs text-slate-500">No earnings yet.</p>}
+            ) : <p className="text-xs text-slate-500">{tx('No earnings yet.')}</p>}
           </section>
         )}
       </div>

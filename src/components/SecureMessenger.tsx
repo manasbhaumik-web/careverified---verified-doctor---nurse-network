@@ -182,7 +182,7 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
             {shown.length === 0 && (
               <li className="px-4 py-12 text-xs text-[color:var(--ink-2)] text-center">
                 <MessageSquare className="h-8 w-8 text-[color:var(--t-300)] mx-auto mb-2" />
-                {threads.length === 0 ? 'You can message practitioners after you have booked or consulted them.' : 'No conversations found.'}
+                {threads.length === 0 ? tx('You can message practitioners after you have booked or consulted them.') : tx('No conversations found.')}
               </li>
             )}
           </ul>

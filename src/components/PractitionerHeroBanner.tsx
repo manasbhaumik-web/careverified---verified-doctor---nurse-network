@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Shield, Check, Eye, Send, CheckCircle2, X, LifeBuoy } from 'lucide-react';
+import { useTr, useLocale, dateLocaleOf } from '../locale';
 import { Professional, Review, Booking, UserRole, VerificationStatus, ConsultationMode } from '../types';
 import DashboardHeader, {
   BannerRow,
@@ -49,6 +50,8 @@ export default function PractitionerHeroBanner<T extends string = string>({
   onOpenHelp,
   isHelpActive,
 }: PractitionerHeroBannerProps<T>) {
+  const tx = useTr();
+  const { lang } = useLocale();
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showPublicProfilePreview, setShowPublicProfilePreview] = useState(false);
 
@@ -81,10 +84,10 @@ export default function PractitionerHeroBanner<T extends string = string>({
             ? 'font-semibold text-[color:var(--t-700)] bg-[color:var(--t-50)]'
             : 'font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
         }`}
-        title="Practitioner Help & Support Desk"
+        title={tx('Practitioner Help & Support Desk')}
       >
         <LifeBuoy className={`h-4 w-4 ${helpActive ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
-        <span className="whitespace-nowrap font-medium sm:font-semibold">Help & Support</span>
+        <span className="whitespace-nowrap font-medium sm:font-semibold">{tx('Help & Support')}</span>
       </button>
     </div>
   );
@@ -160,26 +163,26 @@ export default function PractitionerHeroBanner<T extends string = string>({
               avatarBadge={isVerified && (
                 <span
                   className="absolute -bottom-1 -right-1 bg-white text-[color:var(--t-600)] p-1.5 rounded-full shadow-md flex items-center justify-center border border-[color:var(--t-200)]"
-                  title="Verified Licensed Practitioner"
+                  title={tx('Verified Licensed Practitioner')}
                 >
                   <Shield className="h-3.5 w-3.5 fill-current text-[color:var(--t-600)]" />
                 </span>
               )}
               badges={
                 <>
-                  <BannerBadge>{isDoc ? "Physician Account" : "Nurse Account"}</BannerBadge>
+                  <BannerBadge>{isDoc ? tx('Physician Account') : tx('Nurse Account')}</BannerBadge>
                   {isVerified && (
                     <BannerBadge tone="success">
-                      <Check className="h-3 w-3 text-emerald-600 stroke-[3]" /> Verified Active
+                      <Check className="h-3 w-3 text-emerald-600 stroke-[3]" /> {tx('Verified Active')}
                     </BannerBadge>
                   )}
                 </>
               }
               meta={
                 <>
-                  <span className="font-extrabold text-[color:var(--ink)]">{profile.specialization}</span>
+                  <span className="font-extrabold text-[color:var(--ink)]">{tx(profile.specialization)}</span>
                   <span className="text-slate-400">&bull;</span>
-                  <span className="font-mono text-[color:var(--ink-2)]">{profile.experienceYears} Years Exp.</span>
+                  <span className="font-mono text-[color:var(--ink-2)]">{tx('{n} Years Exp.', { n: profile.experienceYears })}</span>
                   <span className="text-slate-400">&bull;</span>
                   <span className="font-mono font-bold text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)] text-2xs rounded-none shadow-2xs">
                     {profile.licenseNumber}
@@ -195,14 +198,14 @@ export default function PractitionerHeroBanner<T extends string = string>({
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </span>
-                      Verified by the medical board
+                      {tx('Verified by the medical board')}
                     </span>
                   )}
                   {((profile as any).apcExpiry || (profile as any).licenseExpiry) && (
                     <>
                       <span className="text-slate-400">&bull;</span>
                       <span className="font-mono text-[color:var(--ink-2)] text-xs font-semibold">
-                        APC: {new Date((profile as any).apcExpiry || (profile as any).licenseExpiry).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {tx('APC:')} {new Date((profile as any).apcExpiry || (profile as any).licenseExpiry).toLocaleDateString(dateLocaleOf(lang), { day: 'numeric', month: 'short', year: 'numeric' })}
                       </span>
                     </>
                   )}
@@ -213,25 +216,25 @@ export default function PractitionerHeroBanner<T extends string = string>({
           aside={
             <>
               <BannerKpis items={[
-                { value: patientsAttendedCount, label: 'Patients' },
-                { value: upcomingBookingsCount, label: 'Upcoming' },
-                { value: avgOverall ?? '5.0', label: 'Rating' },
+                { value: patientsAttendedCount, label: tx('Patients') },
+                { value: upcomingBookingsCount, label: tx('Upcoming') },
+                { value: avgOverall ?? '5.0', label: tx('Rating') },
               ]} />
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                 <button type="button" onClick={() => setShowPublicProfilePreview(true)} className={bannerOnBrandPrimaryBtn}>
                   <Eye className="h-4 w-4" />
-                  <span>View Public Profile</span>
+                  <span>{tx('View Public Profile')}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     navigator.clipboard.writeText(`${window.location.origin}/verify-practitioners?q=${encodeURIComponent(profile.id)}`);
-                    showToast("Profile link copied to clipboard!");
+                    showToast(tx('Profile link copied to clipboard!'));
                   }}
                   className={bannerOnBrandSecondaryBtn}
                 >
                   <Send className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                  <span>Share Link</span>
+                  <span>{tx('Share Link')}</span>
                 </button>
               </div>
             </>
@@ -247,7 +250,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
               type="button"
               onClick={() => setShowPublicProfilePreview(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
-              aria-label="Close modal"
+              aria-label={tx('Close modal')}
             >
               <X className="h-5 w-5" />
             </button>
@@ -264,30 +267,30 @@ export default function PractitionerHeroBanner<T extends string = string>({
                   <h3 className="font-sans text-xl font-semibold text-slate-900">{profile.name}</h3>
                   {isVerified && <Shield className="h-4.5 w-4.5 text-emerald-500 fill-emerald-500" />}
                 </div>
-                <p className="text-xs font-bold text-[color:var(--t-600)] uppercase tracking-widest">{profile.specialization}</p>
+                <p className="text-xs font-bold text-[color:var(--t-600)] uppercase tracking-widest">{tx(profile.specialization)}</p>
               </div>
             </div>
 
             <div className="space-y-4 text-xs font-semibold text-slate-600">
               <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-1.5">
-                <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Clinical Philosophy</span>
-                <p className="text-slate-700 leading-relaxed italic whitespace-pre-line">{profile.bio || "Patient-centered evidence-based clinical practice."}</p>
+                <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">{tx('Clinical Philosophy')}</span>
+                <p className="text-slate-700 leading-relaxed italic whitespace-pre-line">{profile.bio || tx('Patient-centered evidence-based clinical practice.')}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
-                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">Registration ID</span>
+                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">{tx('Registration ID')}</span>
                   <strong className="text-slate-800 font-extrabold">{profile.id}</strong>
                 </div>
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
-                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">Consultation Fee</span>
+                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">{tx('Consultation Fee')}</span>
                   <strong className="text-slate-800 font-extrabold">RM {profile.fee || 150}</strong>
                 </div>
               </div>
 
               {(profile as any).certifications && (profile as any).certifications.length > 0 && (
                 <div className="space-y-1.5">
-                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Verified Clinical Credentials</span>
+                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">{tx('Verified Clinical Credentials')}</span>
                   <div className="flex flex-wrap gap-1.5">
                     {((profile as any).certifications as string[]).map(cert => (
                       <span key={cert} className="bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-2xs font-bold px-2.5 py-1 rounded-md">
@@ -299,8 +302,8 @@ export default function PractitionerHeroBanner<T extends string = string>({
               )}
 
               <div className="space-y-1">
-                <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Clinical Center Address</span>
-                <p className="text-slate-800 font-bold">{profile.practiceAddress || "Beach Specialist Center"}, {profile.city || "Kuala Lumpur"}</p>
+                <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">{tx('Clinical Center Address')}</span>
+                <p className="text-slate-800 font-bold">{profile.practiceAddress || tx('Beach Specialist Center')}, {profile.city || tx('Kuala Lumpur')}</p>
               </div>
             </div>
 
@@ -310,7 +313,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
                 onClick={() => setShowPublicProfilePreview(false)}
                 className="w-full py-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black rounded-xl transition-all shadow-md cursor-pointer"
               >
-                Close Public Profile Preview
+                {tx('Close Public Profile Preview')}
               </button>
             </div>
           </div>
