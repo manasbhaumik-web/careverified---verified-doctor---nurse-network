@@ -4,6 +4,7 @@ import {
   AlertTriangle, Clock, ArrowDownUp, CheckCircle2, User,
   ExternalLink, Download, Eye, ChevronRight, X
 } from 'lucide-react';
+import { useTr } from '../locale';
 
 export interface AuditLogEntry {
   id: number;
@@ -24,6 +25,7 @@ export interface AdminAuditLogProps {
 }
 
 export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAuditLogProps) {
+  const tx = useTr();
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
@@ -45,10 +47,10 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
         setLogs(data.data.logs || []);
         setTotalCount(data.data.totalCount || (data.data.logs || []).length);
       } else {
-        setError(data.message || 'Failed to retrieve audit log telemetry.');
+        setError(data.message || tx('Failed to retrieve audit log telemetry.'));
       }
     } catch (err: any) {
-      setError(err.message || 'Network connection failed while querying audit logs.');
+      setError(err.message || tx('Network connection failed while querying audit logs.'));
     } finally {
       setLoading(false);
     }
@@ -124,9 +126,9 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-2xs font-black uppercase tracking-wider px-2 py-0.5 bg-slate-900 text-amber-300 border border-slate-800">
-                  Statutory Audit Log (WAL Mode)
+                  {tx('Statutory Audit Log (WAL Mode)')}
                 </span>
-                <span className="text-xs text-slate-500 font-mono">SQLite careverified.db</span>
+                <span className="text-xs text-slate-500 font-mono">{tx('SQLite careverified.db')}</span>
               </div>
               <h3 className="text-base font-black text-slate-900 uppercase tracking-tight mt-0.5">
                 Regulatory Action Audit Trail &amp; System Log Inspector
@@ -138,20 +140,20 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
               type="button"
               onClick={exportAuditCsv}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 transition-colors cursor-pointer"
-              title="Export filtered audit logs to CSV"
+              title={tx('Export filtered audit logs to CSV')}
             >
               <Download className="h-3.5 w-3.5 text-slate-500" />
-              <span className="hidden sm:inline">Export CSV</span>
+              <span className="hidden sm:inline">{tx('Export CSV')}</span>
             </button>
             <button
               type="button"
               onClick={fetchLogs}
               disabled={loading}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 transition-colors cursor-pointer"
-              title="Refresh audit telemetry from server"
+              title={tx('Refresh audit telemetry from server')}
             >
               <RefreshCw className={`h-3.5 w-3.5 text-slate-600 ${loading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Refresh</span>
+              <span className="hidden sm:inline">{tx('Refresh')}</span>
             </button>
             {!isEmbedded && onClose && (
               <button
@@ -168,24 +170,24 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
         {/* Telemetry Metric Ribbons */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
           <div className="p-3 bg-slate-50 border border-slate-200">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Total Audit Events</span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">{tx('Total Audit Events')}</span>
             <span className="text-xl font-black text-slate-900 tabular-nums">{totalCount}</span>
-            <span className="text-xs text-slate-600 block mt-0.5 font-semibold">Persisted in SQLite</span>
+            <span className="text-xs text-slate-600 block mt-0.5 font-semibold">{tx('Persisted in SQLite')}</span>
           </div>
           <div className="p-3 bg-slate-50 border border-slate-200">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Active Search Filter</span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">{tx('Active Search Filter')}</span>
             <span className="text-xl font-black text-slate-900 tabular-nums">{filteredLogs.length}</span>
-            <span className="text-xs text-emerald-700 font-bold block mt-0.5">Matching criteria</span>
+            <span className="text-xs text-emerald-700 font-bold block mt-0.5">{tx('Matching criteria')}</span>
           </div>
           <div className="p-3 bg-slate-50 border border-slate-200">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Integrity Mode</span>
-            <span className="text-xl font-black text-slate-900 font-mono text-xs">WAL PRAGMA</span>
-            <span className="text-xs text-emerald-700 font-bold block mt-0.5">Crash-proof ACID log</span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">{tx('Integrity Mode')}</span>
+            <span className="text-xl font-black text-slate-900 font-mono text-xs">{tx('WAL PRAGMA')}</span>
+            <span className="text-xs text-emerald-700 font-bold block mt-0.5">{tx('Crash-proof ACID log')}</span>
           </div>
           <div className="p-3 bg-slate-50 border border-slate-200">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Statutory Scope</span>
-            <span className="text-xl font-black text-slate-900 font-mono text-xs">Act 50 / 586</span>
-            <span className="text-xs text-slate-600 block mt-0.5 font-semibold">Retention compliance</span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">{tx('Statutory Scope')}</span>
+            <span className="text-xl font-black text-slate-900 font-mono text-xs">{tx('Act 50 / 586')}</span>
+            <span className="text-xs text-slate-600 block mt-0.5 font-semibold">{tx('Retention compliance')}</span>
           </div>
         </div>
 
@@ -195,7 +197,7 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
             <Search className="h-4 w-4 text-slate-400 absolute left-3 top-2.5" />
             <input
               type="text"
-              placeholder="Search audit trail by actor ID, practitioner ID, action, or details..."
+              placeholder={tx('Search audit trail by actor ID, practitioner ID, action, or details...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-3 py-2 text-xs font-semibold border border-slate-300 bg-white focus:outline-none focus:border-slate-800"
@@ -208,14 +210,14 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
               onChange={(e) => setSelectedAction(e.target.value)}
               className="border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800 bg-white focus:outline-none focus:border-slate-800 cursor-pointer"
             >
-              <option value="all">All Actions (Full Trail)</option>
-              <option value="verification">Verification &amp; Approvals</option>
-              <option value="sanction">Sanctions &amp; Dual-Signoff</option>
-              <option value="professional.suspend">Suspension Orders</option>
-              <option value="professional.reinstate">Reinstatements</option>
-              <option value="complaint">Complaints &amp; Reports</option>
-              <option value="breach">PDPA Data Breaches</option>
-              <option value="retention">Retention &amp; Erasure</option>
+              <option value="all">{tx('All Actions (Full Trail)')}</option>
+              <option value="verification">{tx('Verification & Approvals')}</option>
+              <option value="sanction">{tx('Sanctions & Dual-Signoff')}</option>
+              <option value="professional.suspend">{tx('Suspension Orders')}</option>
+              <option value="professional.reinstate">{tx('Reinstatements')}</option>
+              <option value="complaint">{tx('Complaints & Reports')}</option>
+              <option value="breach">{tx('PDPA Data Breaches')}</option>
+              <option value="retention">{tx('Retention & Erasure')}</option>
             </select>
           </div>
         </div>
@@ -225,13 +227,13 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-xs">
-                <th className="p-2.5">Log ID</th>
-                <th className="p-2.5">Timestamp</th>
-                <th className="p-2.5">Actor (Role)</th>
-                <th className="p-2.5">Action</th>
-                <th className="p-2.5">Target</th>
-                <th className="p-2.5">Details</th>
-                <th className="p-2.5 text-right">Inspect</th>
+                <th className="p-2.5">{tx('Log ID')}</th>
+                <th className="p-2.5">{tx('Timestamp')}</th>
+                <th className="p-2.5">{tx('Actor (Role)')}</th>
+                <th className="p-2.5">{tx('Action')}</th>
+                <th className="p-2.5">{tx('Target')}</th>
+                <th className="p-2.5">{tx('Details')}</th>
+                <th className="p-2.5 text-right">{tx('Inspect')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-150">
@@ -239,13 +241,13 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
                 <tr>
                   <td colSpan={7} className="p-8 text-center text-slate-500">
                     <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2 text-slate-400" />
-                    <span>Loading statutory audit records from WAL SQLite database...</span>
+                    <span>{tx('Loading statutory audit records from WAL SQLite database...')}</span>
                   </td>
                 </tr>
               ) : filteredLogs.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-6 text-center text-slate-400 text-xs">
-                    No audit records matched your search query.
+                    {tx('No audit records matched your search query.')}
                   </td>
                 </tr>
               ) : (
@@ -259,7 +261,7 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
                     </td>
                     <td className="p-2.5">
                       <span className="font-bold text-slate-900 block truncate max-w-[130px]" title={log.actor_id || 'system'}>
-                        {log.actor_id || 'System Daemon'}
+                        {log.actor_id || tx('System Daemon')}
                       </span>
                       <span className="text-xs font-mono text-slate-500 block uppercase font-semibold">
                         {log.actor_role || 'system'}
@@ -277,7 +279,7 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
                       {log.details ? (
                         <span className="font-mono text-xs">{log.details.slice(0, 60)}{log.details.length > 60 ? '...' : ''}</span>
                       ) : (
-                        <span className="text-slate-400 italic">None</span>
+                        <span className="text-slate-400 italic">{tx('None')}</span>
                       )}
                     </td>
                     <td className="p-2.5 text-right">
@@ -287,7 +289,7 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
                         className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold uppercase tracking-wider inline-flex items-center gap-1 cursor-pointer transition-colors"
                       >
                         <Eye className="h-3 w-3" />
-                        <span>Inspect</span>
+                        <span>{tx('Inspect')}</span>
                       </button>
                     </td>
                   </tr>
@@ -309,7 +311,7 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
             >
               <div className="flex items-start justify-between pb-2 border-b border-slate-200">
                 <div>
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-500">Audit Record Inspector</span>
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500">{tx('Audit Record Inspector')}</span>
                   <h4 className="text-sm font-black text-slate-900 font-mono">Event #{selectedLog.id} · {selectedLog.action}</h4>
                 </div>
                 <button
@@ -323,25 +325,25 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
 
               <div className="grid grid-cols-2 gap-2 text-slate-700 bg-slate-50 p-3 border border-slate-200">
                 <div>
-                  <span className="text-xs font-bold text-slate-500 block uppercase">Timestamp (ISO)</span>
+                  <span className="text-xs font-bold text-slate-500 block uppercase">{tx('Timestamp (ISO)')}</span>
                   <span className="font-mono font-semibold text-xs">{selectedLog.ts}</span>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-slate-500 block uppercase">IP Address</span>
-                  <span className="font-mono font-semibold text-xs">{selectedLog.ip || 'Local Loopback'}</span>
+                  <span className="text-xs font-bold text-slate-500 block uppercase">{tx('IP Address')}</span>
+                  <span className="font-mono font-semibold text-xs">{selectedLog.ip || tx('Local Loopback')}</span>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-slate-500 block uppercase">Actor ID</span>
-                  <span className="font-mono font-semibold text-xs">{selectedLog.actor_id || 'System'}</span>
+                  <span className="text-xs font-bold text-slate-500 block uppercase">{tx('Actor ID')}</span>
+                  <span className="font-mono font-semibold text-xs">{selectedLog.actor_id || tx('System')}</span>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-slate-500 block uppercase">Actor Role</span>
+                  <span className="text-xs font-bold text-slate-500 block uppercase">{tx('Actor Role')}</span>
                   <span className="font-mono font-bold text-xs uppercase text-emerald-800">{selectedLog.actor_role || 'internal'}</span>
                 </div>
               </div>
 
               <div>
-                <span className="text-xs font-bold text-slate-600 block uppercase mb-1">Parsed JSON Event Metadata:</span>
+                <span className="text-xs font-bold text-slate-600 block uppercase mb-1">{tx('Parsed JSON Event Metadata:')}</span>
                 <div className="p-3 bg-slate-900 text-emerald-300 font-mono text-xs max-h-48 overflow-y-auto border border-slate-800">
                   <pre>{JSON.stringify(selectedLog.parsedDetails || selectedLog.details, null, 2)}</pre>
                 </div>

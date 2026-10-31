@@ -6,6 +6,7 @@ import {
   Search,
   Trash2,
 } from 'lucide-react';
+import { useTr } from '../locale';
 import WorkspaceHeader from './WorkspaceHeader';
 import { BannerBadge } from './DashboardHeader';
 
@@ -46,14 +47,15 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
   handleUninstallPackage,
   renderIcon,
 }) => {
+  const tx = useTr();
   return (
         <div id="panel-packages" role="tabpanel" aria-labelledby="tab-packages" tabIndex={0} className="space-y-6 animate-fade-in text-slate-800">
           <WorkspaceHeader
             icon={Puzzle}
-            eyebrow="Partner hospitals · Patient catalogue"
-            title="Medical packages"
-            description="Health-screening and treatment packages from partner hospitals. Publishing a package lists it for patients under Services, Medical Packages. It does not add anything to the menu."
-            badges={<BannerBadge tone="brand">Board control</BannerBadge>}
+            eyebrow={tx('Partner hospitals · Patient catalogue')}
+            title={tx('Medical packages')}
+            description={tx('Health-screening and treatment packages from partner hospitals. Publishing a package lists it for patients under Services, Medical Packages. It does not add anything to the menu.')}
+            badges={<BannerBadge tone="brand">{tx('Board control')}</BannerBadge>}
           />
 
           {/* SUBTAB 1: INSTALLED MODULES & RUNTIME */}
@@ -63,29 +65,29 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[color:var(--ink-2)]">Packages</span>
+                    <span className="text-xs font-semibold text-[color:var(--ink-2)]">{tx('Packages')}</span>
                     <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-600)]"><Puzzle className="h-4 w-4" /></span>
                   </div>
                   <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{adminPackages.length} in total</span>
-                  <span className="text-xs text-slate-600">Across all partner hospitals.</span>
+                  <span className="text-xs text-slate-600">{tx('Across all partner hospitals.')}</span>
                 </div>
 
                 <div className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[color:var(--ink-2)]">Published</span>
+                    <span className="text-xs font-semibold text-[color:var(--ink-2)]">{tx('Published')}</span>
                     <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--e-50)] border-[color:var(--e-200)] text-[color:var(--e-600)]"><CheckCircle2 className="h-4 w-4" /></span>
                   </div>
                   <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{adminPackages.filter(p => getPkgEnabled(p)).length} published</span>
-                  <span className="text-xs text-slate-600">Visible to patients.</span>
+                  <span className="text-xs text-slate-600">{tx('Visible to patients.')}</span>
                 </div>
 
                 <div className="bg-white border border-[color:var(--t-200)] shadow-xs p-5 flex flex-col gap-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[color:var(--ink-2)]">Drafts</span>
+                    <span className="text-xs font-semibold text-[color:var(--ink-2)]">{tx('Drafts')}</span>
                     <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-600)]"><Download className="h-4 w-4" /></span>
                   </div>
                   <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{adminPackages.filter(p => !getPkgEnabled(p)).length === 1 ? '1 draft' : `${adminPackages.filter(p => !getPkgEnabled(p)).length} drafts`}</span>
-                  <span className="text-xs text-slate-600">Hidden from patients until published.</span>
+                  <span className="text-xs text-slate-600">{tx('Hidden from patients until published.')}</span>
                 </div>
               </div>
 
@@ -96,7 +98,7 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
                     <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <input
                       type="text"
-                      placeholder="Search packages or hospitals…"
+                      placeholder={tx('Search packages or hospitals…')}
                       value={packageSearch}
                       onChange={(e) => setPackageSearch(e.target.value)}
                       className="w-full bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:bg-white h-11 pl-10 pr-4 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors"
@@ -109,7 +111,7 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
                       Category:
                     </span>
                     <select
-                      aria-label="Category"
+                      aria-label={tx('Category')}
                       value={packageCategoryFilter}
                       onChange={(e) => setPackageCategoryFilter(e.target.value)}
                       className="h-full bg-transparent text-xs font-bold text-[color:var(--ink)] pr-2 cursor-pointer focus:outline-none"
@@ -145,8 +147,8 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
                 }).length === 0 ? (
                   <div className="bg-white border border-slate-200 p-12 text-center text-slate-500 rounded-none">
                     <Search className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                    <p className="text-sm font-bold text-slate-700">No packages match your search.</p>
-                    <button type="button" onClick={() => { setPackageSearch(''); setPackageCategoryFilter('All'); }} className="mt-2 text-xs font-bold text-[color:var(--t-700)] underline cursor-pointer">Reset filters</button>
+                    <p className="text-sm font-bold text-slate-700">{tx('No packages match your search.')}</p>
+                    <button type="button" onClick={() => { setPackageSearch(''); setPackageCategoryFilter('All'); }} className="mt-2 text-xs font-bold text-[color:var(--t-700)] underline cursor-pointer">{tx('Reset filters')}</button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -212,7 +214,7 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
                                     ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
                                     : 'bg-amber-50 border-amber-200 text-amber-800'
                                 }`}>
-                                  {isEnabled ? 'Published' : 'Draft'}
+                                  {isEnabled ? tx('Published') : tx('Draft')}
                                 </span>
                               </div>
 
@@ -228,7 +230,7 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
                                   onClick={() => handleTogglePackage(pkg.id)}
                                   role="switch"
                                   aria-checked={isEnabled}
-                                  aria-label={`${isEnabled ? 'Unpublish' : 'Publish'} ${pkgName}`}
+                                  aria-label={`${isEnabled ? tx('Unpublish') : tx('Publish')} ${pkgName}`}
                                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-none border border-slate-300 transition-colors duration-150 ease-in-out focus:outline-none ${
                                     isEnabled ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)]' : 'bg-slate-200'
                                   }`}
@@ -240,7 +242,7 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
                                   />
                                 </button>
                                 <span className="text-xs font-extrabold text-slate-600 uppercase tracking-wide">
-                                  {isEnabled ? 'Listed for patients' : 'Hidden from patients'}
+                                  {isEnabled ? tx('Listed for patients') : tx('Hidden from patients')}
                                 </span>
                               </div>
 
@@ -249,14 +251,14 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
                                   type="button"
                                   onClick={() => { if (window.confirm(`Delete "${pkgName}"? Patients will no longer see it, and this cannot be undone.`)) handleUninstallPackage(pkg.id); }}
                                   className="h-8 px-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-none border border-transparent hover:border-rose-200 transition-all cursor-pointer flex items-center gap-1 text-xs font-bold"
-                                  title="Delete this package"
+                                  title={tx('Delete this package')}
                                 >
                                   <Trash2 className="h-3.5 w-3.5" />
-                                  <span>Remove</span>
+                                  <span>{tx('Remove')}</span>
                                 </button>
                               ) : (
                                 <span className="text-2xs font-black text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-none uppercase tracking-wider">
-                                  Core Module
+                                  {tx('Core Module')}
                                 </span>
                               )}
                             </div>
