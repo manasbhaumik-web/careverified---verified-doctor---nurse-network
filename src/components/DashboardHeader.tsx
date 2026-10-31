@@ -78,7 +78,7 @@ export default function DashboardHeader<T extends string>({
         <div className="dh-brand relative border-t-0 text-[color:var(--ink)] overflow-hidden bg-[color:var(--t-50)] border-b border-[color:var(--t-200)]">
           {title && (
             <div className={`relative z-10 pt-5 pb-5 sm:pt-6 sm:pb-6 ${
-              fullWidth ? 'max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8' : 'px-4 sm:px-7'
+              fullWidth ? 'max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8' : 'px-4 sm:px-7'
             }`}>
               <BannerRow
                 identity={<BannerIdentity as="h1" icon={icon ?? ShieldCheck} name={title} badges={eyebrow ? <BannerBadge>{eyebrow}</BannerBadge> : undefined} description={description} />}
@@ -89,7 +89,7 @@ export default function DashboardHeader<T extends string>({
 
           {children && (
             <div className={`relative z-10 py-5 sm:py-6 ${
-              fullWidth ? 'max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8' : 'px-5 sm:px-7'
+              fullWidth ? 'max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8' : 'px-5 sm:px-7'
             }`}>
               {children}
             </div>
@@ -103,7 +103,7 @@ export default function DashboardHeader<T extends string>({
             role="tablist"
             aria-label={tabsLabel}
             className={`relative flex items-center gap-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
-              fullWidth ? 'max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8' : 'px-3 sm:px-5'
+              fullWidth ? 'max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8' : 'px-3 sm:px-5'
             }`}
           >
             {tabs?.map((tab, idx) => {

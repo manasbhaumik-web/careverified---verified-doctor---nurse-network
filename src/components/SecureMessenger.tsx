@@ -140,7 +140,7 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
         </div>
       )}
 
-      <div className={embedded ? "space-y-4" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
+      <div className={embedded ? "space-y-4" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
         <div className={`bg-white border border-[color:var(--t-200)] shadow-xs grid grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)] lg:h-[calc(100dvh-280px)] lg:min-h-[520px] ${mobileThread ? 'h-[calc(100dvh-9rem-env(safe-area-inset-bottom))]' : ''}`}>
         <aside aria-label="Conversations" className={`${mobileThread ? 'hidden lg:flex' : 'flex'} border-b lg:border-b-0 lg:border-r border-[color:var(--t-200)] flex-col min-h-0 lg:max-h-none bg-white`}>
           <div className="p-3 border-b border-[color:var(--t-200)]">

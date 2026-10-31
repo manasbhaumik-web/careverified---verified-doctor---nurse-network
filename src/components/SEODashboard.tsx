@@ -130,7 +130,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
         />
       )}
 
-      <div className={embedded ? "space-y-6" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
+      <div className={embedded ? "space-y-6" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
         {/* TAB 1: SCHEMA GENERATOR */}
         {activeTab === 'schema' && (
           <div className="space-y-6">

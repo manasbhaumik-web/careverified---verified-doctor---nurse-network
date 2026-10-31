@@ -73,7 +73,7 @@ export default function PharmacyFinder({ embedded = false }: { embedded?: boolea
         />
       )}
 
-      <div className={embedded ? "space-y-5 pt-2" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
+      <div className={embedded ? "space-y-5 pt-2" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
         {/* Unified Single-Row Filter Control Bar */}
         <section aria-label="Find pharmacies" className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
           <div className="flex flex-col lg:flex-row lg:items-center gap-3">

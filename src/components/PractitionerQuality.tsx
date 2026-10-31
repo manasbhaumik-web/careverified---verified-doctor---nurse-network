@@ -36,7 +36,7 @@ export default function PractitionerQuality({ profileId, embedded = false }: { p
 
   if (!profileId) {
     return (
-      <div className={embedded ? "space-y-6 w-full" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
+      <div className={embedded ? "space-y-6 w-full" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
         <WorkspaceHeader
           icon={Award}
           eyebrow="Continuous Professional Development · Audit"
@@ -52,7 +52,7 @@ export default function PractitionerQuality({ profileId, embedded = false }: { p
   }
 
   return (
-    <div className={embedded ? "space-y-6 w-full" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
+    <div className={embedded ? "space-y-6 w-full" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
       <WorkspaceHeader
         icon={Award}
         eyebrow="Continuous Professional Development · Audit"

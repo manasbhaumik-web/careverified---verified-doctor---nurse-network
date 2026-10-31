@@ -55,7 +55,7 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
         />
       )}
 
-      <div className={embedded ? "space-y-6" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
+      <div className={embedded ? "space-y-6" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
         {!s && <p className="text-xs bg-amber-50 border border-amber-200 text-amber-900 p-3 font-semibold">Finish your practitioner registration to see earnings.</p>}
 
         {s && (
