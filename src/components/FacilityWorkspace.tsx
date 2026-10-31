@@ -1178,7 +1178,6 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                 name={facility?.name || 'Healthcare Facility & Clinic'}
                 badges={
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <BannerBadge tone="brand">{FACILITY_GROUPS[currentGroup].name}</BannerBadge>
                     <span className="bg-slate-50 text-slate-700 border border-slate-300 text-2xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">
                       {facility?.kind || 'Medical Centre'}
                     </span>

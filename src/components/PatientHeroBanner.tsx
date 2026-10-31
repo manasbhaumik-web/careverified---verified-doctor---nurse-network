@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTr } from '../locale';
 import { CheckCircle2, LifeBuoy, Video, Sparkles, FolderHeart } from 'lucide-react';
 import DashboardHeader, {
   BannerRow,
@@ -59,6 +60,7 @@ export default function PatientHeroBanner<T extends string = string>({
   onOpenTriage,
   onOpenRecords,
 }: PatientHeroBannerProps<T>) {
+  const tx = useTr();
   const helpActive = isHelpActive ?? (groupName === 'Help & Support');
 
   const handleHelpClick = () => {
@@ -78,15 +80,15 @@ export default function PatientHeroBanner<T extends string = string>({
         id="tab-patient-help"
         aria-selected={helpActive}
         onClick={handleHelpClick}
-        className={`shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer border-b transition-colors ${
+        className={`shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer transition-colors ${
           helpActive
-            ? 'font-semibold text-[color:var(--t-700)] border-[color:var(--t-600)] bg-[color:var(--t-50)]/60'
-            : 'font-medium text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
+            ? 'font-semibold text-[color:var(--t-700)] bg-[color:var(--t-50)]'
+            : 'font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
         }`}
-        title="Patient Care Concierge & Support Desk"
+        title={tx('Patient Care Concierge & Support Desk')}
       >
         <LifeBuoy className={`h-4 w-4 ${helpActive ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
-        <span className="whitespace-nowrap font-medium sm:font-semibold">Help & Support</span>
+        <span className="whitespace-nowrap font-medium sm:font-semibold">{tx('Help & Support')}</span>
         {openTicketsCount > 0 && (
           <span className="tabular-nums text-2xs min-w-[18px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
             {openTicketsCount}
@@ -102,7 +104,7 @@ export default function PatientHeroBanner<T extends string = string>({
       tabs={tabs}
       activeTab={activeTab}
       onTabChange={onTabChange}
-      tabsLabel={tabsLabel || `${groupName} sections`}
+      tabsLabel={tabsLabel || tx('{name} sections', { name: tx(groupName) })}
       tabsRight={helpRightNode}
     >
       <BannerRow
@@ -113,9 +115,8 @@ export default function PatientHeroBanner<T extends string = string>({
             role="patient"
             badges={
               <>
-                {groupName && <BannerBadge tone="brand">{groupName}</BannerBadge>}
                 <BannerBadge tone="success">
-                  <CheckCircle2 className="h-3 w-3 text-emerald-600 stroke-[3]" /> EHR Verified Patient
+                  <CheckCircle2 className="h-3 w-3 text-emerald-600 stroke-[3]" /> {tx('EHR Verified Patient')}
                 </BannerBadge>
               </>
             }
@@ -134,7 +135,7 @@ export default function PatientHeroBanner<T extends string = string>({
                           : 'text-2xs font-mono font-bold text-[color:var(--t-700)] bg-white px-1.5 py-0.5 border border-[color:var(--t-200)] shadow-2xs'
                       }
                     >
-                      BP: {bpSummary.value1}/{bpSummary.value2} mmHg
+                      {tx('BP: {a}/{b} mmHg', { a: bpSummary.value1 ?? '', b: bpSummary.value2 ?? '' })}
                     </span>
                   </>
                 )}
@@ -146,28 +147,28 @@ export default function PatientHeroBanner<T extends string = string>({
           <>
             <BannerKpis
               items={[
-                { value: upcomingCount, label: 'Upcoming' },
-                { value: activeRxCount, label: 'Prescriptions' },
-                { value: careTeamCount, label: 'Care Team' },
+                { value: upcomingCount, label: tx('Upcoming') },
+                { value: activeRxCount, label: tx('Prescriptions') },
+                { value: careTeamCount, label: tx('Care Team') },
               ]}
             />
             <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
               {onConsultNow && (
                 <button type="button" onClick={onConsultNow} className={bannerOnBrandPrimaryBtn}>
                   <Video className="h-4 w-4" />
-                  <span>On-Call Doctor</span>
+                  <span>{tx('On-Call Doctor')}</span>
                 </button>
               )}
               {onOpenTriage && (
                 <button type="button" onClick={onOpenTriage} className={bannerOnBrandSecondaryBtn}>
                   <Sparkles className="h-3.5 w-3.5" />
-                  <span>AI Triage</span>
+                  <span>{tx('AI Triage')}</span>
                 </button>
               )}
               {onOpenRecords && (
                 <button type="button" onClick={onOpenRecords} className={bannerOnBrandSecondaryBtn}>
                   <FolderHeart className="h-3.5 w-3.5" />
-                  <span>Health Records</span>
+                  <span>{tx('Health Records')}</span>
                 </button>
               )}
             </div>

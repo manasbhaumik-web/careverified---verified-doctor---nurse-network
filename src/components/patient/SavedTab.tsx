@@ -4,7 +4,7 @@ import {
   Heart, Trash2, Stethoscope, MapPin, Star, ShieldCheck, MessageSquare, CalendarRange, CheckCircle2, AlertTriangle, Search, X, ArrowRight
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, UserRole, VerificationStatus } from '../../types';
-import { formatMoney } from '../../locale';
+import { formatMoney, useTr } from '../../locale';
 import { requestConversationWith } from '../SecureMessenger';
 import { FilterSelect } from '../DashboardHeader';
 import { UserAvatar } from '../../avatars';
@@ -31,17 +31,18 @@ interface SavedTabProps {
 
 /** From the practitioner's record, never assumed: only a currently verified practitioner is called verified. */
 function Standing({ p }: { p: Pro }) {
+  const tx = useTr();
   const isDoc = p.role === UserRole.DOCTOR;
   const verified = p.verificationStatus === VerificationStatus.VERIFIED;
   return verified ? (
     <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
       <CheckCircle2 className="h-3 w-3 shrink-0 text-emerald-600" aria-hidden="true" />
-      {isDoc ? 'MMC Verified' : 'LJM Verified'}
+      {isDoc ? tx('MMC Verified') : tx('LJM Verified')}
     </span>
   ) : (
     <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold uppercase px-2 py-0.5 bg-amber-50 text-amber-900 border border-amber-300">
       <AlertTriangle className="h-3 w-3 shrink-0" aria-hidden="true" />
-      Pending Verification
+      {tx('Pending Verification')}
     </span>
   );
 }
@@ -58,6 +59,7 @@ export default function SavedTab({
   onFindProviders,
   hideHeader = false,
 }: SavedTabProps) {
+  const tx = useTr();
   const [query, setQuery] = useState('');
   const [specialty, setSpecialty] = useState('all');
   const [city, setCity] = useState('all');
@@ -140,23 +142,23 @@ export default function SavedTab({
         <div className="border-b border-[color:var(--t-200)] pb-4">
           <h3 className="font-display font-black text-xl text-[color:var(--ink)] tracking-tight flex items-center gap-2">
             <Heart className="h-5 w-5 text-rose-500 fill-rose-500" aria-hidden="true" />
-            Your care team
+            {tx('Your care team')}
           </h3>
-          <p className="text-xs text-slate-600 font-medium mt-1">The doctors and nurses you have seen, and others you saved to book later.</p>
+          <p className="text-xs text-slate-600 font-medium mt-1">{tx('The doctors and nurses you have seen, and others you saved to book later.')}</p>
         </div>
       )}
 
       {/* Unified Single-Row h-11 Filter Control Bar */}
-      <section aria-label="Filter care team" className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
+      <section aria-label={tx('Filter care team')} className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
         <div className="flex flex-col xl:flex-row xl:items-center gap-3">
           {/* Search Input */}
           <div className="relative flex-1 min-w-[240px]">
-            <label htmlFor="care-team-search" className="sr-only">Search care team</label>
+            <label htmlFor="care-team-search" className="sr-only">{tx('Search care team')}</label>
             <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               id="care-team-search"
               type="text"
-              placeholder="Search your care team or recommended specialists by name, specialty, or city…"
+              placeholder={tx('Search your care team or recommended specialists by name, specialty, or city…')}
               value={query}
               onChange={e => setQuery(e.target.value)}
               className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
@@ -165,7 +167,7 @@ export default function SavedTab({
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                aria-label="Clear search query"
+                aria-label={tx('Clear search query')}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
               >
                 <X className="h-3.5 w-3.5" />
@@ -175,21 +177,21 @@ export default function SavedTab({
 
           {/* Inline Dropdown Controls */}
           <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-            <FilterSelect label="Specialty" value={specialty} onChange={setSpecialty}>
-              <option value="all">All Specialties ({specialties.length})</option>
-              {specialties.map(s => <option key={s} value={s}>{s}</option>)}
+            <FilterSelect label={tx('Specialty')} value={specialty} onChange={setSpecialty}>
+              <option value="all">{tx('All Specialties ({n})', { n: specialties.length })}</option>
+              {specialties.map(s => <option key={s} value={s}>{tx(s)}</option>)}
             </FilterSelect>
 
-            <FilterSelect label="City" value={city} onChange={setCity}>
-              <option value="all">All Cities ({cities.length})</option>
-              {cities.map(c => <option key={c} value={c}>{c}</option>)}
+            <FilterSelect label={tx('City')} value={city} onChange={setCity}>
+              <option value="all">{tx('All Cities ({n})', { n: cities.length })}</option>
+              {cities.map(c => <option key={c} value={c}>{tx(c)}</option>)}
             </FilterSelect>
 
-            <FilterSelect label="Sort by" value={sort} onChange={v => setSort(v as any)}>
-              <option value="rating">Highest Rated</option>
-              <option value="experience">Most Experienced</option>
-              <option value="fee_asc">Fee: Low to High</option>
-              <option value="fee_desc">Fee: High to Low</option>
+            <FilterSelect label={tx('Sort by')} value={sort} onChange={v => setSort(v as any)}>
+              <option value="rating">{tx('Highest Rated')}</option>
+              <option value="experience">{tx('Most Experienced')}</option>
+              <option value="fee_asc">{tx('Fee: Low to High')}</option>
+              <option value="fee_desc">{tx('Fee: High to Low')}</option>
             </FilterSelect>
           </div>
         </div>
@@ -199,23 +201,23 @@ export default function SavedTab({
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-bold text-slate-600 tabular-nums" aria-live="polite">
               {totalCareCount > 0 ? (
-                <>Showing <strong className="font-black text-[color:var(--ink)]">{shownCareCount}</strong> of {totalCareCount} care team provider{totalCareCount === 1 ? '' : 's'}</>
+                <>{tx('Showing')} <strong className="font-black text-[color:var(--ink)]">{shownCareCount}</strong> {tx(totalCareCount === 1 ? 'of {n} care team provider' : 'of {n} care team providers', { n: totalCareCount })}</>
               ) : (
-                <>0 saved providers · Showing <strong className="font-black text-[color:var(--ink)]">{suggestedProviders.length}</strong> recommended practitioner{suggestedProviders.length === 1 ? '' : 's'}</>
+                <>{tx('0 saved providers · Showing')} <strong className="font-black text-[color:var(--ink)]">{suggestedProviders.length}</strong> {tx(suggestedProviders.length === 1 ? 'recommended practitioner' : 'recommended practitioners')}</>
               )}
             </span>
             {specialty !== 'all' && (
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
-                Specialty: {specialty}
-                <button type="button" onClick={() => setSpecialty('all')} className="hover:text-slate-900 cursor-pointer" aria-label="Remove specialty filter">
+                {tx('Specialty: ')}{tx(specialty)}
+                <button type="button" onClick={() => setSpecialty('all')} className="hover:text-slate-900 cursor-pointer" aria-label={tx('Remove specialty filter')}>
                   <X className="h-3 w-3" />
                 </button>
               </span>
             )}
             {city !== 'all' && (
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
-                City: {city}
-                <button type="button" onClick={() => setCity('all')} className="hover:text-slate-900 cursor-pointer" aria-label="Remove city filter">
+                {tx('City: ')}{tx(city)}
+                <button type="button" onClick={() => setCity('all')} className="hover:text-slate-900 cursor-pointer" aria-label={tx('Remove city filter')}>
                   <X className="h-3 w-3" />
                 </button>
               </span>
@@ -228,7 +230,7 @@ export default function SavedTab({
               onClick={() => { setQuery(''); setSpecialty('all'); setCity('all'); }}
               className="text-xs font-bold text-[color:var(--t-700)] hover:text-[color:var(--dark)] underline underline-offset-2 cursor-pointer"
             >
-              Reset Filters
+              {tx('Reset Filters')}
             </button>
           )}
         </div>
@@ -239,11 +241,11 @@ export default function SavedTab({
         <section aria-labelledby="care-team-seen" className="space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <h3 id="care-team-seen" className="font-display font-black text-base text-[color:var(--ink)]">Doctors &amp; Nurses You Have Seen</h3>
-              <p className="text-xs text-slate-600">Book a follow-up consultation or send a direct clinical message.</p>
+              <h3 id="care-team-seen" className="font-display font-black text-base text-[color:var(--ink)]">{tx('Doctors & Nurses You Have Seen')}</h3>
+              <p className="text-xs text-slate-600">{tx('Book a follow-up consultation or send a direct clinical message.')}</p>
             </div>
             <span className="text-2xs font-mono font-bold uppercase px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
-              {filteredCareTeam.length} Seen
+              {tx('{n} Seen', { n: filteredCareTeam.length })}
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -261,7 +263,7 @@ export default function SavedTab({
                       )}
                     </div>
                     <h4 className="font-display font-extrabold text-sm text-[color:var(--ink)] leading-snug truncate mt-1">{p.name}</h4>
-                    <p className="text-xs text-[color:var(--t-700)] font-bold truncate">{p.specialization}</p>
+                    <p className="text-xs text-[color:var(--t-700)] font-bold truncate">{tx(p.specialization)}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 pt-2.5 border-t border-[color:var(--t-100)] mt-auto">
@@ -271,7 +273,7 @@ export default function SavedTab({
                     className="h-9 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold px-2.5 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <MessageSquare className="h-3.5 w-3.5 text-[color:var(--t-600)]" aria-hidden="true" />
-                    <span>Message</span>
+                    <span>{tx('Message')}</span>
                   </button>
                   <button
                     type="button"
@@ -279,7 +281,7 @@ export default function SavedTab({
                     className="h-9 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-2.5 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-[color:var(--t-700)]"
                   >
                     <CalendarRange className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>Book Again</span>
+                    <span>{tx('Book Again')}</span>
                   </button>
                 </div>
               </article>
@@ -290,13 +292,13 @@ export default function SavedTab({
 
       {undo && (
         <div role="status" className="fixed bottom-20 lg:bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white text-xs font-semibold pl-4 pr-1 min-h-[48px] flex items-center gap-3 shadow-lg max-w-[calc(100vw-2rem)]">
-          <span className="truncate">Removed {undo.name} from saved.</span>
+          <span className="truncate">{tx('Removed {name} from saved.', { name: undo.name })}</span>
           <button
             type="button"
             onClick={() => { onRestoreSaved?.(undo.id); setUndo(null); }}
             className="min-h-[44px] px-4 font-extrabold underline cursor-pointer shrink-0"
           >
-            Undo
+            {tx('Undo')}
           </button>
         </div>
       )}
@@ -309,7 +311,7 @@ export default function SavedTab({
             <p className="text-xs text-slate-600">Practitioners you bookmarked for future consultations or home care.</p>
           </div>
           <span className="text-2xs font-mono font-bold uppercase px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
-            {filteredSaved.length} Saved
+            {tx('{n} Saved', { n: filteredSaved.length })}
           </span>
         </div>
 
@@ -320,12 +322,12 @@ export default function SavedTab({
             </div>
             <div className="space-y-1 max-w-lg mx-auto">
               <p className="text-sm text-[color:var(--ink)] font-black uppercase tracking-wider">
-                {careTeam.length === 0 ? 'Your saved care team list is currently empty' : 'No saved practitioners match your filter'}
+                {careTeam.length === 0 ? tx('Your saved care team list is currently empty') : tx('No saved practitioners match your filter')}
               </p>
               <p className="text-xs text-slate-500 leading-relaxed">
                 {careTeam.length === 0
-                  ? 'Doctors and nurses you book appear here automatically, or you can save recommended practitioners below to build your personal care team.'
-                  : 'Save a doctor or nurse from the directory below and they will appear here for one-click booking.'}
+                  ? tx('Doctors and nurses you book appear here automatically, or you can save recommended practitioners below to build your personal care team.')
+                  : tx('Save a doctor or nurse from the directory below and they will appear here for one-click booking.')}
               </p>
             </div>
             {onFindProviders && (
@@ -358,15 +360,15 @@ export default function SavedTab({
                         <div className="min-w-0">
                           <Standing p={p} />
                           <h4 className="font-display font-extrabold text-sm text-[color:var(--ink)] leading-snug truncate mt-1">{p.name}</h4>
-                          <p className="text-xs text-[color:var(--t-700)] font-bold truncate">{p.specialization}</p>
+                          <p className="text-xs text-[color:var(--t-700)] font-bold truncate">{tx(p.specialization)}</p>
                         </div>
                       </div>
                       <button
                         type="button"
                         onClick={() => remove(p)}
                         className="h-8 w-8 flex items-center justify-center hover:bg-rose-50 text-slate-500 hover:text-rose-700 border border-transparent hover:border-rose-200 transition-all cursor-pointer bg-white shrink-0"
-                        title="Remove from saved"
-                        aria-label={`Remove ${p.name} from saved`}
+                        title={tx('Remove from saved')}
+                        aria-label={tx('Remove {name} from saved', { name: p.name })}
                       >
                         <Trash2 className="h-4 w-4" aria-hidden="true" />
                       </button>
@@ -375,11 +377,11 @@ export default function SavedTab({
                     <div className="pt-2 border-t border-[color:var(--t-100)] text-xs text-slate-600 space-y-1">
                       <p className="flex items-center gap-1.5 truncate">
                         <MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" aria-hidden="true" />
-                        <span className="truncate">{p.city}{p.practiceAddress ? ` • ${p.practiceAddress.split(',')[0]}` : ''}</span>
+                        <span className="truncate">{tx(p.city)}{p.practiceAddress ? ` • ${p.practiceAddress.split(',')[0]}` : ''}</span>
                       </p>
                       <div className="flex items-center justify-between pt-1 flex-wrap gap-2">
                         <span className="text-2xs font-bold uppercase tracking-wider text-slate-600 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-0.5">
-                          {p.experienceYears} yrs exp
+                          {tx('{n} yrs exp', { n: p.experienceYears })}
                         </span>
                         <span className="text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
                           {formatMoney(p.fee)}/consult
@@ -397,7 +399,7 @@ export default function SavedTab({
                           className="h-9 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold px-2.5 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                         >
                           <MessageSquare className="h-3.5 w-3.5 text-[color:var(--t-600)]" aria-hidden="true" />
-                          <span>Message</span>
+                          <span>{tx('Message')}</span>
                         </button>
                       ) : (
                         <button
@@ -406,7 +408,7 @@ export default function SavedTab({
                           className="h-9 bg-[color:var(--t-50)] border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--t-700)] text-xs font-bold px-2.5 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                         >
                           <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-                          <span>Credentials</span>
+                          <span>{tx('Credentials')}</span>
                         </button>
                       )}
                       <button
@@ -415,7 +417,7 @@ export default function SavedTab({
                         className="h-9 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-2.5 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-[color:var(--t-700)]"
                       >
                         <CalendarRange className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>Book Visit</span>
+                        <span>{tx('Book Visit')}</span>
                       </button>
                     </div>
                   </div>
@@ -432,14 +434,14 @@ export default function SavedTab({
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h3 id="care-team-suggested" className="font-display font-black text-base text-[color:var(--ink)]">
-                Recommended Verified Practitioners
+                {tx('Recommended Verified Practitioners')}
               </h3>
               <p className="text-xs text-slate-600">
-                Save specialists or staff nurses to your personal care team for instant access and follow-up booking.
+                {tx('Save specialists or staff nurses to your personal care team for instant access and follow-up booking.')}
               </p>
             </div>
             <span className="text-2xs font-mono font-bold uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
-              MMC &amp; LJM Verified
+              {tx('MMC & LJM Verified')}
             </span>
           </div>
 
@@ -460,7 +462,7 @@ export default function SavedTab({
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-[color:var(--t-700)] font-bold mt-0.5">{prof.specialization}</p>
+                      <p className="text-xs text-[color:var(--t-700)] font-bold mt-0.5">{tx(prof.specialization)}</p>
                       <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
                         <Standing p={prof} />
                         {prof.licenseNumber && (
@@ -476,12 +478,12 @@ export default function SavedTab({
                     {(prof.practiceAddress || prof.city) && (
                       <p className="flex items-center gap-1.5 truncate">
                         <MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
-                        <span className="truncate">{prof.practiceAddress ? `${prof.practiceAddress}${prof.city && !prof.practiceAddress.includes(prof.city) ? `, ${prof.city}` : ''}` : prof.city}</span>
+                        <span className="truncate">{prof.practiceAddress ? `${prof.practiceAddress}${prof.city && !prof.practiceAddress.includes(prof.city) ? `, ${tx(prof.city)}` : ''}` : tx(prof.city)}</span>
                       </p>
                     )}
                     <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                       <span className="text-2xs font-bold uppercase tracking-wider text-slate-600 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-0.5">
-                        {prof.experienceYears} yrs exp
+                        {tx('{n} yrs exp', { n: prof.experienceYears })}
                       </span>
                       <span className="text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
                         RM {prof.fee}{prof.role === UserRole.NURSE ? ' / hr' : ''}
@@ -506,7 +508,7 @@ export default function SavedTab({
                     onClick={() => onSelectProfessional(prof.id)}
                     className="h-9 px-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                   >
-                    <span>Book Visit</span>
+                    <span>{tx('Book Visit')}</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>

@@ -1,4 +1,5 @@
 import { getLocale } from '../locale/store';
+import { useTr } from '../locale';
 import React, { useState } from 'react';
 import { openLegal } from '../legal';
 import { IdFields, PhoneField, AddressFields, emptyId, emptyPhone, emptyAddress, idProblem, phoneE164, type IdState, type PhoneState } from './IdentityFields';
@@ -17,6 +18,7 @@ export default function PatientRegistrationForm({
   onRegisterSuccess,
   onCancel
 }: PatientRegistrationFormProps) {
+  const tx = useTr();
   // Wizard Step State
   const [step, setStep] = useState(1);
 
@@ -60,12 +62,12 @@ export default function PatientRegistrationForm({
   })();
 
   const step1Problem = () => {
-    if (!name.trim() || !email.trim() || !password.trim()) return 'Please fill in all mandatory account details before continuing.';
+    if (!name.trim() || !email.trim() || !password.trim()) return tx('Please fill in all mandatory account details before continuing.');
     return idProblem(idState);
   };
   const step2Problem = () => {
-    if (!phoneE164(phone)) return 'Enter a valid mobile or phone number.';
-    if (age < 0 || age > 120) return 'The birth date looks wrong.';
+    if (!phoneE164(phone)) return tx('Enter a valid mobile or phone number.');
+    if (age < 0 || age > 120) return tx('The birth date looks wrong.');
     return addressProblem(address);
   };
   const isStep1Valid = () => step1Problem() === null;
@@ -79,7 +81,7 @@ export default function PatientRegistrationForm({
   const handleNextStep = () => {
     setError('');
     const problem = step === 1 ? step1Problem() : step === 2 ? step2Problem() : null;
-    if (problem) { setError(problem); return; }
+    if (problem) { setError(tx(problem)); return; }
     setStep(prev => prev + 1);
   };
 
@@ -93,7 +95,7 @@ export default function PatientRegistrationForm({
     setError('');
 
     if (!isStep1Valid() || !isStep2Valid() || !isStep3Valid()) {
-      setError('Please complete all wizard steps with valid credentials.');
+      setError(tx('Please complete all wizard steps with valid credentials.'));
       return;
     }
 
@@ -134,11 +136,11 @@ export default function PatientRegistrationForm({
         const me = await fetch('/api/auth/me').then(r => r.json());
         onRegisterSuccess(me.data.user, data.data);
       } else {
-        setError(data.message || 'Registration failed.');
+        setError(data.message || tx('Registration failed.'));
         setLoading(false);
       }
     } catch (err: any) {
-      setError('Server connection error. Please try again.');
+      setError(tx('Server connection error. Please try again.'));
       setLoading(false);
     }
   };
@@ -152,15 +154,15 @@ export default function PatientRegistrationForm({
             <UserCheck className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-base font-black text-[color:var(--ink)]">Create Member Profile</h3>
-            <p className="text-xs text-slate-600 font-bold uppercase tracking-wider mt-0.5">Secure National Health Register</p>
+            <h3 className="text-base font-black text-[color:var(--ink)]">{tx('Create Member Profile')}</h3>
+            <p className="text-xs text-slate-600 font-bold uppercase tracking-wider mt-0.5">{tx('Secure National Health Register')}</p>
           </div>
         </div>
         <button 
           onClick={onCancel} 
           className="text-[color:var(--t-600)] hover:text-[color:var(--t-800)] transition-all text-xs font-black py-1.5 px-3 hover:bg-[color:var(--t-100)] rounded-none cursor-pointer"
         >
-          Sign In Instead
+          {tx('Sign In Instead')}
         </button>
       </div>
 
@@ -169,9 +171,9 @@ export default function PatientRegistrationForm({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs font-black uppercase text-[color:var(--t-600)] tracking-wider">
             <Activity className="h-4 w-4" />
-            <span>Registration Progress Guide</span>
+            <span>{tx('Registration Progress Guide')}</span>
           </div>
-          <span className="text-xs text-slate-600 font-mono font-bold">Step {step} of 3</span>
+          <span className="text-xs text-slate-600 font-mono font-bold">{tx('Step {a} of 3', { a: step })}</span>
         </div>
         
         {/* Dynamic Timeline Steps */}
@@ -218,9 +220,9 @@ export default function PatientRegistrationForm({
 
           {/* Row of labels aligned directly below circles */}
           <div className="flex items-center justify-between mt-1.5">
-            <span className={`text-xs font-black uppercase text-left ${step === 1 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Account Setup</span>
-            <span className={`text-xs font-black uppercase text-center ${step === 2 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Demographics</span>
-            <span className={`text-xs font-black uppercase text-right ${step === 3 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>Medical Background</span>
+            <span className={`text-xs font-black uppercase text-left ${step === 1 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>{tx('Account Setup')}</span>
+            <span className={`text-xs font-black uppercase text-center ${step === 2 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>{tx('Demographics')}</span>
+            <span className={`text-xs font-black uppercase text-right ${step === 3 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>{tx('Medical Background')}</span>
           </div>
         </div>
       </div>
@@ -228,7 +230,7 @@ export default function PatientRegistrationForm({
       {error && (
         <div className="bg-[color:var(--t-100)] border border-[color:var(--t-200)] text-[color:var(--t-800)] p-3 rounded-none flex gap-2 text-xs font-semibold animate-shake">
           <AlertCircle className="h-4.5 w-4.5 shrink-0 mt-0.5 text-[color:var(--t-600)]" />
-          <span>{error}</span>
+          <span>{tx(error)}</span>
         </div>
       )}
 
@@ -240,14 +242,14 @@ export default function PatientRegistrationForm({
           <div className="space-y-4 animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Full Name (as on your ID) *</label>
+                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">{tx('Full Name (as on your ID) *')}</label>
                 <div className="relative">
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                   <input type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ahmad Fauzi Bin Ramli" className="form-input pl-10" required />
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Email Address *</label>
+                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">{tx('Email Address *')}</label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                   <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" spellCheck={false} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ahmad@gmail.com" className="form-input pl-10" required />
@@ -255,17 +257,17 @@ export default function PatientRegistrationForm({
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Account Password *</label>
+              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">{tx('Account Password *')}</label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                <input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters, letters and numbers" className="form-input pl-10" required />
+                <input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={tx('At least 8 characters, letters and numbers')} className="form-input pl-10" required />
               </div>
             </div>
             <IdFields value={idState} onChange={setIdState} />
             <div className="flex justify-end pt-3">
               <button type="button" onClick={handleNextStep} disabled={!isStep1Valid()}
                 className="py-2.5 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-none text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-md">
-                <span>Continue</span>
+                <span>{tx('Continue')}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
@@ -276,23 +278,23 @@ export default function PatientRegistrationForm({
         {step === 2 && (
           <div className="space-y-4 animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <PhoneField id="reg-phone" title="Mobile number" value={phone} onChange={setPhone} />
+              <PhoneField id="reg-phone" title={tx('Mobile number')} value={phone} onChange={setPhone} />
               <div className="space-y-1.5">
-                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block" htmlFor="reg-gender">Gender</label>
+                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block" htmlFor="reg-gender">{tx('Gender')}</label>
                 <select id="reg-gender" value={gender} onChange={(e) => setGender(e.target.value)} className="form-select">
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
+                  <option value="Male">{tx('Male')}</option>
+                  <option value="Female">{tx('Female')}</option>
+                  <option value="Other">{tx('Other')}</option>
                 </select>
-                {nric && nric.gender !== gender && <p className="text-xs font-semibold text-amber-700 mt-1">Your MyKad number suggests {nric.gender}. Keep your choice if you prefer.</p>}
+                {nric && nric.gender !== gender && <p className="text-xs font-semibold text-amber-700 mt-1">{tx('Your MyKad number suggests {x}. Keep your choice if you prefer.', { x: tx(nric.gender) })}</p>}
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block" htmlFor="reg-lang">Preferred language for care</label>
+              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block" htmlFor="reg-lang">{tx('Preferred language for care')}</label>
               <select id="reg-lang" value={preferredLanguage} onChange={(e) => setPreferredLanguage(e.target.value)} className="form-select">
                 {PREFERRED_LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
               </select>
-              <p className="text-xs text-slate-500 font-semibold mt-1">Used to match you with a practitioner who speaks your language{age ? `. Age on record: ${age}.` : '.'}</p>
+              <p className="text-xs text-slate-500 font-semibold mt-1">{tx('Used to match you with a practitioner who speaks your language')}{age ? tx('. Age on record: {age}.', { age }) : '.'}</p>
             </div>
             <AddressFields value={address} onChange={setAddress} />
 
@@ -300,11 +302,11 @@ export default function PatientRegistrationForm({
               <button type="button" onClick={handlePrevStep}
                 className="py-2.5 px-5 border border-[color:var(--t-200)] bg-white text-slate-700 hover:text-[color:var(--t-800)] hover:bg-[color:var(--t-100)] rounded-none text-xs font-black transition-all flex items-center gap-2 cursor-pointer">
                 <ArrowLeft className="h-4 w-4" />
-                <span>Back</span>
+                <span>{tx('Back')}</span>
               </button>
               <button type="button" onClick={handleNextStep} disabled={!isStep2Valid()}
                 className="py-2.5 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-none text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-md">
-                <span>Continue</span>
+                <span>{tx('Continue')}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
@@ -316,7 +318,7 @@ export default function PatientRegistrationForm({
           <div className="space-y-5 animate-fade-in">
             {/* Chronic Conditions */}
             <div className="space-y-2">
-              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Pre-Existing Chronic Conditions</label>
+              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">{tx('Pre-Existing Chronic Conditions')}</label>
               <div className="flex flex-wrap gap-2 pt-1">
                 {['Hypertension', 'Diabetes Mellitus', 'Asthma', 'Heart Conditions', 'Chronic Kidney Disease'].map((cond) => {
                   const isChecked = selectedConditions.includes(cond);
@@ -331,7 +333,7 @@ export default function PatientRegistrationForm({
                           : 'bg-white text-slate-600 border-[color:var(--t-200)] hover:border-[color:var(--t-600)] hover:text-[color:var(--ink)]'
                       }`}
                     >
-                      {cond}
+                      {tx(cond)}
                     </button>
                   );
                 })}
@@ -340,43 +342,43 @@ export default function PatientRegistrationForm({
 
             {/* Drug Allergies */}
             <div className="space-y-1.5">
-              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Drug or General Allergies (Optional)</label>
+              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">{tx('Drug or General Allergies (Optional)')}</label>
               <input
                 type="text"
                 value={allergiesText}
                 onChange={(e) => setAllergiesText(e.target.value)}
-                placeholder="e.g. Penicillin, Seafood, Peanuts"
+                placeholder={tx('e.g. Penicillin, Seafood, Peanuts')}
                 className="form-input"
               />
             </div>
 
             {/* Emergency Contacts */}
             <div className="space-y-3.5 pt-2 border-t border-[color:var(--t-200)]">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Emergency Contact (used for Doctor-on-Call dispatches) *</span>
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">{tx('Emergency Contact (used for Doctor-on-Call dispatches) *')}</span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-extrabold uppercase tracking-wider text-slate-600 block">Contact Person Name</label>
+                  <label className="text-xs font-extrabold uppercase tracking-wider text-slate-600 block">{tx('Contact Person Name')}</label>
                   <input type="text" value={emergencyContactName} onChange={(e) => setEmergencyContactName(e.target.value)} placeholder="Fatimah Binti Fauzi" className="form-input" required />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-extrabold uppercase tracking-wider text-slate-600 block">Relationship</label>
+                  <label className="text-xs font-extrabold uppercase tracking-wider text-slate-600 block">{tx('Relationship')}</label>
                   <select value={emergencyRelationship} onChange={(e) => setEmergencyRelationship(e.target.value)} className="form-select">
-                    {RELATIONSHIPS.map(r => <option key={r} value={r}>{r}</option>)}
+                    {RELATIONSHIPS.map(r => <option key={r} value={r}>{tx(r)}</option>)}
                   </select>
                 </div>
               </div>
-              <PhoneField id="reg-emergency-phone" title="Emergency phone number" value={emergencyPhone} onChange={setEmergencyPhone} />
+              <PhoneField id="reg-emergency-phone" title={tx('Emergency phone number')} value={emergencyPhone} onChange={setEmergencyPhone} />
               <label className="flex items-start gap-3 text-xs text-slate-700 cursor-pointer">
                 <input type="checkbox" checked={!separateNok} onChange={(e) => setSeparateNok(!e.target.checked)} className="mt-0.5 h-4 w-4 accent-[color:var(--t-600)]" />
-                <span>This person is also my next of kin (the person we contact about your records if you cannot).</span>
+                <span>{tx('This person is also my next of kin (the person we contact about your records if you cannot).')}</span>
               </label>
               {separateNok && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-[color:var(--t-200)] p-3">
-                  <input type="text" value={nokName} onChange={(e) => setNokName(e.target.value)} placeholder="Next of kin name" aria-label="Next of kin name" className="form-input" required />
-                  <select value={nokRelationship} onChange={(e) => setNokRelationship(e.target.value)} aria-label="Next of kin relationship" className="form-select">
-                    {RELATIONSHIPS.map(r => <option key={r} value={r}>{r}</option>)}
+                  <input type="text" value={nokName} onChange={(e) => setNokName(e.target.value)} placeholder={tx('Next of kin name')} aria-label={tx('Next of kin name')} className="form-input" required />
+                  <select value={nokRelationship} onChange={(e) => setNokRelationship(e.target.value)} aria-label={tx('Next of kin relationship')} className="form-select">
+                    {RELATIONSHIPS.map(r => <option key={r} value={r}>{tx(r)}</option>)}
                   </select>
-                  <div className="sm:col-span-2"><PhoneField id="reg-nok-phone" title="Next of kin phone" value={nokPhone} onChange={setNokPhone} /></div>
+                  <div className="sm:col-span-2"><PhoneField id="reg-nok-phone" title={tx('Next of kin phone')} value={nokPhone} onChange={setNokPhone} /></div>
                 </div>
               )}
               <label className="flex items-start gap-3 text-xs text-slate-700 cursor-pointer pt-2">
@@ -387,7 +389,7 @@ export default function PatientRegistrationForm({
                   className="mt-0.5 h-4 w-4 accent-[color:var(--t-600)]"
                 />
                 <span>
-                  I accept the <button type="button" onClick={() => openLegal('terms')} className="underline font-bold text-[color:var(--t-700)] cursor-pointer">Terms of Service</button> and <button type="button" onClick={() => openLegal('notice')} className="underline font-bold text-[color:var(--t-700)] cursor-pointer">Privacy Notice</button>, and consent to MedCred storing and processing my health information so practitioners can treat me, and agree that verified doctors may review samples of my care for quality and safety with my name hidden. I can export or request deletion of my data at any time.
+                  {tx('I accept the')} <button type="button" onClick={() => openLegal('terms')} className="underline font-bold text-[color:var(--t-700)] cursor-pointer">{tx('Terms of Service')}</button> {tx('and')} <button type="button" onClick={() => openLegal('notice')} className="underline font-bold text-[color:var(--t-700)] cursor-pointer">{tx('Privacy Notice')}</button>{tx(', and consent to MedCred storing and processing my health information so practitioners can treat me, and agree that verified doctors may review samples of my care for quality and safety with my name hidden. I can export or request deletion of my data at any time.')}
                 </span>
               </label>
             </div>
@@ -400,7 +402,7 @@ export default function PatientRegistrationForm({
                 className="py-2.5 px-5 border border-[color:var(--t-200)] bg-white text-slate-700 hover:text-[color:var(--t-800)] hover:bg-[color:var(--t-100)] rounded-none text-xs font-black transition-all flex items-center gap-2 cursor-pointer"
               >
                 <ArrowLeft className="h-4 w-4" />
-                <span>Back</span>
+                <span>{tx('Back')}</span>
               </button>
 
               <button
@@ -411,11 +413,11 @@ export default function PatientRegistrationForm({
                 {loading ? (
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin text-white" />
-                    <span>Registering Profile...</span>
+                    <span>{tx('Registering Profile...')}</span>
                   </>
                 ) : (
                   <>
-                    <span>Submit Secure Registration</span>
+                    <span>{tx('Submit Secure Registration')}</span>
                     <ArrowRight className="h-4 w-4" />
                   </>
                 )}

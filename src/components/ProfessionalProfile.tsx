@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { ConsultationMode, UserRole, Booking, Review } from '../types';
 import PaymentDialog from './PaymentDialog';
-import { formatMoney } from '../locale';
+import { formatMoney, useTr } from '../locale';
 import { useSavedProviders } from '../savedProviders';
 
 interface ProfessionalProfileProps {
@@ -31,6 +31,7 @@ export default function ProfessionalProfile({
   currentUser,
   prefilledSymptoms
 }: ProfessionalProfileProps) {
+  const tx = useTr();
   const [prof, setProf] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   
@@ -130,10 +131,10 @@ export default function ProfessionalProfile({
         setPendingBooking(data.data);
         setShowPayment(true);
       } else {
-        setBookingError(data.message || 'Could not book that slot.');
+        setBookingError(data.message || tx('Could not book that slot.'));
       }
     } catch (err) {
-      setBookingError('Server connection error. Please try again.');
+      setBookingError(tx('Server connection error. Please try again.'));
     } finally {
       setBookingLoading(false);
     }
@@ -185,7 +186,7 @@ export default function ProfessionalProfile({
     return (
       <div className="bg-white border border-slate-100 rounded-2xl p-10 text-center space-y-4 shadow-sm">
         <RefreshCw className="h-8 w-8 text-[color:var(--t-600)] animate-spin mx-auto" />
-        <p className="text-xs text-slate-500 font-semibold">Retrieving verified credential profile records...</p>
+        <p className="text-xs text-slate-500 font-semibold">{tx('Retrieving verified credential profile records...')}</p>
       </div>
     );
   }
@@ -194,9 +195,9 @@ export default function ProfessionalProfile({
     return (
       <div className="bg-white border border-slate-100 rounded-2xl p-10 text-center space-y-4 shadow-sm">
         <ShieldAlert className="h-10 w-10 text-red-500 mx-auto animate-pulse" />
-        <h4 className="text-sm font-bold text-slate-800">Credential profile not found or suspended</h4>
+        <h4 className="text-sm font-bold text-slate-800">{tx('Credential profile not found or suspended')}</h4>
         <button onClick={onBack} className="text-xs font-semibold bg-[color:var(--dark)] text-white rounded-lg py-2 px-4 hover:bg-[color:var(--t-600)]">
-          Back to Directory
+          {tx('Back to Directory')}
         </button>
       </div>
     );
@@ -229,7 +230,7 @@ export default function ProfessionalProfile({
           className="text-xs font-bold bg-white text-slate-700 hover:text-slate-900 border border-slate-200/80 rounded-xl px-4 py-2 flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Verified Network Directory
+          {tx('Back to Verified Network Directory')}
         </button>
 
         <button
@@ -241,7 +242,7 @@ export default function ProfessionalProfile({
           }`}
         >
           <Heart className={`h-4 w-4 ${isSaved ? 'fill-rose-500 text-rose-500' : ''}`} />
-          {isSaved ? 'Practitioner Saved' : 'Save Practitioner'}
+          {isSaved ? tx('Practitioner Saved') : tx('Save Practitioner')}
         </button>
       </div>
       {currentUser?.role === 'patient' && <ReportPractitioner professionalId={prof.id} />}
@@ -250,11 +251,11 @@ export default function ProfessionalProfile({
       {!bookingSuccess && (
         <div className="lg:hidden fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 bg-white border-t border-[color:var(--t-200)] shadow-[0_-4px_12px_rgba(15,23,42,0.08)] px-4 py-2.5 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-semibold text-slate-500 leading-none">Consultation fee</p>
+            <p className="text-xs font-semibold text-slate-500 leading-none">{tx('Consultation fee')}</p>
             <p className="text-base font-black text-[color:var(--ink)] tabular-nums leading-tight">{formatMoney(prof.fee)}</p>
           </div>
           <button type="button" onClick={() => document.getElementById('booking-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-            className="min-h-[44px] px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer">Book</button>
+            className="min-h-[44px] px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer">{tx('Book')}</button>
         </div>
       )}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -274,45 +275,45 @@ export default function ProfessionalProfile({
                     <h2 className="text-xl font-extrabold text-[color:var(--ink)]">{prof.name}</h2>
                     <span className="bg-emerald-50 text-emerald-800 text-2xs font-extrabold px-2 py-0.5 border border-emerald-200 flex items-center gap-1 shadow-2xs">
                       <BadgeCheck className="h-3.5 w-3.5 text-emerald-600" />
-                      Verified
+                      {tx('Verified')}
                     </span>
                   </div>
 
                   <span className="inline-block text-2xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
-                    {isDoc ? "Doctor (MMC Registered)" : "Registered Nurse (LJM Registered)"}
+                    {isDoc ? tx('Doctor (MMC Registered)') : tx('Registered Nurse (LJM Registered)')}
                   </span>
 
                   <div className="flex items-center gap-1.5 text-xs text-[color:var(--ink-2)] font-semibold">
                     <Stethoscope className="h-4 w-4 text-[color:var(--t-600)]" />
-                    <span>{prof.specialization} specialist</span>
+                    <span>{tx('{name} specialist', { name: tx(prof.specialization) })}</span>
                   </div>
 
                   <div className="flex items-center gap-1.5 text-xs text-[color:var(--ink-2)] font-semibold">
                     <MapPin className="h-4 w-4 text-[color:var(--t-600)]" />
-                    <span>Practicing in {prof.city}</span>
+                    <span>{tx('Practicing in {city}', { city: tx(prof.city) })}</span>
                   </div>
                 </div>
               </div>
 
               <div className="text-left sm:text-right bg-[color:var(--t-bg)] p-4 border border-[color:var(--t-200)] min-w-[150px]">
-                <span className="text-xs text-slate-500 font-bold uppercase block tracking-wider">Consultation Fee</span>
+                <span className="text-xs text-slate-500 font-bold uppercase block tracking-wider">{tx('Consultation Fee')}</span>
                 <span className="text-xl font-extrabold text-[color:var(--t-700)] block">
                   RM {prof.fee}
-                  <span className="text-xs font-normal text-slate-500">{isDoc ? "" : "/hr"}</span>
+                  <span className="text-xs font-normal text-slate-500">{isDoc ? "" : tx("/hr")}</span>
                 </span>
-                <span className="text-xs font-mono text-emerald-700 font-bold">Verified Practitioner</span>
+                <span className="text-xs font-mono text-emerald-700 font-bold">{tx('Verified Practitioner')}</span>
               </div>
             </div>
 
             {/* License details */}
             <div className="bg-emerald-50/60 border border-emerald-200 p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <span className="text-xs font-bold text-emerald-900 uppercase block tracking-wider">Council Accreditation</span>
+                <span className="text-xs font-bold text-emerald-900 uppercase block tracking-wider">{tx('Council Accreditation')}</span>
                 <p className="text-xs font-semibold text-slate-800 mt-0.5">{prof.medicalCouncil || (prof as any).nursingCouncil}</p>
                 <VerificationScopeBadge prof={prof as any} className="mt-1" />
               </div>
               <div>
-                <span className="text-xs font-bold text-emerald-900 uppercase block tracking-wider">Annual Practising Certificate</span>
+                <span className="text-xs font-bold text-emerald-900 uppercase block tracking-wider">{tx('Annual Practising Certificate')}</span>
                 <code className="text-xs font-bold font-mono text-emerald-950 mt-0.5 block">{prof.licenseNumber}</code>
               </div>
             </div>
@@ -321,14 +322,14 @@ export default function ProfessionalProfile({
             <div className="space-y-2">
               <h3 className="text-sm font-bold text-[color:var(--ink)] uppercase tracking-wider flex items-center gap-1.5">
                 <Activity className="h-4 w-4 text-[color:var(--t-600)]" />
-                Clinical Overview & Experience
+                {tx('Clinical Overview & Experience')}
               </h3>
               <p className="text-xs text-[color:var(--ink-2)] leading-relaxed bg-[color:var(--t-bg)] p-4 border border-[color:var(--t-200)]">
                 "{prof.bio}"
               </p>
               {credentials.length > 0 && (
                 <div className="pt-3">
-                  <p className="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-1.5">Verified Medical Credentials</p>
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-1.5">{tx('Verified Medical Credentials')}</p>
                   <ul className="flex flex-wrap gap-2">
                     {credentials.map((c, i) => (
                       <li key={i} className="text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-900 px-2.5 py-1">{c.name} · {c.issuer}</li>
@@ -343,7 +344,7 @@ export default function ProfessionalProfile({
               <div className="space-y-3">
                 <h4 className="text-sm font-bold text-[color:var(--ink)] uppercase tracking-wider flex items-center gap-1">
                   <GraduationCap className="h-4 w-4 text-[color:var(--t-600)]" />
-                  Degrees & Certifications
+                  {tx('Degrees & Certifications')}
                 </h4>
                 <ul className="space-y-2 text-xs">
                   {prof.education.map((edu: string, i: number) => (
@@ -358,22 +359,22 @@ export default function ProfessionalProfile({
               <div className="space-y-3">
                 <h4 className="text-sm font-bold text-[color:var(--ink)] uppercase tracking-wider flex items-center gap-1">
                   <Languages className="h-4 w-4 text-[color:var(--t-600)]" />
-                  Languages & Spoken Dialects
+                  {tx('Languages & Spoken Dialects')}
                 </h4>
                 <div className="flex flex-wrap gap-1.5">
                   {prof.languages.map((lang: string, i: number) => (
                     <span key={i} className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-bold py-1 px-2.5">
-                      {lang}
+                      {tx(lang)}
                     </span>
                   ))}
                 </div>
 
                 <h4 className="text-sm font-bold text-[color:var(--ink)] uppercase tracking-wider flex items-center gap-1 mt-4">
                   <Award className="h-4 w-4 text-[color:var(--t-600)]" />
-                  Clinical Seniority
+                  {tx('Clinical Seniority')}
                 </h4>
                 <p className="text-xs font-extrabold text-[color:var(--ink)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-3 py-1.5 inline-block font-mono">
-                  {prof.experienceYears} Years in Clinical Practice
+                  {tx('{n} Years in Clinical Practice', { n: prof.experienceYears })}
                 </p>
               </div>
             </div>
@@ -383,15 +384,15 @@ export default function ProfessionalProfile({
           <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm space-y-4">
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
               <MapPin className="h-4 w-4 text-[color:var(--t-600)] animate-bounce" />
-              Practice Locations & Clinic Coordinates
+              {tx('Practice Locations & Clinic Coordinates')}
             </h3>
             <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs flex justify-between items-center">
               <div>
-                <p className="font-extrabold text-slate-800">Primary Outpatient Ward</p>
+                <p className="font-extrabold text-slate-800">{tx('Primary Outpatient Ward')}</p>
                 <p className="text-slate-500 mt-1 font-medium">{prof.practiceAddress}</p>
               </div>
               <span className="bg-emerald-50 text-emerald-800 text-2xs font-extrabold px-2.5 py-1 rounded-lg border border-emerald-100">
-                Active Now
+                {tx('Active Now')}
               </span>
             </div>
           </div>
@@ -399,39 +400,39 @@ export default function ProfessionalProfile({
           {/* Feedback & Patient Reviews */}
           <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm space-y-6">
             <h3 className="text-sm font-bold text-slate-900">
-              Patient Feedback & Verified Reviews
+              {tx('Patient Feedback & Verified Reviews')}
             </h3>
 
             {/* Metrics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50 p-5 rounded-2xl border border-slate-100">
               <div className="text-center md:border-r border-slate-200/50">
-                <span className="text-3xl font-extrabold text-slate-900 block">{avgOverall ?? "New"}</span>
+                <span className="text-3xl font-extrabold text-slate-900 block">{avgOverall ?? tx("New")}</span>
                 <div className="flex justify-center my-1">
                   <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
                 </div>
-                <span className="text-xs text-slate-400 font-bold uppercase block">{filteredReviews.length} Review{filteredReviews.length === 1 ? '' : 's'}</span>
+                <span className="text-xs text-slate-400 font-bold uppercase block">{tx(filteredReviews.length === 1 ? '{n} Review' : '{n} Reviews', { n: filteredReviews.length })}</span>
               </div>
 
               <div className="text-center md:border-r border-slate-200/50">
                 <span className="text-lg font-extrabold text-[color:var(--t-700)] block">{hasReviews ? `⭐ ${scorePunctuality} / 5` : '—'}</span>
-                <span className="text-xs text-slate-500 font-bold uppercase block mt-1">Punctuality</span>
+                <span className="text-xs text-slate-500 font-bold uppercase block mt-1">{tx('Punctuality')}</span>
               </div>
 
               <div className="text-center md:border-r border-slate-200/50">
                 <span className="text-lg font-extrabold text-[color:var(--t-700)] block">{hasReviews ? `⭐ ${scoreCommunication} / 5` : '—'}</span>
-                <span className="text-xs text-slate-500 font-bold uppercase block mt-1">Communication</span>
+                <span className="text-xs text-slate-500 font-bold uppercase block mt-1">{tx('Communication')}</span>
               </div>
 
               <div className="text-center">
                 <span className="text-lg font-extrabold text-[color:var(--t-700)] block">{hasReviews ? `⭐ ${scoreSatisfaction} / 5` : '—'}</span>
-                <span className="text-xs text-slate-500 font-bold uppercase block mt-1">Satisfaction</span>
+                <span className="text-xs text-slate-500 font-bold uppercase block mt-1">{tx('Satisfaction')}</span>
               </div>
             </div>
 
             {/* Review List */}
             <div className="space-y-4">
               {filteredReviews.length === 0 ? (
-                <p className="text-xs text-slate-400 italic text-center py-6">No patient reviews published yet. Be the first to consult and post.</p>
+                <p className="text-xs text-slate-400 italic text-center py-6">{tx('No patient reviews published yet. Be the first to consult and post.')}</p>
               ) : (
                 filteredReviews.map((rev) => (
                   <div key={rev.id} className="border-b border-slate-100 pb-4 space-y-2">
@@ -440,7 +441,7 @@ export default function ProfessionalProfile({
                         <span className="font-bold text-xs text-slate-800">{rev.patientName}</span>
                         {rev.isVerifiedPatient && (
                           <span className="bg-emerald-50 text-emerald-800 text-2xs font-extrabold ml-2 px-1.5 py-0.5 rounded border border-emerald-100">
-                            Verified Patient
+                            {tx('Verified Patient')}
                           </span>
                         )}
                       </div>
@@ -457,7 +458,7 @@ export default function ProfessionalProfile({
 
                     {rev.replyText && (
                       <div className="bg-slate-50 rounded-xl p-3 border border-slate-100 mt-2 text-xs">
-                        <span className="font-bold text-slate-800 block mb-1">Reply from {prof.name}:</span>
+                        <span className="font-bold text-slate-800 block mb-1">{tx('Reply from {name}:', { name: prof.name })}</span>
                         <p className="text-slate-600 leading-relaxed font-normal">"{rev.replyText}"</p>
                       </div>
                     )}
@@ -468,22 +469,22 @@ export default function ProfessionalProfile({
 
             {/* Post a Review Form: only after a completed visit */}
             {canReview === false && !reviewSuccess && (
-              <p className="border-t border-slate-100 pt-6 text-xs text-slate-500">Only patients with a completed visit can write a review, so every review comes from a real consultation.</p>
+              <p className="border-t border-slate-100 pt-6 text-xs text-slate-500">{tx('Only patients with a completed visit can write a review, so every review comes from a real consultation.')}</p>
             )}
             {(canReview || reviewSuccess) && (
             <form onSubmit={handlePostReview} className="border-t border-slate-100 pt-6 space-y-4">
-              <h4 className="font-bold text-slate-800 text-sm">You have completed a visit with this specialist. Write a review</h4>
+              <h4 className="font-bold text-slate-800 text-sm">{tx('You have completed a visit with this specialist. Write a review')}</h4>
               
               {reviewSuccess ? (
                 <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-xs text-emerald-800 font-semibold flex items-center gap-1.5">
                   <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                  Review submitted and verified successfully!
+                  {tx('Review submitted and verified successfully!')}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-3">
                     <div className="hidden">
-                      <label className="block text-xs font-semibold text-slate-600 mb-1">Your Full Name</label>
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">{tx('Your Full Name')}</label>
                       <input
                         type="text"
                         value={reviewName}
@@ -495,7 +496,7 @@ export default function ProfessionalProfile({
 
                     <div className="grid grid-cols-2 gap-3 text-xs">
                       <div>
-                        <label className="block font-semibold text-slate-600 mb-1">Punctuality (1-5)</label>
+                        <label className="block font-semibold text-slate-600 mb-1">{tx('Punctuality (1-5)')}</label>
                         <select 
                           value={reviewPunctuality} 
                           onChange={(e) => setReviewPunctuality(Number(e.target.value))}
@@ -505,7 +506,7 @@ export default function ProfessionalProfile({
                         </select>
                       </div>
                       <div>
-                        <label className="block font-semibold text-slate-600 mb-1">Communication (1-5)</label>
+                        <label className="block font-semibold text-slate-600 mb-1">{tx('Communication (1-5)')}</label>
                         <select 
                           value={reviewCommunication} 
                           onChange={(e) => setReviewCommunication(Number(e.target.value))}
@@ -519,12 +520,12 @@ export default function ProfessionalProfile({
 
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1">Treatment Satisfaction Comments</label>
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">{tx('Treatment Satisfaction Comments')}</label>
                       <textarea
                         rows={2}
                         value={reviewComment}
                         onChange={(e) => setReviewComment(e.target.value)}
-                        placeholder="Write your clinical experience details..."
+                        placeholder={tx('Write your clinical experience details...')}
                         className="w-full text-xs border border-slate-200/80 rounded-xl p-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 placeholder-slate-400"
                         required
                       />
@@ -534,7 +535,7 @@ export default function ProfessionalProfile({
                       type="submit"
                       className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white rounded-xl py-2.5 text-xs font-bold shadow-sm transition-colors"
                     >
-                      Publish Patient Review
+                      {tx('Publish Patient Review')}
                     </button>
                   </div>
                 </div>
@@ -549,7 +550,7 @@ export default function ProfessionalProfile({
           <div className="bg-white border border-[color:var(--t-200)] p-4 sm:p-5 shadow-xs lg:sticky lg:top-24 space-y-6 scroll-mt-20">
             <h3 className="text-sm font-bold text-[color:var(--ink)] flex items-center gap-1.5 uppercase tracking-wider">
               <Calendar className="h-4 w-4 text-[color:var(--t-600)]" />
-              Book Clinical Consultation
+              {tx('Book Clinical Consultation')}
             </h3>
 
             {bookingSuccess ? (
@@ -558,26 +559,26 @@ export default function ProfessionalProfile({
                   <CheckCircle2 className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[color:var(--ink)]">Appointment Confirmed!</h4>
-                  <p className="text-xs text-[color:var(--ink-2)] mt-1 font-medium">Consultation slot secured with {prof.name}</p>
+                  <h4 className="text-sm font-bold text-[color:var(--ink)]">{tx('Appointment Confirmed!')}</h4>
+                  <p className="text-xs text-[color:var(--ink-2)] mt-1 font-medium">{tx('Consultation slot secured with {name}', { name: prof.name })}</p>
                 </div>
 
                 <div className="bg-[color:var(--t-bg)] p-4 text-left border border-[color:var(--t-200)] text-xs space-y-2">
                   <div className="flex justify-between font-bold text-slate-800">
-                    <span>Reference ID:</span>
+                    <span>{tx('Reference ID:')}</span>
                     <code className="font-mono text-[color:var(--t-700)]">{bookingSuccess.id}</code>
                   </div>
                   <div className="flex justify-between font-medium text-[color:var(--ink-2)]">
-                    <span>Date:</span>
+                    <span>{tx('Date:')}</span>
                     <span className="font-bold text-[color:var(--ink)]">{bookingSuccess.date}</span>
                   </div>
                   <div className="flex justify-between font-medium text-[color:var(--ink-2)]">
-                    <span>Time Slot:</span>
+                    <span>{tx('Time Slot:')}</span>
                     <span className="font-bold text-[color:var(--ink)]">{bookingSuccess.timeSlot}</span>
                   </div>
                   <div className="flex justify-between font-medium text-[color:var(--ink-2)]">
-                    <span>Mode:</span>
-                    <span className="font-bold text-[color:var(--t-700)]">{bookingSuccess.mode}</span>
+                    <span>{tx('Mode:')}</span>
+                    <span className="font-bold text-[color:var(--t-700)]">{tx(bookingSuccess.mode)}</span>
                   </div>
                 </div>
 
@@ -585,14 +586,14 @@ export default function ProfessionalProfile({
                   onClick={() => setBookingSuccess(null)}
                   className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white h-12 text-xs font-bold transition-colors cursor-pointer"
                 >
-                  Book Another Appointment
+                  {tx('Book Another Appointment')}
                 </button>
               </div>
             ) : (
               <form onSubmit={handleBookAppointment} className="space-y-4">
                 {/* Mode selector */}
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-2">Consultation Format</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-2">{tx('Consultation Format')}</label>
                   <div className="grid grid-cols-1 gap-2">
                     {prof.consultationModes.map((m: any, idx: number) => (
                       <label 
@@ -612,7 +613,7 @@ export default function ProfessionalProfile({
                             onChange={() => setBookingMode(m)}
                             className="accent-[color:var(--t-600)]"
                           />
-                          <span className="text-xs font-bold text-[color:var(--ink)]">{m}</span>
+                          <span className="text-xs font-bold text-[color:var(--ink)]">{tx(m)}</span>
                         </div>
                       </label>
                     ))}
@@ -623,7 +624,7 @@ export default function ProfessionalProfile({
 
                 {/* Calendar Date selector */}
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">Select Appointment Date</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">{tx('Select Appointment Date')}</label>
                   <input
                     type="date"
                     value={bookingDate}
@@ -636,7 +637,7 @@ export default function ProfessionalProfile({
 
                 {/* Slots selection */}
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">Available Slots</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">{tx('Available Slots')}</label>
                   <div className="grid grid-cols-2 gap-2">
                     {prof.availability.slots.map((slot: string, idx: number) => (
                       <button
@@ -658,10 +659,10 @@ export default function ProfessionalProfile({
                 {/* Symptoms description box */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)]">Consultation Notes (Optional)</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)]">{tx('Consultation Notes (Optional)')}</label>
                     {prefilledSymptoms && symptoms === prefilledSymptoms && (
                       <span className="text-2xs font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5">
-                        Pre-filled from AI Triage
+                        {tx('Pre-filled from AI Triage')}
                       </span>
                     )}
                   </div>
@@ -669,14 +670,14 @@ export default function ProfessionalProfile({
                     rows={2}
                     value={symptoms}
                     onChange={(e) => setSymptoms(e.target.value)}
-                    placeholder="Briefly state symptoms or clinical concerns…"
+                    placeholder={tx('Briefly state symptoms or clinical concerns…')}
                     className="w-full text-xs border border-[color:var(--t-200)] p-3 outline-none focus:border-[color:var(--t-600)] text-[color:var(--ink)] placeholder-slate-400 bg-[color:var(--t-bg)] font-medium"
                   />
                 </div>
 
                 <label className="flex items-start gap-2 text-xs text-[color:var(--ink-2)] cursor-pointer">
                   <input type="checkbox" className="mt-0.5 accent-[color:var(--t-600)]" checked={shareRecord} onChange={(e) => setShareRecord(e.target.checked)} />
-                  <span>Share my medical records (allergies, medications) with this specialist.</span>
+                  <span>{tx('Share my medical records (allergies, medications) with this specialist.')}</span>
                 </label>
 
                 {bookingError && <p className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 p-2.5">{bookingError}</p>}
@@ -685,7 +686,7 @@ export default function ProfessionalProfile({
                   disabled={bookingLoading || !bookingDate || !bookingSlot}
                   className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white h-12 text-xs font-bold shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
-                  {bookingLoading ? "Securing appointment slot…" : `Confirm & Pay ${formatMoney(prof.fee)}`}
+                  {bookingLoading ? tx('Securing appointment slot…') : `${tx('Confirm & Pay')} ${formatMoney(prof.fee)}`}
                 </button>
               </form>
             )}
@@ -697,7 +698,7 @@ export default function ProfessionalProfile({
         <PaymentDialog
           kind="booking"
           refId={pendingBooking.id}
-          description={`Appointment with ${prof.name} on ${pendingBooking.date}, ${pendingBooking.timeSlot}`}
+          description={tx('Appointment with {name} on {date}, {slot}', { name: prof.name, date: pendingBooking.date, slot: pendingBooking.timeSlot })}
           onPaid={handlePaymentSuccess}
           onCancel={() => setShowPayment(false)}
         />

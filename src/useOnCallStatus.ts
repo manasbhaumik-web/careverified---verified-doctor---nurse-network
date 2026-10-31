@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { getLocale, tr } from './locale';
 
 /**
  * How many doctors are online right now, from the server. One shared poll feeds every place that shows it
@@ -38,7 +39,8 @@ export function useOnCallStatus(): OnCallStatus | null {
 
 /** "3 doctors online now" / "No doctor online right now" */
 export function onCallLabel(s: OnCallStatus | null): string {
-  if (!s) return 'Checking doctors online…';
-  if (s.onlineDoctors === 0) return 'No doctor online right now';
-  return `${s.onlineDoctors} doctor${s.onlineDoctors === 1 ? '' : 's'} online now`;
+  const lang = getLocale().lang;
+  if (!s) return tr(lang, 'Checking doctors online…');
+  if (s.onlineDoctors === 0) return tr(lang, 'No doctor online right now');
+  return tr(lang, s.onlineDoctors === 1 ? '{n} doctor online now' : '{n} doctors online now', { n: s.onlineDoctors });
 }
