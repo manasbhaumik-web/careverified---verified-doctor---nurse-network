@@ -72,8 +72,8 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
   };
 
   const buttonTone = tone === 'onColor'
-    ? 'text-white border-transparent bg-white/15 hover:bg-white/25'
-    : 'text-[color:var(--t-600)] border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)]';
+    ? 'text-white border-white/25 hover:border-white/50 bg-white/10 hover:bg-white/20'
+    : 'text-slate-700 border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50';
 
   return (
     <div ref={rootRef} className={`relative ${className}`}>
@@ -84,14 +84,14 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
         aria-expanded={open}
         aria-label={tx('Settings: application theme')}
         title={tx('Settings')}
-        className={`h-11 w-11 flex items-center justify-center ${tone === 'onColor' ? 'border-0' : 'border'} rounded-none transition-colors cursor-pointer ${buttonTone}`}
+        className={`h-10 w-10 rounded-full border flex items-center justify-center transition-all cursor-pointer shadow-2xs focus:outline-none focus:ring-2 focus:ring-white/40 ${buttonTone}`}
       >
-        <Settings className="h-[18px] w-[18px]" />
+        <Settings className="h-4 w-4" />
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white border border-[color:var(--t-200)] shadow-xl text-slate-800 rounded-none overflow-hidden panel-edge">
-          <p className="px-3 pt-3 pb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white border border-slate-200 shadow-xl text-slate-800 rounded-xl overflow-hidden panel-edge">
+          <p className="px-3.5 pt-3 pb-1.5 text-xs font-bold uppercase tracking-wider text-slate-500">
             {tx('Application theme')}
           </p>
           <ul role="listbox" aria-label={tx('Application theme')} className="pb-1.5">
@@ -100,11 +100,19 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
                 <button
                   type="button"
                   onClick={() => choose(t.id)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-left hover:bg-[color:var(--t-50)] cursor-pointer"
+                  className="w-full flex items-center justify-between gap-2.5 px-3.5 py-2 text-xs font-semibold text-left hover:bg-slate-50 transition-colors cursor-pointer"
                 >
-                  <span className="h-4 w-4 rounded-full border-0 shadow-xs shrink-0" style={{ backgroundColor: t.swatch }} />
-                  <span className="flex-1 font-medium">{tx(t.label)}</span>
-                  {theme === t.id && <Check className="h-4 w-4 text-[color:var(--t-600)]" />}
+                  <span className="flex items-center gap-2">
+                    <span
+                      aria-hidden="true"
+                      className="inline-block h-3.5 w-3.5 rounded-full border border-black/15 shrink-0"
+                      style={{ backgroundColor: t.swatch }}
+                    />
+                    <span className="text-slate-800 font-bold">{t.label}</span>
+                  </span>
+                  {theme === t.id && (
+                    <Check className="h-4 w-4 text-[color:var(--t-600)] shrink-0" aria-hidden="true" />
+                  )}
                 </button>
               </li>
             ))}

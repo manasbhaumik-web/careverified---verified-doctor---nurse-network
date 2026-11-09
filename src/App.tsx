@@ -569,7 +569,7 @@ export default function App() {
               setSelectedProfId(null);
             }}
           >
-            <div className="w-10 h-10 rounded-none bg-white text-[color:var(--t-600)] flex items-center justify-center shrink-0 group-hover:bg-[color:var(--t-50)] transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-white text-[color:var(--t-600)] flex items-center justify-center shrink-0 group-hover:bg-[color:var(--t-50)] transition-colors shadow-2xs">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
             </div>
             <div className="leading-none">
@@ -582,53 +582,55 @@ export default function App() {
             </div>
           </div>
 
-          {/* Right-Side Desktop Actions & User Session Details */}
-          <div className="hidden lg:flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-white/15 border-0 shadow-none px-3 py-1.5 rounded-none text-xs font-bold text-white">
+          {/* Right-Side Desktop Actions & User Session Details - Standardized Gaps & Round Outlines */}
+          <div className="hidden lg:flex items-center gap-2.5 sm:gap-3">
+            <div className="flex items-center gap-2 bg-white/10 border border-white/20 shadow-2xs px-3 py-1.5 rounded-full text-xs font-bold text-white">
               <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true"></span>
               <ShieldCheck className="h-3.5 w-3.5 text-white" aria-hidden="true" />
               <span>{tt('Council-Verified Network (Act 586)')}</span>
             </div>
 
+            <div className="h-5 w-px bg-white/20 mx-0.5" aria-hidden="true" />
+
             <LocaleSwitcher tone="onColor" />
             <ThemeSwitcher tone="onColor" />
-            <div className="flex items-center gap-3 pl-4">
-              {currentUser.role === 'patient' && <SOSButton />}
-              <NotificationBell />
+            {currentUser.role === 'patient' && <SOSButton />}
+            <NotificationBell tone="onColor" />
 
-              {/* Profile Badge embedded with Close Session Button */}
-              <div className="flex items-center gap-2.5 bg-white/15 border-0 shadow-none px-2.5 py-1">
-                <UserAvatar
-                  src={currentUser.avatarUrl}
-                  role={currentUser.role}
-                  alt={currentUser.name}
-                  className="w-8 h-8 rounded-full object-cover border border-white/40 shrink-0"
-                />
-                <div className="text-left hidden xl:block leading-tight">
-                  <p className="text-xs font-black text-white leading-none truncate max-w-[140px]">{currentUser.name}</p>
-                  <p className="text-xs text-white/80 font-bold uppercase tracking-wider mt-0.5">
-                    {currentUser.role === 'admin' ? tt('Board Admin') : currentUser.role === 'practitioner' ? tt('Practitioner') : currentUser.role === 'pharmacy' ? tt('Pharmacy') : tt('Member')}
-                  </p>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="h-7 w-7 text-white/80 hover:text-white hover:bg-white/20 bg-transparent border-0 rounded-none transition-colors cursor-pointer ml-1 flex items-center justify-center"
-                  title={tt('Close Session')}
-                  aria-label={tt('Close session')}
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
+            <div className="h-5 w-px bg-white/20 mx-0.5" aria-hidden="true" />
+
+            {/* Profile Badge embedded with Close Session Button */}
+            <div className="flex items-center gap-2.5 bg-white/10 hover:bg-white/15 border border-white/20 shadow-2xs pl-1.5 pr-2 py-1 rounded-full transition-all">
+              <UserAvatar
+                src={currentUser.avatarUrl}
+                role={currentUser.role}
+                alt={currentUser.name}
+                className="w-8 h-8 rounded-full object-cover border border-white/40 shrink-0"
+              />
+              <div className="text-left hidden xl:block leading-tight">
+                <p className="text-xs font-black text-white leading-none truncate max-w-[140px]">{currentUser.name}</p>
+                <p className="text-3xs text-white/80 font-bold uppercase tracking-wider mt-0.5">
+                  {currentUser.role === 'admin' ? tt('Board Admin') : currentUser.role === 'practitioner' ? tt('Practitioner') : currentUser.role === 'pharmacy' ? tt('Pharmacy') : tt('Member')}
+                </p>
               </div>
+              <button
+                onClick={handleLogout}
+                className="h-6 w-6 text-white/80 hover:text-white hover:bg-white/20 bg-transparent border-0 rounded-full transition-colors cursor-pointer flex items-center justify-center ml-0.5"
+                title={tt('Close Session')}
+                aria-label={tt('Close session')}
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
             </div>
           </div>
 
-          {/* Mobile Navigation Toggler */}
-          <div className="flex lg:hidden items-center gap-1.5">
+          {/* Mobile Navigation Toggler - Standardized Gaps & Round Outlines */}
+          <div className="flex lg:hidden items-center gap-2">
             {currentUser.role === 'patient' && <SOSButton />}
-            <NotificationBell />
+            <NotificationBell tone="onColor" />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="min-h-11 min-w-11 flex items-center justify-center rounded-none border-0 text-white hover:bg-white/15 cursor-pointer"
+              className="h-10 w-10 flex items-center justify-center rounded-full border border-white/25 hover:border-white/50 bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-all shadow-2xs"
               aria-label={tt('Toggle navigation')}
               aria-expanded={mobileMenuOpen}
             >

@@ -49,40 +49,48 @@ export default function SOSButton() {
 
   return (
     <>
-      <button onClick={show} className="inline-flex shrink-0 items-center gap-1.5 h-11 px-3 bg-white/15 text-white text-xs font-black whitespace-nowrap border-0 hover:bg-white/25 cursor-pointer" aria-label={tx('Emergency help')}>
-        <Siren className="h-4 w-4" /> SOS
+      <button
+        onClick={show}
+        className="inline-flex shrink-0 items-center gap-1.5 h-10 px-3.5 rounded-full border border-white/25 hover:border-white/50 bg-white/10 text-white text-xs font-bold whitespace-nowrap hover:bg-white/20 cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-white/40"
+        aria-label={tx('Emergency help')}
+      >
+        <Siren className="h-4 w-4 text-rose-300" />
+        <span>SOS</span>
       </button>
       {open && (
         <div className="fixed inset-0 z-[110] bg-slate-900/60 flex items-center justify-center p-4" role="alertdialog" aria-modal="true" aria-label={tx('Emergency help')}>
-          <div className="bg-white w-full max-w-md border-2 border-rose-500 shadow-2xl p-6 space-y-4">
+          <div className="bg-white w-full max-w-md border border-slate-200 shadow-2xl rounded-2xl p-6 space-y-4">
             <div className="flex justify-between items-start">
-              <h3 className="text-lg font-black text-rose-700 flex items-center gap-2"><Siren className="h-5 w-5" /> {tx('Emergency')}</h3>
-              <button onClick={() => setOpen(false)} aria-label={tx('Close')} className="p-1 hover:bg-slate-100 cursor-pointer"><X className="h-4 w-4" /></button>
+              <h3 className="text-base font-bold text-rose-700 flex items-center gap-2">
+                <Siren className="h-5 w-5" />
+                <span>{tx('Emergency')}</span>
+              </h3>
+              <button onClick={() => setOpen(false)} aria-label={tx('Close')} className="p-1.5 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors"><X className="h-4 w-4" /></button>
             </div>
             <div className="space-y-2">
               {(info?.numbers ?? [{ label: 'National emergency', number: '999' }]).map(n => (
-                <a key={n.number} href={`tel:${n.number}`} className="flex items-center justify-between bg-rose-600 hover:bg-rose-700 text-white px-4 py-3 font-black">
-                  <span className="text-xs font-bold">{tx(n.label)}</span><span className="text-2xl">{n.number}</span>
+                <a key={n.number} href={`tel:${n.number}`} className="flex items-center justify-between bg-rose-600 hover:bg-rose-700 text-white px-4 py-3 rounded-xl font-bold transition-colors">
+                  <span className="text-xs font-bold">{tx(n.label)}</span><span className="text-xl font-mono">{n.number}</span>
                 </a>
               ))}
             </div>
             <label className="flex items-center gap-2 text-xs text-slate-600">
               {tx('Where are you? (country code)')}
               <input value={country} onChange={e => changeCountry(e.target.value)} maxLength={2} aria-label={tx('Country code for emergency numbers')}
-                className="w-14 border border-slate-300 p-1 text-center font-bold uppercase" />
+                className="w-14 border border-slate-300 rounded-lg p-1 text-center font-bold uppercase outline-none focus:border-rose-600" />
             </label>
-            {info?.verifyLocal && <p className="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 p-2">{tx('We do not have the local number for this country. 112 works on many mobile networks, but check the local emergency number.')}</p>}
+            {info?.verifyLocal && <p className="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 p-2 rounded-lg">{tx('We do not have the local number for this country. 112 works on many mobile networks, but check the local emergency number.')}</p>}
             <p className="text-xs text-slate-600">{tx(info?.disclaimer ?? 'MediCred is not an emergency service. Call the number above first.')}</p>
 
             {!result ? (
               <>
                 {error && <p className="text-xs font-bold text-rose-700">{error}</p>}
-                <button onClick={alertTeam} disabled={busy} className="w-full border-2 border-rose-300 text-rose-800 font-extrabold text-xs py-2.5 hover:bg-rose-50 disabled:opacity-60 cursor-pointer">
+                <button onClick={alertTeam} disabled={busy} className="w-full border border-rose-300 text-rose-800 font-bold text-xs py-2.5 rounded-xl hover:bg-rose-50 disabled:opacity-60 cursor-pointer transition-colors">
                   {busy ? tx('Sending…') : tx('Also alert the MediCred on-call team (shares your location)')}
                 </button>
               </>
             ) : (
-              <div className="bg-emerald-50 border border-emerald-200 p-3 text-xs text-emerald-900 space-y-1">
+              <div className="bg-emerald-50 border border-emerald-200 p-3 text-xs text-emerald-900 space-y-1 rounded-xl">
                 <p className="font-bold">{tx(result.message)}</p>
                 {result.mapUrl && <a href={result.mapUrl} target="_blank" rel="noreferrer" className="underline font-bold">{tx('Find hospitals near you (OpenStreetMap)')}</a>}
               </div>
