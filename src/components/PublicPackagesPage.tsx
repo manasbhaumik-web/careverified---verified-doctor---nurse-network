@@ -887,7 +887,7 @@ function ClinicCard({ c, onPickClinic, onEnquire }: { c: FacilityCard; onPickCli
         <button
           type="button"
           onClick={() => onEnquire({ kind: 'clinic', title: c.name, subtitle: place(c), facilityId: c.id })}
-          className="px-3 py-1.5 text-xs font-bold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer transition-colors"
+          className="whitespace-nowrap shrink-0 px-3 py-1.5 text-xs font-bold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer transition-colors"
         >
           Enquire Clinic
         </button>
@@ -945,7 +945,7 @@ function HospitalCard({ h, onPickHospital, onEnquire }: { h: FacilityCard; onPic
         <button
           type="button"
           onClick={() => onEnquire({ kind: 'hospital', title: h.name, subtitle: place(h), facilityId: h.id })}
-          className="px-3 py-1.5 text-xs font-bold bg-[color:var(--t-900)] hover:bg-[color:var(--t-800)] text-white cursor-pointer transition-colors"
+          className="whitespace-nowrap shrink-0 px-3 py-1.5 text-xs font-bold bg-[color:var(--t-900)] hover:bg-[color:var(--t-800)] text-white cursor-pointer transition-colors"
         >
           Ask Hospital
         </button>
@@ -1011,7 +1011,7 @@ function NurseCard({ n, signedIn = false, onEnquire }: { n: Professional; signed
               onEnquire({ kind: 'nurse', title: n.name, subtitle: `${n.specialization} (${n.city})`, price: `${myr(n.fee)}/hr`, professionalId: n.id });
             }
           }}
-          className="px-3 py-2 text-xs font-bold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer transition-colors"
+          className="whitespace-nowrap shrink-0 px-3 py-2 text-xs font-bold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer transition-colors"
         >
           {signedIn ? 'Book Home Visit' : 'Book Nurse Care'}
         </button>
@@ -1075,7 +1075,7 @@ function DoctorCard({ d, signedIn = false, onEnquire }: { d: Professional; signe
               onEnquire({ kind: 'doctor', title: d.name, subtitle: `${d.specialization} (${d.city})`, price: myr(d.fee), professionalId: d.id });
             }
           }}
-          className="px-3 py-2 text-xs font-bold bg-[color:var(--t-900)] hover:bg-[color:var(--t-800)] text-white cursor-pointer transition-colors"
+          className="whitespace-nowrap shrink-0 px-3 py-2 text-xs font-bold bg-[color:var(--t-900)] hover:bg-[color:var(--t-800)] text-white cursor-pointer transition-colors"
         >
           {signedIn ? 'Book Telehealth / Visit' : 'Book Consultation'}
         </button>
@@ -1084,67 +1084,111 @@ function DoctorCard({ d, signedIn = false, onEnquire }: { d: Professional; signe
   );
 }
 
+function formatDeliveryMethods(methods?: string[]): string {
+  if (!methods || methods.length === 0) return 'In-Store Dispensing & Pickup';
+  const labelMap: Record<string, string> = {
+    pharmacy_courier: 'Cold-Chain Courier',
+    grab: 'GrabExpress',
+    lalamove: 'Lalamove Express',
+    other_courier: 'Nationwide Courier',
+    courier: 'Courier Delivery',
+    pickup: 'Self-Pickup',
+  };
+  return methods.map(m => labelMap[m.toLowerCase()] || m.replace(/_/g, ' ')).join(' · ');
+}
+
 function PharmacyCard({ ph, onEnquire }: { ph: Pharmacy; onEnquire: (target: EnquiryTarget) => void; key?: React.Key }) {
+  const deliveryLabel = formatDeliveryMethods(ph.deliveryMethods);
   return (
-    <div className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-5 flex flex-col justify-between transition-all shadow-xs hover:shadow-md">
-      <div className="space-y-3">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <h3 className="font-display font-bold text-lg text-slate-900 leading-snug">{ph.name}</h3>
-            <p className="text-xs text-slate-600 flex items-center gap-1 mt-1">
-              <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-500" />
-              {ph.address || ph.city}
-            </p>
-          </div>
-          {ph.coldChain && (
-            <span className="text-[11px] font-bold px-2 py-1 bg-cyan-50 text-cyan-900 border border-cyan-200 inline-flex items-center gap-1 shrink-0">
-              <Thermometer className="h-3 w-3" /> Cold Chain ❄️
+    <div className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-5 flex flex-col justify-between transition-all shadow-xs hover:shadow-md h-full">
+      <div className="space-y-3.5">
+        {/* Eyebrow Status Badges */}
+        <div className="flex items-center justify-between gap-2">
+          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-wider text-teal-900 bg-teal-50 px-2.5 py-0.5 border border-teal-200">
+            <ShieldCheck className="h-3 w-3 text-teal-600 shrink-0" />
+            NPRA Licensed
+          </span>
+          {ph.coldChain ? (
+            <span className="text-[11px] font-bold px-2 py-0.5 bg-cyan-50 text-cyan-900 border border-cyan-200 inline-flex items-center gap-1 shrink-0">
+              <Thermometer className="h-3 w-3 text-cyan-600 shrink-0" />
+              Cold Chain ❄️
+            </span>
+          ) : (
+            <span className="text-[11px] font-semibold text-slate-500 bg-slate-50 px-2 py-0.5 border border-slate-200 inline-flex items-center gap-1 shrink-0">
+              Standard Storage
             </span>
           )}
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-2 text-xs text-slate-600 bg-[color:var(--t-50)]/60 p-3 border border-[color:var(--t-100)]">
-          {ph.hours && (
-            <div className="flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5 text-slate-500 shrink-0" />
-              <span>{ph.hours}</span>
+        {/* Title & Location with full width and consistent multi-line height */}
+        <div>
+          <h3 className="font-display font-bold text-base sm:text-lg text-slate-900 leading-snug line-clamp-2 min-h-[3rem]" title={ph.name}>
+            {ph.name}
+          </h3>
+          <p className="text-xs text-slate-600 flex items-start gap-1.5 mt-1.5 min-h-[2rem] line-clamp-2" title={ph.address || ph.city}>
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400 mt-0.5" />
+            <span>{ph.address || ph.city}</span>
+          </p>
+        </div>
+
+        {/* Operating Hours, Phone & Formatted Delivery */}
+        <div className="space-y-1.5 text-xs text-slate-700 bg-[color:var(--t-50)]/70 p-3 border border-[color:var(--t-100)]">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Clock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+              <span className="truncate">{ph.hours || '09:00 AM – 10:00 PM'}</span>
             </div>
-          )}
-          {ph.phone && (
-            <div className="flex items-center gap-1.5">
-              <Phone className="h-3.5 w-3.5 text-slate-500 shrink-0" />
-              <span className="font-mono font-medium">{ph.phone}</span>
-            </div>
-          )}
-          <div className="flex items-center gap-1.5 sm:col-span-2">
-            <Truck className="h-3.5 w-3.5 text-slate-500 shrink-0" />
-            <span>Delivery: {(ph.deliveryMethods ?? ['Grab', 'Courier']).join(', ')}</span>
+            {ph.phone && (
+              <div className="flex items-center gap-1 shrink-0">
+                <Phone className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                <span className="font-mono font-medium text-slate-900">{ph.phone}</span>
+              </div>
+            )}
+          </div>
+          <div className="flex items-start gap-1.5 pt-1 border-t border-[color:var(--t-100)]/80 text-[11px]">
+            <Truck className="h-3.5 w-3.5 text-slate-400 shrink-0 mt-0.5" />
+            <span className="line-clamp-1 text-slate-600" title={deliveryLabel}>
+              <strong className="font-semibold text-slate-800">Delivery:</strong> {deliveryLabel}
+            </span>
           </div>
         </div>
 
+        {/* Specialized Clinical Services - Single column full width */}
         {ph.services && ph.services.length > 0 && (
-          <div>
-            <div className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Specialized Clinical Services</div>
-            <ul className="grid sm:grid-cols-2 gap-1 text-xs text-slate-800">
-              {ph.services.slice(0, 4).map((s, idx) => (
-                <li key={idx} className="flex items-center gap-1.5">
-                  <Check className="h-3 w-3 text-emerald-600 shrink-0" />
-                  <span className="truncate">{s}</span>
+          <div className="space-y-1.5">
+            <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+              Specialized Clinical Services
+            </div>
+            <ul className="space-y-1 min-h-[4.25rem]">
+              {ph.services.slice(0, 3).map((s, idx) => (
+                <li key={idx} className="flex items-center gap-1.5 text-xs text-slate-700">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                  <span className="truncate" title={s}>{s}</span>
                 </li>
               ))}
             </ul>
+            {ph.services.length > 3 && (
+              <div className="text-[11px] font-semibold text-[color:var(--t-700)]">
+                +{ph.services.length - 3} more clinical services
+              </div>
+            )}
           </div>
         )}
       </div>
 
+      {/* Card Footer with Verified Dispensary and Non-wrapping Action Button */}
       <div className="mt-4 pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between gap-2">
-        <span className="text-xs text-slate-500">NPRA Registered Pharmacy</span>
+        <div className="min-w-0">
+          <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">NPRA Registered</span>
+          <span className="text-xs font-semibold text-slate-700 truncate block">Dispensary</span>
+        </div>
         <button
           type="button"
           onClick={() => onEnquire({ kind: 'pharmacy', title: ph.name, subtitle: `Pharmacy Delivery & Services (${ph.city})`, facilityId: ph.id })}
-          className="px-3 py-1.5 text-xs font-bold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer transition-colors"
+          className="whitespace-nowrap shrink-0 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white shadow-xs cursor-pointer transition-colors"
         >
-          Inquire Services
+          <span>Inquire Services</span>
+          <ArrowRight className="h-3.5 w-3.5 shrink-0" />
         </button>
       </div>
     </div>
