@@ -10,7 +10,7 @@ import { useLocale } from '../locale/store';
 
 const jpost = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
-const field = 'border border-slate-200 bg-white px-3 py-2 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
+const field = 'form-input h-9 text-xs';
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString() : '');
 
 interface SupportDeskProps {

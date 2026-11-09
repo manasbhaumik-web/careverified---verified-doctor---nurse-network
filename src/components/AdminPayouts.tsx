@@ -4,8 +4,8 @@ import { formatMoney, useTr } from '../locale';
 const jreq = (url: string, method = 'GET', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString() : '');
-const btn = 'min-h-[36px] px-3 text-xs font-bold border border-slate-300 cursor-pointer hover:bg-slate-50';
-const btnPrimary = 'min-h-[36px] px-3 text-xs font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] cursor-pointer disabled:opacity-60';
+const btn = 'btn btn-sm btn-secondary';
+const btnPrimary = 'btn btn-sm btn-primary';
 const sen = (n: number) => formatMoney(n, { fromMinor: true });
 
 interface Overview {

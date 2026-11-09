@@ -8,7 +8,7 @@ import { Activity, AlertTriangle, ClipboardList, FileText, FlaskConical, Pill, S
 const jpost = (url: string, body?: unknown, method = 'POST') =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
 const fmt = fmtDate;
-const field = 'border border-[color:var(--t-200)] bg-white px-3.5 h-11 text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all';
+const field = 'form-input';
 
 /** A <input type="datetime-local"> value for "now", in the person's own time zone. */
 const localNow = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };

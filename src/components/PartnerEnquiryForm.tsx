@@ -43,8 +43,8 @@ const T: Record<Lang, {
   },
 };
 
-const label = 'text-sm font-bold text-slate-900 block mb-1.5';
-const inputCls = 'w-full bg-white border border-[color:var(--t-200)] rounded-none px-4 h-12 text-sm font-medium text-[color:var(--ink)] focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]';
+const label = 'form-label';
+const inputCls = 'form-input h-12';
 
 export default function PartnerEnquiryForm({ kind }: { kind: 'clinic' | 'pharmacy' }) {
   const { lang } = useLocale();
@@ -132,7 +132,7 @@ export default function PartnerEnquiryForm({ kind }: { kind: 'clinic' | 'pharmac
         <span>{tx.consent} <button type="button" onClick={() => openLegal('notice')} className="underline font-bold text-[color:var(--t-700)] cursor-pointer">{tx.privacy}</button></span>
       </label>
 
-      <button type="submit" disabled={busy || !f.consent} className="min-h-[48px] px-7 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] cursor-pointer disabled:opacity-60 inline-flex items-center gap-2">
+      <button type="submit" disabled={busy || !f.consent} className="btn btn-lg btn-primary">
         {busy ? <><RefreshCw className="h-4 w-4 animate-spin" aria-hidden="true" />{tx.sending}</> : <><Send className="h-4 w-4" aria-hidden="true" />{tx.send}</>}
       </button>
     </form>

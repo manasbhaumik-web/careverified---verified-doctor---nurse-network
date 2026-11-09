@@ -4,7 +4,7 @@ import { useTr } from '../locale';
 
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
-const field = 'border border-slate-200 bg-white px-3 py-2 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
+const field = 'form-input h-9 text-xs';
 const lab = 'text-xs font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '—');
 

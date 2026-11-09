@@ -15,8 +15,8 @@ const SEV: Record<string, string> = {
   moderate: 'bg-slate-100 border-slate-300 text-slate-800',
 };
 const blankItem = () => ({ name: '', strength: '', form: 'tablet', dose: '', frequency: '', durationDays: 5, quantity: 10, instructions: '', npraReg: '' });
-const field = 'w-full border border-slate-200 bg-white px-2.5 py-1.5 text-xs focus:outline-none focus:border-[color:var(--t-600)]';
-const label = 'text-sm font-bold text-slate-800 block mb-1';
+const field = 'form-input h-9 text-xs';
+const label = 'form-label';
 
 /** The doctor's clinical tools for one booking or consultation: record, notes, prescriptions, certificates, referrals, labs. */
 export default function ClinicalWorkspace({ kind, refId }: Props) {

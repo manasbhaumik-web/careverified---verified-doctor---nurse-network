@@ -407,10 +407,8 @@ export default function ClinicHospitalPage() {
     return c.category === 'all' || c.category === activeTab;
   });
 
-  const btnPrimary =
-    'min-h-[48px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] cursor-pointer inline-flex items-center justify-center gap-2 shadow-sm transition-all duration-200';
-  const btnSecondary =
-    'min-h-[48px] px-6 text-sm font-extrabold text-slate-800 bg-white/95 hover:bg-slate-100 border border-[color:var(--t-200)] cursor-pointer inline-flex items-center justify-center shadow-xs transition-all duration-200';
+  const btnPrimary = 'btn btn-lg btn-primary shadow-sm';
+  const btnSecondary = 'btn btn-lg btn-secondary shadow-xs';
   const h2 =
     'font-display font-black text-2xl sm:text-3xl tracking-tight text-[color:var(--ink)] leading-tight';
 

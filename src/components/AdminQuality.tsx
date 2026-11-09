@@ -10,7 +10,7 @@ const jreq = (url: string, method = 'POST', body?: unknown) =>
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString() : '—');
 const lab = 'text-xs font-extrabold uppercase tracking-wider text-slate-500';
 const btn = 'text-xs font-bold cursor-pointer';
-const field = 'border border-slate-200 px-3 py-2 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
+const field = 'form-input h-9 text-xs';
 
 export type QualitySubTab = 'support' | 'partners' | 'reviews' | 'incidents' | 'peer' | 'credentials';
 

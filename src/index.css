@@ -377,27 +377,288 @@ footer button.bg-slate-800:hover,
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
 }
 
-/* Registration form controls (light panel, matches the sign-in inputs) */
-.form-input, .form-select {
+/* =============================================================
+ * UNIFIED APPLICATION COMPONENT SYSTEM
+ * Single source of truth for core UI elements across all MediCred pages:
+ * 1. Buttons (.btn, .btn-primary, .btn-secondary, .btn-ghost, .btn-danger, .btn-sm, .btn-md, .btn-lg)
+ * 2. Form Controls (.form-label, .form-input, .form-select, .form-textarea, .form-control, .form-help)
+ * 3. Cards & Panels (.app-card, .app-card-interactive, .app-card-equal, .app-card-body, .app-card-footer, .app-info-box)
+ * 4. Badges & Status Chips (.app-badge, .badge-brand, .badge-brand-solid, .badge-success, .badge-warning, .badge-neutral, .badge-cyan)
+ * 5. Section Headers (.section-header, .section-header-title, .section-header-subtitle)
+ * ============================================================= */
+
+/* 1. UNIFIED BUTTONS */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: inherit;
+  font-weight: 700;
+  border-radius: 0px !important;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+.btn:disabled, .btn[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.btn-sm {
+  min-height: 36px;
+  padding: 0 0.875rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+.btn-md {
+  min-height: 40px;
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.btn-lg {
+  min-height: 48px;
+  padding: 0 1.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 800;
+}
+
+.btn-primary {
+  background-color: var(--t-600);
+  color: #FFFFFF !important;
+  border-color: var(--t-700);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.btn-primary:hover {
+  background-color: var(--t-700);
+  border-color: var(--t-800);
+  color: #FFFFFF !important;
+}
+.btn-primary:active {
+  background-color: var(--t-800);
+}
+
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: var(--t-700);
+  border-color: var(--t-200);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+.btn-secondary:hover {
+  background-color: var(--t-50);
+  border-color: var(--t-600);
+  color: var(--t-800);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--ink-2);
+  border-color: transparent;
+}
+.btn-ghost:hover {
+  background-color: var(--t-50);
+  color: var(--t-700);
+}
+
+.btn-danger {
+  background-color: #DC2626;
+  color: #FFFFFF !important;
+  border-color: #B91C1C;
+}
+.btn-danger:hover {
+  background-color: #B91C1C;
+}
+
+/* 2. UNIFIED FORM CONTROLS */
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.375rem;
+}
+
+.form-input, .form-select, .form-control {
   width: 100%;
-  height: 48px;
+  height: 44px;
   background-color: var(--t-bg);
   color: var(--ink);
   border: 1px solid var(--t-200);
-  padding: 0 1rem;
+  border-radius: 0px !important;
+  padding: 0 0.875rem;
   font-size: 0.875rem;
   font-weight: 500;
-  transition: border-color .15s, box-shadow .15s;
+  transition: border-color .15s, box-shadow .15s, background-color .15s;
 }
 .form-input.pl-10 { padding-left: 2.5rem; }
-/* Multi-line variant: .form-input is a fixed-height single-line field */
-.form-input.form-textarea { height: auto; min-height: 48px; padding: 0.625rem 1rem; line-height: 1.45; resize: vertical; }
-.form-input::placeholder { color: #94a3b8; }
-.form-input:focus, .form-select:focus {
+.form-input.h-12, .form-select.h-12 { height: 48px; }
+.form-input::placeholder { color: #94A3B8; }
+.form-input:focus, .form-select:focus, .form-control:focus {
   outline: none;
+  background-color: #FFFFFF;
   border-color: var(--t-600);
   box-shadow: 0 0 0 1px var(--t-600);
 }
+
+.form-textarea {
+  width: 100%;
+  min-height: 88px;
+  padding: 0.625rem 0.875rem;
+  background-color: var(--t-bg);
+  color: var(--ink);
+  border: 1px solid var(--t-200);
+  border-radius: 0px !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  resize: vertical;
+  transition: border-color .15s, box-shadow .15s, background-color .15s;
+}
+.form-textarea:focus {
+  outline: none;
+  background-color: #FFFFFF;
+  border-color: var(--t-600);
+  box-shadow: 0 0 0 1px var(--t-600);
+}
+.form-help {
+  font-size: 0.75rem;
+  color: #64748B;
+  margin-top: 0.25rem;
+}
+
+/* 3. UNIFIED CARDS & PANELS */
+.app-card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--t-200);
+  border-radius: 0px !important;
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+.app-card-interactive {
+  background-color: #FFFFFF;
+  border: 1px solid var(--t-200);
+  border-radius: 0px !important;
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+.app-card-interactive:hover {
+  border-color: var(--t-600);
+  box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.08);
+}
+.app-card-equal {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.app-card-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.app-card-footer {
+  margin-top: auto;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--t-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.app-info-box {
+  background-color: color-mix(in srgb, var(--t-50) 65%, white);
+  border: 1px solid var(--t-100);
+  padding: 0.625rem 0.75rem;
+  font-size: 0.75rem;
+  color: #334155;
+  border-radius: 0px !important;
+}
+
+/* 4. UNIFIED BADGES & STATUS CHIPS */
+.app-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.625rem;
+  line-height: 1;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid;
+  border-radius: 0px !important;
+  white-space: nowrap;
+}
+.badge-brand {
+  background-color: var(--t-50);
+  color: var(--t-700);
+  border-color: var(--t-200);
+}
+.badge-brand-solid {
+  background-color: var(--t-600);
+  color: #FFFFFF !important;
+  border-color: var(--t-700);
+}
+.badge-success {
+  background-color: #ECFDF5;
+  color: #065F46;
+  border-color: #A7F3D0;
+}
+.badge-warning {
+  background-color: #FFFBEB;
+  color: #92400E;
+  border-color: #FDE68A;
+}
+.badge-neutral {
+  background-color: #F8FAFC;
+  color: #334155;
+  border-color: var(--t-200);
+}
+.badge-cyan {
+  background-color: #ECFEFF;
+  color: #155E75;
+  border-color: #A5F3FC;
+}
+
+/* 5. UNIFIED SECTION HEADERS */
+.section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--t-200);
+}
+@media (min-width: 640px) {
+  .section-header {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+.section-header-title {
+  font-family: var(--font-display, sans-serif);
+  font-weight: 900;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.section-header-subtitle {
+  font-size: 0.875rem;
+  color: #475569;
+  margin-top: 0.125rem;
+}
+
 
 /* Printing an open Medical Library article: hide everything except the reader */
 @media print {

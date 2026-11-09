@@ -38,9 +38,9 @@ const T: Record<Lang, Record<string, string>> = {
   },
 };
 
-const label = 'text-sm font-bold text-slate-900 block mb-1.5';
-const input = 'w-full bg-white border border-[color:var(--t-200)] px-4 h-12 text-sm font-medium focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]';
-const primary = 'w-full h-12 min-h-[48px] text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60';
+const label = 'form-label';
+const input = 'form-input h-12';
+const primary = 'btn btn-lg btn-primary w-full';
 
 export default function AccountRecovery({ mode }: { mode: 'forgot' | 'reset' }) {
   const { lang } = useLocale();

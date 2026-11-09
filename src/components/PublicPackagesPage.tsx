@@ -154,9 +154,9 @@ const place = (p: { facility_city?: string; facility_state?: string; city?: stri
 const audience = (a: Pkg['target_audience']) => (a === 'international' ? 'International visitors' : a === 'local' ? 'Malaysian residents' : 'Residents and visitors');
 
 const wrap = 'max-w-7xl mx-auto px-4 sm:px-6';
-const control = 'min-h-[44px] px-3 text-sm bg-white border border-[color:var(--t-200)] focus:border-[color:var(--t-600)] outline-none';
-const primaryBtn = 'min-h-[44px] px-5 text-sm font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] cursor-pointer inline-flex items-center justify-center gap-1.5 transition-colors';
-const ghostBtn = 'min-h-[44px] px-5 text-sm font-bold text-[color:var(--t-700)] bg-white hover:bg-[color:var(--t-50)] border border-[color:var(--t-300)] cursor-pointer inline-flex items-center justify-center gap-1.5 transition-colors';
+const control = 'form-input';
+const primaryBtn = 'btn btn-md btn-primary';
+const ghostBtn = 'btn btn-md btn-secondary';
 
 function Photo({ src, alt }: { src?: string; alt: string }) {
   const [failed, setFailed] = useState(false);
@@ -214,7 +214,7 @@ function UniversalEnquiryDialog({ target, onClose }: { target: EnquiryTarget; on
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [ref, setRef] = useState('');
-  const label = 'block text-sm font-bold mb-1 text-slate-900';
+  const label = 'form-label';
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -852,35 +852,35 @@ function TrustBand({ facilities }: { facilities: FacilityCard[] }) {
 
 function ClinicCard({ c, onPickClinic, onEnquire }: { c: FacilityCard; onPickClinic: (name: string) => void; onEnquire: (target: EnquiryTarget) => void; key?: React.Key }) {
   return (
-    <div className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-5 flex flex-col justify-between transition-all shadow-xs hover:shadow-md">
+    <div className="app-card-interactive app-card-equal p-5">
       <div className="space-y-2.5">
         <div className="flex items-start justify-between gap-2">
-          <span className="text-xs font-extrabold uppercase tracking-wide text-white bg-[color:var(--t-700)] px-2 py-0.5">
+          <span className="app-badge badge-brand-solid">
             Clinic
           </span>
           {c.isLicenceValid && (
-            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+            <span className="app-badge badge-success">
               <CheckCircle className="h-3 w-3" /> Licence Verified
             </span>
           )}
         </div>
 
         <div>
-          <h3 className="font-display font-bold text-lg text-slate-900 leading-snug">{c.name}</h3>
-          <p className="text-sm text-slate-600 flex items-center gap-1 mt-1">
+          <h3 className="font-display font-bold text-lg text-slate-900 leading-snug line-clamp-2 min-h-[3rem]">{c.name}</h3>
+          <p className="text-xs text-slate-600 flex items-center gap-1 mt-1 min-h-[1.5rem]">
             <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-500" />
             {place(c)}
           </p>
         </div>
 
-        <div className="text-xs space-y-1 text-slate-700 bg-[color:var(--t-50)]/60 p-2.5 border border-[color:var(--t-100)]">
+        <div className="app-info-box space-y-1">
           {c.licenceNo && <div><span className="text-slate-500">MOH Licence:</span> <span className="font-mono font-semibold">{c.licenceNo}</span></div>}
           <div><span className="text-slate-500">Practice:</span> Family Medicine, Health Screening, Minor Surgeri</div>
           <div><span className="text-slate-500">Hours:</span> Open daily · Appointment & walk-ins</div>
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between gap-2">
+      <div className="app-card-footer mt-4">
         <button
           type="button"
           onClick={() => onPickClinic(c.name)}
@@ -891,7 +891,7 @@ function ClinicCard({ c, onPickClinic, onEnquire }: { c: FacilityCard; onPickCli
         <button
           type="button"
           onClick={() => onEnquire({ kind: 'clinic', title: c.name, subtitle: place(c), facilityId: c.id })}
-          className="whitespace-nowrap shrink-0 px-3 py-1.5 text-xs font-bold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer transition-colors"
+          className="btn btn-sm btn-primary whitespace-nowrap"
         >
           Enquire Clinic
         </button>
@@ -903,20 +903,20 @@ function ClinicCard({ c, onPickClinic, onEnquire }: { c: FacilityCard; onPickCli
 function HospitalCard({ h, onPickHospital, onEnquire }: { h: FacilityCard; onPickHospital: (name: string) => void; onEnquire: (target: EnquiryTarget) => void; key?: React.Key }) {
   const accs = (h.accreditations ?? []).map(a => a.body).filter(Boolean);
   return (
-    <div className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-5 flex flex-col justify-between transition-all shadow-xs hover:shadow-md">
+    <div className="app-card-interactive app-card-equal p-5">
       <div className="space-y-2.5">
         <div className="flex items-start justify-between gap-2">
-          <span className="text-xs font-extrabold uppercase tracking-wide text-white bg-[color:var(--t-900)] px-2 py-0.5">
+          <span className="app-badge badge-brand-solid">
             Hospital
           </span>
           <div className="flex flex-wrap gap-1 justify-end">
             {h.mhtcMember && (
-              <span className="text-2xs font-bold px-1.5 py-0.5 bg-amber-50 text-amber-900 border border-amber-200">
+              <span className="app-badge badge-warning">
                 MHTC Member
               </span>
             )}
             {accs.length > 0 && (
-              <span className="text-2xs font-bold px-1.5 py-0.5 bg-blue-50 text-blue-900 border border-blue-200">
+              <span className="app-badge badge-brand">
                 {accs.join(' / ')}
               </span>
             )}
@@ -924,21 +924,21 @@ function HospitalCard({ h, onPickHospital, onEnquire }: { h: FacilityCard; onPic
         </div>
 
         <div>
-          <h3 className="font-display font-bold text-lg text-slate-900 leading-snug">{h.name}</h3>
-          <p className="text-sm text-slate-600 flex items-center gap-1 mt-1">
+          <h3 className="font-display font-bold text-lg text-slate-900 leading-snug line-clamp-2 min-h-[3rem]">{h.name}</h3>
+          <p className="text-xs text-slate-600 flex items-center gap-1 mt-1 min-h-[1.5rem]">
             <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-500" />
             {place(h)}
           </p>
         </div>
 
-        <div className="text-xs space-y-1 text-slate-700 bg-[color:var(--t-50)]/60 p-2.5 border border-[color:var(--t-100)]">
+        <div className="app-info-box space-y-1">
           <div><span className="text-slate-500">Key Centers:</span> Oncology, Cardiology, Robotic Surgery, IVF, Orthopedics</div>
           <div><span className="text-slate-500">Facilities:</span> 24/7 Emergency, Inpatient Suites, International Lounge</div>
           {h.licenceNo && <div><span className="text-slate-500">Licence:</span> <span className="font-mono">{h.licenceNo}</span></div>}
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between gap-2">
+      <div className="app-card-footer mt-4">
         <button
           type="button"
           onClick={() => onPickHospital(h.name)}
@@ -949,7 +949,7 @@ function HospitalCard({ h, onPickHospital, onEnquire }: { h: FacilityCard; onPic
         <button
           type="button"
           onClick={() => onEnquire({ kind: 'hospital', title: h.name, subtitle: place(h), facilityId: h.id })}
-          className="whitespace-nowrap shrink-0 px-3 py-1.5 text-xs font-bold bg-[color:var(--t-900)] hover:bg-[color:var(--t-800)] text-white cursor-pointer transition-colors"
+          className="btn btn-sm btn-primary whitespace-nowrap"
         >
           Ask Hospital
         </button>
@@ -960,14 +960,14 @@ function HospitalCard({ h, onPickHospital, onEnquire }: { h: FacilityCard; onPic
 
 function NurseCard({ n, signedIn = false, onEnquire }: { n: Professional; signedIn?: boolean; onEnquire: (target: EnquiryTarget) => void; key?: React.Key }) {
   return (
-    <div className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-5 flex flex-col justify-between transition-all shadow-xs hover:shadow-md">
+    <div className="app-card-interactive app-card-equal p-5">
       <div className="space-y-3">
         <div className="flex items-start gap-3">
           <div className="w-14 h-14 rounded-full overflow-hidden bg-[color:var(--t-100)] border border-[color:var(--t-200)] shrink-0">
             <Photo src={n.avatar || '/assets/malaysian_female_nurse.jpg'} alt={n.name} />
           </div>
           <div className="min-w-0 flex-1">
-            <span className="inline-block text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+            <span className="app-badge badge-success">
               LJM Certified Nurse
             </span>
             <h3 className="font-display font-bold text-sm text-slate-900 leading-tight mt-1 truncate" title={n.name}>
@@ -977,9 +977,9 @@ function NurseCard({ n, signedIn = false, onEnquire }: { n: Professional; signed
           </div>
         </div>
 
-        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">{n.bio || 'Experienced nursing sister delivering evidence-based clinical nursing care and home rehabilitation.'}</p>
+        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed min-h-[2rem]">{n.bio || 'Experienced nursing sister delivering evidence-based clinical nursing care and home rehabilitation.'}</p>
 
-        <div className="text-xs space-y-1.5 bg-[color:var(--t-50)]/70 p-2.5 border border-[color:var(--t-100)]">
+        <div className="app-info-box space-y-1.5">
           <div className="flex justify-between text-slate-600">
             <span>Experience:</span>
             <span className="font-semibold text-slate-900">{n.experienceYears} Years</span>
@@ -1001,7 +1001,7 @@ function NurseCard({ n, signedIn = false, onEnquire }: { n: Professional; signed
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between gap-2">
+      <div className="app-card-footer mt-4">
         <div>
           <span className="block text-xs text-slate-500">Hourly Rate</span>
           <span className="font-display font-black text-lg text-[color:var(--ink)]">{myr(n.fee)}<span className="text-xs font-normal text-slate-500">/hr</span></span>
@@ -1015,7 +1015,7 @@ function NurseCard({ n, signedIn = false, onEnquire }: { n: Professional; signed
               onEnquire({ kind: 'nurse', title: n.name, subtitle: `${n.specialization} (${n.city})`, price: `${myr(n.fee)}/hr`, professionalId: n.id });
             }
           }}
-          className="whitespace-nowrap shrink-0 px-3 py-2 text-xs font-bold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer transition-colors"
+          className="btn btn-sm btn-primary whitespace-nowrap"
         >
           {signedIn ? 'Book Home Visit' : 'Book Nurse Care'}
         </button>
@@ -1104,21 +1104,21 @@ function formatDeliveryMethods(methods?: string[]): string {
 function PharmacyCard({ ph, onEnquire }: { ph: Pharmacy; onEnquire: (target: EnquiryTarget) => void; key?: React.Key }) {
   const deliveryLabel = formatDeliveryMethods(ph.deliveryMethods);
   return (
-    <div className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-5 flex flex-col justify-between transition-all shadow-xs hover:shadow-md h-full">
+    <div className="app-card-interactive app-card-equal p-5">
       <div className="space-y-3.5">
         {/* Eyebrow Status Badges */}
         <div className="flex items-center justify-between gap-2">
-          <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-teal-900 bg-teal-50 px-2.5 py-0.5 border border-teal-200">
-            <ShieldCheck className="h-3 w-3 text-teal-600 shrink-0" />
+          <span className="app-badge badge-success">
+            <ShieldCheck className="h-3 w-3 shrink-0" />
             NPRA Licensed
           </span>
           {ph.coldChain ? (
-            <span className="text-xs font-bold px-2 py-0.5 bg-cyan-50 text-cyan-900 border border-cyan-200 inline-flex items-center gap-1 shrink-0">
-              <Thermometer className="h-3 w-3 text-cyan-600 shrink-0" />
+            <span className="app-badge badge-cyan shrink-0">
+              <Thermometer className="h-3 w-3 shrink-0" />
               Cold Chain ❄️
             </span>
           ) : (
-            <span className="text-xs font-semibold text-slate-500 bg-slate-50 px-2 py-0.5 border border-slate-200 inline-flex items-center gap-1 shrink-0">
+            <span className="app-badge badge-neutral shrink-0">
               Standard Storage
             </span>
           )}
@@ -1136,7 +1136,7 @@ function PharmacyCard({ ph, onEnquire }: { ph: Pharmacy; onEnquire: (target: Enq
         </div>
 
         {/* Operating Hours, Phone & Formatted Delivery */}
-        <div className="space-y-1.5 text-xs text-slate-700 bg-[color:var(--t-50)]/70 p-3 border border-[color:var(--t-100)]">
+        <div className="app-info-box space-y-1.5">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 min-w-0">
               <Clock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
@@ -1181,7 +1181,7 @@ function PharmacyCard({ ph, onEnquire }: { ph: Pharmacy; onEnquire: (target: Enq
       </div>
 
       {/* Card Footer with Verified Dispensary and Non-wrapping Action Button */}
-      <div className="mt-4 pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between gap-2">
+      <div className="app-card-footer mt-4">
         <div className="min-w-0">
           <span className="block text-2xs uppercase font-bold text-slate-400 tracking-wider">NPRA Registered</span>
           <span className="text-xs font-semibold text-slate-700 truncate block">Dispensary</span>
@@ -1189,7 +1189,7 @@ function PharmacyCard({ ph, onEnquire }: { ph: Pharmacy; onEnquire: (target: Enq
         <button
           type="button"
           onClick={() => onEnquire({ kind: 'pharmacy', title: ph.name, subtitle: `Pharmacy Delivery & Services (${ph.city})`, facilityId: ph.id })}
-          className="whitespace-nowrap shrink-0 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white shadow-xs cursor-pointer transition-colors"
+          className="btn btn-sm btn-primary whitespace-nowrap"
         >
           <span>Inquire Services</span>
           <ArrowRight className="h-3.5 w-3.5 shrink-0" />
@@ -1220,13 +1220,13 @@ function SectionHeader({
   onViewAll: () => void;
 }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-3 border-b border-[color:var(--t-200)]">
+    <div className="section-header">
       <div>
-        <h2 className="font-display font-black text-2xl text-slate-900 flex items-center gap-2">
+        <h2 className="section-header-title">
           <Icon className="h-6 w-6 text-[color:var(--t-600)]" aria-hidden="true" />
           {title}
         </h2>
-        <p className="text-sm text-slate-600 mt-0.5">{subtitle}</p>
+        <p className="section-header-subtitle">{subtitle}</p>
       </div>
       <a
         href={viewAllLink}
@@ -1234,7 +1234,7 @@ function SectionHeader({
           e.preventDefault();
           onViewAll();
         }}
-        className="self-start sm:self-auto inline-flex items-center gap-1.5 px-4 py-2 text-xs font-extrabold uppercase tracking-wider text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] transition-colors shadow-xs"
+        className="btn btn-sm btn-primary self-start sm:self-auto"
       >
         <span>{viewAllText} ({totalCount})</span>
         <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />

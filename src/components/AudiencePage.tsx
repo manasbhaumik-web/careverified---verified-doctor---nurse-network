@@ -92,8 +92,8 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
 
   const toApply = () => document.getElementById('apply')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const signIn = () => navigate(loginUrl(signInRole, false));
-  const btnPrimary = 'min-h-[48px] px-6 text-sm font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] cursor-pointer inline-flex items-center justify-center gap-2';
-  const btnSecondary = 'min-h-[48px] px-6 text-sm font-extrabold text-[color:var(--t-700)] bg-white hover:bg-[color:var(--t-100)] border border-[color:var(--t-200)] cursor-pointer inline-flex items-center justify-center';
+  const btnPrimary = 'btn btn-lg btn-primary';
+  const btnSecondary = 'btn btn-lg btn-secondary';
   const h2 = 'font-display font-black text-2xl sm:text-3xl tracking-tight text-[color:var(--ink)] leading-tight';
   const wrap = 'max-w-6xl mx-auto px-4 sm:px-6';
   const bg = (i: number, tint?: boolean) => (tint ?? i % 2 === 1 ? 'bg-[color:var(--t-50)]' : 'bg-white');
