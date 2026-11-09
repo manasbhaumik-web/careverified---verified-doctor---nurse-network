@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useLocale } from '../locale';
+import { useLocale, useTr } from '../locale';
 import { ArrowRight, BadgeCheck, Bookmark, BookOpen, ExternalLink, Flag, Printer, Search, Send, ShieldCheck, X } from 'lucide-react';
 import { Article, DoctorProfile, NurseProfile, Review, Booking } from '../types';
 import DashboardHeader, { BannerBadge, BannerKpis, FilterSelect } from './DashboardHeader';
@@ -117,27 +117,29 @@ function ArticleBody({ text, lang }: { text: string; lang: string }) {
 }
 
 function EvidenceBadge({ article }: { article: Article }) {
+  const tx = useTr();
   if (!article.evidence) {
-    return <span className="text-2xs font-bold text-slate-700 bg-slate-50 border border-slate-200 px-2.5 py-0.5">{article.draft ? 'Editorial draft' : 'Practitioner article'}</span>;
+    return <span className="text-2xs font-bold text-slate-700 bg-slate-50 border border-slate-200 px-2.5 py-0.5">{article.draft ? tx('Editorial draft') : tx('Practitioner article')}</span>;
   }
   const tone = article.evidence.level === 'high'
     ? 'text-[color:var(--e-800)] bg-[color:var(--e-50)] border-[color:var(--e-200)]'
     : article.evidence.level === 'moderate'
       ? 'text-[color:var(--t-700)] bg-[color:var(--t-50)] border-[color:var(--t-200)]'
       : 'text-slate-700 bg-slate-50 border-slate-200';
-  return <span className={`text-2xs font-bold border px-2.5 py-0.5 ${tone}`} title="Strength of evidence, from the paper's publication type">{article.evidence.label}</span>;
+  return <span className={`text-2xs font-bold border px-2.5 py-0.5 ${tone}`} title={tx("Strength of evidence, from the paper's publication type")}>{tx(article.evidence.label)}</span>;
 }
 
 function Takeaway({ text, ms, className = '' }: { text?: string | null; ms?: string | null; className?: string }) {
+  const tx = useTr();
   const [lang, setLang] = useState<'en' | 'ms'>('en');
   if (!text) return null;
   const shown = lang === 'ms' && ms ? ms : text;
   return (
     <div className={`bg-[color:var(--t-50)] border-l-4 border-[color:var(--t-600)] px-3 py-2 ${className}`}>
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">{lang === 'ms' ? 'Intipati utama' : 'Key takeaway'}</p>
+        <p className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">{lang === 'ms' ? 'Intipati utama' : tx('Key takeaway')}</p>
         {ms && (
-          <span role="group" aria-label="Language" className="inline-flex text-xs font-bold">
+          <span role="group" aria-label={tx('Language')} className="inline-flex text-xs font-bold">
             {([['en', 'EN'], ['ms', 'BM']] as const).map(([id, label]) => (
               <button key={id} type="button" aria-pressed={lang === id} onClick={() => setLang(id)}
                 className={`px-1.5 py-0.5 border border-[color:var(--t-200)] cursor-pointer ${lang === id ? 'bg-[color:var(--t-600)] text-white' : 'bg-white text-[color:var(--ink)]'}`}>{label}</button>
@@ -154,6 +156,7 @@ const initialsOf = (name: string) =>
   name.replace('Dr. ', '').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
 
 function AuthorBadge({ article, large = false }: { article: Article; large?: boolean }) {
+  const tx = useTr();
   return (
     <div className="flex items-center gap-2.5 min-w-0">
       {article.authorAvatar ? (
@@ -169,10 +172,10 @@ function AuthorBadge({ article, large = false }: { article: Article; large?: boo
         </div>
       )}
       <div className="min-w-0">
-        <p className="text-xs font-semibold text-[color:var(--ink)] truncate">{article.authorName}</p>
+        <p className="text-xs font-semibold text-[color:var(--ink)] truncate">{tx(article.authorName)}</p>
         <p className="text-xs text-[color:var(--ink-2)] truncate">
-          {article.authorTitle}
-          {article.authorCredentialsVerified !== false && <span className="text-[color:var(--e-700)] font-semibold"> · Verified</span>}
+          {tx(article.authorTitle)}
+          {article.authorCredentialsVerified !== false && <span className="text-[color:var(--e-700)] font-semibold"> · {tx('Verified')}</span>}
         </p>
       </div>
     </div>
@@ -191,6 +194,7 @@ export default function MedicalLibrary({
   onOpenHelp,
   embedded = false,
 }: MedicalLibraryProps) {
+  const tx = useTr();
   const isPractitioner = canRecommend || currentUser?.role === 'practitioner';
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>(ALL);
@@ -226,7 +230,7 @@ export default function MedicalLibrary({
     const d = await fetch(`/api/articles/${encodeURIComponent(openArticle.id)}/recommend`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ patientUserId: recPatient, note: recNote }),
     }).then(r => r.json()).catch(() => null);
-    setRecMsg({ ok: d?.status === 'success', text: d?.status === 'success' ? 'Sent. The patient will see it on their dashboard.' : d?.message || 'Could not send.' });
+    setRecMsg({ ok: d?.status === 'success', text: d?.status === 'success' ? tx('Sent. The patient will see it on their dashboard.') : d?.message || tx('Could not send.') });
     if (d?.status === 'success') { setRecNote(''); setRecPatient(''); }
   };
 
@@ -299,41 +303,41 @@ export default function MedicalLibrary({
   }> = {
     all: {
       icon: BookOpen,
-      eyebrow: "Evidence-Based Medicine · Clinical Knowledge Base",
-      title: "Medical Library & Published Clinical Research",
-      description: "Access peer-reviewed PubMed clinical studies, physician-authored medical articles, and statutory clinical practice guidelines.",
+      eyebrow: tx('Evidence-Based Medicine · Clinical Knowledge Base'),
+      title: tx('Medical Library & Published Clinical Research'),
+      description: tx('Access peer-reviewed PubMed clinical studies, physician-authored medical articles, and statutory clinical practice guidelines.'),
       badges: (
         <>
-          <BannerBadge tone="brand">MMC / LJM Accredited</BannerBadge>
-          <BannerBadge tone="success">PubMed Indexed</BannerBadge>
+          <BannerBadge tone="brand">{tx('MMC / LJM Accredited')}</BannerBadge>
+          <BannerBadge tone="success">{tx('PubMed Indexed')}</BannerBadge>
         </>
       ),
     },
     practitioner: {
       icon: ShieldCheck,
-      eyebrow: "Practitioner Contributions · Peer-Reviewed Guidance",
-      title: "Physician & Clinical Nurse Authored Articles",
-      description: "Clinical treatment protocols, local disease management advice, and practice case summaries by registered healthcare professionals.",
-      badges: <BannerBadge tone="brand">Doctor Verified</BannerBadge>,
+      eyebrow: tx('Practitioner Contributions · Peer-Reviewed Guidance'),
+      title: tx('Physician & Clinical Nurse Authored Articles'),
+      description: tx('Clinical treatment protocols, local disease management advice, and practice case summaries by registered healthcare professionals.'),
+      badges: <BannerBadge tone="brand">{tx('Doctor Verified')}</BannerBadge>,
     },
     research: {
       icon: BadgeCheck,
-      eyebrow: "PubMed Repository · Medical Board Oversight",
-      title: "Peer-Reviewed Clinical Trials & Research Papers",
-      description: "National Library of Medicine systematic reviews, randomized clinical trials, and meta-analyses vetted by our medical board.",
+      eyebrow: tx('PubMed Repository · Medical Board Oversight'),
+      title: tx('Peer-Reviewed Clinical Trials & Research Papers'),
+      description: tx('National Library of Medicine systematic reviews, randomized clinical trials, and meta-analyses vetted by our medical board.'),
       badges: (
         <>
-          <BannerBadge tone="brand">PubMed Central</BannerBadge>
-          <BannerBadge tone="success">Retraction Screened</BannerBadge>
+          <BannerBadge tone="brand">{tx('PubMed Central')}</BannerBadge>
+          <BannerBadge tone="success">{tx('Retraction Screened')}</BannerBadge>
         </>
       ),
     },
     saved: {
       icon: Bookmark,
-      eyebrow: "Clinical Reference · Personal Archive",
-      title: "Saved Clinical Articles & Bookmarked Research",
-      description: "Quick access to your bookmarked patient guides, clinical studies, and medical references for rapid bedside consultation.",
-      badges: <BannerBadge tone="brand">Personal Reading List</BannerBadge>,
+      eyebrow: tx('Clinical Reference · Personal Archive'),
+      title: tx('Saved Clinical Articles & Bookmarked Research'),
+      description: tx('Quick access to your bookmarked patient guides, clinical studies, and medical references for rapid bedside consultation.'),
+      badges: <BannerBadge tone="brand">{tx('Personal Reading List')}</BannerBadge>,
     },
   };
 
@@ -346,29 +350,29 @@ export default function MedicalLibrary({
             professionals={professionals as any}
             reviews={reviews}
             bookings={bookings}
-            groupName="Medical Library"
+            groupName={tx('Medical Library')}
             tabs={[
-              { id: 'all' as const, label: 'All Articles', icon: BookOpen, count: articles.length },
-              { id: 'practitioner' as const, label: 'Clinical Articles', icon: ShieldCheck, count: articles.filter(a => !a.source).length },
-              { id: 'research' as const, label: 'Research Papers', icon: BadgeCheck, count: articles.filter(a => !!a.source).length },
-              { id: 'saved' as const, label: 'Saved Articles', icon: Bookmark, count: savedIds.length },
+              { id: 'all' as const, label: tx('All Articles'), icon: BookOpen, count: articles.length },
+              { id: 'practitioner' as const, label: tx('Clinical Articles'), icon: ShieldCheck, count: articles.filter(a => !a.source).length },
+              { id: 'research' as const, label: tx('Research Papers'), icon: BadgeCheck, count: articles.filter(a => !!a.source).length },
+              { id: 'saved' as const, label: tx('Saved Articles'), icon: Bookmark, count: savedIds.length },
             ]}
             activeTab={activeLibraryTab}
             onTabChange={handleLibraryTabChange}
-            tabsLabel="Medical Library sections"
+            tabsLabel={tx('Medical Library sections')}
             onOpenHelp={onOpenHelp}
           />
         ) : (
           <DashboardHeader
             icon={BookOpen}
-            eyebrow="Verified Medical Library"
-            title="Clinical Articles & Published Research"
-            description="Articles by credential-checked practitioners, plus peer-reviewed papers from PubMed that our medical board has approved. Every item lists its sources."
+            eyebrow={tx('Verified Medical Library')}
+            title={tx('Clinical Articles & Published Research')}
+            description={tx('Articles by credential-checked practitioners, plus peer-reviewed papers from PubMed that our medical board has approved. Every item lists its sources.')}
             actions={
               <BannerKpis items={[
-                { value: articles.length, label: 'Articles' },
-                { value: articles.filter(a => a.source).length, label: 'Research papers' },
-                { value: categories.length, label: 'Topics' },
+                { value: articles.length, label: tx('Articles') },
+                { value: articles.filter(a => a.source).length, label: tx('Research papers') },
+                { value: categories.length, label: tx('Topics') },
               ]} />
             }
           />
@@ -386,16 +390,16 @@ export default function MedicalLibrary({
           />
         )}
         {/* Unified Single-Row Filter Control Bar */}
-        <section aria-label="Find articles" className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
+        <section aria-label={tx('Find articles')} className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
           <div className="flex flex-col xl:flex-row xl:items-center gap-3">
             {/* Search Input */}
             <div className="flex-1 min-w-[240px] flex items-center gap-3 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-4 h-11 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors">
-              <label htmlFor="library-search" className="sr-only">Search articles</label>
+              <label htmlFor="library-search" className="sr-only">{tx('Search articles')}</label>
               <Search className="h-4 w-4 text-slate-400 shrink-0" />
               <input
                 id="library-search"
                 type="text"
-                placeholder="Search medical topics, symptoms, or clinical terms (e.g. hypertension, diabetes, pediatrics)…"
+                placeholder={tx('Search medical topics, symptoms, or clinical terms (e.g. hypertension, diabetes, pediatrics)…')}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="flex-1 min-w-0 bg-transparent text-xs font-medium text-[color:var(--ink)] outline-none placeholder-slate-400"
@@ -404,31 +408,31 @@ export default function MedicalLibrary({
 
             {/* Inline Dropdowns & Saved Toggle */}
             <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-              <FilterSelect label="Topic" value={category} onChange={setCategory}>
-                <option value={ALL}>All Topics ({articles.length})</option>
-                {categories.map(([c, n]) => <option key={c} value={c}>{c} ({n})</option>)}
+              <FilterSelect label={tx('Topic')} value={category} onChange={setCategory}>
+                <option value={ALL}>{tx('All Topics ({n})', { n: articles.length })}</option>
+                {categories.map(([c, n]) => <option key={c} value={c}>{tx(c)} ({n})</option>)}
               </FilterSelect>
               {hasResearch && (
                 <>
-                  <FilterSelect label="Source" value={source} onChange={(v) => { setSource(v as SourceFilter); if (v === 'practitioner') setEvidence('all'); }}>
-                    <option value="all">All Sources</option>
-                    <option value="practitioner">Practitioner Articles</option>
-                    <option value="research">Research Papers</option>
+                  <FilterSelect label={tx('Source')} value={source} onChange={(v) => { setSource(v as SourceFilter); if (v === 'practitioner') setEvidence('all'); }}>
+                    <option value="all">{tx('All Sources')}</option>
+                    <option value="practitioner">{tx('Practitioner Articles')}</option>
+                    <option value="research">{tx('Research Papers')}</option>
                   </FilterSelect>
-                  <FilterSelect label="Evidence" value={evidence} onChange={(v) => { setEvidence(v); if (v !== 'all') setSource('research'); }}>
-                    <option value="all">Any Evidence</option>
-                    {evidenceLabels.map(l => <option key={l} value={l}>{l}</option>)}
+                  <FilterSelect label={tx('Evidence')} value={evidence} onChange={(v) => { setEvidence(v); if (v !== 'all') setSource('research'); }}>
+                    <option value="all">{tx('Any Evidence')}</option>
+                    {evidenceLabels.map(l => <option key={l} value={l}>{tx(l)}</option>)}
                   </FilterSelect>
-                  <FilterSelect label="Sort by" value={sort} onChange={(v) => setSort(v as SortKey)}>
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="evidence">Strongest Evidence</option>
+                  <FilterSelect label={tx('Sort by')} value={sort} onChange={(v) => setSort(v as SortKey)}>
+                    <option value="newest">{tx('Newest First')}</option>
+                    <option value="oldest">{tx('Oldest First')}</option>
+                    <option value="evidence">{tx('Strongest Evidence')}</option>
                   </FilterSelect>
                 </>
               )}
               <button type="button" aria-pressed={onlySaved} onClick={() => setOnlySaved(v => !v)}
                 className={`h-11 px-4 text-xs font-bold border inline-flex items-center gap-2 cursor-pointer transition-colors ${onlySaved ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' : 'bg-[color:var(--t-bg)] border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'}`}>
-                <Bookmark className="h-3.5 w-3.5" /> Saved ({savedIds.length})
+                <Bookmark className="h-3.5 w-3.5" /> {tx('Saved ({n})', { n: savedIds.length })}
               </button>
             </div>
           </div>
@@ -436,12 +440,12 @@ export default function MedicalLibrary({
           {/* Active Filter Summary & Result Counter Footer */}
           <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[color:var(--t-100)]">
             <span className="text-xs font-bold text-slate-600 tabular-nums" aria-live="polite">
-              Showing <strong className="font-black text-[color:var(--ink)]">{filtered.length}</strong> of {articles.length} article{articles.length === 1 ? '' : 's'}
+              {tx('Showing')} <strong className="font-black text-[color:var(--ink)]">{filtered.length}</strong> {tx(articles.length === 1 ? 'of {n} article' : 'of {n} articles', { n: articles.length })}
             </span>
             {(category !== ALL || source !== 'all' || evidence !== 'all' || onlySaved || query) && (
               <button type="button" onClick={() => { setCategory(ALL); setSource('all'); setEvidence('all'); setOnlySaved(false); setQuery(''); }}
                 className="text-xs font-bold text-[color:var(--t-700)] hover:text-[color:var(--dark)] underline underline-offset-2 cursor-pointer">
-                Reset Filters
+                {tx('Reset Filters')}
               </button>
             )}
           </div>
@@ -450,28 +454,28 @@ export default function MedicalLibrary({
       <div className="flex flex-wrap gap-6 items-start">
         <div className="flex-[999_1_640px] min-w-0 space-y-6">
           {category !== ALL && (
-            <section aria-label={`${category} topic page`} className="bg-white border border-[color:var(--t-200)] border-t-[3px] border-t-[color:var(--t-600)] p-5 space-y-4">
+            <section aria-label={tx('{name} topic page', { name: tx(category) })} className="bg-white border border-[color:var(--t-200)] border-t-[3px] border-t-[color:var(--t-600)] p-5 space-y-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">Topic</p>
-                  <h2 className="text-xl font-bold text-[color:var(--ink)] leading-tight">{category}</h2>
-                  <p className="text-xs text-slate-600 mt-1">{hubArticles.length} article{hubArticles.length === 1 ? '' : 's'} in this topic{hubArticles.some(a => a.source) ? `, ${hubArticles.filter(a => a.source).length} research paper${hubArticles.filter(a => a.source).length === 1 ? '' : 's'}` : ''}</p>
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">{tx('Topic')}</p>
+                  <h2 className="text-xl font-bold text-[color:var(--ink)] leading-tight">{tx(category)}</h2>
+                  <p className="text-xs text-slate-600 mt-1">{tx(hubArticles.length === 1 ? '{n} article in this topic' : '{n} articles in this topic', { n: hubArticles.length })}{hubArticles.some(a => a.source) ? `, ${tx(hubArticles.filter(a => a.source).length === 1 ? '{n} research paper' : '{n} research papers', { n: hubArticles.filter(a => a.source).length })}` : ''}</p>
                 </div>
-                <button type="button" onClick={() => setCategory(ALL)} className="text-xs font-bold text-[color:var(--t-700)] cursor-pointer">← All topics</button>
+                <button type="button" onClick={() => setCategory(ALL)} className="text-xs font-bold text-[color:var(--t-700)] cursor-pointer">{tx('← All topics')}</button>
               </div>
               {hubSheet && (
                 <div className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-4 space-y-2">
-                  <h3 className="text-sm font-bold">About this condition</h3>
+                  <h3 className="text-sm font-bold">{tx('About this condition')}</h3>
                   <p className="text-xs leading-relaxed text-[color:var(--ink-2)]">{hubSheet.summary}</p>
                   <a href={hubSheet.url} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-[color:var(--t-700)] inline-flex items-center gap-1 hover:underline">
-                    Read more on MedlinePlus (U.S. National Library of Medicine) <ExternalLink className="h-3 w-3" />
+                    {tx('Read more on MedlinePlus (U.S. National Library of Medicine)')} <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
               )}
               {hubSpecialty && (
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-xs text-slate-600">Specialists: {hubSpecialists.length ? hubSpecialists.map(p => p.name).join(', ') : hubSpecialty}</span>
-                  <button type="button" onClick={() => onFindDoctor(hubSpecialty)} className="min-h-[36px] px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer">Find a {hubSpecialty}</button>
+                  <span className="text-xs text-slate-600">{tx('Specialists: ')}{hubSpecialists.length ? hubSpecialists.map(p => p.name).join(', ') : tx(hubSpecialty)}</span>
+                  <button type="button" onClick={() => onFindDoctor(hubSpecialty)} className="min-h-[36px] px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer">{tx('Find a {name}', { name: tx(hubSpecialty) })}</button>
                 </div>
               )}
             </section>
@@ -479,8 +483,8 @@ export default function MedicalLibrary({
           {!featured ? (
             <div className="bg-white border border-[color:var(--t-200)] p-12 text-center space-y-3">
               <BookOpen className="h-12 w-12 text-[color:var(--t-200)] mx-auto" />
-              <h3 className="text-sm font-bold text-[color:var(--ink)]">{onlySaved ? 'No saved articles match' : 'No articles match your search'}</h3>
-              <p className="text-xs text-slate-600">{onlySaved ? 'Open an article and tap Save to keep it here.' : 'Try a different keyword or category.'}</p>
+              <h3 className="text-sm font-bold text-[color:var(--ink)]">{onlySaved ? tx('No saved articles match') : tx('No articles match your search')}</h3>
+              <p className="text-xs text-slate-600">{onlySaved ? tx('Open an article and tap Save to keep it here.') : tx('Try a different keyword or category.')}</p>
             </div>
           ) : (
             <>
@@ -493,10 +497,10 @@ export default function MedicalLibrary({
                 </div>
                 <div className="flex-[2_1_380px] min-w-0 p-6 flex flex-col gap-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-2xs font-bold uppercase tracking-wider text-white bg-[color:var(--t-600)] px-2.5 py-1">Featured</span>
-                    <span className="text-2xs font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-0.5">{featured.category}</span>
+                    <span className="text-2xs font-bold uppercase tracking-wider text-white bg-[color:var(--t-600)] px-2.5 py-1">{tx('Featured')}</span>
+                    <span className="text-2xs font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-0.5">{tx(featured.category)}</span>
                     <EvidenceBadge article={featured} />
-                    <span className="text-xs text-slate-600">{featured.date} · {readingMinutes(featured)} min read</span>
+                    <span className="text-xs text-slate-600">{featured.date} · {tx('{n} min read', { n: readingMinutes(featured) })}</span>
                   </div>
                   <h2 className="text-2xl font-bold tracking-tight text-[color:var(--ink)] leading-snug [overflow-wrap:anywhere]">{featured.title}</h2>
                   <Takeaway text={featured.takeaway} ms={featured.takeawayMs} />
@@ -508,22 +512,22 @@ export default function MedicalLibrary({
                       onClick={() => setOpenArticle(featured)}
                       className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer"
                     >
-                      Read article <ArrowRight className="h-3.5 w-3.5" />
+                      {tx('Read article')} <ArrowRight className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </div>
               </article>
 
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-base font-bold text-[color:var(--ink)]">Latest articles</h2>
-                <span className="text-xs text-slate-600">Showing {filtered.length} article{filtered.length === 1 ? '' : 's'}</span>
+                <h2 className="text-base font-bold text-[color:var(--ink)]">{tx('Latest articles')}</h2>
+                <span className="text-xs text-slate-600">{tx(filtered.length === 1 ? 'Showing {n} article' : 'Showing {n} articles', { n: filtered.length })}</span>
               </div>
 
-              <section aria-label="Articles" className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <section aria-label={tx('Articles')} className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {rest.map(art => (
                   <article key={art.id} className="bg-white border border-[color:var(--t-200)] shadow-xs hover:shadow-md hover:border-[color:var(--t-300)] transition-all p-5 flex flex-col gap-3">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-2xs font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-0.5">{art.category}</span>
+                      <span className="text-2xs font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-0.5">{tx(art.category)}</span>
                       <span className="text-xs text-slate-600">{art.date}</span>
                     </div>
                     <div><EvidenceBadge article={art} /></div>
@@ -532,14 +536,14 @@ export default function MedicalLibrary({
                     <p className={`text-xs text-[color:var(--ink-2)] leading-relaxed ${art.takeaway ? 'line-clamp-2' : 'line-clamp-3'}`}>{art.excerpt}</p>
                     <div className="mt-auto pt-3.5 border-t border-[color:var(--t-100)] flex flex-wrap items-center justify-between gap-2">
                       <AuthorBadge article={art} />
-                      <span className="text-xs text-slate-600">{readingMinutes(art)} min read{art.citations?.length > 0 ? ` · ${art.citations.length} citation${art.citations.length === 1 ? '' : 's'}` : ''}</span>
+                      <span className="text-xs text-slate-600">{tx('{n} min read', { n: readingMinutes(art) })}{art.citations?.length > 0 ? ` · ${tx(art.citations.length === 1 ? '{n} citation' : '{n} citations', { n: art.citations.length })}` : ''}</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => setOpenArticle(art)}
                       className="min-h-[44px] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-xs font-semibold cursor-pointer"
                     >
-                      Read article
+                      {tx('Read article')}
                     </button>
                   </article>
                 ))}
@@ -549,9 +553,9 @@ export default function MedicalLibrary({
         </div>
 
         {/* Side rail */}
-        <aside aria-label="Library information" className="flex-[1_1_300px] max-w-full xl:max-w-[380px] min-w-0 space-y-6">
+        <aside aria-label={tx('Library information')} className="flex-[1_1_300px] max-w-full xl:max-w-[380px] min-w-0 space-y-6">
           <section className="bg-white border border-[color:var(--t-200)] shadow-xs p-5">
-            <h2 className="text-base font-bold text-[color:var(--ink)] mb-3">Browse by category</h2>
+            <h2 className="text-base font-bold text-[color:var(--ink)] mb-3">{tx('Browse by category')}</h2>
             <ul>
               {categories.map(([c, n]) => (
                 <li key={c} className="border-b border-[color:var(--t-100)] last:border-b-0">
@@ -560,7 +564,7 @@ export default function MedicalLibrary({
                     onClick={() => setCategory(c)}
                     className="w-full min-h-[44px] flex items-center justify-between text-xs font-medium text-[color:var(--ink)] hover:text-[color:var(--t-600)] cursor-pointer"
                   >
-                    <span>{c}</span>
+                    <span>{tx(c)}</span>
                     <span className="text-2xs font-semibold text-slate-600 bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 tabular-nums">{n}</span>
                   </button>
                 </li>
@@ -571,22 +575,22 @@ export default function MedicalLibrary({
           <section className="bg-[color:var(--e-50)] border border-[color:var(--e-200)] p-5">
             <div className="flex items-center gap-2.5">
               <ShieldCheck className="h-5 w-5 text-[color:var(--e-600)]" />
-              <h2 className="text-base font-bold text-[color:var(--e-800)]">How articles are verified</h2>
+              <h2 className="text-base font-bold text-[color:var(--e-800)]">{tx('How articles are verified')}</h2>
             </div>
             <p className="mt-2.5 text-xs leading-relaxed text-[color:var(--e-800)]">
-              Practitioner articles are written by authors checked against MMC and LJM registries. Research papers come from PubMed, are limited to reviews, trials and guidelines, are screened for retraction, and only appear after our medical board approves them. Each item links to its source so you can confirm the evidence yourself.
+              {tx('Practitioner articles are written by authors checked against MMC and LJM registries. Research papers come from PubMed, are limited to reviews, trials and guidelines, are screened for retraction, and only appear after our medical board approves them. Each item links to its source so you can confirm the evidence yourself.')}
             </p>
           </section>
 
           <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
-            <h2 className="text-base font-bold text-[color:var(--ink)]">Need to speak to a clinician?</h2>
-            <p className="text-xs leading-relaxed text-[color:var(--ink-2)]">Articles are for education. For personal medical advice, book a consultation.</p>
+            <h2 className="text-base font-bold text-[color:var(--ink)]">{tx('Need to speak to a clinician?')}</h2>
+            <p className="text-xs leading-relaxed text-[color:var(--ink-2)]">{tx('Articles are for education. For personal medical advice, book a consultation.')}</p>
             <button
               type="button"
               onClick={() => onFindDoctor()}
               className="w-full min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors cursor-pointer"
             >
-              Find a doctor
+              {tx('Find a doctor')}
             </button>
           </section>
         </aside>
@@ -608,7 +612,7 @@ export default function MedicalLibrary({
             <div className="bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] p-5 flex items-start justify-between gap-4 shrink-0">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                  <span className="text-2xs font-bold text-[color:var(--t-700)] bg-white border border-[color:var(--t-200)] px-2.5 py-0.5">{openArticle.category}</span>
+                  <span className="text-2xs font-bold text-[color:var(--t-700)] bg-white border border-[color:var(--t-200)] px-2.5 py-0.5">{tx(openArticle.category)}</span>
                   <EvidenceBadge article={openArticle} />
                   <span className="text-xs text-slate-600">{openArticle.date}</span>
                 </div>
@@ -617,7 +621,7 @@ export default function MedicalLibrary({
               <button
                 type="button"
                 onClick={() => setOpenArticle(null)}
-                aria-label="Close article"
+                aria-label={tx('Close article')}
                 className="h-11 w-11 shrink-0 flex items-center justify-center text-slate-600 hover:text-[color:var(--t-600)] cursor-pointer"
               >
                 <X className="h-5 w-5" />
@@ -628,19 +632,19 @@ export default function MedicalLibrary({
               <div className="flex items-center gap-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3.5">
                 <AuthorBadge article={openArticle} large />
                 <span className="ml-auto hidden sm:inline-flex items-center gap-1 text-2xs font-bold text-[color:var(--e-800)] bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-2 py-1">
-                  <BadgeCheck className="h-3.5 w-3.5 text-[color:var(--e-600)]" /> {openArticle.source ? 'PubMed paper · board-approved' : openArticle.draft ? 'Draft · not yet doctor-reviewed' : 'Verified & accredited'}
+                  <BadgeCheck className="h-3.5 w-3.5 text-[color:var(--e-600)]" /> {openArticle.source ? tx('PubMed paper · board-approved') : openArticle.draft ? tx('Draft · not yet doctor-reviewed') : tx('Verified & accredited')}
                 </span>
               </div>
 
               {openArticle.draft && (
                 <p role="note" className="text-xs bg-amber-50 border border-amber-200 text-amber-900 p-3 font-semibold">
                   {ms
-                    ? 'Draf: ditulis oleh pasukan editorial MediCred dan belum disemak oleh doktor berdaftar. Terjemahan ini ialah draf yang belum disemak oleh doktor dan penutur asli bahasa Melayu.'
-                    : 'Draft: written by the MediCred editorial team and not yet reviewed by a registered doctor.' + (openArticle.contentMs ? ' The Malay version is a draft translation, not yet checked by a clinician and a native speaker.' : '')}
+                    ? tx('Draft: written by the MediCred editorial team and not yet reviewed by a registered doctor.')
+                    : tx('Draft: written by the MediCred editorial team and not yet reviewed by a registered doctor.') + (openArticle.contentMs ? ' ' + tx('The Malay version is a draft translation, not yet checked by a clinician and a native speaker.') : '')}
                 </p>
               )}
               {openArticle.contentMs && (
-                <div role="group" aria-label="Reading language" className="flex gap-1 text-xs font-bold">
+                <div role="group" aria-label={tx('Reading language')} className="flex gap-1 text-xs font-bold">
                   {([['en', 'English'], ['ms', 'Bahasa Malaysia']] as const).map(([id, label]) => (
                     <button key={id} type="button" aria-pressed={readLang === id} onClick={() => setReadLang(id)}
                       className={`px-2.5 py-1 border cursor-pointer ${readLang === id ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-600)]' : 'bg-white text-[color:var(--ink)] border-[color:var(--t-200)]'}`}>{label}</button>
@@ -651,8 +655,8 @@ export default function MedicalLibrary({
               <ArticleBody lang={ms ? 'ms' : 'en'} text={(ms ? openArticle.contentMs : openArticle.content) ?? ''} />
 
               {openArticle.localBurden && openArticle.localBurden.facts.length > 0 && (
-                <section className="border border-sky-200 bg-sky-50/60 p-4 space-y-2" aria-label={ms ? 'Angka di Malaysia' : 'Malaysia in numbers'}>
-                  <h3 className="text-sm font-bold text-[color:var(--ink)]">{ms ? 'Angka di Malaysia' : 'Malaysia in numbers'}</h3>
+                <section className="border border-sky-200 bg-sky-50/60 p-4 space-y-2" aria-label={ms ? 'Angka di Malaysia' : tx('Malaysia in numbers')}>
+                  <h3 className="text-sm font-bold text-[color:var(--ink)]">{ms ? 'Angka di Malaysia' : tx('Malaysia in numbers')}</h3>
                   <ul className="space-y-2 text-xs text-[color:var(--ink-2)] leading-relaxed">
                     {openArticle.localBurden.facts.map((f, i) => (
                       <li key={i}>
@@ -665,19 +669,19 @@ export default function MedicalLibrary({
               )}
 
               {openArticle.source?.approvedAt && (
-                <p className="text-xs text-slate-600 flex items-center gap-1.5"><BadgeCheck className="h-3.5 w-3.5 text-[color:var(--e-600)]" /> Approved for this library by the medical board on {new Date(openArticle.source.approvedAt).toLocaleDateString()}.</p>
+                <p className="text-xs text-slate-600 flex items-center gap-1.5"><BadgeCheck className="h-3.5 w-3.5 text-[color:var(--e-600)]" /> {tx('Approved for this library by the medical board on {date}.', { date: new Date(openArticle.source.approvedAt).toLocaleDateString() })}</p>
               )}
               {openArticle.source && (
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
-                  <a href={openArticle.source.url} target="_blank" rel="noopener noreferrer" className="font-bold text-[color:var(--t-700)] inline-flex items-center gap-1 hover:underline">Read the full paper on PubMed <ExternalLink className="h-3 w-3" /></a>
-                  {openArticle.source.doi && <a href={`https://doi.org/${openArticle.source.doi}`} target="_blank" rel="noopener noreferrer" className="font-bold text-[color:var(--t-700)] inline-flex items-center gap-1 hover:underline">Publisher (DOI) <ExternalLink className="h-3 w-3" /></a>}
-                  {openArticle.source.retractionCheckedAt && <span className="text-slate-500">Checked for retraction {new Date(openArticle.source.retractionCheckedAt).toLocaleDateString()}</span>}
+                  <a href={openArticle.source.url} target="_blank" rel="noopener noreferrer" className="font-bold text-[color:var(--t-700)] inline-flex items-center gap-1 hover:underline">{tx('Read the full paper on PubMed')} <ExternalLink className="h-3 w-3" /></a>
+                  {openArticle.source.doi && <a href={`https://doi.org/${openArticle.source.doi}`} target="_blank" rel="noopener noreferrer" className="font-bold text-[color:var(--t-700)] inline-flex items-center gap-1 hover:underline">{tx('Publisher (DOI)')} <ExternalLink className="h-3 w-3" /></a>}
+                  {openArticle.source.retractionCheckedAt && <span className="text-slate-500">{tx('Checked for retraction {date}', { date: new Date(openArticle.source.retractionCheckedAt).toLocaleDateString() })}</span>}
                 </div>
               )}
 
               {openArticle.citations?.length > 0 && (
                 <section className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-4 space-y-2">
-                  <h3 className="text-sm font-bold text-[color:var(--ink)]">{openArticle.source ? 'Source' : 'Peer-reviewed citations'}</h3>
+                  <h3 className="text-sm font-bold text-[color:var(--ink)]">{openArticle.source ? tx('Source') : tx('Peer-reviewed citations')}</h3>
                   <ol className="list-decimal list-inside space-y-1 text-xs text-[color:var(--ink-2)] leading-relaxed">
                     {openArticle.citations.map((cit, idx) => <li key={idx}>{cit}</li>)}
                   </ol>
@@ -686,7 +690,7 @@ export default function MedicalLibrary({
 
               {openArticle.faq?.length > 0 && (
                 <section className="space-y-2.5">
-                  <h3 className="text-sm font-bold text-[color:var(--ink)]">Common questions</h3>
+                  <h3 className="text-sm font-bold text-[color:var(--ink)]">{tx('Common questions')}</h3>
                   {openArticle.faq.map((f, idx) => (
                     <details key={idx} className="group border border-[color:var(--t-200)] bg-white">
                       <summary className="min-h-[44px] px-4 py-3 text-xs font-semibold text-[color:var(--ink)] flex justify-between items-center cursor-pointer list-none">
@@ -702,17 +706,17 @@ export default function MedicalLibrary({
 
             {isPractitioner && recOpen && (
               <div className="no-print border-t border-[color:var(--t-200)] px-6 py-4 shrink-0 bg-white space-y-2">
-                <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-600">Recommend to a patient</h3>
+                <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-600">{tx('Recommend to a patient')}</h3>
                 {patients.length === 0 ? (
-                  <p className="text-xs text-slate-500">You have no patients yet. You can recommend articles to people you have treated.</p>
+                  <p className="text-xs text-slate-500">{tx('You have no patients yet. You can recommend articles to people you have treated.')}</p>
                 ) : (
                   <div className="grid gap-2 sm:grid-cols-[220px_1fr_auto] items-start">
-                    <select value={recPatient} onChange={e => setRecPatient(e.target.value)} aria-label="Patient" className="border border-slate-200 bg-white px-3 py-2 text-xs">
-                      <option value="">Choose a patient…</option>
+                    <select value={recPatient} onChange={e => setRecPatient(e.target.value)} aria-label={tx('Patient')} className="border border-slate-200 bg-white px-3 py-2 text-xs">
+                      <option value="">{tx('Choose a patient…')}</option>
                       {patients.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                     </select>
-                    <input value={recNote} onChange={e => setRecNote(e.target.value)} maxLength={300} placeholder="Optional note, e.g. “Read this before our follow-up”" aria-label="Note" className="border border-slate-200 px-3 py-2 text-xs" />
-                    <button type="button" onClick={sendRecommendation} disabled={!recPatient} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 py-2.5 cursor-pointer">Send</button>
+                    <input value={recNote} onChange={e => setRecNote(e.target.value)} maxLength={300} placeholder={tx('Optional note, e.g. “Read this before our follow-up”')} aria-label={tx('Note')} className="border border-slate-200 px-3 py-2 text-xs" />
+                    <button type="button" onClick={sendRecommendation} disabled={!recPatient} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 py-2.5 cursor-pointer">{tx('Send')}</button>
                   </div>
                 )}
                 {recMsg && <p role="status" className={`text-xs font-bold ${recMsg.ok ? 'text-emerald-700' : 'text-rose-700'}`}>{recMsg.text}</p>}
@@ -721,12 +725,12 @@ export default function MedicalLibrary({
 
             {related.length > 0 && (
               <div className="no-print border-t border-[color:var(--t-200)] px-6 py-4 shrink-0 bg-[color:var(--t-bg)]">
-                <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-600 mb-2">Related articles</h3>
+                <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-600 mb-2">{tx('Related articles')}</h3>
                 <ul className="grid gap-2 sm:grid-cols-3">
                   {related.map(r => (
                     <li key={r.id}>
                       <button type="button" onClick={() => setOpenArticle(r)} className="w-full text-left bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-2.5 cursor-pointer">
-                        <span className="block text-xs text-slate-500">{r.category}</span>
+                        <span className="block text-xs text-slate-500">{tx(r.category)}</span>
                         <span className="text-xs font-semibold leading-snug line-clamp-2 [overflow-wrap:anywhere]">{r.title}</span>
                       </button>
                     </li>
@@ -738,19 +742,19 @@ export default function MedicalLibrary({
             <div className="no-print border-t border-[color:var(--t-200)] p-4 flex flex-wrap gap-2.5 items-center shrink-0 bg-white">
               <button type="button" onClick={() => toggleSaved(openArticle.id)} aria-pressed={savedIds.includes(openArticle.id)}
                 className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-xs font-semibold inline-flex items-center gap-2 cursor-pointer">
-                <Bookmark className={`h-4 w-4 ${savedIds.includes(openArticle.id) ? 'fill-current text-[color:var(--t-600)]' : ''}`} /> {savedIds.includes(openArticle.id) ? 'Saved' : 'Save'}
+                <Bookmark className={`h-4 w-4 ${savedIds.includes(openArticle.id) ? 'fill-current text-[color:var(--t-600)]' : ''}`} /> {savedIds.includes(openArticle.id) ? tx('Saved') : tx('Save')}
               </button>
               <button type="button" onClick={() => window.print()} className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-xs font-semibold inline-flex items-center gap-2 cursor-pointer">
-                <Printer className="h-4 w-4" /> Print
+                <Printer className="h-4 w-4" /> {tx('Print')}
               </button>
               {isPractitioner && (
                 <button type="button" onClick={() => setRecOpen(v => !v)} aria-expanded={recOpen} className="min-h-[44px] px-4 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-xs font-semibold inline-flex items-center gap-2 cursor-pointer">
-                  <Send className="h-4 w-4" /> Recommend to a patient
+                  <Send className="h-4 w-4" /> {tx('Recommend to a patient')}
                 </button>
               )}
               {onReportProblem && (
                 <button type="button" onClick={() => { const a = openArticle; setOpenArticle(null); onReportProblem(a); }} className="min-h-[44px] px-4 text-xs font-semibold text-slate-600 hover:text-rose-700 inline-flex items-center gap-2 cursor-pointer">
-                  <Flag className="h-4 w-4" /> Report a problem
+                  <Flag className="h-4 w-4" /> {tx('Report a problem')}
                 </button>
               )}
               <span className="flex-1" />
@@ -759,14 +763,14 @@ export default function MedicalLibrary({
                 onClick={() => setOpenArticle(null)}
                 className="min-h-[44px] px-5 border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)] text-[color:var(--ink)] text-xs font-semibold cursor-pointer"
               >
-                Close
+                {tx('Close')}
               </button>
               <button
                 type="button"
                 onClick={() => { const sp = specialtyFor(openArticle, professionals); setOpenArticle(null); onFindDoctor(sp ?? undefined); }}
                 className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer"
               >
-                {(() => { const sp = specialtyFor(openArticle, professionals); return sp ? `Find a ${sp}` : 'Find a doctor'; })()}
+                {(() => { const sp = specialtyFor(openArticle, professionals); return sp ? tx('Find a {name}', { name: tx(sp) }) : tx('Find a doctor'); })()}
               </button>
             </div>
           </div>

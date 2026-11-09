@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ShieldCheck, ShieldAlert, Building2, CalendarClock, Globe2, Search, X, CheckCircle2, MapPin, Clock, Send } from 'lucide-react';
 import { MY_STATES } from '../identity';
-import { formatMoney, formatDate } from '../locale';
+import { formatMoney, formatDate, useTr } from '../locale';
 import { FilterSelect } from './DashboardHeader';
 
 const jget = (url: string) => fetch(url).then(r => r.json());
@@ -29,6 +29,7 @@ export const extrasPayload = (e: JobExtras) => ({
 });
 
 export function JobFormFields({ value, onChange, jobType }: { value: JobExtras; onChange: (v: JobExtras) => void; jobType: string }) {
+  const tx = useTr();
   const [employers, setEmployers] = useState<any[]>([]);
   useEffect(() => { jget('/api/jobs/employers').then(d => d.status === 'success' && setEmployers(d.data)).catch(() => {}); }, []);
   const set = (p: Partial<JobExtras>) => onChange({ ...value, ...p });
@@ -37,40 +38,40 @@ export function JobFormFields({ value, onChange, jobType }: { value: JobExtras; 
     <div className="space-y-4 border border-[color:var(--t-200)] bg-[color:var(--t-50)]/40 p-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className={label}>Sector</label>
+          <label className={label}>{tx('Sector')}</label>
           <select className={`${input} w-full`} value={value.sector} onChange={e => set({ sector: e.target.value })}>
-            <option value="private">Private</option><option value="public">Public (government)</option><option value="other">Other</option>
+            <option value="private">{tx('Private')}</option><option value="public">{tx('Public (government)')}</option><option value="other">{tx('Other')}</option>
           </select>
         </div>
         <div>
-          <label className={label}>State</label>
-          <select className={`${input} w-full`} value={value.state} onChange={e => set({ state: e.target.value })}>{MY_STATES.map(s => <option key={s} value={s}>{s}</option>)}</select>
+          <label className={label}>{tx('State')}</label>
+          <select className={`${input} w-full`} value={value.state} onChange={e => set({ state: e.target.value })}>{MY_STATES.map(s => <option key={s} value={s}>{tx(s)}</option>)}</select>
         </div>
         <div>
-          <label className={label}>Who can apply</label>
+          <label className={label}>{tx('Who can apply')}</label>
           <select className={`${input} w-full`} value={value.roleRequired} onChange={e => set({ roleRequired: e.target.value })}>
-            <option value="any">Doctors and nurses</option><option value="doctor">Doctors only</option><option value="nurse">Nurses only</option>
+            <option value="any">{tx('Doctors and nurses')}</option><option value="doctor">{tx('Doctors only')}</option><option value="nurse">{tx('Nurses only')}</option>
           </select>
         </div>
       </div>
 
       <div>
-        <label className={label}>Employer (licensed facility register)</label>
+        <label className={label}>{tx('Employer (licensed facility register)')}</label>
         <select className={`${input} w-full`} value={value.facilityId} onChange={e => set({ facilityId: e.target.value })}>
-          <option value="">{value.sector === 'private' ? 'Choose a facility…' : 'Not in the register (shown as unchecked)'}</option>
-          {employers.map(e => <option key={e.id} value={e.id}>{e.name} · {e.licenceOk ? 'licence checked' : 'licence NOT checked'}</option>)}
+          <option value="">{value.sector === 'private' ? tx('Choose a facility…') : tx('Not in the register (shown as unchecked)')}</option>
+          {employers.map(e => <option key={e.id} value={e.id}>{e.name} · {e.licenceOk ? tx('licence checked') : tx('licence NOT checked')}</option>)}
         </select>
-        {value.sector === 'private' && employers.length === 0 && <p className="text-xs text-amber-800 mt-1">Private-sector posts need a licensed facility you are assigned to. Ask an admin to add the facility and assign you (Medical tourism &gt; Facilities).</p>}
-        {emp && !emp.licenceOk && <p className="text-xs text-rose-700 mt-1">This facility's licence has not been checked or has expired, so it cannot advertise yet.</p>}
+        {value.sector === 'private' && employers.length === 0 && <p className="text-xs text-amber-800 mt-1">{tx('Private-sector posts need a licensed facility you are assigned to. Ask an admin to add the facility and assign you (Medical tourism > Facilities).')}</p>}
+        {emp && !emp.licenceOk && <p className="text-xs text-rose-700 mt-1">{tx('This facility\'s licence has not been checked or has expired, so it cannot advertise yet.')}</p>}
       </div>
 
       <div>
-        <label className={label}>Pay (Malaysian ringgit)</label>
+        <label className={label}>{tx('Pay (Malaysian ringgit)')}</label>
         <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span>RM</span><input className={`${input} w-28`} type="number" min={0} step="0.01" placeholder="Min" aria-label="Minimum pay" value={value.salaryMin} onChange={e => set({ salaryMin: e.target.value })} />
-          <span>to</span><input className={`${input} w-28`} type="number" min={0} step="0.01" placeholder="Max" aria-label="Maximum pay" value={value.salaryMax} onChange={e => set({ salaryMax: e.target.value })} />
-          <select className={input} aria-label="Pay period" value={value.salaryPeriod} onChange={e => set({ salaryPeriod: e.target.value })}>
-            <option value="month">per month</option><option value="day">per day</option><option value="hour">per hour</option><option value="shift">per shift</option>
+          <span>{tx('RM')}</span><input className={`${input} w-28`} type="number" min={0} step="0.01" placeholder={tx('Min')} aria-label={tx('Minimum pay')} value={value.salaryMin} onChange={e => set({ salaryMin: e.target.value })} />
+          <span>to</span><input className={`${input} w-28`} type="number" min={0} step="0.01" placeholder={tx('Max')} aria-label={tx('Maximum pay')} value={value.salaryMax} onChange={e => set({ salaryMax: e.target.value })} />
+          <select className={input} aria-label={tx('Pay period')} value={value.salaryPeriod} onChange={e => set({ salaryPeriod: e.target.value })}>
+            <option value="month">{tx('per month')}</option><option value="day">{tx('per day')}</option><option value="hour">{tx('per hour')}</option><option value="shift">{tx('per shift')}</option>
           </select>
         </div>
       </div>
@@ -81,24 +82,24 @@ export function JobFormFields({ value, onChange, jobType }: { value: JobExtras; 
           <div className="space-y-2">
             {value.shifts.map((s, i) => (
               <div key={i} className="flex flex-wrap items-center gap-2 text-xs">
-                <input type="date" className={input} aria-label="Shift date" value={s.date} onChange={e => set({ shifts: value.shifts.map((x, k) => (k === i ? { ...x, date: e.target.value } : x)) })} />
-                <input type="time" className={input} aria-label="Start" value={s.start} onChange={e => set({ shifts: value.shifts.map((x, k) => (k === i ? { ...x, start: e.target.value } : x)) })} />
+                <input type="date" className={input} aria-label={tx('Shift date')} value={s.date} onChange={e => set({ shifts: value.shifts.map((x, k) => (k === i ? { ...x, date: e.target.value } : x)) })} />
+                <input type="time" className={input} aria-label={tx('Start')} value={s.start} onChange={e => set({ shifts: value.shifts.map((x, k) => (k === i ? { ...x, start: e.target.value } : x)) })} />
                 <span>to</span>
-                <input type="time" className={input} aria-label="End" value={s.end} onChange={e => set({ shifts: value.shifts.map((x, k) => (k === i ? { ...x, end: e.target.value } : x)) })} />
+                <input type="time" className={input} aria-label={tx('End')} value={s.end} onChange={e => set({ shifts: value.shifts.map((x, k) => (k === i ? { ...x, end: e.target.value } : x)) })} />
                 <button type="button" className="text-rose-700 font-bold cursor-pointer" onClick={() => set({ shifts: value.shifts.filter((_, k) => k !== i) })}>remove</button>
               </div>
             ))}
-            <button type="button" className="text-xs font-bold underline cursor-pointer" onClick={() => set({ shifts: [...value.shifts, { date: '', start: '08:00', end: '20:00' }] })}>Add a shift</button>
+            <button type="button" className="text-xs font-bold underline cursor-pointer" onClick={() => set({ shifts: [...value.shifts, { date: '', start: '08:00', end: '20:00' }] })}>{tx('Add a shift')}</button>
           </div>
         </div>
       )}
 
       <div className="space-y-2 text-xs">
-        <label className="flex items-start gap-2 cursor-pointer"><input type="checkbox" className="mt-0.5" checked={value.acceptsForeign} onChange={e => set({ acceptsForeign: e.target.checked })} /><span>We also consider practitioners registered outside Malaysia. (Their Malaysian registration and work permit are the employer's responsibility: see the Eligibility tab.)</span></label>
+        <label className="flex items-start gap-2 cursor-pointer"><input type="checkbox" className="mt-0.5" checked={value.acceptsForeign} onChange={e => set({ acceptsForeign: e.target.checked })} /><span>{tx('We also consider practitioners registered outside Malaysia. (Their Malaysian registration and work permit are the employer\'s responsibility: see the Eligibility tab.)')}</span></label>
         {value.acceptsForeign && (
           <>
-            <label className="flex items-start gap-2 cursor-pointer"><input type="checkbox" className="mt-0.5" checked={value.visaSupport} onChange={e => set({ visaSupport: e.target.checked })} /><span>We help with MMC/LJM registration and the work permit.</span></label>
-            <textarea className="border border-[color:var(--t-200)] p-3 text-xs font-semibold bg-white w-full outline-none focus:border-[color:var(--t-600)]" rows={2} maxLength={500} placeholder="Notes for foreign applicants (what you can sponsor, timelines)" value={value.foreignNotes} onChange={e => set({ foreignNotes: e.target.value })} />
+            <label className="flex items-start gap-2 cursor-pointer"><input type="checkbox" className="mt-0.5" checked={value.visaSupport} onChange={e => set({ visaSupport: e.target.checked })} /><span>{tx('We help with MMC/LJM registration and the work permit.')}</span></label>
+            <textarea className="border border-[color:var(--t-200)] p-3 text-xs font-semibold bg-white w-full outline-none focus:border-[color:var(--t-600)]" rows={2} maxLength={500} placeholder={tx('Notes for foreign applicants (what you can sponsor, timelines)')} value={value.foreignNotes} onChange={e => set({ foreignNotes: e.target.value })} />
           </>
         )}
       </div>
@@ -114,63 +115,67 @@ export const matchesFilter = (j: any, f: JobFilter) =>
   (f.role === 'all' || !j.roleRequired || j.roleRequired === 'any' || j.roleRequired === f.role) && (!f.foreign || !!j.acceptsForeign);
 
 export function JobFilters({ value, onChange }: { value: JobFilter; onChange: (v: JobFilter) => void }) {
+  const tx = useTr();
   return (
-    <section aria-label="Malaysian filters" className="bg-white border border-[color:var(--t-200)] shadow-xs p-4 flex flex-wrap gap-3 items-center text-xs">
-      <FilterSelect label="State" value={value.state} onChange={v => onChange({ ...value, state: v })}><option value="all">All states</option>{MY_STATES.map(s => <option key={s} value={s}>{s}</option>)}</FilterSelect>
-      <FilterSelect label="Sector" value={value.sector} onChange={v => onChange({ ...value, sector: v })}><option value="all">Public and private</option><option value="public">Public sector</option><option value="private">Private sector</option><option value="other">Other</option></FilterSelect>
-      <FilterSelect label="Role" value={value.role} onChange={v => onChange({ ...value, role: v })}><option value="all">Doctors and nurses</option><option value="doctor">Doctors</option><option value="nurse">Nurses</option></FilterSelect>
-      <label className="flex items-center gap-1.5 font-bold"><input type="checkbox" checked={value.foreign} onChange={e => onChange({ ...value, foreign: e.target.checked })} /> Considers practitioners registered abroad</label>
+    <section aria-label={tx('Malaysian filters')} className="bg-white border border-[color:var(--t-200)] shadow-xs p-4 flex flex-wrap gap-3 items-center text-xs">
+      <FilterSelect label={tx('State')} value={value.state} onChange={v => onChange({ ...value, state: v })}><option value="all">{tx('All states')}</option>{MY_STATES.map(s => <option key={s} value={s}>{tx(s)}</option>)}</FilterSelect>
+      <FilterSelect label={tx('Sector')} value={value.sector} onChange={v => onChange({ ...value, sector: v })}><option value="all">{tx('Public and private')}</option><option value="public">{tx('Public sector')}</option><option value="private">{tx('Private sector')}</option><option value="other">{tx('Other')}</option></FilterSelect>
+      <FilterSelect label={tx('Role')} value={value.role} onChange={v => onChange({ ...value, role: v })}><option value="all">{tx('Doctors and nurses')}</option><option value="doctor">{tx('Doctors')}</option><option value="nurse">{tx('Nurses')}</option></FilterSelect>
+      <label className="flex items-center gap-1.5 font-bold"><input type="checkbox" checked={value.foreign} onChange={e => onChange({ ...value, foreign: e.target.checked })} /> {tx('Considers practitioners registered abroad')}</label>
     </section>
   );
 }
 
 // ───────── badges and detail on a listing ─────────
 export function JobBadges({ job }: { job: any }) {
+  const tx = useTr();
   const emp = job.employer;
   return (
     <div className="flex flex-wrap gap-1.5 text-2xs font-black uppercase tracking-wider">
-      {job.sector && <span className="px-2 py-0.5 border border-slate-300 bg-slate-50 text-slate-700">{SECTOR_LABEL[job.sector] ?? job.sector}</span>}
-      {job.state && <span className="px-2 py-0.5 border border-slate-300 bg-slate-50 text-slate-700">{job.state}</span>}
+      {job.sector && <span className="px-2 py-0.5 border border-slate-300 bg-slate-50 text-slate-700">{tx(SECTOR_LABEL[job.sector] ?? job.sector)}</span>}
+      {job.state && <span className="px-2 py-0.5 border border-slate-300 bg-slate-50 text-slate-700">{tx(job.state)}</span>}
       {emp?.licenceOk
-        ? <span className="px-2 py-0.5 border border-emerald-300 bg-emerald-50 text-emerald-900 inline-flex items-center gap-1"><ShieldCheck className="h-3 w-3" />Facility licence checked{emp.licenceExpiry ? ` · to ${emp.licenceExpiry}` : ''}</span>
-        : <span title={emp?.problem ?? ''} className="px-2 py-0.5 border border-amber-300 bg-amber-50 text-amber-900 inline-flex items-center gap-1"><ShieldAlert className="h-3 w-3" />Employer licence not checked</span>}
-      {job.shifts?.length > 0 && <span className="px-2 py-0.5 border border-sky-300 bg-sky-50 text-sky-900 inline-flex items-center gap-1"><CalendarClock className="h-3 w-3" />{job.shifts.length} shift{job.shifts.length === 1 ? '' : 's'}</span>}
-      {job.acceptsForeign && <span className="px-2 py-0.5 border border-violet-300 bg-violet-50 text-violet-900 inline-flex items-center gap-1"><Globe2 className="h-3 w-3" />Considers foreign-registered{job.visaSupport ? ' · helps with permit' : ''}</span>}
+        ? <span className="px-2 py-0.5 border border-emerald-300 bg-emerald-50 text-emerald-900 inline-flex items-center gap-1"><ShieldCheck className="h-3 w-3" />{tx('Facility licence checked')}{emp.licenceExpiry ? ` · ${tx('to {date}', { date: emp.licenceExpiry })}` : ''}</span>
+        : <span title={emp?.problem ?? ''} className="px-2 py-0.5 border border-amber-300 bg-amber-50 text-amber-900 inline-flex items-center gap-1"><ShieldAlert className="h-3 w-3" />{tx('Employer licence not checked')}</span>}
+      {job.shifts?.length > 0 && <span className="px-2 py-0.5 border border-sky-300 bg-sky-50 text-sky-900 inline-flex items-center gap-1"><CalendarClock className="h-3 w-3" />{tx(job.shifts.length === 1 ? '{n} shift' : '{n} shifts', { n: job.shifts.length })}</span>}
+      {job.acceptsForeign && <span className="px-2 py-0.5 border border-violet-300 bg-violet-50 text-violet-900 inline-flex items-center gap-1"><Globe2 className="h-3 w-3" />{tx('Considers foreign-registered')}{job.visaSupport ? ` · ${tx('helps with permit')}` : ''}</span>}
     </div>
   );
 }
 
 export function JobDetailExtras({ job }: { job: any }) {
+  const tx = useTr();
   return (
     <div className="space-y-3 text-xs">
       <JobBadges job={job} />
       {job.employer?.problem && <p className="text-amber-800 bg-amber-50 border border-amber-200 p-2">{job.employer.problem}</p>}
       {job.shifts?.length > 0 && (
-        <div><p className="font-black uppercase tracking-wide text-slate-700 mb-1">Shifts</p>
+        <div><p className="font-black uppercase tracking-wide text-slate-700 mb-1">{tx('Shifts')}</p>
           <ul className="space-y-0.5">{job.shifts.map((s: any, i: number) => <li key={i}>{formatDate(s.date)} · {s.start} to {s.end}</li>)}</ul></div>
       )}
       {job.acceptsForeign && (
         <div className="bg-violet-50 border border-violet-200 p-2 space-y-1">
-          <p><b>Practitioners registered abroad:</b> considered{job.visaSupport ? ', and the employer says it helps with registration and the work permit' : ', but the employer has not said it helps with registration or the permit'}.</p>
+          <p><b>{tx('Practitioners registered abroad:')}</b> {job.visaSupport ? tx('considered, and the employer says it helps with registration and the work permit.') : tx('considered, but the employer has not said it helps with registration or the permit.')}</p>
           {job.foreignNotes && <p>{job.foreignNotes}</p>}
-          <p className="text-slate-500">Confirm registration and permit support in writing before you resign or travel.</p>
+          <p className="text-slate-500">{tx('Confirm registration and permit support in writing before you resign or travel.')}</p>
         </div>
       )}
-      {job.applyBlockedReason && <p className="text-rose-800 bg-rose-50 border border-rose-200 p-2 font-semibold">You cannot apply yet: {job.applyBlockedReason}</p>}
+      {job.applyBlockedReason && <p className="text-rose-800 bg-rose-50 border border-rose-200 p-2 font-semibold">{tx('You cannot apply yet: ')}{job.applyBlockedReason}</p>}
     </div>
   );
 }
 
 // ───────── eligibility information ─────────
 export function EligibilityInfo() {
+  const tx = useTr();
   const [info, setInfo] = useState<any>(null);
   useEffect(() => { jget('/api/jobs/info').then(d => d.status === 'success' && setInfo(d.data)).catch(() => {}); }, []);
   return (
     <div className="bg-white border border-[color:var(--t-200)] p-6 space-y-5 shadow-2xs">
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[color:var(--t-100)] pb-4">
         <div>
-          <h3 className="text-base font-black text-[color:var(--ink)] uppercase tracking-wide">Malaysian Clinical Staffing &amp; Registration Eligibility</h3>
-          <p className="text-xs text-slate-600 mt-1">Statutory requirements for doctors (MMC) and nurses (LJM) applying to hospital shifts and locum posts.</p>
+          <h3 className="text-base font-black text-[color:var(--ink)] uppercase tracking-wide">{tx('Malaysian Clinical Staffing & Registration Eligibility')}</h3>
+          <p className="text-xs text-slate-600 mt-1">{tx('Statutory requirements for doctors (MMC) and nurses (LJM) applying to hospital shifts and locum posts.')}</p>
         </div>
         <span className="text-2xs font-black uppercase tracking-wider px-2.5 py-1 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
           MMC &amp; LJM Compliance
@@ -178,7 +183,7 @@ export function EligibilityInfo() {
       </div>
       {info?.draft && (
         <p className="text-xs bg-amber-50 border border-amber-200 text-amber-900 p-3 font-semibold">
-          Draft from web research: not legal or immigration advice. Confirm with the Malaysian Medical Council, the Nursing Board and Immigration.
+          {tx('Draft from web research: not legal or immigration advice. Confirm with the Malaysian Medical Council, the Nursing Board and Immigration.')}
         </p>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -195,6 +200,7 @@ export function EligibilityInfo() {
 
 // ───────── locum profiles and directory ─────────
 export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
+  const tx = useTr();
   const [mine, setMine] = useState<any>(null);
   const [apc, setApc] = useState<any>(null);
   const [form, setForm] = useState({ states: [] as string[], specialties: '', minRate: '', ratePeriod: 'hour', availableFrom: '', availableTo: '', note: '', visible: true });
@@ -222,7 +228,7 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     const d = await jsend('PUT', '/api/locum/me', { ...form, minRate: form.minRate === '' ? undefined : Number(form.minRate), specialties: form.specialties.split(',').map(x => x.trim()).filter(Boolean) });
-    setMsg(d.status === 'success' ? 'Saved. Employers can find you when your annual practising certificate is valid.' : d.message);
+    setMsg(d.status === 'success' ? tx('Saved. Employers can find you when your annual practising certificate is valid.') : d.message);
     if (d.status === 'success') loadMine();
   };
   const sendInvite = async (e: React.FormEvent, id: string) => {
@@ -249,9 +255,9 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
           {/* Card Header + APC & Status Pill Badges */}
           <div className="flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-[color:var(--t-100)]">
             <div>
-              <h3 className="text-base font-black uppercase tracking-wide text-[color:var(--ink)]">My Locum Availability &amp; Rate Profile</h3>
+              <h3 className="text-base font-black uppercase tracking-wide text-[color:var(--ink)]">{tx('My Locum Availability & Rate Profile')}</h3>
               <p className="text-xs text-slate-600 mt-0.5">
-                Configure your preferred Malaysian states, clinical specialties, minimum rate, and availability dates so licensed hospitals can invite you.
+                {tx('Configure your preferred Malaysian states, clinical specialties, minimum rate, and availability dates so licensed hospitals can invite you.')}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -260,15 +266,15 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
               }`}>
                 <ShieldCheck className="h-3.5 w-3.5" />
                 {apc?.validUntil
-                  ? `Annual practising certificate: valid to ${apc.validUntil}${!apcValid ? ' (expired)' : ''}`
-                  : 'Annual practising certificate: no expiry date on your profile'}
+                  ? `${tx('Annual practising certificate: valid to {date}', { date: apc.validUntil })}${!apcValid ? ` (${tx('expired')})` : ''}`
+                  : tx('Annual practising certificate: no expiry date on your profile')}
               </span>
               <span className={`text-2xs font-mono font-black uppercase tracking-wider px-2.5 py-1 border ${
                 mine && form.visible
                   ? 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]'
                   : 'bg-slate-50 text-slate-600 border-slate-200'
               }`}>
-                {mine ? (form.visible ? 'Listed in Directory' : 'Hidden from Employers') : 'Not Listed Yet'}
+                {mine ? (form.visible ? tx('Listed in Directory') : tx('Hidden from Employers')) : tx('Not Listed Yet')}
               </span>
             </div>
           </div>
@@ -277,7 +283,7 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
           <fieldset className="border border-[color:var(--t-200)] bg-[color:var(--t-bg)] p-4 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <legend className="text-2xs font-black uppercase tracking-wider text-slate-600">
-                States I Can Work In ({form.states.length} of {MY_STATES.length} selected)
+                {tx('States I Can Work In ({n} of {total} selected)', { n: form.states.length, total: MY_STATES.length })}
               </legend>
               <div className="flex items-center gap-3 text-xs font-bold">
                 <button
@@ -285,7 +291,7 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
                   onClick={() => setForm({ ...form, states: ['Selangor', 'W.P. Kuala Lumpur', 'W.P. Putrajaya'] })}
                   className="text-[color:var(--t-700)] hover:underline cursor-pointer"
                 >
-                  Klang Valley
+                  {tx('Klang Valley')}
                 </button>
                 <span className="text-slate-300">&bull;</span>
                 <button
@@ -293,7 +299,7 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
                   onClick={() => setForm({ ...form, states: [...MY_STATES] })}
                   className="text-[color:var(--t-700)] hover:underline cursor-pointer"
                 >
-                  Select All
+                  {tx('Select All')}
                 </button>
                 <span className="text-slate-300">&bull;</span>
                 <button
@@ -333,20 +339,20 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
           {/* Row 2: Balanced 4-Column h-11 Rate, Specialties & Date Window Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             <div>
-              <label className={label}>Clinical Specialties (Comma-Separated)</label>
+              <label className={label}>{tx('Clinical Specialties (Comma-Separated)')}</label>
               <input
                 className={`${input} w-full`}
-                placeholder="Specialties (comma-separated)"
+                placeholder={tx('Specialties (comma-separated)')}
                 value={form.specialties}
                 onChange={e => setForm({ ...form, specialties: e.target.value })}
               />
             </div>
 
             <div>
-              <label className={label}>Minimum Locum Rate (MYR)</label>
+              <label className={label}>{tx('Minimum Locum Rate (MYR)')}</label>
               <div className="flex items-center gap-2">
                 <div className="flex-1 flex items-center border border-[color:var(--t-200)] bg-[color:var(--t-bg)] h-11 px-3 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors">
-                  <span className="text-2xs font-black uppercase tracking-wider text-slate-400 mr-2 shrink-0">RM</span>
+                  <span className="text-2xs font-black uppercase tracking-wider text-slate-400 mr-2 shrink-0">{tx('RM')}</span>
                   <input
                     className="w-full bg-transparent text-xs font-bold text-[color:var(--ink)] outline-none"
                     type="number"
@@ -362,16 +368,16 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
                   value={form.ratePeriod}
                   onChange={e => setForm({ ...form, ratePeriod: e.target.value })}
                 >
-                  <option value="hour">per hour</option>
-                  <option value="shift">per shift</option>
-                  <option value="day">per day</option>
-                  <option value="month">per month</option>
+                  <option value="hour">{tx('per hour')}</option>
+                  <option value="shift">{tx('per shift')}</option>
+                  <option value="day">{tx('per day')}</option>
+                  <option value="month">{tx('per month')}</option>
                 </select>
               </div>
             </div>
 
             <div>
-              <label className={label}>Available From</label>
+              <label className={label}>{tx('Available From')}</label>
               <input
                 className={`${input} w-full`}
                 type="date"
@@ -381,7 +387,7 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
             </div>
 
             <div>
-              <label className={label}>Available Until</label>
+              <label className={label}>{tx('Available Until')}</label>
               <input
                 className={`${input} w-full`}
                 type="date"
@@ -394,11 +400,11 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
           {/* Row 3: Shift Note + Employer Visibility + Action Button on One Unified Row */}
           <div className="flex flex-col lg:flex-row lg:items-end gap-4 pt-2 border-t border-[color:var(--t-100)]">
             <div className="flex-1">
-              <label className={label}>Shift Preferences &amp; Notes</label>
+              <label className={label}>{tx('Shift Preferences & Notes')}</label>
               <input
                 className={`${input} w-full`}
                 maxLength={400}
-                placeholder="Note (e.g. weekends and nights only)"
+                placeholder={tx('Note (e.g. weekends and nights only)')}
                 value={form.note}
                 onChange={e => setForm({ ...form, note: e.target.value })}
               />
@@ -412,14 +418,14 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
                   onChange={e => setForm({ ...form, visible: e.target.checked })}
                   className="h-4 w-4 accent-[color:var(--t-600)]"
                 />
-                <span>Show me to employers</span>
+                <span>{tx('Show me to employers')}</span>
               </label>
 
               <button
                 type="submit"
                 className="h-11 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold uppercase tracking-wider cursor-pointer transition-colors shadow-2xs"
               >
-                {mine ? 'Update' : 'List me for locum work'}
+                {mine ? tx('Update') : tx('List me for locum work')}
               </button>
             </div>
           </div>
@@ -436,7 +442,7 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
                 <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
-                  placeholder="Specialty"
+                  placeholder={tx('Specialty')}
                   value={f.specialty}
                   onChange={e => setF({ ...f, specialty: e.target.value })}
                 />
@@ -452,30 +458,30 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
               </div>
 
               <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-                <FilterSelect label="State" value={f.state} onChange={v => setF({ ...f, state: v })}>
-                  <option value="">Any state</option>
-                  {MY_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                <FilterSelect label={tx('State')} value={f.state} onChange={v => setF({ ...f, state: v })}>
+                  <option value="">{tx('Any state')}</option>
+                  {MY_STATES.map(s => <option key={s} value={s}>{tx(s)}</option>)}
                 </FilterSelect>
 
-                <FilterSelect label="Role" value={f.role} onChange={v => setF({ ...f, role: v })}>
-                  <option value="">Doctors and nurses</option>
-                  <option value="doctor">Doctors</option>
-                  <option value="nurse">Nurses</option>
+                <FilterSelect label={tx('Role')} value={f.role} onChange={v => setF({ ...f, role: v })}>
+                  <option value="">{tx('Doctors and nurses')}</option>
+                  <option value="doctor">{tx('Doctors')}</option>
+                  <option value="nurse">{tx('Nurses')}</option>
                 </FilterSelect>
 
                 <label className="flex items-center gap-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-3 h-11 shrink-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors">
-                  <span className="text-2xs font-black uppercase tracking-widest text-slate-400 shrink-0">Max RM:</span>
+                  <span className="text-2xs font-black uppercase tracking-widest text-slate-400 shrink-0">{tx('Max RM:')}</span>
                   <input
                     className="w-20 bg-transparent text-xs font-bold text-[color:var(--ink)] outline-none"
                     type="number"
-                    placeholder="Max RM rate"
+                    placeholder={tx('Max RM rate')}
                     value={f.maxRate}
                     onChange={e => setF({ ...f, maxRate: e.target.value })}
                   />
                 </label>
 
                 <label className="flex items-center gap-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-3 h-11 shrink-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors">
-                  <span className="text-2xs font-black uppercase tracking-widest text-slate-400 shrink-0">Free on:</span>
+                  <span className="text-2xs font-black uppercase tracking-widest text-slate-400 shrink-0">{tx('Free on:')}</span>
                   <input
                     className="bg-transparent text-xs font-bold text-[color:var(--ink)] outline-none"
                     type="date"
@@ -488,7 +494,7 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
 
             <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[color:var(--t-100)]">
               <span className="text-xs font-bold text-slate-600 tabular-nums">
-                Available locums: Showing <strong className="font-black text-[color:var(--ink)]">{list.length}</strong> verified practitioner{list.length === 1 ? '' : 's'}
+                {tx('Available locums: Showing')} <strong className="font-black text-[color:var(--ink)]">{list.length}</strong> {tx(list.length === 1 ? 'verified practitioner' : 'verified practitioners')}
               </span>
               {hasLocumFilters && (
                 <button
@@ -496,7 +502,7 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
                   onClick={() => setF({ state: '', role: '', specialty: '', maxRate: '', date: '' })}
                   className="text-xs font-bold text-[color:var(--t-700)] hover:text-[color:var(--dark)] underline underline-offset-2 cursor-pointer"
                 >
-                  Reset Filters
+                  {tx('Reset Filters')}
                 </button>
               )}
             </div>
@@ -504,8 +510,8 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
 
           {list.length === 0 ? (
             <div className="bg-white border border-[color:var(--t-200)] p-10 text-center space-y-2">
-              <p className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)]">No locums match</p>
-              <p className="text-xs text-slate-500">Only verified practitioners with a valid annual practising certificate are listed.</p>
+              <p className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)]">{tx('No locums match')}</p>
+              <p className="text-xs text-slate-500">{tx('Only verified practitioners with a valid annual practising certificate are listed.')}</p>
             </div>
           ) : (
             <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -561,20 +567,20 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
                           required
                           minLength={10}
                           maxLength={500}
-                          placeholder="Describe the cover you need"
+                          placeholder={tx('Describe the cover you need')}
                           value={inv.message}
                           onChange={e => setInv({ ...inv, message: e.target.value })}
                         />
                         <select className={`${input} w-full`} value={inv.jobId} onChange={e => setInv({ ...inv, jobId: e.target.value })}>
-                          <option value="">Not linked to a listing</option>
+                          <option value="">{tx('Not linked to a listing')}</option>
                           {jobs.map(j => <option key={j.id} value={j.id}>{j.title} · {j.hospitalName}</option>)}
                         </select>
                         <div className="flex gap-2">
                           <button className="flex-1 h-9 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer">
-                            Send invitation
+                            {tx('Send invitation')}
                           </button>
                           <button type="button" className="h-9 px-3 border border-[color:var(--t-200)] bg-white text-slate-700 font-bold cursor-pointer" onClick={() => setInviting(null)}>
-                            Cancel
+                            {tx('Cancel')}
                           </button>
                         </div>
                       </form>
@@ -585,7 +591,7 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
                         onClick={() => setInviting(l.profileId)}
                       >
                         <Send className="h-3.5 w-3.5" />
-                        <span>Invite</span>
+                        <span>{tx('Invite')}</span>
                       </button>
                     )}
                   </div>
@@ -595,7 +601,7 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
           )}
         </section>
       )}
-      {list === null && role !== 'practitioner' && <p className="text-slate-500">Only facility staff and admins can browse locums.</p>}
+      {list === null && role !== 'practitioner' && <p className="text-slate-500">{tx('Only facility staff and admins can browse locums.')}</p>}
     </div>
   );
 }

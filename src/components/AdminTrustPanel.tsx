@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Check, X, MessageSquareWarning, ShieldOff, ShieldCheck, History, Download } from 'lucide-react';
+import { useTr } from '../locale';
 
 const post = (url: string, body: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json());
@@ -8,6 +9,7 @@ const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() :
 
 // ───────── Decision controls shown in the application review modal ─────────
 export function ReviewActions({ request, onDone }: { request: any; onDone: () => void }) {
+  const tx = useTr();
   const [note, setNote] = useState('');
   const [registryReference, setRegistryReference] = useState('');
   const [busy, setBusy] = useState(false);
@@ -33,9 +35,9 @@ export function ReviewActions({ request, onDone }: { request: any; onDone: () =>
     try {
       const d = await post(`/api/verification-requests/${request.id}/decision`, { decision, note, registryReference });
       if (d.status === 'success') onDone();
-      else setError(d.message || 'Could not record the decision.');
+      else setError(d.message || tx('Could not record the decision.'));
     } catch {
-      setError('Server connection error.');
+      setError(tx('Server connection error.'));
     } finally {
       setBusy(false);
     }
@@ -59,19 +61,19 @@ export function ReviewActions({ request, onDone }: { request: any; onDone: () =>
       )}
 
       <div>
-        <label className="text-xs font-black uppercase text-slate-600 block mb-1.5 tracking-wider">Council register check (required to approve)</label>
+        <label className="text-xs font-black uppercase text-slate-600 block mb-1.5 tracking-wider">{tx('Council register check (required to approve)')}</label>
         {registry && (
           <p className="text-xs text-slate-600 font-semibold mb-1.5 bg-slate-50 border border-slate-200 p-2">
             <b>{registry.name}</b>: {registry.lookup.note}
-            {registry.lookup.url && <> <a href={registry.lookup.url} target="_blank" rel="noopener noreferrer" className="underline text-[color:var(--t-600)]">Open register</a></>}
+            {registry.lookup.url && <> <a href={registry.lookup.url} target="_blank" rel="noopener noreferrer" className="underline text-[color:var(--t-600)]">{tx('Open register')}</a></>}
             {registry.lookup.contact && <> · Contact: {registry.lookup.contact}</>}
           </p>
         )}
         <input className={field} value={registryReference} onChange={e => setRegistryReference(e.target.value)}
-          placeholder="e.g. MMC online register, checked today, ref / URL" maxLength={200} />
+          placeholder={tx('e.g. MMC online register, checked today, ref / URL')} maxLength={200} />
       </div>
       <div>
-        <label className="text-xs font-black uppercase text-slate-600 block mb-1.5 tracking-wider">Note to practitioner (required to reject or request more information)</label>
+        <label className="text-xs font-black uppercase text-slate-600 block mb-1.5 tracking-wider">{tx('Note to practitioner (required to reject or request more information)')}</label>
         <textarea className={field} rows={2} value={note} onChange={e => setNote(e.target.value)} maxLength={1000} />
       </div>
       {error && <p className="text-xs font-bold text-rose-800 bg-rose-50 border border-rose-200 rounded-none p-2.5">{error}</p>}
@@ -82,7 +84,7 @@ export function ReviewActions({ request, onDone }: { request: any; onDone: () =>
         </button>
         <button disabled={busy} onClick={() => decide('request_info')}
           className="h-10 px-4 bg-white border border-amber-300 hover:bg-amber-50 text-amber-800 text-xs font-bold uppercase tracking-wider rounded-none cursor-pointer disabled:opacity-60 transition-all">
-          Request more info
+          {tx('Request more info')}
         </button>
         <button disabled={busy} onClick={() => decide('approve')}
           className="h-10 px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] active:bg-[color:var(--t-800)] border border-[color:var(--t-700)] text-white text-xs font-bold uppercase tracking-wider rounded-none flex items-center gap-1.5 cursor-pointer disabled:opacity-60 transition-all shadow-none">
@@ -113,6 +115,7 @@ export interface AdminTrustPanelProps {
 
 // ───────── Trust tab: practitioners (suspend/reinstate) and complaints ─────────
 export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole = 'registrar', currentUser }: AdminTrustPanelProps) {
+  const tx = useTr();
   const [practitioners, setPractitioners] = useState<any[]>([]);
   const [complaints, setComplaints] = useState<any[]>([]);
   const [sanctions, setSanctions] = useState<any[]>([]);
@@ -131,12 +134,12 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
     if (c.status === 'success') setComplaints(c.data);
     if (s.status === 'success') setSanctions(s.data);
   };
-  useEffect(() => { load().catch(() => setError('Could not load data.')); }, []);
+  useEffect(() => { load().catch(() => setError(tx('Could not load data.'))); }, []);
 
   const act = async (fn: () => Promise<any>) => {
     setError('');
     const d = await fn();
-    if (d.status !== 'success') setError(d.message || 'Action failed.');
+    if (d.status !== 'success') setError(d.message || tx('Action failed.'));
     await load();
     onChanged();
   };
@@ -155,7 +158,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
   };
 
   const handleDismissSanction = async (sanctionId: string) => {
-    if (window.confirm('Dismiss this proposed disciplinary sanction?')) {
+    if (window.confirm(tx('Dismiss this proposed disciplinary sanction?'))) {
       await act(() => post(`/api/admin/sanctions/${sanctionId}/dismiss`, {}));
     }
   };
@@ -166,7 +169,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
     if (outcome !== 'investigating') {
       resolution = window.prompt(`Resolution note for the ${outcome} outcome:`) || '';
       if (!resolution) return;
-      if (outcome === 'upheld') suspendToo = window.confirm('Also suspend this practitioner now?');
+      if (outcome === 'upheld') suspendToo = window.confirm(tx('Also suspend this practitioner now?'));
     }
     act(() => post(`/api/complaints/${c.id}/resolve`, { outcome, resolution, suspend: suspendToo }));
   };
@@ -183,7 +186,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
       `"${fmt(p.licenseExpiry)}"`,
       `"${fmt(p.verifiedUntil)}"`,
       `"${(p.verificationStatus || '').replace(/"/g, '""')}"`,
-      `"${(p.flag ? (FLAG_LABEL[p.flag]?.text || p.flag) : (p.verificationStatus === 'Suspended' ? 'Suspended' : 'Normal')).replace(/"/g, '""')}"`,
+      `"${(p.flag ? (FLAG_LABEL[p.flag]?.text || p.flag) : (p.verificationStatus === 'Suspended' ? tx('Suspended') : tx('Normal'))).replace(/"/g, '""')}"`,
     ]);
     const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     const encodedUri = encodeURI(csvContent);
@@ -203,7 +206,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
         <section className="bg-white border border-[color:var(--t-200)] rounded-none p-5 shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-150 pb-3">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-bold flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-amber-600" /> Licence & re-verification watchlist</h3>
+            <h3 className="text-sm font-bold flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-amber-600" /> {tx('Licence & re-verification watchlist')}</h3>
             <span className="text-xs font-bold text-slate-500">({shown.length})</span>
           </div>
           <div className="flex items-center gap-2">
@@ -211,24 +214,24 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
               type="button"
               onClick={exportTrustCsv}
               className="h-8 px-3 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider rounded-none flex items-center gap-1.5 cursor-pointer shadow-none transition-colors"
-              title="Export compliance watchlist to CSV"
+              title={tx('Export compliance watchlist to CSV')}
             >
               <Download className="h-3.5 w-3.5 text-slate-500" />
-              <span>Export CSV</span>
+              <span>{tx('Export CSV')}</span>
             </button>
             <div className="flex gap-1 bg-slate-100 p-1 rounded-none text-xs font-bold border border-slate-200">
               {(['attention', 'all'] as const).map(f => (
                 <button key={f} onClick={() => setFilter(f)} className={`px-3 py-1 rounded-none cursor-pointer border ${filter === f ? 'bg-white text-[color:var(--t-700)] border-[color:var(--t-200)] shadow-xs' : 'text-slate-500 border-transparent'}`}>
-                  {f === 'attention' ? 'Needs attention' : 'Everyone'}
+                  {f === 'attention' ? tx('Needs attention') : tx('Everyone')}
                 </button>
               ))}
             </div>
           </div>
         </div>
-        {shown.length === 0 ? <p className="text-xs text-slate-500">Nobody needs attention.</p> : (
+        {shown.length === 0 ? <p className="text-xs text-slate-500">{tx('Nobody needs attention.')}</p> : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead><tr className="text-left text-xs uppercase text-slate-500"><th className="py-2 pr-3">Practitioner</th><th className="pr-3">Licence</th><th className="pr-3">Expiry</th><th className="pr-3">Verified until</th><th className="pr-3">Status</th><th /></tr></thead>
+              <thead><tr className="text-left text-xs uppercase text-slate-500"><th className="py-2 pr-3">{tx('Practitioner')}</th><th className="pr-3">{tx('Licence')}</th><th className="pr-3">{tx('Expiry')}</th><th className="pr-3">{tx('Verified until')}</th><th className="pr-3">{tx('Status')}</th><th /></tr></thead>
               <tbody>
                 {shown.map(p => (
                   <tr key={p.id} className="border-t border-slate-100">
@@ -238,14 +241,14 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
                     <td className="pr-3">{fmt(p.verifiedUntil)}</td>
                     <td className="pr-3">
                       <span className="font-bold">{p.verificationStatus}</span>
-                      {p.flag && <span className={`ml-1.5 px-1.5 py-0.5 rounded-none text-2xs font-bold ${FLAG_LABEL[p.flag].cls}`}>{FLAG_LABEL[p.flag].text}</span>}
+                      {p.flag && <span className={`ml-1.5 px-1.5 py-0.5 rounded-none text-2xs font-bold ${FLAG_LABEL[p.flag].cls}`}>{tx(FLAG_LABEL[p.flag].text)}</span>}
                       {p.suspensionReason && <span className="block text-slate-500">{p.suspensionReason}</span>}
                     </td>
                     <td className="text-right">
                       {p.verificationStatus === 'Suspended'
-                        ? <button onClick={() => act(() => post(`/api/professionals/${p.id}/reinstate`, {}))} className="inline-flex items-center gap-1 text-emerald-700 font-bold cursor-pointer"><ShieldCheck className="h-3.5 w-3.5" />Reinstate</button>
+                        ? <button onClick={() => act(() => post(`/api/professionals/${p.id}/reinstate`, {}))} className="inline-flex items-center gap-1 text-emerald-700 font-bold cursor-pointer"><ShieldCheck className="h-3.5 w-3.5" />{tx('Reinstate')}</button>
                         : p.verificationStatus.startsWith('Verified')
-                          ? <button onClick={() => handleOpenSanctionDrawer(p)} className="inline-flex items-center gap-1 text-rose-700 font-bold hover:text-rose-800 cursor-pointer"><ShieldOff className="h-3.5 w-3.5" />Sanction Order</button>
+                          ? <button onClick={() => handleOpenSanctionDrawer(p)} className="inline-flex items-center gap-1 text-rose-700 font-bold hover:text-rose-800 cursor-pointer"><ShieldOff className="h-3.5 w-3.5" />{tx('Sanction Order')}</button>
                           : null}
                     </td>
                   </tr>
@@ -267,13 +270,13 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
               </span>
               <div>
                 <h3 className="text-sm font-black text-amber-950 uppercase tracking-tight flex items-center gap-2">
-                  Dual-Signoff Disciplinary Sanctions Pending Countersignature
+                  {tx('Dual-Signoff Disciplinary Sanctions Pending Countersignature')}
                   <span className="px-2 py-0.5 text-2xs font-black uppercase bg-amber-600 text-white">
                     {sanctions.filter(s => s.status === 'pending_countersign').length} Pending
                   </span>
                 </h3>
                 <p className="text-xs text-amber-800 font-semibold">
-                  Medical Act 1971 (Section 29) · Requires two distinct administrative officers or super_admin to execute formal suspension.
+                  {tx('Medical Act 1971 (Section 29) · Requires two distinct administrative officers or super_admin to execute formal suspension.')}
                 </p>
               </div>
             </div>
@@ -298,7 +301,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
                       </span>
                     </div>
                     <p className="text-xs text-slate-700 font-semibold">
-                      <strong>Statutory Basis:</strong> {s.statutory_basis}
+                      <strong>{tx('Statutory Basis:')}</strong> {s.statutory_basis}
                     </p>
                     <p className="text-xs text-slate-600 italic">
                       "{s.reason}"
@@ -320,7 +323,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
                       type="button"
                       disabled={!canCountersign || countersigningId === s.id}
                       onClick={() => handleCountersignSanction(s.id)}
-                      title={!canCountersign ? "Four-Eyes Principle: Cannot countersign your own order without super_admin authority" : "Confirm and enforce statutory suspension"}
+                      title={!canCountersign ? tx('Four-Eyes Principle: Cannot countersign your own order without super_admin authority') : tx('Confirm and enforce statutory suspension')}
                       className={`px-4 py-1.5 text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 transition-colors cursor-pointer rounded-none shadow-xs ${
                         canCountersign
                           ? 'bg-rose-700 hover:bg-rose-800 text-white'
@@ -328,11 +331,11 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
                       }`}
                     >
                       {countersigningId === s.id ? (
-                        <span>Enforcing...</span>
+                        <span>{tx('Enforcing...')}</span>
                       ) : (
                         <>
                           <ShieldCheck className="h-3.5 w-3.5" />
-                          <span>Countersign &amp; Enforce</span>
+                          <span>{tx('Countersign & Enforce')}</span>
                         </>
                       )}
                     </button>
@@ -347,7 +350,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
       {(!activeSub || activeSub === 'complaints') && (
         <section className="bg-white border border-[color:var(--t-200)] rounded-none p-5 shadow-xs space-y-3">
           <h3 className="text-sm font-bold flex items-center gap-2"><MessageSquareWarning className="h-4 w-4 text-[color:var(--t-600)]" /> Patient complaints ({openComplaints.length} open)</h3>
-          {complaints.length === 0 ? <p className="text-xs text-slate-500">No complaints have been filed.</p> : (
+          {complaints.length === 0 ? <p className="text-xs text-slate-500">{tx('No complaints have been filed.')}</p> : (
             <ul className="space-y-3">
               {complaints.map(c => (
                 <li key={c.id} className="border border-slate-200 rounded-none p-3 text-xs space-y-1.5 bg-white">
@@ -359,9 +362,9 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
                   <p className="text-slate-400">From {c.complainantName || 'patient'} · {fmt(c.created_at)}{c.resolution ? ` · Resolution: ${c.resolution}` : ''}</p>
                   {(c.status === 'open' || c.status === 'investigating') && (
                     <div className="flex gap-3 pt-1 font-bold">
-                      {c.status === 'open' && <button onClick={() => resolve(c, 'investigating')} className="text-amber-700 cursor-pointer">Start investigation</button>}
-                      <button onClick={() => resolve(c, 'upheld')} className="text-rose-700 cursor-pointer">Uphold</button>
-                      <button onClick={() => resolve(c, 'dismissed')} className="text-slate-600 cursor-pointer">Dismiss</button>
+                      {c.status === 'open' && <button onClick={() => resolve(c, 'investigating')} className="text-amber-700 cursor-pointer">{tx('Start investigation')}</button>}
+                      <button onClick={() => resolve(c, 'upheld')} className="text-rose-700 cursor-pointer">{tx('Uphold')}</button>
+                      <button onClick={() => resolve(c, 'dismissed')} className="text-slate-600 cursor-pointer">{tx('Dismiss')}</button>
                     </div>
                   )}
                 </li>

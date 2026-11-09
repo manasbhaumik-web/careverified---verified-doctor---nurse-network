@@ -15,7 +15,7 @@ import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, Fi
 import PatientRecords, { RecordSubTab } from './PatientRecords';
 import SavedTab from './patient/SavedTab';
 import PaymentDialog from './PaymentDialog';
-import { formatMoney, formatDate } from '../locale';
+import { formatMoney, formatDate, useTr } from '../locale';
 import ConsultNow from './ConsultNow';
 import SecureMessenger from './SecureMessenger';
 import MedicalPackagesModule from './MedicalPackagesModule';
@@ -157,6 +157,7 @@ export default function PatientDashboard({
   bookings, setBookings, professionals, onSelectProfessional, onNavigateToMessages, onConsultNow, onOpenArticle, onFindDoctors, onOpenTriage, onOpenPharmacies, onOpenHelp, activeGroup, initialTab, currentUser, articles,
   selectedSpecialtyFilter, onSelectSpecialtyFilter, onClearSpecialtyFilter,
 }: PatientDashboardProps) {
+  const tx = useTr();
   const currentGroup: PatientTabGroup = activeGroup || (
     initialTab ? (
       (['records', 'prescriptions', 'certs', 'labs'].includes(initialTab)) ? 'records' :
@@ -254,7 +255,7 @@ export default function PatientDashboard({
   const userName = currentUser?.name || patientUser?.name || 'there';
   const userAvatar = currentUser?.avatarUrl || patientUser?.avatarUrl || '/assets/patient_female_malay.jpg';
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const greeting = hour < 12 ? tx('Good morning') : hour < 18 ? tx('Good afternoon') : tx('Good evening');
 
   // Load Primary Records Data
   const loadSummary = useCallback(async () => {
@@ -358,22 +359,22 @@ export default function PatientDashboard({
   })();
 
   const cancelBooking = async (b: Booking) => {
-    if (!window.confirm('Cancel this appointment?')) return;
+    if (!window.confirm(tx('Cancel this appointment?'))) return;
     const d = await fetch(`/api/bookings/${b.id}/cancel`, { method: 'POST' }).then(r => r.json()).catch(() => null);
     if (d?.status === 'success') {
       setBookings(prev => prev.map(x => (x.id === b.id ? d.data : x)));
       setMsg(d.message);
-    } else setMsg(d?.message || 'Could not cancel.');
+    } else setMsg(d?.message || tx('Could not cancel.'));
   };
 
   const cancelActiveConsult = async (id: string) => {
-    if (!window.confirm('Cancel this consultation request and receive an immediate refund?')) return;
+    if (!window.confirm(tx('Cancel this consultation request and receive an immediate refund?'))) return;
     const d = await fetch(`/api/consults/${id}/end`, { method: 'POST' }).then(r => r.json()).catch(() => null);
     if (d?.status === 'success') {
-      setMsg('Consultation request cancelled. Refund processed automatically.');
+      setMsg(tx('Consultation request cancelled. Refund processed automatically.'));
       loadClinicalIntegrations();
     } else {
-      setMsg(d?.message || 'Failed to cancel consultation.');
+      setMsg(d?.message || tx('Failed to cancel consultation.'));
     }
   };
 
@@ -416,17 +417,17 @@ export default function PatientDashboard({
       });
       const data = await resp.json();
       if (data.status === 'success') {
-        setDispatchResult({ ok: true, text: data.message || 'Prescription transferred to pharmacy.' });
+        setDispatchResult({ ok: true, text: data.message || tx('Prescription transferred to pharmacy.') });
         loadSummary();
         setTimeout(() => {
           setDispatchingRx(null);
           setDispatchResult(null);
         }, 1500);
       } else {
-        setDispatchResult({ ok: false, text: data.message || 'Could not transfer prescription.' });
+        setDispatchResult({ ok: false, text: data.message || tx('Could not transfer prescription.') });
       }
     } catch {
-      setDispatchResult({ ok: false, text: 'Server connection error.' });
+      setDispatchResult({ ok: false, text: tx('Server connection error.') });
     } finally {
       setDispatchBusy(false);
     }
@@ -445,11 +446,11 @@ export default function PatientDashboard({
           if (onOpenHelp) onOpenHelp();
           else window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
         }}
-        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
-        title="Patient Help & Concierge Support Desk"
+        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
+        title={tx('Patient Help & Concierge Support Desk')}
       >
         <LifeBuoy className="h-4 w-4 text-slate-500" />
-        <span className="whitespace-nowrap font-medium sm:font-semibold">Help & Support</span>
+        <span className="whitespace-nowrap font-medium sm:font-semibold">{tx('Help & Support')}</span>
         {openTickets.length > 0 && (
           <span className="tabular-nums text-2xs min-w-[18px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
             {openTickets.length}
@@ -468,11 +469,11 @@ export default function PatientDashboard({
         greeting={greeting}
         groupName={PATIENT_GROUPS[currentGroup].name}
         upcomingCount={upcoming.length}
-        nextVisitText={upcoming[0] ? `Next Visit: ${upcoming[0].professionalName}, ${upcoming[0].date}` : 'No upcoming consultations'}
+        nextVisitText={upcoming[0] ? tx('Next Visit: {name}, {date}', { name: upcoming[0].professionalName, date: upcoming[0].date }) : tx('No upcoming consultations')}
         activeRxCount={summary?.activeRx ?? '–'}
         careTeamCount={careTeam.length}
         bpSummary={summary?.bp}
-        tabs={PATIENT_GROUPS[currentGroup].tabs.map(t => {
+        tabs={PATIENT_GROUPS[currentGroup].tabs.map(tab => ({ ...tab, label: tx(tab.label) })).map(t => {
           if (t.id === 'appointments') return { ...t, count: upcoming.length };
           if (t.id === 'prescriptions') return { ...t, count: activePrescriptions.length || undefined };
           if (t.id === 'saved') return { ...t, count: savedIds.length };
@@ -487,7 +488,7 @@ export default function PatientDashboard({
           if (t === 'labs') setLabsSubTab('labs');
           if (t === 'consult') setConsultSubTab('instant');
         }}
-        tabsLabel={`${PATIENT_GROUPS[currentGroup].name} sections`}
+        tabsLabel={tx('{name} sections', { name: tx(PATIENT_GROUPS[currentGroup].name) })}
         onOpenHelp={onOpenHelp}
         openTicketsCount={openTickets.length}
         onConsultNow={onConsultNow}
@@ -515,7 +516,7 @@ export default function PatientDashboard({
             className="text-xs font-bold text-[color:var(--t-600)] hover:text-white hover:bg-[color:var(--t-600)] px-3 py-1 bg-white border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer shrink-0"
             onClick={() => setMsg(null)}
           >
-            Dismiss
+            {tx('Dismiss')}
           </button>
         </div>
       )}
@@ -526,10 +527,10 @@ export default function PatientDashboard({
           {/* INNER WORKSPACE HEADER TITLE SECTION */}
           <WorkspaceHeader
             icon={Calendar}
-            eyebrow="My Care · Clinical Encounters"
-            title="Appointments & Consultation Visits"
-            description="Manage your upcoming confirmed visits, instant video consult rooms, and clinical consultation history archive."
-            badges={<BannerBadge tone="brand">MOH Protocol</BannerBadge>}
+            eyebrow={tx('My Care · Clinical Encounters')}
+            title={tx('Appointments & Consultation Visits')}
+            description={tx('Manage your upcoming confirmed visits, instant video consult rooms, and clinical consultation history archive.')}
+            badges={<BannerBadge tone="brand">{tx('MOH Protocol')}</BannerBadge>}
             aside={
               <div className="flex flex-wrap items-center gap-2">
                 {onFindDoctors && (
@@ -539,15 +540,15 @@ export default function PatientDashboard({
                     className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                   >
                     <Calendar className="h-3.5 w-3.5" />
-                    <span>Schedule Doctor Visit</span>
+                    <span>{tx('Schedule Doctor Visit')}</span>
                   </button>
                 )}
               </div>
             }
             tabs={[
-              { id: 'all', label: 'All Encounters', count: bookings.length },
-              { id: 'upcoming', label: 'Upcoming Visits', count: upcoming.length },
-              { id: 'past', label: 'Consultation Archive', count: past.length },
+              { id: 'all', label: tx('All Encounters'), count: bookings.length },
+              { id: 'upcoming', label: tx('Upcoming Visits'), count: upcoming.length },
+              { id: 'past', label: tx('Consultation Archive'), count: past.length },
             ]}
             activeTab={appointmentsSubTab}
             onTabChange={setAppointmentsSubTab}
@@ -556,7 +557,7 @@ export default function PatientDashboard({
           {/* LIVE ON-CALL CONSULTATION BANNER (Rendered if patient has an active/queued instant consult) */}
           {activeConsult && (
             <section
-              aria-label="Active live consultation status"
+              aria-label={tx('Active live consultation status')}
               className="bg-emerald-50/90 border-l-4 border-l-emerald-600 border-t border-r border-b border-emerald-200 p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4"
             >
               <div className="flex items-start gap-3.5 min-w-0">
@@ -567,21 +568,21 @@ export default function PatientDashboard({
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-2xs font-mono font-black uppercase tracking-wider px-2 py-0.5 bg-emerald-600 text-white">
                       {activeConsult.status === 'active'
-                        ? 'Live Room Open'
+                        ? tx('Live Room Open')
                         : activeConsult.status === 'queued'
-                        ? 'In Triage Queue'
-                        : 'Awaiting Payment'}
+                        ? tx('In Triage Queue')
+                        : tx('Awaiting Payment')}
                     </span>
                     <h3 className="font-display font-black text-sm sm:text-base text-emerald-950">
                       {activeConsult.status === 'active'
-                        ? 'Your On-Call Doctor has joined the Video Room'
-                        : 'Instant Telehealth Consultation in Progress'}
+                        ? tx('Your On-Call Doctor has joined the Video Room')
+                        : tx('Instant Telehealth Consultation in Progress')}
                     </h3>
                   </div>
                   <p className="text-xs text-emerald-900 font-medium mt-1">
                     {activeConsult.symptoms
-                      ? `Chief complaint: “${activeConsult.symptoms}”`
-                      : 'Encrypted WebRTC audio/video consultation room ready.'}
+                      ? tx('Chief complaint: “{text}”', { text: activeConsult.symptoms })
+                      : tx('Encrypted WebRTC audio/video consultation room ready.')}
                   </p>
                 </div>
               </div>
@@ -595,7 +596,7 @@ export default function PatientDashboard({
                   className="min-h-[38px] px-4 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
                 >
                   <Video className="h-3.5 w-3.5" />
-                  <span>Enter Consultation Room</span>
+                  <span>{tx('Enter Consultation Room')}</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </button>
                 <button
@@ -603,7 +604,7 @@ export default function PatientDashboard({
                   onClick={() => cancelActiveConsult(activeConsult.id)}
                   className="min-h-[38px] px-3 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-emerald-200 text-xs font-bold transition-colors cursor-pointer"
                 >
-                  Cancel Request
+                  {tx('Cancel Request')}
                 </button>
               </div>
             </section>
@@ -611,7 +612,7 @@ export default function PatientDashboard({
 
           {/* TIER 1: UPCOMING SCHEDULED CONSULTATIONS (Shown in 'all' and 'upcoming' sub-tabs) */}
           {(appointmentsSubTab === 'all' || appointmentsSubTab === 'upcoming') && (
-            <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6" aria-label="Upcoming appointments">
+            <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6" aria-label={tx('Upcoming appointments')}>
               <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-3.5 border-b border-[color:var(--t-100)]">
                 <div className="flex items-center gap-2.5">
                   <span className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shadow-2xs">
@@ -620,14 +621,14 @@ export default function PatientDashboard({
                   <div>
                     <div className="flex items-center gap-2">
                       <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
-                        Upcoming Consultations
+                        {tx('Upcoming Consultations')}
                       </h2>
                       <span className="text-2xs font-mono font-extrabold bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-2 py-0.5">
-                        {upcoming.length} Scheduled
+                        {tx('{n} Scheduled', { n: upcoming.length })}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 font-medium mt-0.5">
-                      Confirmed visits, video consult rooms, and scheduled clinic appointments
+                      {tx('Confirmed visits, video consult rooms, and scheduled clinic appointments')}
                     </p>
                   </div>
                 </div>
@@ -639,7 +640,7 @@ export default function PatientDashboard({
                       onClick={() => setAppointmentsSubTab('past')}
                       className="text-xs font-bold text-slate-600 hover:text-[color:var(--t-600)] cursor-pointer"
                     >
-                      View Archive ({past.length})
+                      {tx('View Archive ({n})', { n: past.length })}
                     </button>
                   )}
                   {onFindDoctors && (
@@ -648,7 +649,7 @@ export default function PatientDashboard({
                       onClick={onFindDoctors}
                       className="text-xs font-bold text-[color:var(--t-600)] hover:underline flex items-center gap-1 cursor-pointer"
                     >
-                      <Search className="h-3.5 w-3.5" /> Book Another Doctor
+                      <Search className="h-3.5 w-3.5" /> {tx('Book Another Doctor')}
                     </button>
                   )}
                 </div>
@@ -660,10 +661,10 @@ export default function PatientDashboard({
                     <Calendar className="h-6 w-6 text-[color:var(--t-600)]" />
                   </div>
                   <h3 className="font-display font-black text-sm text-[color:var(--ink)] mb-1">
-                    No Consultations Currently Scheduled
+                    {tx('No Consultations Currently Scheduled')}
                   </h3>
                   <p className="text-xs text-slate-600 max-w-md font-medium leading-relaxed mb-6">
-                    Maintain your proactive care schedule. Connect immediately with an on-call triage doctor or book a future consultation with a council-verified practitioner.
+                    {tx('Maintain your proactive care schedule. Connect immediately with an on-call triage doctor or book a future consultation with a council-verified practitioner.')}
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-3">
                     <button
@@ -672,7 +673,7 @@ export default function PatientDashboard({
                       className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer"
                     >
                       <Video className="h-4 w-4" />
-                      <span>Consult On-Call Doctor Now</span>
+                      <span>{tx('Consult On-Call Doctor Now')}</span>
                     </button>
                     {onFindDoctors && (
                       <button
@@ -681,7 +682,7 @@ export default function PatientDashboard({
                         className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] border border-[color:var(--t-200)] text-xs font-bold shadow-2xs transition-all cursor-pointer"
                       >
                         <Search className="h-4 w-4 text-[color:var(--t-600)]" />
-                        <span>Browse Medical Registry</span>
+                        <span>{tx('Browse Medical Registry')}</span>
                       </button>
                     )}
                     {onOpenTriage && (
@@ -691,7 +692,7 @@ export default function PatientDashboard({
                         className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] border border-[color:var(--t-200)] text-xs font-bold shadow-2xs transition-all cursor-pointer"
                       >
                         <Sparkles className="h-4 w-4 text-[color:var(--t-600)]" />
-                        <span>Check Symptoms</span>
+                        <span>{tx('Check Symptoms')}</span>
                       </button>
                     )}
                   </div>
@@ -733,26 +734,26 @@ export default function PatientDashboard({
                               </button>
                               <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
                                 <ShieldCheck className="h-3 w-3 text-emerald-600" />
-                                {isNurse ? 'LJM Board Verified' : 'MMC Council Verified'}
+                                {isNurse ? tx('LJM Board Verified') : tx('MMC Council Verified')}
                               </span>
                               {isVideo ? (
                                 <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> WebRTC Audio/Video Encrypted
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> {tx('WebRTC Audio/Video Encrypted')}
                                 </span>
                               ) : isHomeVisit ? (
                                 <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-cyan-800 bg-cyan-50 border border-cyan-200 px-2 py-0.5">
-                                  <MapPin className="h-3 w-3 text-cyan-600" /> Home Care Visit
+                                  <MapPin className="h-3 w-3 text-cyan-600" /> {tx('Home Care Visit')}
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5">
-                                  <MapPin className="h-3 w-3 text-slate-600" /> In-Clinic Consultation
+                                  <MapPin className="h-3 w-3 text-slate-600" /> {tx('In-Clinic Consultation')}
                                 </span>
                               )}
                             </div>
 
                             {/* Specialty & Location Subtitle */}
                             <p className="text-xs font-bold text-[color:var(--t-700)] mt-0.5">
-                              {prof?.specialization || 'General Practice & Primary Care'}
+                              {prof?.specialization ? tx(prof.specialization) : tx('General Practice & Primary Care')}
                               {prof?.city ? <span className="text-slate-500 font-medium"> · {prof.city}</span> : null}
                             </p>
 
@@ -772,7 +773,7 @@ export default function PatientDashboard({
                                 ) : (
                                   <MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                                 )}
-                                {b.mode}
+                                {tx(String(b.mode))}
                               </span>
                               <span className="text-slate-300">&bull;</span>
                               <span className="font-mono font-bold text-[color:var(--t-700)]">
@@ -782,12 +783,12 @@ export default function PatientDashboard({
                               {isPending ? (
                                 <span className="inline-flex items-center gap-1 text-2xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5">
                                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
-                                  Awaiting Payment
+                                  {tx('Awaiting Payment')}
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 text-2xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
                                   <CheckCircle2 className="h-3 w-3 text-emerald-600" />
-                                  Confirmed &amp; Paid
+                                  {tx('Confirmed & Paid')}
                                 </span>
                               )}
                             </div>
@@ -802,7 +803,7 @@ export default function PatientDashboard({
                               onClick={() => setPaying(b)}
                               className="min-h-[40px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
                             >
-                              <span>Pay {formatMoney(b.fee)}</span>
+                              <span>{tx('Pay {amount}', { amount: formatMoney(b.fee) })}</span>
                               <ArrowRight className="h-3.5 w-3.5" />
                             </button>
                           ) : (
@@ -817,7 +818,7 @@ export default function PatientDashboard({
                                   className="min-h-[40px] px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
                                 >
                                   <Video className="h-3.5 w-3.5" />
-                                  <span>Join Video Room</span>
+                                  <span>{tx('Join Video Room')}</span>
                                 </button>
                               )}
                               <button
@@ -826,14 +827,14 @@ export default function PatientDashboard({
                                 className="min-h-[40px] px-3.5 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                               >
                                 <MessageSquare className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                                <span>Message</span>
+                                <span>{tx('Message')}</span>
                               </button>
                               <button
                                 type="button"
                                 onClick={() => onSelectProfessional(b.professionalId)}
                                 className="min-h-[40px] px-3.5 bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] text-[color:var(--t-700)] text-xs font-bold border border-[color:var(--t-200)] transition-all cursor-pointer"
                               >
-                                Doctor Profile
+                                {tx('Doctor Profile')}
                               </button>
                             </>
                           )}
@@ -842,9 +843,9 @@ export default function PatientDashboard({
                             type="button"
                             onClick={() => cancelBooking(b)}
                             className="min-h-[40px] px-3 text-xs font-semibold text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
-                            title="Cancel appointment"
+                            title={tx('Cancel appointment')}
                           >
-                            Cancel
+                            {tx('Cancel')}
                           </button>
                         </div>
                       </div>
@@ -854,26 +855,26 @@ export default function PatientDashboard({
               )}
 
               <div className="mt-4 pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between text-xs text-slate-500 font-medium">
-                <span>Cancellations &gt;24h in advance are 100% refunded to the original payment method.</span>
-                <span className="font-bold text-[color:var(--t-600)] hidden sm:inline">Statutory SLA Compliant</span>
+                <span>{tx('Cancellations >24h in advance are 100% refunded to the original payment method.')}</span>
+                <span className="font-bold text-[color:var(--t-600)] hidden sm:inline">{tx('Statutory SLA Compliant')}</span>
               </div>
             </section>
           )}
 
           {/* TIER 2: COMPACT IMMEDIATE MEDICAL ASSISTANCE ACTION BAR (Shown in 'all' and 'upcoming') */}
           {(appointmentsSubTab === 'all' || appointmentsSubTab === 'upcoming') && (
-            <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-3.5 sm:p-4" aria-label="Immediate medical assistance channels">
+            <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-3.5 sm:p-4" aria-label={tx('Immediate medical assistance channels')}>
               <div className="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2.5 border-b border-[color:var(--t-100)]">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
-                    Immediate Medical Assistance
+                    {tx('Immediate Medical Assistance')}
                   </h2>
                   <span className="hidden sm:inline text-xs text-slate-400">&bull;</span>
-                  <span className="hidden sm:inline text-xs text-slate-500 font-medium">On-demand video doctor, clinical AI triage &amp; dispensary routing</span>
+                  <span className="hidden sm:inline text-xs text-slate-500 font-medium">{tx('On-demand video doctor, clinical AI triage & dispensary routing')}</span>
                 </div>
                 <span className="text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
-                  {onCallStatus && onCallStatus.onlineDoctors > 0 ? `${onCallStatus.onlineDoctors} Doctors Online` : '24/7 Care Triage'}
+                  {onCallStatus && onCallStatus.onlineDoctors > 0 ? tx('{n} Doctors Online', { n: onCallStatus.onlineDoctors }) : tx('24/7 Care Triage')}
                 </span>
               </div>
 
@@ -888,21 +889,21 @@ export default function PatientDashboard({
                         </div>
                         <div className="min-w-0">
                           <h3 className="font-display font-black text-sm text-[color:var(--ink)] leading-tight truncate">
-                            On-Call Video Doctor
+                            {tx('On-Call Video Doctor')}
                           </h3>
                           <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
-                            &lt; 3 min wait · MMC Certified
+                            {tx('< 3 min wait · MMC Certified')}
                           </p>
                         </div>
                       </div>
                       <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 shrink-0">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> {tx('Live')}
                       </span>
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-2.5">
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Digital MC</span>
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">e-Prescription</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('Digital MC')}</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('e-Prescription')}</span>
                       <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">WebRTC HD</span>
                     </div>
                   </div>
@@ -913,7 +914,7 @@ export default function PatientDashboard({
                     className="w-full min-h-[34px] px-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black border border-[color:var(--t-700)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Video className="h-3.5 w-3.5" />
-                    <span>Start Instant Consult</span>
+                    <span>{tx('Start Instant Consult')}</span>
                     <ArrowRight className="h-3 w-3" />
                   </button>
                 </div>
@@ -928,22 +929,22 @@ export default function PatientDashboard({
                         </div>
                         <div className="min-w-0">
                           <h3 className="font-display font-black text-sm text-[color:var(--ink)] leading-tight truncate">
-                            AI Symptom Triage
+                            {tx('AI Symptom Triage')}
                           </h3>
                           <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
-                            MOH Protocol · Free Assessment
+                            {tx('MOH Protocol · Free Assessment')}
                           </p>
                         </div>
                       </div>
                       <span className="text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-1.5 py-0.2 shrink-0">
-                        Triage
+                        {tx('Triage')}
                       </span>
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-2.5">
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">180+ Conditions</span>
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Red-Flag Check</span>
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Dept Route</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('180+ Conditions')}</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('Red-Flag Check')}</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('Dept Route')}</span>
                     </div>
                   </div>
 
@@ -953,7 +954,7 @@ export default function PatientDashboard({
                     className="w-full min-h-[34px] px-3 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Stethoscope className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                    <span>Run Symptom Triage</span>
+                    <span>{tx('Run Symptom Triage')}</span>
                     <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)]" />
                   </button>
                 </div>
@@ -968,22 +969,22 @@ export default function PatientDashboard({
                         </div>
                         <div className="min-w-0">
                           <h3 className="font-display font-black text-sm text-[color:var(--ink)] leading-tight truncate">
-                            Pharmacy Dispensary
+                            {tx('Pharmacy Dispensary')}
                           </h3>
                           <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
-                            {summary?.activeRx || 0} Active Prescriptions
+                            {tx('{n} Active Prescriptions', { n: summary?.activeRx || 0 })}
                           </p>
                         </div>
                       </div>
                       <span className="text-2xs font-mono font-bold text-cyan-800 bg-cyan-50 border border-cyan-200 px-1.5 py-0.2 shrink-0">
-                        Dispensary
+                        {tx('Dispensary')}
                       </span>
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-2.5">
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">50+ Retail Branches</span>
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">QR Verified</span>
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">Home Courier</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('50+ Retail Branches')}</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('QR Verified')}</span>
+                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('Home Courier')}</span>
                     </div>
                   </div>
 
@@ -993,7 +994,7 @@ export default function PatientDashboard({
                     className="w-full min-h-[34px] px-3 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Pill className="h-3.5 w-3.5 text-cyan-600" />
-                    <span>Refill Prescriptions</span>
+                    <span>{tx('Refill Prescriptions')}</span>
                     <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)]" />
                   </button>
                 </div>
@@ -1003,7 +1004,7 @@ export default function PatientDashboard({
 
           {/* TIER 3: CONSULTATION HISTORY & EHR ARCHIVE (Shown in 'all' and 'past' sub-tabs) */}
           {(appointmentsSubTab === 'all' || appointmentsSubTab === 'past') && (
-            <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6" aria-label="Completed consultation history">
+            <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6" aria-label={tx('Completed consultation history')}>
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-[color:var(--t-100)]">
                 <div className="flex items-center gap-2.5">
                   <span className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shadow-2xs">
@@ -1012,14 +1013,14 @@ export default function PatientDashboard({
                   <div>
                     <div className="flex items-center gap-2">
                       <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
-                        Consultation History &amp; Encounter Archive
+                        {tx('Consultation History & Encounter Archive')}
                       </h2>
                       <span className="text-2xs font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 border border-slate-200">
-                        {past.length} Encounters
+                        {tx('{n} Encounters', { n: past.length })}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 font-medium mt-0.5">
-                      Past appointments, completed clinical visits, and follow-up rebooking
+                      {tx('Past appointments, completed clinical visits, and follow-up rebooking')}
                     </p>
                   </div>
                 </div>
@@ -1029,7 +1030,7 @@ export default function PatientDashboard({
                   onClick={() => { setRecordsSubTab('overview'); setActiveTab('records'); }}
                   className="text-xs font-bold text-[color:var(--t-600)] hover:underline flex items-center gap-1 cursor-pointer"
                 >
-                  <span>Full Clinical EHR</span>
+                  <span>{tx('Full Clinical EHR')}</span>
                   <ChevronRight className="h-3.5 w-3.5" />
                 </button>
               </div>
@@ -1061,7 +1062,7 @@ export default function PatientDashboard({
                                 {b.professionalName}
                               </button>
                               <span className="text-xs font-semibold text-[color:var(--t-700)]">
-                                {prof?.specialization || 'Clinical Specialist'}
+                                {prof?.specialization ? tx(prof.specialization) : tx('Clinical Specialist')}
                               </span>
                               <span
                                 className={`inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-mono font-bold border ${
@@ -1071,7 +1072,7 @@ export default function PatientDashboard({
                                 }`}
                               >
                                 <CheckCircle2 className={`h-3 w-3 ${isCancelled ? 'text-slate-500' : 'text-emerald-600'}`} />
-                                {b.status}{b.paymentStatus === 'Refunded' ? ' · Refunded' : ''}
+                                {tx(b.status)}{b.paymentStatus === 'Refunded' ? tx(' · Refunded') : ''}
                               </span>
                             </div>
                             <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-500 font-medium mt-1">
@@ -1079,7 +1080,7 @@ export default function PatientDashboard({
                               <span>&bull;</span>
                               <span className="font-mono">{b.timeSlot}</span>
                               <span>&bull;</span>
-                              <span>{b.mode}</span>
+                              <span>{tx(String(b.mode))}</span>
                               <span>&bull;</span>
                               <span className="font-mono font-bold text-slate-700">{formatMoney(b.fee)}</span>
                             </div>
@@ -1092,14 +1093,14 @@ export default function PatientDashboard({
                             onClick={() => { setRecordsSubTab('overview'); setActiveTab('records'); }}
                             className="min-h-[34px] px-3 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] border border-[color:var(--t-200)] text-xs font-bold transition-colors cursor-pointer"
                           >
-                            Notes &amp; Rx
+                            {tx('Notes & Rx')}
                           </button>
                           <button
                             type="button"
                             onClick={() => onSelectProfessional(b.professionalId)}
                             className="min-h-[34px] px-3 bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] hover:text-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
                           >
-                            <span>Book Follow-Up</span>
+                            <span>{tx('Book Follow-Up')}</span>
                             <ArrowRight className="h-3 w-3" />
                           </button>
                         </div>
@@ -1114,7 +1115,7 @@ export default function PatientDashboard({
                         onClick={() => setAppointmentsSubTab('past')}
                         className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
                       >
-                        View All {past.length} Past Consultations &rarr;
+                        {tx('View All {n} Past Consultations →', { n: past.length })}
                       </button>
                     </div>
                   )}
@@ -1122,9 +1123,9 @@ export default function PatientDashboard({
               ) : (
                 <div className="py-8 text-center bg-[color:var(--t-50)]/30 border border-dashed border-[color:var(--t-200)] my-1">
                   <Calendar className="h-6 w-6 text-slate-400 mx-auto mb-1.5" />
-                  <p className="text-sm font-bold text-slate-700">No Past Consultations Yet</p>
+                  <p className="text-sm font-bold text-slate-700">{tx('No Past Consultations Yet')}</p>
                   <p className="text-xs text-slate-500 mt-0.5 max-w-xs mx-auto">
-                    Completed consultations and clinical visits will be archived here for your permanent record.
+                    {tx('Completed consultations and clinical visits will be archived here for your permanent record.')}
                   </p>
                 </div>
               )}
@@ -1134,18 +1135,18 @@ export default function PatientDashboard({
           {/* TIER 4: UNIFIED CLINICAL VITALS & SAFETY SNAPSHOT (Shown on 'all' overview only — single source of truth) */}
           {appointmentsSubTab === 'all' && (
             <section
-              aria-label="Clinical vitals and safety snapshot"
+              aria-label={tx('Clinical vitals and safety snapshot')}
               className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-4 sm:p-5 space-y-4"
             >
               <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[color:var(--t-100)]">
                 <div className="flex items-center gap-2">
                   <HeartPulse className="h-4 w-4 text-[color:var(--t-600)]" />
                   <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
-                    Pre-Consultation Vitals &amp; Safety Snapshot
+                    {tx('Pre-Consultation Vitals & Safety Snapshot')}
                   </h2>
                   <span className="hidden sm:inline text-xs text-slate-600">&bull;</span>
                   <span className="hidden sm:inline text-xs text-slate-600 font-medium">
-                    Your doctor sees this only if you share your record
+                    {tx('Your doctor sees this only if you share your record')}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -1159,17 +1160,17 @@ export default function PatientDashboard({
                     }`}
                   >
                     {patientAllergies.length > 0
-                      ? `Allergies: ${patientAllergies.join(', ')}`
+                      ? tx('Allergies: {list}', { list: patientAllergies.map(a => tx(a)).join(', ') })
                       : recordsData?.allergyStatement?.kind === 'none_known'
-                        ? 'You said: no known allergies'
-                        : 'No allergies recorded yet'}
+                        ? tx('You said: no known allergies')
+                        : tx('No allergies recorded yet')}
                   </span>
                   <button
                     type="button"
                     onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
                     className="text-xs font-bold text-[color:var(--t-600)] hover:underline flex items-center gap-1 cursor-pointer"
                   >
-                    <span>Update Vitals</span>
+                    <span>{tx('Update Vitals')}</span>
                     <ChevronRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -1184,10 +1185,10 @@ export default function PatientDashboard({
                   <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
                     <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
                       <HeartPulse className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                      Blood Pressure
+                      {tx('Blood Pressure')}
                     </span>
                     <span className={`text-2xs font-bold px-1.5 py-0.2 border ${classifyBp(summary?.bp?.value1 || 120, summary?.bp?.value2 || 78).badgeClass}`}>
-                      {classifyBp(summary?.bp?.value1 || 120, summary?.bp?.value2 || 78).label.split('/')[0].trim()}
+                      {tx(classifyBp(summary?.bp?.value1 || 120, summary?.bp?.value2 || 78).label.split('/')[0].trim())}
                     </span>
                   </div>
                   <div className="text-xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
@@ -1195,7 +1196,7 @@ export default function PatientDashboard({
                     <span className="text-xs font-normal text-slate-500 font-sans">mmHg</span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-1 truncate">
-                    {summary?.bp?.recordedAt ? `Logged ${fmtDate(summary.bp.recordedAt)}` : 'Reference Target < 120/80'}
+                    {summary?.bp?.recordedAt ? tx('Logged {date}', { date: fmtDate(summary.bp.recordedAt) }) : tx('Reference Target < 120/80')}
                   </p>
                 </div>
 
@@ -1207,10 +1208,10 @@ export default function PatientDashboard({
                   <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
                     <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
                       <Activity className="h-3.5 w-3.5 text-emerald-600" />
-                      Heart Rate
+                      {tx('Heart Rate')}
                     </span>
                     <span className="text-2xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
-                      Normal
+                      {tx('Normal')}
                     </span>
                   </div>
                   <div className="text-xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
@@ -1218,7 +1219,7 @@ export default function PatientDashboard({
                     <span className="text-xs font-normal text-slate-500 font-sans">BPM</span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-1 truncate">
-                    Resting target 60–100 BPM
+                    {tx('Resting target 60–100 BPM')}
                   </p>
                 </div>
 
@@ -1230,10 +1231,10 @@ export default function PatientDashboard({
                   <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
                     <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
                       <Sparkles className="h-3.5 w-3.5 text-amber-600" />
-                      Blood Glucose
+                      {tx('Blood Glucose')}
                     </span>
                     <span className="text-2xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
-                      {summary?.glucose?.value1 ? (summary.glucose.value1 > 6.0 ? 'Elevated' : 'Target') : 'Target'}
+                      {summary?.glucose?.value1 ? (summary.glucose.value1 > 6.0 ? tx('Elevated') : tx('Target')) : tx('Target')}
                     </span>
                   </div>
                   <div className="text-xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
@@ -1241,7 +1242,7 @@ export default function PatientDashboard({
                     <span className="text-xs font-normal text-slate-500 font-sans">{summary?.glucose?.unit || 'mmol/L'}</span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-1 truncate">
-                    Fasting target 4.0–7.0 mmol/L
+                    {tx('Fasting target 4.0–7.0 mmol/L')}
                   </p>
                 </div>
 
@@ -1253,10 +1254,10 @@ export default function PatientDashboard({
                   <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
                     <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
                       <ShieldCheck className="h-3.5 w-3.5 text-cyan-600" />
-                      Oxygen (SpO₂)
+                      {tx('Oxygen (SpO₂)')}
                     </span>
                     <span className="text-2xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
-                      Optimal
+                      {tx('Optimal')}
                     </span>
                   </div>
                   <div className="text-xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
@@ -1264,7 +1265,7 @@ export default function PatientDashboard({
                     <span className="text-xs font-normal text-slate-500 font-sans">%</span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-1 truncate">
-                    Arterial saturation ≥ 95%
+                    {tx('Arterial saturation ≥ 95%')}
                   </p>
                 </div>
               </div>
@@ -1275,7 +1276,7 @@ export default function PatientDashboard({
           {appointmentsSubTab === 'all' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {/* LEFT: ACTIVE E-PRESCRIPTIONS & PHARMACY DISPATCH */}
-              <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6 flex flex-col justify-between" aria-label="Active prescriptions and dispensary">
+              <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6 flex flex-col justify-between" aria-label={tx('Active prescriptions and dispensary')}>
                 <div>
                   <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-[color:var(--t-100)]">
                     <div className="flex items-center gap-2.5">
@@ -1284,16 +1285,16 @@ export default function PatientDashboard({
                       </span>
                       <div>
                         <h3 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
-                          Active Doctor E-Prescriptions
+                          {tx('Active Doctor E-Prescriptions')}
                         </h3>
                         <p className="text-xs text-slate-500 font-medium mt-0.5">
-                          Digital prescriptions from your consultations ready for fulfillment
+                          {tx('Digital prescriptions from your consultations ready for fulfillment')}
                         </p>
                       </div>
                     </div>
 
                     <span className="text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)]">
-                      {activePrescriptions.length} Active
+                      {tx('{n} Active', { n: activePrescriptions.length })}
                     </span>
                   </div>
 
@@ -1301,10 +1302,10 @@ export default function PatientDashboard({
                     <div className="py-7 px-4 text-center bg-[color:var(--t-50)]/30 border border-dashed border-[color:var(--t-200)] my-2">
                       <Pill className="h-7 w-7 text-slate-400 mx-auto mb-2" />
                       <p className="text-sm font-bold text-[color:var(--ink)] mb-0.5">
-                        No Active Prescriptions Requiring Refill
+                        {tx('No Active Prescriptions Requiring Refill')}
                       </p>
                       <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
-                        Medications prescribed during your telehealth consultations appear here automatically for one-click pharmacy dispensing.
+                        {tx('Medications prescribed during your telehealth consultations appear here automatically for one-click pharmacy dispensing.')}
                       </p>
                     </div>
                   ) : (
@@ -1316,14 +1317,14 @@ export default function PatientDashboard({
                             <div className="flex items-start justify-between gap-2 mb-2">
                               <div>
                                 <span className="inline-block text-2xs font-mono font-black text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
-                                  RX CODE: {rx.code}
+                                  {tx('RX CODE: {code}', { code: rx.code })}
                                 </span>
                                 <h4 className="font-display font-black text-sm text-[color:var(--ink)] mt-1">
-                                  {firstMed?.name || rx.diagnosis || 'Prescribed Medication'}
+                                  {firstMed?.name || rx.diagnosis || tx('Prescribed Medication')}
                                 </h4>
                                 {firstMed?.instructions && (
                                   <p className="text-xs text-slate-600 font-medium mt-0.5">
-                                    {firstMed.instructions} {firstMed?.quantity ? `· ${firstMed.quantity}` : ''}
+                                    {tx(firstMed.instructions)} {firstMed?.quantity ? `· ${firstMed.quantity}` : ''}
                                   </p>
                                 )}
                               </div>
@@ -1331,11 +1332,11 @@ export default function PatientDashboard({
                               <div className="text-right shrink-0">
                                 {rx.fillStatus === 'ready' ? (
                                   <span className="inline-block text-2xs font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5">
-                                    Ready for Pickup
+                                    {tx('Ready for Pickup')}
                                   </span>
                                 ) : rx.fillStatus === 'preparing' ? (
                                   <span className="inline-block text-2xs font-mono font-bold bg-[color:var(--t-50)] text-[color:var(--t-800)] border border-[color:var(--t-200)] px-2 py-0.5">
-                                    Being Prepared
+                                    {tx('Being Prepared')}
                                   </span>
                                 ) : rx.pharmacyName ? (
                                   <span className="inline-block text-2xs font-mono font-bold bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 truncate max-w-[130px]">
@@ -1350,20 +1351,20 @@ export default function PatientDashboard({
                                     }}
                                     className="inline-flex items-center gap-1 text-xs font-mono font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white px-2.5 py-1 shadow-2xs cursor-pointer transition-colors"
                                   >
-                                    <Send className="h-3 w-3" /> Dispatch to Pharmacy
+                                    <Send className="h-3 w-3" /> {tx('Dispatch to Pharmacy')}
                                   </button>
                                 )}
                                 <p className="text-xs font-mono text-slate-600 mt-1">
-                                  Valid until: {fmtDate(rx.validUntil)}
+                                  {tx('Valid until: {date}', { date: fmtDate(rx.validUntil) })}
                                 </p>
                               </div>
                             </div>
 
                             <div className="flex items-center justify-between pt-2 border-t border-[color:var(--t-100)] text-xs">
                               <span className="text-slate-500 font-medium">
-                                Doctor: <strong className="text-slate-700">{rx.doctor?.name || 'Verified Physician'}</strong>
+                                {tx('Doctor:')} <strong className="text-slate-700">{rx.doctor?.name || tx('Verified Physician')}</strong>
                               </span>
-                              <button type="button" onClick={() => { setRxSubTab('active'); setActiveTab('prescriptions'); }} className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer">View Full Prescription &rarr;</button>
+                              <button type="button" onClick={() => { setRxSubTab('active'); setActiveTab('prescriptions'); }} className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer">{tx('View Full Prescription →')}</button>
                             </div>
                           </div>
                         );
@@ -1378,7 +1379,7 @@ export default function PatientDashboard({
                     onClick={() => setActiveTab('prescriptions')}
                     className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
                   >
-                    Manage All Prescriptions &rarr;
+                    {tx('Manage All Prescriptions →')}
                   </button>
                   {onOpenPharmacies && (
                     <button
@@ -1386,14 +1387,14 @@ export default function PatientDashboard({
                       onClick={onOpenPharmacies}
                       className="text-xs font-bold text-slate-700 hover:text-[color:var(--t-600)] flex items-center gap-1 cursor-pointer"
                     >
-                      <ExternalLink className="h-3 w-3" /> Pharmacies Directory
+                      <ExternalLink className="h-3 w-3" /> {tx('Pharmacies Directory')}
                     </button>
                   )}
                 </div>
               </section>
 
               {/* RIGHT: RECOMMENDED SPECIALISTS FOR FOLLOW-UP */}
-              <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6 flex flex-col justify-between" aria-label="Personalized specialist care recommendations">
+              <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6 flex flex-col justify-between" aria-label={tx('Personalized specialist care recommendations')}>
                 <div>
                   <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-[color:var(--t-100)]">
                     <div className="flex items-center gap-2.5">
@@ -1402,10 +1403,10 @@ export default function PatientDashboard({
                       </span>
                       <div>
                         <h3 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
-                          Recommended Specialists for You
+                          {tx('Recommended Specialists for You')}
                         </h3>
                         <p className="text-xs text-slate-500 font-medium mt-0.5">
-                          Matched to {patientConditions.length > 0 ? patientConditions.join(', ') : 'your clinical profile & vitals'}
+                          {tx('Matched to {x}', { x: patientConditions.length > 0 ? patientConditions.map(c => tx(c)).join(', ') : tx('your clinical profile & vitals') })}
                         </p>
                       </div>
                     </div>
@@ -1416,7 +1417,7 @@ export default function PatientDashboard({
                         onClick={onFindDoctors}
                         className="text-xs font-bold text-[color:var(--t-600)] hover:underline flex items-center gap-1 cursor-pointer"
                       >
-                        <Search className="h-3.5 w-3.5" /> Full Directory
+                        <Search className="h-3.5 w-3.5" /> {tx('Full Directory')}
                       </button>
                     )}
                   </div>
@@ -1443,7 +1444,7 @@ export default function PatientDashboard({
                               {prof.name}
                             </button>
                             <p className="text-xs text-[color:var(--t-700)] font-bold truncate">
-                              {prof.specialization} · <span className="text-slate-500 font-medium">{prof.city || 'Kuala Lumpur'}</span>
+                              {tx(prof.specialization)} · <span className="text-slate-500 font-medium">{prof.city || 'Kuala Lumpur'}</span>
                             </p>
                           </div>
                         </div>
@@ -1457,7 +1458,7 @@ export default function PatientDashboard({
                             onClick={() => onSelectProfessional(prof.id)}
                             className="min-h-[34px] px-3 bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] hover:text-white text-[color:var(--t-700)] text-xs font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all cursor-pointer flex items-center gap-1"
                           >
-                            <span>Book</span>
+                            <span>{tx('Book')}</span>
                             <ArrowRight className="h-3 w-3" />
                           </button>
                         </div>
@@ -1467,14 +1468,14 @@ export default function PatientDashboard({
                 </div>
 
                 <div className="pt-3 border-t border-[color:var(--t-100)] mt-3 flex items-center justify-between text-xs">
-                  <span className="text-slate-500 font-medium">Need help choosing a specialist or verifying an MC?</span>
+                  <span className="text-slate-500 font-medium">{tx('Need help choosing a specialist or verifying an MC?')}</span>
                   {onOpenHelp && (
                     <button
                       type="button"
                       onClick={onOpenHelp}
                       className="font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
                     >
-                      Ask Care Concierge &rarr;
+                      {tx('Ask Care Concierge →')}
                     </button>
                   )}
                 </div>
@@ -1489,9 +1490,9 @@ export default function PatientDashboard({
         <div id="panel-records" role="tabpanel" aria-labelledby="tab-records" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={FolderHeart}
-            eyebrow="Health record"
-            title="Your health profile and readings"
-            description="Your allergies, conditions, medicines and readings. You decide which doctors can see them."
+            eyebrow={tx('Health record')}
+            title={tx('Your health profile and readings')}
+            description={tx('Your allergies, conditions, medicines and readings. You decide which doctors can see them.')}
             aside={
               <button
                 type="button"
@@ -1499,13 +1500,13 @@ export default function PatientDashboard({
                 className="px-3.5 min-h-[44px] bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
               >
                 <FileText className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                <span>Print this page</span>
+                <span>{tx('Print this page')}</span>
               </button>
             }
             tabs={[
-              { id: 'overview', label: 'Profile', icon: ClipboardList },
-              { id: 'vitals', label: 'Readings', icon: Activity },
-              { id: 'sharing', label: 'Sharing & PIN', icon: Share2 },
+              { id: 'overview', label: tx('Profile'), icon: ClipboardList },
+              { id: 'vitals', label: tx('Readings'), icon: Activity },
+              { id: 'sharing', label: tx('Sharing & PIN'), icon: Share2 },
             ]}
             activeTab={recordsSubTab}
             onTabChange={setRecordsSubTab}
@@ -1523,9 +1524,9 @@ export default function PatientDashboard({
         <div id="panel-prescriptions" role="tabpanel" aria-labelledby="tab-prescriptions" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={Pill}
-            eyebrow="Pharmacy"
-            title="Prescriptions & medicines"
-            description="Send a prescription to a partner pharmacy, follow its progress, and keep the past ones."
+            eyebrow={tx('Pharmacy')}
+            title={tx('Prescriptions & medicines')}
+            description={tx('Send a prescription to a partner pharmacy, follow its progress, and keep the past ones.')}
             aside={
               onOpenPharmacies && (
                 <button
@@ -1534,13 +1535,13 @@ export default function PatientDashboard({
                   className="px-3.5 min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <Store className="h-3.5 w-3.5" />
-                  <span>Find a pharmacy</span>
+                  <span>{tx('Find a pharmacy')}</span>
                 </button>
               )
             }
             tabs={[
-              { id: 'active', label: 'Active', icon: Pill, count: activePrescriptions.length },
-              { id: 'history', label: 'Past prescriptions', icon: FileText },
+              { id: 'active', label: tx('Active'), icon: Pill, count: activePrescriptions.length },
+              { id: 'history', label: tx('Past prescriptions'), icon: FileText },
             ]}
             activeTab={rxSubTab}
             onTabChange={setRxSubTab}
@@ -1559,12 +1560,12 @@ export default function PatientDashboard({
         <div id="panel-certs" role="tabpanel" aria-labelledby="tab-certs" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={FileText}
-            eyebrow="Certificates and referrals"
-            title="Medical certificates & referrals"
-            description="Each certificate has a code and QR that your employer can check online. The check shows the doctor's registration number and whether the certificate has been changed since it was signed."
+            eyebrow={tx('Certificates and referrals')}
+            title={tx('Medical certificates & referrals')}
+            description={tx('Each certificate has a code and QR that your employer can check online. The check shows the doctor\'s registration number and whether the certificate has been changed since it was signed.')}
             tabs={[
-              { id: 'mc', label: 'Medical Certificates (MC)', icon: FileText },
-              { id: 'referrals', label: 'Referral Letters', icon: HeartHandshake },
+              { id: 'mc', label: tx('Medical Certificates (MC)'), icon: FileText },
+              { id: 'referrals', label: tx('Referral Letters'), icon: HeartHandshake },
             ]}
             activeTab={certsSubTab}
             onTabChange={setCertsSubTab}
@@ -1583,13 +1584,13 @@ export default function PatientDashboard({
         <div id="panel-labs" role="tabpanel" aria-labelledby="tab-labs" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={FlaskConical}
-            eyebrow="Clinical Diagnostics · Diagnostic Reports"
-            title="Diagnostic Lab Reports & Doctor Clinical Notes"
-            description="Pathology test results, blood analysis, radiology reports, and physician consultation summaries."
-            badges={<BannerBadge tone="brand">Accredited Pathology</BannerBadge>}
+            eyebrow={tx('Clinical Diagnostics · Diagnostic Reports')}
+            title={tx('Diagnostic Lab Reports & Doctor Clinical Notes')}
+            description={tx('Pathology test results, blood analysis, radiology reports, and physician consultation summaries.')}
+            badges={<BannerBadge tone="brand">{tx('Accredited Pathology')}</BannerBadge>}
             tabs={[
-              { id: 'labs', label: 'Lab Test Reports', icon: FlaskConical },
-              { id: 'notes', label: 'Doctor Clinical Notes', icon: FileText },
+              { id: 'labs', label: tx('Lab Test Reports'), icon: FlaskConical },
+              { id: 'notes', label: tx('Doctor Clinical Notes'), icon: FileText },
             ]}
             activeTab={labsSubTab}
             onTabChange={setLabsSubTab}
@@ -1607,9 +1608,9 @@ export default function PatientDashboard({
         <div id="panel-consult" role="tabpanel" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={Video}
-            eyebrow="Telehealth network"
-            title="Consult a doctor now"
-            description="Chat or video with a doctor. If no doctor joins within 10 minutes you are refunded automatically."
+            eyebrow={tx('Telehealth network')}
+            title={tx('Consult a doctor now')}
+            description={tx('Chat or video with a doctor. If no doctor joins within 10 minutes you are refunded automatically.')}
             badges={
               onCall && onCall.onlineDoctors > 0 ? (
                 <BannerBadge tone="success">
@@ -1627,7 +1628,7 @@ export default function PatientDashboard({
                   className="px-3.5 min-h-[44px] bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <Sparkles className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                  <span>Not sure? Try AI symptom triage</span>
+                  <span>{tx('Not sure? Try AI symptom triage')}</span>
                 </button>
               ) : (
                 <button
@@ -1636,7 +1637,7 @@ export default function PatientDashboard({
                   className="px-3.5 min-h-[44px] bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <Video className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                  <span>Back to consultation</span>
+                  <span>{tx('Back to consultation')}</span>
                 </button>
               )
             }
@@ -1668,9 +1669,9 @@ export default function PatientDashboard({
         <div id="panel-messages" role="tabpanel" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={MessageSquare}
-            eyebrow="Care messages"
-            title="Patient Care Mailbox & Direct Messaging"
-            description="Private messages with the doctors and nurses you have booked or consulted. Replies can take time. Not for emergencies: call 999."
+            eyebrow={tx('Care messages')}
+            title={tx('Patient Care Mailbox & Direct Messaging')}
+            description={tx('Private messages with the doctors and nurses you have booked or consulted. Replies can take time. Not for emergencies: call 999.')}
             aside={
               onFindDoctors && (
                 <button
@@ -1679,7 +1680,7 @@ export default function PatientDashboard({
                   className="px-3.5 py-2 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <Search className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                  <span>Find Doctor to Message</span>
+                  <span>{tx('Find Doctor to Message')}</span>
                 </button>
               )
             }
@@ -1696,10 +1697,10 @@ export default function PatientDashboard({
         <div id="panel-saved" role="tabpanel" aria-labelledby="tab-saved" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={Heart}
-            eyebrow="Personal Care Team · Saved Practitioners"
-            title="Your Care Team & Saved Specialists"
-            description="The doctors and nurses you have seen, and others you saved to book later."
-            badges={<BannerBadge tone="brand">{careTeam.length} seen · {savedIds.length} saved</BannerBadge>}
+            eyebrow={tx('Personal Care Team · Saved Practitioners')}
+            title={tx('Your Care Team & Saved Specialists')}
+            description={tx('The doctors and nurses you have seen, and others you saved to book later.')}
+            badges={<BannerBadge tone="brand">{tx('{a} seen · {b} saved', { a: careTeam.length, b: savedIds.length })}</BannerBadge>}
             aside={
               onFindDoctors && (
                 <button
@@ -1708,14 +1709,14 @@ export default function PatientDashboard({
                   className="px-3.5 h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <Search className="h-3.5 w-3.5" />
-                  <span>Find a doctor or nurse</span>
+                  <span>{tx('Find a doctor or nurse')}</span>
                 </button>
               )
             }
             tabs={[
-              { id: 'all', label: 'All Care Team', count: careTeam.length + savedIds.length },
-              { id: 'doctors', label: 'Doctors & Specialists', count: professionals.filter(p => (savedIds.includes(p.id) || careTeam.some(c => c.id === p.id)) && p.role === UserRole.DOCTOR).length },
-              { id: 'nurses', label: 'Clinical Nurses', count: professionals.filter(p => (savedIds.includes(p.id) || careTeam.some(c => c.id === p.id)) && p.role === UserRole.NURSE).length },
+              { id: 'all', label: tx('All Care Team'), count: careTeam.length + savedIds.length },
+              { id: 'doctors', label: tx('Doctors & Specialists'), count: professionals.filter(p => (savedIds.includes(p.id) || careTeam.some(c => c.id === p.id)) && p.role === UserRole.DOCTOR).length },
+              { id: 'nurses', label: tx('Clinical Nurses'), count: professionals.filter(p => (savedIds.includes(p.id) || careTeam.some(c => c.id === p.id)) && p.role === UserRole.NURSE).length },
             ]}
             activeTab={savedSubTab}
             onTabChange={setSavedSubTab}
@@ -1753,10 +1754,10 @@ export default function PatientDashboard({
         <div id="panel-packages" role="tabpanel" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={PackagePlus}
-            eyebrow="Preventive Health · Hospital Packages"
-            title="Comprehensive Medical Screening & Treatment Packages"
-            description="Curated healthcare packages from accredited private hospitals and specialist clinics across Malaysia."
-            badges={<BannerBadge tone="brand">Price Transparent</BannerBadge>}
+            eyebrow={tx('Preventive Health · Hospital Packages')}
+            title={tx('Comprehensive Medical Screening & Treatment Packages')}
+            description={tx('Curated healthcare packages from accredited private hospitals and specialist clinics across Malaysia.')}
+            badges={<BannerBadge tone="brand">{tx('Price Transparent')}</BannerBadge>}
             aside={
               <a
                 href="/packages"
@@ -1767,14 +1768,14 @@ export default function PatientDashboard({
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors shadow-2xs cursor-pointer shrink-0"
               >
                 <PackagePlus className="h-4 w-4" />
-                <span>Explore Full Marketplace &amp; Directory</span>
+                <span>{tx('Explore Full Marketplace & Directory')}</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </a>
             }
             tabs={[
-              { id: 'packages', label: 'Medical Packages' },
-              { id: 'promotions', label: 'Promotions & Offers' },
-              { id: 'facilities', label: 'Facilities & Infrastructure' },
+              { id: 'packages', label: tx('Medical Packages') },
+              { id: 'promotions', label: tx('Promotions & Offers') },
+              { id: 'facilities', label: tx('Facilities & Infrastructure') },
             ]}
             activeTab={packagesSubTab}
             onTabChange={(t) => setPackagesSubTab(t as any)}
@@ -1792,14 +1793,14 @@ export default function PatientDashboard({
         <div id="panel-assistance" role="tabpanel" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={HeartHandshake}
-            eyebrow="Treatment quotes"
-            title="Treatment quotes and assistance"
-            description="Ask a hospital for an itemised quote, then accept it or ask for changes. Sending a request is free and does not commit you."
+            eyebrow={tx('Treatment quotes')}
+            title={tx('Treatment quotes and assistance')}
+            description={tx('Ask a hospital for an itemised quote, then accept it or ask for changes. Sending a request is free and does not commit you.')}
             tabs={[
-              { id: 'enquiry', label: 'Request a quote' },
-              { id: 'cases', label: 'My requests and quotes' },
-              { id: 'guide', label: 'Travel guide' },
-              ...(currentUser ? [] : [{ id: 'track', label: 'Track a request' }]),
+              { id: 'enquiry', label: tx('Request a quote') },
+              { id: 'cases', label: tx('My requests and quotes') },
+              { id: 'guide', label: tx('Travel guide') },
+              ...(currentUser ? [] : [{ id: 'track', label: tx('Track a request') }]),
             ]}
             activeTab={assistanceSubTab}
             onTabChange={(t) => setAssistanceSubTab(t as any)}
@@ -1817,13 +1818,13 @@ export default function PatientDashboard({
         <div id="panel-tourism" role="tabpanel" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={Plane}
-            eyebrow="Hospitals and medical travel"
-            title="Global patient care"
-            description="Find licensed hospitals in Malaysia, ask one for an itemised quote, and follow your request. For patients in Malaysia and from abroad."
+            eyebrow={tx('Hospitals and medical travel')}
+            title={tx('Global patient care')}
+            description={tx('Find licensed hospitals in Malaysia, ask one for an itemised quote, and follow your request. For patients in Malaysia and from abroad.')}
             tabs={[
-              { id: 'find', label: 'Find a hospital' },
-              { id: 'cases', label: 'My requests' },
-              { id: 'info', label: 'Travel information' },
+              { id: 'find', label: tx('Find a hospital') },
+              { id: 'cases', label: tx('My requests') },
+              { id: 'info', label: tx('Travel information') },
             ]}
             activeTab={tourismSubTab}
             onTabChange={(t) => setTourismSubTab(t as any)}
@@ -1842,14 +1843,14 @@ export default function PatientDashboard({
         <div id="panel-pharmacies" role="tabpanel" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={Store}
-            eyebrow="Pharmacy Registry · Poison Licences"
-            title="Licensed Pharmacy Dispensary Network"
-            description="Locate Type A Poison Licensed retail pharmacies and hospital dispensaries for prescription fulfillment and delivery."
-            badges={<BannerBadge tone="brand">Type A Poison Licensed</BannerBadge>}
+            eyebrow={tx('Pharmacy Registry · Poison Licences')}
+            title={tx('Licensed Pharmacy Dispensary Network')}
+            description={tx('Locate Type A Poison Licensed retail pharmacies and hospital dispensaries for prescription fulfillment and delivery.')}
+            badges={<BannerBadge tone="brand">{tx('Type A Poison Licensed')}</BannerBadge>}
             tabs={[
-              { id: 'all', label: 'All Dispensaries', count: pharmacies.length },
-              { id: 'delivery', label: 'Home Delivery Licensed' },
-              { id: 'open24', label: '24-Hour Emergency' },
+              { id: 'all', label: tx('All Dispensaries'), count: pharmacies.length },
+              { id: 'delivery', label: tx('Home Delivery Licensed') },
+              { id: 'open24', label: tx('24-Hour Emergency') },
             ]}
             activeTab={pharmaciesSubTab}
             onTabChange={setPharmaciesSubTab}
@@ -1863,10 +1864,10 @@ export default function PatientDashboard({
         <div id="panel-articles" role="tabpanel" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={BookOpen}
-            eyebrow="Patient Health Guides · Evidence-Based Medicine"
-            title="Clinical Health Library & Patient Guides"
-            description="Physician-authored, evidence-based medical articles, disease management guides, and clinical wellness advice."
-            badges={<BannerBadge tone="brand">Doctor Reviewed</BannerBadge>}
+            eyebrow={tx('Patient Health Guides · Evidence-Based Medicine')}
+            title={tx('Clinical Health Library & Patient Guides')}
+            description={tx('Physician-authored, evidence-based medical articles, disease management guides, and clinical wellness advice.')}
+            badges={<BannerBadge tone="brand">{tx('Doctor Reviewed')}</BannerBadge>}
             aside={
               onFindDoctors && (
                 <button
@@ -1875,7 +1876,7 @@ export default function PatientDashboard({
                   className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <Search className="h-3.5 w-3.5" />
-                  <span>Find Article Author</span>
+                  <span>{tx('Find Article Author')}</span>
                 </button>
               )
             }
@@ -1924,10 +1925,10 @@ export default function PatientDashboard({
           <div id="panel-registry" role="tabpanel" tabIndex={0} className="space-y-4">
             <WorkspaceHeader
               icon={Search}
-              eyebrow="National Medical Registry · Doctor Directory"
-              title="Verified Malaysian Doctors & Specialists"
-              description="Directory of registered physicians verified directly against the Malaysian Medical Council (MMC) database with active Annual Practising Certificates (APC)."
-              badges={<BannerBadge tone="success"><CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" /> MMC Verified</BannerBadge>}
+              eyebrow={tx('National Medical Registry · Doctor Directory')}
+              title={tx('Verified Malaysian Doctors & Specialists')}
+              description={tx('Directory of registered physicians verified directly against the Malaysian Medical Council (MMC) database with active Annual Practising Certificates (APC).')}
+              badges={<BannerBadge tone="success"><CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" /> {tx('MMC Verified')}</BannerBadge>}
               aside={
                 onFindDoctors && (
                   <button
@@ -1936,30 +1937,30 @@ export default function PatientDashboard({
                     className="px-3.5 h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                   >
                     <Search className="h-3.5 w-3.5" />
-                    <span>Full Interactive Directory</span>
+                    <span>{tx('Full Interactive Directory')}</span>
                   </button>
                 )
               }
               tabs={[
-                { id: 'all', label: 'All Specialists', count: allDoctors.length },
-                { id: 'telehealth', label: 'Available for Telehealth', count: allDoctors.filter(d => d.consultationModes?.includes(ConsultationMode.VIDEO)).length },
-                { id: 'specialists', label: 'Consultant Physicians', count: allDoctors.filter(d => d.specialization?.toLowerCase() !== 'general physician').length },
+                { id: 'all', label: tx('All Specialists'), count: allDoctors.length },
+                { id: 'telehealth', label: tx('Available for Telehealth'), count: allDoctors.filter(d => d.consultationModes?.includes(ConsultationMode.VIDEO)).length },
+                { id: 'specialists', label: tx('Consultant Physicians'), count: allDoctors.filter(d => d.specialization?.toLowerCase() !== 'general physician').length },
               ]}
               activeTab={registrySubTab}
               onTabChange={setRegistrySubTab}
             />
 
             {/* Unified Single-Row Filter Control Bar */}
-            <section aria-label="Filter doctors" className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
+            <section aria-label={tx('Filter doctors')} className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
               <div className="flex flex-col xl:flex-row xl:items-center gap-3">
                 {/* Search Input */}
                 <div className="relative flex-1 min-w-[240px]">
-                  <label htmlFor="registry-doctor-search" className="sr-only">Search doctors</label>
+                  <label htmlFor="registry-doctor-search" className="sr-only">{tx('Search doctors')}</label>
                   <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     id="registry-doctor-search"
                     type="text"
-                    placeholder="Search by doctor name, specialty, hospital, city, or MMC number…"
+                    placeholder={tx('Search by doctor name, specialty, hospital, city, or MMC number…')}
                     value={registryQuery}
                     onChange={e => setRegistryQuery(e.target.value)}
                     className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
@@ -1968,7 +1969,7 @@ export default function PatientDashboard({
                     <button
                       type="button"
                       onClick={() => setRegistryQuery('')}
-                      aria-label="Clear search query"
+                      aria-label={tx('Clear search query')}
                       className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
                     >
                       <X className="h-3.5 w-3.5" />
@@ -1979,31 +1980,31 @@ export default function PatientDashboard({
                 {/* Inline Dropdown Controls */}
                 <div className="flex flex-wrap items-center gap-2.5 shrink-0">
                   <FilterSelect
-                    label="Specialty"
+                    label={tx('Specialty')}
                     value={selectedSpecialtyFilter ? selectedSpecialtyFilter : registrySpecialty}
                     onChange={val => {
                       if (selectedSpecialtyFilter && onClearSpecialtyFilter) onClearSpecialtyFilter();
                       setRegistrySpecialty(val);
                     }}
                   >
-                    <option value="all">All Specialties ({doctorSpecialties.length})</option>
+                    <option value="all">{tx('All Specialties ({n})', { n: doctorSpecialties.length })}</option>
                     {doctorSpecialties.map(spec => (
-                      <option key={spec} value={spec}>{spec}</option>
+                      <option key={spec} value={spec}>{tx(spec)}</option>
                     ))}
                   </FilterSelect>
 
-                  <FilterSelect label="City" value={registryCity} onChange={setRegistryCity}>
-                    <option value="all">All Cities ({doctorCities.length})</option>
+                  <FilterSelect label={tx('City')} value={registryCity} onChange={setRegistryCity}>
+                    <option value="all">{tx('All Cities ({n})', { n: doctorCities.length })}</option>
                     {doctorCities.map(c => (
-                      <option key={c} value={c}>{c}</option>
+                      <option key={c} value={c}>{tx(c)}</option>
                     ))}
                   </FilterSelect>
 
-                  <FilterSelect label="Sort by" value={registrySort} onChange={v => setRegistrySort(v as any)}>
-                    <option value="rating">Highest Rated</option>
-                    <option value="experience">Most Experienced</option>
-                    <option value="fee_asc">Fee: Low to High</option>
-                    <option value="fee_desc">Fee: High to Low</option>
+                  <FilterSelect label={tx('Sort by')} value={registrySort} onChange={v => setRegistrySort(v as any)}>
+                    <option value="rating">{tx('Highest Rated')}</option>
+                    <option value="experience">{tx('Most Experienced')}</option>
+                    <option value="fee_asc">{tx('Fee: Low to High')}</option>
+                    <option value="fee_desc">{tx('Fee: High to Low')}</option>
                   </FilterSelect>
                 </div>
               </div>
@@ -2012,11 +2013,11 @@ export default function PatientDashboard({
               <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[color:var(--t-100)]">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs font-bold text-slate-600 tabular-nums" aria-live="polite">
-                    Showing <strong className="font-black text-[color:var(--ink)]">{filteredDoctors.length}</strong> of {allDoctors.length} verified doctor{allDoctors.length === 1 ? '' : 's'}
+                    {tx('Showing')} <strong className="font-black text-[color:var(--ink)]">{filteredDoctors.length}</strong> {tx(allDoctors.length === 1 ? 'of {n} verified doctor' : 'of {n} verified doctors', { n: allDoctors.length })}
                   </span>
                   {effectiveSpecialty && (
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
-                      {selectedSpecialtyFilter ? 'AI Triage: ' : 'Specialty: '}{effectiveSpecialty}
+                      {selectedSpecialtyFilter ? tx('AI Triage: ') : tx('Specialty: ')}{effectiveSpecialty}
                       <button
                         type="button"
                         onClick={() => {
@@ -2024,7 +2025,7 @@ export default function PatientDashboard({
                           setRegistrySpecialty('all');
                         }}
                         className="hover:text-slate-900 cursor-pointer"
-                        aria-label="Clear specialty filter"
+                        aria-label={tx('Clear specialty filter')}
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -2032,8 +2033,8 @@ export default function PatientDashboard({
                   )}
                   {registryCity !== 'all' && (
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
-                      City: {registryCity}
-                      <button type="button" onClick={() => setRegistryCity('all')} className="hover:text-slate-900 cursor-pointer" aria-label="Clear city filter">
+                      {tx('City: ')}{registryCity}
+                      <button type="button" onClick={() => setRegistryCity('all')} className="hover:text-slate-900 cursor-pointer" aria-label={tx('Clear city filter')}>
                         <X className="h-3 w-3" />
                       </button>
                     </span>
@@ -2052,7 +2053,7 @@ export default function PatientDashboard({
                     }}
                     className="text-xs font-bold text-[color:var(--t-700)] hover:text-[color:var(--dark)] underline underline-offset-2 cursor-pointer"
                   >
-                    Reset Filters
+                    {tx('Reset Filters')}
                   </button>
                 )}
               </div>
@@ -2061,8 +2062,8 @@ export default function PatientDashboard({
             {filteredDoctors.length === 0 ? (
               <div className="bg-white border border-[color:var(--t-200)] p-10 text-center space-y-2.5">
                 <Search className="h-8 w-8 text-[color:var(--t-300)] mx-auto" />
-                <p className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)]">No doctors match your current filter criteria</p>
-                <p className="text-xs text-slate-500">Try clearing your specialty or city filter to see all registered practitioners.</p>
+                <p className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)]">{tx('No doctors match your current filter criteria')}</p>
+                <p className="text-xs text-slate-500">{tx('Try clearing your specialty or city filter to see all registered practitioners.')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -2082,10 +2083,10 @@ export default function PatientDashboard({
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-[color:var(--t-700)] font-bold mt-0.5">{prof.specialization}</p>
+                          <p className="text-xs text-[color:var(--t-700)] font-bold mt-0.5">{tx(prof.specialization)}</p>
                           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
                             <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
-                              MMC Verified · Active
+                              {tx('MMC Verified · Active')}
                             </span>
                             {prof.licenseNumber && (
                               <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-2 py-0.5">
@@ -2100,16 +2101,16 @@ export default function PatientDashboard({
                         {(prof.practiceAddress || prof.city) && (
                           <p className="flex items-center gap-1.5 truncate">
                             <MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
-                            <span className="truncate">{prof.practiceAddress ? `${prof.practiceAddress}${prof.city && !prof.practiceAddress.includes(prof.city) ? `, ${prof.city}` : ''}` : prof.city}</span>
+                            <span className="truncate">{prof.practiceAddress ? `${prof.practiceAddress}${prof.city && !prof.practiceAddress.includes(prof.city) ? `, ${tx(prof.city)}` : ''}` : tx(prof.city)}</span>
                           </p>
                         )}
                         <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                           <span className="text-2xs font-bold uppercase tracking-wider text-slate-600 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-0.5">
-                            {prof.experienceYears} yrs exp
+                            {tx('{n} yrs exp', { n: prof.experienceYears })}
                           </span>
                           {prof.consultationModes?.map(mode => (
                             <span key={mode} className="text-2xs font-bold uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
-                              {mode}
+                              {tx(String(mode))}
                             </span>
                           ))}
                         </div>
@@ -2118,7 +2119,7 @@ export default function PatientDashboard({
 
                     <div className="pt-2.5 border-t border-[color:var(--t-100)] flex items-center justify-between mt-auto">
                       <div>
-                        <span className="text-2xs font-bold uppercase tracking-wider text-slate-400 block">Consultation Fee</span>
+                        <span className="text-2xs font-bold uppercase tracking-wider text-slate-400 block">{tx('Consultation Fee')}</span>
                         <span className="font-mono text-xs font-extrabold text-[color:var(--ink)]">RM {prof.fee}</span>
                       </div>
                       <button
@@ -2126,7 +2127,7 @@ export default function PatientDashboard({
                         onClick={() => onSelectProfessional(prof.id)}
                         className="h-9 px-3.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors"
                       >
-                        <span>Book Visit</span>
+                        <span>{tx('Book Visit')}</span>
                         <ArrowRight className="h-3.5 w-3.5" />
                       </button>
                     </div>
@@ -2170,10 +2171,10 @@ export default function PatientDashboard({
           <div id="panel-nurses" role="tabpanel" tabIndex={0} className="space-y-4">
             <WorkspaceHeader
               icon={UserCheck}
-              eyebrow="National Nursing Registry · Clinical Nurses"
-              title="LJM Registered Staff Nurses & Care Providers"
-              description="Verified professional nurses registered with the Lembaga Jururawat Malaysia (LJM) for clinic care, home nursing, and wound dressing."
-              badges={<BannerBadge tone="success"><CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" /> LJM Verified</BannerBadge>}
+              eyebrow={tx('National Nursing Registry · Clinical Nurses')}
+              title={tx('LJM Registered Staff Nurses & Care Providers')}
+              description={tx('Verified professional nurses registered with the Lembaga Jururawat Malaysia (LJM) for clinic care, home nursing, and wound dressing.')}
+              badges={<BannerBadge tone="success"><CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" /> {tx('LJM Verified')}</BannerBadge>}
               aside={
                 onFindDoctors && (
                   <button
@@ -2182,30 +2183,30 @@ export default function PatientDashboard({
                     className="px-3.5 h-10 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
                   >
                     <Search className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                    <span>Search All Providers</span>
+                    <span>{tx('Search All Providers')}</span>
                   </button>
                 )
               }
               tabs={[
-                { id: 'all', label: 'All Registered Nurses', count: allNurses.length },
-                { id: 'homecare', label: 'Home Care & Private Nursing', count: allNurses.filter(n => n.consultationModes?.includes(ConsultationMode.HOME_VISIT)).length },
-                { id: 'clinic', label: 'Clinical & Hospital', count: allNurses.filter(n => n.consultationModes?.includes(ConsultationMode.IN_PERSON)).length },
+                { id: 'all', label: tx('All Registered Nurses'), count: allNurses.length },
+                { id: 'homecare', label: tx('Home Care & Private Nursing'), count: allNurses.filter(n => n.consultationModes?.includes(ConsultationMode.HOME_VISIT)).length },
+                { id: 'clinic', label: tx('Clinical & Hospital'), count: allNurses.filter(n => n.consultationModes?.includes(ConsultationMode.IN_PERSON)).length },
               ]}
               activeTab={nursesSubTab}
               onTabChange={setNursesSubTab}
             />
 
             {/* Unified Single-Row Filter Control Bar */}
-            <section aria-label="Filter nurses" className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
+            <section aria-label={tx('Filter nurses')} className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
               <div className="flex flex-col xl:flex-row xl:items-center gap-3">
                 {/* Search Input */}
                 <div className="relative flex-1 min-w-[240px]">
-                  <label htmlFor="registry-nurse-search" className="sr-only">Search nurses</label>
+                  <label htmlFor="registry-nurse-search" className="sr-only">{tx('Search nurses')}</label>
                   <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     id="registry-nurse-search"
                     type="text"
-                    placeholder="Search by nurse name, nursing specialty, city, or LJM number…"
+                    placeholder={tx('Search by nurse name, nursing specialty, city, or LJM number…')}
                     value={nursesQuery}
                     onChange={e => setNursesQuery(e.target.value)}
                     className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
@@ -2214,7 +2215,7 @@ export default function PatientDashboard({
                     <button
                       type="button"
                       onClick={() => setNursesQuery('')}
-                      aria-label="Clear nurse search"
+                      aria-label={tx('Clear nurse search')}
                       className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
                     >
                       <X className="h-3.5 w-3.5" />
@@ -2224,25 +2225,25 @@ export default function PatientDashboard({
 
                 {/* Inline Dropdown Controls */}
                 <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-                  <FilterSelect label="Specialty" value={nursesSpecialty} onChange={setNursesSpecialty}>
-                    <option value="all">All Specialties ({nurseSpecialties.length})</option>
+                  <FilterSelect label={tx('Specialty')} value={nursesSpecialty} onChange={setNursesSpecialty}>
+                    <option value="all">{tx('All Specialties ({n})', { n: nurseSpecialties.length })}</option>
                     {nurseSpecialties.map(spec => (
-                      <option key={spec} value={spec}>{spec}</option>
+                      <option key={spec} value={spec}>{tx(spec)}</option>
                     ))}
                   </FilterSelect>
 
-                  <FilterSelect label="City" value={nursesCity} onChange={setNursesCity}>
-                    <option value="all">All Cities ({nurseCities.length})</option>
+                  <FilterSelect label={tx('City')} value={nursesCity} onChange={setNursesCity}>
+                    <option value="all">{tx('All Cities ({n})', { n: nurseCities.length })}</option>
                     {nurseCities.map(c => (
-                      <option key={c} value={c}>{c}</option>
+                      <option key={c} value={c}>{tx(c)}</option>
                     ))}
                   </FilterSelect>
 
-                  <FilterSelect label="Sort by" value={nursesSort} onChange={v => setNursesSort(v as any)}>
-                    <option value="rating">Highest Rated</option>
-                    <option value="experience">Most Experienced</option>
-                    <option value="fee_asc">Rate: Low to High</option>
-                    <option value="fee_desc">Rate: High to Low</option>
+                  <FilterSelect label={tx('Sort by')} value={nursesSort} onChange={v => setNursesSort(v as any)}>
+                    <option value="rating">{tx('Highest Rated')}</option>
+                    <option value="experience">{tx('Most Experienced')}</option>
+                    <option value="fee_asc">{tx('Rate: Low to High')}</option>
+                    <option value="fee_desc">{tx('Rate: High to Low')}</option>
                   </FilterSelect>
                 </div>
               </div>
@@ -2251,20 +2252,20 @@ export default function PatientDashboard({
               <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[color:var(--t-100)]">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs font-bold text-slate-600 tabular-nums" aria-live="polite">
-                    Showing <strong className="font-black text-[color:var(--ink)]">{filteredNurses.length}</strong> of {allNurses.length} registered nurse{allNurses.length === 1 ? '' : 's'}
+                    {tx('Showing')} <strong className="font-black text-[color:var(--ink)]">{filteredNurses.length}</strong> {tx(allNurses.length === 1 ? 'of {n} registered nurse' : 'of {n} registered nurses', { n: allNurses.length })}
                   </span>
                   {nursesSpecialty !== 'all' && (
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
-                      Specialty: {nursesSpecialty}
-                      <button type="button" onClick={() => setNursesSpecialty('all')} className="hover:text-slate-900 cursor-pointer" aria-label="Clear nurse specialty filter">
+                      {tx('Specialty: ')}{nursesSpecialty}
+                      <button type="button" onClick={() => setNursesSpecialty('all')} className="hover:text-slate-900 cursor-pointer" aria-label={tx('Clear nurse specialty filter')}>
                         <X className="h-3 w-3" />
                       </button>
                     </span>
                   )}
                   {nursesCity !== 'all' && (
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
-                      City: {nursesCity}
-                      <button type="button" onClick={() => setNursesCity('all')} className="hover:text-slate-900 cursor-pointer" aria-label="Clear nurse city filter">
+                      {tx('City: ')}{nursesCity}
+                      <button type="button" onClick={() => setNursesCity('all')} className="hover:text-slate-900 cursor-pointer" aria-label={tx('Clear nurse city filter')}>
                         <X className="h-3 w-3" />
                       </button>
                     </span>
@@ -2282,7 +2283,7 @@ export default function PatientDashboard({
                     }}
                     className="text-xs font-bold text-[color:var(--t-700)] hover:text-[color:var(--dark)] underline underline-offset-2 cursor-pointer"
                   >
-                    Reset Filters
+                    {tx('Reset Filters')}
                   </button>
                 )}
               </div>
@@ -2291,8 +2292,8 @@ export default function PatientDashboard({
             {filteredNurses.length === 0 ? (
               <div className="bg-white border border-[color:var(--t-200)] p-10 text-center space-y-2.5">
                 <UserCheck className="h-8 w-8 text-[color:var(--t-300)] mx-auto" />
-                <p className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)]">No clinical nurses match your filter criteria</p>
-                <p className="text-xs text-slate-500">Try resetting your specialty or city filter to browse all registered nurses.</p>
+                <p className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)]">{tx('No clinical nurses match your filter criteria')}</p>
+                <p className="text-xs text-slate-500">{tx('Try resetting your specialty or city filter to browse all registered nurses.')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -2312,10 +2313,10 @@ export default function PatientDashboard({
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-[color:var(--t-700)] font-bold mt-0.5">{prof.specialization || 'Clinical Staff Nurse'}</p>
+                          <p className="text-xs text-[color:var(--t-700)] font-bold mt-0.5">{tx(prof.specialization || 'Clinical Staff Nurse')}</p>
                           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
                             <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
-                              LJM Verified · Active
+                              {tx('LJM Verified · Active')}
                             </span>
                             {prof.licenseNumber && (
                               <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-2 py-0.5">
@@ -2330,16 +2331,16 @@ export default function PatientDashboard({
                         {(prof.practiceAddress || prof.city) && (
                           <p className="flex items-center gap-1.5 truncate">
                             <MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
-                            <span className="truncate">{prof.practiceAddress ? `${prof.practiceAddress}${prof.city && !prof.practiceAddress.includes(prof.city) ? `, ${prof.city}` : ''}` : prof.city}</span>
+                            <span className="truncate">{prof.practiceAddress ? `${prof.practiceAddress}${prof.city && !prof.practiceAddress.includes(prof.city) ? `, ${tx(prof.city)}` : ''}` : tx(prof.city)}</span>
                           </p>
                         )}
                         <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                           <span className="text-2xs font-bold uppercase tracking-wider text-slate-600 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-0.5">
-                            {prof.experienceYears} yrs exp
+                            {tx('{n} yrs exp', { n: prof.experienceYears })}
                           </span>
                           {prof.consultationModes?.map(mode => (
                             <span key={mode} className="text-2xs font-bold uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
-                              {mode}
+                              {tx(String(mode))}
                             </span>
                           ))}
                         </div>
@@ -2348,7 +2349,7 @@ export default function PatientDashboard({
 
                     <div className="pt-2.5 border-t border-[color:var(--t-100)] flex items-center justify-between mt-auto">
                       <div>
-                        <span className="text-2xs font-bold uppercase tracking-wider text-slate-400 block">Care Rate</span>
+                        <span className="text-2xs font-bold uppercase tracking-wider text-slate-400 block">{tx('Care Rate')}</span>
                         <span className="font-mono text-xs font-extrabold text-[color:var(--ink)]">RM {prof.fee || 60} / hr</span>
                       </div>
                       <button
@@ -2356,7 +2357,7 @@ export default function PatientDashboard({
                         onClick={() => onSelectProfessional(prof.id)}
                         className="h-9 px-3.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors"
                       >
-                        <span>Book Nurse</span>
+                        <span>{tx('Book Nurse')}</span>
                         <ArrowRight className="h-3.5 w-3.5" />
                       </button>
                     </div>
@@ -2384,7 +2385,7 @@ export default function PatientDashboard({
                 </div>
                 <div>
                   <h3 id="dispatch-dialog-title" className="font-display font-black text-sm text-[color:var(--ink)] leading-tight">
-                    Dispatch Prescription to Pharmacy
+                    {tx('Dispatch Prescription to Pharmacy')}
                   </h3>
                   <p className="text-xs font-mono text-slate-500">RX CODE: {dispatchingRx.code}</p>
                 </div>
@@ -2393,7 +2394,7 @@ export default function PatientDashboard({
                 type="button"
                 onClick={() => { setDispatchingRx(null); setDispatchResult(null); }}
                 className="text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
-                aria-label="Close dialog"
+                aria-label={tx('Close dialog')}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -2402,24 +2403,24 @@ export default function PatientDashboard({
             {/* PRESCRIPTION DETAILS */}
             <div className="p-3 bg-[color:var(--t-50)]/40 border border-[color:var(--t-200)] text-xs space-y-1">
               <p className="font-bold text-[color:var(--ink)]">
-                {Array.isArray(dispatchingRx.items) && dispatchingRx.items[0]?.name ? dispatchingRx.items[0].name : dispatchingRx.diagnosis || 'Prescribed Medicine'}
+                {Array.isArray(dispatchingRx.items) && dispatchingRx.items[0]?.name ? dispatchingRx.items[0].name : dispatchingRx.diagnosis || tx('Prescribed Medicine')}
               </p>
               {Array.isArray(dispatchingRx.items) && dispatchingRx.items[0]?.instructions && (
                 <p className="text-slate-600 font-medium">{dispatchingRx.items[0].instructions}</p>
               )}
               <p className="text-xs font-mono text-slate-500 pt-0.5">
-                Prescribing Doctor: {dispatchingRx.doctor?.name || 'Verified Physician'}
+                {tx('Prescribing Doctor: {name}', { name: dispatchingRx.doctor?.name || tx('Verified Physician') })}
               </p>
             </div>
 
             <form onSubmit={handleDispatchPrescription} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                  Select Partner Pharmacy for Dispensing:
+                  {tx('Select Partner Pharmacy for Dispensing:')}
                 </label>
                 {pharmacies.length === 0 ? (
                   <p className="text-xs text-slate-500 p-3 bg-slate-50 border border-slate-200">
-                    Loading partner pharmacies…
+                    {tx('Loading partner pharmacies…')}
                   </p>
                 ) : (
                   <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
@@ -2473,7 +2474,7 @@ export default function PatientDashboard({
                   className="mt-0.5 text-[color:var(--t-600)] focus:ring-[color:var(--t-600)]"
                 />
                 <span>
-                  Authorize pharmacist to view documented drug allergies &amp; conditions for safety cross-checking.
+                  {tx('Authorize pharmacist to view documented drug allergies & conditions for safety cross-checking.')}
                 </span>
               </label>
 
@@ -2493,7 +2494,7 @@ export default function PatientDashboard({
                   onClick={() => { setDispatchingRx(null); setDispatchResult(null); }}
                   className="min-h-[40px] px-4 text-xs font-bold border border-slate-300 hover:bg-slate-50 cursor-pointer transition-colors"
                 >
-                  Cancel
+                  {tx('Cancel')}
                 </button>
                 <button
                   type="submit"
@@ -2501,7 +2502,7 @@ export default function PatientDashboard({
                   className="min-h-[40px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:opacity-50 text-white text-xs font-black shadow-xs cursor-pointer transition-colors flex items-center gap-1.5"
                 >
                   <Send className="h-3.5 w-3.5" />
-                  <span>{dispatchBusy ? 'Transmitting…' : 'Confirm Dispatch to Pharmacy'}</span>
+                  <span>{dispatchBusy ? tx('Transmitting…') : tx('Confirm Dispatch to Pharmacy')}</span>
                 </button>
               </div>
             </form>
@@ -2514,7 +2515,7 @@ export default function PatientDashboard({
         <PaymentDialog 
           kind="booking" 
           refId={paying.id} 
-          description={`Appointment with ${paying.professionalName} on ${paying.date}, ${paying.timeSlot}`}
+          description={tx('Appointment with {name} on {date}, {slot}', { name: paying.professionalName, date: paying.date, slot: paying.timeSlot })}
           onCancel={() => setPaying(null)}
           onPaid={() => { 
             setBookings(prev => prev.map(x => (x.id === paying.id ? { ...x, paymentStatus: 'Paid' as const } : x))); 

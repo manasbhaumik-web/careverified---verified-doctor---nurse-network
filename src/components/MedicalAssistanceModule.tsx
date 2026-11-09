@@ -33,6 +33,7 @@ import {
   MessageSquare,
   FileCheck
 } from 'lucide-react';
+import { useTr } from '../locale';
 import DashboardHeader from './DashboardHeader';
 import { MyCases } from './MedicalTourism';
 
@@ -144,6 +145,7 @@ export default function MedicalAssistanceModule({
   activeTab: controlledActiveTab,
   onTabChange: setControlledActiveTab,
 }: MedicalAssistanceModuleProps = {}) {
+  const tx = useTr();
   const [internalActiveTab, setInternalActiveTab] = useState<AssistanceTab>('enquiry');
   const activeTab = controlledActiveTab !== undefined ? controlledActiveTab : internalActiveTab;
   const setActiveTab = (tab: AssistanceTab) => {
@@ -298,14 +300,14 @@ export default function MedicalAssistanceModule({
 
     if (step < 3) { goNext(); return; }
     if (!stepIsValid(3)) return;
-    if (!facilityId) { setFormError('No hospital is available to receive your request right now. Please try again later.'); setStep(2); return; }
+    if (!facilityId) { setFormError(tx('No hospital is available to receive your request right now. Please try again later.')); setStep(2); return; }
     if (summary.trim().length < 15) {
-      setFormError('Please describe the condition or the treatment you want in at least 15 characters.');
+      setFormError(tx('Please describe the condition or the treatment you want in at least 15 characters.'));
       setStep(2);
       return;
     }
     if (!fullName.trim() || !email.trim()) {
-      setFormError('Please provide the patient contact person full name and email address.');
+      setFormError(tx('Please provide the patient contact person full name and email address.'));
       return;
     }
 
@@ -353,10 +355,10 @@ export default function MedicalAssistanceModule({
         setSummary('');
         setStep(1);
       } else {
-        setFormError(data.message || 'Failed to submit enquiry. Please verify the information provided.');
+        setFormError(data.message || tx('Failed to submit enquiry. Please verify the information provided.'));
       }
     } catch {
-      setFormError('A network error occurred while submitting your medical enquiry.');
+      setFormError(tx('A network error occurred while submitting your medical enquiry.'));
     } finally {
       setFormSubmitting(false);
     }
@@ -386,10 +388,10 @@ export default function MedicalAssistanceModule({
         setRevisionNotes('');
         loadCases();
       } else {
-        setActionError(data.message || 'Your answer could not be saved. Please try again.');
+        setActionError(data.message || tx('Your answer could not be saved. Please try again.'));
       }
     } catch {
-      setActionError('Network error. Your answer was not saved. Please try again.');
+      setActionError(tx('Network error. Your answer was not saved. Please try again.'));
     } finally {
       setDecisionSubmitting(false);
     }
@@ -415,7 +417,7 @@ export default function MedicalAssistanceModule({
         }
       }
     } catch {
-      setActionError('The message was not sent. Please try again.');
+      setActionError(tx('The message was not sent. Please try again.'));
     } finally {
       setSendingMsg(false);
     }
@@ -430,10 +432,10 @@ export default function MedicalAssistanceModule({
         setProformaData(data.data);
         setShowProformaModal(true);
       } else {
-        setActionError(data.message || 'There is no quotation document for this request yet.');
+        setActionError(data.message || tx('There is no quotation document for this request yet.'));
       }
     } catch {
-      setActionError('The quotation document could not be loaded. Please try again.');
+      setActionError(tx('The quotation document could not be loaded. Please try again.'));
     }
   };
 
@@ -442,7 +444,7 @@ export default function MedicalAssistanceModule({
     e.preventDefault();
     setTrackError('');
     if (!trackCode.trim() || !trackEmail.trim()) {
-      setTrackError('Please provide both your Tracking Code and the Contact Email used during submission.');
+      setTrackError(tx('Please provide both your Tracking Code and the Contact Email used during submission.'));
       return;
     }
     setTrackingLoading(true);
@@ -454,10 +456,10 @@ export default function MedicalAssistanceModule({
         setSelectedCase(data.data[0]);
         setActiveTab('cases');
       } else {
-        setTrackError('No request matches that code and email. Check both and try again.');
+        setTrackError(tx('No request matches that code and email. Check both and try again.'));
       }
     } catch {
-      setTrackError('An error occurred during lookup.');
+      setTrackError(tx('An error occurred during lookup.'));
     } finally {
       setTrackingLoading(false);
     }
@@ -469,14 +471,14 @@ export default function MedicalAssistanceModule({
       {!embedded && (
         <DashboardHeader
           icon={HeartHandshake}
-          eyebrow="Treatment quotes"
-          title="Treatment quotes and assistance"
-          description="Ask a hospital for an itemised quote, then accept it or ask for changes. Sending a request is free and does not commit you."
+          eyebrow={tx('Treatment quotes')}
+          title={tx('Treatment quotes and assistance')}
+          description={tx('Ask a hospital for an itemised quote, then accept it or ask for changes. Sending a request is free and does not commit you.')}
           tabs={[
-            { id: 'enquiry', label: 'Request a quote', icon: FileText },
-            { id: 'cases', label: 'My requests and quotes', icon: DollarSign },
-            { id: 'guide', label: 'Travel guide', icon: Globe },
-            ...(me ? [] : [{ id: 'track', label: 'Track a request', icon: Search }]),
+            { id: 'enquiry', label: tx('Request a quote'), icon: FileText },
+            { id: 'cases', label: tx('My requests and quotes'), icon: DollarSign },
+            { id: 'guide', label: tx('Travel guide'), icon: Globe },
+            ...(me ? [] : [{ id: 'track', label: tx('Track a request'), icon: Search }]),
           ]}
           activeTab={activeTab}
           onTabChange={(t) => setActiveTab(t as any)}
@@ -494,10 +496,10 @@ export default function MedicalAssistanceModule({
               <div>
                 <h2 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
                   <FileText className="h-5 w-5 text-[color:var(--t-600)]" aria-hidden="true" />
-                  Request a treatment quote
+                  {tx('Request a treatment quote')}
                 </h2>
                 <p className="text-xs text-slate-700 mt-1">
-                  Tell a hospital what you need and it replies with an itemised quote. Sending this request is free and does not commit you.
+                  {tx('Tell a hospital what you need and it replies with an itemised quote. Sending this request is free and does not commit you.')}
                 </p>
               </div>
 
@@ -505,17 +507,17 @@ export default function MedicalAssistanceModule({
                 <div role="status" className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs space-y-2">
                   <div className="flex items-center gap-2 font-extrabold text-base">
                     <CheckCircle2 className="h-5 w-5 text-emerald-700 shrink-0" aria-hidden="true" />
-                    Request sent. Your reference is <span className="font-mono">{formSuccessMessage.trackingCode}</span>
+                    {tx('Request sent. Your reference is')} <span className="font-mono">{formSuccessMessage.trackingCode}</span>
                   </div>
                   <p>
-                    The hospital will review it and add a quote to your request. {me ? 'You will find it under My requests and quotes.' : 'Keep this reference and the email you used: you need both to see your request later.'}
+                    {tx('The hospital will review it and add a quote to your request.')} {me ? tx('You will find it under My requests and quotes.') : tx('Keep this reference and the email you used: you need both to see your request later.')}
                   </p>
                   <button
                     type="button"
                     onClick={() => { if (me) setOpenCaseId(formSuccessMessage.id); setActiveTab('cases'); }}
                     className="min-h-[44px] px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white font-bold text-xs cursor-pointer"
                   >
-                    View my request
+                    {tx('View my request')}
                   </button>
                 </div>
               )}
@@ -527,10 +529,10 @@ export default function MedicalAssistanceModule({
                 </div>
               )}
 
-              <ol aria-label="Steps" className="flex flex-wrap gap-x-5 gap-y-1 text-xs">
+              <ol aria-label={tx('Steps')} className="flex flex-wrap gap-x-5 gap-y-1 text-xs">
                 {['About you', 'What you need', 'Extras and consent'].map((t, i) => (
                   <li key={t} aria-current={step === i + 1 ? 'step' : undefined} className={step === i + 1 ? 'font-extrabold text-[color:var(--t-700)]' : step > i + 1 ? 'font-semibold text-slate-800' : 'text-slate-700'}>
-                    {i + 1}. {t}{step > i + 1 ? ' (done)' : ''}
+                    {i + 1}. {tx(t)}{step > i + 1 ? ` (${tx('done')})` : ''}
                   </li>
                 ))}
               </ol>
@@ -539,7 +541,7 @@ export default function MedicalAssistanceModule({
                 {/* STEP 1: who */}
                 <div data-step="1" hidden={step !== 1} className="space-y-4">
                   <fieldset className="space-y-2">
-                    <legend className="text-xs font-bold text-slate-800 block">Where do you live? *</legend>
+                    <legend className="text-xs font-bold text-slate-800 block">{tx('Where do you live? *')}</legend>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {[
                         { id: 'local_malaysian', title: 'Malaysian citizen', text: 'You hold a MyKad.', home: 'MY' },
@@ -548,7 +550,7 @@ export default function MedicalAssistanceModule({
                       ].map(o => (
                         <label key={o.id} className={`flex items-start gap-3 p-3 min-h-[44px] border cursor-pointer ${patientType === o.id ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)]' : 'border-slate-300 bg-white hover:bg-slate-50'}`}>
                           <input type="radio" name="patientType" className="mt-1 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" checked={patientType === o.id} onChange={() => { setPatientType(o.id as any); setHomeCountry(o.home); }} />
-                          <span><span className="block text-xs font-bold text-slate-900">{o.title}</span><span className="block text-xs text-slate-700">{o.text}</span></span>
+                          <span><span className="block text-xs font-bold text-slate-900">{tx(o.title)}</span><span className="block text-xs text-slate-700">{tx(o.text)}</span></span>
                         </label>
                       ))}
                     </div>
@@ -556,24 +558,24 @@ export default function MedicalAssistanceModule({
 
                   {patientType !== 'local_malaysian' && (
                     <div className="space-y-1 sm:max-w-xs">
-                      <label htmlFor="aq-country" className="text-xs font-bold text-slate-800 block">Country you live in</label>
+                      <label htmlFor="aq-country" className="text-xs font-bold text-slate-800 block">{tx('Country you live in')}</label>
                       <select id="aq-country" value={homeCountry} onChange={(e) => setHomeCountry(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
-                        {[['ID', 'Indonesia'], ['SG', 'Singapore'], ['CN', 'China'], ['IN', 'India'], ['AU', 'Australia'], ['GB', 'United Kingdom'], ['US', 'United States'], ['SA', 'Saudi Arabia'], ['AE', 'United Arab Emirates'], ['JP', 'Japan'], ['MY', 'Malaysia'], ['XX', 'Other']].map(([c, n]) => <option key={c} value={c}>{n}</option>)}
+                        {[['ID', 'Indonesia'], ['SG', 'Singapore'], ['CN', 'China'], ['IN', 'India'], ['AU', 'Australia'], ['GB', 'United Kingdom'], ['US', 'United States'], ['SA', 'Saudi Arabia'], ['AE', 'United Arab Emirates'], ['JP', 'Japan'], ['MY', 'Malaysia'], ['XX', 'Other']].map(([c, n]) => <option key={c} value={c}>{tx(n)}</option>)}
                       </select>
                     </div>
                   )}
 
                   <div className="space-y-1">
-                    <label htmlFor="aq-name" className="text-xs font-bold text-slate-800 block">Full name *</label>
-                    <input id="aq-name" type="text" required autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="e.g. Fatimah binti Ali" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                    <label htmlFor="aq-name" className="text-xs font-bold text-slate-800 block">{tx('Full name *')}</label>
+                    <input id="aq-name" type="text" required autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={tx('e.g. Fatimah binti Ali')} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="aq-email" className="text-xs font-bold text-slate-800 block">Email *</label>
-                      <input id="aq-email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                      <label htmlFor="aq-email" className="text-xs font-bold text-slate-800 block">{tx('Email *')}</label>
+                      <input id="aq-email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={tx('you@example.com')} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="aq-phone" className="text-xs font-bold text-slate-800 block">Phone or WhatsApp (helps the hospital reach you)</label>
+                      <label htmlFor="aq-phone" className="text-xs font-bold text-slate-800 block">{tx('Phone or WhatsApp (helps the hospital reach you)')}</label>
                       <input id="aq-phone" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+60 12-345 6789" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                     </div>
                   </div>
@@ -583,33 +585,33 @@ export default function MedicalAssistanceModule({
                 <div data-step="2" hidden={step !== 2} className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="aq-type" className="text-xs font-bold text-slate-800 block">What do you need? *</label>
+                      <label htmlFor="aq-type" className="text-xs font-bold text-slate-800 block">{tx('What do you need? *')}</label>
                       <select id="aq-type" value={assistanceType} onChange={(e) => setAssistanceType(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
-                        <option value="elective_surgery">A procedure and hospital stay</option>
-                        <option value="specialist_consult">A specialist consultation or second opinion</option>
-                        <option value="urgent_evacuation">Transfer between hospitals</option>
-                        <option value="maternity_care">Maternity and delivery</option>
-                        <option value="executive_screening">A full health screening</option>
-                        <option value="oncology_workup">Cancer care</option>
+                        <option value="elective_surgery">{tx('A procedure and hospital stay')}</option>
+                        <option value="specialist_consult">{tx('A specialist consultation or second opinion')}</option>
+                        <option value="urgent_evacuation">{tx('Transfer between hospitals')}</option>
+                        <option value="maternity_care">{tx('Maternity and delivery')}</option>
+                        <option value="executive_screening">{tx('A full health screening')}</option>
+                        <option value="oncology_workup">{tx('Cancer care')}</option>
                       </select>
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="aq-specialty" className="text-xs font-bold text-slate-800 block">Medical specialty *</label>
+                      <label htmlFor="aq-specialty" className="text-xs font-bold text-slate-800 block">{tx('Medical specialty *')}</label>
                       <select id="aq-specialty" value={specialty} onChange={(e) => setSpecialty(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
-                        <option value="Cardiology & Interventional">Cardiology and heart surgery</option>
-                        <option value="Orthopaedics & Joint Reconstruction">Orthopaedics (knee, hip, joints)</option>
-                        <option value="Oncology & Surgical Oncology">Oncology and radiotherapy</option>
-                        <option value="Obstetrics & Gynaecology">Obstetrics, gynaecology and IVF</option>
-                        <option value="Neurology & Neurosurgery">Neurology and neurosurgery</option>
-                        <option value="Gastroenterology & Bariatric">Gastroenterology and endoscopy</option>
-                        <option value="Paediatrics & Neonatology">Paediatrics</option>
-                        <option value="Executive Health Screening">Health screening</option>
+                        <option value="Cardiology & Interventional">{tx('Cardiology and heart surgery')}</option>
+                        <option value="Orthopaedics & Joint Reconstruction">{tx('Orthopaedics (knee, hip, joints)')}</option>
+                        <option value="Oncology & Surgical Oncology">{tx('Oncology and radiotherapy')}</option>
+                        <option value="Obstetrics & Gynaecology">{tx('Obstetrics, gynaecology and IVF')}</option>
+                        <option value="Neurology & Neurosurgery">{tx('Neurology and neurosurgery')}</option>
+                        <option value="Gastroenterology & Bariatric">{tx('Gastroenterology and endoscopy')}</option>
+                        <option value="Paediatrics & Neonatology">{tx('Paediatrics')}</option>
+                        <option value="Executive Health Screening">{tx('Health screening')}</option>
                       </select>
                     </div>
                   </div>
 
                   <fieldset className="space-y-2">
-                    <legend className="text-xs font-bold text-slate-800 block">How soon do you need a reply? *</legend>
+                    <legend className="text-xs font-bold text-slate-800 block">{tx('How soon do you need a reply? *')}</legend>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {[
                         { id: 'routine', title: 'Routine', text: 'Within a few weeks' },
@@ -618,7 +620,7 @@ export default function MedicalAssistanceModule({
                       ].map(o => (
                         <label key={o.id} className={`flex items-start gap-3 p-3 min-h-[44px] border cursor-pointer ${urgency === o.id ? (o.id === 'urgent' ? 'border-red-700 bg-red-50' : 'border-[color:var(--t-600)] bg-[color:var(--t-50)]') : 'border-slate-300 bg-white hover:bg-slate-50'}`}>
                           <input type="radio" name="urgency" className="mt-1 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" checked={urgency === o.id} onChange={() => setUrgency(o.id as any)} />
-                          <span><span className="block text-xs font-bold text-slate-900">{o.title}</span><span className="block text-xs text-slate-700">{o.text}</span></span>
+                          <span><span className="block text-xs font-bold text-slate-900">{tx(o.title)}</span><span className="block text-xs text-slate-700">{tx(o.text)}</span></span>
                         </label>
                       ))}
                     </div>
@@ -626,32 +628,32 @@ export default function MedicalAssistanceModule({
 
                   {(urgency === 'urgent' || assistanceType === 'urgent_evacuation') && (
                     <div role="alert" className="p-4 bg-red-50 border-2 border-red-300 text-red-950 text-xs space-y-1">
-                      <p className="font-extrabold flex items-center gap-2"><AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" /> If someone is in danger now, do not wait for this request.</p>
-                      <p>Call <strong>999</strong> (Malaysia) or go to the nearest emergency department. This form is not an emergency service and may not be read straight away.</p>
+                      <p className="font-extrabold flex items-center gap-2"><AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" /> {tx('If someone is in danger now, do not wait for this request.')}</p>
+                      <p>{tx('Call')} <strong>999</strong> {tx('(Malaysia) or go to the nearest emergency department. This form is not an emergency service and may not be read straight away.')}</p>
                     </div>
                   )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="aq-facility" className="text-xs font-bold text-slate-800 block">Hospital *</label>
+                      <label htmlFor="aq-facility" className="text-xs font-bold text-slate-800 block">{tx('Hospital *')}</label>
                       {facilities.length <= 1 ? (
-                        <p className={`min-h-[44px] flex items-center text-xs font-semibold ${facilities[0] ? 'text-slate-900' : 'text-rose-900'}`}>{facilities[0] ? `${facilities[0].name}${facilities[0].city ? `, ${facilities[0].city}` : ''}` : 'No hospital is available right now. Please try again later.'}</p>
+                        <p className={`min-h-[44px] flex items-center text-xs font-semibold ${facilities[0] ? 'text-slate-900' : 'text-rose-900'}`}>{facilities[0] ? `${facilities[0].name}${facilities[0].city ? `, ${tx(facilities[0].city)}` : ''}` : tx('No hospital is available right now. Please try again later.')}</p>
                       ) : (
                         <select id="aq-facility" value={facilityId} onChange={(e) => setFacilityId(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
-                          {facilities.map(f => <option key={f.id} value={f.id}>{f.name}{f.city ? ` (${f.city})` : ''}</option>)}
+                          {facilities.map(f => <option key={f.id} value={f.id}>{f.name}{f.city ? ` (${tx(f.city)})` : ''}</option>)}
                         </select>
                       )}
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="aq-from" className="text-xs font-bold text-slate-800 block">Earliest date you could start</label>
+                      <label htmlFor="aq-from" className="text-xs font-bold text-slate-800 block">{tx('Earliest date you could start')}</label>
                       <input id="aq-from" type="date" value={preferredFrom} min={new Date().toISOString().slice(0, 10)} onChange={(e) => setPreferredFrom(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="aq-summary" className="text-xs font-bold text-slate-800 block">Describe your condition or the treatment you want *</label>
-                    <textarea id="aq-summary" rows={5} required minLength={15} value={summary} onChange={(e) => setSummary(e.target.value)} placeholder="Symptoms, any diagnosis you have been given, past operations, the procedure you are asking about…" className="w-full px-3 py-2 border border-slate-300 text-xs bg-white leading-relaxed focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
-                    <p className="text-xs text-slate-700">At least 15 characters. Do not put passport, card or bank numbers here. You can share reports later in Messages.</p>
+                    <label htmlFor="aq-summary" className="text-xs font-bold text-slate-800 block">{tx('Describe your condition or the treatment you want *')}</label>
+                    <textarea id="aq-summary" rows={5} required minLength={15} value={summary} onChange={(e) => setSummary(e.target.value)} placeholder={tx('Symptoms, any diagnosis you have been given, past operations, the procedure you are asking about…')} className="w-full px-3 py-2 border border-slate-300 text-xs bg-white leading-relaxed focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                    <p className="text-xs text-slate-700">{tx('At least 15 characters. Do not put passport, card or bank numbers here. You can share reports later in Messages.')}</p>
                   </div>
                 </div>
 
@@ -659,17 +661,17 @@ export default function MedicalAssistanceModule({
                 <div data-step="3" hidden={step !== 3} className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="aq-insurer" className="text-xs font-bold text-slate-800 block">Insurance provider (optional)</label>
-                      <input id="aq-insurer" type="text" value={insuranceCarrier} onChange={(e) => setInsuranceCarrier(e.target.value)} placeholder="e.g. Great Eastern, Bupa, Cigna, Allianz" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
+                      <label htmlFor="aq-insurer" className="text-xs font-bold text-slate-800 block">{tx('Insurance provider (optional)')}</label>
+                      <input id="aq-insurer" type="text" value={insuranceCarrier} onChange={(e) => setInsuranceCarrier(e.target.value)} placeholder={tx('e.g. Great Eastern, Bupa, Cigna, Allianz')} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                     </div>
                     <label className="flex items-center gap-3 min-h-[44px] sm:mt-7 px-3 border border-slate-300 bg-white cursor-pointer text-xs font-semibold text-slate-900">
                       <input type="checkbox" checked={guaranteeLetter} onChange={(e) => setGuaranteeLetter(e.target.checked)} className="h-5 w-5 shrink-0 accent-[color:var(--t-600)]" />
-                      Ask the hospital about a guarantee letter from my insurer
+                      {tx('Ask the hospital about a guarantee letter from my insurer')}
                     </label>
                   </div>
 
                   <fieldset className="space-y-2">
-                    <legend className="text-xs font-bold text-slate-800 block">Help you would like arranged (optional)</legend>
+                    <legend className="text-xs font-bold text-slate-800 block">{tx('Help you would like arranged (optional)')}</legend>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {[
                         { label: 'A medical interpreter', v: needsInterpreter, set: setNeedsInterpreter },
@@ -681,20 +683,20 @@ export default function MedicalAssistanceModule({
                       ].map(o => (
                         <label key={o.label} className="flex items-center gap-3 min-h-[44px] px-3 border border-slate-300 bg-white cursor-pointer text-xs font-semibold text-slate-900">
                           <input type="checkbox" checked={o.v} onChange={(e) => o.set(e.target.checked)} className="h-5 w-5 shrink-0 accent-[color:var(--t-600)]" />
-                          {o.label}
+                          {tx(o.label)}
                         </label>
                       ))}
                     </div>
                     {needsInterpreter && (
                       <div className="space-y-1 sm:max-w-xs">
-                        <label htmlFor="aq-lang" className="text-xs font-bold text-slate-800 block">Language</label>
+                        <label htmlFor="aq-lang" className="text-xs font-bold text-slate-800 block">{tx('Language')}</label>
                         <select id="aq-lang" value={interpreterLanguage} onChange={(e) => setInterpreterLanguage(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
-                          <option value="Arabic">Arabic</option>
-                          <option value="Mandarin">Mandarin</option>
-                          <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-                          <option value="Japanese">Japanese</option>
-                          <option value="Russian">Russian</option>
-                          <option value="French">French</option>
+                          <option value="Arabic">{tx('Arabic')}</option>
+                          <option value="Mandarin">{tx('Mandarin')}</option>
+                          <option value="Bahasa Indonesia">{tx('Bahasa Indonesia')}</option>
+                          <option value="Japanese">{tx('Japanese')}</option>
+                          <option value="Russian">{tx('Russian')}</option>
+                          <option value="French">{tx('French')}</option>
                         </select>
                       </div>
                     )}
@@ -702,21 +704,21 @@ export default function MedicalAssistanceModule({
 
                   <label className="flex items-start gap-3 cursor-pointer text-xs text-slate-800">
                     <input type="checkbox" required checked={shareDocuments} onChange={(e) => setShareDocuments(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" />
-                    <span>I agree that MediCred and the hospital I chose may read what I have written here, only to assess my request and prepare a quote (Personal Data Protection Act 2010). *</span>
+<span>{tx('I agree that MediCred and the hospital I chose may read what I have written here, only to assess my request and prepare a quote (Personal Data Protection Act 2010). *')}</span>
                   </label>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-200">
                   <button type="button" onClick={goBack} disabled={step === 1} className="min-h-[44px] px-5 border border-slate-300 bg-white text-slate-800 text-xs font-bold hover:bg-slate-50 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
-                    Back
+                    {tx('Back')}
                   </button>
                   {step < 3 ? (
                     <button type="button" onClick={goNext} className="min-h-[44px] px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer">
-                      Next
+                      {tx('Next')}
                     </button>
                   ) : (
                     <button type="submit" disabled={formSubmitting} className="min-h-[44px] px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer flex items-center gap-2 disabled:opacity-60">
-                      {formSubmitting ? (<><RefreshCw className="h-4 w-4 animate-spin" aria-hidden="true" /> Sending…</>) : (<><Send className="h-4 w-4" aria-hidden="true" /> Send request</>)}
+                      {formSubmitting ? (<><RefreshCw className="h-4 w-4 animate-spin" aria-hidden="true" /> {tx('Sending…')}</>) : (<><Send className="h-4 w-4" aria-hidden="true" /> {tx('Send request')}</>)}
                     </button>
                   )}
                 </div>
@@ -728,19 +730,19 @@ export default function MedicalAssistanceModule({
               <div className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
                 <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2">
                   <Shield className="h-4 w-4 text-[color:var(--t-600)]" aria-hidden="true" />
-                  What happens next
+                  {tx('What happens next')}
                 </h3>
                 <ol className="space-y-3 text-xs text-slate-800 list-decimal ml-5">
-                  <li><strong>The hospital reads your request.</strong> Reply times differ between hospitals.</li>
-                  <li><strong>You get an itemised quote</strong> with what is included, what is not, and how long the price is valid.</li>
-                  <li><strong>You decide.</strong> Accept it, ask for changes, or ask questions. Accepting does not charge you.</li>
-                  <li><strong>The hospital arranges the details</strong> with you: dates, transfers and any insurer guarantee letter.</li>
+                  <li><strong>{tx('The hospital reads your request.')}</strong> {tx('Reply times differ between hospitals.')}</li>
+                  <li><strong>{tx('You get an itemised quote')}</strong> {tx('with what is included, what is not, and how long the price is valid.')}</li>
+                  <li><strong>{tx('You decide.')}</strong> {tx('Accept it, ask for changes, or ask questions. Accepting does not charge you.')}</li>
+                  <li><strong>{tx('The hospital arranges the details')}</strong> {tx('with you: dates, transfers and any insurer guarantee letter.')}</li>
                 </ol>
               </div>
 
               <div role="note" className="bg-red-50 border border-red-200 p-4 text-xs text-red-950 space-y-1">
-                <p className="font-extrabold">In an emergency, call 999.</p>
-                <p>This service is for planned and urgent-but-stable care. It is not an emergency line.</p>
+                <p className="font-extrabold">{tx('In an emergency, call 999.')}</p>
+                <p>{tx('This service is for planned and urgent-but-stable care. It is not an emergency line.')}</p>
               </div>
             </div>
           </div>
@@ -757,7 +759,7 @@ export default function MedicalAssistanceModule({
           <div className="space-y-4">
           {cases.length > 0 && (
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              <label htmlFor="currency-select" className="font-bold text-slate-800">Show prices in</label>
+              <label htmlFor="currency-select" className="font-bold text-slate-800">{tx('Show prices in')}</label>
               <select
                 id="currency-select"
                 value={selectedCurrency}
@@ -765,10 +767,10 @@ export default function MedicalAssistanceModule({
                 className="border border-slate-300 bg-white text-xs font-semibold px-3 min-h-[44px] cursor-pointer focus:outline-none focus:border-[color:var(--t-600)]"
               >
                 {Object.entries(CURRENCY_RATES).map(([code, item]) => (
-                  <option key={code} value={code}>{code} - {item.label}</option>
+                  <option key={code} value={code}>{code} - {tx(item.label)}</option>
                 ))}
               </select>
-              <span className="text-xs text-slate-700">Other currencies are a rough guide only. The hospital bills in ringgit (RM).</span>
+              <span className="text-xs text-slate-700">{tx('Other currencies are a rough guide only. The hospital bills in ringgit (RM).')}</span>
             </div>
           )}
           {actionError && <p role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-xs">{actionError}</p>}
@@ -789,20 +791,20 @@ export default function MedicalAssistanceModule({
               </div>
 
               {loadingCases && (
-                <div className="p-8 text-center text-xs text-slate-400">Loading cases…</div>
+                <div className="p-8 text-center text-xs text-slate-400">{tx('Loading cases…')}</div>
               )}
 
               {!loadingCases && cases.length === 0 && (
                 <div className="bg-white border border-dashed border-slate-300 p-8 text-center text-xs text-slate-500 space-y-2">
                   <FileText className="h-8 w-8 text-slate-600 mx-auto" aria-hidden="true" />
-                  <p className="text-sm font-bold text-slate-900">You have no requests yet.</p>
-                  <p className="text-xs text-slate-700">{me ? 'Ask a hospital for a quote and it will appear here.' : 'If you already sent a request, use "Track a request" with your reference and email.'}</p>
+                  <p className="text-sm font-bold text-slate-900">{tx('You have no requests yet.')}</p>
+                  <p className="text-xs text-slate-700">{me ? tx('Ask a hospital for a quote and it will appear here.') : tx('If you already sent a request, use "Track a request" with your reference and email.')}</p>
                   <button
                     type="button"
                     onClick={() => setActiveTab('enquiry')}
                     className="mt-2 min-h-[44px] px-4 bg-[color:var(--t-600)] text-white text-xs font-bold cursor-pointer"
                   >
-                    Request a quote
+                    {tx('Request a quote')}
                   </button>
                 </div>
               )}
@@ -826,18 +828,18 @@ export default function MedicalAssistanceModule({
                           <div className="flex items-center gap-1.5">
                             <span className="font-mono text-xs font-black text-slate-900">{c.trackingCode}</span>
                             <span className="text-2xs uppercase font-extrabold px-1.5 py-0.2 bg-slate-100 text-slate-700">
-                              {c.patientType === 'local_malaysian' ? '🇲🇾 Local' : c.patientType === 'expat_resident' ? '🌏 Expat' : '✈️ Int’l'}
+                              {c.patientType === 'local_malaysian' ? `🇲🇾 ${tx('Local')}` : c.patientType === 'expat_resident' ? `🌏 ${tx('Expat')}` : `✈️ ${tx('Int’l')}`}
                             </span>
                           </div>
                           <p className="text-xs font-bold text-slate-800 mt-1 line-clamp-1">{c.summary}</p>
                         </div>
                         <span className={`px-2 py-0.5 text-2xs font-black uppercase border shrink-0 ${st.bg} ${st.color} ${st.border}`}>
-                          {st.label}
+                          {tx(st.label)}
                         </span>
                       </div>
 
                       <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                        <span>{c.facility?.name || 'Accredited Facility'}</span>
+                        <span>{c.facility?.name || tx('Accredited Facility')}</span>
                         {c.latestQuote && (
                           <span className="font-mono font-black text-emerald-800">
                             {formatCur(c.latestQuote.total)}
@@ -859,18 +861,18 @@ export default function MedicalAssistanceModule({
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-base font-black text-slate-900 tracking-tight">
-                          Case {selectedCase.trackingCode}
+                          {tx('Case {code}', { code: selectedCase.trackingCode })}
                         </span>
                         <span className={`px-2 py-0.5 text-2xs font-black uppercase border ${
                           STATUS_DISPLAY[selectedCase.status]?.bg || 'bg-slate-50'
                         } ${STATUS_DISPLAY[selectedCase.status]?.color || 'text-slate-700'} ${
                           STATUS_DISPLAY[selectedCase.status]?.border || 'border-slate-300'
                         }`}>
-                          {STATUS_DISPLAY[selectedCase.status]?.label || selectedCase.status}
+                          {tx(STATUS_DISPLAY[selectedCase.status]?.label || selectedCase.status)}
                         </span>
                       </div>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        Patient: <strong>{selectedCase.patientName}</strong> · Origin: {selectedCase.homeCountry} · Created {new Date(selectedCase.createdAt).toLocaleDateString('en-MY')}
+                        {tx('Patient: ')}<strong>{selectedCase.patientName}</strong> · {tx('Origin: ')}{selectedCase.homeCountry} · {tx('Created {date}', { date: new Date(selectedCase.createdAt).toLocaleDateString('en-MY') })}
                       </p>
                     </div>
 
@@ -882,7 +884,7 @@ export default function MedicalAssistanceModule({
                           className="px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-xs"
                         >
                           <Printer className="h-3.5 w-3.5" />
-                          Official Pro-Forma Quote
+                          {tx('Official Pro-Forma Quote')}
                         </button>
                       )}
                     </div>
@@ -899,7 +901,7 @@ export default function MedicalAssistanceModule({
                           : 'border-transparent text-slate-500 hover:text-slate-800'
                       }`}
                     >
-                      Treatment Quotation ({selectedCase.quotes.length})
+                      {tx('Treatment Quotation')} ({selectedCase.quotes.length})
                     </button>
                     <button
                       type="button"
@@ -910,7 +912,7 @@ export default function MedicalAssistanceModule({
                           : 'border-transparent text-slate-500 hover:text-slate-800'
                       }`}
                     >
-                      Assistance Itinerary ({selectedCase.itinerary.length})
+                      {tx('Assistance Itinerary')} ({selectedCase.itinerary.length})
                     </button>
                     <button
                       type="button"
@@ -921,7 +923,7 @@ export default function MedicalAssistanceModule({
                           : 'border-transparent text-slate-500 hover:text-slate-800'
                       }`}
                     >
-                      Care Coordination Chat ({selectedCase.messages.length})
+                      {tx('Care Coordination Chat')} ({selectedCase.messages.length})
                     </button>
                   </div>
 
@@ -933,20 +935,20 @@ export default function MedicalAssistanceModule({
                           <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <div>
                               <span className="text-xs font-black uppercase tracking-wider text-slate-900">
-                                Quotation Version v{selectedCase.latestQuote.version}
+                                {tx('Quotation Version v{n}', { n: selectedCase.latestQuote.version })}
                               </span>
                               <span className="text-xs text-slate-500 ml-2">
-                                Valid until {selectedCase.latestQuote.validUntil}
+                                {tx('Valid until {date}', { date: selectedCase.latestQuote.validUntil })}
                               </span>
                             </div>
                             <div className="text-right">
-                              <span className="text-xs text-slate-500">Estimated Total:</span>
+                              <span className="text-xs text-slate-500">{tx('Estimated Total:')}</span>
                               <span className="text-base font-black font-mono text-emerald-800 ml-2">
                                 {formatCur(selectedCase.latestQuote.total)}
                               </span>
                               {selectedCurrency !== 'MYR' && (
                                 <span className="block text-xs text-slate-400 font-mono">
-                                  Base: RM {selectedCase.latestQuote.total.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
+                                  {tx('Base: ')}RM {selectedCase.latestQuote.total.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
                                 </span>
                               )}
                             </div>
@@ -957,16 +959,16 @@ export default function MedicalAssistanceModule({
                             <table className="w-full text-xs text-left">
                               <thead>
                                 <tr className="border-b border-slate-200 text-slate-500 uppercase tracking-wider text-xs">
-                                  <th className="py-2 font-bold">Category</th>
-                                  <th className="py-2 font-bold">Clinical Service Description</th>
-                                  <th className="py-2 font-bold text-right">Price ({selectedCurrency})</th>
+                                  <th className="py-2 font-bold">{tx('Category')}</th>
+                                  <th className="py-2 font-bold">{tx('Clinical Service Description')}</th>
+                                  <th className="py-2 font-bold text-right">{tx('Price ({cur})', { cur: selectedCurrency })}</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-slate-100">
                                 {selectedCase.latestQuote.items.map((it, idx) => (
                                   <tr key={idx} className="hover:bg-slate-50/50">
                                     <td className="py-2 font-bold text-slate-600">
-                                      {CATEGORY_NAMES[it.category] || it.category}
+                                      {tx(CATEGORY_NAMES[it.category] || it.category)}
                                     </td>
                                     <td className="py-2 text-slate-800 font-medium">
                                       {it.label}
@@ -989,7 +991,7 @@ export default function MedicalAssistanceModule({
                                 {selectedCase.latestQuote.tax > 0 && (
                                   <tr>
                                     <td colSpan={2} className="py-1 text-right text-slate-500 text-xs">
-                                      Healthcare Service Tax ({selectedCase.latestQuote.taxRatePct}% SST):
+                                      {tx('Healthcare Service Tax ({pct}% SST):', { pct: selectedCase.latestQuote.taxRatePct })}
                                     </td>
                                     <td className="py-1 text-right font-mono text-slate-600 text-xs">
                                       {formatCur(selectedCase.latestQuote.tax)}
@@ -998,7 +1000,7 @@ export default function MedicalAssistanceModule({
                                 )}
                                 <tr>
                                   <td colSpan={2} className="pt-2 text-right text-xs font-black text-slate-900">
-                                    Grand Total:
+                                    {tx('Grand Total:')}
                                   </td>
                                   <td className="pt-2 text-right text-xs font-black font-mono text-emerald-800">
                                     {formatCur(selectedCase.latestQuote.total)}
@@ -1012,18 +1014,18 @@ export default function MedicalAssistanceModule({
                           <div className="p-4 bg-slate-50/60 border-t border-slate-200 text-xs space-y-2">
                             {selectedCase.latestQuote.inclusions && (
                               <p className="text-slate-700">
-                                <strong className="text-slate-900">What is Included:</strong> {selectedCase.latestQuote.inclusions}
+                                <strong className="text-slate-900">{tx('What is Included:')}</strong> {selectedCase.latestQuote.inclusions}
                               </p>
                             )}
                             <p className="text-slate-700">
-                              <strong className="text-slate-900">What is Excluded:</strong> {selectedCase.latestQuote.exclusions}
+                              <strong className="text-slate-900">{tx('What is Excluded:')}</strong> {selectedCase.latestQuote.exclusions}
                             </p>
                             <p className="text-slate-700">
-                              <strong className="text-slate-900">Cancellation Terms:</strong> {selectedCase.latestQuote.cancellationTerms}
+                              <strong className="text-slate-900">{tx('Cancellation Terms:')}</strong> {selectedCase.latestQuote.cancellationTerms}
                             </p>
                             {selectedCase.latestQuote.paymentTerms && (
                               <p className="text-slate-700">
-                                <strong className="text-slate-900">Payment & Settlement:</strong> {selectedCase.latestQuote.paymentTerms}
+                                <strong className="text-slate-900">{tx('Payment & Settlement:')}</strong> {selectedCase.latestQuote.paymentTerms}
                               </p>
                             )}
                           </div>
@@ -1032,7 +1034,7 @@ export default function MedicalAssistanceModule({
                           {selectedCase.status === 'quoted' && (
                             <div className="p-4 bg-white border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
                               <span className="text-xs text-slate-700">
-                                The hospital is waiting for your answer.
+                                {tx('The hospital is waiting for your answer.')}
                               </span>
                               <div className="flex items-center gap-2">
                                 <button
@@ -1040,7 +1042,7 @@ export default function MedicalAssistanceModule({
                                   onClick={() => setShowRevisionModal(true)}
                                   className="px-3 min-h-[44px] border border-slate-300 hover:bg-slate-100 text-slate-800 text-xs font-bold cursor-pointer"
                                 >
-                                  Ask for changes
+                                  {tx('Ask for changes')}
                                 </button>
                                 <button
                                   type="button"
@@ -1049,7 +1051,7 @@ export default function MedicalAssistanceModule({
                                   className="px-4 min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer flex items-center gap-1.5 shadow-xs"
                                 >
                                   <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-                                  Accept this quote
+                                  {tx('Accept this quote')}
                                 </button>
                               </div>
                             </div>
@@ -1058,15 +1060,15 @@ export default function MedicalAssistanceModule({
                           {selectedCase.status === 'accepted' && (
                             <div className="p-3 bg-emerald-50 border-t border-emerald-200 text-xs text-emerald-900 font-bold flex items-center gap-2">
                               <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                              You accepted this quote. The hospital will contact you to arrange the details.
+                              {tx('You accepted this quote. The hospital will contact you to arrange the details.')}
                             </div>
                           )}
                         </div>
                       ) : (
                         <div className="p-8 bg-slate-50 border border-dashed border-slate-300 text-center text-xs text-slate-500 space-y-2">
                           <Clock className="h-6 w-6 text-slate-400 mx-auto" />
-                          <p className="text-sm font-bold text-slate-700">Quotation formulation in progress.</p>
-                          <p>The facility clinical team is reviewing your intake notes. Once ready, an itemized quote will appear here.</p>
+                          <p className="text-sm font-bold text-slate-700">{tx('Quotation formulation in progress.')}</p>
+                          <p>{tx('The facility clinical team is reviewing your intake notes. Once ready, an itemized quote will appear here.')}</p>
                         </div>
                       )}
                     </div>
@@ -1078,8 +1080,8 @@ export default function MedicalAssistanceModule({
                       {selectedCase.itinerary.length === 0 ? (
                         <div className="p-8 bg-slate-50 border border-dashed border-slate-300 text-center text-xs text-slate-500 space-y-1">
                           <Calendar className="h-6 w-6 text-slate-400 mx-auto" />
-                          <p className="text-sm font-bold text-slate-700">No scheduled itinerary items yet.</p>
-                          <p>The hospital coordinator will schedule your admission, consultations, and discharge timeline upon quotation confirmation.</p>
+                          <p className="text-sm font-bold text-slate-700">{tx('No scheduled itinerary items yet.')}</p>
+                          <p>{tx('The hospital coordinator will schedule your admission, consultations, and discharge timeline upon quotation confirmation.')}</p>
                         </div>
                       ) : (
                         <div className="divide-y divide-slate-100 border border-slate-200">
@@ -1091,7 +1093,7 @@ export default function MedicalAssistanceModule({
                               <div className="space-y-0.5">
                                 <span className="text-xs font-black text-slate-900">{it.title}</span>
                                 <span className="ml-2 text-2xs font-extrabold uppercase px-1.5 py-0.2 bg-slate-100 text-slate-600">
-                                  {it.kind}
+                                  {tx(it.kind)}
                                 </span>
                                 {it.note && <p className="text-xs text-slate-600">{it.note}</p>}
                               </div>
@@ -1133,7 +1135,7 @@ export default function MedicalAssistanceModule({
                       <form onSubmit={handleSendMessage} className="flex gap-2">
                         <input
                           type="text"
-                          placeholder="Type a message to the hospital medical assistance desk..."
+                          placeholder={tx('Type a message to the hospital medical assistance desk...')}
                           value={replyMessage}
                           onChange={(e) => setReplyMessage(e.target.value)}
                           className="flex-1 border border-slate-300 p-2 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)]"
@@ -1151,7 +1153,7 @@ export default function MedicalAssistanceModule({
                 </div>
               ) : cases.length > 0 ? (
                 <div className="p-12 bg-white border border-dashed border-slate-300 text-center text-xs text-slate-700">
-                  Choose a request from the list to see its quote, itinerary and messages.
+                  {tx('Choose a request from the list to see its quote, itinerary and messages.')}
                 </div>
               ) : null}
             </div>
@@ -1167,45 +1169,45 @@ export default function MedicalAssistanceModule({
             <div className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
               <h3 className="font-black text-sm uppercase tracking-wider text-slate-900 flex items-center gap-2">
                 <Plane className="h-4 w-4 text-[color:var(--t-600)]" />
-                Medical Travel Visa & MHTC
+                {tx('Medical Travel Visa & MHTC')}
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                International healthcare travelers visiting Malaysia can access dedicated Medical e-Visas through the Malaysia Healthcare Travel Council (MHTC). MHTC member hospitals issue formal medical endorsement letters facilitating entry passes for patients and companions.
+                {tx('International healthcare travelers visiting Malaysia can access dedicated Medical e-Visas through the Malaysia Healthcare Travel Council (MHTC). MHTC member hospitals issue formal medical endorsement letters facilitating entry passes for patients and companions.')}
               </p>
               <div className="text-xs text-slate-700 space-y-1 bg-slate-50 p-3 border border-slate-200">
-                <p>✓ Fast-track medical immigration counter at KLIA</p>
-                <p>✓ Airport lounge and ambulance gate transfer</p>
-                <p>✓ Extension support for prolonged hospital recovery</p>
+                <p>{tx('✓ Fast-track medical immigration counter at KLIA')}</p>
+                <p>{tx('✓ Airport lounge and ambulance gate transfer')}</p>
+                <p>{tx('✓ Extension support for prolonged hospital recovery')}</p>
               </div>
             </div>
 
             <div className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
               <h3 className="font-black text-sm uppercase tracking-wider text-slate-900 flex items-center gap-2">
                 <CreditCard className="h-4 w-4 text-[color:var(--t-600)]" />
-                Letter of Guarantee (LOG) & Insurance
+                {tx('Letter of Guarantee (LOG) & Insurance')}
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Most Malaysian private medical centres support direct cashless billing via Letters of Guarantee (LOG) from major international insurers (Cigna, Bupa Global, Allianz Worldwide, Aetna International, Prudential, AIA, Great Eastern).
+                {tx('Most Malaysian private medical centres support direct cashless billing via Letters of Guarantee (LOG) from major international insurers (Cigna, Bupa Global, Allianz Worldwide, Aetna International, Prudential, AIA, Great Eastern).')}
               </p>
               <div className="text-xs text-slate-700 space-y-1 bg-slate-50 p-3 border border-slate-200">
-                <p>✓ 0% SST on healthcare services for Malaysian citizens</p>
-                <p>✓ Pre-authorization submission within 24-48 hours</p>
-                <p>✓ Multi-currency settlement (MYR, USD, SGD, EUR)</p>
+                <p>{tx('✓ 0% SST on healthcare services for Malaysian citizens')}</p>
+                <p>{tx('✓ Pre-authorization submission within 24-48 hours')}</p>
+                <p>{tx('✓ Multi-currency settlement (MYR, USD, SGD, EUR)')}</p>
               </div>
             </div>
 
             <div className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
               <h3 className="font-black text-sm uppercase tracking-wider text-slate-900 flex items-center gap-2">
                 <Ambulance className="h-4 w-4 text-[color:var(--t-600)]" />
-                Medical Evacuation & Fit-to-Fly
+                {tx('Medical Evacuation & Fit-to-Fly')}
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                For high-acuity patients, accredited air and ground ambulance services operate between regional airports (KLIA, Subang, Penang) and hospital intensive care suites with specialized flight physicians.
+                {tx('For high-acuity patients, accredited air and ground ambulance services operate between regional airports (KLIA, Subang, Penang) and hospital intensive care suites with specialized flight physicians.')}
               </p>
               <div className="text-xs text-slate-700 space-y-1 bg-slate-50 p-3 border border-slate-200">
-                <p>✓ Fit-to-fly assessment certificates issued before departure</p>
-                <p>✓ Discharge summaries formatted for home country GP</p>
-                <p>✓ 24/7 ICU & Cath Lab emergency preparedness</p>
+                <p>{tx('✓ Fit-to-fly assessment certificates issued before departure')}</p>
+                <p>{tx('✓ Discharge summaries formatted for home country GP')}</p>
+                <p>{tx('✓ 24/7 ICU & Cath Lab emergency preparedness')}</p>
               </div>
             </div>
           </div>
@@ -1219,10 +1221,10 @@ export default function MedicalAssistanceModule({
             <div>
               <h3 className="font-black text-sm uppercase tracking-wider text-slate-900 flex items-center gap-2">
                 <Search className="h-4 w-4 text-[color:var(--t-600)]" />
-                Track Medical Assistance Inquiry
+                {tx('Track Medical Assistance Inquiry')}
               </h3>
               <p className="text-xs text-slate-600 mt-1">
-                If you sent a request without signing in, enter your reference (for example <code>MED-MY-AB12CD34</code>) and contact email to view your itemized quotation and updates.
+                {tx('If you sent a request without signing in, enter your reference (for example')} <code>MED-MY-AB12CD34</code>{tx(') and contact email to view your itemized quotation and updates.')}
               </p>
             </div>
 
@@ -1236,12 +1238,12 @@ export default function MedicalAssistanceModule({
             <form onSubmit={handleTrackCase} className="space-y-4">
               <div className="space-y-1">
                 <label className="text-xs font-black uppercase tracking-wider text-slate-700">
-                  Reference *
+                  {tx('Reference *')}
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. MED-MY-AB12CD34"
+                  placeholder={tx('e.g. MED-MY-AB12CD34')}
                   value={trackCode}
                   onChange={(e) => setTrackCode(e.target.value)}
                   className="w-full border border-slate-300 px-3 min-h-[44px] text-xs font-mono uppercase bg-white focus:outline-none focus:border-[color:var(--t-600)]"
@@ -1250,12 +1252,12 @@ export default function MedicalAssistanceModule({
 
               <div className="space-y-1">
                 <label className="text-xs font-black uppercase tracking-wider text-slate-700">
-                  Email used on the request *
+                  {tx('Email used on the request *')}
                 </label>
                 <input
                   type="email"
                   required
-                  placeholder="The email you used during enquiry submission"
+                  placeholder={tx('The email you used during enquiry submission')}
                   value={trackEmail}
                   onChange={(e) => setTrackEmail(e.target.value)}
                   className="w-full border border-slate-300 px-3 min-h-[44px] text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)]"
@@ -1268,7 +1270,7 @@ export default function MedicalAssistanceModule({
                 className="w-full min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2 shadow-xs"
               >
                 {trackingLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                Find my request
+                {tx('Find my request')}
               </button>
             </form>
           </div>
@@ -1284,7 +1286,7 @@ export default function MedicalAssistanceModule({
             {/* Modal Controls */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-200 print:hidden">
               <span className="text-xs font-black uppercase tracking-wider text-slate-500">
-                Official Pro-Forma Medical Document Preview
+                {tx('Official Pro-Forma Medical Document Preview')}
               </span>
               <div className="flex items-center gap-2">
                 <button
@@ -1312,11 +1314,11 @@ export default function MedicalAssistanceModule({
                 </h1>
                 {proformaData.facility.address && <p className="text-xs text-slate-700 mt-0.5">{proformaData.facility.address}</p>}
                 <p className="text-xs text-slate-700">
-                  {[proformaData.facility.licenceNo && `Licence: ${proformaData.facility.licenceNo}`, proformaData.facility.phone && `Tel: ${proformaData.facility.phone}`].filter(Boolean).join(' · ')}
+                  {[proformaData.facility.licenceNo && `${tx('Licence: ')}${proformaData.facility.licenceNo}`, proformaData.facility.phone && `${tx('Tel: ')}${proformaData.facility.phone}`].filter(Boolean).join(' · ')}
                 </p>
                 {proformaData.facility.mhtcMember && (
                   <span className="inline-block mt-1 text-2xs font-black uppercase px-2 py-0.5 bg-sky-50 text-sky-800 border border-sky-300">
-                    Malaysia Healthcare Travel Council (MHTC) Endorsed
+                    {tx('Malaysia Healthcare Travel Council (MHTC) Endorsed')}
                   </span>
                 )}
               </div>
@@ -1325,10 +1327,10 @@ export default function MedicalAssistanceModule({
                   {proformaData.referenceNumber}
                 </span>
                 <span className="text-xs text-slate-600 block mt-1">
-                  Issue Date: <strong>{proformaData.issueDate}</strong>
+                  {tx('Issue Date: ')}<strong>{proformaData.issueDate}</strong>
                 </span>
                 <span className="text-xs text-slate-600 block">
-                  Valid Until: <strong>{proformaData.validUntil}</strong>
+                  {tx('Valid Until: ')}<strong>{proformaData.validUntil}</strong>
                 </span>
               </div>
             </div>
@@ -1342,14 +1344,14 @@ export default function MedicalAssistanceModule({
             {/* Patient & Clinical Grid */}
             <div className="grid grid-cols-2 gap-4 text-xs bg-slate-50 p-4 border border-slate-200">
               <div>
-                <span className="text-xs font-black uppercase text-slate-400 block">Patient Information</span>
+                <span className="text-xs font-black uppercase text-slate-400 block">{tx('Patient Information')}</span>
                 <p className="font-bold text-slate-900 mt-1">{proformaData.patient.name}</p>
-                <p className="text-slate-600">Nationality: {proformaData.patient.nationality}</p>
-                <p className="text-slate-600">Insurance / Settlement: {proformaData.patient.insuranceCarrier}</p>
+                <p className="text-slate-600">{tx('Nationality: ')}{proformaData.patient.nationality}</p>
+                <p className="text-slate-600">{tx('Insurance / Settlement: ')}{proformaData.patient.insuranceCarrier}</p>
               </div>
               <div>
-                <span className="text-xs font-black uppercase text-slate-400 block">Clinical Overview</span>
-                <p className="font-bold text-slate-900 mt-1">Specialty: {proformaData.clinicalDetails.specialty}</p>
+                <span className="text-xs font-black uppercase text-slate-400 block">{tx('Clinical Overview')}</span>
+                <p className="font-bold text-slate-900 mt-1">{tx('Specialty: ')}{proformaData.clinicalDetails.specialty}</p>
                 <p className="text-slate-600 line-clamp-2">{proformaData.clinicalDetails.clinicalSummary}</p>
               </div>
             </div>
@@ -1359,16 +1361,16 @@ export default function MedicalAssistanceModule({
               <table className="w-full text-xs text-left border border-slate-200">
                 <thead className="bg-slate-100 text-slate-700 uppercase tracking-wider text-xs">
                   <tr>
-                    <th className="p-2.5 font-bold">Item Description</th>
-                    <th className="p-2.5 font-bold">Category</th>
-                    <th className="p-2.5 font-bold text-right">Amount (MYR)</th>
+                    <th className="p-2.5 font-bold">{tx('Item Description')}</th>
+                    <th className="p-2.5 font-bold">{tx('Category')}</th>
+                    <th className="p-2.5 font-bold text-right">{tx('Amount (MYR)')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {proformaData.items.map((it: any, idx: number) => (
                     <tr key={idx}>
                       <td className="p-2.5 font-medium text-slate-900">{it.label}</td>
-                      <td className="p-2.5 text-slate-600">{CATEGORY_NAMES[it.category] || it.category}</td>
+                      <td className="p-2.5 text-slate-600">{tx(CATEGORY_NAMES[it.category] || it.category)}</td>
                       <td className="p-2.5 text-right font-mono font-bold text-slate-900">
                         RM {(it.amountSen / 100).toLocaleString('en-MY', { minimumFractionDigits: 2 })}
                       </td>
@@ -1377,7 +1379,7 @@ export default function MedicalAssistanceModule({
                 </tbody>
                 <tfoot className="border-t-2 border-slate-300 bg-slate-50 font-bold">
                   <tr>
-                    <td colSpan={2} className="p-2.5 text-right">Subtotal:</td>
+                    <td colSpan={2} className="p-2.5 text-right">{tx('Subtotal:')}</td>
                     <td className="p-2.5 text-right font-mono">
                       RM {proformaData.subtotalMYR.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
                     </td>
@@ -1385,7 +1387,7 @@ export default function MedicalAssistanceModule({
                   {proformaData.taxMYR > 0 && (
                     <tr>
                       <td colSpan={2} className="p-1.5 text-right text-xs text-slate-600">
-                        Service Tax ({proformaData.taxRatePct}% SST):
+                        {tx('Service Tax ({pct}% SST):', { pct: proformaData.taxRatePct })}
                       </td>
                       <td className="p-1.5 text-right font-mono text-xs">
                         RM {proformaData.taxMYR.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
@@ -1393,7 +1395,7 @@ export default function MedicalAssistanceModule({
                     </tr>
                   )}
                   <tr className="border-t border-slate-300 text-xs font-black text-slate-900">
-                    <td colSpan={2} className="p-2.5 text-right">TOTAL PAYABLE:</td>
+                    <td colSpan={2} className="p-2.5 text-right">{tx('TOTAL PAYABLE:')}</td>
                     <td className="p-2.5 text-right font-mono text-emerald-800">
                       RM {proformaData.totalMYR.toLocaleString('en-MY', { minimumFractionDigits: 2 })}
                     </td>
@@ -1404,10 +1406,10 @@ export default function MedicalAssistanceModule({
 
             {/* Terms and Exclusions */}
             <div className="text-xs text-slate-600 space-y-1.5 border-t border-slate-200 pt-3">
-              <p><strong>Inclusions:</strong> {proformaData.inclusions}</p>
-              <p><strong>Exclusions:</strong> {proformaData.exclusions}</p>
-              <p><strong>Cancellation:</strong> {proformaData.cancellationTerms}</p>
-              <p><strong>Payment Guidelines:</strong> {proformaData.paymentTerms}</p>
+              <p><strong>{tx('Inclusions:')}</strong> {proformaData.inclusions}</p>
+              <p><strong>{tx('Exclusions:')}</strong> {proformaData.exclusions}</p>
+              <p><strong>{tx('Cancellation:')}</strong> {proformaData.cancellationTerms}</p>
+              <p><strong>{tx('Payment Guidelines:')}</strong> {proformaData.paymentTerms}</p>
             </div>
 
             <div className="pt-4 border-t border-slate-200 text-xs text-slate-400 text-center">
@@ -1423,20 +1425,20 @@ export default function MedicalAssistanceModule({
       {showAcceptConfirm && selectedCase?.latestQuote && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="accept-title">
           <div className="bg-white border border-slate-300 max-w-md w-full p-6 space-y-4 shadow-xl">
-            <h3 id="accept-title" className="font-extrabold text-lg text-slate-900">Accept this quote?</h3>
+            <h3 id="accept-title" className="font-extrabold text-lg text-slate-900">{tx('Accept this quote?')}</h3>
             <dl className="text-xs grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
-              <dt className="text-slate-700">Hospital</dt><dd className="font-bold text-slate-900">{selectedCase.facility?.name || 'The hospital'}</dd>
-              <dt className="text-slate-700">Total</dt><dd className="font-extrabold text-slate-900 tabular-nums">RM {selectedCase.latestQuote.total.toLocaleString('en-MY', { minimumFractionDigits: 2 })}{selectedCurrency !== 'MYR' ? ` (about ${formatCur(selectedCase.latestQuote.total)})` : ''}</dd>
-              {selectedCase.latestQuote.validUntil && <><dt className="text-slate-700">Valid until</dt><dd className="font-bold text-slate-900">{new Date(selectedCase.latestQuote.validUntil).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</dd></>}
+              <dt className="text-slate-700">{tx('Hospital')}</dt><dd className="font-bold text-slate-900">{selectedCase.facility?.name || 'The hospital'}</dd>
+              <dt className="text-slate-700">{tx('Total')}</dt><dd className="font-extrabold text-slate-900 tabular-nums">RM {selectedCase.latestQuote.total.toLocaleString('en-MY', { minimumFractionDigits: 2 })}{selectedCurrency !== 'MYR' ? ` (about ${formatCur(selectedCase.latestQuote.total)})` : ''}</dd>
+              {selectedCase.latestQuote.validUntil && <><dt className="text-slate-700">{tx('Valid until')}</dt><dd className="font-bold text-slate-900">{new Date(selectedCase.latestQuote.validUntil).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</dd></>}
             </dl>
             <p className="text-xs text-slate-800">
-              Accepting tells the hospital you want to go ahead at this price. <strong>It does not charge you.</strong> The hospital will contact you about dates and how to pay. Check what is not included and the cancellation terms first.
+              {tx('Accepting tells the hospital you want to go ahead at this price.')} <strong>{tx('It does not charge you.')}</strong> {tx('The hospital will contact you about dates and how to pay. Check what is not included and the cancellation terms first.')}
             </p>
             {actionError && <p role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-xs">{actionError}</p>}
             <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
-              <button type="button" onClick={() => setShowAcceptConfirm(false)} className="min-h-[44px] px-4 border border-slate-300 text-slate-800 text-xs font-bold cursor-pointer">Not yet</button>
+              <button type="button" onClick={() => setShowAcceptConfirm(false)} className="min-h-[44px] px-4 border border-slate-300 text-slate-800 text-xs font-bold cursor-pointer">{tx('Not yet')}</button>
               <button type="button" disabled={decisionSubmitting} onClick={() => handleQuoteDecision('accept')} className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer disabled:opacity-60">
-                {decisionSubmitting ? 'Saving…' : 'Yes, accept this quote'}
+                {decisionSubmitting ? tx('Saving…') : tx('Yes, accept this quote')}
               </button>
             </div>
           </div>
@@ -1451,11 +1453,11 @@ export default function MedicalAssistanceModule({
           <div className="bg-white border border-slate-300 max-w-md w-full p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between">
               <h3 className="font-extrabold text-lg text-slate-900">
-                Ask for changes to this quote
+                {tx('Ask for changes to this quote')}
               </h3>
               <button
                 type="button"
-                aria-label="Close"
+                aria-label={tx('Close')}
                 onClick={() => setShowRevisionModal(false)}
                 className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-slate-900"
               >
@@ -1464,14 +1466,14 @@ export default function MedicalAssistanceModule({
             </div>
 
             <p className="text-xs text-slate-800">
-              Say what you would like changed, for example a different room type or a different date.
+              {tx('Say what you would like changed, for example a different room type or a different date.')}
             </p>
             {actionError && <p role="alert" className="p-3 bg-red-50 border border-red-300 text-red-900 text-xs">{actionError}</p>}
 
             <textarea
               rows={4}
               required
-              placeholder="e.g. Please revise room category from VIP Suite to Standard Single Room, and adjust target admission to the third week of November."
+              placeholder={tx('e.g. Please revise room category from VIP Suite to Standard Single Room, and adjust target admission to the third week of November.')}
               value={revisionNotes}
               onChange={(e) => setRevisionNotes(e.target.value)}
               className="w-full border border-slate-300 p-2 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)]"
@@ -1483,7 +1485,7 @@ export default function MedicalAssistanceModule({
                 onClick={() => setShowRevisionModal(false)}
                 className="px-3 py-1.5 border border-slate-300 text-slate-700 text-xs font-bold uppercase cursor-pointer"
               >
-                Cancel
+                {tx('Cancel')}
               </button>
               <button
                 type="button"
@@ -1491,7 +1493,7 @@ export default function MedicalAssistanceModule({
                 onClick={() => handleQuoteDecision('request_revision')}
                 className="px-4 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold uppercase cursor-pointer"
               >
-                {decisionSubmitting ? 'Sending…' : 'Send request for changes'}
+                {decisionSubmitting ? tx('Sending…') : tx('Send request for changes')}
               </button>
             </div>
           </div>

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import PrescriptionList, { fmtDate } from './PrescriptionList';
 import CertificatesPanel from './CertificatesPanel';
 import TrendChart from './TrendChart';
+import { useTr } from '../locale';
 import { Activity, AlertTriangle, ClipboardList, FileText, FlaskConical, Pill, Share2, Trash2, CheckCircle2, AlertCircle, Plus } from 'lucide-react';
 
 const jpost = (url: string, body?: unknown, method = 'POST') =>
@@ -38,6 +39,7 @@ export default function PatientRecords({
   onFindDoctors,
   onBookSpecialist,
 }: PatientRecordsProps = {}) {
+  const tx = useTr();
   const [data, setData] = useState<any | null>(null);
   const [tab, setTab] = useState<RecordSubTab>(activeSubTab || initialTab || 'overview');
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -82,15 +84,15 @@ export default function PatientRecords({
   // sharing
   const [shareWith, setShareWith] = useState('');
 
-  if (!data) return <p className="text-xs text-slate-600 p-6">Loading your health record…</p>;
+  if (!data) return <p className="text-xs text-slate-600 p-6">{tx('Loading your health record…')}</p>;
 
   const removeItem = async (i: any) => {
-    if (i.type === 'allergy' && !window.confirm(`Remove the ${i.name} allergy from your record? Doctors and pharmacists use this to keep you safe.`)) return;
+    if (i.type === 'allergy' && !window.confirm(tx('Remove the {name} allergy from your record? Doctors and pharmacists use this to keep you safe.', { name: i.name }))) return;
     const d = await act(() => jpost(`/api/records/items/${i.id}`, undefined, 'DELETE'));
     if (d.status === 'success' && i.type !== 'allergy') setUndo({ label: i.name, payload: { type: i.type, name: i.name, detail: i.detail ?? null, severity: i.severity ?? null } });
   };
   const removeReading = (v: any) => {
-    if (!window.confirm('Delete this reading? This cannot be undone.')) return;
+    if (!window.confirm(tx('Delete this reading? This cannot be undone.'))) return;
     act(() => jpost(`/api/records/vitals/${v.id}`, undefined, 'DELETE'));
   };
   const saidNoAllergies = data.allergyStatement?.kind === 'none_known';
@@ -119,7 +121,7 @@ export default function PatientRecords({
           {tabs.map(([id, text, Icon]) => (
             <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setMsg(null); onSubTabChange?.(id); }}
               className={`px-3 py-2.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer ${tab === id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-600'}`}>
-              <Icon className="h-3.5 w-3.5" /> {text}
+              <Icon className="h-3.5 w-3.5" /> {tx(text)}
             </button>
           ))}
         </div>
@@ -135,27 +137,27 @@ export default function PatientRecords({
         >
           <div className="flex items-center gap-2">
             {msg.ok ? <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" /> : <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" />}
-            <span>{msg.text}</span>
+            <span>{tx(msg.text)}</span>
           </div>
           <button
             type="button"
             onClick={() => setMsg(null)}
             className="text-xs underline cursor-pointer hover:opacity-80 shrink-0 min-h-[44px] px-2"
           >
-            Dismiss
+            {tx('Dismiss')}
           </button>
         </div>
       )}
 
       {undo && (
         <div role="status" className="fixed bottom-20 lg:bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white text-xs font-semibold pl-4 pr-1 min-h-[48px] flex items-center gap-3 shadow-lg max-w-[calc(100vw-2rem)]">
-          <span className="truncate">Removed {undo.label}.</span>
+          <span className="truncate">{tx('Removed {label}.', { label: undo.label })}</span>
           <button
             type="button"
             onClick={async () => { const u = undo; setUndo(null); await act(() => jpost('/api/records/items', u.payload), 'Put back.'); }}
             className="min-h-[44px] px-4 font-extrabold underline cursor-pointer shrink-0"
           >
-            Undo
+            {tx('Undo')}
           </button>
         </div>
       )}
@@ -171,7 +173,7 @@ export default function PatientRecords({
                   <div className="flex items-center gap-1.5">
                     <AlertTriangle className="h-3.5 w-3.5 text-rose-600" />
                     <h3 className="font-display font-extrabold text-sm text-[color:var(--ink)] uppercase tracking-wider">
-                      Documented Allergies
+                      {tx('Documented Allergies')}
                     </h3>
                   </div>
                   <span className={`text-2xs font-mono font-bold px-1.5 py-0.2 border ${
@@ -188,17 +190,17 @@ export default function PatientRecords({
                 {data.items.filter((i: any) => i.type === 'allergy').length === 0 ? (
                   saidNoAllergies ? (
                     <div className="py-3 px-3 bg-emerald-50 border border-emerald-200 my-1 space-y-1">
-                      <p className="text-sm text-emerald-900 font-bold">You told us you have no known allergies.</p>
-                      <p className="text-xs text-slate-700">Said on {new Date(data.allergyStatement.recorded_at).toLocaleDateString()}.</p>
-                      <button type="button" onClick={clearNoKnownAllergies} className="min-h-[44px] text-xs font-bold underline text-emerald-900 cursor-pointer">Change this</button>
+                      <p className="text-sm text-emerald-900 font-bold">{tx('You told us you have no known allergies.')}</p>
+                      <p className="text-xs text-slate-700">{tx('Said on {date}.', { date: new Date(data.allergyStatement.recorded_at).toLocaleDateString() })}</p>
+                      <button type="button" onClick={clearNoKnownAllergies} className="min-h-[44px] text-xs font-bold underline text-emerald-900 cursor-pointer">{tx('Change this')}</button>
                     </div>
                   ) : (
                     <div className="py-3 px-3 bg-slate-50 border border-dashed border-slate-300 my-1 space-y-2">
-                      <p className="text-sm text-slate-800 font-bold">No allergies recorded yet.</p>
-                      <p className="text-xs text-slate-700 leading-snug">Doctors and pharmacists cannot tell "none" from "not filled in". Add an allergy, or tell us you have none.</p>
+                      <p className="text-sm text-slate-800 font-bold">{tx('No allergies recorded yet.')}</p>
+                      <p className="text-xs text-slate-700 leading-snug">{tx('Doctors and pharmacists cannot tell "none" from "not filled in". Add an allergy, or tell us you have none.')}</p>
                       <div className="flex flex-wrap gap-2">
-                        <button type="button" onClick={addAnAllergy} className="min-h-[44px] px-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer">Add an allergy</button>
-                        <button type="button" onClick={noKnownAllergies} className="min-h-[44px] px-3 bg-white border border-slate-300 hover:bg-slate-100 text-slate-900 text-xs font-bold cursor-pointer">I have no known allergies</button>
+                        <button type="button" onClick={addAnAllergy} className="min-h-[44px] px-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer">{tx('Add an allergy')}</button>
+                        <button type="button" onClick={noKnownAllergies} className="min-h-[44px] px-3 bg-white border border-slate-300 hover:bg-slate-100 text-slate-900 text-xs font-bold cursor-pointer">{tx('I have no known allergies')}</button>
                       </div>
                     </div>
                   )
@@ -207,12 +209,12 @@ export default function PatientRecords({
                     {data.items.filter((i: any) => i.type === 'allergy').map((i: any) => (
                       <li key={i.id} className="py-1.5 flex items-center justify-between gap-2 text-xs group">
                         <div className="min-w-0">
-                          <strong className="text-rose-900 font-bold block truncate">{i.name}</strong>
+                          <strong className="text-rose-900 font-bold block truncate">{tx(i.name)}</strong>
                           {i.detail && <p className="text-xs text-slate-600 truncate">{i.detail}</p>}
                         </div>
                         <button
                           type="button"
-                          aria-label={`Remove ${i.name}`}
+                          aria-label={tx('Remove {name}', { name: i.name })}
                           onClick={() => removeItem(i)}
                           className="h-11 w-11 flex items-center justify-center text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
                         >
@@ -232,7 +234,7 @@ export default function PatientRecords({
                   <div className="flex items-center gap-1.5">
                     <Activity className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                     <h3 className="font-display font-extrabold text-sm text-[color:var(--ink)] uppercase tracking-wider">
-                      Chronic Conditions
+                      {tx('Chronic Conditions')}
                     </h3>
                   </div>
                   <span className="text-2xs font-mono font-bold px-1.5 py-0.2 border bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]">
@@ -242,19 +244,19 @@ export default function PatientRecords({
 
                 {data.items.filter((i: any) => i.type === 'condition').length === 0 ? (
                   <div className="py-3 px-2 text-center bg-[color:var(--t-50)]/40 border border-dashed border-[color:var(--t-200)] my-1">
-                    <p className="text-xs text-slate-600 font-medium">No chronic conditions</p>
+                    <p className="text-xs text-slate-600 font-medium">{tx('No chronic conditions')}</p>
                   </div>
                 ) : (
                   <ul className="divide-y divide-[color:var(--t-100)] max-h-48 overflow-y-auto">
                     {data.items.filter((i: any) => i.type === 'condition').map((i: any) => (
                       <li key={i.id} className="py-1.5 flex items-center justify-between gap-2 text-xs group">
                         <div className="min-w-0">
-                          <strong className="text-[color:var(--ink)] font-bold block truncate">{i.name}</strong>
+                          <strong className="text-[color:var(--ink)] font-bold block truncate">{tx(i.name)}</strong>
                           {i.detail && <p className="text-xs text-slate-600 truncate">{i.detail}</p>}
                         </div>
                         <button
                           type="button"
-                          aria-label={`Remove ${i.name}`}
+                          aria-label={tx('Remove {name}', { name: i.name })}
                           onClick={() => removeItem(i)}
                           className="h-11 w-11 flex items-center justify-center text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
                         >
@@ -274,7 +276,7 @@ export default function PatientRecords({
                   <div className="flex items-center gap-1.5">
                     <Pill className="h-3.5 w-3.5 text-cyan-600" />
                     <h3 className="font-display font-extrabold text-sm text-[color:var(--ink)] uppercase tracking-wider">
-                      Active Medications
+                      {tx('Active Medications')}
                     </h3>
                   </div>
                   <span className="text-2xs font-mono font-bold px-1.5 py-0.2 border bg-cyan-50 text-cyan-800 border-cyan-200">
@@ -284,35 +286,35 @@ export default function PatientRecords({
 
                 {prescribed.length > 0 && (
                   <div className="mb-2">
-                    <p className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--t-700)] mb-1">Prescribed by your doctors</p>
+                    <p className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--t-700)] mb-1">{tx('Prescribed by your doctors')}</p>
                     <ul className="divide-y divide-[color:var(--t-100)] max-h-48 overflow-y-auto">
                       {prescribed.map((m, k) => (
                         <li key={k} className="py-1.5 text-xs">
                           <strong className="text-[color:var(--ink)] font-bold block truncate">{m.name}{m.strength ? ` ${m.strength}` : ''}</strong>
-                          <p className="text-xs text-slate-600">{m.detail}{m.doctor ? ` · ${m.doctor}` : ''}{m.until ? ` · until ${fmt(m.until)}` : ''}</p>
+                          <p className="text-xs text-slate-600">{m.detail}{m.doctor ? ` · ${m.doctor}` : ''}{m.until ? tx(' · until {date}', { date: fmt(m.until) }) : ''}</p>
                         </li>
                       ))}
                     </ul>
                   </div>
                 )}
                 {data.items.filter((i: any) => i.type === 'medication').length > 0 && prescribed.length > 0 && (
-                  <p className="text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">You added</p>
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">{tx('You added')}</p>
                 )}
                 {data.items.filter((i: any) => i.type === 'medication').length === 0 ? (prescribed.length > 0 ? null : (
                   <div className="py-3 px-2 text-center bg-cyan-50/30 border border-dashed border-cyan-200 my-1">
-                    <p className="text-xs text-slate-600 font-medium">No active medications</p>
+                    <p className="text-xs text-slate-600 font-medium">{tx('No active medications')}</p>
                   </div>
                 )) : (
                   <ul className="divide-y divide-[color:var(--t-100)] max-h-48 overflow-y-auto">
                     {data.items.filter((i: any) => i.type === 'medication').map((i: any) => (
                       <li key={i.id} className="py-1.5 flex items-center justify-between gap-2 text-xs group">
                         <div className="min-w-0">
-                          <strong className="text-[color:var(--ink)] font-bold block truncate">{i.name}</strong>
+                          <strong className="text-[color:var(--ink)] font-bold block truncate">{tx(i.name)}</strong>
                           {i.detail && <p className="text-xs text-slate-600 truncate">{i.detail}</p>}
                         </div>
                         <button
                           type="button"
-                          aria-label={`Remove ${i.name}`}
+                          aria-label={tx('Remove {name}', { name: i.name })}
                           onClick={() => removeItem(i)}
                           className="h-11 w-11 flex items-center justify-center text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
                         >
@@ -336,38 +338,38 @@ export default function PatientRecords({
             className="bg-white border border-[color:var(--t-200)] p-3 shadow-2xs flex flex-wrap sm:flex-nowrap items-center gap-2.5"
           >
             <div className="w-full sm:w-36 shrink-0">
-              <label className="sr-only">Entry Type</label>
+              <label className="sr-only">{tx('Entry Type')}</label>
               <select 
                 value={item.type} 
                 onChange={e => setItem({ ...item, type: e.target.value })}
                 className="w-full border border-[color:var(--t-200)] bg-white px-2.5 h-11 text-xs font-bold text-[color:var(--ink)] focus:outline-none focus:border-[color:var(--t-600)] transition-colors cursor-pointer"
               >
-                <option value="allergy">Allergy</option>
-                <option value="condition">Condition</option>
-                <option value="medication">Medicine</option>
+                <option value="allergy">{tx('Allergy')}</option>
+                <option value="condition">{tx('Condition')}</option>
+                <option value="medication">{tx('Medicine')}</option>
               </select>
             </div>
 
             <div className="flex-1 min-w-[140px] w-full sm:w-auto">
-              <label className="sr-only">Name</label>
+              <label className="sr-only">{tx('Name')}</label>
               <input 
                 ref={nameRef}
                 value={item.name} 
                 onChange={e => setItem({ ...item, name: e.target.value })} 
                 required 
                 maxLength={120} 
-                placeholder={item.type === 'allergy' ? 'Allergy name (e.g. Penicillin)' : item.type === 'condition' ? 'Condition (e.g. Hypertension)' : 'Medicine name (e.g. Metformin)'}
+                placeholder={tx(item.type === 'allergy' ? 'Allergy name (e.g. Penicillin)' : item.type === 'condition' ? 'Condition (e.g. Hypertension)' : 'Medicine name (e.g. Metformin)')}
                 className="w-full border border-[color:var(--t-200)] bg-white px-3 h-11 text-xs font-semibold text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus:border-[color:var(--t-600)] transition-colors"
               />
             </div>
 
             <div className="flex-1 min-w-[140px] w-full sm:w-auto">
-              <label className="sr-only">Details</label>
+              <label className="sr-only">{tx('Details')}</label>
               <input 
                 value={item.detail} 
                 onChange={e => setItem({ ...item, detail: e.target.value })} 
                 maxLength={300} 
-                placeholder="Details (optional, e.g. severe rash, 5mg daily)"
+                placeholder={tx('Details (optional, e.g. severe rash, 5mg daily)')}
                 className="w-full border border-[color:var(--t-200)] bg-white px-3 h-11 text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus:border-[color:var(--t-600)] transition-colors"
               />
             </div>
@@ -377,12 +379,12 @@ export default function PatientRecords({
               className="w-full sm:w-auto shrink-0 h-11 px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black border border-[color:var(--t-700)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
             >
               <Plus className="h-3.5 w-3.5" />
-              <span>Add Entry</span>
+              <span>{tx('Add Entry')}</span>
             </button>
           </form>
 
           <p className="text-xs text-slate-600 font-medium">
-            Only you can see this unless you share it with a doctor. Each time a doctor opens it, that is logged. Keep it accurate: doctors and pharmacists use it to check that medicines are safe for you.
+            {tx('Only you can see this unless you share it with a doctor. Each time a doctor opens it, that is logged. Keep it accurate: doctors and pharmacists use it to check that medicines are safe for you.')}
           </p>
         </div>
       )}
@@ -395,28 +397,28 @@ export default function PatientRecords({
             const d = await act(() => jpost('/api/records/vitals', { kind: vital.kind, value1: Number(vital.value1), value2: vital.kind === 'bp' ? Number(vital.value2) : undefined, takenAt: vital.takenAt ? new Date(vital.takenAt).toISOString() : undefined }), 'Reading saved.');
             if (d.status === 'success') { setVital({ ...vital, value1: '', value2: '', takenAt: localNow() }); setTrendKind(vital.kind); setVitalFlag(d.data.flag ? d.data.flag.text : null); }
           }}>
-            <label className="text-xs font-bold text-slate-700 w-full sm:w-56 sm:flex-none">Reading<select className={`${field} block w-full mt-1.5`} value={vital.kind} onChange={e => setVital({ ...vital, kind: e.target.value, value1: '', value2: '' })}>{Object.entries(VITAL_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select><span className="block font-normal text-slate-700 mt-1">What you measured</span></label>
-            <label className="text-xs font-bold text-slate-700 flex-1 min-w-[200px]">{vital.kind === 'bp' ? 'Top number (systolic)' : 'Value'}
+            <label className="text-xs font-bold text-slate-700 w-full sm:w-56 sm:flex-none">{tx('Reading')}<select className={`${field} block w-full mt-1.5`} value={vital.kind} onChange={e => setVital({ ...vital, kind: e.target.value, value1: '', value2: '' })}>{Object.entries(VITAL_LABEL).map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}</select><span className="block font-normal text-slate-700 mt-1">{tx('What you measured')}</span></label>
+            <label className="text-xs font-bold text-slate-700 flex-1 min-w-[200px]">{tx(vital.kind === 'bp' ? 'Top number (systolic)' : 'Value')}
               <span className="flex items-center gap-2 mt-1.5">
                 <input type="number" step="any" inputMode="decimal" className={`${field} block w-full min-w-0 flex-1`} value={vital.value1} onChange={e => setVital({ ...vital, value1: e.target.value })} min={vitalSpec?.min} max={vitalSpec?.max} required />
                 <span className="text-xs font-semibold text-slate-700">{vitalSpec?.unit}</span>
               </span>
-              {vitalSpec && <span className="block font-normal text-slate-700 mt-1">Between {vitalSpec.min} and {vitalSpec.max}</span>}
+              {vitalSpec && <span className="block font-normal text-slate-700 mt-1">{tx('Between {a} and {b}', { a: vitalSpec.min, b: vitalSpec.max })}</span>}
             </label>
-            {vital.kind === 'bp' && <label className="text-xs font-bold text-slate-700 flex-1 min-w-[200px]">Bottom number (diastolic)
+            {vital.kind === 'bp' && <label className="text-xs font-bold text-slate-700 flex-1 min-w-[200px]">{tx('Bottom number (diastolic)')}
               <span className="flex items-center gap-2 mt-1.5">
                 <input type="number" inputMode="decimal" className={`${field} block w-full min-w-0 flex-1`} value={vital.value2} onChange={e => setVital({ ...vital, value2: e.target.value })} min={vitalSpec?.min2} max={vitalSpec?.max2} required />
                 <span className="text-xs font-semibold text-slate-700">{vitalSpec?.unit}</span>
               </span>
-              {vitalSpec && <span className="block font-normal text-slate-700 mt-1">Between {vitalSpec.min2} and {vitalSpec.max2}</span>}
+              {vitalSpec && <span className="block font-normal text-slate-700 mt-1">{tx('Between {a} and {b}', { a: vitalSpec.min2, b: vitalSpec.max2 })}</span>}
             </label>}
-            <label className="text-xs font-bold text-slate-700 flex-[1.3] min-w-[240px]">When it was taken
+            <label className="text-xs font-bold text-slate-700 flex-[1.3] min-w-[240px]">{tx('When it was taken')}
               <input type="datetime-local" className={`${field} block w-full mt-1.5`} value={vital.takenAt} max={localNow()} onChange={e => setVital({ ...vital, takenAt: e.target.value })} required />
-              <span className="block font-normal text-slate-700 mt-1">Now, unless you change it</span>
+              <span className="block font-normal text-slate-700 mt-1">{tx('Now, unless you change it')}</span>
             </label>
             <div>
-              <span className="block text-xs font-bold invisible" aria-hidden="true">Save</span>
-              <button className="mt-1.5 h-11 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer border border-[color:var(--t-700)] shadow-xs transition-all">Save Reading</button>
+              <span className="block text-xs font-bold invisible" aria-hidden="true">{tx('Save')}</span>
+              <button className="mt-1.5 h-11 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer border border-[color:var(--t-700)] shadow-xs transition-all">{tx('Save Reading')}</button>
             </div>
           </form>
           {vitalFlag && <p role="alert" className="bg-rose-50 border-2 border-rose-300 text-rose-900 text-xs font-bold p-3 flex gap-2"><AlertTriangle className="h-5 w-5 shrink-0" />{vitalFlag}</p>}
@@ -424,49 +426,49 @@ export default function PatientRecords({
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
           <section aria-labelledby="trend-heading" className="min-w-0 bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 space-y-3">
             <div className="flex flex-wrap items-end justify-between gap-3">
-              <h3 id="trend-heading" className="font-display font-black text-sm text-[color:var(--ink)]">Trend</h3>
-              <label className="text-xs font-bold text-slate-700 flex items-center gap-2">Show
+              <h3 id="trend-heading" className="font-display font-black text-sm text-[color:var(--ink)]">{tx('Trend')}</h3>
+              <label className="text-xs font-bold text-slate-700 flex items-center gap-2">{tx('Show')}
                 <select className={`${field} text-xs`} value={trendKind} onChange={e => setTrendKind(e.target.value)}>
-                  {Object.entries(VITAL_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+                  {Object.entries(VITAL_LABEL).map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}
                 </select>
               </label>
             </div>
-            <TrendChart readings={data.vitals.filter((v: any) => v.kind === trendKind)} label={VITAL_LABEL[trendKind]} unit={trendSpec?.unit ?? ''} twoValues={!!trendSpec?.two} />
+            <TrendChart readings={data.vitals.filter((v: any) => v.kind === trendKind)} label={tx(VITAL_LABEL[trendKind])} unit={trendSpec?.unit ?? ''} twoValues={!!trendSpec?.two} />
           </section>
           <section className="min-w-0 bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5">
-            <h3 className="font-display font-black text-sm text-[color:var(--ink)] mb-3">Recorded Physiological Readings</h3>
+            <h3 className="font-display font-black text-sm text-[color:var(--ink)] mb-3">{tx('Recorded Physiological Readings')}</h3>
             {data.vitals.length === 0 ? (
               <div className="py-6 px-4 bg-[color:var(--t-50)]/40 border border-dashed border-[color:var(--t-200)] text-center">
-                <p className="text-xs text-slate-600 font-medium">No readings recorded yet.</p>
+                <p className="text-xs text-slate-600 font-medium">{tx('No readings recorded yet.')}</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="text-left text-xs font-mono font-extrabold uppercase text-slate-600 border-b border-[color:var(--t-200)] pb-2">
-                      <th className="py-2">Date &amp; Time</th>
-                      <th>Metric</th>
-                      <th>Value</th>
-                      <th className="text-right">Action</th>
+                      <th className="py-2">{tx('Date & Time')}</th>
+                      <th>{tx('Metric')}</th>
+                      <th>{tx('Value')}</th>
+                      <th className="text-right">{tx('Action')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[color:var(--t-100)]">
                     {data.vitals.map((v: any) => (
                       <tr key={v.id} className="hover:bg-[color:var(--t-50)]/30 transition-colors">
                         <td className="py-2.5 font-mono text-slate-600">{new Date(v.ts).toLocaleString()}</td>
-                        <td className="font-bold text-[color:var(--ink)]">{VITAL_LABEL[v.kind]}</td>
+                        <td className="font-bold text-[color:var(--ink)]">{tx(VITAL_LABEL[v.kind])}</td>
                         <td className={`py-2 font-mono font-bold ${v.flag?.level === 'urgent' ? 'text-rose-700' : 'text-slate-800'}`}>
                           {v.value1}{v.value2 ? `/${v.value2}` : ''} {v.unit}
                           {v.flag && (
                             <span className={`mt-1 flex items-start gap-1.5 font-sans font-semibold text-xs leading-snug max-w-md ${v.flag.level === 'urgent' ? 'text-rose-800' : 'text-amber-900'}`}>
                               <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" aria-hidden="true" />
-                              <span><span className="sr-only">{v.flag.level === 'urgent' ? 'Urgent: ' : 'Watch: '}</span>{v.flag.text}</span>
+                              <span><span className="sr-only">{tx(v.flag.level === 'urgent' ? 'Urgent: ' : 'Watch: ')}</span>{v.flag.text}</span>
                             </span>
                           )}
                         </td>
                         <td className="text-right">
                           <button
-                            aria-label="Delete reading"
+                            aria-label={tx('Delete reading')}
                             onClick={() => removeReading(v)}
                             className="h-11 w-11 inline-flex items-center justify-center text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
                           >
@@ -508,15 +510,15 @@ export default function PatientRecords({
 
       {tab === 'labs' && (
         <div className="space-y-3">
-          {data.labOrders.length === 0 && <p className="text-xs text-slate-600 bg-white border border-slate-200 p-4">No lab tests have been requested.</p>}
+          {data.labOrders.length === 0 && <p className="text-xs text-slate-600 bg-white border border-slate-200 p-4">{tx('No lab tests have been requested.')}</p>}
           {data.labOrders.map((o: any) => (
             <article key={o.id} className="bg-white border border-slate-200 p-4 text-xs space-y-1.5">
-              <p><b>{o.tests}</b> <span className="text-xs text-slate-600">requested by {o.doctor} · {fmt(o.orderedAt)}</span></p>
+              <p><b>{o.tests}</b> <span className="text-xs text-slate-600">{tx('requested by {doctor} · {date}', { doctor: o.doctor, date: fmt(o.orderedAt) })}</span></p>
               {o.notes && <p className="text-xs">{o.notes}</p>}
               {o.status === 'resulted'
-                ? <p className="text-xs font-bold text-emerald-800">Result uploaded {fmt(o.resultedAt)} · <a className="underline" href={`/api/documents/${o.resultDocumentId}/download`}>download</a></p>
+                ? <p className="text-xs font-bold text-emerald-800">{tx('Result uploaded {date} ·', { date: fmt(o.resultedAt) })} <a className="underline" href={`/api/documents/${o.resultDocumentId}/download`}>{tx('download')}</a></p>
                 : <label className="text-xs font-bold border border-dashed border-slate-300 px-3 py-2 inline-block cursor-pointer">
-                    Upload result (PDF, JPG or PNG)
+                    {tx('Upload result (PDF, JPG or PNG)')}
                     <input type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={async e => {
                       const f = e.target.files?.[0]; if (!f) return;
                       const form = new FormData(); form.append('file', f); form.append('kind', 'lab_result'); form.append('labOrderId', o.id);
@@ -530,11 +532,11 @@ export default function PatientRecords({
 
       {tab === 'notes' && (
         <div className="space-y-3">
-          {data.encounters.length === 0 && <p className="text-xs text-slate-600 bg-white border border-slate-200 p-4">Your doctors' consultation summaries will appear here.</p>}
+          {data.encounters.length === 0 && <p className="text-xs text-slate-600 bg-white border border-slate-200 p-4">{tx('Your doctors\' consultation summaries will appear here.')}</p>}
           {data.encounters.map((e: any) => (
             <article key={e.id} className="bg-white border border-slate-200 p-4 text-xs space-y-1">
               <p className="font-extrabold">{e.professionalName} · {fmt(e.signed_at)}</p>
-              {(['subjective', 'objective', 'assessment', 'plan'] as const).map(k => e[k] ? <p key={k}><span className="text-xs font-extrabold uppercase text-slate-600 mr-2">{k}</span>{e[k]}</p> : null)}
+              {(['subjective', 'objective', 'assessment', 'plan'] as const).map(k => e[k] ? <p key={k}><span className="text-xs font-extrabold uppercase text-slate-600 mr-2">{tx(k)}</span>{e[k]}</p> : null)}
             </article>
           ))}
         </div>
@@ -542,21 +544,21 @@ export default function PatientRecords({
 
       {tab === 'sharing' && (
         <div className="space-y-4">
-          <p className="text-xs text-slate-700 bg-white border border-slate-200 p-4">Doctors can read your allergies, conditions, medicines, readings and lab results only while you share them. You can stop sharing at any time. Every time a doctor opens your record it is logged.</p>
+          <p className="text-xs text-slate-700 bg-white border border-slate-200 p-4">{tx('Doctors can read your allergies, conditions, medicines, readings and lab results only while you share them. You can stop sharing at any time. Every time a doctor opens your record it is logged.')}</p>
           <section className="bg-white border border-slate-200 p-4 space-y-2">
-            <h3 className="text-sm font-extrabold">Currently sharing with</h3>
-            {data.grants.length === 0 ? <p className="text-xs text-slate-600">Nobody.</p> : data.grants.map((g: any) => (
+            <h3 className="text-sm font-extrabold">{tx('Currently sharing with')}</h3>
+            {data.grants.length === 0 ? <p className="text-xs text-slate-600">{tx('Nobody.')}</p> : data.grants.map((g: any) => (
               <div key={g.id} className="flex items-center justify-between gap-3 text-xs border-t border-slate-100 pt-2">
-                <span><b>{g.professionalName}</b> <span className="text-xs text-slate-600">until {fmt(g.expires_at)}</span></span>
-                <button onClick={() => act(() => jpost(`/api/records/grants/${g.id}`, undefined, 'DELETE'), 'Sharing stopped.')} className="text-xs font-bold text-rose-700 cursor-pointer">Stop sharing</button>
+                <span><b>{g.professionalName}</b> <span className="text-xs text-slate-600">{tx('until {date}', { date: fmt(g.expires_at) })}</span></span>
+                <button onClick={() => act(() => jpost(`/api/records/grants/${g.id}`, undefined, 'DELETE'), 'Sharing stopped.')} className="text-xs font-bold text-rose-700 cursor-pointer">{tx('Stop sharing')}</button>
               </div>
             ))}
           </section>
           {data.sharableWith.length > 0 && (
             <form className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap gap-2 items-end" onSubmit={e => { e.preventDefault(); if (shareWith) act(() => jpost('/api/records/grants', { professionalId: shareWith, days: 30 }), 'Shared for 30 days.'); }}>
-              <label className="text-xs font-bold flex-1 min-w-[12rem]">Share with a doctor you have seen
-                <select className={`${field} block w-full mt-1`} value={shareWith} onChange={e => setShareWith(e.target.value)}><option value="">Choose…</option>{data.sharableWith.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
-              <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Share for 30 days</button>
+              <label className="text-xs font-bold flex-1 min-w-[12rem]">{tx('Share with a doctor you have seen')}
+                <select className={`${field} block w-full mt-1`} value={shareWith} onChange={e => setShareWith(e.target.value)}><option value="">{tx('Choose…')}</option>{data.sharableWith.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+              <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">{tx('Share for 30 days')}</button>
             </form>
           )}
         </div>

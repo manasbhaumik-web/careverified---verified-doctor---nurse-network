@@ -347,7 +347,7 @@ footer button.bg-slate-800:hover,
   --dark: #0F172A;
   --t-50: #ECFEFF; --t-100: #CFFAFE; --t-200: #A5F3FC; --t-300: #67E8F9; --t-400: #22D3EE;
   --t-500: #06B6D4; --t-600: #0891B2; --t-700: #0E7490; --t-800: #155E75; --t-900: #164E63;
-  --t-bg: #F2FDFF; --t-hue: 188deg;
+  --t-bg: color-mix(in srgb, var(--t-50) 35%, #EEF3F7); --t-hue: 188deg;
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
   --t-text: var(--t-600);
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
@@ -359,7 +359,7 @@ footer button.bg-slate-800:hover,
   --dark: #0F172A;
   --t-50: #F0F9FF; --t-100: #E0F2FE; --t-200: #BAE6FD; --t-300: #7DD3FC; --t-400: #38BDF8;
   --t-500: #0EA5E9; --t-600: #0270A9; --t-700: #0369A1; --t-800: #075985; --t-900: #0C4A6E;
-  --t-bg: #F5FAFF; --t-hue: 205deg;
+  --t-bg: color-mix(in srgb, var(--t-50) 35%, #EEF3F7); --t-hue: 205deg;
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
   --t-text: var(--t-600);
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
@@ -371,7 +371,7 @@ footer button.bg-slate-800:hover,
   --dark: #0F172A;
   --t-50: #FFF0F2; --t-100: #FFE4E6; --t-200: #FECDD3; --t-300: #FDA4AF; --t-400: #FF8A98;
   --t-500: #E0243F; --t-600: #C81E1E; --t-700: #B91C1C; --t-800: #86102A; --t-900: #6B0F24;
-  --t-bg: #FFF8F9; --t-hue: 0deg;
+  --t-bg: color-mix(in srgb, var(--t-50) 35%, #EEF3F7); --t-hue: 0deg;
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
   --t-text: var(--t-600);
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);

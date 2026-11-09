@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTr } from '../locale';
 
 export interface TrendReading { id: string; ts: string; value1: number; value2?: number | null }
 
@@ -21,11 +22,12 @@ const num = (n: number) => (Math.abs(n) >= 100 ? String(Math.round(n)) : String(
  * so nothing is only available in the picture. Needs two readings to show a trend.
  */
 export default function TrendChart({ readings, label, unit, twoValues = false }: Props) {
+  const tx = useTr();
   const pts = [...readings].sort((a, b) => a.ts.localeCompare(b.ts)).slice(-30);
   if (pts.length < 2) {
     return (
       <p className="text-xs text-slate-700 bg-slate-50 border border-dashed border-slate-300 p-4">
-        {pts.length === 0 ? `No ${label.toLowerCase()} readings yet.` : `One ${label.toLowerCase()} reading so far.`} Add at least two to see a trend.
+        {pts.length === 0 ? tx('No {label} readings yet.', { label: label.toLowerCase() }) : tx('One {label} reading so far.', { label: label.toLowerCase() })}{tx(' Add at least two to see a trend.')}
       </p>
     );
   }

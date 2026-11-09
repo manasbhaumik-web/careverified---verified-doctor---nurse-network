@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { BookOpenCheck, ExternalLink, RefreshCw, Search, FileText, Sparkles, CheckCircle2 } from 'lucide-react';
+import { useTr } from '../locale';
 
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -30,6 +31,7 @@ export default function AdminLiterature({
   onSubChange,
   hideHeaderTabs = false,
 }: AdminLiteratureProps = {}) {
+  const tx = useTr();
   const [internalSub, setInternalSub] = useState<LitSubTab>('queue');
   const sub = activeSub ?? internalSub;
   const setSub = (newSub: LitSubTab) => {
@@ -75,7 +77,7 @@ export default function AdminLiterature({
   const fetchSheet = async (e: React.FormEvent) => {
     e.preventDefault(); setBusy(true); setMsg(null);
     const d = await jreq('/api/admin/literature/factsheets/fetch', 'POST', { topic: sheetTopic });
-    if (d.status === 'success') { setSheetTopic(''); setMsg({ ok: true, text: 'Fetched from MedlinePlus. Review it below before publishing.' }); loadSheets(); } else setMsg({ ok: false, text: d.message });
+    if (d.status === 'success') { setSheetTopic(''); setMsg({ ok: true, text: tx('Fetched from MedlinePlus. Review it below before publishing.') }); loadSheets(); } else setMsg({ ok: false, text: d.message });
     setBusy(false);
   };
   const sheetAct = async (id: string, action: 'approve' | 'reject' | 'unpublish') => {
@@ -107,14 +109,14 @@ export default function AdminLiterature({
         setSub('queue');
         await load();
       } else setMsg({ ok: false, text: d.message });
-    } catch { setMsg({ ok: false, text: 'Server connection error.' }); }
+    } catch { setMsg({ ok: false, text: tx('Server connection error.') }); }
     setBusy(false);
   };
 
   const act = async (id: string, action: 'approve' | 'reject' | 'unpublish', body?: unknown) => {
     setMsg(null);
     const d = await jreq(`/api/admin/literature/${id}/${action}`, 'POST', body);
-    setMsg({ ok: d.status === 'success', text: d.status === 'success' ? (action === 'approve' ? 'Published to the Medical Library.' : 'Updated.') : d.message });
+    setMsg({ ok: d.status === 'success', text: d.status === 'success' ? (action === 'approve' ? tx('Published to the Medical Library.') : tx('Updated.')) : d.message });
     load();
   };
 
@@ -152,7 +154,7 @@ export default function AdminLiterature({
           msg.ok ? 'text-emerald-800 bg-emerald-50 border-emerald-200' : 'text-rose-700 bg-rose-50 border-rose-200'
         }`}>
           <span>{msg.text}</span>
-          <button onClick={() => setMsg(null)} className="text-xs uppercase font-mono font-bold text-slate-500 hover:text-slate-800 cursor-pointer ml-4">Dismiss</button>
+          <button onClick={() => setMsg(null)} className="text-xs uppercase font-mono font-bold text-slate-500 hover:text-slate-800 cursor-pointer ml-4">{tx('Dismiss')}</button>
         </p>
       )}
 
@@ -161,8 +163,8 @@ export default function AdminLiterature({
         <div className="space-y-5">
           <div className="bg-white border border-[color:var(--t-200)] p-4 rounded-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide">PubMed Clinical Studies Queue</h3>
-              <p className="text-xs text-slate-500 font-semibold mt-0.5">Approve, reject, or edit clinical summaries and takeaways before public display.</p>
+              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide">{tx('PubMed Clinical Studies Queue')}</h3>
+              <p className="text-xs text-slate-500 font-semibold mt-0.5">{tx('Approve, reject, or edit clinical summaries and takeaways before public display.')}</p>
             </div>
             <div role="tablist" className="flex flex-wrap items-center gap-1.5">
               {TABS.map(([id, text]) => (
@@ -196,7 +198,7 @@ export default function AdminLiterature({
                   {tab === 'candidate' ? 'No research papers waiting for review.' : `No ${tab} papers found.`}
                 </h4>
                 <p className="text-xs text-slate-500">
-                  {tab === 'candidate' ? 'Use the PubMed Discovery tab to query new medical conditions into the queue.' : 'Papers will appear here once processed by moderators.'}
+                  {tab === 'candidate' ? tx('Use the PubMed Discovery tab to query new medical conditions into the queue.') : tx('Papers will appear here once processed by moderators.')}
                 </p>
               </div>
             </div>
@@ -214,49 +216,49 @@ export default function AdminLiterature({
                   <p className="text-xs text-slate-600 [overflow-wrap:anywhere]">{p.authors} · <i>{p.journal}</i> · {p.pubDate} · PMID {p.pmid}{p.doi ? ` · doi:${p.doi}` : ''}</p>
                   <p className={`text-xs text-slate-700 leading-relaxed whitespace-pre-line ${openId === p.id ? '' : 'line-clamp-4'}`}>{p.abstract}</p>
                   <div className="flex flex-wrap items-center gap-3 text-xs">
-                    <button onClick={() => setOpenId(openId === p.id ? null : p.id)} className="font-bold text-[color:var(--t-700)] cursor-pointer hover:underline">{openId === p.id ? 'Show less' : 'Read full abstract'}</button>
-                    <a href={p.url} target="_blank" rel="noopener noreferrer" className="font-bold text-[color:var(--t-700)] inline-flex items-center gap-1 hover:underline">Open on PubMed <ExternalLink className="h-3 w-3" /></a>
+                    <button onClick={() => setOpenId(openId === p.id ? null : p.id)} className="font-bold text-[color:var(--t-700)] cursor-pointer hover:underline">{openId === p.id ? tx('Show less') : tx('Read full abstract')}</button>
+                    <a href={p.url} target="_blank" rel="noopener noreferrer" className="font-bold text-[color:var(--t-700)] inline-flex items-center gap-1 hover:underline">{tx('Open on PubMed')} <ExternalLink className="h-3 w-3" /></a>
                     <span className="text-slate-400">Retraction check {when(p.retractionCheckedAt)}</span>
                   </div>
 
                   {p.status === 'candidate' && (
                     <div className="flex flex-wrap items-end gap-2 pt-3 border-t border-slate-100">
                       <div className="basis-full">
-                        <label className={lab} htmlFor={`tk-${p.id}`}>Key takeaway for patients (required, plain language)</label>
+                        <label className={lab} htmlFor={`tk-${p.id}`}>{tx('Key takeaway for patients (required, plain language)')}</label>
                         <textarea id={`tk-${p.id}`} className={field} rows={2} maxLength={400} value={takeaway[p.id] ?? ''} onChange={e => setTakeaway({ ...takeaway, [p.id]: e.target.value })}
-                          placeholder="e.g. Higher long-term blood sugar was linked to a greater chance of heart failure in people with type 2 diabetes." />
+                          placeholder={tx('e.g. Higher long-term blood sugar was linked to a greater chance of heart failure in people with type 2 diabetes.')} />
                         <p className="text-xs text-slate-500 mt-0.5">Say what the paper found, not what patients should do. Shown above the abstract. {(takeaway[p.id] ?? '').length}/400</p>
-                        <label className={`${lab} mt-2`} htmlFor={`tkms-${p.id}`}>Bahasa Malaysia version (optional, written or checked by a Malay speaker)</label>
+                        <label className={`${lab} mt-2`} htmlFor={`tkms-${p.id}`}>{tx('Bahasa Malaysia version (optional, written or checked by a Malay speaker)')}</label>
                         <textarea id={`tkms-${p.id}`} className={field} rows={2} maxLength={400} value={takeawayMs[p.id] ?? ''} onChange={e => setTakeawayMs({ ...takeawayMs, [p.id]: e.target.value })} />
                       </div>
                       <div className="flex-1 min-w-[160px]">
-                        <label className={lab} htmlFor={`cat-${p.id}`}>Library category</label>
+                        <label className={lab} htmlFor={`cat-${p.id}`}>{tx('Library category')}</label>
                         <input id={`cat-${p.id}`} className={field} value={category[p.id] ?? p.condition} onChange={e => setCategory({ ...category, [p.id]: e.target.value })} maxLength={60} />
                       </div>
-                      <button onClick={() => act(p.id, 'approve', { category: category[p.id] ?? p.condition, takeaway: takeaway[p.id] ?? '', takeawayMs: takeawayMs[p.id] ?? '' })} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">Approve &amp; publish</button>
-                      <button onClick={() => act(p.id, 'reject', { note: window.prompt('Reason (optional)') ?? undefined })} className="border border-slate-200 text-xs font-bold px-4 py-2.5 cursor-pointer hover:bg-slate-50">Reject</button>
+                      <button onClick={() => act(p.id, 'approve', { category: category[p.id] ?? p.condition, takeaway: takeaway[p.id] ?? '', takeawayMs: takeawayMs[p.id] ?? '' })} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">{tx('Approve & publish')}</button>
+                      <button onClick={() => act(p.id, 'reject', { note: window.prompt('Reason (optional)') ?? undefined })} className="border border-slate-200 text-xs font-bold px-4 py-2.5 cursor-pointer hover:bg-slate-50">{tx('Reject')}</button>
                     </div>
                   )}
                   {p.status === 'approved' && (
                     <div className="space-y-2 pt-3 border-t border-slate-100 text-xs">
                       <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-3">
-                        <span className={lab}>Key takeaway</span>
+                        <span className={lab}>{tx('Key takeaway')}</span>
                         {editing === p.id ? (
                           <div className="space-y-2">
-                            <textarea className={field} rows={2} maxLength={400} value={takeaway[p.id] ?? p.takeaway ?? ''} onChange={e => setTakeaway({ ...takeaway, [p.id]: e.target.value })} aria-label="Key takeaway" />
-                            <textarea className={field} rows={2} maxLength={400} placeholder="Bahasa Malaysia version (optional)" value={takeawayMs[p.id] ?? p.takeawayMs ?? ''} onChange={e => setTakeawayMs({ ...takeawayMs, [p.id]: e.target.value })} aria-label="Bahasa Malaysia takeaway" />
+                            <textarea className={field} rows={2} maxLength={400} value={takeaway[p.id] ?? p.takeaway ?? ''} onChange={e => setTakeaway({ ...takeaway, [p.id]: e.target.value })} aria-label={tx('Key takeaway')} />
+                            <textarea className={field} rows={2} maxLength={400} placeholder={tx('Bahasa Malaysia version (optional)')} value={takeawayMs[p.id] ?? p.takeawayMs ?? ''} onChange={e => setTakeawayMs({ ...takeawayMs, [p.id]: e.target.value })} aria-label={tx('Bahasa Malaysia takeaway')} />
                             <div className="flex gap-2">
-                              <button onClick={async () => { const d = await jreq(`/api/admin/literature/${p.id}/takeaway`, 'POST', { takeaway: takeaway[p.id] ?? p.takeaway ?? '', takeawayMs: takeawayMs[p.id] ?? p.takeawayMs ?? '' }); setMsg({ ok: d.status === 'success', text: d.status === 'success' ? 'Takeaway updated.' : d.message }); if (d.status === 'success') { setEditing(null); load(); } }} className="bg-[color:var(--t-600)] text-white font-extrabold px-3 py-1.5 cursor-pointer">Save</button>
-                              <button onClick={() => setEditing(null)} className="border border-slate-200 font-bold px-3 py-1.5 cursor-pointer">Cancel</button>
+                              <button onClick={async () => { const d = await jreq(`/api/admin/literature/${p.id}/takeaway`, 'POST', { takeaway: takeaway[p.id] ?? p.takeaway ?? '', takeawayMs: takeawayMs[p.id] ?? p.takeawayMs ?? '' }); setMsg({ ok: d.status === 'success', text: d.status === 'success' ? 'Takeaway updated.' : d.message }); if (d.status === 'success') { setEditing(null); load(); } }} className="bg-[color:var(--t-600)] text-white font-extrabold px-3 py-1.5 cursor-pointer">{tx('Save')}</button>
+                              <button onClick={() => setEditing(null)} className="border border-slate-200 font-bold px-3 py-1.5 cursor-pointer">{tx('Cancel')}</button>
                             </div>
                           </div>
                         ) : (
-                          <p className="text-slate-700">{p.takeaway || 'None yet.'} <button onClick={() => setEditing(p.id)} className="font-bold text-[color:var(--t-700)] cursor-pointer ml-1">Edit</button></p>
+                          <p className="text-slate-700">{p.takeaway || tx('None yet.')} <button onClick={() => setEditing(p.id)} className="font-bold text-[color:var(--t-700)] cursor-pointer ml-1">{tx('Edit')}</button></p>
                         )}
                       </div>
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-emerald-700 font-bold">Published in “{p.category}” · {when(p.reviewedAt)}</span>
-                        <button onClick={() => act(p.id, 'unpublish', { note: window.prompt('Reason (optional)') ?? undefined })} className="border border-slate-200 font-bold px-3 py-1.5 cursor-pointer hover:bg-slate-50">Unpublish</button>
+                        <button onClick={() => act(p.id, 'unpublish', { note: window.prompt('Reason (optional)') ?? undefined })} className="border border-slate-200 font-bold px-3 py-1.5 cursor-pointer hover:bg-slate-50">{tx('Unpublish')}</button>
                       </div>
                     </div>
                   )}
@@ -273,13 +275,13 @@ export default function AdminLiterature({
         <div className="space-y-6">
           <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-4 rounded-none">
             <div>
-              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide">MedlinePlus Condition Fact Sheets Ingestion</h3>
-              <p className="text-xs text-slate-500 font-semibold mt-0.5">Plain-language clinical condition overviews from the U.S. National Library of Medicine. They appear on the condition's guide page in MediCred once verified and approved.</p>
+              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide">{tx('MedlinePlus Condition Fact Sheets Ingestion')}</h3>
+              <p className="text-xs text-slate-500 font-semibold mt-0.5">{tx("Plain-language clinical condition overviews from the U.S. National Library of Medicine. They appear on the condition's guide page in MediCred once verified and approved.")}</p>
             </div>
             <form onSubmit={fetchSheet} className="flex flex-col sm:flex-row gap-3 max-w-xl">
-              <input className={field} value={sheetTopic} onChange={e => setSheetTopic(e.target.value)} placeholder="Enter medical condition topic (e.g. Asthma, Hypertension, Diabetes)" minLength={3} maxLength={80} required aria-label="Fact sheet topic" />
+              <input className={field} value={sheetTopic} onChange={e => setSheetTopic(e.target.value)} placeholder={tx('Enter medical condition topic (e.g. Asthma, Hypertension, Diabetes)')} minLength={3} maxLength={80} required aria-label={tx('Fact sheet topic')} />
               <button disabled={busy} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:opacity-60 text-white text-xs font-black uppercase tracking-wider px-5 py-2.5 cursor-pointer shrink-0">
-                {busy ? 'Fetching…' : 'Fetch Fact Sheet'}
+                {busy ? tx('Fetching…') : tx('Fetch Fact Sheet')}
               </button>
             </form>
           </section>
@@ -288,8 +290,8 @@ export default function AdminLiterature({
             <div className="bg-white border border-slate-200 p-12 text-center text-slate-500 flex flex-col items-center justify-center gap-3 rounded-none">
               <FileText className="h-10 w-10 text-slate-300" />
               <div className="space-y-1">
-                <h4 className="text-sm font-bold text-slate-700">No condition fact sheets in registry</h4>
-                <p className="text-xs text-slate-500">Fetch a condition above using MedlinePlus integration to review and publish to the patient guides.</p>
+                <h4 className="text-sm font-bold text-slate-700">{tx('No condition fact sheets in registry')}</h4>
+                <p className="text-xs text-slate-500">{tx('Fetch a condition above using MedlinePlus integration to review and publish to the patient guides.')}</p>
               </div>
             </div>
           ) : (
@@ -309,9 +311,9 @@ export default function AdminLiterature({
                     Open on MedlinePlus <ExternalLink className="h-3 w-3" />
                   </a>
                   <div className="flex gap-2 pt-2 border-t border-slate-100">
-                    {s.status !== 'approved' && <button onClick={() => sheetAct(s.id, 'approve')} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider px-3.5 py-2 cursor-pointer">Approve &amp; publish</button>}
-                    {s.status === 'candidate' && <button onClick={() => sheetAct(s.id, 'reject')} className="border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold uppercase tracking-wider px-3.5 py-2 cursor-pointer">Reject</button>}
-                    {s.status === 'approved' && <button onClick={() => sheetAct(s.id, 'unpublish')} className="border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold uppercase tracking-wider px-3.5 py-2 cursor-pointer">Unpublish</button>}
+                    {s.status !== 'approved' && <button onClick={() => sheetAct(s.id, 'approve')} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider px-3.5 py-2 cursor-pointer">{tx('Approve & publish')}</button>}
+                    {s.status === 'candidate' && <button onClick={() => sheetAct(s.id, 'reject')} className="border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold uppercase tracking-wider px-3.5 py-2 cursor-pointer">{tx('Reject')}</button>}
+                    {s.status === 'approved' && <button onClick={() => sheetAct(s.id, 'unpublish')} className="border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold uppercase tracking-wider px-3.5 py-2 cursor-pointer">{tx('Unpublish')}</button>}
                   </div>
                 </li>
               ))}
@@ -326,31 +328,31 @@ export default function AdminLiterature({
           <section className="bg-white border border-[color:var(--t-200)] p-5 grid gap-5 xl:grid-cols-[1fr_auto] items-end rounded-none">
             <form onSubmit={search} className="grid gap-3 sm:grid-cols-[1fr_140px_auto] items-end">
               <div>
-                <label className={lab} htmlFor="lit-condition">Medical Condition or Research Topic</label>
-                <input id="lit-condition" className={field} value={condition} onChange={e => setCondition(e.target.value)} placeholder="e.g. Type 2 Diabetes, Paediatric Asthma, Hypertension" required minLength={3} maxLength={80} />
+                <label className={lab} htmlFor="lit-condition">{tx('Medical Condition or Research Topic')}</label>
+                <input id="lit-condition" className={field} value={condition} onChange={e => setCondition(e.target.value)} placeholder={tx('e.g. Type 2 Diabetes, Paediatric Asthma, Hypertension')} required minLength={3} maxLength={80} />
               </div>
               <div>
-                <label className={lab} htmlFor="lit-years">Publication Window</label>
+                <label className={lab} htmlFor="lit-years">{tx('Publication Window')}</label>
                 <select id="lit-years" className={field} value={years} onChange={e => setYears(Number(e.target.value))}>
                   {[1, 3, 5, 10].map(y => <option key={y} value={y}>{y} year{y === 1 ? '' : 's'}</option>)}
                 </select>
               </div>
               <button disabled={busy} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:opacity-60 text-white text-xs font-black uppercase tracking-wider px-5 py-2.5 cursor-pointer inline-flex items-center gap-2">
-                <Search className="h-4 w-4" /> {busy ? 'Searching…' : 'Query PubMed'}
+                <Search className="h-4 w-4" /> {busy ? tx('Searching…') : tx('Query PubMed')}
               </button>
             </form>
             <button onClick={recheck} disabled={busy || !(counts.approved > 0)} className="border border-slate-200 hover:bg-slate-50 text-xs font-bold uppercase tracking-wider px-4 py-2.5 cursor-pointer inline-flex items-center gap-2 disabled:opacity-50">
               <RefreshCw className="h-4 w-4 text-[color:var(--t-600)]" /> Retraction Monitor
             </button>
             <p className="text-xs text-slate-500 font-semibold xl:col-span-2">
-              National Library of Medicine query filtering: Systematic reviews, meta-analyses, randomized clinical trials, and practice guidelines with abstracts are fetched. Retracted publications are automatically flagged.
+              {tx('National Library of Medicine query filtering: Systematic reviews, meta-analyses, randomized clinical trials, and practice guidelines with abstracts are fetched. Retracted publications are automatically flagged.')}
             </p>
           </section>
 
           <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-4 rounded-none">
             <div className="flex flex-wrap items-end justify-between gap-3 border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide">Automated Topic Ingestion Watchlist</h3>
+                <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide">{tx('Automated Topic Ingestion Watchlist')}</h3>
                 <p className="text-xs text-slate-500 font-semibold mt-0.5">PubMed is polled weekly for these clinical conditions; incoming literature is routed to the Research Papers Queue for moderation.</p>
               </div>
               <button onClick={runTopics} disabled={busy || topics.length === 0} className="border border-slate-200 hover:bg-slate-50 text-xs font-bold uppercase tracking-wider px-4 py-2 cursor-pointer inline-flex items-center gap-2 disabled:opacity-50">
@@ -359,7 +361,7 @@ export default function AdminLiterature({
             </div>
 
             <ul className="flex flex-wrap gap-2">
-              {topics.length === 0 && <li className="text-xs text-slate-500 font-semibold py-2">No active conditions in automated watchlist.</li>}
+              {topics.length === 0 && <li className="text-xs text-slate-500 font-semibold py-2">{tx('No active conditions in automated watchlist.')}</li>}
               {topics.map(t => (
                 <li key={t.condition} className="inline-flex items-center gap-2 border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold rounded-none">
                   <b className="text-slate-800">{t.condition}</b>
@@ -370,8 +372,8 @@ export default function AdminLiterature({
             </ul>
 
             <form onSubmit={addTopic} className="flex gap-2 max-w-md pt-1">
-              <input className={field} value={newTopic} onChange={e => setNewTopic(e.target.value)} placeholder="Add condition to track (e.g. Asthma, Glaucoma)" minLength={3} maxLength={80} required aria-label="Condition to track" />
-              <button className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider px-5 cursor-pointer shrink-0">Track Condition</button>
+              <input className={field} value={newTopic} onChange={e => setNewTopic(e.target.value)} placeholder={tx('Add condition to track (e.g. Asthma, Glaucoma)')} minLength={3} maxLength={80} required aria-label={tx('Condition to track')} />
+              <button className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider px-5 cursor-pointer shrink-0">{tx('Track Condition')}</button>
             </form>
           </section>
         </div>

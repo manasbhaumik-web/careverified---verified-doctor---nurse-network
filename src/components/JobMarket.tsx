@@ -3,6 +3,7 @@ import {
   Briefcase, MapPin, Search, PlusCircle, 
   CheckCircle2, Loader, Tag, Users, ShieldCheck, LayoutGrid, List, Eye, X, Clock 
 } from 'lucide-react';
+import { useTr } from '../locale';
 import { JobPost, Professional, Review, Booking } from '../types';
 import DashboardHeader, { BannerBadge, FilterSelect } from './DashboardHeader';
 import { MY_STATES } from '../identity';
@@ -37,6 +38,7 @@ export default function JobMarket({
   onOpenHelp,
   embedded = false,
 }: JobMarketProps) {
+  const tx = useTr();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedCity, setSelectedCity] = useState<string>('all');
@@ -109,7 +111,7 @@ export default function JobMarket({
       });
 
       const data = await response.json();
-      if (data.status !== 'success') setFormError(data.message || 'Could not publish the listing.');
+      if (data.status !== 'success') setFormError(data.message || tx('Could not publish the listing.'));
       if (data.status === 'success') {
         onNewJobCreated(data.data);
         setFormSuccess(true);
@@ -157,7 +159,7 @@ export default function JobMarket({
       if (data.status === 'success') {
         if (onRefreshData) onRefreshData();
       } else {
-        alert(data.message || 'Could not clock in.');
+        alert(data.message || tx('Could not clock in.'));
       }
     } catch (e) {
       console.error(e);
@@ -167,11 +169,11 @@ export default function JobMarket({
   };
 
   const handleClockOut = async (jobId: string) => {
-    const hoursStr = window.prompt('Confirm actual hours worked on shift:', '8.0');
+    const hoursStr = window.prompt(tx('Confirm actual hours worked on shift:'), '8.0');
     if (!hoursStr) return;
     const hours = parseFloat(hoursStr);
     if (isNaN(hours) || hours <= 0) {
-      alert('Please enter a valid number of hours.');
+      alert(tx('Please enter a valid number of hours.'));
       return;
     }
     setShiftActionLoading(jobId);
@@ -185,7 +187,7 @@ export default function JobMarket({
       if (data.status === 'success') {
         if (onRefreshData) onRefreshData();
       } else {
-        alert(data.message || 'Could not clock out.');
+        alert(data.message || tx('Could not clock out.'));
       }
     } catch (e) {
       console.error(e);
@@ -211,7 +213,7 @@ export default function JobMarket({
     return (
       <div className="border border-[color:var(--t-200)] bg-[color:var(--t-bg)] p-3 text-xs space-y-2 mt-2">
         <div className="flex items-center justify-between gap-2">
-          <span className="font-bold text-[color:var(--ink)]">Application:</span>
+          <span className="font-bold text-[color:var(--ink)]">{tx('Application:')}</span>
           {isAccepted && (
             <span className="inline-flex items-center gap-1 text-2xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5">
               <CheckCircle2 className="h-3 w-3 text-emerald-600" /> Accepted & Escrow Secured
@@ -224,14 +226,14 @@ export default function JobMarket({
           )}
           {isPending && (
             <span className="inline-flex items-center gap-1 text-2xs font-black uppercase tracking-wider text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5">
-              <Clock className="h-3 w-3 text-amber-600" /> Under Hospital Review
+              <Clock className="h-3 w-3 text-amber-600" /> {tx('Under Hospital Review')}
             </span>
           )}
         </div>
 
         {app?.paymentRef && (
           <div className="text-xs text-slate-600 flex items-center justify-between">
-            <span>Security Reference:</span>
+            <span>{tx('Security Reference:')}</span>
             <span className="font-mono font-bold text-[color:var(--ink)]">{app.paymentRef}</span>
           </div>
         )}
@@ -252,7 +254,7 @@ export default function JobMarket({
                 className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white font-bold px-3 py-1.5 flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-xs"
               >
                 {shiftActionLoading === job.id ? <Loader className="h-3 w-3 animate-spin" /> : <Clock className="h-3 w-3" />}
-                Clock In for Shift
+                {tx('Clock In for Shift')}
               </button>
             ) : !clockOutAt ? (
               <div className="flex items-center gap-2 flex-wrap">
@@ -267,7 +269,7 @@ export default function JobMarket({
                   className="bg-[color:var(--t-700)] hover:bg-[color:var(--t-800)] border border-[color:var(--t-800)] text-white font-bold px-3 py-1.5 flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-xs"
                 >
                   {shiftActionLoading === job.id ? <Loader className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3" />}
-                  Clock Out & Submit Hours
+                  {tx('Clock Out & Submit Hours')}
                 </button>
               </div>
             ) : timesheetStatus === 'submitted' ? (
@@ -291,15 +293,15 @@ export default function JobMarket({
       {embedded ? (
         <WorkspaceHeader
           icon={Briefcase}
-          eyebrow="Clinical Human Capital · Act 586 Staffing"
-          title="Hospital Staffing & Nurse Shift Marketplace"
-          description="Clinics source credential-verified staff for temporary and full contract roles with automated compliance tracking."
-          badges={<BannerBadge tone="brand">National Shift Registry</BannerBadge>}
+          eyebrow={tx('Clinical Human Capital · Act 586 Staffing')}
+          title={tx('Hospital Staffing & Nurse Shift Marketplace')}
+          description={tx('Clinics source credential-verified staff for temporary and full contract roles with automated compliance tracking.')}
+          badges={<BannerBadge tone="brand">{tx('National Shift Registry')}</BannerBadge>}
           tabs={[
-            { id: 'open' as const, label: 'Open shifts', icon: Briefcase, count: jobs.length },
-            { id: 'applied' as const, label: 'My applications', icon: CheckCircle2, count: myApplications.length },
-            { id: 'locums' as const, label: 'Locums', icon: Users },
-            { id: 'eligibility' as const, label: 'Eligibility', icon: ShieldCheck },
+            { id: 'open' as const, label: tx('Open shifts'), icon: Briefcase, count: jobs.length },
+            { id: 'applied' as const, label: tx('My applications'), icon: CheckCircle2, count: myApplications.length },
+            { id: 'locums' as const, label: tx('Locums'), icon: Users },
+            { id: 'eligibility' as const, label: tx('Eligibility'), icon: ShieldCheck },
           ]}
           activeTab={activeTab}
           onTabChange={setActiveTab}
@@ -324,21 +326,21 @@ export default function JobMarket({
           bookings={bookings}
           groupName="Clinical Shifts"
           tabs={[
-            { id: 'open' as const, label: 'Open shifts', icon: Briefcase, count: jobs.length },
-            { id: 'applied' as const, label: 'My applications', icon: CheckCircle2, count: myApplications.length },
-            { id: 'locums' as const, label: 'Locums', icon: Users },
-            { id: 'eligibility' as const, label: 'Eligibility', icon: ShieldCheck },
+            { id: 'open' as const, label: tx('Open shifts'), icon: Briefcase, count: jobs.length },
+            { id: 'applied' as const, label: tx('My applications'), icon: CheckCircle2, count: myApplications.length },
+            { id: 'locums' as const, label: tx('Locums'), icon: Users },
+            { id: 'eligibility' as const, label: tx('Eligibility'), icon: ShieldCheck },
           ]}
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          tabsLabel="Shift sections"
+          tabsLabel={tx('Shift sections')}
           onOpenHelp={onOpenHelp}
         />
       ) : (
         <DashboardHeader
-          eyebrow="B2B Shift & Staff Recruitment"
-          title="Hospital Staffing & Nurse Shift Marketplace"
-          description="Clinics source credential-verified staff for temporary and full contract roles."
+          eyebrow={tx('B2B Shift & Staff Recruitment')}
+          title={tx('Hospital Staffing & Nurse Shift Marketplace')}
+          description={tx('Clinics source credential-verified staff for temporary and full contract roles.')}
           actions={
             (role === 'facility' || role === 'admin') ? (
               <button
@@ -351,28 +353,28 @@ export default function JobMarket({
             ) : undefined
           }
           tabs={[
-            { id: 'open' as const, label: 'Open shifts', icon: Briefcase, count: jobs.length },
-            { id: 'applied' as const, label: 'My applications', icon: CheckCircle2, count: myApplications.length },
-            { id: 'locums' as const, label: 'Locums', icon: Users },
-            { id: 'eligibility' as const, label: 'Eligibility', icon: ShieldCheck },
+            { id: 'open' as const, label: tx('Open shifts'), icon: Briefcase, count: jobs.length },
+            { id: 'applied' as const, label: tx('My applications'), icon: CheckCircle2, count: myApplications.length },
+            { id: 'locums' as const, label: tx('Locums'), icon: Users },
+            { id: 'eligibility' as const, label: tx('Eligibility'), icon: ShieldCheck },
           ]}
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          tabsLabel="Shift sections"
+          tabsLabel={tx('Shift sections')}
         />
       )}
 
       <div className={embedded ? "space-y-6" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
         {/* Compact Summary Metrics Bar */}
         <section
-          aria-label="Marketplace summary"
+          aria-label={tx('Marketplace summary')}
           className="bg-white border border-[color:var(--t-200)] shadow-2xs grid grid-cols-2 lg:grid-cols-4"
         >
           {[
-            { label: 'Open listings', value: jobs.length, caption: 'Across all contract types', icon: Briefcase, tone: 'brand' },
-            { label: 'Shift-based roles', value: shiftBasedCount, caption: 'Temporary cover, nights & weekends', icon: Clock, tone: 'emerald' },
-            { label: 'Applications sent', value: myApplications.length, caption: 'Awaiting hospital response', icon: CheckCircle2, tone: 'brand' },
-            { label: 'Licensed employers', value: licensedEmployers, caption: 'Facility licence checked by us', icon: ShieldCheck, tone: 'emerald' },
+            { label: tx('Open listings'), value: jobs.length, caption: tx('Across all contract types'), icon: Briefcase, tone: 'brand' },
+            { label: tx('Shift-based roles'), value: shiftBasedCount, caption: tx('Temporary cover, nights & weekends'), icon: Clock, tone: 'emerald' },
+            { label: tx('Applications sent'), value: myApplications.length, caption: tx('Awaiting hospital response'), icon: CheckCircle2, tone: 'brand' },
+            { label: tx('Licensed employers'), value: licensedEmployers, caption: tx('Facility licence checked by us'), icon: ShieldCheck, tone: 'emerald' },
           ].map((card, idx) => (
             <div
               key={card.label}
@@ -409,21 +411,21 @@ export default function JobMarket({
       {/* JOB POSTING FORM */}
       {showForm && (
         <form onSubmit={handleCreateJob} className="bg-white border border-[color:var(--t-200)] p-6 shadow-xs space-y-6 animate-slide-down">
-          <h3 className="text-base font-bold text-[color:var(--ink)] border-b border-[color:var(--t-200)] pb-3">Publish Shift Openings & Vacancies</h3>
+          <h3 className="text-base font-bold text-[color:var(--ink)] border-b border-[color:var(--t-200)] pb-3">{tx('Publish Shift Openings & Vacancies')}</h3>
           
           {formSuccess ? (
             <div className="bg-emerald-50 border-2 border-emerald-100 p-4 rounded-xl text-xs text-emerald-800 font-extrabold flex items-center gap-1.5">
               <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-              Listing posted successfully! Redirecting...
+              {tx('Listing posted successfully! Redirecting...')}
             </div>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Clinic / Hospital Name</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">{tx('Clinic / Hospital Name')}</label>
                   <input
                     type="text"
-                    placeholder="Kuala Lumpur Specialist Hospital"
+                    placeholder={tx('Kuala Lumpur Specialist Hospital')}
                     value={hospitalName}
                     onChange={(e) => setHospitalName(e.target.value)}
                     className="w-full text-xs border border-[color:var(--t-200)] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold transition-all"
@@ -432,10 +434,10 @@ export default function JobMarket({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Job Title</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">{tx('Job Title')}</label>
                   <input
                     type="text"
-                    placeholder="ICU Nurse Night Duty Focus"
+                    placeholder={tx('ICU Nurse Night Duty Focus')}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     className="w-full text-xs border border-[color:var(--t-200)] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold transition-all"
@@ -444,25 +446,25 @@ export default function JobMarket({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Contract Type</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">{tx('Contract Type')}</label>
                   <select
                     value={type}
                     onChange={(e) => setType(e.target.value as any)}
                     className="w-full text-xs border border-[color:var(--t-200)] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-extrabold text-slate-700 cursor-pointer transition-all"
                   >
-                    <option value="Full-time">Full-time Vacancy</option>
-                    <option value="Part-time">Part-time Role</option>
-                    <option value="Contract">Contractual Term</option>
-                    <option value="Shift-based">Shift-based Marketplace</option>
-                    <option value="Locum">Locum cover (dated shifts)</option>
+                    <option value="Full-time">{tx('Full-time Vacancy')}</option>
+                    <option value="Part-time">{tx('Part-time Role')}</option>
+                    <option value="Contract">{tx('Contractual Term')}</option>
+                    <option value="Shift-based">{tx('Shift-based Marketplace')}</option>
+                    <option value="Locum">{tx('Locum cover (dated shifts)')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Location Details</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">{tx('Location Details')}</label>
                   <input
                     type="text"
-                    placeholder="ICU Department, Ground Floor"
+                    placeholder={tx('ICU Department, Ground Floor')}
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     className="w-full text-xs border border-[color:var(--t-200)] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold transition-all"
@@ -471,22 +473,22 @@ export default function JobMarket({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">City / Town</label>
-                  <input type="text" placeholder="Petaling Jaya" value={city} onChange={(e) => setCity(e.target.value)} className="w-full text-xs border border-[color:var(--t-200)] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold transition-all" required />
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">{tx('City / Town')}</label>
+                  <input type="text" placeholder={tx('Petaling Jaya')} value={city} onChange={(e) => setCity(e.target.value)} className="w-full text-xs border border-[color:var(--t-200)] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold transition-all" required />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Specialty Required</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">{tx('Specialty Required')}</label>
                   <select
                     value={specialtyRequired}
                     onChange={(e) => setSpecialtyRequired(e.target.value)}
                     className="w-full text-xs border border-[color:var(--t-200)] py-2.5 px-3.5 outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-extrabold text-slate-700 cursor-pointer transition-all"
                   >
-                    <option value="ICU & Critical Care">ICU & Critical Care</option>
-                    <option value="Geriatric & Eldercare">Geriatric & Eldercare</option>
-                    <option value="Pediatric & Neonatal Care">Pediatric & Neonatal Care</option>
-                    <option value="Cardiologist">Cardiologist</option>
-                    <option value="Dermatologist">Dermatologist</option>
+                    <option value="ICU & Critical Care">{tx('ICU & Critical Care')}</option>
+                    <option value="Geriatric & Eldercare">{tx('Geriatric & Eldercare')}</option>
+                    <option value="Pediatric & Neonatal Care">{tx('Pediatric & Neonatal Care')}</option>
+                    <option value="Cardiologist">{tx('Cardiologist')}</option>
+                    <option value="Dermatologist">{tx('Dermatologist')}</option>
                   </select>
                 </div>
               </div>
@@ -494,10 +496,10 @@ export default function JobMarket({
               <JobFormFields value={extras} onChange={setExtras} jobType={type} />
 
               <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1.5">Detailed Description of Clinical Roles</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1.5">{tx('Detailed Description of Clinical Roles')}</label>
                 <textarea
                   rows={3}
-                  placeholder="Outline shift schedules, clinical assignments, equipment operation needed, and team scope..."
+                  placeholder={tx('Outline shift schedules, clinical assignments, equipment operation needed, and team scope...')}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className="w-full text-xs border border-[color:var(--t-200)] p-3 outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold transition-all"
@@ -506,10 +508,10 @@ export default function JobMarket({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1.5">Specific Requirements / Licensing (One per line)</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1.5">{tx('Specific Requirements / Licensing (One per line)')}</label>
                 <textarea
                   rows={2}
-                  placeholder="e.g. Registered with state nursing council with active license"
+                  placeholder={tx('e.g. Registered with state nursing council with active license')}
                   value={requirementText}
                   onChange={(e) => setRequirementText(e.target.value)}
                   className="w-full text-xs border border-[color:var(--t-200)] p-3 outline-none focus:ring-2 focus:ring-[color:var(--t-600)]/20 focus:border-[color:var(--t-600)] font-semibold transition-all"
@@ -532,7 +534,7 @@ export default function JobMarket({
                   className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-bold px-8 h-12 transition-colors shadow-xs flex items-center gap-2 cursor-pointer"
                 >
                   {formLoading && <Loader className="h-4 w-4 animate-spin" />}
-                  Publish Job Vacancy
+                  {tx('Publish Job Vacancy')}
                 </button>
               </div>
             </>
@@ -565,16 +567,16 @@ export default function JobMarket({
         return (
           <>
             {/* UNIFIED SINGLE-ROW h-11 FILTER CONTROL BAR */}
-            <section aria-label="Filters" className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
+            <section aria-label={tx('Filters')} className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
               <div className="flex flex-col xl:flex-row xl:items-center gap-3">
                 {/* Search Input */}
                 <div className="relative flex-1 min-w-[240px]">
-                  <label htmlFor="job-search" className="sr-only">Search shifts</label>
+                  <label htmlFor="job-search" className="sr-only">{tx('Search shifts')}</label>
                   <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     id="job-search"
                     type="text"
-                    placeholder="Search clinical shifts by role, hospital name, or ward (e.g. ICU, Neonatal, Emergency)…"
+                    placeholder={tx('Search clinical shifts by role, hospital name, or ward (e.g. ICU, Neonatal, Emergency)…')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
@@ -583,7 +585,7 @@ export default function JobMarket({
                     <button
                       type="button"
                       onClick={() => setSearchTerm('')}
-                      aria-label="Clear search query"
+                      aria-label={tx('Clear search query')}
                       className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
                     >
                       <X className="h-3.5 w-3.5" />
@@ -593,43 +595,43 @@ export default function JobMarket({
 
                 {/* Inline Dropdowns & Grid/List View Toggle */}
                 <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-                  <FilterSelect label="Role" value={filter.role} onChange={v => setFilter({ ...filter, role: v })}>
-                    <option value="all">Doctors &amp; Nurses</option>
-                    <option value="doctor">Doctors Only</option>
-                    <option value="nurse">Nurses Only</option>
+                  <FilterSelect label={tx('Role')} value={filter.role} onChange={v => setFilter({ ...filter, role: v })}>
+                    <option value="all">{tx('Doctors & Nurses')}</option>
+                    <option value="doctor">{tx('Doctors Only')}</option>
+                    <option value="nurse">{tx('Nurses Only')}</option>
                   </FilterSelect>
 
-                  <FilterSelect label="Contract" value={selectedType} onChange={setSelectedType}>
-                    <option value="all">All Contracts</option>
-                    <option value="Full-time">Full-time</option>
-                    <option value="Part-time">Part-time</option>
-                    <option value="Contract">Contract</option>
-                    <option value="Shift-based">Shift-based</option>
-                    <option value="Locum">Locum</option>
+                  <FilterSelect label={tx('Contract')} value={selectedType} onChange={setSelectedType}>
+                    <option value="all">{tx('All Contracts')}</option>
+                    <option value="Full-time">{tx('Full-time')}</option>
+                    <option value="Part-time">{tx('Part-time')}</option>
+                    <option value="Contract">{tx('Contract')}</option>
+                    <option value="Shift-based">{tx('Shift-based')}</option>
+                    <option value="Locum">{tx('Locum')}</option>
                   </FilterSelect>
 
-                  <FilterSelect label="City" value={selectedCity} onChange={setSelectedCity}>
-                    <option value="all">All Cities ({distinctCities.length})</option>
-                    {distinctCities.map(c => <option key={c} value={c}>{c}</option>)}
+                  <FilterSelect label={tx('City')} value={selectedCity} onChange={setSelectedCity}>
+                    <option value="all">{tx('All Cities ({n})', { n: distinctCities.length })}</option>
+                    {distinctCities.map(c => <option key={c} value={c}>{tx(c)}</option>)}
                   </FilterSelect>
 
-                  <FilterSelect label="State" value={filter.state} onChange={v => setFilter({ ...filter, state: v })}>
-                    <option value="all">All States</option>
-                    {MY_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                  <FilterSelect label={tx('State')} value={filter.state} onChange={v => setFilter({ ...filter, state: v })}>
+                    <option value="all">{tx('All States')}</option>
+                    {MY_STATES.map(s => <option key={s} value={s}>{tx(s)}</option>)}
                   </FilterSelect>
 
-                  <FilterSelect label="Sector" value={filter.sector} onChange={v => setFilter({ ...filter, sector: v })}>
-                    <option value="all">Public &amp; Private</option>
-                    <option value="private">Private Sector</option>
-                    <option value="public">Public Sector</option>
-                    <option value="other">Other Sector</option>
+                  <FilterSelect label={tx('Sector')} value={filter.sector} onChange={v => setFilter({ ...filter, sector: v })}>
+                    <option value="all">{tx('Public & Private')}</option>
+                    <option value="private">{tx('Private Sector')}</option>
+                    <option value="public">{tx('Public Sector')}</option>
+                    <option value="other">{tx('Other Sector')}</option>
                   </FilterSelect>
 
                   <div className="flex border border-[color:var(--t-200)] h-11 shrink-0">
                     <button
                       type="button"
                       onClick={() => setViewMode('grid')}
-                      aria-label="Grid view"
+                      aria-label={tx('Grid view')}
                       aria-pressed={viewMode === 'grid'}
                       id="toggle-job-grid-view"
                       className={`h-full w-11 flex items-center justify-center cursor-pointer transition-colors ${viewMode === 'grid' ? 'bg-[color:var(--t-600)] text-white' : 'bg-[color:var(--t-bg)] text-slate-500 hover:bg-[color:var(--t-50)]'}`}
@@ -639,7 +641,7 @@ export default function JobMarket({
                     <button
                       type="button"
                       onClick={() => setViewMode('list')}
-                      aria-label="List view"
+                      aria-label={tx('List view')}
                       aria-pressed={viewMode === 'list'}
                       id="toggle-job-list-view"
                       className={`h-full w-11 flex items-center justify-center border-l border-[color:var(--t-200)] cursor-pointer transition-colors ${viewMode === 'list' ? 'bg-[color:var(--t-600)] text-white' : 'bg-[color:var(--t-bg)] text-slate-500 hover:bg-[color:var(--t-50)]'}`}
@@ -654,18 +656,18 @@ export default function JobMarket({
               <div className="flex flex-wrap items-center justify-between gap-3 pt-2.5 border-t border-[color:var(--t-100)]">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs font-bold text-slate-600 tabular-nums" aria-live="polite">
-                    {activeTab === 'applied' ? 'Your applications: ' : 'Open shifts & vacancies: '}
-                    Showing <strong className="font-black text-[color:var(--ink)]">{filteredJobs.length}</strong> of {baseJobs.length} listing{baseJobs.length === 1 ? '' : 's'}
+                    {activeTab === 'applied' ? tx('Your applications: ') : tx('Open shifts & vacancies: ')}
+                    {tx('Showing')} <strong className="font-black text-[color:var(--ink)]">{filteredJobs.length}</strong> {tx(baseJobs.length === 1 ? 'of {n} listing' : 'of {n} listings', { n: baseJobs.length })}
                   </span>
                   {filter.role !== 'all' && (
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
-                      Role: {filter.role}
+                      {tx('Role: ')}{filter.role === 'doctor' ? tx('Doctors Only') : filter.role === 'nurse' ? tx('Nurses Only') : filter.role}
                       <button type="button" onClick={() => setFilter({ ...filter, role: 'all' })} className="hover:text-slate-900 cursor-pointer"><X className="h-3 w-3" /></button>
                     </span>
                   )}
                   {selectedType !== 'all' && (
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
-                      Contract: {selectedType}
+                      {tx('Contract: ')}{tx(selectedType)}
                       <button type="button" onClick={() => setSelectedType('all')} className="hover:text-slate-900 cursor-pointer"><X className="h-3 w-3" /></button>
                     </span>
                   )}
@@ -677,7 +679,7 @@ export default function JobMarket({
                   )}
                   {filter.state !== 'all' && (
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
-                      State: {filter.state}
+                      {tx('State: ')}{tx(filter.state)}
                       <button type="button" onClick={() => setFilter({ ...filter, state: 'all' })} className="hover:text-slate-900 cursor-pointer"><X className="h-3 w-3" /></button>
                     </span>
                   )}
@@ -697,7 +699,7 @@ export default function JobMarket({
                       onChange={e => setFilter({ ...filter, foreign: e.target.checked })}
                       className="h-3.5 w-3.5 accent-[color:var(--t-600)] rounded-none cursor-pointer"
                     />
-                    <span>Considers practitioners registered abroad</span>
+                    <span>{tx('Considers practitioners registered abroad')}</span>
                   </label>
                   {hasActiveFilters && (
                     <button
@@ -705,7 +707,7 @@ export default function JobMarket({
                       onClick={resetAllFilters}
                       className="text-xs font-bold text-[color:var(--t-700)] hover:text-[color:var(--dark)] underline underline-offset-2 cursor-pointer"
                     >
-                      Reset Filters
+                      {tx('Reset Filters')}
                     </button>
                   )}
                 </div>
@@ -723,10 +725,10 @@ export default function JobMarket({
                 <div className="col-span-full bg-white border border-[color:var(--t-200)] p-12 text-center space-y-3">
                   <Briefcase className="h-10 w-10 text-[color:var(--t-200)] mx-auto" />
                   <h4 className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)]">
-                    {activeTab === 'applied' ? 'You have not applied to any shifts yet' : 'No shift posts match active filters'}
+                    {activeTab === 'applied' ? tx('You have not applied to any shifts yet') : tx('No shift posts match active filters')}
                   </h4>
                   <p className="text-xs text-slate-600">
-                    {activeTab === 'applied' ? 'Apply to an open shift and it will appear here.' : 'Modify filters to explore other contract categories.'}
+                    {activeTab === 'applied' ? tx('Apply to an open shift and it will appear here.') : tx('Modify filters to explore other contract categories.')}
                   </p>
                   {hasActiveFilters && (
                     <div className="pt-1">
@@ -735,7 +737,7 @@ export default function JobMarket({
                         onClick={resetAllFilters}
                         className="h-10 px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer transition-colors"
                       >
-                        Reset All Filters
+                        {tx('Reset All Filters')}
                       </button>
                     </div>
                   )}
@@ -745,10 +747,10 @@ export default function JobMarket({
                   const hasApplied = isJobApplied(job);
                   const blockedReason = hasApplied ? null : job.applyBlockedReason;
                   const blockedShortLabel = blockedReason?.includes('for nurses')
-                    ? 'Nurses Only'
+                    ? tx('Nurses Only')
                     : blockedReason?.includes('for doctors')
-                    ? 'Doctors Only'
-                    : 'Not eligible';
+                    ? tx('Doctors Only')
+                    : tx('Not eligible');
 
                   const typePill = job.type === 'Shift-based'
                     ? 'bg-[color:var(--e-50)] border-[color:var(--e-200)] text-[color:var(--e-800)]'
@@ -769,11 +771,11 @@ export default function JobMarket({
                       }`}
                     >
                       {hasApplied ? (
-                        <><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />Applied</>
+                        <><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />{tx('Applied')}</>
                       ) : blockedReason ? (
                         blockedShortLabel
                       ) : (
-                        'Apply for shift'
+                        tx('Apply for shift')
                       )}
                     </button>
                   );
@@ -793,9 +795,9 @@ export default function JobMarket({
                           </div>
                         </div>
                         <div className="flex flex-wrap items-center gap-2 flex-1 text-xs text-[color:var(--ink-2)]">
-                          <span className={`border text-2xs font-black uppercase tracking-wider px-2 py-0.5 ${typePill}`}>{job.type}</span>
-                          <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)]" />{job.city}</span>
-                          <span className="inline-flex items-center gap-1"><Tag className="h-3.5 w-3.5 text-[color:var(--t-600)]" />{job.specialtyRequired}</span>
+                          <span className={`border text-2xs font-black uppercase tracking-wider px-2 py-0.5 ${typePill}`}>{tx(job.type)}</span>
+                          <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)]" />{tx(job.city)}</span>
+                          <span className="inline-flex items-center gap-1"><Tag className="h-3.5 w-3.5 text-[color:var(--t-600)]" />{tx(job.specialtyRequired)}</span>
                         </div>
                         <div className="flex items-center justify-between md:justify-end gap-4 shrink-0">
                           <span className="text-base font-bold font-mono text-[color:var(--ink)]">{job.salaryRange}</span>
@@ -826,13 +828,13 @@ export default function JobMarket({
                           <h3 className="text-base font-bold text-[color:var(--ink)] leading-snug">{job.title}</h3>
                           <p className="text-xs text-[color:var(--ink-2)] font-medium mt-0.5">{job.hospitalName}</p>
                         </div>
-                        <span className={`border text-2xs font-black uppercase tracking-wider px-2 py-0.5 shrink-0 ${typePill}`}>{job.type}</span>
+                        <span className={`border text-2xs font-black uppercase tracking-wider px-2 py-0.5 shrink-0 ${typePill}`}>{tx(job.type)}</span>
                       </div>
 
                       {/* Location & Specialty Metadata */}
                       <div className="flex flex-col gap-1.5 text-xs text-[color:var(--ink-2)] font-medium">
-                        <div className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" /><span>{job.location}, {job.city}</span></div>
-                        <div className="flex items-center gap-2"><Tag className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" /><span>{job.specialtyRequired}</span></div>
+                        <div className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" /><span>{job.location}, {tx(job.city)}</span></div>
+                        <div className="flex items-center gap-2"><Tag className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" /><span>{tx(job.specialtyRequired)}</span></div>
                       </div>
 
                       {/* Description */}
@@ -844,7 +846,7 @@ export default function JobMarket({
                           <span className="text-base font-extrabold font-mono text-[color:var(--ink)]">{job.salaryRange}</span>
                           <span className="text-2xs font-mono font-bold text-slate-600 bg-slate-50 border border-slate-200 px-2 py-0.5 inline-flex items-center gap-1 shrink-0">
                             <Users className="h-3 w-3 text-slate-500" />
-                            <span className="tabular-nums">{job.applicantsCount}</span> applicant{job.applicantsCount === 1 ? '' : 's'}
+                            <span className="tabular-nums">{job.applicantsCount}</span> {tx(job.applicantsCount === 1 ? 'applicant' : 'applicants')}
                           </span>
                         </div>
                         <JobBadges job={job} />
@@ -859,7 +861,7 @@ export default function JobMarket({
                             onClick={() => setSelectedModalJob(job)}
                             className="min-h-[40px] bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                           >
-                            <Eye className="h-3.5 w-3.5" /> View details
+                            <Eye className="h-3.5 w-3.5" /> {tx('View details')}
                           </button>
                           {applyButton}
                         </div>
@@ -877,7 +879,7 @@ export default function JobMarket({
       <section className="bg-[color:var(--e-50)] border border-[color:var(--e-200)] px-5 py-4 flex flex-wrap items-center gap-3.5">
         <ShieldCheck className="h-5 w-5 text-[color:var(--e-600)] shrink-0" />
         <p className="flex-1 min-w-[260px] text-xs leading-relaxed text-[color:var(--e-800)]">
-          <strong className="font-bold">Credential-verified only.</strong> Every applicant is checked against MMC and LJM registries before a hospital sees the application.
+          <strong className="font-bold">{tx('Credential-verified only.')}</strong> {tx('Every applicant is checked against MMC and LJM registries before a hospital sees the application.')}
         </p>
       </section>
 
@@ -904,7 +906,7 @@ export default function JobMarket({
                     {selectedModalJob.title}
                   </h4>
                   <p className="text-xs text-[color:var(--ink-2)] mt-0.5">
-                    {selectedModalJob.hospitalName} &bull; {selectedModalJob.employer?.licenceOk ? 'Licence checked' : 'Licence not checked'}
+                    {selectedModalJob.hospitalName} &bull; {selectedModalJob.employer?.licenceOk ? tx('Licence checked') : tx('Licence not checked')}
                   </p>
                 </div>
               </div>
@@ -923,35 +925,35 @@ export default function JobMarket({
               {/* Allowance Badge Panel */}
               <div className="flex flex-wrap justify-between items-center gap-3 bg-[color:var(--t-50)] p-4 rounded-xl border border-[color:var(--t-200)]">
                 <div>
-                  <span className="text-xs text-[color:var(--t-700)] block font-black uppercase tracking-wider">Estimated Allowance</span>
+                  <span className="text-xs text-[color:var(--t-700)] block font-black uppercase tracking-wider">{tx('Estimated Allowance')}</span>
                   <span className="font-mono text-base font-extrabold text-[color:var(--ink)] leading-tight block">{selectedModalJob.salaryRange}</span>
                 </div>
                 <span className="bg-[color:var(--t-600)] text-white text-2xs font-black uppercase px-3 py-1.5 rounded-lg tracking-wider">
-                  {selectedModalJob.type}
+                  {tx(selectedModalJob.type)}
                 </span>
               </div>
 
               {/* Location & Specialty Grid */}
               <div className="grid grid-cols-2 gap-3 text-xs font-bold text-slate-700">
                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                  <span className="text-xs text-slate-400 block uppercase">Department & City</span>
+                  <span className="text-xs text-slate-400 block uppercase">{tx('Department & City')}</span>
                   <p className="text-xs font-bold text-slate-800 mt-1 flex items-center gap-1.5">
                     <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                    {selectedModalJob.location}, {selectedModalJob.city}
+                    {selectedModalJob.location}, {tx(selectedModalJob.city)}
                   </p>
                 </div>
                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                  <span className="text-xs text-slate-400 block uppercase">Specialty Focus</span>
+                  <span className="text-xs text-slate-400 block uppercase">{tx('Specialty Focus')}</span>
                   <p className="text-xs font-bold text-slate-800 mt-1 flex items-center gap-1.5">
                     <Tag className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                    {selectedModalJob.specialtyRequired}
+                    {tx(selectedModalJob.specialtyRequired)}
                   </p>
                 </div>
               </div>
 
               {/* Description */}
               <div className="space-y-1.5">
-                <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wide block">Detailed Clinical Scope & Shift Schedule</span>
+                <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wide block">{tx('Detailed Clinical Scope & Shift Schedule')}</span>
                 <p className="text-xs text-slate-600 leading-relaxed font-semibold bg-slate-50/40 p-4 rounded-xl border border-slate-150">
                   {selectedModalJob.description}
                 </p>
@@ -961,7 +963,7 @@ export default function JobMarket({
               <div className="space-y-2.5">
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wide block flex items-center gap-1.5">
                   <ShieldCheck className="h-4.5 w-4.5 text-emerald-600" />
-                  Mandated Licensing & Clinical Credentials Check:
+                  {tx('Mandated Licensing & Clinical Credentials Check:')}
                 </span>
                 <div className="bg-emerald-50/20 border border-emerald-100/50 rounded-xl p-4 space-y-2">
                   <ul className="text-xs text-slate-700 list-disc list-inside space-y-1.5">
@@ -978,10 +980,10 @@ export default function JobMarket({
               <div className="border-t border-slate-100 pt-4 flex justify-between items-center text-xs text-slate-500 font-bold">
                 <span className="flex items-center gap-1.5">
                   <Users className="h-4 w-4 text-slate-400" />
-                  {selectedModalJob.applicantsCount} Practitioners applied
+                  {tx('{n} Practitioners applied', { n: selectedModalJob.applicantsCount })}
                 </span>
                 <span className={`px-2 py-0.5 rounded text-2xs font-extrabold uppercase border ${selectedModalJob.employer?.licenceOk ? 'text-emerald-700 bg-emerald-50 border-emerald-100' : 'text-amber-800 bg-amber-50 border-amber-200'}`}>
-                  {selectedModalJob.employer?.licenceOk ? 'Facility licence checked' : 'Employer not checked'}
+                  {selectedModalJob.employer?.licenceOk ? tx('Facility licence checked') : tx('Employer not checked')}
                 </span>
               </div>
             </div>
@@ -993,7 +995,7 @@ export default function JobMarket({
                 onClick={() => setSelectedModalJob(null)}
                 className="flex-1 border-2 border-slate-200 text-slate-700 text-xs font-bold py-2.5 rounded-xl hover:bg-slate-100 transition-all cursor-pointer"
               >
-                Close Details
+                {tx('Close Details')}
               </button>
               <div className="flex-1 flex flex-col gap-1">
                 <button

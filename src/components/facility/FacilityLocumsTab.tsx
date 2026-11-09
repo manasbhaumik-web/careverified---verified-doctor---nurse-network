@@ -1,5 +1,6 @@
 import React from 'react';
 import { Users, Search, Send } from 'lucide-react';
+import { useTr } from '../../locale';
 import WorkspaceHeader from '../WorkspaceHeader';
 import { BannerBadge, DashboardTab } from '../DashboardHeader';
 import { LocumProfile } from './types';
@@ -29,14 +30,15 @@ export default function FacilityLocumsTab({
   filteredLocums,
   onInviteLocum,
 }: FacilityLocumsTabProps) {
+  const tx = useTr();
   return (
     <div className="space-y-4">
       <WorkspaceHeader
         icon={Users}
-        eyebrow="Practitioner Directory · On-Demand Talent"
-        title="Verified Doctor & Nurse Talent Network"
-        description="Directly source and engage credentialed doctors and nurses with active APC registration for scheduled shifts and emergency relief."
-        badges={<BannerBadge tone="brand">MMC / LJM Verified</BannerBadge>}
+        eyebrow={tx('Practitioner Directory · On-Demand Talent')}
+        title={tx('Verified Doctor & Nurse Talent Network')}
+        description={tx('Directly source and engage credentialed doctors and nurses with active APC registration for scheduled shifts and emergency relief.')}
+        badges={<BannerBadge tone="brand">{tx('MMC / LJM Verified')}</BannerBadge>}
         tabs={embedded && displayedTabs.length > 1 ? displayedTabs : undefined}
         activeTab={tab}
         onTabChange={setTab}
@@ -46,7 +48,7 @@ export default function FacilityLocumsTab({
           <Search className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search practitioners by doctor name, specialty, state, or city…"
+            placeholder={tx('Search practitioners by doctor name, specialty, state, or city…')}
             value={locumSearch}
             onChange={e => setLocumSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2 border border-[color:var(--t-200)] text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
@@ -54,7 +56,7 @@ export default function FacilityLocumsTab({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-black uppercase tracking-wider text-slate-500">Role:</span>
+          <span className="text-xs font-black uppercase tracking-wider text-slate-500">{tx('Role:')}</span>
           <button
             type="button"
             onClick={() => setLocumRoleFilter('all')}
@@ -93,7 +95,7 @@ export default function FacilityLocumsTab({
 
       {filteredLocums.length === 0 ? (
         <div className="bg-white border border-[color:var(--t-200)] p-12 text-center text-xs text-slate-500">
-          No verified medical practitioners found matching search criteria.
+          {tx('No verified medical practitioners found matching search criteria.')}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -116,14 +118,14 @@ export default function FacilityLocumsTab({
                     </span>
                   </div>
                   <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-2xs font-black uppercase tracking-wider border border-emerald-300 shrink-0">
-                    APC Active
+                    {tx('APC Active')}
                   </span>
                 </div>
 
                 <div className="text-xs space-y-1 text-slate-600">
-                  <div>Registry: <strong className="font-mono text-slate-800">{loc.registry || 'MMC Registered'}</strong></div>
-                  <div>APC Expiry: <strong className="text-slate-800">{loc.apcValidUntil || '2029-12-31'}</strong></div>
-                  <div>Available: <strong className="text-slate-800">{loc.states?.join(', ') || loc.city || 'Kuala Lumpur'}</strong></div>
+                  <div>{tx('Registry:')} <strong className="font-mono text-slate-800">{loc.registry || tx('MMC Registered')}</strong></div>
+                  <div>{tx('APC Expiry:')} <strong className="text-slate-800">{loc.apcValidUntil || '2029-12-31'}</strong></div>
+                  <div>{tx('Available:')} <strong className="text-slate-800">{loc.states?.join(', ') || loc.city || tx('Kuala Lumpur')}</strong></div>
                   {loc.minRate && (
                     <div className="text-xs font-black text-[color:var(--t-700)]">
                       Expected Rate: RM {loc.minRate} / {loc.ratePeriod || 'hour'}
@@ -144,7 +146,7 @@ export default function FacilityLocumsTab({
                 className="w-full py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider border border-[color:var(--t-700)] cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Send className="h-3.5 w-3.5" />
-                Invite to Shift
+                {tx('Invite to Shift')}
               </button>
             </div>
           ))}

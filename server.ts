@@ -257,7 +257,7 @@ function ensureDemoData() {
   if (!docProfile) {
     docProfile = {
       id: "doc-demo-1",
-      name: "Dr Demo Physician",
+      name: "Dr. Arjun Menon",
       avatar: "/assets/malaysian_male_doctor.jpg",
       role: UserRole.DOCTOR,
       specialization: "General Physician",
@@ -291,7 +291,7 @@ function ensureDemoData() {
       email: "demo.doctor@careverified.test",
       password: DEMO_PASSWORD,
       role: "practitioner",
-      name: "Dr Demo Physician",
+      name: "Dr. Arjun Menon",
       avatarUrl: "/assets/malaysian_male_doctor.jpg",
       profileId: docProfile.id,
       consentVersion: "2026-11",
@@ -316,7 +316,7 @@ function ensureDemoData() {
       email: "demo.patient@careverified.test",
       password: DEMO_PASSWORD,
       role: "patient",
-      name: "Demo Patient",
+      name: "Aisyah Rahman",
       avatarUrl: "/assets/patient_female_malay.jpg",
       consentVersion: "2026-11",
     });
@@ -329,7 +329,7 @@ function ensureDemoData() {
     patProfile = {
       id: "pat-99912",
       userId: patUser.id,
-      name: "Demo Patient",
+      name: "Aisyah Rahman",
       email: "demo.patient@careverified.test",
       icNumber: "900101-14-0000",
       age: 34,
@@ -348,7 +348,7 @@ function ensureDemoData() {
   for (const b of bookings) {
     if (b.patientId === "pat-99912" && !b.patientUserId) {
       b.patientUserId = patUser.id;
-      b.patientName = "Demo Patient";
+      b.patientName = "Aisyah Rahman";
       b.patientEmail = "demo.patient@careverified.test";
     }
   }

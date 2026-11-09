@@ -11,6 +11,7 @@ import {
   Clock, ExternalLink, Copy, AlertTriangle, BarChart2,
   Lock, Unlock, Radio, Webhook, Send, RefreshCw, Sliders, Shield, Users, ArrowLeft
 } from 'lucide-react';
+import { useTr } from '../locale';
 import AdminPackagesTab from './AdminPackagesTab';
 import AdminRegistryTab from './AdminRegistryTab';
 import AdminTrustPanel, { ReviewActions } from './AdminTrustPanel';
@@ -104,6 +105,7 @@ export interface AdminDashboardProps {
 
 // Documents the practitioner uploaded for a verification request (fetched through the audited, admin-only API)
 function RequestDocuments({ requestId }: { requestId: string }) {
+  const tx = useTr();
   const [docs, setDocs] = useState<any[] | null>(null);
 
   useEffect(() => {
@@ -115,9 +117,9 @@ function RequestDocuments({ requestId }: { requestId: string }) {
     return () => { cancelled = true; };
   }, [requestId]);
 
-  if (docs === null) return <p className="text-xs text-slate-500 font-semibold">Loading documents…</p>;
+  if (docs === null) return <p className="text-xs text-slate-500 font-semibold">{tx('Loading documents…')}</p>;
   if (docs.length === 0) {
-    return <p className="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-none p-3">No documents were uploaded. Do not approve without reviewing the practitioner's certificates.</p>;
+    return <p className="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-none p-3">{tx('No documents were uploaded. Do not approve without reviewing the practitioner\'s certificates.')}</p>;
   }
   return (
     <div className="space-y-2">
@@ -154,6 +156,7 @@ export default function AdminDashboard({
   adminSubRole,
   onAdminSubRoleChange,
 }: AdminDashboardProps) {
+  const tx = useTr();
   const [pendingRequests, setPendingRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [votedId, setVotedId] = useState<string | null>(null);
@@ -242,7 +245,7 @@ export default function AdminDashboard({
       const diff = Math.floor((expiry - Date.now()) / 1000);
       if (diff <= 0) {
         revertElevationToRegistrar();
-        alert('Break-Glass Ephemeral Lease Expired (15 Minutes). Privilege elevation automatically revoked and persona reverted to Council Medical Registrar per Segregation of Duties.');
+        alert(tx('Break-Glass Ephemeral Lease Expired (15 Minutes). Privilege elevation automatically revoked and persona reverted to Council Medical Registrar per Segregation of Duties.'));
       } else {
         setElevationSecondsLeft(diff);
       }
@@ -282,22 +285,22 @@ export default function AdminDashboard({
       });
       const data = await res.json();
       if (data.status === 'success') {
-        setSanctionSuccessBanner(data.message || 'Dual-signoff complete. Disciplinary suspension enforced under Medical Act 1971 / Nurses Act 1950.');
+        setSanctionSuccessBanner(data.message || tx('Dual-signoff complete. Disciplinary suspension enforced under Medical Act 1971 / Nurses Act 1950.'));
         await fetchPendingSanctions();
         if (onRefreshData) onRefreshData();
         fetchPending();
       } else {
-        setSanctionErrorBanner(data.message || 'Failed to countersign sanction.');
+        setSanctionErrorBanner(data.message || tx('Failed to countersign sanction.'));
       }
     } catch (err: any) {
-      setSanctionErrorBanner(err.message || 'Network error executing countersignature.');
+      setSanctionErrorBanner(err.message || tx('Network error executing countersignature.'));
     } finally {
       setCountersigningSanctionId(null);
     }
   };
 
   const handleDashboardDismissSanction = async (sanctionId: string) => {
-    if (!window.confirm('Dismiss this pending disciplinary sanction proposal?')) return;
+    if (!window.confirm(tx('Dismiss this pending disciplinary sanction proposal?'))) return;
     setSanctionSuccessBanner(null);
     setSanctionErrorBanner(null);
     try {
@@ -307,13 +310,13 @@ export default function AdminDashboard({
       });
       const data = await res.json();
       if (data.status === 'success') {
-        setSanctionSuccessBanner('Sanction proposal dismissed.');
+        setSanctionSuccessBanner(tx('Sanction proposal dismissed.'));
         await fetchPendingSanctions();
       } else {
-        setSanctionErrorBanner(data.message || 'Failed to dismiss sanction.');
+        setSanctionErrorBanner(data.message || tx('Failed to dismiss sanction.'));
       }
     } catch (err: any) {
-      setSanctionErrorBanner(err.message || 'Network error dismissing sanction.');
+      setSanctionErrorBanner(err.message || tx('Network error dismissing sanction.'));
     }
   };
 
@@ -330,7 +333,7 @@ export default function AdminDashboard({
     e.preventDefault();
     if (!pendingSubRoleTarget) return;
     if (!elevationReason.trim() || elevationReason.trim().length < 10) {
-      setElevationError('Please state a valid statutory justification (minimum 10 characters).');
+      setElevationError(tx('Please state a valid statutory justification (minimum 10 characters).'));
       return;
     }
 
@@ -371,10 +374,10 @@ export default function AdminDashboard({
         setRbacModalOpen(false);
         setPendingSubRoleTarget(null);
       } else {
-        setElevationError(data.message || 'Failed to record privilege elevation.');
+        setElevationError(data.message || tx('Failed to record privilege elevation.'));
       }
     } catch (err: any) {
-      setElevationError(err.message || 'Network error recording privilege elevation.');
+      setElevationError(err.message || tx('Network error recording privilege elevation.'));
     } finally {
       setElevationSubmitting(false);
     }
@@ -424,7 +427,7 @@ export default function AdminDashboard({
         setWebhookTestResult({
           id: webhookId,
           success: true,
-          message: `HTTP 200 OK — Delivered event "${targetLog?.event_type || 'test.ping'}" to ${targetLog?.facility_name || 'Hospital Gateway'}`,
+          message: `HTTP 200 OK — Delivered event "${targetLog?.event_type || 'test.ping'}" to ${targetLog?.facility_name || tx('Hospital Gateway')}`,
           payload: payloadObj
         });
         await fetchWebhooks();
@@ -432,14 +435,14 @@ export default function AdminDashboard({
         setWebhookTestResult({
           id: webhookId,
           success: false,
-          message: data.message || 'Webhook dispatch test failed'
+          message: data.message || tx('Webhook dispatch test failed')
         });
       }
     } catch (err: any) {
       setWebhookTestResult({
         id: webhookId,
         success: false,
-        message: err.message || 'Failed to ping webhook'
+        message: err.message || tx('Failed to ping webhook')
       });
     } finally {
       setWebhookTesting(null);
@@ -538,8 +541,8 @@ export default function AdminDashboard({
       return {
         isValid: isMmcRegex,
         standard: 'Malaysian Medical Council (Medical Act 1971 / Act 50)',
-        badgeText: isMmcRegex ? 'Valid MMC Statutory Format' : 'Non-Standard Format (Verify with MMC)',
-        details: isMmcRegex ? 'Standard MMC 5-digit statutory medical council register structure.' : 'Format deviates from standard MMC numbering; manual council cross-check advised.',
+        badgeText: isMmcRegex ? tx('Valid MMC Statutory Format') : tx('Non-Standard Format (Verify with MMC)'),
+        details: isMmcRegex ? tx('Standard MMC 5-digit statutory medical council register structure.') : tx('Format deviates from standard MMC numbering; manual council cross-check advised.'),
         portalUrl: 'https://mmc.gov.my/',
         portalName: 'Malaysian Medical Council (MMC) Official Register',
       };
@@ -548,8 +551,8 @@ export default function AdminDashboard({
       return {
         isValid: isLjmRegex,
         standard: 'Lembaga Jururawat Malaysia (Nurses Act 1950)',
-        badgeText: isLjmRegex ? 'Valid LJM Statutory Format' : 'Non-Standard Format (Verify with LJM)',
-        details: isLjmRegex ? 'Standard LJM registered nurse certificate structure.' : 'Format deviates from standard LJM numbering; manual council cross-check advised.',
+        badgeText: isLjmRegex ? tx('Valid LJM Statutory Format') : tx('Non-Standard Format (Verify with LJM)'),
+        details: isLjmRegex ? tx('Standard LJM registered nurse certificate structure.') : tx('Format deviates from standard LJM numbering; manual council cross-check advised.'),
         portalUrl: 'https://nursing.moh.gov.my/',
         portalName: 'Lembaga Jururawat Malaysia (LJM) Official Register',
       };
@@ -631,12 +634,12 @@ export default function AdminDashboard({
   }, []);
   useEffect(() => { void loadAdminPackages(); }, [loadAdminPackages]);
 
-  const getPkgName = (p: any) => p?.name || p?.title || p?.code || 'Medical package';
+  const getPkgName = (p: any) => p?.name || p?.title || p?.code || tx('Medical package');
   const getPkgDesc = (p: any) => p?.description || '';
-  const getPkgAuthor = (p: any) => p?.author || p?.facility_name || 'System Provider';
+  const getPkgAuthor = (p: any) => p?.author || p?.facility_name || tx('System Provider');
   const getPkgVersion = (p: any) => p?.version || (p?.code ? `Code: ${p.code}` : '1.0.0');
   const getPkgEnabled = (p: any) => p?.isEnabled !== undefined ? Boolean(p.isEnabled) : (p?.status ? p.status === 'published' : true);
-  const getPkgCategory = (p: any) => p?.category || 'Clinical Operations';
+  const getPkgCategory = (p: any) => p?.category || tx('Clinical Operations');
   const getPkgIcon = (p: any) => p?.icon || (p?.category === 'Health Screening' ? 'Heart' : p?.category === 'Cardiology' ? 'Activity' : 'Puzzle');
 
   const handleTogglePackage = async (id: string) => {
@@ -665,7 +668,7 @@ export default function AdminDashboard({
       if (data.status === 'success') {
         onPackagesChanged();
       } else {
-        alert(data.message || "Failed to install package.");
+        alert(data.message || tx('Failed to install package.'));
       }
     } catch (err) {
       console.error("Error installing package:", err);
@@ -681,7 +684,7 @@ export default function AdminDashboard({
       if (data.status === 'success') {
         onPackagesChanged();
       } else {
-        alert(data.message || "Failed to remove package.");
+        alert(data.message || tx('Failed to remove package.'));
       }
     } catch (err) {
       console.error("Error uninstating package:", err);
@@ -722,7 +725,7 @@ export default function AdminDashboard({
         setShowCustomForm(false);
         setPackageSubTab('installed');
       } else {
-        alert(data.message || "Failed to compile custom package.");
+        alert(data.message || tx('Failed to compile custom package.'));
       }
     } catch (err) {
       console.error("Error compiling custom package:", err);
@@ -835,10 +838,10 @@ export default function AdminDashboard({
     const headers = ['Practitioner Name', 'Council', 'Role', 'License Number', 'Specialization', 'Verification Status', 'License Expiry'];
     const rows = professionals.map(p => [
       `"${(p.name || '').replace(/"/g, '""')}"`,
-      `"${((p as any).medicalCouncil || (p as any).nursingCouncil || 'National Board').replace(/"/g, '""')}"`,
+      `"${((p as any).medicalCouncil || (p as any).nursingCouncil || tx('National Board')).replace(/"/g, '""')}"`,
       `"${(p.role || '').toUpperCase()}"`,
       `"${(p.licenseNumber || '').replace(/"/g, '""')}"`,
-      `"${(p.specialization || 'General Practice').replace(/"/g, '""')}"`,
+      `"${(p.specialization || tx('General Practice')).replace(/"/g, '""')}"`,
       `"${(p.verificationStatus || '').replace(/"/g, '""')}"`,
       `"${(p.licenseExpiry || 'N/A').replace(/"/g, '""')}"`,
     ]);
@@ -862,7 +865,7 @@ export default function AdminDashboard({
             type="button"
             onClick={revertElevationToRegistrar}
             className="ml-1 px-1.5 py-0.5 bg-slate-900 hover:bg-slate-800 text-amber-300 text-xs font-bold uppercase transition-colors cursor-pointer"
-            title="Immediately drop elevated privileges and revert to Council Medical Registrar"
+            title={tx('Immediately drop elevated privileges and revert to Council Medical Registrar')}
           >
             Revert
           </button>
@@ -873,11 +876,11 @@ export default function AdminDashboard({
         type="button"
         onClick={() => setAuditModalOpen(true)}
         className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-black uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-400 transition-colors rounded-none cursor-pointer"
-        title="View Statutory Audit Trail (SQLite WAL logs)"
+        title={tx('View Statutory Audit Trail (SQLite WAL logs)')}
       >
         <FileText className="h-3.5 w-3.5 text-amber-400" />
-        <span className="hidden md:inline">Audit Trail</span>
-        <span className="md:hidden">Audit</span>
+        <span className="hidden md:inline">{tx('Audit Trail')}</span>
+        <span className="md:hidden">{tx('Audit')}</span>
       </button>
 
       <button
@@ -887,18 +890,18 @@ export default function AdminDashboard({
           fetchWebhooks();
         }}
         className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-black uppercase tracking-wider bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 transition-colors rounded-none cursor-pointer"
-        title="Hospital HR Webhooks (Act 586 statutory telemetry)"
+        title={tx('Hospital HR Webhooks (Act 586 statutory telemetry)')}
       >
         <Webhook className="h-3.5 w-3.5 text-emerald-600" />
-        <span className="hidden md:inline">Hospital HR Webhooks</span>
-        <span className="md:hidden">Webhooks</span>
+        <span className="hidden md:inline">{tx('Hospital HR Webhooks')}</span>
+        <span className="md:hidden">{tx('Webhooks')}</span>
       </button>
 
       <button
         type="button"
         onClick={() => setRbacModalOpen(true)}
         className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-black uppercase tracking-wider bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 transition-colors rounded-none cursor-pointer"
-        title="Switch Administrative Persona & Statutory Scope"
+        title={tx('Switch Administrative Persona & Statutory Scope')}
       >
         <Sliders className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
         <span className="hidden sm:inline">Role: {currentSubRoleConfig.shortTitle}</span>
@@ -913,10 +916,10 @@ export default function AdminDashboard({
           window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
         }}
         className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
-        title="Open Support Desk & Help Center"
+        title={tx('Open Support Desk & Help Center')}
       >
         <LifeBuoy className="h-4 w-4 text-slate-500" />
-        <span className="hidden md:inline">Help &amp; Support</span>
+        <span className="hidden md:inline">{tx('Help & Support')}</span>
       </button>
     </div>
   );
@@ -927,6 +930,7 @@ export default function AdminDashboard({
         fullWidth={true}
         tabs={ADMIN_GROUPS[currentGroup]?.tabs.map(t => ({
           ...t,
+          label: tx(t.label),
           count: t.id === 'approvals' 
             ? pendingRequests.length 
             : t.id === 'trust'
@@ -937,7 +941,7 @@ export default function AdminDashboard({
         })) || []}
         activeTab={activeTab}
         onTabChange={(id) => setActiveTab(id as AdminDashboardTab)}
-        tabsLabel={`${ADMIN_GROUPS[currentGroup]?.name || 'Admin'} sections`}
+        tabsLabel={tx('{name} sections', { name: tx(ADMIN_GROUPS[currentGroup]?.name || tx('Admin')) })}
         tabsRight={adminHeaderControls}
       >
         <BannerRow
@@ -946,7 +950,7 @@ export default function AdminDashboard({
               as="h1"
               avatarUrl={currentUser?.avatarUrl || '/assets/admin_board_female.jpg'}
               role="admin"
-              name={currentUser?.name || 'Datin Dr. Sharifah Halimah'}
+              name={currentUser?.name || tx('Datin Dr. Sharifah Halimah')}
               badges={
                 <div className="flex flex-wrap items-center gap-1.5">
                   <BannerBadge tone={currentSubRoleConfig.badgeTone}>{currentSubRoleConfig.shortTitle}</BannerBadge>
@@ -963,14 +967,13 @@ export default function AdminDashboard({
                       </button>
                     </div>
                   )}
-                  <BannerBadge tone="brand">{ADMIN_GROUPS[currentGroup]?.name || 'Audit Terminal'}</BannerBadge>
                   <button
                     type="button"
                     onClick={() => setRbacModalOpen(true)}
                     className="inline-flex items-center gap-1 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-slate-900 text-amber-300 border border-amber-400 hover:bg-slate-800 transition-colors cursor-pointer"
                   >
                     <Sliders className="h-3 w-3 text-amber-400" />
-                    <span>Switch Persona</span>
+                    <span>{tx('Switch Persona')}</span>
                   </button>
                 </div>
               }
@@ -980,9 +983,9 @@ export default function AdminDashboard({
           aside={
             <BannerKpis
               items={[
-                { value: pendingRequests.length, label: 'Pending' },
-                { value: professionals.filter(p => p.verificationStatus === VerificationStatus.VERIFIED).length, label: 'Verified' },
-                { value: adminPackages.filter(p => p.status === 'published').length, label: 'Packages' },
+                { value: pendingRequests.length, label: tx('Pending') },
+                { value: professionals.filter(p => p.verificationStatus === VerificationStatus.VERIFIED).length, label: tx('Verified') },
+                { value: adminPackages.filter(p => p.status === 'published').length, label: tx('Packages') },
               ]}
             />
           }
@@ -999,15 +1002,15 @@ export default function AdminDashboard({
               <div className="space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-2xs font-black uppercase tracking-wider px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">
-                    Statutory Segregation of Duties (SoD)
+                    {tx('Statutory Segregation of Duties (SoD)')}
                   </span>
-                  <span className="text-xs text-slate-500 font-mono">Malaysian Healthcare Regulatory Guard</span>
+                  <span className="text-xs text-slate-500 font-mono">{tx('Malaysian Healthcare Regulatory Guard')}</span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                  Access Restricted — {ADMIN_GROUPS[currentGroup]?.name}
+                  {tx('Access Restricted — {name}', { name: tx(ADMIN_GROUPS[currentGroup]?.name) })}
                 </h2>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Your active compliance persona, <strong className="text-slate-900 font-bold">{currentSubRoleConfig.title}</strong>, is restricted from the <strong className="text-slate-900 font-bold">{ADMIN_GROUPS[currentGroup]?.name}</strong> workspace to prevent regulatory conflicts of interest.
+                  Your active compliance persona, <strong className="text-slate-900 font-bold">{currentSubRoleConfig.title}</strong>{tx(', is restricted from the')} <strong className="text-slate-900 font-bold">{ADMIN_GROUPS[currentGroup]?.name}</strong> workspace to prevent regulatory conflicts of interest.
                 </p>
               </div>
             </div>
@@ -1019,30 +1022,30 @@ export default function AdminDashboard({
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
-                  <span className="text-slate-500 block text-xs">Assigned Role</span>
+                  <span className="text-slate-500 block text-xs">{tx('Assigned Role')}</span>
                   <span className="font-bold text-slate-900">{currentSubRoleConfig.title}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-xs">Assigned Department</span>
+                  <span className="text-slate-500 block text-xs">{tx('Assigned Department')}</span>
                   <span className="font-bold text-slate-900">{currentSubRoleConfig.department}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-xs">Statutory Authority</span>
+                  <span className="text-slate-500 block text-xs">{tx('Statutory Authority')}</span>
                   <span className="font-mono font-bold text-slate-800">{currentSubRoleConfig.authority}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-xs">Permitted Workspaces</span>
+                  <span className="text-slate-500 block text-xs">{tx('Permitted Workspaces')}</span>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {currentSubRoleConfig.allowedGroups.map(g => (
                       <span key={g} className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold uppercase text-2xs">
-                        {ADMIN_GROUPS[g]?.name || g}
+                        {tx(ADMIN_GROUPS[g]?.name || g)}
                       </span>
                     ))}
                   </div>
                 </div>
               </div>
               <div className="pt-2 border-t border-slate-200 text-xs text-slate-600 leading-relaxed">
-                <strong>Statutory Context:</strong> Under the Medical Act 1971, Nurses Act 1950, and Private Healthcare Facilities & Services Act 1998 (Act 586), regulatory credentialing audits and operational/fiscal disbursements must maintain strict segregation of duties to ensure independence, patient safety, and audit integrity.
+                <strong>{tx('Statutory Context:')}</strong> Under the Medical Act 1971, Nurses Act 1950, and Private Healthcare Facilities & Services Act 1998 (Act 586), regulatory credentialing audits and operational/fiscal disbursements must maintain strict segregation of duties to ensure independence, patient safety, and audit integrity.
               </div>
             </div>
 
@@ -1056,7 +1059,7 @@ export default function AdminDashboard({
                 className="px-4 py-2.5 bg-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider hover:bg-[color:var(--t-800)] transition-colors inline-flex items-center gap-2 rounded-none cursor-pointer"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Return to Permitted Workspace ({ADMIN_GROUPS[currentSubRoleConfig.allowedGroups[0]]?.name})
+                {tx('Return to Permitted Workspace ({name})', { name: tx(ADMIN_GROUPS[currentSubRoleConfig.allowedGroups[0]]?.name) })}
               </button>
               <button
                 type="button"
@@ -1064,7 +1067,7 @@ export default function AdminDashboard({
                 className="px-4 py-2.5 bg-slate-900 text-amber-300 text-xs font-black uppercase tracking-wider hover:bg-slate-800 transition-colors inline-flex items-center gap-2 border border-amber-400 rounded-none cursor-pointer"
               >
                 <Sliders className="h-4 w-4 text-amber-400" />
-                Switch Compliance Persona
+                {tx('Switch Compliance Persona')}
               </button>
             </div>
           </div>
@@ -1074,10 +1077,10 @@ export default function AdminDashboard({
         <div id="panel-approvals" role="tabpanel" aria-labelledby="tab-approvals" tabIndex={0} className="space-y-6">
           <WorkspaceHeader
             icon={ShieldCheck}
-            eyebrow="Medical Council Governance · Regulatory Verification"
-            title="Practitioner Accreditation & Credential Verification Queue"
-            description="Audit practitioner medical council registration numbers, annual practicing certificates (APC), and specialist qualifications."
-            badges={<BannerBadge tone="brand">Statutory Audit Oversight</BannerBadge>}
+            eyebrow={tx('Medical Council Governance · Regulatory Verification')}
+            title={tx('Practitioner Accreditation & Credential Verification Queue')}
+            description={tx('Audit practitioner medical council registration numbers, annual practicing certificates (APC), and specialist qualifications.')}
+            badges={<BannerBadge tone="brand">{tx('Statutory Audit Oversight')}</BannerBadge>}
           />
 
           {/* Dual-Signoff Pending Sanctions Queue Widget */}
@@ -1149,7 +1152,7 @@ export default function AdminDashboard({
                           </span>
                         </div>
                         <p className="text-xs text-slate-700 font-semibold">
-                          <strong className="text-slate-900">Statutory Basis:</strong> {s.statutory_basis}
+                          <strong className="text-slate-900">{tx('Statutory Basis:')}</strong> {s.statutory_basis}
                         </p>
                         <p className="text-xs text-slate-600 italic bg-amber-50/50 p-2 border border-amber-200/60">
                           "{s.reason}"
@@ -1165,13 +1168,13 @@ export default function AdminDashboard({
                           onClick={() => handleDashboardDismissSanction(s.id)}
                           className="px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold uppercase tracking-wider cursor-pointer transition-colors"
                         >
-                          Dismiss Proposal
+                          {tx('Dismiss Proposal')}
                         </button>
                         <button
                           type="button"
                           disabled={!canCountersign || countersigningSanctionId === s.id}
                           onClick={() => handleDashboardCountersign(s.id)}
-                          title={!canCountersign ? "Four-Eyes Principle: Cannot countersign your own order without super_admin authority" : "Confirm and enforce statutory suspension"}
+                          title={!canCountersign ? tx('Four-Eyes Principle: Cannot countersign your own order without super_admin authority') : tx('Confirm and enforce statutory suspension')}
                           className={`px-4 py-2 text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 transition-colors cursor-pointer rounded-none ${
                             canCountersign
                               ? 'bg-rose-700 hover:bg-rose-800 text-white shadow-xs'
@@ -1179,11 +1182,11 @@ export default function AdminDashboard({
                           }`}
                         >
                           {countersigningSanctionId === s.id ? (
-                            <span>Enforcing...</span>
+                            <span>{tx('Enforcing...')}</span>
                           ) : (
                             <>
                               <ShieldCheck className="h-4 w-4" />
-                              <span>Countersign &amp; Enforce</span>
+                              <span>{tx('Countersign & Enforce')}</span>
                             </>
                           )}
                         </button>
@@ -1199,29 +1202,29 @@ export default function AdminDashboard({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-700">Accredited Directory</span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-700">{tx('Accredited Directory')}</span>
             <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-600)] rounded-none"><UserCheck className="h-4 w-4" /></span>
           </div>
           <span className="text-2xl sm:text-3xl font-black tracking-tight text-[color:var(--ink)] tabular-nums">{professionals.length} Verified</span>
-          <span className="text-xs text-slate-600 font-semibold">Registered with medical & nursing councils.</span>
+          <span className="text-xs text-slate-600 font-semibold">{tx('Registered with medical & nursing councils.')}</span>
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-700">Pending Approvals</span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-700">{tx('Pending Approvals')}</span>
             <span className="h-8 w-8 flex items-center justify-center border bg-amber-50 border-amber-200 text-amber-700 rounded-none"><ShieldAlert className="h-4 w-4 animate-pulse" /></span>
           </div>
           <span className="text-2xl sm:text-3xl font-black tracking-tight text-[color:var(--ink)] tabular-nums">{pendingRequests.length} Pending</span>
-          <span className="text-xs text-slate-600 font-semibold">Awaiting administrative credential review.</span>
+          <span className="text-xs text-slate-600 font-semibold">{tx('Awaiting administrative credential review.')}</span>
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-700">Verified Status</span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-700">{tx('Verified Status')}</span>
             <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--e-50)] border-[color:var(--e-200)] text-[color:var(--e-600)] rounded-none"><CheckCircle2 className="h-4 w-4" /></span>
           </div>
-          <span className="text-2xl sm:text-3xl font-black tracking-tight text-[color:var(--ink)] tabular-nums">Board reviewed</span>
-          <span className="text-xs text-slate-600 font-semibold">Each licence is checked by a board reviewer.</span>
+          <span className="text-2xl sm:text-3xl font-black tracking-tight text-[color:var(--ink)] tabular-nums">{tx('Board reviewed')}</span>
+          <span className="text-xs text-slate-600 font-semibold">{tx('Each licence is checked by a board reviewer.')}</span>
         </div>
       </div>
 
@@ -1234,16 +1237,16 @@ export default function AdminDashboard({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h4 className="text-sm font-black uppercase tracking-wider text-white">Statutory Credentialing SLA &amp; Cohort Telemetry</h4>
-                <span className="text-2xs font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5">30-Day Rolling Window</span>
+                <h4 className="text-sm font-black uppercase tracking-wider text-white">{tx('Statutory Credentialing SLA & Cohort Telemetry')}</h4>
+                <span className="text-2xs font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5">{tx('30-Day Rolling Window')}</span>
               </div>
-              <p className="text-xs text-slate-400 font-semibold mt-0.5">Statutory 24-hour turnaround target under MMC &amp; LJM accreditation frameworks.</p>
+              <p className="text-xs text-slate-400 font-semibold mt-0.5">{tx('Statutory 24-hour turnaround target under MMC & LJM accreditation frameworks.')}</p>
             </div>
           </div>
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>96.4% SLA Adherence</span>
+              <span>{tx('96.4% SLA Adherence')}</span>
             </div>
             <div className="text-slate-400 font-mono text-xs">
               Target: &lt;24h · Avg: <strong className="text-white">14.8h</strong>
@@ -1253,34 +1256,34 @@ export default function AdminDashboard({
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
           <div className="space-y-1">
-            <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">Avg Turnaround</span>
+            <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">{tx('Avg Turnaround')}</span>
             <div className="text-xl font-black text-white flex items-baseline gap-1.5">
-              <span>14.8 hrs</span>
-              <span className="text-xs text-emerald-400 font-semibold font-mono">(-2.1h MoM)</span>
+              <span>{tx('14.8 hrs')}</span>
+              <span className="text-xs text-emerald-400 font-semibold font-mono">{tx('(-2.1h MoM)')}</span>
             </div>
-            <p className="text-xs text-slate-400">Statutory SLA limit: 24h</p>
+            <p className="text-xs text-slate-400">{tx('Statutory SLA limit: 24h')}</p>
           </div>
 
           <div className="space-y-1">
-            <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">Statutory Adherence</span>
+            <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">{tx('Statutory Adherence')}</span>
             <div className="text-xl font-black text-white flex items-baseline gap-1.5">
               <span>96.4%</span>
               <span className="text-xs text-emerald-400 font-semibold font-mono">(+1.2%)</span>
             </div>
-            <p className="text-xs text-slate-400">137 of 142 on-time</p>
+            <p className="text-xs text-slate-400">{tx('137 of 142 on-time')}</p>
           </div>
 
           <div className="space-y-1">
-            <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">Clearance Velocity</span>
+            <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">{tx('Clearance Velocity')}</span>
             <div className="text-xl font-black text-white flex items-baseline gap-1.5">
-              <span>4.8 / day</span>
-              <span className="text-xs text-cyan-400 font-semibold font-mono">(Cohort Mode)</span>
+              <span>{tx('4.8 / day')}</span>
+              <span className="text-xs text-cyan-400 font-semibold font-mono">{tx('(Cohort Mode)')}</span>
             </div>
-            <p className="text-xs text-slate-400">Peak throughput reached</p>
+            <p className="text-xs text-slate-400">{tx('Peak throughput reached')}</p>
           </div>
 
           <div className="space-y-1">
-            <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">Active Queue SLA Health</span>
+            <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">{tx('Active Queue SLA Health')}</span>
             <div className="flex items-center gap-2 pt-1">
               <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-800">
                 <CheckCircle2 className="h-3 w-3" />
@@ -1297,7 +1300,7 @@ export default function AdminDashboard({
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-400">Automatic priority ordering</p>
+            <p className="text-xs text-slate-400">{tx('Automatic priority ordering')}</p>
           </div>
         </div>
       </div>
@@ -1310,8 +1313,8 @@ export default function AdminDashboard({
               <ShieldCheck className="h-4.5 w-4.5" />
             </div>
             <div>
-              <h3 className="text-sm font-black text-slate-800 uppercase tracking-wide">Practitioner Approval Queue</h3>
-              <p className="text-xs text-slate-500 font-semibold">Review credentials for incoming practitioner registrations.</p>
+              <h3 className="text-sm font-black text-slate-800 uppercase tracking-wide">{tx('Practitioner Approval Queue')}</h3>
+              <p className="text-xs text-slate-500 font-semibold">{tx('Review credentials for incoming practitioner registrations.')}</p>
             </div>
           </div>
 
@@ -1323,7 +1326,7 @@ export default function AdminDashboard({
                 onClick={toggleSelectAllRequests}
                 className="h-8 px-3 rounded-none bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs font-bold uppercase tracking-wider cursor-pointer transition-colors"
               >
-                <span>{selectedRequestIds.length === pendingRequests.length ? 'Deselect All' : 'Select All'}</span>
+                <span>{selectedRequestIds.length === pendingRequests.length ? tx('Deselect All') : tx('Select All')}</span>
               </button>
             )}
             <div className="flex bg-slate-100 p-0.5 rounded-none border border-slate-300 shrink-0 items-center">
@@ -1335,11 +1338,11 @@ export default function AdminDashboard({
                     ? 'bg-[color:var(--t-600)] text-white shadow-none'
                     : 'text-slate-600 hover:text-slate-900 bg-transparent'
                 }`}
-                title="List View"
+                title={tx('List View')}
                 id="toggle-admin-list-view"
               >
                 <List className="h-3.5 w-3.5" />
-                <span>List</span>
+                <span>{tx('List')}</span>
               </button>
               <button
                 type="button"
@@ -1349,11 +1352,11 @@ export default function AdminDashboard({
                     ? 'bg-[color:var(--t-600)] text-white shadow-none'
                     : 'text-slate-600 hover:text-slate-900 bg-transparent'
                 }`}
-                title="Grid View"
+                title={tx('Grid View')}
                 id="toggle-admin-grid-view"
               >
                 <LayoutGrid className="h-3.5 w-3.5" />
-                <span>Grid</span>
+                <span>{tx('Grid')}</span>
               </button>
             </div>
           </div>
@@ -1378,7 +1381,7 @@ export default function AdminDashboard({
                 onClick={() => setSelectedRequestIds([])}
                 className="px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-none border border-slate-700 cursor-pointer transition-colors"
               >
-                Deselect All
+                {tx('Deselect All')}
               </button>
               <button
                 type="button"
@@ -1395,13 +1398,13 @@ export default function AdminDashboard({
         {loading ? (
           <div className="text-center py-10 space-y-2">
             <Loader className="h-6 w-6 text-[color:var(--t-600)] animate-spin mx-auto" />
-            <p className="text-xs text-slate-500 font-semibold">Fetching registration requests...</p>
+            <p className="text-xs text-slate-500 font-semibold">{tx('Fetching registration requests...')}</p>
           </div>
         ) : pendingRequests.length === 0 ? (
           <div className="text-center py-12 border border-dashed border-slate-300 rounded-none bg-slate-50 space-y-2">
             <CheckCircle2 className="h-10 w-10 text-emerald-500 mx-auto" />
-            <h4 className="text-sm font-black text-slate-850 uppercase tracking-wide">Queue Cleared! All Practitioners Verified</h4>
-            <p className="text-xs text-slate-500 font-semibold">No pending license requests are waiting approval.</p>
+            <h4 className="text-sm font-black text-slate-850 uppercase tracking-wide">{tx('Queue Cleared! All Practitioners Verified')}</h4>
+            <p className="text-xs text-slate-500 font-semibold">{tx('No pending license requests are waiting approval.')}</p>
           </div>
         ) : (
           <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-5" : "space-y-3"}>
@@ -1410,9 +1413,9 @@ export default function AdminDashboard({
               const reqName = req.userName || req.name || "Practitioner";
               const reqRole = req.userType || req.role || UserRole.DOCTOR;
               const reqAvatar = req.avatar || getRoleFailoverAvatar(reqRole === UserRole.DOCTOR ? 'doctor' : 'nurse');
-              const reqSpecialization = req.specialization || (reqRole === UserRole.DOCTOR ? "General Medicine" : "Registered Nurse");
+              const reqSpecialization = req.specialization || (reqRole === UserRole.DOCTOR ? tx('General Medicine') : tx('Registered Nurse'));
               const reqEducation = req.degreeName || (Array.isArray(req.education) ? req.education.join(', ') : (req.education || ''));
-              const reqBio = req.bio || "Applicant has submitted credentials for official medical/nursing validation.";
+              const reqBio = req.bio || tx('Applicant has submitted credentials for official medical/nursing validation.');
 
               if (viewMode === 'list') {
                 return (
@@ -1431,7 +1434,7 @@ export default function AdminDashboard({
                             ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' 
                             : 'bg-white border-slate-300 hover:border-slate-500'
                         }`}
-                        title="Select for statutory batch verification"
+                        title={tx('Select for statutory batch verification')}
                       >
                         {selectedRequestIds.includes(req.id) && <Check className="h-3.5 w-3.5 stroke-[3]" />}
                       </div>
@@ -1456,7 +1459,7 @@ export default function AdminDashboard({
 
                     <div className="flex flex-wrap gap-2 items-center text-xs font-mono font-bold text-slate-600 lg:flex-1">
                       <span className="bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-none">Lic: {req.licenseNumber}</span>
-                      <span className="bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-none truncate max-w-[180px]">{req.medicalCouncil || req.nursingCouncil || "National Council"}</span>
+                      <span className="bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-none truncate max-w-[180px]">{req.medicalCouncil || req.nursingCouncil || tx('National Council')}</span>
                       {(() => {
                         const sla = getSlaStatus(req);
                         return (
@@ -1481,7 +1484,7 @@ export default function AdminDashboard({
                         className="h-10 px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] active:bg-[color:var(--t-800)] border border-[color:var(--t-700)] text-white rounded-none text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-none"
                       >
                         <Check className="h-3.5 w-3.5" />
-                        <span>Review Credentials</span>
+                        <span>{tx('Review Credentials')}</span>
                       </button>
                     </div>
                   </div>
@@ -1505,7 +1508,7 @@ export default function AdminDashboard({
                             ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' 
                             : 'bg-white border-slate-300 hover:border-slate-500'
                         }`}
-                        title="Select for statutory batch verification"
+                        title={tx('Select for statutory batch verification')}
                       >
                         {selectedRequestIds.includes(req.id) && <Check className="h-3.5 w-3.5 stroke-[3]" />}
                       </div>
@@ -1521,7 +1524,7 @@ export default function AdminDashboard({
                           <span className={`text-2xs font-black uppercase px-2 py-0.5 rounded-none border ${
                             reqRole === UserRole.DOCTOR ? "bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]" : "bg-emerald-50 text-emerald-800 border-emerald-200"
                           }`}>
-                            {reqRole === UserRole.DOCTOR ? "Doctor" : "Registered Nurse"}
+                            {reqRole === UserRole.DOCTOR ? "Doctor" : tx('Registered Nurse')}
                           </span>
                         </div>
                         <div className="flex flex-wrap items-center gap-2 mt-1">
@@ -1547,21 +1550,21 @@ export default function AdminDashboard({
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                       <div className="bg-slate-50 p-3 rounded-none border border-slate-200">
-                        <span className="text-xs text-slate-500 font-black block uppercase tracking-wide">Submitted License</span>
+                        <span className="text-xs text-slate-500 font-black block uppercase tracking-wide">{tx('Submitted License')}</span>
                         <code className="text-xs font-bold font-mono text-slate-900 mt-0.5 block">{req.licenseNumber}</code>
                       </div>
                       <div className="bg-slate-50 p-3 rounded-none border border-slate-200">
-                        <span className="text-xs text-slate-500 font-black block uppercase tracking-wide">Council Registry</span>
-                        <p className="text-xs font-bold text-slate-800 mt-0.5 truncate">{req.medicalCouncil || req.nursingCouncil || "National Council"}</p>
+                        <span className="text-xs text-slate-500 font-black block uppercase tracking-wide">{tx('Council Registry')}</span>
+                        <p className="text-xs font-bold text-slate-800 mt-0.5 truncate">{req.medicalCouncil || req.nursingCouncil || tx('National Council')}</p>
                       </div>
                       <div className="bg-slate-50 p-3 rounded-none border border-slate-200">
-                        <span className="text-xs text-slate-500 font-black block uppercase tracking-wide">Primary Degree</span>
+                        <span className="text-xs text-slate-500 font-black block uppercase tracking-wide">{tx('Primary Degree')}</span>
                         <p className="text-xs font-bold text-slate-800 mt-0.5 truncate">{reqEducation}</p>
                       </div>
                     </div>
 
                     <div>
-                      <span className="text-xs text-slate-500 font-black block uppercase tracking-wide mb-1">Onboarding Philosophy & Bio</span>
+                      <span className="text-xs text-slate-500 font-black block uppercase tracking-wide mb-1">{tx('Onboarding Philosophy & Bio')}</span>
                       <p className="text-xs text-slate-650 leading-relaxed font-semibold bg-slate-50 p-3.5 rounded-none border border-slate-200 italic">
                         "{reqBio}"
                       </p>
@@ -1574,7 +1577,7 @@ export default function AdminDashboard({
                       className="h-10 px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] active:bg-[color:var(--t-800)] border border-[color:var(--t-700)] text-white rounded-none text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-none"
                     >
                       <Check className="h-4 w-4" />
-                      <span>Review Credentials</span>
+                      <span>{tx('Review Credentials')}</span>
                     </button>
                   </div>
                 </div>
@@ -1596,7 +1599,7 @@ export default function AdminDashboard({
           >
             <div className="flex items-start justify-between border-b border-slate-200 pb-3">
               <div>
-                <span className="text-xs font-black uppercase text-emerald-800 tracking-wider block">Statutory Cohort Accreditation</span>
+                <span className="text-xs font-black uppercase text-emerald-800 tracking-wider block">{tx('Statutory Cohort Accreditation')}</span>
                 <h3 className="font-sans text-lg font-black text-slate-900">
                   Batch Verify & Approve ({selectedRequestIds.length} Practitioners)
                 </h3>
@@ -1614,7 +1617,7 @@ export default function AdminDashboard({
             <div className="space-y-4 text-xs">
               <div>
                 <label className="text-xs font-black uppercase text-slate-600 block mb-1.5 tracking-wider">
-                  Selected Cohort Practitioners
+                  {tx('Selected Cohort Practitioners')}
                 </label>
                 <div className="max-h-40 overflow-y-auto border border-slate-200 divide-y divide-slate-100 bg-slate-50 p-2">
                   {pendingRequests
@@ -1624,7 +1627,7 @@ export default function AdminDashboard({
                         <span className="font-bold">{r.userName || r.name}</span>
                         <div className="flex items-center gap-2 font-mono text-xs text-slate-600">
                           <span>{r.licenseNumber}</span>
-                          <span className="bg-slate-200 px-1.5 py-0.5 text-2xs font-bold uppercase">{r.userType || r.role || 'Doctor'}</span>
+                          <span className="bg-slate-200 px-1.5 py-0.5 text-2xs font-bold uppercase">{r.userType || r.role || tx('Doctor')}</span>
                         </div>
                       </div>
                     ))}
@@ -1633,28 +1636,28 @@ export default function AdminDashboard({
 
               <div>
                 <label className="text-xs font-black uppercase text-slate-600 block mb-1.5 tracking-wider">
-                  Council Verification Reference (Statutory Audit Trail)
+                  {tx('Council Verification Reference (Statutory Audit Trail)')}
                 </label>
                 <input
                   type="text"
                   className="w-full border border-slate-300 rounded-none px-3.5 py-2.5 text-xs focus:outline-none focus:border-emerald-600 font-semibold text-slate-800 bg-white"
                   value={batchRegistryRef}
                   onChange={(e) => setBatchRegistryRef(e.target.value)}
-                  placeholder="e.g. MMC / LJM Official Batch Registry Check - Q4/2026"
+                  placeholder={tx('e.g. MMC / LJM Official Batch Registry Check - Q4/2026')}
                   maxLength={200}
                 />
               </div>
 
               <div>
                 <label className="text-xs font-black uppercase text-slate-600 block mb-1.5 tracking-wider">
-                  Board Accreditation Audit Note
+                  {tx('Board Accreditation Audit Note')}
                 </label>
                 <textarea
                   className="w-full border border-slate-300 rounded-none px-3.5 py-2.5 text-xs focus:outline-none focus:border-emerald-600 font-semibold text-slate-800 bg-white"
                   rows={2}
                   value={batchNote}
                   onChange={(e) => setBatchNote(e.target.value)}
-                  placeholder="Official accreditation rationale recorded in statutory registry..."
+                  placeholder={tx('Official accreditation rationale recorded in statutory registry...')}
                   maxLength={500}
                 />
               </div>
@@ -1678,7 +1681,7 @@ export default function AdminDashboard({
                 {batchProcessing ? (
                   <>
                     <Loader className="h-4 w-4 animate-spin" />
-                    <span>Processing Batch...</span>
+                    <span>{tx('Processing Batch...')}</span>
                   </>
                 ) : (
                   <>
@@ -1708,7 +1711,7 @@ export default function AdminDashboard({
             <button
               onClick={() => setSelectedModalRequest(null)}
               className="absolute top-4 right-4 h-8 w-8 rounded-none text-slate-400 hover:text-slate-800 hover:bg-slate-100 border border-transparent hover:border-slate-300 transition-all cursor-pointer z-10 flex items-center justify-center"
-              title="Close"
+              title={tx('Close')}
             >
               <X className="h-4 w-4" />
             </button>
@@ -1727,14 +1730,14 @@ export default function AdminDashboard({
                       ? "bg-[color:var(--t-50)] text-[color:var(--t-600)] border-[color:var(--t-200)]" 
                       : "bg-emerald-50 text-emerald-850 border-emerald-200"
                   }`}>
-                    {(selectedModalRequest.userType || selectedModalRequest.role) === UserRole.DOCTOR ? "Doctor Application" : "Nurse Application"}
+                    {(selectedModalRequest.userType || selectedModalRequest.role) === UserRole.DOCTOR ? tx('Doctor Application') : tx('Nurse Application')}
                   </span>
                   <h3 className="font-sans text-lg font-black text-slate-900 leading-tight">
                     {selectedModalRequest.userName || selectedModalRequest.name}
                   </h3>
                   <p className="text-xs text-slate-500 font-bold flex items-center gap-1.5">
                     <Award className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                    <span>{selectedModalRequest.specialization || "General Practitioner"} Specialist</span>
+                    <span>{selectedModalRequest.specialization || tx('General Practitioner')} Specialist</span>
                   </p>
                 </div>
               </div>
@@ -1742,12 +1745,12 @@ export default function AdminDashboard({
               {/* Submitted Licenses details info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-none">
-                  <span className="text-xs text-slate-500 font-black uppercase block tracking-wider mb-1">State License Key</span>
+                  <span className="text-xs text-slate-500 font-black uppercase block tracking-wider mb-1">{tx('State License Key')}</span>
                   <code className="font-mono text-xs font-bold text-slate-900">{selectedModalRequest.licenseNumber}</code>
                 </div>
                 <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-none">
-                  <span className="text-xs text-slate-500 font-black uppercase block tracking-wider mb-1">Assigned Medical Council</span>
-                  <p className="text-xs font-bold text-slate-800">{selectedModalRequest.medicalCouncil || selectedModalRequest.nursingCouncil || "National Regulatory Board"}</p>
+                  <span className="text-xs text-slate-500 font-black uppercase block tracking-wider mb-1">{tx('Assigned Medical Council')}</span>
+                  <p className="text-xs font-bold text-slate-800">{selectedModalRequest.medicalCouncil || selectedModalRequest.nursingCouncil || tx('National Regulatory Board')}</p>
                 </div>
               </div>
 
@@ -1790,7 +1793,7 @@ export default function AdminDashboard({
 
                     <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
                       <span className="text-xs text-slate-500 font-semibold">
-                        Cross-check with statutory council database:
+                        {tx('Cross-check with statutory council database:')}
                       </span>
                       <button
                         type="button"
@@ -1801,7 +1804,7 @@ export default function AdminDashboard({
                           window.open(statutory.portalUrl, '_blank', 'noopener,noreferrer');
                         }}
                         className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-slate-300 hover:border-slate-400 hover:bg-slate-100 text-slate-800 text-xs font-bold rounded-none cursor-pointer transition-colors shadow-2xs"
-                        title="Copy licence number and launch council verification portal"
+                        title={tx('Copy licence number and launch council verification portal')}
                       >
                         <Copy className="h-3.5 w-3.5 text-slate-500" />
                         <span>Copy Licence &amp; Open {selectedModalRequest.userType === UserRole.NURSE || selectedModalRequest.role === UserRole.NURSE ? 'LJM' : 'MMC'} Portal</span>
@@ -1812,7 +1815,7 @@ export default function AdminDashboard({
                     {copiedLicence && (
                       <p className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-none animate-fade-in flex items-center gap-1.5">
                         <Check className="h-3.5 w-3.5 text-emerald-600" />
-                        Licence number copied to clipboard! Paste into official council search portal.
+                        {tx('Licence number copied to clipboard! Paste into official council search portal.')}
                       </p>
                     )}
                   </div>
@@ -1821,15 +1824,15 @@ export default function AdminDashboard({
 
               {/* Bio block */}
               <div className="space-y-1.5">
-                <span className="text-xs text-slate-500 font-black uppercase block tracking-wider">Statement of Clinical Philosophy</span>
+                <span className="text-xs text-slate-500 font-black uppercase block tracking-wider">{tx('Statement of Clinical Philosophy')}</span>
                 <p className="text-xs text-slate-700 italic bg-slate-50 p-4 border-l-4 border-[color:var(--t-600)] rounded-none leading-relaxed font-semibold">
-                  "{selectedModalRequest.bio || "Applicant is seeking medical or nurse credential verification."}"
+                  "{selectedModalRequest.bio || tx('Applicant is seeking medical or nurse credential verification.')}"
                 </p>
               </div>
 
               {/* Credentials scans and PDF attachments */}
               <div className="space-y-2">
-                <span className="text-xs text-slate-500 font-black uppercase block tracking-wider">Proof of Registry & Certifications</span>
+                <span className="text-xs text-slate-500 font-black uppercase block tracking-wider">{tx('Proof of Registry & Certifications')}</span>
                 <RequestDocuments requestId={selectedModalRequest.id} />
               </div>
             </div>
@@ -1854,11 +1857,11 @@ export default function AdminDashboard({
         <div id="panel-literature" role="tabpanel" tabIndex={0} className="space-y-6">
           <WorkspaceHeader
             icon={BookOpen}
-            eyebrow="Evidence-Based Medicine · PubMed National Repository"
-            title="Medical Literature & Clinical Research Moderation"
-            description="Audit PubMed-indexed clinical studies, clinical practice guidelines, and patient fact sheets before platform publishing."
-            badges={<BannerBadge tone="brand">Evidence-Based Governance</BannerBadge>}
-            tabs={LIT_SUBS}
+            eyebrow={tx('Evidence-Based Medicine · PubMed National Repository')}
+            title={tx('Medical Literature & Clinical Research Moderation')}
+            description={tx('Audit PubMed-indexed clinical studies, clinical practice guidelines, and patient fact sheets before platform publishing.')}
+            badges={<BannerBadge tone="brand">{tx('Evidence-Based Governance')}</BannerBadge>}
+            tabs={LIT_SUBS.map(t => ({ ...t, label: tx(t.label) }))}
             activeTab={litSubTab}
             onTabChange={(t) => setLitSubTab(t as LitSubTab)}
           />
@@ -1874,11 +1877,11 @@ export default function AdminDashboard({
         <div id="panel-quality" role="tabpanel" tabIndex={0} className="space-y-6">
           <WorkspaceHeader
             icon={CheckCircle2}
-            eyebrow="Clinical Safety & Quality Assurance · Act 586"
-            title="Quality Governance, Support Desk & Incident Resolution"
-            description="Oversee user support turnaround SLAs, partner inquiries, review moderation, critical incident investigations, and CPD audits."
-            badges={<BannerBadge tone="brand">Quality & Safety Committee</BannerBadge>}
-            tabs={QUALITY_SUBS}
+            eyebrow={tx('Clinical Safety & Quality Assurance · Act 586')}
+            title={tx('Quality Governance, Support Desk & Incident Resolution')}
+            description={tx('Oversee user support turnaround SLAs, partner inquiries, review moderation, critical incident investigations, and CPD audits.')}
+            badges={<BannerBadge tone="brand">{tx('Quality & Safety Committee')}</BannerBadge>}
+            tabs={QUALITY_SUBS.map(t => ({ ...t, label: tx(t.label) }))}
             activeTab={qualitySubTab}
             onTabChange={(t) => setQualitySubTab(t as QualitySubTab)}
           />
@@ -1894,11 +1897,11 @@ export default function AdminDashboard({
         <div id="panel-ops" role="tabpanel" tabIndex={0} className="space-y-6">
           <WorkspaceHeader
             icon={CreditCard}
-            eyebrow="Operational Infrastructure · Emergency & Financial Settlements"
-            title="Clinical Operations, Rostering & Payment Settlements"
-            description="Audit locum shift payouts, emergency SOS dispatches, pharmacy registry credentials, and refund resolutions."
-            badges={<BannerBadge tone="brand">MOH & Financial Compliance</BannerBadge>}
-            tabs={OPS_SUBS}
+            eyebrow={tx('Operational Infrastructure · Emergency & Financial Settlements')}
+            title={tx('Clinical Operations, Rostering & Payment Settlements')}
+            description={tx('Audit locum shift payouts, emergency SOS dispatches, pharmacy registry credentials, and refund resolutions.')}
+            badges={<BannerBadge tone="brand">{tx('MOH & Financial Compliance')}</BannerBadge>}
+            tabs={OPS_SUBS.map(t => ({ ...t, label: tx(t.label) }))}
             activeTab={opsSubTab}
             onTabChange={(t) => setOpsSubTab(t as OpsSubTab)}
           />
@@ -1914,14 +1917,14 @@ export default function AdminDashboard({
         <div id="panel-trust" role="tabpanel" tabIndex={0} className="space-y-6">
           <WorkspaceHeader
             icon={ShieldAlert}
-            eyebrow="Clinical Safety & Integrity · Disciplinary Oversight"
-            title="Trust, Clinical Complaints & Regulatory Auditing"
-            description="Manage clinical incident disclosures, disciplinary investigations, and peer review compliance under medical council bylaws."
-            badges={<BannerBadge tone="brand">Clinical Safety Oversight</BannerBadge>}
+            eyebrow={tx('Clinical Safety & Integrity · Disciplinary Oversight')}
+            title={tx('Trust, Clinical Complaints & Regulatory Auditing')}
+            description={tx('Manage clinical incident disclosures, disciplinary investigations, and peer review compliance under medical council bylaws.')}
+            badges={<BannerBadge tone="brand">{tx('Clinical Safety Oversight')}</BannerBadge>}
             tabs={[
-              { id: 'watchlist', label: 'Licence Watchlist' },
-              { id: 'complaints', label: 'Patient Complaints' },
-              { id: 'sanctions' as any, label: 'Disciplinary Orders (Dual-Signoff)' },
+              { id: 'watchlist', label: tx('Licence Watchlist') },
+              { id: 'complaints', label: tx('Patient Complaints') },
+              { id: 'sanctions' as any, label: tx('Disciplinary Orders (Dual-Signoff)') },
             ]}
             activeTab={trustSubTab}
             onTabChange={(t) => setTrustSubTab(t as any)}
@@ -2046,7 +2049,7 @@ export default function AdminDashboard({
 
             <div className="py-4 space-y-4">
               <div className="p-3.5 bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed">
-                <strong>Statutory Segregation Mandate:</strong> In compliance with the Medical Act 1971 and Financial Services Act 2013, administrative privileges are partitioned to prevent conflicts of interest between practitioner licensing approvals, clinical operations disbursements, hospital relations, and international patient coordination.
+                <strong>{tx('Statutory Segregation Mandate:')}</strong> In compliance with the Medical Act 1971 and Financial Services Act 2013, administrative privileges are partitioned to prevent conflicts of interest between practitioner licensing approvals, clinical operations disbursements, hospital relations, and international patient coordination.
               </div>
 
               <div className="space-y-3">
@@ -2068,7 +2071,7 @@ export default function AdminDashboard({
                             {isActive ? (
                               <span className="px-2 py-0.5 text-2xs font-black uppercase bg-emerald-600 text-white tracking-wider flex items-center gap-1">
                                 <Check className="h-3 w-3" />
-                                Active Mandate
+                                {tx('Active Mandate')}
                               </span>
                             ) : (
                               <span className="px-2 py-0.5 text-2xs font-bold uppercase bg-slate-100 text-slate-700 border border-slate-300">
@@ -2092,18 +2095,18 @@ export default function AdminDashboard({
                                 : 'bg-slate-900 hover:bg-slate-800 text-white shadow-xs'
                             }`}
                           >
-                            {isActive ? 'Current Persona' : 'Switch Persona'}
+                            {isActive ? tx('Current Persona') : tx('Switch Persona')}
                           </button>
                         </div>
                       </div>
 
                       <div className="mt-3 pt-3 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs">
                         <div className="flex items-center gap-1.5 text-slate-600">
-                          <span className="font-bold text-slate-700">Permitted Workspaces:</span>
+                          <span className="font-bold text-slate-700">{tx('Permitted Workspaces:')}</span>
                           <div className="flex flex-wrap gap-1">
                             {roleItem.allowedGroups.map(g => (
                               <span key={g} className="px-1.5 py-0.5 bg-slate-100 text-slate-800 font-mono font-bold uppercase text-2xs border border-slate-200">
-                                {ADMIN_GROUPS[g]?.name || g}
+                                {tx(ADMIN_GROUPS[g]?.name || g)}
                               </span>
                             ))}
                           </div>
@@ -2124,7 +2127,7 @@ export default function AdminDashboard({
                 onClick={() => setRbacModalOpen(false)}
                 className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-black uppercase tracking-wider transition-colors cursor-pointer"
               >
-                Close Switcher
+                {tx('Close Switcher')}
               </button>
             </div>
           </div>
@@ -2150,11 +2153,11 @@ export default function AdminDashboard({
                   <h3 className="text-base font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
                     Hospital HR Webhook Event Dispatcher &amp; Telemetry
                     <span className="text-2xs font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">
-                      Act 586 Compliant
+                      {tx('Act 586 Compliant')}
                     </span>
                   </h3>
                   <p className="text-xs text-slate-600 font-semibold mt-0.5">
-                    Real-time automated credential syndication to premier Malaysian Hospital Information Systems (HIS)
+                    {tx('Real-time automated credential syndication to premier Malaysian Hospital Information Systems (HIS)')}
                   </p>
                 </div>
               </div>
@@ -2170,19 +2173,19 @@ export default function AdminDashboard({
             {/* Quick Metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="p-3 bg-slate-50 border border-slate-200">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Active Hospital Gateways</span>
+                <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">{tx('Active Hospital Gateways')}</span>
                 <span className="text-xl font-black text-slate-900 tabular-nums">{webhooks.length || 3} Endpoints</span>
-                <span className="text-xs text-emerald-700 font-bold block mt-0.5">Pantai KL, KPJ, Gleneagles KL</span>
+                <span className="text-xs text-emerald-700 font-bold block mt-0.5">{tx('Pantai KL, KPJ, Gleneagles KL')}</span>
               </div>
               <div className="p-3 bg-slate-50 border border-slate-200">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Security &amp; Encryption</span>
-                <span className="text-xl font-black text-slate-900">HMAC-SHA256</span>
-                <span className="text-xs text-slate-600 font-semibold block mt-0.5">Signed webhook payloads + TLS 1.3</span>
+                <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">{tx('Security & Encryption')}</span>
+                <span className="text-xl font-black text-slate-900">{tx('HMAC-SHA256')}</span>
+                <span className="text-xs text-slate-600 font-semibold block mt-0.5">{tx('Signed webhook payloads + TLS 1.3')}</span>
               </div>
               <div className="p-3 bg-slate-50 border border-slate-200">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">Automated Triggers</span>
+                <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">{tx('Automated Triggers')}</span>
                 <span className="text-xl font-black text-slate-900 font-mono text-xs">practitioner.verified</span>
-                <span className="text-xs text-slate-600 font-semibold block mt-0.5">On council registration approval</span>
+                <span className="text-xs text-slate-600 font-semibold block mt-0.5">{tx('On council registration approval')}</span>
               </div>
             </div>
 
@@ -2218,7 +2221,7 @@ export default function AdminDashboard({
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
                   <Building2 className="h-4 w-4 text-emerald-600" />
-                  Integrated Hospital HR Endpoints
+                  {tx('Integrated Hospital HR Endpoints')}
                 </h4>
                 <button
                   type="button"
@@ -2242,10 +2245,10 @@ export default function AdminDashboard({
                       <div className="flex items-center gap-2">
                         <span className="font-black text-xs text-slate-900">{wh.facility_name || wh.hospital_name}</span>
                         <span className="text-2xs font-bold uppercase px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300">
-                          Active Endpoint
+                          {tx('Active Endpoint')}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 font-semibold">{wh.system_name || 'Hospital Staffing & Credentialing Gateway'}</p>
+                      <p className="text-xs text-slate-500 font-semibold">{wh.system_name || tx('Hospital Staffing & Credentialing Gateway')}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <code className="text-xs font-mono bg-slate-100 text-slate-700 px-2 py-0.5 border border-slate-200">
                           {wh.endpoint_url}
@@ -2265,12 +2268,12 @@ export default function AdminDashboard({
                         {webhookTesting === wh.id ? (
                           <>
                             <Loader className="h-3.5 w-3.5 animate-spin" />
-                            <span>Dispatching...</span>
+                            <span>{tx('Dispatching...')}</span>
                           </>
                         ) : (
                           <>
                             <Send className="h-3 w-3" />
-                            <span>Test Ping</span>
+                            <span>{tx('Test Ping')}</span>
                           </>
                         )}
                       </button>
@@ -2284,18 +2287,18 @@ export default function AdminDashboard({
             <div className="space-y-2">
               <h4 className="text-sm font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
                 <Clock className="h-4 w-4 text-slate-500" />
-                Recent Webhook Dispatch Telemetry
+                {tx('Recent Webhook Dispatch Telemetry')}
               </h4>
               <div className="overflow-x-auto border border-slate-200">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
                     <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-xs">
-                      <th className="p-2.5">Time</th>
-                      <th className="p-2.5">Target Hospital</th>
-                      <th className="p-2.5">Event</th>
-                      <th className="p-2.5">HTTP Status</th>
-                      <th className="p-2.5">Latency</th>
-                      <th className="p-2.5">Delivery Status</th>
+                      <th className="p-2.5">{tx('Time')}</th>
+                      <th className="p-2.5">{tx('Target Hospital')}</th>
+                      <th className="p-2.5">{tx('Event')}</th>
+                      <th className="p-2.5">{tx('HTTP Status')}</th>
+                      <th className="p-2.5">{tx('Latency')}</th>
+                      <th className="p-2.5">{tx('Delivery Status')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-150">
@@ -2323,7 +2326,7 @@ export default function AdminDashboard({
                     ) : (
                       <tr>
                         <td colSpan={6} className="p-4 text-center text-slate-400 text-xs">
-                          No webhook dispatches recorded in current session. Click "Test Ping" above to simulate an Act 586 hospital notification.
+                          {tx('No webhook dispatches recorded in current session. Click "Test Ping" above to simulate an Act 586 hospital notification.')}
                         </td>
                       </tr>
                     )}
@@ -2334,14 +2337,14 @@ export default function AdminDashboard({
 
             <div className="pt-3 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
               <span className="font-mono text-xs">
-                Specification: MediCred Event Dispatcher v2.4 · SHA-256 HMAC
+{tx('Specification: MediCred Event Dispatcher v2.4 · SHA-256 HMAC')}
               </span>
               <button
                 type="button"
                 onClick={() => setWebhookModalOpen(false)}
                 className="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-black uppercase tracking-wider transition-colors cursor-pointer"
               >
-                Close Monitor
+                {tx('Close Monitor')}
               </button>
             </div>
           </div>
@@ -2373,10 +2376,10 @@ export default function AdminDashboard({
                 </div>
                 <div>
                   <span className="text-xs font-black uppercase tracking-wider text-amber-800 block">
-                    Statutory Segregation of Duties (SoD) Protocol
+                    {tx('Statutory Segregation of Duties (SoD) Protocol')}
                   </span>
                   <h3 id="elevation-modal-title" className="text-sm font-black text-slate-900 uppercase tracking-tight">
-                    Break-Glass Privilege Elevation Justification
+                    {tx('Break-Glass Privilege Elevation Justification')}
                   </h3>
                 </div>
               </div>
@@ -2390,10 +2393,10 @@ export default function AdminDashboard({
             </div>
 
             <div className="p-3 bg-amber-50/80 border border-amber-200 text-amber-950 space-y-1">
-              <span className="font-bold block text-xs">Notice of Statutory Role Elevation</span>
+              <span className="font-bold block text-xs">{tx('Notice of Statutory Role Elevation')}</span>
               <p className="text-xs leading-relaxed">
                 You are transitioning from <strong className="font-bold text-slate-900">{ADMIN_SUB_ROLES[subRole]?.shortTitle}</strong> to <strong className="font-bold text-slate-900">{ADMIN_SUB_ROLES[pendingSubRoleTarget]?.shortTitle}</strong>. 
-                Under Medical Act 1971 and Financial Services Act 2013, role switches must be justified and are logged to the immutable SQLite audit trail.
+                {tx('Under Medical Act 1971 and Financial Services Act 2013, role switches must be justified and are logged to the immutable SQLite audit trail.')}
               </p>
             </div>
 
@@ -2406,20 +2409,20 @@ export default function AdminDashboard({
             <form onSubmit={executeElevationSwitch} className="space-y-3.5">
               <div>
                 <label className="text-xs font-black uppercase text-slate-700 tracking-wider block mb-1">
-                  Duty Handover / Incident Case Reference
+                  {tx('Duty Handover / Incident Case Reference')}
                 </label>
                 <input
                   type="text"
                   value={elevationCaseRef}
                   onChange={(e) => setElevationCaseRef(e.target.value)}
                   className="w-full border border-slate-300 px-3 py-2 text-xs font-mono font-bold text-slate-800 bg-white focus:outline-none focus:border-amber-600"
-                  placeholder="EMERG-SOD-2026-001"
+                  placeholder={tx('EMERG-SOD-2026-001')}
                 />
               </div>
 
               <div>
                 <label className="text-xs font-black uppercase text-slate-600 tracking-wider block mb-1">
-                  Preset Regulatory Justifications:
+                  {tx('Preset Regulatory Justifications:')}
                 </label>
                 <div className="flex flex-wrap gap-1">
                   {[
@@ -2448,7 +2451,7 @@ export default function AdminDashboard({
                   rows={2}
                   value={elevationReason}
                   onChange={(e) => setElevationReason(e.target.value)}
-                  placeholder="State the official governance reason or shift mandate for this sub-role elevation..."
+                  placeholder={tx('State the official governance reason or shift mandate for this sub-role elevation...')}
                   className="w-full border border-slate-300 p-2.5 text-xs font-semibold text-slate-800 bg-white focus:outline-none focus:border-amber-600"
                   required
                 />
@@ -2470,12 +2473,12 @@ export default function AdminDashboard({
                   {elevationSubmitting ? (
                     <>
                       <Loader className="h-3.5 w-3.5 animate-spin" />
-                      <span>Logging Elevation...</span>
+                      <span>{tx('Logging Elevation...')}</span>
                     </>
                   ) : (
                     <>
                       <Lock className="h-3.5 w-3.5" />
-                      <span>Authorize &amp; Switch Mandate</span>
+                      <span>{tx('Authorize & Switch Mandate')}</span>
                     </>
                   )}
                 </button>

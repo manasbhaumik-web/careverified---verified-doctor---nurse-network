@@ -1,7 +1,7 @@
 import React from 'react';
 import { TrendingUp, Star } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking, OnCallDispatch, ConsultationMode } from '../../types';
-import { formatMoney } from '../../locale';
+import { formatMoney, useTr } from '../../locale';
 import WorkspaceHeader from '../WorkspaceHeader';
 import { BannerBadge } from '../DashboardHeader';
 
@@ -20,6 +20,7 @@ export default function PractitionerAnalyticsTab({
   avgOverall,
   reviewCount
 }: PractitionerAnalyticsTabProps) {
+  const tx = useTr();
   const completedBookings = myBookings.filter(b => b.status === 'Completed');
   const completedDispatches = dispatches.filter(d => d.doctorId === matchedProfile.id && d.dispatchStatus === 'Completed');
 
@@ -35,59 +36,59 @@ export default function PractitionerAnalyticsTab({
     <div id="panel-analytics" role="tabpanel" aria-labelledby="tab-analytics" tabIndex={0} className="space-y-6 animate-fade-in">
       <WorkspaceHeader
         icon={TrendingUp}
-        eyebrow="Practice Intelligence & Clinical Metrics · Analytics"
-        title="Consultation Analytics, Patient Volume & Clinical Performance"
-        description="Comprehensive clinical workload insights, completed consultation trends, revenue distribution, and patient satisfaction ratings."
+        eyebrow={tx('Practice Intelligence & Clinical Metrics · Analytics')}
+        title={tx('Consultation Analytics, Patient Volume & Clinical Performance')}
+        description={tx('Comprehensive clinical workload insights, completed consultation trends, revenue distribution, and patient satisfaction ratings.')}
         badges={
           <>
-            <BannerBadge tone="brand">Practice Intelligence</BannerBadge>
-            <BannerBadge tone="success">100% Payout Rate</BannerBadge>
+            <BannerBadge tone="brand">{tx('Practice Intelligence')}</BannerBadge>
+            <BannerBadge tone="success">{tx('100% Payout Rate')}</BannerBadge>
           </>
         }
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">Generated Income</span>
+          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Generated Income')}</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{formatMoney(totalEarnings)}</span>
           <p className="text-xs text-emerald-600 font-bold flex items-center gap-0.5">
             <TrendingUp className="h-3 w-3" />
-            <span>100% practitioner distribution</span>
+            <span>{tx('100% practitioner distribution')}</span>
           </p>
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">Patients Attended</span>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{totalAttendedCount} Patients</span>
-          <p className="text-xs text-slate-500 font-semibold">{completedBookings.length} consults &bull; {completedDispatches.length} dispatches</p>
+          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Patients Attended')}</span>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{tx('{n} Patients', { n: totalAttendedCount })}</span>
+          <p className="text-xs text-slate-500 font-semibold">{tx('{a} consults • {b} dispatches', { a: completedBookings.length, b: completedDispatches.length })}</p>
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">Practice Rating</span>
+          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Practice Rating')}</span>
           <div className="flex items-center gap-1.5">
             <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{avgOverall ?? "—"}</span>
             <Star className="h-4.5 w-4.5 text-amber-500 fill-amber-500" />
           </div>
-          <p className="text-xs text-slate-500 font-semibold">Based on {reviewCount} clinical ratings</p>
+          <p className="text-xs text-slate-500 font-semibold">{tx('Based on {n} clinical ratings', { n: reviewCount })}</p>
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">Clinical Accuracy</span>
+          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Clinical Accuracy')}</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--e-700)] tabular-nums">99.8%</span>
-          <p className="text-xs text-slate-500 font-semibold">Government standard audit cleared</p>
+          <p className="text-xs text-slate-500 font-semibold">{tx('Government standard audit cleared')}</p>
         </div>
       </div>
 
       {/* Earnings Visualizer Chart */}
       <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-xs space-y-5">
         <div>
-          <h4 className="text-base font-bold text-[color:var(--ink)]">Revenue Stream Distribution</h4>
-          <p className="text-xs text-[color:var(--ink-2)]">Visualizing contribution proportions across clinical channels</p>
+          <h4 className="text-base font-bold text-[color:var(--ink)]">{tx('Revenue Stream Distribution')}</h4>
+          <p className="text-xs text-[color:var(--ink-2)]">{tx('Visualizing contribution proportions across clinical channels')}</p>
         </div>
 
         <div className="space-y-3 max-w-xl text-xs font-bold text-slate-700">
           <div>
             <div className="flex justify-between mb-1">
-              <span>Video Telehealth Booking ({formatMoney(videoEarned)})</span>
+              <span>{tx('Video Telehealth Booking ({amount})', { amount: formatMoney(videoEarned) })}</span>
               <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((videoEarned / totalEarnings) * 100) : 0}%</span>
             </div>
             <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
@@ -97,7 +98,7 @@ export default function PractitionerAnalyticsTab({
 
           <div>
             <div className="flex justify-between mb-1">
-              <span>In-Person Clinic consultations ({formatMoney(inPersonEarned)})</span>
+              <span>{tx('In-Person Clinic consultations ({amount})', { amount: formatMoney(inPersonEarned) })}</span>
               <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((inPersonEarned / totalEarnings) * 100) : 0}%</span>
             </div>
             <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
@@ -107,7 +108,7 @@ export default function PractitionerAnalyticsTab({
 
           <div>
             <div className="flex justify-between mb-1">
-              <span>Urgent On-Call Ambulance Dispatches ({formatMoney(totalDispatchesEarned)})</span>
+              <span>{tx('Urgent On-Call Ambulance Dispatches ({amount})', { amount: formatMoney(totalDispatchesEarned) })}</span>
               <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((totalDispatchesEarned / totalEarnings) * 100) : 0}%</span>
             </div>
             <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
@@ -120,19 +121,19 @@ export default function PractitionerAnalyticsTab({
       {/* Patient History Logs */}
       <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-xs space-y-4">
         <div>
-          <h4 className="text-base font-bold text-[color:var(--ink)]">Clinical Attended Ledger</h4>
-          <p className="text-xs text-[color:var(--ink-2)]">Chronological history log of all patients evaluated and treatments finalized</p>
+          <h4 className="text-base font-bold text-[color:var(--ink)]">{tx('Clinical Attended Ledger')}</h4>
+          <p className="text-xs text-[color:var(--ink-2)]">{tx('Chronological history log of all patients evaluated and treatments finalized')}</p>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-semibold text-slate-600">
             <thead>
               <tr className="border-b border-[color:var(--t-200)] text-slate-400 font-bold uppercase text-xs tracking-wider">
-                <th className="pb-2.5">Patient Name</th>
-                <th className="pb-2.5">Channel Mode</th>
-                <th className="pb-2.5">Final Diagnosis</th>
-                <th className="pb-2.5">Date Completed</th>
-                <th className="pb-2.5 text-right">Fee Distributed</th>
+                <th className="pb-2.5">{tx('Patient Name')}</th>
+                <th className="pb-2.5">{tx('Channel Mode')}</th>
+                <th className="pb-2.5">{tx('Final Diagnosis')}</th>
+                <th className="pb-2.5">{tx('Date Completed')}</th>
+                <th className="pb-2.5 text-right">{tx('Fee Distributed')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium">
@@ -148,15 +149,15 @@ export default function PractitionerAnalyticsTab({
               {completedDispatches.map(d => (
                 <tr key={d.id} className="hover:bg-slate-55/20 transition-colors">
                   <td className="py-3 font-extrabold text-slate-800">{d.patientName}</td>
-                  <td className="py-3 text-rose-600 font-bold">🚨 Emergency Dispatch</td>
+                  <td className="py-3 text-rose-600 font-bold">{tx('🚨 Emergency Dispatch')}</td>
                   <td className="py-3 font-semibold">{(d as any).reason}</td>
                   <td className="py-3 font-mono tabular-nums">{((d as any).timestamp || '').split(' ')[0]}</td>
-                  <td className="py-3 text-right font-mono tabular-nums font-bold text-slate-900">RM 250</td>
+                  <td className="py-3 text-right font-mono tabular-nums font-bold text-slate-900">{tx('RM 250')}</td>
                 </tr>
               ))}
               {completedBookings.length === 0 && completedDispatches.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-slate-400">No finalized treatments recorded in the current billing cycle.</td>
+                  <td colSpan={5} className="py-8 text-center text-slate-400">{tx('No finalized treatments recorded in the current billing cycle.')}</td>
                 </tr>
               )}
             </tbody>

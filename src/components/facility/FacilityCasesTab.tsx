@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Building2, FileText, DollarSign, CheckCircle2, BadgeCheck, Receipt, ShieldCheck
 } from 'lucide-react';
+import { useTr } from '../../locale';
 import WorkspaceHeader from '../WorkspaceHeader';
 import { BannerBadge } from '../DashboardHeader';
 import { PatientCase, ReferralLedgerData, ReferralLedgerCase } from './types';
@@ -31,17 +32,18 @@ export default function FacilityCasesTab({
   onUpdateCaseStatus,
   onSelectInvoice,
 }: FacilityCasesTabProps) {
+  const tx = useTr();
   return (
     <div className="space-y-4">
       <WorkspaceHeader
         icon={Building2}
-        eyebrow="Clinical Logistics & Patient Intake"
-        title="Patient Referrals, Quotations & Facilitator Ledger"
-        description="Manage cross-border medical referrals, issue formal treatment quotes, and track automated 8% institutional facilitator success fees."
-        badges={<BannerBadge tone="brand">MHTC Coordinated</BannerBadge>}
+        eyebrow={tx('Clinical Logistics & Patient Intake')}
+        title={tx('Patient Referrals, Quotations & Facilitator Ledger')}
+        description={tx('Manage cross-border medical referrals, issue formal treatment quotes, and track automated 8% institutional facilitator success fees.')}
+        badges={<BannerBadge tone="brand">{tx('MHTC Coordinated')}</BannerBadge>}
         tabs={[
-          { id: 'referrals', label: 'Inbound Referrals', count: cases.length },
-          { id: 'ledger', label: 'Commission Ledger (8% Fee)', count: referralLedger?.cases.length || 0 },
+          { id: 'referrals', label: tx('Inbound Referrals'), count: cases.length },
+          { id: 'ledger', label: tx('Commission Ledger (8% Fee)'), count: referralLedger?.cases.length || 0 },
         ]}
         activeTab={casesSubTab}
         onTabChange={(t) => setCasesSubTab(t as any)}
@@ -53,7 +55,7 @@ export default function FacilityCasesTab({
       {casesSubTab === 'referrals' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
-            <span className="text-xs font-extrabold uppercase text-slate-400">Filter Status:</span>
+            <span className="text-xs font-extrabold uppercase text-slate-400">{tx('Filter Status:')}</span>
             <div className="flex items-center gap-1 flex-wrap">
               {['all', 'enquiry', 'quoted', 'accepted', 'in_treatment', 'completed'].map(st => (
                 <button
@@ -75,8 +77,8 @@ export default function FacilityCasesTab({
           {filteredCases.length === 0 ? (
             <div className="p-12 bg-slate-50 text-center text-xs text-slate-500 space-y-2 border border-dashed border-slate-200">
               <FileText className="h-8 w-8 text-slate-400 mx-auto" />
-              <p className="text-sm font-bold text-slate-700">No active patient referral cases found.</p>
-              <p className="text-xs text-slate-500">Inbound clinical referral inquiries and cross-border consultations will appear here automatically.</p>
+              <p className="text-sm font-bold text-slate-700">{tx('No active patient referral cases found.')}</p>
+              <p className="text-xs text-slate-500">{tx('Inbound clinical referral inquiries and cross-border consultations will appear here automatically.')}</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-100 border border-slate-200">
@@ -109,7 +111,7 @@ export default function FacilityCasesTab({
                       )}
                       {c.guaranteeLetter && (
                         <span className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 text-2xs font-black uppercase">
-                          LOG / Direct Billing
+                          {tx('LOG / Direct Billing')}
                         </span>
                       )}
                       {c.specialty && (
@@ -138,16 +140,16 @@ export default function FacilityCasesTab({
 
                     {c.revisionNotes && (
                       <div className="p-2 bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold flex items-center gap-1.5">
-                        <span className="font-black text-amber-800 uppercase text-xs">⚠️ Patient Requested Revision:</span>
+                        <span className="font-black text-amber-800 uppercase text-xs">{tx('⚠️ Patient Requested Revision:')}</span>
                         <span>"{c.revisionNotes}"</span>
                       </div>
                     )}
 
                     <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
-                      <span>Case ID: <code className="font-mono text-slate-600 font-bold">{c.id}</code></span>
-                      {c.patientEmail && <span>Contact: <strong className="text-slate-600">{c.patientEmail}</strong></span>}
-                      {c.insuranceCarrier && <span>Insurance: <strong className="text-slate-600">{c.insuranceCarrier}</strong></span>}
-                      {c.preferredFrom && <span>Requested: <strong className="text-slate-600">{c.preferredFrom}</strong></span>}
+                      <span>{tx('Case ID:')} <code className="font-mono text-slate-600 font-bold">{c.id}</code></span>
+                      {c.patientEmail && <span>{tx('Contact:')} <strong className="text-slate-600">{c.patientEmail}</strong></span>}
+                      {c.insuranceCarrier && <span>{tx('Insurance:')} <strong className="text-slate-600">{c.insuranceCarrier}</strong></span>}
+                      {c.preferredFrom && <span>{tx('Requested:')} <strong className="text-slate-600">{c.preferredFrom}</strong></span>}
                       <span>Updated: {new Date(c.updatedAt).toLocaleDateString('en-MY')}</span>
                     </div>
 
@@ -165,7 +167,7 @@ export default function FacilityCasesTab({
                       <div className="p-2.5 bg-slate-900 text-white flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2">
                           <BadgeCheck className="h-4 w-4 text-emerald-400" />
-                          <span>Hospital Facilitator Invoice: <strong className="font-mono text-emerald-300">{c.commissionInvoiceNo}</strong></span>
+                          <span>{tx('Hospital Facilitator Invoice:')} <strong className="font-mono text-emerald-300">{c.commissionInvoiceNo}</strong></span>
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="text-xs text-slate-300">
@@ -174,7 +176,7 @@ export default function FacilityCasesTab({
                           <span className={`text-2xs font-black uppercase px-2 py-0.5 ${
                             c.commissionStatus === 'settled' ? 'bg-emerald-500 text-white' : 'bg-amber-400 text-slate-950'
                           }`}>
-                            {c.commissionStatus || 'Invoiced'}
+                            {c.commissionStatus || tx('Invoiced')}
                           </span>
                         </div>
                       </div>
@@ -190,7 +192,7 @@ export default function FacilityCasesTab({
                         className="px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-black uppercase tracking-wider cursor-pointer flex items-center gap-1.5 shadow-xs"
                       >
                         <DollarSign className="h-3.5 w-3.5" />
-                        {c.latestQuote ? 'Update Quote' : 'Issue Treatment Quote'}
+                        {c.latestQuote ? tx('Update Quote') : tx('Issue Treatment Quote')}
                       </button>
                     )}
 
@@ -201,7 +203,7 @@ export default function FacilityCasesTab({
                           onClick={() => onUpdateCaseStatus(c.id, 'accepted')}
                           className="px-2 py-1 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 cursor-pointer"
                         >
-                          Mark Accepted
+                          {tx('Mark Accepted')}
                         </button>
                       )}
                       {c.status === 'accepted' && (
@@ -210,7 +212,7 @@ export default function FacilityCasesTab({
                           onClick={() => onUpdateCaseStatus(c.id, 'in_treatment')}
                           className="px-2 py-1 text-xs font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] border border-[color:var(--t-200)] cursor-pointer"
                         >
-                          Admit / In Treatment
+                          {tx('Admit / In Treatment')}
                         </button>
                       )}
                       {c.status === 'in_treatment' && (
@@ -220,7 +222,7 @@ export default function FacilityCasesTab({
                           className="px-2 py-1 text-xs font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] cursor-pointer flex items-center gap-1 shadow-xs"
                         >
                           <CheckCircle2 className="h-3.5 w-3.5" />
-                          Discharge & Invoice Fee
+                          {tx('Discharge & Invoice Fee')}
                         </button>
                       )}
                       {c.status === 'completed' && c.commissionInvoiceNo && (
@@ -233,7 +235,7 @@ export default function FacilityCasesTab({
                           className="px-2 py-1 text-xs font-bold text-slate-800 bg-white hover:bg-slate-100 border border-slate-300 cursor-pointer flex items-center gap-1"
                         >
                           <Receipt className="h-3.5 w-3.5 text-emerald-600" />
-                          View Invoice
+                          {tx('View Invoice')}
                         </button>
                       )}
                     </div>
@@ -255,34 +257,34 @@ export default function FacilityCasesTab({
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-5 w-5 text-emerald-400 shrink-0" />
               <h4 className="font-black text-sm uppercase tracking-wider text-emerald-300">
-                Malaysian Medical Act 1971 & MMC Ethical Code Compliance Notice
+                {tx('Malaysian Medical Act 1971 & MMC Ethical Code Compliance Notice')}
               </h4>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              All success fees recorded below are <strong>strictly institutional facilitation fees</strong> payable by the healthcare facility to MediCred for patient coordination, cross-border second opinions, and medical logistics. <strong>Doctor professional consultation fees are never split or subject to referral commissions</strong>, ensuring 100% adherence to MMC Ethical Code Chapter 2 & Act 586 statutory directives.
+              All success fees recorded below are <strong>{tx('strictly institutional facilitation fees')}</strong> {tx('payable by the healthcare facility to MediCred for patient coordination, cross-border second opinions, and medical logistics.')} <strong>{tx('Doctor professional consultation fees are never split or subject to referral commissions')}</strong>, ensuring 100% adherence to MMC Ethical Code Chapter 2 & Act 586 statutory directives.
             </p>
           </div>
 
           {/* Ledger Aggregate KPIs */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white border border-slate-200 p-4 space-y-1">
-              <span className="text-xs font-mono font-bold uppercase text-slate-400 block">Total Discharged Referrals</span>
+              <span className="text-xs font-mono font-bold uppercase text-slate-400 block">{tx('Total Discharged Referrals')}</span>
               <div className="text-2xl font-black text-slate-900 font-mono">
                 {referralLedger?.cases.length || 0} Cases
               </div>
-              <span className="text-2xs text-slate-500 font-medium">Completed medical admissions</span>
+              <span className="text-2xs text-slate-500 font-medium">{tx('Completed medical admissions')}</span>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 space-y-1">
-              <span className="text-xs font-mono font-bold uppercase text-emerald-700 block">Institutional Success Fee Rate</span>
+              <span className="text-xs font-mono font-bold uppercase text-emerald-700 block">{tx('Institutional Success Fee Rate')}</span>
               <div className="text-2xl font-black text-emerald-800 font-mono">
                 {referralLedger?.summary.commissionRatePct || 8}%
               </div>
-              <span className="text-2xs text-slate-500 font-medium">Contracted facilitation rate</span>
+              <span className="text-2xs text-slate-500 font-medium">{tx('Contracted facilitation rate')}</span>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 space-y-1">
-              <span className="text-xs font-mono font-bold uppercase text-slate-400 block">Total Invoiced Fees (MYR)</span>
+              <span className="text-xs font-mono font-bold uppercase text-slate-400 block">{tx('Total Invoiced Fees (MYR)')}</span>
               <div className="text-2xl font-black text-slate-900 font-mono">
                 RM {(referralLedger?.summary.totalInvoicedMyr || 0).toLocaleString('en-MY', { minimumFractionDigits: 2 })}
               </div>
@@ -290,11 +292,11 @@ export default function FacilityCasesTab({
             </div>
 
             <div className="bg-white border border-slate-200 p-4 space-y-1">
-              <span className="text-xs font-mono font-bold uppercase text-amber-800 block">Pending Settlement (MYR)</span>
+              <span className="text-xs font-mono font-bold uppercase text-amber-800 block">{tx('Pending Settlement (MYR)')}</span>
               <div className="text-2xl font-black text-amber-700 font-mono">
                 RM {(referralLedger?.summary.totalPendingMyr || 0).toLocaleString('en-MY', { minimumFractionDigits: 2 })}
               </div>
-              <span className="text-2xs text-amber-700 font-medium">Net-30 Corporate Terms</span>
+              <span className="text-2xs text-amber-700 font-medium">{tx('Net-30 Corporate Terms')}</span>
             </div>
           </div>
 
@@ -303,10 +305,10 @@ export default function FacilityCasesTab({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
               <div>
                 <h3 className="font-extrabold text-sm text-slate-900">
-                  Patient Admission & Commission Ledger
+                  {tx('Patient Admission & Commission Ledger')}
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Itemized historical record of finalized hospital patient admissions with verifiable facilitation invoices.
+                  {tx('Itemized historical record of finalized hospital patient admissions with verifiable facilitation invoices.')}
                 </p>
               </div>
             </div>
@@ -314,9 +316,9 @@ export default function FacilityCasesTab({
             {!referralLedger || referralLedger.cases.length === 0 ? (
               <div className="p-12 text-center text-xs text-slate-500 space-y-2 bg-slate-50 border border-dashed border-slate-200">
                 <Receipt className="h-8 w-8 text-slate-300 mx-auto" />
-                <p className="text-sm font-bold text-slate-700">No discharged patient referral records in the ledger yet.</p>
+                <p className="text-sm font-bold text-slate-700">{tx('No discharged patient referral records in the ledger yet.')}</p>
                 <p className="text-xs text-slate-400">
-                  When an admitted patient completes treatment and is discharged, their final institutional invoice will be generated here automatically.
+                  {tx('When an admitted patient completes treatment and is discharged, their final institutional invoice will be generated here automatically.')}
                 </p>
               </div>
             ) : (
@@ -324,14 +326,14 @@ export default function FacilityCasesTab({
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
                     <tr className="bg-slate-100 text-slate-600 border-b border-slate-200 font-extrabold text-xs uppercase tracking-wider">
-                      <th className="p-3">Patient & Origin</th>
-                      <th className="p-3">Clinical Specialty</th>
-                      <th className="p-3">Discharge Date</th>
-                      <th className="p-3 text-right">Hospital Quotation (MYR)</th>
-                      <th className="p-3 text-right">8% Success Fee (MYR)</th>
-                      <th className="p-3">Invoice Number</th>
-                      <th className="p-3">Settlement</th>
-                      <th className="p-3 text-right">Actions</th>
+                      <th className="p-3">{tx('Patient & Origin')}</th>
+                      <th className="p-3">{tx('Clinical Specialty')}</th>
+                      <th className="p-3">{tx('Discharge Date')}</th>
+                      <th className="p-3 text-right">{tx('Hospital Quotation (MYR)')}</th>
+                      <th className="p-3 text-right">{tx('8% Success Fee (MYR)')}</th>
+                      <th className="p-3">{tx('Invoice Number')}</th>
+                      <th className="p-3">{tx('Settlement')}</th>
+                      <th className="p-3 text-right">{tx('Actions')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -343,7 +345,7 @@ export default function FacilityCasesTab({
                         </td>
                         <td className="p-3">
                           <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] text-2xs font-black uppercase border border-[color:var(--t-200)]">
-                            {lc.specialty || 'General Care'}
+                            {lc.specialty || tx('General Care')}
                           </span>
                         </td>
                         <td className="p-3 text-slate-600 font-mono text-xs">
@@ -357,7 +359,7 @@ export default function FacilityCasesTab({
                         </td>
                         <td className="p-3">
                           <code className="font-mono text-xs font-black text-[color:var(--t-700)] bg-slate-100 px-1.5 py-0.5">
-                            {lc.commissionInvoiceNo || 'Pending'}
+                            {lc.commissionInvoiceNo || tx('Pending')}
                           </code>
                         </td>
                         <td className="p-3">
@@ -376,7 +378,7 @@ export default function FacilityCasesTab({
                             className="px-2.5 py-1 text-xs font-bold border border-slate-300 hover:bg-slate-100 text-slate-800 cursor-pointer flex items-center gap-1 ml-auto"
                           >
                             <FileText className="h-3 w-3 text-slate-500" />
-                            Invoice Details
+                            {tx('Invoice Details')}
                           </button>
                         </td>
                       </tr>

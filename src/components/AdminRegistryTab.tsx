@@ -4,6 +4,7 @@ import {
   Search,
   Download,
 } from 'lucide-react';
+import { useTr } from '../locale';
 import WorkspaceHeader from './WorkspaceHeader';
 import { BannerBadge } from './DashboardHeader';
 import { UserAvatar } from '../avatars';
@@ -26,18 +27,19 @@ export const AdminRegistryTab: React.FC<AdminRegistryTabProps> = ({
   setRegistrySearch,
   exportRegistryCsv,
 }) => {
+  const tx = useTr();
   return (
         <div id="panel-registry" role="tabpanel" tabIndex={0} className="space-y-6">
           <WorkspaceHeader
             icon={UserCheck}
-            eyebrow="Medical Council of Malaysia · Official Registry"
-            title="MMC, LJM & MDC Registered Practitioner Directory"
-            description="Official registry of doctors, registered nurses, and clinical specialists credentialed under statutory healthcare councils."
-            badges={<BannerBadge tone="success">Active Council Register</BannerBadge>}
+            eyebrow={tx('Medical Council of Malaysia · Official Registry')}
+            title={tx('MMC, LJM & MDC Registered Practitioner Directory')}
+            description={tx('Official registry of doctors, registered nurses, and clinical specialists credentialed under statutory healthcare councils.')}
+            badges={<BannerBadge tone="success">{tx('Active Council Register')}</BannerBadge>}
             tabs={[
-              { id: 'all', label: 'All Registered', count: professionals.length },
-              { id: 'doctor', label: 'Doctors (MMC)', count: professionals.filter(p => p.role === UserRole.DOCTOR).length },
-              { id: 'nurse', label: 'Nurses (LJM)', count: professionals.filter(p => p.role === UserRole.NURSE).length },
+              { id: 'all', label: tx('All Registered'), count: professionals.length },
+              { id: 'doctor', label: tx('Doctors (MMC)'), count: professionals.filter(p => p.role === UserRole.DOCTOR).length },
+              { id: 'nurse', label: tx('Nurses (LJM)'), count: professionals.filter(p => p.role === UserRole.NURSE).length },
             ]}
             activeTab={registryRoleFilter}
             onTabChange={(t) => setRegistryRoleFilter(t as any)}
@@ -51,7 +53,7 @@ export const AdminRegistryTab: React.FC<AdminRegistryTabProps> = ({
                   type="text"
                   value={registrySearch}
                   onChange={(e) => setRegistrySearch(e.target.value)}
-                  placeholder="Search by name, license number, council or specialization..."
+                  placeholder={tx('Search by name, license number, council or specialization...')}
                   className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus:border-[color:var(--t-600)] outline-none"
                 />
               </div>
@@ -59,10 +61,10 @@ export const AdminRegistryTab: React.FC<AdminRegistryTabProps> = ({
                 type="button"
                 onClick={exportRegistryCsv}
                 className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-300 hover:border-slate-400 hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-sm cursor-pointer whitespace-nowrap transition-colors rounded-none"
-                title="Download official compliance registry as CSV"
+                title={tx('Download official compliance registry as CSV')}
               >
                 <Download className="h-4 w-4 text-slate-500" />
-                Export Statutory Register (CSV)
+                {tx('Export Statutory Register (CSV)')}
               </button>
             </div>
 
@@ -70,12 +72,12 @@ export const AdminRegistryTab: React.FC<AdminRegistryTabProps> = ({
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-xs">
-                    <th className="p-3">Practitioner</th>
-                    <th className="p-3">Council &amp; Licence</th>
-                    <th className="p-3">Specialization</th>
-                    <th className="p-3">Status</th>
-                    <th className="p-3">Licence Expiry</th>
-                    <th className="p-3 text-right">Action</th>
+                    <th className="p-3">{tx('Practitioner')}</th>
+                    <th className="p-3">{tx('Council & Licence')}</th>
+                    <th className="p-3">{tx('Specialization')}</th>
+                    <th className="p-3">{tx('Status')}</th>
+                    <th className="p-3">{tx('Licence Expiry')}</th>
+                    <th className="p-3 text-right">{tx('Action')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-150">
@@ -97,15 +99,15 @@ export const AdminRegistryTab: React.FC<AdminRegistryTabProps> = ({
                         <tr>
                           <td colSpan={6} className="p-12 text-center text-slate-500 bg-slate-50/50">
                             <Search className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                            <p className="text-sm font-bold text-slate-700">No registered practitioners match your search criteria.</p>
-                            <p className="text-xs text-slate-500 mt-1">Try adjusting your search terms or filter tabs.</p>
+                            <p className="text-sm font-bold text-slate-700">{tx('No registered practitioners match your search criteria.')}</p>
+                            <p className="text-xs text-slate-500 mt-1">{tx('Try adjusting your search terms or filter tabs.')}</p>
                             {registrySearch && (
                               <button
                                 type="button"
                                 onClick={() => setRegistrySearch('')}
                                 className="mt-3 text-xs font-bold text-[color:var(--t-700)] underline cursor-pointer"
                               >
-                                Clear search query
+                                {tx('Clear search query')}
                               </button>
                             )}
                           </td>
@@ -129,11 +131,11 @@ export const AdminRegistryTab: React.FC<AdminRegistryTabProps> = ({
                             {prof.licenseNumber}
                           </code>
                           <p className="text-xs text-slate-500 font-semibold mt-0.5">
-                            {(prof as any).medicalCouncil || (prof as any).nursingCouncil || 'National Board'}
+                            {(prof as any).medicalCouncil || (prof as any).nursingCouncil || tx('National Board')}
                           </p>
                         </td>
                         <td className="p-3 font-semibold text-slate-700">
-                          {prof.specialization || 'General Practice'}
+                          {prof.specialization || tx('General Practice')}
                         </td>
                         <td className="p-3">
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-black uppercase tracking-wider border ${

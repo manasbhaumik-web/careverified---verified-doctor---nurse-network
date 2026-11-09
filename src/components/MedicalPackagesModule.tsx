@@ -5,6 +5,7 @@ import {
   Sparkles, Gift, Filter, ArrowRight, Copy, CheckCircle2, FileText,
   BadgeCheck, HeartPulse, CreditCard, Lock, Receipt, Download, Printer
 } from 'lucide-react';
+import { useTr } from '../locale';
 import DashboardHeader, { bannerPrimaryBtn } from './DashboardHeader';
 
 export interface MedicalPackage {
@@ -126,6 +127,7 @@ export default function MedicalPackagesModule({
   activeTab: controlledActiveTab,
   onTabChange: setControlledActiveTab,
 }: MedicalPackagesModuleProps) {
+  const tx = useTr();
   const [internalActiveTab, setInternalActiveTab] = useState<PackageTabType>('packages');
   const activeTab = controlledActiveTab !== undefined ? controlledActiveTab : internalActiveTab;
   const setActiveTab = (tab: PackageTabType) => {
@@ -191,7 +193,7 @@ export default function MedicalPackagesModule({
         setPackages(data.data);
       }
     } catch {
-      setError('Unable to load medical packages. Please try again.');
+      setError(tx('Unable to load medical packages. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -236,7 +238,7 @@ export default function MedicalPackagesModule({
   const handleApplyPromo = async (codeToVerify?: string) => {
     const code = (codeToVerify || promoCodeInput).trim().toUpperCase();
     if (!code) {
-      setPromoError('Please enter a promotion code.');
+      setPromoError(tx('Please enter a promotion code.'));
       return;
     }
     setPromoError(null);
@@ -263,12 +265,12 @@ export default function MedicalPackagesModule({
           discountMyr: discount,
           title: data.data.title,
         });
-        setPromoSuccess(data.message || 'Promotion applied successfully!');
+        setPromoSuccess(data.message || tx('Promotion applied successfully!'));
       } else {
-        setPromoError(data.message || 'Invalid promotion code.');
+        setPromoError(data.message || tx('Invalid promotion code.'));
       }
     } catch {
-      setPromoError('Failed to verify promo code. Please check your connection.');
+      setPromoError(tx('Failed to verify promo code. Please check your connection.'));
     }
   };
 
@@ -302,10 +304,10 @@ export default function MedicalPackagesModule({
       if (data.status === 'success') {
         setDepositReceipt(data.data);
       } else {
-        setBookFeedback({ type: 'error', message: data.message || 'The request could not be sent. Please check your details and try again.' });
+        setBookFeedback({ type: 'error', message: data.message || tx('The request could not be sent. Please check your details and try again.') });
       }
     } catch {
-      setBookFeedback({ type: 'error', message: 'Network error. Please try again, or contact the hospital directly.' });
+      setBookFeedback({ type: 'error', message: tx('Network error. Please try again, or contact the hospital directly.') });
     } finally {
       setBookSubmitting(false);
     }
@@ -322,9 +324,9 @@ export default function MedicalPackagesModule({
       {!embedded && (
         <DashboardHeader
           fullWidth={true}
-          eyebrow="Partner hospitals"
-          title="Medical packages"
-          description="Health screening and treatment packages from partner hospitals. Prices are set by each hospital and may change. Requesting a package does not charge you."
+          eyebrow={tx('Partner hospitals')}
+          title={tx('Medical packages')}
+          description={tx('Health screening and treatment packages from partner hospitals. Prices are set by each hospital and may change. Requesting a package does not charge you.')}
           tabs={[
             { id: 'packages', label: 'Medical Packages', icon: PackagePlus, count: packages.length },
             { id: 'promotions', label: 'Offers', icon: Tag, count: promotions.length },
@@ -332,7 +334,7 @@ export default function MedicalPackagesModule({
           ]}
           activeTab={activeTab}
           onTabChange={(id) => setActiveTab(id as any)}
-          tabsLabel="Medical package modules"
+          tabsLabel={tx('Medical package modules')}
         />
       )}
 
@@ -351,14 +353,14 @@ export default function MedicalPackagesModule({
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <h4 className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)]">
-                      Offers from Partner Hospitals
+                      {tx('Offers from Partner Hospitals')}
                     </h4>
                     <span className="text-2xs font-mono font-bold bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-2 py-0.5">
-                      {promotions.length} Available
+                      {tx('{n} Available', { n: promotions.length })}
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    Tap a promo code to copy it, then apply it under Package Details to calculate your discounted rate.
+                    {tx('Tap a promo code to copy it, then apply it under Package Details to calculate your discounted rate.')}
                   </p>
                 </div>
               </div>
@@ -374,17 +376,17 @@ export default function MedicalPackagesModule({
                       setPromoCodeInput(pr.code);
                     }}
                     className="inline-flex items-center gap-2 px-3 h-9 bg-[color:var(--t-50)]/40 hover:bg-[color:var(--t-50)] border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] text-[color:var(--ink)] text-xs font-bold cursor-pointer transition-colors shadow-2xs"
-                    title="Click to copy promo code"
+                    title={tx('Click to copy promo code')}
                   >
                     <Tag className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
                     <span className="font-mono font-extrabold text-[color:var(--t-700)]">{pr.code}</span>
                     <span className="text-2xs text-emerald-800 font-extrabold uppercase px-1.5 py-0.5 bg-emerald-50 border border-emerald-200">
-                      {pr.badge_text || (pr.discount_type === 'percentage' ? `${pr.discount_value}% OFF` : `RM ${pr.discountValueMyr} OFF`)}
+                      {pr.badge_text || (pr.discount_type === 'percentage' ? tx('{pct}% OFF', { pct: pr.discount_value }) : tx('RM {amt} OFF', { amt: pr.discountValueMyr }))}
                     </span>
                     {copiedCode === pr.code ? (
-                      <span className="flex items-center gap-1 text-emerald-700 text-2xs font-bold"><CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> Copied</span>
+                      <span className="flex items-center gap-1 text-emerald-700 text-2xs font-bold"><CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> {tx('Copied')}</span>
                     ) : (
-                      <Copy className="h-3.5 w-3.5 text-slate-400 hover:text-[color:var(--t-600)]" aria-label="Copy code" />
+                      <Copy className="h-3.5 w-3.5 text-slate-400 hover:text-[color:var(--t-600)]" aria-label={tx('Copy code')} />
                     )}
                   </button>
                 ))}
@@ -408,7 +410,7 @@ export default function MedicalPackagesModule({
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search packages by procedure, health test, hospital, or city..."
+                    placeholder={tx('Search packages by procedure, health test, hospital, or city...')}
                     className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] text-xs text-[color:var(--ink)] font-medium focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white rounded-none transition-colors"
                   />
                   {searchQuery && (
@@ -416,7 +418,7 @@ export default function MedicalPackagesModule({
                       type="button"
                       onClick={() => setSearchQuery('')}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                      aria-label="Clear search"
+                      aria-label={tx('Clear search')}
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -427,17 +429,17 @@ export default function MedicalPackagesModule({
                   {/* 2. Category Dropdown List (h-11) */}
                   <label className="flex items-center h-11 border border-[color:var(--t-200)] bg-white px-3 gap-2 shrink-0 focus-within:border-[color:var(--t-600)]">
                     <span className="text-2xs font-mono font-black uppercase tracking-wider text-slate-500 shrink-0">
-                      Category:
+                      {tx('Category:')}
                     </span>
                     <select
-                      aria-label="Category"
+                      aria-label={tx('Category')}
                       value={selectedCategory}
                       onChange={(e) => setSelectedCategory(e.target.value)}
                       className="h-full bg-transparent text-xs font-bold text-[color:var(--ink)] pr-2 cursor-pointer focus:outline-none"
                     >
                       {CATEGORIES.map((cat) => (
                         <option key={cat} value={cat}>
-                          {cat === 'All' ? 'All Specialties' : cat}
+                          {cat === 'All' ? tx('All Specialties') : tx(cat)}
                         </option>
                       ))}
                     </select>
@@ -447,12 +449,12 @@ export default function MedicalPackagesModule({
                   <div className="flex items-center h-11 border border-[color:var(--t-200)] bg-[color:var(--t-50)]/40 p-1 gap-1 shrink-0 overflow-x-auto">
                     <span className="text-2xs font-mono font-black uppercase tracking-wider text-slate-500 px-2 flex items-center gap-1 shrink-0">
                       <Filter className="h-3 w-3 text-[color:var(--t-600)]" />
-                      Audience:
+                      {tx('Audience:')}
                     </span>
                     {[
-                      { id: 'all', label: 'All Patients' },
-                      { id: 'local', label: 'Malaysian Residents' },
-                      { id: 'international', label: 'Medical Tourism (MHTC)' },
+                      { id: 'all', label: tx('All Patients') },
+                      { id: 'local', label: tx('Malaysian Residents') },
+                      { id: 'international', label: tx('Medical Tourism (MHTC)') },
                     ].map((aud) => (
                       <button
                         key={aud.id}
@@ -472,18 +474,18 @@ export default function MedicalPackagesModule({
                   {/* 4. Sort By Dropdown (h-11) */}
                   <label className="flex items-center h-11 border border-[color:var(--t-200)] bg-white px-3 gap-2 shrink-0 focus-within:border-[color:var(--t-600)]">
                     <span className="text-2xs font-mono font-black uppercase tracking-wider text-slate-500 shrink-0">
-                      Sort by:
+                      {tx('Sort by:')}
                     </span>
                     <select
-                      aria-label="Sort by"
+                      aria-label={tx('Sort by')}
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as PackageSort)}
                       className="h-full bg-transparent text-xs font-bold text-[color:var(--ink)] pr-2 cursor-pointer focus:outline-none"
                     >
-                      <option value="featured">Recommended</option>
-                      <option value="price-asc">Price: Low to High</option>
-                      <option value="price-desc">Price: High to Low</option>
-                      <option value="saving">Biggest Saving</option>
+                      <option value="featured">{tx('Recommended')}</option>
+                      <option value="price-asc">{tx('Price: Low to High')}</option>
+                      <option value="price-desc">{tx('Price: High to Low')}</option>
+                      <option value="saving">{tx('Biggest Saving')}</option>
                     </select>
                   </label>
                 </div>
@@ -493,11 +495,11 @@ export default function MedicalPackagesModule({
               <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[color:var(--t-100)] text-xs">
                 <div className="flex flex-wrap items-center gap-2">
                   <span role="status" className="font-bold text-[color:var(--ink)] tabular-nums">
-                    Showing {visiblePackages.length} {visiblePackages.length === 1 ? 'package' : 'packages'}
+                    {tx(visiblePackages.length === 1 ? 'Showing {n} package' : 'Showing {n} packages', { n: visiblePackages.length })}
                   </span>
                   {selectedCategory !== 'All' && (
                     <span className="text-2xs font-mono font-bold bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-2 py-0.5">
-                      Category: {selectedCategory}
+                      {tx('Category:')} {selectedCategory === 'All' ? tx('All Specialties') : tx(selectedCategory)}
                     </span>
                   )}
                   {selectedAudience !== 'all' && (
@@ -517,7 +519,7 @@ export default function MedicalPackagesModule({
                     }}
                     className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
                   >
-                    Reset Filters
+                    {tx('Reset Filters')}
                   </button>
                 )}
               </div>
@@ -526,14 +528,14 @@ export default function MedicalPackagesModule({
             {/* Packages Grid */}
             {loading ? (
               <div className="p-16 text-center text-slate-500 text-xs bg-white border border-slate-200">
-                Loading published medical packages…
+                {tx('Loading published medical packages…')}
               </div>
             ) : packages.length === 0 ? (
               <div className="p-16 text-center bg-white border border-dashed border-slate-300 space-y-3">
                 <PackagePlus className="h-10 w-10 text-slate-300 mx-auto" />
-                <h3 className="text-sm font-bold text-slate-800">No medical packages match your criteria</h3>
+                <h3 className="text-sm font-bold text-slate-800">{tx('No medical packages match your criteria')}</h3>
                 <p className="text-xs text-slate-500 max-w-md mx-auto">
-                  Try clearing your search query or selecting a different specialty category.
+                  {tx('Try clearing your search query or selecting a different specialty category.')}
                 </p>
                 <button
                   type="button"
@@ -544,7 +546,7 @@ export default function MedicalPackagesModule({
                   }}
                   className="mt-2 text-xs font-bold px-4 py-2 border border-slate-300 hover:bg-slate-50 cursor-pointer"
                 >
-                  Reset All Filters
+                  {tx('Reset All Filters')}
                 </button>
               </div>
             ) : (
@@ -558,7 +560,7 @@ export default function MedicalPackagesModule({
                     <div className="relative aspect-21/9 overflow-hidden bg-[color:var(--t-50)]">
                       <PackageImage src={pkg.image_url} alt={pkg.title} category={pkg.category} />
                       <span className="absolute top-2.5 left-2.5 text-2xs font-bold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-600)] text-white shadow-xs">
-                        {pkg.category}
+                        {tx(pkg.category)}
                       </span>
                     </div>
 
@@ -570,14 +572,14 @@ export default function MedicalPackagesModule({
                         <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-700">
                           <span className="flex items-center gap-1 font-semibold">
                             <Building2 className="h-3.5 w-3.5 text-[color:var(--t-600)]" aria-hidden="true" />
-                            {pkg.facility_name}, {pkg.facility_city}
+                            {pkg.facility_name}, {tx(pkg.facility_city)}
                           </span>
                           {Boolean(pkg.verified_facilitator) && (
                             <span className="flex items-center gap-1 font-semibold text-emerald-800">
-                              <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" /> Verified facilitator
+                              <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" /> {tx('Verified facilitator')}
                             </span>
                           )}
-                          {Boolean(pkg.mhtc_member) && <span className="font-semibold text-sky-800">MHTC member</span>}
+                          {Boolean(pkg.mhtc_member) && <span className="font-semibold text-sky-800">{tx('MHTC member')}</span>}
                         </p>
                       </div>
 
@@ -587,7 +589,7 @@ export default function MedicalPackagesModule({
                           <>
                             <span className="text-xs text-slate-700 line-through">RM {pkg.originalPriceMyr.toLocaleString()}</span>
                             <span className="text-2xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5">
-                              Save {Math.round(savingPct(pkg) * 100)}%
+                              {tx('Save {pct}%', { pct: Math.round(savingPct(pkg) * 100) })}
                             </span>
                           </>
                         ) : null}
@@ -595,7 +597,7 @@ export default function MedicalPackagesModule({
 
                       <p className="text-xs text-slate-700 flex flex-wrap items-center gap-x-3 gap-y-1">
                         <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5 text-slate-600" aria-hidden="true" /> {pkg.duration}</span>
-                        {pkg.fastingRequired && <span className="font-bold text-amber-900">Fasting required</span>}
+                        {pkg.fastingRequired && <span className="font-bold text-amber-900">{tx('Fasting required')}</span>}
                       </p>
 
                       <p className="text-xs text-slate-700 line-clamp-2">{pkg.description}</p>
@@ -608,7 +610,7 @@ export default function MedicalPackagesModule({
                           </li>
                         ))}
                         {pkg.inclusions.length > 2 && (
-                          <li className="text-xs font-semibold text-[color:var(--t-700)]">+ {pkg.inclusions.length - 2} more in Details</li>
+                          <li className="text-xs font-semibold text-[color:var(--t-700)]">{tx('+ {n} more in Details', { n: pkg.inclusions.length - 2 })}</li>
                         )}
                       </ul>
                     </div>
@@ -625,7 +627,7 @@ export default function MedicalPackagesModule({
                           }}
                           className="flex-1 min-h-[44px] px-3 text-xs font-bold border border-slate-300 hover:border-slate-400 bg-white text-slate-800 hover:bg-slate-50 cursor-pointer"
                         >
-                          Details
+                          {tx('Details')}
                         </button>
                         <button
                           type="button"
@@ -637,10 +639,10 @@ export default function MedicalPackagesModule({
                           }}
                           className="flex-1 min-h-[44px] px-4 text-xs font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer shadow-xs"
                         >
-                          Request this package
+                          {tx('Request this package')}
                         </button>
                       </div>
-                      <p className="text-xs text-slate-700">No payment is taken. The hospital confirms and tells you how any deposit is paid.</p>
+                      <p className="text-xs text-slate-700">{tx('No payment is taken. The hospital confirms and tells you how any deposit is paid.')}</p>
                     </div>
                   </article>
                 ))}
@@ -664,10 +666,10 @@ export default function MedicalPackagesModule({
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <span className="text-2xs font-extrabold uppercase px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300">
-                        {promo.badge_text || (promo.discount_type === 'percentage' ? `${promo.discount_value}% Discount` : `RM ${promo.discountValueMyr} Rebate`)}
+                        {promo.badge_text || (promo.discount_type === 'percentage' ? tx('{pct}% Discount', { pct: promo.discount_value }) : tx('RM {amt} Rebate', { amt: promo.discountValueMyr }))}
                       </span>
                       <span className="text-xs font-mono text-slate-500">
-                        Valid until {promo.valid_until}
+                        {tx('Valid until {date}', { date: promo.valid_until })}
                       </span>
                     </div>
 
@@ -681,7 +683,7 @@ export default function MedicalPackagesModule({
 
                     {promo.package_title && (
                       <div className="text-xs text-slate-500 bg-slate-50 p-2.5 border border-slate-200">
-                        <b>Applicable to:</b> {promo.package_title}
+                        <b>{tx('Applicable to:')}</b> {promo.package_title}
                       </div>
                     )}
 
@@ -708,12 +710,12 @@ export default function MedicalPackagesModule({
                       {copiedCode === promo.code ? (
                         <>
                           <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                          Copied
+                          {tx('Copied')}
                         </>
                       ) : (
                         <>
                           <Copy className="h-4 w-4" />
-                          Copy Code
+                          {tx('Copy Code')}
                         </>
                       )}
                     </button>
@@ -745,17 +747,17 @@ export default function MedicalPackagesModule({
                       />
                       <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2">
                         <span className="text-2xs font-black uppercase px-2.5 py-1 bg-slate-900/90 text-white backdrop-blur-xs">
-                          {fac.kind.replace('_', ' ').toUpperCase()}
+                          {tx(fac.kind.replace('_', ' ')).toUpperCase()}
                         </span>
                         {fac.mhtcMember && (
                           <span className="text-2xs font-black uppercase px-2.5 py-1 bg-sky-800/95 text-white border border-sky-400/60 backdrop-blur-xs flex items-center gap-1">
-                            🇲🇾 MHTC Member Hospital
+                            🇲🇾 {tx('MHTC Member Hospital')}
                           </span>
                         )}
                         {Boolean(fac.verifiedFacilitator) && (
                           <span className="text-2xs font-black uppercase px-2.5 py-1 bg-emerald-800/95 text-white border border-emerald-400/60 backdrop-blur-xs flex items-center gap-1">
                             <ShieldCheck className="h-3 w-3" />
-                            Verified Facilitator Partner
+                            {tx('Verified Facilitator Partner')}
                           </span>
                         )}
                       </div>
@@ -769,7 +771,7 @@ export default function MedicalPackagesModule({
                         </h3>
                         <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
                           <MapPin className="h-3.5 w-3.5 text-slate-400" />
-                          {fac.address}, {fac.city}, {fac.state}
+                          {fac.address}, {tx(fac.city)}, {tx(fac.state)}
                         </p>
                       </div>
 
@@ -782,18 +784,18 @@ export default function MedicalPackagesModule({
                         {Boolean(fac.verifiedFacilitator) && (
                           <span className="px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 text-2xs font-black uppercase flex items-center gap-1">
                             <BadgeCheck className="h-3 w-3 text-emerald-600" />
-                            Verified facilitator
+                            {tx('Verified facilitator')}
                           </span>
                         )}
                         {fac.mhtcMember && (
                           <span className="px-2.5 py-1 bg-sky-50 text-sky-800 border border-sky-300 text-2xs font-black uppercase flex items-center gap-1">
-                            🇲🇾 MHTC Affiliated
+                            🇲🇾 {tx('MHTC Affiliated')}
                           </span>
                         )}
                         {fac.isLicenceValid && (
                           <span className="px-2.5 py-1 bg-slate-100 text-slate-800 border border-slate-300 text-2xs font-black uppercase flex items-center gap-1">
                             <ShieldCheck className="h-3 w-3 text-slate-600" />
-                            Licensed hospital{fac.licenceNo ? ` (${fac.licenceNo})` : ''}
+                            {tx('Licensed hospital')}{fac.licenceNo ? ` (${fac.licenceNo})` : ''}
                           </span>
                         )}
                         {fac.accreditations.map((a, i) => (
@@ -807,12 +809,12 @@ export default function MedicalPackagesModule({
                       {fac.specialties.length > 0 && (
                         <div className="space-y-1.5">
                           <div className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
-                            Specialist Clinical Services:
+                            {tx('Specialist Clinical Services:')}
                           </div>
                           <div className="flex flex-wrap gap-1.5">
                             {fac.specialties.map((spec, i) => (
                               <span key={i} className="text-2xs px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200">
-                                {spec}
+                                {tx(spec)}
                               </span>
                             ))}
                           </div>
@@ -824,7 +826,7 @@ export default function MedicalPackagesModule({
                         <div className="space-y-1.5 pt-2 border-t border-slate-100">
                           <div className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
                             <HeartPulse className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                            Diagnostic Equipment & Infrastructure:
+                            {tx('Diagnostic Equipment & Infrastructure:')}
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs text-slate-700">
                             {fac.equipment.map((eq, i) => (
@@ -841,7 +843,7 @@ export default function MedicalPackagesModule({
                       {fac.amenities.length > 0 && (
                         <div className="space-y-1.5 pt-2 border-t border-slate-100">
                           <div className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
-                            Patient Care Amenities & Services:
+                            {tx('Patient Care Amenities & Services:')}
                           </div>
                           <div className="flex flex-wrap gap-1.5">
                             {fac.amenities.map((am, i) => (
@@ -858,7 +860,7 @@ export default function MedicalPackagesModule({
                   {/* Footer Action */}
                   <div className="p-6 pt-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
                     <div className="text-xs text-slate-500">
-                      <span className="font-extrabold text-slate-800">{fac.packagesCount}</span> Packages Published
+                      <span className="font-extrabold text-slate-800">{fac.packagesCount}</span> {tx('Packages Published')}
                     </div>
                     <button
                       type="button"
@@ -869,7 +871,7 @@ export default function MedicalPackagesModule({
                       }}
                       className="px-4 py-2 text-xs font-bold bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 cursor-pointer flex items-center gap-1.5"
                     >
-                      View Facility Packages
+                      {tx('View Facility Packages')}
                       <ChevronRight className="h-3.5 w-3.5" />
                     </button>
                   </div>
@@ -891,13 +893,13 @@ export default function MedicalPackagesModule({
                     {selectedPackage.code}
                   </span>
                   <span className="text-xs font-extrabold text-[color:var(--t-700)]">
-                    {selectedPackage.category}
+                    {tx(selectedPackage.category)}
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSelectedPackage(null)}
-                  aria-label="Close"
+                  aria-label={tx('Close')}
                   className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-slate-900 cursor-pointer"
                 >
                   <X className="h-5 w-5" />
@@ -911,7 +913,7 @@ export default function MedicalPackagesModule({
                   </h2>
                   <p className="text-xs text-slate-500 mt-1 flex items-center gap-2">
                     <Building2 className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                    {selectedPackage.facility_name} · {selectedPackage.facility_city}, {selectedPackage.facility_state}
+                    {selectedPackage.facility_name} · {tx(selectedPackage.facility_city)}, {tx(selectedPackage.facility_state)}
                   </p>
                 </div>
 
@@ -922,13 +924,13 @@ export default function MedicalPackagesModule({
                 {/* Duration & Fasting metadata */}
                 <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 border border-slate-200 text-xs">
                   <div>
-                    <span className="text-xs font-bold uppercase text-slate-400 block">Procedure Duration:</span>
+                    <span className="text-xs font-bold uppercase text-slate-400 block">{tx('Procedure Duration:')}</span>
                     <span className="font-semibold text-slate-800">{selectedPackage.duration}</span>
                   </div>
                   <div>
-                    <span className="text-xs font-bold uppercase text-slate-400 block">Clinical Fasting:</span>
+                    <span className="text-xs font-bold uppercase text-slate-400 block">{tx('Clinical Fasting:')}</span>
                     <span className={`font-semibold ${selectedPackage.fastingRequired ? 'text-amber-800' : 'text-slate-800'}`}>
-                      {selectedPackage.fastingRequired ? 'Fasting Required (8–10 hours)' : 'No Fasting Required'}
+                      {selectedPackage.fastingRequired ? tx('Fasting Required (8–10 hours)') : tx('No Fasting Required')}
                     </span>
                   </div>
                 </div>
@@ -936,7 +938,7 @@ export default function MedicalPackagesModule({
                 {/* Inclusions List */}
                 <div className="space-y-2">
                   <h4 className="text-sm font-black uppercase tracking-wider text-slate-800">
-                    Included Tests, Consultations & Services ({selectedPackage.inclusions.length} items):
+                    {tx('Included Tests, Consultations & Services ({n} items):', { n: selectedPackage.inclusions.length })}
                   </h4>
                   <div className="space-y-1.5 bg-slate-50 p-3 border border-slate-200">
                     {selectedPackage.inclusions.map((inc, i) => (
@@ -953,7 +955,7 @@ export default function MedicalPackagesModule({
                   <div className="p-3 bg-amber-50 border border-amber-200 space-y-1">
                     <div className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
                       <AlertCircle className="h-3.5 w-3.5 text-amber-700" />
-                      Preparation & Instructions Before Visit:
+                      {tx('Preparation & Instructions Before Visit:')}
                     </div>
                     <p className="text-xs text-amber-900/90 leading-relaxed">
                       {selectedPackage.preparation_instructions}
@@ -965,14 +967,14 @@ export default function MedicalPackagesModule({
                 <div className="p-4 bg-slate-50 border border-slate-200 space-y-3">
                   <div className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
                     <Tag className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                    Have a Promotion Code?
+                    {tx('Have a Promotion Code?')}
                   </div>
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
                       value={promoCodeInput}
                       onChange={(e) => setPromoCodeInput(e.target.value)}
-                      placeholder="e.g. CAREMERDEKA"
+                      placeholder={tx('e.g. CAREMERDEKA')}
                       className="px-3 py-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-800 uppercase flex-1 focus:outline-none focus:border-[color:var(--t-600)]"
                     />
                     <button
@@ -980,7 +982,7 @@ export default function MedicalPackagesModule({
                       onClick={() => handleApplyPromo()}
                       className="px-4 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer shadow-xs"
                     >
-                      Apply Code
+                      {tx('Apply Code')}
                     </button>
                   </div>
                   {promoError && (
@@ -1000,19 +1002,19 @@ export default function MedicalPackagesModule({
                 {/* Final Price Breakdown */}
                 <div className="p-4 bg-white border-2 border-[color:var(--t-600)] space-y-2">
                   <div className="flex items-center justify-between text-xs text-slate-600">
-                    <span>Published Package Price:</span>
+                    <span>{tx('Published Package Price:')}</span>
                     <span className="font-semibold tabular-nums">RM {selectedPackage.priceMyr.toLocaleString()}</span>
                   </div>
                   {appliedPromo && (
                     <div className="flex items-center justify-between text-xs text-emerald-700 font-bold">
-                      <span>Promo Discount ({appliedPromo.code}):</span>
+                      <span>{tx('Promo Discount ({code}):', { code: appliedPromo.code })}</span>
                       <span className="tabular-nums">- RM {appliedPromo.discountMyr.toLocaleString()}</span>
                     </div>
                   )}
                   <div className="pt-2 border-t border-slate-200 flex items-baseline justify-between">
-                    <span className="font-extrabold text-xs text-slate-900">Total Payable:</span>
+                    <span className="font-extrabold text-xs text-slate-900">{tx('Total Payable:')}</span>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-xs font-bold text-slate-700">RM</span>
+                      <span className="text-xs font-bold text-slate-700">{tx('RM')}</span>
                       <span className="text-2xl font-black text-[color:var(--ink)] tabular-nums">
                         {(selectedPackage.priceMyr - (appliedPromo?.discountMyr || 0)).toLocaleString()}
                       </span>
@@ -1027,7 +1029,7 @@ export default function MedicalPackagesModule({
                   onClick={() => setSelectedPackage(null)}
                   className="px-4 py-2.5 text-xs font-bold border border-slate-300 hover:bg-white cursor-pointer"
                 >
-                  Close
+                  {tx('Close')}
                 </button>
                 <button
                   type="button"
@@ -1038,7 +1040,7 @@ export default function MedicalPackagesModule({
                   }}
                   className={bannerPrimaryBtn}
                 >
-                  Request this package
+                  {tx('Request this package')}
                 </button>
               </div>
             </div>
@@ -1064,7 +1066,7 @@ export default function MedicalPackagesModule({
                     </span>
                   </div>
                   <h3 className="font-extrabold text-base text-[color:var(--ink)] mt-1">
-                    {depositReceipt ? 'Request received' : 'Request this package'}
+                    {depositReceipt ? tx('Request received') : tx('Request this package')}
                   </h3>
                 </div>
                 <button
@@ -1073,7 +1075,7 @@ export default function MedicalPackagesModule({
                     setBookingModal(null);
                     setDepositReceipt(null);
                   }}
-                  aria-label="Close"
+                  aria-label={tx('Close')}
                   className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-700 hover:text-slate-900 cursor-pointer"
                 >
                   <X className="h-5 w-5" />
@@ -1085,9 +1087,9 @@ export default function MedicalPackagesModule({
                   <div role="status" className="p-4 bg-sky-50 border border-sky-300 flex items-start gap-3">
                     <CheckCircle2 className="h-6 w-6 text-sky-800 shrink-0 mt-0.5" aria-hidden="true" />
                     <div className="space-y-1">
-                      <h4 className="font-extrabold text-base text-sky-950">Your request has been sent. No payment has been taken.</h4>
+                      <h4 className="font-extrabold text-base text-sky-950">{tx('Your request has been sent. No payment has been taken.')}</h4>
                       <p className="text-xs text-sky-950 leading-relaxed">
-                        {bookingModal.facility_name} will check availability and contact you on <strong className="font-mono">{bookEmail}</strong> or {bookPhone}. They will also tell you if a deposit is needed and how to pay it.
+                        {tx('{name} will check availability and contact you on', { name: bookingModal.facility_name })} <strong className="font-mono">{bookEmail}</strong> {tx('or')} {bookPhone}. {tx('They will also tell you if a deposit is needed and how to pay it.')}
                       </p>
                     </div>
                   </div>
@@ -1095,44 +1097,44 @@ export default function MedicalPackagesModule({
                   <div className="p-5 bg-slate-50 border-2 border-dashed border-slate-300 space-y-4">
                     <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
                       <div>
-                        <div className="text-xs font-bold uppercase text-slate-700 tracking-wider">Request reference</div>
+                        <div className="text-xs font-bold uppercase text-slate-700 tracking-wider">{tx('Request reference')}</div>
                         <div className="text-lg font-mono font-black text-[color:var(--t-700)] tracking-wide">{depositReceipt.depositPaymentRef}</div>
                       </div>
-                      <span className="px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-300 text-2xs font-bold uppercase">Waiting for the hospital</span>
+                      <span className="px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-300 text-2xs font-bold uppercase">{tx('Waiting for the hospital')}</span>
                     </div>
 
                     <dl className="grid grid-cols-2 gap-3 text-xs">
-                      <div><dt className="text-xs text-slate-700 font-bold uppercase">Patient</dt><dd className="font-bold text-slate-900">{depositReceipt.patientName}</dd></div>
-                      <div><dt className="text-xs text-slate-700 font-bold uppercase">Hospital</dt><dd className="font-bold text-slate-900">{bookingModal.facility_name}</dd></div>
-                      <div><dt className="text-xs text-slate-700 font-bold uppercase">Package</dt><dd className="font-bold text-slate-900">{depositReceipt.packageTitle}</dd></div>
-                      <div><dt className="text-xs text-slate-700 font-bold uppercase">Preferred date</dt><dd className="font-bold text-slate-900">{depositReceipt.preferredDate || 'Flexible'}</dd></div>
+                      <div><dt className="text-xs text-slate-700 font-bold uppercase">{tx('Patient')}</dt><dd className="font-bold text-slate-900">{depositReceipt.patientName}</dd></div>
+                      <div><dt className="text-xs text-slate-700 font-bold uppercase">{tx('Hospital')}</dt><dd className="font-bold text-slate-900">{bookingModal.facility_name}</dd></div>
+                      <div><dt className="text-xs text-slate-700 font-bold uppercase">{tx('Package')}</dt><dd className="font-bold text-slate-900">{depositReceipt.packageTitle}</dd></div>
+                      <div><dt className="text-xs text-slate-700 font-bold uppercase">{tx('Preferred date')}</dt><dd className="font-bold text-slate-900">{depositReceipt.preferredDate || tx('Flexible')}</dd></div>
                     </dl>
 
                     <div className="p-3 bg-white border border-slate-200 space-y-1.5 text-xs">
-                      <div className="flex items-center justify-between text-slate-800"><span>Package price</span><span className="font-bold tabular-nums">RM {depositReceipt.totalPriceMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span></div>
-                      <div className="flex items-center justify-between text-slate-800"><span>Deposit the hospital may ask for (10%)</span><span className="tabular-nums">RM {depositReceipt.depositAmountMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span></div>
-                      <div className="flex items-center justify-between text-slate-800"><span>Balance after the deposit</span><span className="tabular-nums">RM {depositReceipt.remainingPayableMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span></div>
+                      <div className="flex items-center justify-between text-slate-800"><span>{tx('Package price')}</span><span className="font-bold tabular-nums">RM {depositReceipt.totalPriceMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span></div>
+                      <div className="flex items-center justify-between text-slate-800"><span>{tx('Deposit the hospital may ask for (10%)')}</span><span className="tabular-nums">RM {depositReceipt.depositAmountMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span></div>
+                      <div className="flex items-center justify-between text-slate-800"><span>{tx('Balance after the deposit')}</span><span className="tabular-nums">RM {depositReceipt.remainingPayableMyr.toLocaleString('en-MY', { minimumFractionDigits: 2 })}</span></div>
                     </div>
 
                     <p className="text-xs text-slate-700 leading-normal">
-                      Quote this reference when the hospital contacts you. Your request does not guarantee a slot until the hospital confirms it. The price is the one the hospital published and may change.
+                      {tx('Quote this reference when the hospital contacts you. Your request does not guarantee a slot until the hospital confirms it. The price is the one the hospital published and may change.')}
                     </p>
                   </div>
 
                   <div className="flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-slate-200">
                     <button type="button" onClick={() => window.print()} className="min-h-[44px] px-4 text-xs font-bold border border-slate-300 hover:bg-slate-50 cursor-pointer flex items-center gap-1.5">
                       <Printer className="h-4 w-4" aria-hidden="true" />
-                      Print summary
+                      {tx('Print summary')}
                     </button>
                     <button type="button" onClick={() => { setBookingModal(null); setDepositReceipt(null); }} className={`${bannerPrimaryBtn} min-h-[44px]`}>
-                      Done
+                      {tx('Done')}
                     </button>
                   </div>
                 </div>
               ) : (
                 <form onSubmit={handleBookingSubmit} className="p-6 space-y-4">
                   <p className="text-xs text-slate-800">
-                    Send your details to {bookingModal.facility_name}. They check availability and contact you. <strong>No payment is taken here.</strong>
+                    {tx('Send your details to {name}. They check availability and contact you.', { name: bookingModal.facility_name })} <strong>{tx('No payment is taken here.')}</strong>
                   </p>
 
                   {bookFeedback && (
@@ -1143,66 +1145,67 @@ export default function MedicalPackagesModule({
                   )}
 
                   <div className="p-3.5 bg-slate-50 border border-slate-200 space-y-2 text-xs">
-                    <div className="flex items-center justify-between"><span className="text-slate-800">Package price</span><span className="font-semibold tabular-nums">RM {bookingModal.priceMyr.toLocaleString()}</span></div>
+                    <div className="flex items-center justify-between"><span className="text-slate-800">{tx('Package price')}</span><span className="font-semibold tabular-nums">RM {bookingModal.priceMyr.toLocaleString()}</span></div>
                     {appliedPromo && (
-                      <div className="flex items-center justify-between text-emerald-800 font-bold"><span>Offer ({appliedPromo.code})</span><span className="tabular-nums">- RM {appliedPromo.discountMyr.toLocaleString()}</span></div>
+                      <div className="flex items-center justify-between text-emerald-800 font-bold"><span>{tx('Offer ({code})', { code: appliedPromo.code })}</span><span className="tabular-nums">- RM {appliedPromo.discountMyr.toLocaleString()}</span></div>
                     )}
                     <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                      <span className="text-slate-800">Deposit the hospital may ask for (10%)</span>
+                      <span className="text-slate-800">{tx('Deposit the hospital may ask for (10%)')}</span>
                       <span className="font-bold tabular-nums">RM {Math.max(50, Math.round((bookingModal.priceMyr - (appliedPromo?.discountMyr || 0)) * 0.1)).toFixed(2)}</span>
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="pkg-name" className="text-xs font-bold text-slate-800 block">Full name (as in passport or NRIC) *</label>
-                    <input id="pkg-name" type="text" required value={bookName} onChange={(e) => setBookName(e.target.value)} placeholder="e.g. Siti Sarah binti Ahmad" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
+                    <label htmlFor="pkg-name" className="text-xs font-bold text-slate-800 block">{tx('Full name (as in passport or NRIC) *')}</label>
+                    <input id="pkg-name" type="text" required value={bookName} onChange={(e) => setBookName(e.target.value)} placeholder={tx('e.g. Siti Sarah binti Ahmad')} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <label htmlFor="pkg-phone" className="text-xs font-bold text-slate-800 block">Mobile phone (WhatsApp) *</label>
+                      <label htmlFor="pkg-phone" className="text-xs font-bold text-slate-800 block">{tx('Mobile phone (WhatsApp) *')}</label>
                       <input id="pkg-phone" type="tel" required value={bookPhone} onChange={(e) => setBookPhone(e.target.value)} placeholder="+60 12-345 6789" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="pkg-email" className="text-xs font-bold text-slate-800 block">Email *</label>
-                      <input id="pkg-email" type="email" required value={bookEmail} onChange={(e) => setBookEmail(e.target.value)} placeholder="you@example.com" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
+                      <label htmlFor="pkg-email" className="text-xs font-bold text-slate-800 block">{tx('Email *')}</label>
+                      <input id="pkg-email" type="email" required value={bookEmail} onChange={(e) => setBookEmail(e.target.value)} placeholder={tx('you@example.com')} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <label htmlFor="pkg-country" className="text-xs font-bold text-slate-800 block">Country of residence</label>
+                      <label htmlFor="pkg-country" className="text-xs font-bold text-slate-800 block">{tx('Country of residence')}</label>
                       <select id="pkg-country" value={bookCountry} onChange={(e) => setBookCountry(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]">
-                        <option value="Malaysia">Malaysia</option>
-                        <option value="Indonesia">Indonesia</option>
-                        <option value="Singapore">Singapore</option>
-                        <option value="China">China</option>
-                        <option value="Australia">Australia</option>
-                        <option value="United Kingdom">United Kingdom</option>
-                        <option value="Other">Other</option>
+                        <option value="Malaysia">{tx('Malaysia')}</option>
+                        <option value="Indonesia">{tx('Indonesia')}</option>
+                        <option value="Singapore">{tx('Singapore')}</option>
+                        <option value="China">{tx('China')}</option>
+                        <option value="Australia">{tx('Australia')}</option>
+                        <option value="United Kingdom">{tx('United Kingdom')}</option>
+                        <option value="Other">{tx('Other')}</option>
                       </select>
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="pkg-date" className="text-xs font-bold text-slate-800 block">Preferred date</label>
+                      <label htmlFor="pkg-date" className="text-xs font-bold text-slate-800 block">{tx('Preferred date')}</label>
                       <input id="pkg-date" type="date" value={bookDate} onChange={(e) => setBookDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="pkg-notes" className="text-xs font-bold text-slate-800 block">Anything the hospital should know (optional)</label>
-                    <textarea id="pkg-notes" rows={2} value={bookNotes} onChange={(e) => setBookNotes(e.target.value)} placeholder="Health conditions, mobility needs, dietary needs…" className="w-full px-3 py-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
+                    <label htmlFor="pkg-notes" className="text-xs font-bold text-slate-800 block">{tx('Anything the hospital should know (optional)')}</label>
+                    <textarea id="pkg-notes" rows={2} value={bookNotes} onChange={(e) => setBookNotes(e.target.value)} placeholder={tx('Health conditions, mobility needs, dietary needs…')} className="w-full px-3 py-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                   </div>
 
                   <p className="p-3 bg-slate-50 border border-slate-200 text-xs text-slate-700">
-                    Your details go to {bookingModal.facility_name}'s admissions desk and MediCred. They are used only to arrange this package.
+                <div className="font-bold text-slate-800">{tx('Pre-admission Guarantee')}</div>
+                <div className="text-xs text-slate-600 mt-0.5">{tx('Packages marked with the MediCred Facilitator badge include price protection: what you see is what the hospital charges for the listed scope.')}</div>
                   </p>
 
                   <div className="flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-slate-200">
                     <button type="button" onClick={() => setBookingModal(null)} className="min-h-[44px] px-4 text-xs font-bold border border-slate-300 hover:bg-slate-50 cursor-pointer">
-                      Cancel
+                      {tx('Cancel')}
                     </button>
                     <button type="submit" disabled={bookSubmitting} className={`${bannerPrimaryBtn} min-h-[44px] disabled:opacity-50`}>
-                      {bookSubmitting ? 'Sending…' : 'Send request'}
+                      {bookSubmitting ? tx('Sending…') : tx('Send request')}
                     </button>
                   </div>
                 </form>

@@ -75,7 +75,7 @@ export default function DashboardHeader<T extends string>({
       }`}
     >
       {(title || children) && (
-        <div className="dh-brand relative border-t-0 text-[color:var(--ink)] overflow-hidden bg-[color:var(--t-50)] border-b border-[color:var(--t-200)]">
+        <div className="dh-brand relative border-t-0 text-[color:var(--ink)] overflow-hidden bg-white border-b border-[color:var(--t-200)]">
           {title && (
             <div className={`relative z-10 pt-5 pb-5 sm:pt-6 sm:pb-6 ${
               fullWidth ? 'max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8' : 'px-4 sm:px-7'
@@ -131,10 +131,10 @@ export default function DashboardHeader<T extends string>({
                     tabIndex={selected ? 0 : -1}
                     onClick={() => onTabChange?.(tab.id)}
                     onKeyDown={handleKeyDown}
-                    className={`shrink-0 min-h-[48px] px-4 text-xs flex items-center gap-2 cursor-pointer border-b transition-colors ${
+                    className={`shrink-0 min-h-[48px] px-4 text-xs flex items-center gap-2 cursor-pointer transition-colors ${
                       selected
-                        ? 'font-semibold text-[color:var(--t-700)] border-[color:var(--t-600)]'
-                        : 'font-medium text-[color:var(--ink-2)] border-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
+                        ? 'font-semibold text-[color:var(--t-700)] bg-[color:var(--t-50)]'
+                        : 'font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
                     }`}
                   >
                     <tab.icon className={`h-4 w-4 ${selected ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
