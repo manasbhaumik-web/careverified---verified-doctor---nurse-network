@@ -22,7 +22,7 @@ function stableImagePath(url: string | null | undefined): string | null | undefi
   return ["public", "dist"].some(dir => fs.existsSync(path.join(process.cwd(), dir, file))) ? `/${file}` : url;
 }
 function fixSavedImages() {
-  for (const [table, col] of [["medical_packages", "image_url"], ["tourism_facilities", "cover_image"]] as const) {
+  for (const [table, col] of [["medical_packages", "image_url"], ["medical_promotions", "image_url"], ["tourism_facilities", "cover_image"]] as const) {
     try {
       for (const r of db.prepare(`SELECT id, ${col} AS img FROM ${table} WHERE ${col} LIKE '/assets/%-%'`).all() as { id: string; img: string }[]) {
         const fixed = stableImagePath(r.img);
@@ -48,6 +48,11 @@ export function initPackagesSchema() {
       /* column already exists */
     }
   }
+
+  // Ensure medical_promotions has image_url
+  try {
+    db.exec(`ALTER TABLE medical_promotions ADD COLUMN image_url TEXT`);
+  } catch {}
 
   // 2. Medical Packages Table
   db.exec(`
@@ -88,6 +93,7 @@ export function initPackagesSchema() {
       valid_from TEXT NOT NULL,
       valid_until TEXT NOT NULL,
       terms TEXT,
+      image_url TEXT,
       status TEXT NOT NULL DEFAULT 'active',
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
@@ -124,7 +130,7 @@ export function initPackagesSchema() {
         ]),
         exclusions: "Additional advanced imaging (CT/MRI) charged separately if clinically indicated.",
         preparation_instructions: "Strict 10-hour overnight fasting required. Plain water allowed. Report to Executive Screening Lounge Level 2 at 8:00 AM.",
-        image_url: "/assets/clean_light_doctor_suite_full.jpg",
+        image_url: "/assets/packages/pkg-exec-screening.jpg",
         status: "published",
         featured: 1,
       },
@@ -149,7 +155,7 @@ export function initPackagesSchema() {
         ]),
         exclusions: "Interventional catheterisation or stent placement not included.",
         preparation_instructions: "Fast for 4 hours prior. Avoid caffeine, chocolate, and smoking for 12 hours. Continue blood pressure medications as advised.",
-        image_url: "/assets/clinics_hospital_hero_bg.jpg",
+        image_url: "/assets/packages/pkg-cardiac.jpg",
         status: "published",
         featured: 1,
       },
@@ -176,7 +182,7 @@ export function initPackagesSchema() {
         ]),
         exclusions: "Pre-existing ICU complications beyond 3 nights single room stay.",
         preparation_instructions: "Pre-admission clinical workup scheduled 3 days prior. Stop anticoagulants/aspirin under physician guidance.",
-        image_url: "/assets/landing_hero_treatment_nursing_pharmacy_2.jpg",
+        image_url: "/assets/packages/pkg-orthopaedic.jpg",
         status: "published",
         featured: 1,
       },
@@ -203,7 +209,7 @@ export function initPackagesSchema() {
         ]),
         exclusions: "Emergency caesarean conversion or nursery phototherapy if needed.",
         preparation_instructions: "Bring maternal health record (buku merah / antenatal book) and registration documents.",
-        image_url: "/assets/practitioners_hero_bg.jpg",
+        image_url: "/assets/packages/pkg-maternity.jpg",
         status: "published",
         featured: 0,
       },
@@ -229,7 +235,7 @@ export function initPackagesSchema() {
         ]),
         exclusions: "Stimulation gonadotropin injections and embryo freezing storage after year 1.",
         preparation_instructions: "Initial consultation on Day 2 of menstrual cycle.",
-        image_url: "/assets/malaysian_female_doctor.jpg",
+        image_url: "/assets/packages/pkg-fertility.jpg",
         status: "published",
         featured: 1,
       },
@@ -265,6 +271,7 @@ export function initPackagesSchema() {
         discount_value: 20,
         package_id: null,
         badge_text: "20% OFF National Special",
+        image_url: "/assets/promotions/promo-merdeka.jpg",
         valid_from: "2026-08-01",
         valid_until: "2026-12-31",
         terms: "Applicable for Malaysian Citizens and Permanent Residents. Cannot be combined with other insurance vouchers.",
@@ -280,6 +287,7 @@ export function initPackagesSchema() {
         discount_value: 25000,
         package_id: "pkg-exec-01",
         badge_text: "RM 250 Women's Rebate",
+        image_url: "/assets/promotions/promo-pink-october.jpg",
         valid_from: "2026-09-15",
         valid_until: "2026-11-30",
         terms: "Applicable for female patients age 35 and above.",
@@ -295,6 +303,7 @@ export function initPackagesSchema() {
         discount_value: 15,
         package_id: null,
         badge_text: "15% MHTC Travel Privilege",
+        image_url: "/assets/promotions/promo-mhtc-global.jpg",
         valid_from: "2026-01-01",
         valid_until: "2026-12-31",
         terms: "Passport holder required at time of hospital registration. Includes complimentary airport meet-and-greet.",
@@ -311,7 +320,7 @@ export function initPackagesSchema() {
     const now = iso();
     for (const pr of defaultPromos) {
       stmt.run(
-        pr.id, pr.facility_id, pr.code, pr.title, pr.description, pr.discount_type, pr.discount_value, pr.package_id, pr.badge_text, pr.valid_from, pr.valid_until, pr.terms, pr.status, now, now
+        pr.id, pr.facility_id, pr.code, pr.title, pr.description, pr.discount_type, pr.discount_value, pr.package_id, pr.badge_text, pr.valid_from, pr.valid_until, pr.terms, pr.status, pr.image_url, now, now
       );
     }
   }
@@ -350,6 +359,31 @@ export function initPackagesSchema() {
 
   // 4. Older rows point at hashed image names
   fixSavedImages();
+  // Upgrade package and promotion images to AI-generated visuals
+  const packageImageMap: Record<string, string> = {
+    "pkg-exec-01": "/assets/packages/pkg-exec-screening.jpg",
+    "pkg-card-02": "/assets/packages/pkg-cardiac.jpg",
+    "pkg-orth-03": "/assets/packages/pkg-orthopaedic.jpg",
+    "pkg-mat-04": "/assets/packages/pkg-maternity.jpg",
+    "pkg-ivf-05": "/assets/packages/pkg-fertility.jpg",
+  };
+  for (const [id, img] of Object.entries(packageImageMap)) {
+    try {
+      db.prepare(`UPDATE medical_packages SET image_url = ? WHERE id = ? AND (image_url IS NULL OR image_url NOT LIKE '/assets/packages/%')`).run(img, id);
+    } catch {}
+  }
+
+  const promoImageMap: Record<string, string> = {
+    "promo-merdeka-20": "/assets/promotions/promo-merdeka.jpg",
+    "promo-pink-oct": "/assets/promotions/promo-pink-october.jpg",
+    "promo-mhtc-global": "/assets/promotions/promo-mhtc-global.jpg",
+  };
+  for (const [id, img] of Object.entries(promoImageMap)) {
+    try {
+      db.prepare(`UPDATE medical_promotions SET image_url = ? WHERE id = ? AND (image_url IS NULL OR image_url NOT LIKE '/assets/promotions/%')`).run(img, id);
+    } catch {}
+  }
+
 }
 
 // -------------------------------------------------------------
@@ -650,6 +684,7 @@ export function registerPackagesRoutes(app: Application) {
     const validUntil = str(req.body.validUntil, 10) || "2026-12-31";
     const terms = str(req.body.terms, 500);
     const status = req.body.status || "active";
+    const imageUrl = req.body.imageUrl ? str(req.body.imageUrl, 250) : null;
 
     if (!code || !title) return fail(res, 400, "Promotion code and title are required.");
     if (isNaN(discountValue) || discountValue <= 0) return fail(res, 400, "Valid discount value is required.");

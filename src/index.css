@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -31,10 +31,10 @@
   --sys-bg-mint: #ecfdf5;
   --sys-border-emerald: #a7f3d0;
 
-  /* Layer 3: Typography (100% Inter across display & body) */
-  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Layer 3: Typography (100% DM Sans across display & body) */
+  --font-display: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   /* Type scale: the only sizes the app uses, from Tailwind's own steps (no text-[Npx]; tests/type-scale.test.ts enforces it).
    *   text-xs   12px  badges, captions, helper text, table cells, eyebrows (the minimum)
    *   text-sm   14px  buttons, form fields, tabs, secondary body text
@@ -55,8 +55,8 @@
   --text-3xl: 1.875rem; --text-3xl--line-height: 2.25rem;
   --text-4xl: 2.25rem;  --text-4xl--line-height: 2.5rem;
 
-  /* Single family: mono utilities resolve to Inter (tabular figures set below) */
-  --font-mono: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* Single family: mono utilities resolve to DM Sans (tabular figures set below) */
+  --font-mono: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 
   /* Standard weight scale: 400 / 500 / 600 / 700 (heavy utilities cap at bold) */
   --font-weight-extrabold: 700;
@@ -121,7 +121,7 @@
 html, body {
   background-color: var(--t-bg);
   color: #1E293B;
-  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
@@ -728,3 +728,10 @@ a, button, [role="button"], summary, label, select, input { touch-action: manipu
 .dh-brand button.bg-\[color\:var\(--t-600\)\] { border: 1px solid #FFFFFF; }
 .dh-brand button.bg-\[color\:var\(--t-600\)\]:hover { background-color: #FFFFFF; color: var(--t-800); }
 .dh-brand :focus-visible { outline: 3px solid #FFFFFF; outline-offset: 2px; }
+
+/* Public packages page banner */
+.pp-hero .pp-kenburns{animation:pp-kb 7s ease-out forwards}
+.pp-hero .pp-progress{animation:pp-bar 5s linear forwards}
+@keyframes pp-kb{from{transform:scale(1.02)}to{transform:scale(1.1)}}
+@keyframes pp-bar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){.pp-hero .pp-kenburns,.pp-hero .pp-progress{animation:none}}

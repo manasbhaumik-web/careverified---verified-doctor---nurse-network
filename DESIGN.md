@@ -1,6 +1,6 @@
 # Unified Design System & UI/UX Specifications
 
-## Platform: MedCred / CareVerified – Verified Doctor & Nurse Network
+## Platform: MediCred / MediCred – Verified Doctor & Nurse Network
 **Version:** 3.0  
 **Design Paradigm:** High-Density Institutional Medical Ergonomics (Clinical Precision Standard)  
 **Core Geometry:** Strict Zero-Border-Radius (`rounded-none`) · Rectangular Structural Integrity  
@@ -10,7 +10,7 @@
 
 ## 1. Design Philosophy & Architectural Vision
 
-MedCred is engineered for high-stakes healthcare operations where cognitive clarity, rapid scanning, and institutional trust are non-negotiable. The design system rejects consumer-grade rounded bubbly aesthetics in favor of **clinical precision, geometric sharpness, and high-density information architecture**.
+MediCred is engineered for high-stakes healthcare operations where cognitive clarity, rapid scanning, and institutional trust are non-negotiable. The design system rejects consumer-grade rounded bubbly aesthetics in favor of **clinical precision, geometric sharpness, and high-density information architecture**.
 
 ### Core Tenets
 1. **Zero-Border-Radius Structural Integrity:** All containers, cards, dialogs, drawers, buttons, form fields, and imagery maintain strictly rectangular geometry (`0px` / `rounded-none`). Rounded corners are reserved exclusively for live telemetry pulse indicators, circular status dots, and explicit micro-signals.

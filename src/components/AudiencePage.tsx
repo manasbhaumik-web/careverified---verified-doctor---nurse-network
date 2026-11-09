@@ -109,11 +109,11 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
 
       <header className="sticky top-0 z-40 bg-[color:var(--t-50)]/95 backdrop-blur-md border-b border-[color:var(--t-200)]">
         <div className={`${wrap} py-2.5 flex items-center justify-between gap-3`}>
-          <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="flex items-center gap-2.5 min-w-0" aria-label="MedCred home">
+          <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="flex items-center gap-2.5 min-w-0" aria-label="MediCred home">
             <span className="w-9 h-9 shrink-0 bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-700)]">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
             </span>
-            <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">MedCred<span className="text-[color:var(--t-600)]">.</span></span>
+            <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">MediCred<span className="text-[color:var(--t-600)]">.</span></span>
           </a>
           <div className="flex items-center gap-2">
             <button type="button" onClick={signIn} className="hidden sm:inline-flex min-h-[44px] px-4 text-sm font-bold text-[color:var(--t-700)] hover:underline cursor-pointer items-center">{tx.hero.signin}</button>

@@ -52,7 +52,7 @@ const COPY: Record<Lang, {
     skip: 'Skip to content',
     backHome: 'Back to home',
     createTitle: 'Create your account',
-    signInTitle: 'Sign in to MedCred',
+    signInTitle: 'Sign in to MediCred',
     subtitle: 'Choose your role first. Patients may register using either a Malaysian MyKad or an International Passport.',
     yourRole: 'Your role',
     roles: {
@@ -83,7 +83,7 @@ const COPY: Record<Lang, {
     skip: 'Langkau ke kandungan',
     backHome: 'Kembali ke laman utama',
     createTitle: 'Cipta akaun anda',
-    signInTitle: 'Log masuk ke MedCred',
+    signInTitle: 'Log masuk ke MediCred',
     subtitle: 'Pilih peranan anda terlebih dahulu. Pesakit boleh mendaftar menggunakan MyKad Malaysia atau Pasport Antarabangsa.',
     yourRole: 'Peranan anda',
     roles: {
@@ -113,8 +113,8 @@ const COPY: Record<Lang, {
   zh: {
     skip: '跳到主要内容',
     backHome: '返回首页',
-    createTitle: '创建您的 MedCred 账户',
-    signInTitle: '登录 MedCred 平台',
+    createTitle: '创建您的 MediCred 账户',
+    signInTitle: '登录 MediCred 平台',
     subtitle: '请先选择您的身份角色。本地及国际患者均可凭马来西亚 MyKad 或国际护照快速注册。',
     yourRole: '您的角色',
     roles: {
@@ -179,7 +179,7 @@ export default function LoginPage({ onLoginSuccess }: { onLoginSuccess: (user: S
   // A sign-in page should not be indexed, and the tab should say where you are.
   useEffect(() => {
     const prevTitle = document.title;
-    document.title = registering ? `${tx.createTitle} | MedCred` : `${tx.signInTitle} | MedCred`;
+    document.title = registering ? `${tx.createTitle} | MediCred` : `${tx.signInTitle} | MediCred`;
     const meta = document.createElement('meta');
     meta.name = 'robots'; meta.content = 'noindex';
     document.head.appendChild(meta);
@@ -237,11 +237,11 @@ export default function LoginPage({ onLoginSuccess }: { onLoginSuccess: (user: S
 
       <header className="sticky top-0 z-40 bg-[color:var(--t-50)]/95 backdrop-blur-md border-b border-[color:var(--t-200)]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
-          <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="flex items-center gap-2.5 min-w-0" aria-label="MedCred home">
+          <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="flex items-center gap-2.5 min-w-0" aria-label="MediCred home">
             <span className="w-9 h-9 shrink-0 bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-700)]">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
             </span>
-            <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">MedCred<span className="text-[color:var(--t-600)]">.</span></span>
+            <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">MediCred<span className="text-[color:var(--t-600)]">.</span></span>
           </a>
           <div className="flex items-center gap-2">
             <LocaleSwitcher />

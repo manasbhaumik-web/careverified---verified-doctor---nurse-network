@@ -225,7 +225,7 @@ export default function PharmacyFinder({ embedded = false }: { embedded?: boolea
                       <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
                       <span>
                         {p.licenceVerified
-                          ? `Licence and pharmacist checked by MedCred${p.licenceExpiresOn ? ` · valid to ${p.licenceExpiresOn}` : ''}`
+                          ? `Licence and pharmacist checked by MediCred${p.licenceExpiresOn ? ` · valid to ${p.licenceExpiresOn}` : ''}`
                           : 'MOH Partner Pharmacy · Registered dispensing facility'}
                       </span>
                     </p>

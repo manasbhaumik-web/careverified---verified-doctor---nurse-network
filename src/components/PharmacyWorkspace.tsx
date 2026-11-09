@@ -761,7 +761,7 @@ function ReportsTab() {
               )}
             </section>
           </div>
-          <p className="text-xs text-slate-500 font-medium">Telemetry covers prescriptions routed to your pharmacy via MedCred. Response latency runs from patient dispatch to first status mutation. Walk-in lookups are logged independently.</p>
+          <p className="text-xs text-slate-500 font-medium">Telemetry covers prescriptions routed to your pharmacy via MediCred. Response latency runs from patient dispatch to first status mutation. Walk-in lookups are logged independently.</p>
         </>
       )}
     </div>

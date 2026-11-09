@@ -1,0 +1,217 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Marketplace Icon Set</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--t-50:#ECFEFF;--t-100:#CFFAFE;--t-200:#A5F3FC;--t-600:#0891B2;--t-800:#155E75;--ink:#1E293B;--muted:#64748B;--line:#E2E8F0;--bg:#F8FAFC;--card:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#E2E8F0;--muted:#94A3B8;--line:#1E293B;--bg:#020617;--card:#0F172A;--t-600:#22D3EE;--t-100:#164E63;--t-50:#083344}}
+:root[data-theme="dark"]{--ink:#E2E8F0;--muted:#94A3B8;--line:#1E293B;--bg:#020617;--card:#0F172A;--t-600:#22D3EE;--t-100:#164E63;--t-50:#083344}
+*{box-sizing:border-box;border-radius:0}body{margin:0;background:var(--bg);color:var(--ink);font:500 14px/1.5 Inter,ui-sans-serif,system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:32px 16px 64px}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--t-600)}
+h1{font-size:32px;font-weight:800;letter-spacing:-.025em;margin:4px 0 6px;line-height:1.15}h2{font-size:18px;font-weight:700;margin:36px 0 12px}
+p.lead{color:var(--muted);max-width:68ch;margin:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.tile{margin:0;padding:20px 14px;background:var(--card);border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.ic{width:56px;height:56px;display:grid;place-items:center;background:var(--t-50);color:var(--t-600);border:1px solid var(--t-100)}
+figcaption b{display:block;font-size:13px}figcaption code{font:500 11px ui-monospace,monospace;color:var(--muted)}
+.strip{background:#fff;border:1px solid #E2E8F0;padding:14px;margin-bottom:10px}
+.row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{width:38px;height:38px;display:grid;place-items:center;background:var(--t-50);color:var(--t-600);border:1px solid var(--t-100)}
+.chip:first-child{background:var(--t-600);color:#fff;border-color:var(--t-800)}
+.sizes{display:flex;flex-wrap:wrap;align-items:flex-end;gap:24px;background:var(--card);border:1px solid var(--line);padding:20px;color:var(--t-600)}
+.sz{display:flex;flex-direction:column;align-items:center;gap:6px}.sz small{color:var(--muted);font:500 11px ui-monospace,monospace}
+pre{background:#0F172A;color:#E2E8F0;padding:16px;overflow-x:auto;font:500 12.5px/1.6 ui-monospace,monospace}
+</style></head><body><main>
+<span class="eyebrow">MediCred · Packages Marketplace</span>
+<h1>Marketplace icon set</h1>
+<p class="lead">16 line icons on a 24px grid with square caps and mitred corners to match the zero-radius design system. They draw in <code>currentColor</code> with a 14% tint, so they recolour with the active theme.</p>
+<h2>Package categories</h2><div class="grid"><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Health Screening"><rect x="5" y="4" width="14" height="17" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<rect x="5" y="4" width="14" height="17"/>
+<rect x="9" y="2.5" width="6" height="3" fill="currentColor" stroke="none"/>
+<path d="M8.5 12.2l2.3 2.3 4.7-4.7"/>
+<path d="M8.5 17.5h7"/></svg></div><figcaption><b>Health Screening</b><code>health-screening</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Cardiology"><path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z"/>
+<path d="M2.5 12.5h5l1.6-2.8 2.4 5.3 1.8-3.5 1 1h7.2"/></svg></div><figcaption><b>Cardiology</b><code>cardiology</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Orthopaedics"><g transform="rotate(-45 12 12)">
+<path d="M8 10.6h8a2.3 2.3 0 1 1 2.6 1.4 2.3 2.3 0 1 1-2.6 1.4H8a2.3 2.3 0 1 1-2.6-1.4A2.3 2.3 0 1 1 8 10.6Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M8 10.6h8a2.3 2.3 0 1 1 2.6 1.4 2.3 2.3 0 1 1-2.6 1.4H8a2.3 2.3 0 1 1-2.6-1.4A2.3 2.3 0 1 1 8 10.6Z"/>
+</g></svg></div><figcaption><b>Orthopaedics</b><code>orthopaedics</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Maternity"><path d="M10 3a6.5 6.5 0 0 1 6.5 6.5H10Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M10 3a6.5 6.5 0 0 1 6.5 6.5H10Z"/>
+<path d="M3 9.5h13.5a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6Z"/>
+<path d="M16.5 9.5 18.5 5H21"/>
+<circle cx="7" cy="19" r="1.8"/><circle cx="13.5" cy="19" r="1.8"/></svg></div><figcaption><b>Maternity</b><code>maternity</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Fertility"><circle cx="12" cy="12" r="8.75" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<circle cx="12" cy="12" r="8.75"/>
+<circle cx="9.6" cy="10" r="2.6"/><circle cx="14.4" cy="10" r="2.6"/><circle cx="12" cy="14.6" r="2.6"/></svg></div><figcaption><b>Fertility</b><code>fertility</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Oncology"><path d="M12 15.2c-2.3-2.6-4-5.3-4-7.7a4 4 0 0 1 8 0c0 2.4-1.7 5.1-4 7.7Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 15.2c-2.3-2.6-4-5.3-4-7.7a4 4 0 0 1 8 0c0 2.4-1.7 5.1-4 7.7Z"/>
+<path d="M10.1 12.8 5.5 21l2.6-.4L9.3 22l3.8-6.5"/>
+<path d="M13.9 12.8 18.5 21l-2.6-.4-1.2 1.4-3.6-6.2"/></svg></div><figcaption><b>Oncology</b><code>oncology</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Eye Care"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/>
+<circle cx="12" cy="12" r="3.25" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<circle cx="12" cy="12" r="3.25"/>
+<rect x="11" y="11" width="2" height="2" fill="currentColor" stroke="none"/></svg></div><figcaption><b>Eye Care</b><code>ophthalmology</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Dental"><path d="M7.7 3.5c-2.4 0-4.2 1.9-4.2 4.6 0 3 1.4 4.6 2.1 7.1l1.5 5.6h2.3l1.1-5c.3-1.2 .8-1.9 1.5-1.9s1.2.7 1.5 1.9l1.1 5h2.3l1.5-5.6c.7-2.5 2.1-4.1 2.1-7.1 0-2.7-1.8-4.6-4.2-4.6-1.9 0-2.6 1-4.3 1s-2.4-1-4.3-1Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M7.7 3.5c-2.4 0-4.2 1.9-4.2 4.6 0 3 1.4 4.6 2.1 7.1l1.5 5.6h2.3l1.1-5c.3-1.2 .8-1.9 1.5-1.9s1.2.7 1.5 1.9l1.1 5h2.3l1.5-5.6c.7-2.5 2.1-4.1 2.1-7.1 0-2.7-1.8-4.6-4.2-4.6-1.9 0-2.6 1-4.3 1s-2.4-1-4.3-1Z"/></svg></div><figcaption><b>Dental</b><code>dental</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Surgery"><path d="M20.5 3.5 9.5 14.5l2 2 6.8-6.8c2.4-2.4 3-4.6 2.2-6.2Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M20.5 3.5 9.5 14.5l2 2 6.8-6.8c2.4-2.4 3-4.6 2.2-6.2Z"/>
+<path d="M9.5 14.5 3 21l1 1 .5.5 7-7"/></svg></div><figcaption><b>Surgery</b><code>surgery</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Medical Package"><rect x="3" y="7" width="18" height="13" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<rect x="3" y="7" width="18" height="13"/>
+<path d="M9 7V4h6v3"/>
+<path d="M12 10.5v6M9 13.5h6"/></svg></div><figcaption><b>Medical Package</b><code>general-package</code></figcaption></figure></div>
+<h2>Card badges &amp; meta</h2><div class="grid"><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Verified Facility"><path d="M12 2.5 20 5.5v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 2.5 20 5.5v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6Z"/>
+<path d="M8.5 11.8l2.5 2.5 4.5-4.8"/></svg></div><figcaption><b>Verified Facility</b><code>verified-facility</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Offer / Savings"><path d="M3 3h8.5l9.5 9.5-8.5 8.5L3 11.5Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M3 3h8.5l9.5 9.5-8.5 8.5L3 11.5Z"/>
+<rect x="6.2" y="6.2" width="2.6" height="2.6"/>
+<path d="M10 15.5l5.5-5.5"/></svg></div><figcaption><b>Offer / Savings</b><code>offer</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Duration"><path d="M7.5 3.5c0 5 4.5 5.8 4.5 8.5s-4.5 3.5-4.5 8.5h9c0-5-4.5-5.8-4.5-8.5s4.5-3.5 4.5-8.5Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M5.5 3.5h13M5.5 20.5h13"/>
+<path d="M7.5 3.5c0 5 4.5 5.8 4.5 8.5s-4.5 3.5-4.5 8.5M16.5 3.5c0 5-4.5 5.8-4.5 8.5s4.5 3.5 4.5 8.5"/></svg></div><figcaption><b>Duration</b><code>duration</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Fasting Required"><path d="M6 3v5.5a2 2 0 0 0 4 0V3M8 3v18"/>
+<path d="M17 21V3c-2 1.6-3 4.2-3 7.5h3"/>
+<path d="M3 21 21 3"/></svg></div><figcaption><b>Fasting Required</b><code>fasting-required</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="International Patients"><circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<circle cx="12" cy="12" r="9"/>
+<path d="M12 3c-2.4 2.5-3.6 5.5-3.6 9s1.2 6.5 3.6 9c2.4-2.5 3.6-5.5 3.6-9s-1.2-6.5-3.6-9Z"/>
+<path d="M3 12h18"/></svg></div><figcaption><b>International Patients</b><code>international</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Inclusions"><path d="M10.5 6h10M10.5 12h10M10.5 18h10"/>
+<path d="M3.5 6l1.5 1.5L8 4.5M3.5 12l1.5 1.5L8 10.5M3.5 18l1.5 1.5L8 16.5"/></svg></div><figcaption><b>Inclusions</b><code>inclusions</code></figcaption></figure><figure class="tile"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Enquire"><path d="M3 4h18v13H10l-5 4v-4H3Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M3 4h18v13H10l-5 4v-4H3Z"/>
+<path d="M7.5 9h9M7.5 12.5h6"/></svg></div><figcaption><b>Enquire</b><code>enquire</code></figcaption></figure></div>
+<h2>Across the three themes</h2><div class="strip" style="--t-50:#ECFEFF;--t-100:#CFFAFE;--t-600:#0891B2;--t-800:#155E75"><span class="eyebrow">Light Cyan</span><div class="row"><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Health Screening"><rect x="5" y="4" width="14" height="17" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<rect x="5" y="4" width="14" height="17"/>
+<rect x="9" y="2.5" width="6" height="3" fill="currentColor" stroke="none"/>
+<path d="M8.5 12.2l2.3 2.3 4.7-4.7"/>
+<path d="M8.5 17.5h7"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Cardiology"><path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z"/>
+<path d="M2.5 12.5h5l1.6-2.8 2.4 5.3 1.8-3.5 1 1h7.2"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Orthopaedics"><g transform="rotate(-45 12 12)">
+<path d="M8 10.6h8a2.3 2.3 0 1 1 2.6 1.4 2.3 2.3 0 1 1-2.6 1.4H8a2.3 2.3 0 1 1-2.6-1.4A2.3 2.3 0 1 1 8 10.6Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M8 10.6h8a2.3 2.3 0 1 1 2.6 1.4 2.3 2.3 0 1 1-2.6 1.4H8a2.3 2.3 0 1 1-2.6-1.4A2.3 2.3 0 1 1 8 10.6Z"/>
+</g></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Maternity"><path d="M10 3a6.5 6.5 0 0 1 6.5 6.5H10Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M10 3a6.5 6.5 0 0 1 6.5 6.5H10Z"/>
+<path d="M3 9.5h13.5a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6Z"/>
+<path d="M16.5 9.5 18.5 5H21"/>
+<circle cx="7" cy="19" r="1.8"/><circle cx="13.5" cy="19" r="1.8"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Fertility"><circle cx="12" cy="12" r="8.75" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<circle cx="12" cy="12" r="8.75"/>
+<circle cx="9.6" cy="10" r="2.6"/><circle cx="14.4" cy="10" r="2.6"/><circle cx="12" cy="14.6" r="2.6"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Oncology"><path d="M12 15.2c-2.3-2.6-4-5.3-4-7.7a4 4 0 0 1 8 0c0 2.4-1.7 5.1-4 7.7Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 15.2c-2.3-2.6-4-5.3-4-7.7a4 4 0 0 1 8 0c0 2.4-1.7 5.1-4 7.7Z"/>
+<path d="M10.1 12.8 5.5 21l2.6-.4L9.3 22l3.8-6.5"/>
+<path d="M13.9 12.8 18.5 21l-2.6-.4-1.2 1.4-3.6-6.2"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Eye Care"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/>
+<circle cx="12" cy="12" r="3.25" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<circle cx="12" cy="12" r="3.25"/>
+<rect x="11" y="11" width="2" height="2" fill="currentColor" stroke="none"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Dental"><path d="M7.7 3.5c-2.4 0-4.2 1.9-4.2 4.6 0 3 1.4 4.6 2.1 7.1l1.5 5.6h2.3l1.1-5c.3-1.2 .8-1.9 1.5-1.9s1.2.7 1.5 1.9l1.1 5h2.3l1.5-5.6c.7-2.5 2.1-4.1 2.1-7.1 0-2.7-1.8-4.6-4.2-4.6-1.9 0-2.6 1-4.3 1s-2.4-1-4.3-1Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M7.7 3.5c-2.4 0-4.2 1.9-4.2 4.6 0 3 1.4 4.6 2.1 7.1l1.5 5.6h2.3l1.1-5c.3-1.2 .8-1.9 1.5-1.9s1.2.7 1.5 1.9l1.1 5h2.3l1.5-5.6c.7-2.5 2.1-4.1 2.1-7.1 0-2.7-1.8-4.6-4.2-4.6-1.9 0-2.6 1-4.3 1s-2.4-1-4.3-1Z"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Surgery"><path d="M20.5 3.5 9.5 14.5l2 2 6.8-6.8c2.4-2.4 3-4.6 2.2-6.2Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M20.5 3.5 9.5 14.5l2 2 6.8-6.8c2.4-2.4 3-4.6 2.2-6.2Z"/>
+<path d="M9.5 14.5 3 21l1 1 .5.5 7-7"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Medical Package"><rect x="3" y="7" width="18" height="13" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<rect x="3" y="7" width="18" height="13"/>
+<path d="M9 7V4h6v3"/>
+<path d="M12 10.5v6M9 13.5h6"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Verified Facility"><path d="M12 2.5 20 5.5v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 2.5 20 5.5v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6Z"/>
+<path d="M8.5 11.8l2.5 2.5 4.5-4.8"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Offer / Savings"><path d="M3 3h8.5l9.5 9.5-8.5 8.5L3 11.5Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M3 3h8.5l9.5 9.5-8.5 8.5L3 11.5Z"/>
+<rect x="6.2" y="6.2" width="2.6" height="2.6"/>
+<path d="M10 15.5l5.5-5.5"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Duration"><path d="M7.5 3.5c0 5 4.5 5.8 4.5 8.5s-4.5 3.5-4.5 8.5h9c0-5-4.5-5.8-4.5-8.5s4.5-3.5 4.5-8.5Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M5.5 3.5h13M5.5 20.5h13"/>
+<path d="M7.5 3.5c0 5 4.5 5.8 4.5 8.5s-4.5 3.5-4.5 8.5M16.5 3.5c0 5-4.5 5.8-4.5 8.5s4.5 3.5 4.5 8.5"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Fasting Required"><path d="M6 3v5.5a2 2 0 0 0 4 0V3M8 3v18"/>
+<path d="M17 21V3c-2 1.6-3 4.2-3 7.5h3"/>
+<path d="M3 21 21 3"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="International Patients"><circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<circle cx="12" cy="12" r="9"/>
+<path d="M12 3c-2.4 2.5-3.6 5.5-3.6 9s1.2 6.5 3.6 9c2.4-2.5 3.6-5.5 3.6-9s-1.2-6.5-3.6-9Z"/>
+<path d="M3 12h18"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Inclusions"><path d="M10.5 6h10M10.5 12h10M10.5 18h10"/>
+<path d="M3.5 6l1.5 1.5L8 4.5M3.5 12l1.5 1.5L8 10.5M3.5 18l1.5 1.5L8 16.5"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Enquire"><path d="M3 4h18v13H10l-5 4v-4H3Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M3 4h18v13H10l-5 4v-4H3Z"/>
+<path d="M7.5 9h9M7.5 12.5h6"/></svg></span></div></div><div class="strip" style="--t-50:#F0F9FF;--t-100:#E0F2FE;--t-600:#0270A9;--t-800:#075985"><span class="eyebrow">Sky</span><div class="row"><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Health Screening"><rect x="5" y="4" width="14" height="17" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<rect x="5" y="4" width="14" height="17"/>
+<rect x="9" y="2.5" width="6" height="3" fill="currentColor" stroke="none"/>
+<path d="M8.5 12.2l2.3 2.3 4.7-4.7"/>
+<path d="M8.5 17.5h7"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Cardiology"><path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z"/>
+<path d="M2.5 12.5h5l1.6-2.8 2.4 5.3 1.8-3.5 1 1h7.2"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Orthopaedics"><g transform="rotate(-45 12 12)">
+<path d="M8 10.6h8a2.3 2.3 0 1 1 2.6 1.4 2.3 2.3 0 1 1-2.6 1.4H8a2.3 2.3 0 1 1-2.6-1.4A2.3 2.3 0 1 1 8 10.6Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M8 10.6h8a2.3 2.3 0 1 1 2.6 1.4 2.3 2.3 0 1 1-2.6 1.4H8a2.3 2.3 0 1 1-2.6-1.4A2.3 2.3 0 1 1 8 10.6Z"/>
+</g></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Maternity"><path d="M10 3a6.5 6.5 0 0 1 6.5 6.5H10Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M10 3a6.5 6.5 0 0 1 6.5 6.5H10Z"/>
+<path d="M3 9.5h13.5a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6Z"/>
+<path d="M16.5 9.5 18.5 5H21"/>
+<circle cx="7" cy="19" r="1.8"/><circle cx="13.5" cy="19" r="1.8"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Fertility"><circle cx="12" cy="12" r="8.75" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<circle cx="12" cy="12" r="8.75"/>
+<circle cx="9.6" cy="10" r="2.6"/><circle cx="14.4" cy="10" r="2.6"/><circle cx="12" cy="14.6" r="2.6"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Oncology"><path d="M12 15.2c-2.3-2.6-4-5.3-4-7.7a4 4 0 0 1 8 0c0 2.4-1.7 5.1-4 7.7Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 15.2c-2.3-2.6-4-5.3-4-7.7a4 4 0 0 1 8 0c0 2.4-1.7 5.1-4 7.7Z"/>
+<path d="M10.1 12.8 5.5 21l2.6-.4L9.3 22l3.8-6.5"/>
+<path d="M13.9 12.8 18.5 21l-2.6-.4-1.2 1.4-3.6-6.2"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Eye Care"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/>
+<circle cx="12" cy="12" r="3.25" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<circle cx="12" cy="12" r="3.25"/>
+<rect x="11" y="11" width="2" height="2" fill="currentColor" stroke="none"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Dental"><path d="M7.7 3.5c-2.4 0-4.2 1.9-4.2 4.6 0 3 1.4 4.6 2.1 7.1l1.5 5.6h2.3l1.1-5c.3-1.2 .8-1.9 1.5-1.9s1.2.7 1.5 1.9l1.1 5h2.3l1.5-5.6c.7-2.5 2.1-4.1 2.1-7.1 0-2.7-1.8-4.6-4.2-4.6-1.9 0-2.6 1-4.3 1s-2.4-1-4.3-1Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M7.7 3.5c-2.4 0-4.2 1.9-4.2 4.6 0 3 1.4 4.6 2.1 7.1l1.5 5.6h2.3l1.1-5c.3-1.2 .8-1.9 1.5-1.9s1.2.7 1.5 1.9l1.1 5h2.3l1.5-5.6c.7-2.5 2.1-4.1 2.1-7.1 0-2.7-1.8-4.6-4.2-4.6-1.9 0-2.6 1-4.3 1s-2.4-1-4.3-1Z"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Surgery"><path d="M20.5 3.5 9.5 14.5l2 2 6.8-6.8c2.4-2.4 3-4.6 2.2-6.2Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M20.5 3.5 9.5 14.5l2 2 6.8-6.8c2.4-2.4 3-4.6 2.2-6.2Z"/>
+<path d="M9.5 14.5 3 21l1 1 .5.5 7-7"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Medical Package"><rect x="3" y="7" width="18" height="13" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<rect x="3" y="7" width="18" height="13"/>
+<path d="M9 7V4h6v3"/>
+<path d="M12 10.5v6M9 13.5h6"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Verified Facility"><path d="M12 2.5 20 5.5v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 2.5 20 5.5v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6Z"/>
+<path d="M8.5 11.8l2.5 2.5 4.5-4.8"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Offer / Savings"><path d="M3 3h8.5l9.5 9.5-8.5 8.5L3 11.5Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M3 3h8.5l9.5 9.5-8.5 8.5L3 11.5Z"/>
+<rect x="6.2" y="6.2" width="2.6" height="2.6"/>
+<path d="M10 15.5l5.5-5.5"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Duration"><path d="M7.5 3.5c0 5 4.5 5.8 4.5 8.5s-4.5 3.5-4.5 8.5h9c0-5-4.5-5.8-4.5-8.5s4.5-3.5 4.5-8.5Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M5.5 3.5h13M5.5 20.5h13"/>
+<path d="M7.5 3.5c0 5 4.5 5.8 4.5 8.5s-4.5 3.5-4.5 8.5M16.5 3.5c0 5-4.5 5.8-4.5 8.5s4.5 3.5 4.5 8.5"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Fasting Required"><path d="M6 3v5.5a2 2 0 0 0 4 0V3M8 3v18"/>
+<path d="M17 21V3c-2 1.6-3 4.2-3 7.5h3"/>
+<path d="M3 21 21 3"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="International Patients"><circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<circle cx="12" cy="12" r="9"/>
+<path d="M12 3c-2.4 2.5-3.6 5.5-3.6 9s1.2 6.5 3.6 9c2.4-2.5 3.6-5.5 3.6-9s-1.2-6.5-3.6-9Z"/>
+<path d="M3 12h18"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Inclusions"><path d="M10.5 6h10M10.5 12h10M10.5 18h10"/>
+<path d="M3.5 6l1.5 1.5L8 4.5M3.5 12l1.5 1.5L8 10.5M3.5 18l1.5 1.5L8 16.5"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Enquire"><path d="M3 4h18v13H10l-5 4v-4H3Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M3 4h18v13H10l-5 4v-4H3Z"/>
+<path d="M7.5 9h9M7.5 12.5h6"/></svg></span></div></div><div class="strip" style="--t-50:#FFF0F2;--t-100:#FFE4E6;--t-600:#C81E1E;--t-800:#86102A"><span class="eyebrow">Crimson</span><div class="row"><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Health Screening"><rect x="5" y="4" width="14" height="17" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<rect x="5" y="4" width="14" height="17"/>
+<rect x="9" y="2.5" width="6" height="3" fill="currentColor" stroke="none"/>
+<path d="M8.5 12.2l2.3 2.3 4.7-4.7"/>
+<path d="M8.5 17.5h7"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Cardiology"><path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z"/>
+<path d="M2.5 12.5h5l1.6-2.8 2.4 5.3 1.8-3.5 1 1h7.2"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Orthopaedics"><g transform="rotate(-45 12 12)">
+<path d="M8 10.6h8a2.3 2.3 0 1 1 2.6 1.4 2.3 2.3 0 1 1-2.6 1.4H8a2.3 2.3 0 1 1-2.6-1.4A2.3 2.3 0 1 1 8 10.6Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M8 10.6h8a2.3 2.3 0 1 1 2.6 1.4 2.3 2.3 0 1 1-2.6 1.4H8a2.3 2.3 0 1 1-2.6-1.4A2.3 2.3 0 1 1 8 10.6Z"/>
+</g></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Maternity"><path d="M10 3a6.5 6.5 0 0 1 6.5 6.5H10Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M10 3a6.5 6.5 0 0 1 6.5 6.5H10Z"/>
+<path d="M3 9.5h13.5a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6Z"/>
+<path d="M16.5 9.5 18.5 5H21"/>
+<circle cx="7" cy="19" r="1.8"/><circle cx="13.5" cy="19" r="1.8"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Fertility"><circle cx="12" cy="12" r="8.75" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<circle cx="12" cy="12" r="8.75"/>
+<circle cx="9.6" cy="10" r="2.6"/><circle cx="14.4" cy="10" r="2.6"/><circle cx="12" cy="14.6" r="2.6"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Oncology"><path d="M12 15.2c-2.3-2.6-4-5.3-4-7.7a4 4 0 0 1 8 0c0 2.4-1.7 5.1-4 7.7Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 15.2c-2.3-2.6-4-5.3-4-7.7a4 4 0 0 1 8 0c0 2.4-1.7 5.1-4 7.7Z"/>
+<path d="M10.1 12.8 5.5 21l2.6-.4L9.3 22l3.8-6.5"/>
+<path d="M13.9 12.8 18.5 21l-2.6-.4-1.2 1.4-3.6-6.2"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Eye Care"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/>
+<circle cx="12" cy="12" r="3.25" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<circle cx="12" cy="12" r="3.25"/>
+<rect x="11" y="11" width="2" height="2" fill="currentColor" stroke="none"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Dental"><path d="M7.7 3.5c-2.4 0-4.2 1.9-4.2 4.6 0 3 1.4 4.6 2.1 7.1l1.5 5.6h2.3l1.1-5c.3-1.2 .8-1.9 1.5-1.9s1.2.7 1.5 1.9l1.1 5h2.3l1.5-5.6c.7-2.5 2.1-4.1 2.1-7.1 0-2.7-1.8-4.6-4.2-4.6-1.9 0-2.6 1-4.3 1s-2.4-1-4.3-1Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M7.7 3.5c-2.4 0-4.2 1.9-4.2 4.6 0 3 1.4 4.6 2.1 7.1l1.5 5.6h2.3l1.1-5c.3-1.2 .8-1.9 1.5-1.9s1.2.7 1.5 1.9l1.1 5h2.3l1.5-5.6c.7-2.5 2.1-4.1 2.1-7.1 0-2.7-1.8-4.6-4.2-4.6-1.9 0-2.6 1-4.3 1s-2.4-1-4.3-1Z"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Surgery"><path d="M20.5 3.5 9.5 14.5l2 2 6.8-6.8c2.4-2.4 3-4.6 2.2-6.2Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M20.5 3.5 9.5 14.5l2 2 6.8-6.8c2.4-2.4 3-4.6 2.2-6.2Z"/>
+<path d="M9.5 14.5 3 21l1 1 .5.5 7-7"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Medical Package"><rect x="3" y="7" width="18" height="13" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<rect x="3" y="7" width="18" height="13"/>
+<path d="M9 7V4h6v3"/>
+<path d="M12 10.5v6M9 13.5h6"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Verified Facility"><path d="M12 2.5 20 5.5v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 2.5 20 5.5v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6Z"/>
+<path d="M8.5 11.8l2.5 2.5 4.5-4.8"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Offer / Savings"><path d="M3 3h8.5l9.5 9.5-8.5 8.5L3 11.5Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M3 3h8.5l9.5 9.5-8.5 8.5L3 11.5Z"/>
+<rect x="6.2" y="6.2" width="2.6" height="2.6"/>
+<path d="M10 15.5l5.5-5.5"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Duration"><path d="M7.5 3.5c0 5 4.5 5.8 4.5 8.5s-4.5 3.5-4.5 8.5h9c0-5-4.5-5.8-4.5-8.5s4.5-3.5 4.5-8.5Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M5.5 3.5h13M5.5 20.5h13"/>
+<path d="M7.5 3.5c0 5 4.5 5.8 4.5 8.5s-4.5 3.5-4.5 8.5M16.5 3.5c0 5-4.5 5.8-4.5 8.5s4.5 3.5 4.5 8.5"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Fasting Required"><path d="M6 3v5.5a2 2 0 0 0 4 0V3M8 3v18"/>
+<path d="M17 21V3c-2 1.6-3 4.2-3 7.5h3"/>
+<path d="M3 21 21 3"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="International Patients"><circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<circle cx="12" cy="12" r="9"/>
+<path d="M12 3c-2.4 2.5-3.6 5.5-3.6 9s1.2 6.5 3.6 9c2.4-2.5 3.6-5.5 3.6-9s-1.2-6.5-3.6-9Z"/>
+<path d="M3 12h18"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Inclusions"><path d="M10.5 6h10M10.5 12h10M10.5 18h10"/>
+<path d="M3.5 6l1.5 1.5L8 4.5M3.5 12l1.5 1.5L8 10.5M3.5 18l1.5 1.5L8 16.5"/></svg></span><span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Enquire"><path d="M3 4h18v13H10l-5 4v-4H3Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M3 4h18v13H10l-5 4v-4H3Z"/>
+<path d="M7.5 9h9M7.5 12.5h6"/></svg></span></div></div>
+<h2>Sizes</h2><div class="sizes"><span class="sz"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="16" height="16" role="img" aria-label="Cardiology"><path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z"/>
+<path d="M2.5 12.5h5l1.6-2.8 2.4 5.3 1.8-3.5 1 1h7.2"/></svg><small>16px</small></span><span class="sz"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="20" height="20" role="img" aria-label="Cardiology"><path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z"/>
+<path d="M2.5 12.5h5l1.6-2.8 2.4 5.3 1.8-3.5 1 1h7.2"/></svg><small>20px</small></span><span class="sz"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="24" height="24" role="img" aria-label="Cardiology"><path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z"/>
+<path d="M2.5 12.5h5l1.6-2.8 2.4 5.3 1.8-3.5 1 1h7.2"/></svg><small>24px</small></span><span class="sz"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="32" height="32" role="img" aria-label="Cardiology"><path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z"/>
+<path d="M2.5 12.5h5l1.6-2.8 2.4 5.3 1.8-3.5 1 1h7.2"/></svg><small>32px</small></span><span class="sz"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="48" height="48" role="img" aria-label="Cardiology"><path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z"/>
+<path d="M2.5 12.5h5l1.6-2.8 2.4 5.3 1.8-3.5 1 1h7.2"/></svg><small>48px</small></span><span class="sz"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" stroke-linejoin="miter" width="64" height="64" role="img" aria-label="Cardiology"><path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+<path d="M12 20 4.2 12.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 7.8 5.8Z"/>
+<path d="M2.5 12.5h5l1.6-2.8 2.4 5.3 1.8-3.5 1 1h7.2"/></svg><small>64px</small></span></div>
+<h2>Usage</h2>
+<pre>import { PackageCategoryIcon, VerifiedFacilityIcon } from './PackageIcons';
+
+&lt;PackageCategoryIcon category={p.category} size={20} className="text-[color:var(--t-700)]" /&gt;
+&lt;VerifiedFacilityIcon size={16} title="Verified facility" /&gt;</pre>
+</main></body></html>

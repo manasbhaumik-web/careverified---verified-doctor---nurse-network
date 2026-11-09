@@ -39,7 +39,7 @@ export function TestimonialForm() {
             <select className={input} aria-label="Rating" value={v.rating} onChange={e => setV({ ...v, rating: e.target.value })}>{[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n} star{n === 1 ? '' : 's'}</option>)}</select>
             <select className={input} aria-label="Where you live" value={v.location} onChange={e => setV({ ...v, location: e.target.value })}><option value="">Location (optional)</option>{MY_STATES.map(s => <option key={s} value={s}>{s}</option>)}</select>
           </div>
-          <label className="flex items-start gap-2"><input type="checkbox" className="mt-0.5" required checked={v.consent} onChange={e => setV({ ...v, consent: e.target.checked })} /><span>MedCred may publish my words on its home page with my first name and last initial. I can remove it at any time.</span></label>
+          <label className="flex items-start gap-2"><input type="checkbox" className="mt-0.5" required checked={v.consent} onChange={e => setV({ ...v, consent: e.target.checked })} /><span>MediCred may publish my words on its home page with my first name and last initial. I can remove it at any time.</span></label>
           <button className="bg-[color:var(--t-600)] text-white font-bold px-4 py-2 cursor-pointer">Send for approval</button>
         </form>
       )}

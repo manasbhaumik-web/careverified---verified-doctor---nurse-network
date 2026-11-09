@@ -68,7 +68,7 @@ const T: Record<Lang, {
       { badge: 'Panel & Insurans', title: 'Sedia untuk Tuntutan TPA & Korporat', desc: 'Ringkasan klinikal berkod ICD-10 dan invois terperinci sesuai untuk tuntutan PMCare, MiCare, AIA, Prudential, Allianz & Great Eastern.' },
     ],
     cards: [
-      { title: 'Antara Muka Tiga Bahasa Yang Prihatin', text: 'Gunakan MedCred dalam Bahasa Malaysia, Inggeris atau Cina dengan tenang, dan tukar bahasa pada bila-bila masa dari bar atas.' },
+      { title: 'Antara Muka Tiga Bahasa Yang Prihatin', text: 'Gunakan MediCred dalam Bahasa Malaysia, Inggeris atau Cina dengan tenang, dan tukar bahasa pada bila-bila masa dari bar atas.' },
       { title: 'Akses Terus Tanpa Perlu Muat Turun Aplikasi', text: 'Dapatkan rawatan terus dari pelayar web telefon anda dengan butang sentuhan 44px yang mesra pengguna dan mudah dibaca.' },
       { title: 'Yuran Telus & Jaminan Pulangan 10 Minit', text: 'Yuran (dari RM 25 GP / RM 80 Pakar) dipaparkan jelas sebelum bayaran. Jika tiada doktor menyertai dalam 10 minit, bayaran dipulangkan secara automatik bersama permohonan maaf kami.' },
       { title: 'Pengesahan Identiti Penuh Hormat', text: 'Warganegara Malaysia mendaftar menggunakan nombor MyKad 12 digit; ekspatriat dan pelawat boleh menggunakan nombor pasport.' },

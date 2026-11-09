@@ -38,6 +38,7 @@ import PharmacyWorkspace from './components/PharmacyWorkspace';
 import FacilityWorkspace from './components/FacilityWorkspace';
 import MedicalPackagesModule from './components/MedicalPackagesModule';
 import MedicalAssistanceModule from './components/MedicalAssistanceModule';
+import PublicPackagesPage from './components/PublicPackagesPage';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import PractitionerPage from './components/PractitionerPage';
@@ -146,6 +147,21 @@ export default function App() {
   };
 
   const routeForRole = (role: SessionUser['role']) => {
+    const params = new URLSearchParams(window.location.search);
+    const pId = params.get('profId') || params.get('consultProfId');
+    const intent = params.get('intent');
+
+    if (pId && role === 'patient') {
+      setSelectedProfId(pId);
+      setActiveView('patient_care');
+      return;
+    }
+
+    if (intent === 'package' && role === 'patient') {
+      setActiveView('patient_services');
+      return;
+    }
+
     setActiveView(
       role === 'patient'
         ? 'patient_care'
@@ -182,9 +198,24 @@ export default function App() {
       .finally(() => setSessionChecked(true));
   }, []);
 
+  // Listen for deep-link intent query parameters (e.g. ?profId=doc-1 or ?intent=package)
+  useEffect(() => {
+    const pId = route.params.get('profId') || route.params.get('consultProfId');
+    const intent = route.params.get('intent');
+    if (pId) {
+      setSelectedProfId(pId);
+      if (currentUser?.role === 'patient') {
+        setActiveView('patient_care');
+      }
+    } else if (intent === 'package' && currentUser?.role === 'patient') {
+      setActiveView('patient_services');
+    }
+  }, [route.params, currentUser]);
+
   const handleLoginSuccess = (user: SessionUser, patient?: unknown) => {
-    // Leave the /login address behind once signed in
-    if (window.location.pathname === '/login') navigate('/', { replace: true });
+    // Leave the /login address behind once signed in, preserving query params (e.g. intent=package, profId=...)
+    const search = window.location.search;
+    if (window.location.pathname === '/login') navigate('/' + search, { replace: true });
     setCurrentUser(user);
     rememberPatient(patient);
     routeForRole(user.role);
@@ -382,7 +413,7 @@ export default function App() {
           <LoadingImage size={80} />
         </div>
         <div className="font-display font-extrabold text-lg text-slate-900 tracking-tight">
-          MedCred<span className="text-[color:var(--t-600)]">.</span>
+          MediCred<span className="text-[color:var(--t-600)]">.</span>
         </div>
         <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">
           Verifying secure medical session…
@@ -407,6 +438,18 @@ export default function App() {
     return <InternationalPatientsPage onSignUp={() => navigate(loginUrl('patient', true))} />;
   }
 
+  // Public medical packages page: its own page, same for visitors and signed-in users
+  if (
+    route.path === '/packages' ||
+    route.path.startsWith('/packages/') ||
+    route.path === '/medical-packages' ||
+    route.path === '/clinics' ||
+    route.path === '/hospitals' ||
+    route.path === '/nurses' ||
+    route.path === '/doctors' ||
+    route.path === '/pharmacies-directory'
+  ) return <PublicPackagesPage signedIn={!!currentUser} />;
+
   // If not logged in, render landing page
   if (!currentUser) {
     if (route.path === '/login') return <LoginPage onLoginSuccess={handleLoginSuccess} />;
@@ -417,7 +460,6 @@ export default function App() {
     if (route.path === '/reset-password') return <AccountRecovery mode="reset" />;
     if (route.path === '/for-pharmacies') return <PharmacyPage />;
     if (route.path === '/for-clinics' || route.path === '/for-hospitals') return <ClinicHospitalPage />;
-    if (route.path === '/packages' || route.path === '/medical-packages') return <MedicalPackagesModule />;
     if (route.path === '/assistance' || route.path === '/medical-assistance' || route.path === '/enquiries-quotes') return <MedicalAssistanceModule />;
     return <LandingPage professionals={professionals} />;
   }
@@ -510,7 +552,7 @@ export default function App() {
         </div>
       )}
 
-      {/* MedCred Elevated Primary Header */}
+      {/* MediCred Elevated Primary Header */}
       <header className="bg-[color:var(--t-600)] text-white border-0 sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-[0_2px_6px_-1px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.06)]">
         <div className="max-w-[1920px] mx-auto flex items-center justify-between h-16">
 
@@ -531,7 +573,7 @@ export default function App() {
             </div>
             <div className="leading-none">
               <span className="font-display font-extrabold text-xl text-white tracking-tight block">
-                MedCred<span className="text-white/80">.</span>
+                MediCred<span className="text-white/80">.</span>
               </span>
               <span className="text-xs font-mono font-bold text-white/90 uppercase tracking-[0.14em] block mt-1">
                 {currentUser.role === 'admin' ? 'Board Console' : currentUser.role === 'practitioner' ? 'Practitioner Hub' : currentUser.role === 'pharmacy' ? 'Pharmacy Workspace' : 'Member Portal'}

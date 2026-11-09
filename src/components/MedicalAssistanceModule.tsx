@@ -702,7 +702,7 @@ export default function MedicalAssistanceModule({
 
                   <label className="flex items-start gap-3 cursor-pointer text-xs text-slate-800">
                     <input type="checkbox" required checked={shareDocuments} onChange={(e) => setShareDocuments(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" />
-                    <span>I agree that MedCred and the hospital I chose may read what I have written here, only to assess my request and prepare a quote (Personal Data Protection Act 2010). *</span>
+                    <span>I agree that MediCred and the hospital I chose may read what I have written here, only to assess my request and prepare a quote (Personal Data Protection Act 2010). *</span>
                   </label>
                 </div>
 

@@ -122,7 +122,7 @@ export default function VerifyPractitionersPage({
                 M
               </span>
               <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">
-                MedCred<span className="text-[color:var(--t-600)]">.</span>
+                MediCred<span className="text-[color:var(--t-600)]">.</span>
               </span>
             </a>
 
@@ -217,7 +217,7 @@ export default function VerifyPractitionersPage({
                 className="w-full py-2.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Heart className="h-3.5 w-3.5" />
-                <span>Join MedCred as a Member</span>
+                <span>Join MediCred as a Member</span>
               </button>
             </div>
           </div>
@@ -461,7 +461,7 @@ export default function VerifyPractitionersPage({
               How Every Licence is Hand-Verified Before Profile Activation
             </h3>
             <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1 leading-relaxed">
-              MedCred operates strictly under Malaysian healthcare statutory frameworks. We do not permit automated unreviewed uploads.
+              MediCred operates strictly under Malaysian healthcare statutory frameworks. We do not permit automated unreviewed uploads.
             </p>
           </div>
 
@@ -510,7 +510,7 @@ export default function VerifyPractitionersPage({
             <div className="max-w-2xl space-y-3">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 border border-white/25 text-white text-xs font-extrabold uppercase tracking-widest">
                 <Sparkles className="h-3.5 w-3.5" />
-                Become a MedCred Member
+                Become a MediCred Member
               </span>
               <h3 className="font-display font-black text-2xl sm:text-3xl text-white tracking-tight leading-tight">
                 Ready to Consult With Verified Doctors &amp; Nurses?

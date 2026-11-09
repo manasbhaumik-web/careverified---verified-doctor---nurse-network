@@ -65,7 +65,7 @@ export function recordConsent(userId: string, kind: ConsentKind, version = CONSE
 
 // ---------- deployment facts shown in the notice ----------
 const config = () => ({
-  controller: process.env.PRIVACY_CONTROLLER_NAME || "MedCred Healthcare Network Sdn Bhd",
+  controller: process.env.PRIVACY_CONTROLLER_NAME || "MediCred Healthcare Network Sdn Bhd",
   contactEmail: process.env.PRIVACY_CONTACT_EMAIL || "",
   hostingCountry: process.env.DATA_HOSTING_COUNTRY || "",
   retentionYears: retentionYearsSet() ? Number(process.env.RETENTION_YEARS) : null,

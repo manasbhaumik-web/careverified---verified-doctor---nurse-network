@@ -1,6 +1,6 @@
-# CareVerified Unified Clinical, Architectural & Governance Rules (RULE.md)
+# MediCred Unified Clinical, Architectural & Governance Rules (RULE.md)
 
-This document establishes the **binding operational directives, clinical safety rules, security standards, coding guidelines, and regulatory enforcement protocols** governing all development, operations, integrations, and administration across the **CareVerified (MedCred)** enterprise telehealth and clinical operations ecosystem.
+This document establishes the **binding operational directives, clinical safety rules, security standards, coding guidelines, and regulatory enforcement protocols** governing all development, operations, integrations, and administration across the **MediCred (MediCred)** enterprise telehealth and clinical operations ecosystem.
 
 Every engineer, system component, autonomous agent, and operational administrator MUST strictly abide by these rules. Zero tolerance for deviations or unauthorized bypasses.
 
@@ -8,7 +8,7 @@ Every engineer, system component, autonomous agent, and operational administrato
 
 ## 1. Statutory & Regulatory Compliance Directives
 
-CareVerified operates at the nexus of clinical care delivery, professional licensure verification, e-prescribing, and cross-border medical travel. Compliance with statutory healthcare frameworks is mandatory.
+MediCred operates at the nexus of clinical care delivery, professional licensure verification, e-prescribing, and cross-border medical travel. Compliance with statutory healthcare frameworks is mandatory.
 
 ### 1.1 Telemedicine Act 1997 & Medical Act 1971 (Malaysia)
 - **R-MED-01: Valid Fully Registered Clinician Exclusivity**:
@@ -68,9 +68,9 @@ Segregation of Duties prevents clinical fraud, rogue administrative sanctions, a
 ### 2.3 Hospital EHR Webhook Authentication & Dispatch
 - **R-SOD-05: HMAC-SHA256 Signature Headers**:
   All outbound clinical and credentialing webhook dispatches to institutional EHR systems must include:
-  - `X-MedCred-Signature-256`: `sha256=HMAC_SHA256(secret_key, timestamp + "." + payload)`.
-  - `X-MedCred-Timestamp`: Current Unix epoch millisecond timestamp.
-  - `X-MedCred-Delivery-Id`: Unique dispatch UUID for deduplication.
+  - `X-MediCred-Signature-256`: `sha256=HMAC_SHA256(secret_key, timestamp + "." + payload)`.
+  - `X-MediCred-Timestamp`: Current Unix epoch millisecond timestamp.
+  - `X-MediCred-Delivery-Id`: Unique dispatch UUID for deduplication.
 - **R-SOD-06: Webhook Delivery Guarantees & Exponential Backoff**:
   Failed webhook dispatches must retry up to 5 times using exponential backoff (`1m, 5m, 15m, 1h, 6h`). Delivery state and response codes are immutably tracked in `webhook_dispatch_logs`.
 
@@ -144,7 +144,7 @@ stateDiagram-v2
 
 ## 5. Frontend & UI/UX Design System Rules
 
-CareVerified employs a high-contrast, clinical-grade interface adhering strictly to the **Rose Pine / Crisp White** design token hierarchy defined in [DESIGN.md](file:///c:/Users/Manas/.gemini/antigravity/scratch/careverified---verified-doctor---nurse-network/DESIGN.md).
+MediCred employs a high-contrast, clinical-grade interface adhering strictly to the **Rose Pine / Crisp White** design token hierarchy defined in [DESIGN.md](file:///c:/Users/Manas/.gemini/antigravity/scratch/careverified---verified-doctor---nurse-network/DESIGN.md).
 
 ### 5.1 Color Palette & Token Directives
 - **R-UI-01: Strict Color Semantics**:
@@ -229,4 +229,4 @@ CareVerified employs a high-contrast, clinical-grade interface adhering strictly
 
 ---
 
-*Directives promulgated and ratified by the CareVerified Executive Leadership Board, Chief Medical Officer, and Principal Systems Architect.*
+*Directives promulgated and ratified by the MediCred Executive Leadership Board, Chief Medical Officer, and Principal Systems Architect.*

@@ -1,6 +1,6 @@
 # System Architecture & Technical Specifications
 
-## Platform: MedCred / CareVerified – Verified Doctor & Nurse Network
+## Platform: MediCred / MediCred – Verified Doctor & Nurse Network
 **Version:** 3.0  
 **Status:** Concrete Architectural Baseline  
 **Classification:** High-Concurrency Healthcare SaaS / Telemedicine & Credentialing Engine  
@@ -145,7 +145,7 @@ Virtual consultations utilize a Peer-to-Peer (P2P) WebRTC connection mediated by
 sequenceDiagram
     autonumber
     actor Patient as Patient Client
-    participant Server as MedCred Signaling Server (server/care.ts)
+    participant Server as MediCred Signaling Server (server/care.ts)
     actor Clinician as Clinician Client
 
     Patient->>Server: POST /api/care/instant-request (symptoms, intake flags)
@@ -325,19 +325,19 @@ Privilege elevation into plenary administration (`super_admin`) is time-bounded:
 ## 7. Interoperability & Integration Architecture
 
 ### 7.1 Outbound Hospital EHR Webhook Dispatcher
-When clinical credentialing status changes, MedCred notifies subscribed hospital EHR systems (Pantai Hospital KL, KPJ Healthcare, Gleneagles Hospital):
+When clinical credentialing status changes, MediCred notifies subscribed hospital EHR systems (Pantai Hospital KL, KPJ Healthcare, Gleneagles Hospital):
 
 * **Payload Cryptographic Signature:**
   ```ts
   const signature = crypto.createHmac("sha256", secretKey).update(payloadString).digest("hex");
   ```
 * **HTTP Header Specifications:**
-  * `X-MedCred-Signature`: `sha256=${signature}` (Standard GitHub/Stripe HMAC format).
-  * `X-MedCred-Signature-256`: `sha256=${signature}` (Enterprise header format).
-  * `X-MedCred-Timestamp`: Unix epoch integer (`Math.floor(Date.now() / 1000)`). Receivers reject timestamps drifting > 300 seconds.
-  * `X-MedCred-Delivery-Id`: Unique delivery UUID (`whl-...`) matching WAL dispatch log.
-  * `X-MedCred-Event`: Event topic (e.g., `practitioner.verified`, `practitioner.suspended`).
-  * `X-MedCred-Delivery-Attempt`: Current delivery attempt number (`1..3`).
+  * `X-MediCred-Signature`: `sha256=${signature}` (Standard GitHub/Stripe HMAC format).
+  * `X-MediCred-Signature-256`: `sha256=${signature}` (Enterprise header format).
+  * `X-MediCred-Timestamp`: Unix epoch integer (`Math.floor(Date.now() / 1000)`). Receivers reject timestamps drifting > 300 seconds.
+  * `X-MediCred-Delivery-Id`: Unique delivery UUID (`whl-...`) matching WAL dispatch log.
+  * `X-MediCred-Event`: Event topic (e.g., `practitioner.verified`, `practitioner.suspended`).
+  * `X-MediCred-Delivery-Attempt`: Current delivery attempt number (`1..3`).
 * **Fault Tolerance & Exponential Backoff:**
   * Attempt 1: Immediate dispatch (3.5-second timeout).
   * Failover Attempt 2: Scheduled at `T + 60s`.

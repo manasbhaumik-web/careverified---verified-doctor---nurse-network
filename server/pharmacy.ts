@@ -89,9 +89,9 @@ export function registerPharmacyWorkspace(app: Application, ctx: Ctx) {
     requireRole("pharmacy"),
     (req, res, next) => {
       const ph = req.user!.profileId ? row("SELECT * FROM pharmacies WHERE id = ?", req.user!.profileId) : null;
-      if (!ph || !ph.active || !ph.verified_at) return fail(res, 403, "This pharmacy account is not active. Contact the MedCred board.");
+      if (!ph || !ph.active || !ph.verified_at) return fail(res, 403, "This pharmacy account is not active. Contact the MediCred board.");
       const lic = pharmacyLicenceProblem(ph);
-      if (lic) return fail(res, 403, `${lic} Contact the MedCred board to renew it.`);
+      if (lic) return fail(res, 403, `${lic} Contact the MediCred board to renew it.`);
       res.locals.ph = ph;
       next();
     },
@@ -409,7 +409,7 @@ export function registerPharmacyWorkspace(app: Application, ctx: Ctx) {
     const data = report(ph.id, days);
     if (req.query.format === "csv") {
       const lines = [
-        `MedCred pharmacy report,${ph.name.replace(/,/g, " ")}`,
+        `MediCred pharmacy report,${ph.name.replace(/,/g, " ")}`,
         `Period (days),${data.days}`,
         `Received,${data.received}`, `Dispensed,${data.dispensed}`, `Could not fill,${data.cannotFill}`, `Expired unfilled,${data.expiredUnfilled}`,
         `Fill rate %,${data.fillRate ?? ""}`,

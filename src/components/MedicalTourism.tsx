@@ -245,7 +245,7 @@ function EnquiryForm({ facility, onClose, onSent }: { facility: any; onClose: ()
         </details>
 
         <label className="flex items-start gap-3 text-xs text-slate-900 cursor-pointer"><input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" checked={v.shareDocuments} onChange={e => setV({ ...v, shareDocuments: e.target.checked })} /><span>The hospital may open the passport copy and medical records I upload for this request. I can change this later.</span></label>
-        <label className="flex items-start gap-3 text-xs text-slate-900 cursor-pointer"><input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" required checked={v.consent} onChange={e => setV({ ...v, consent: e.target.checked })} /><span>I agree that MedCred sends this request, with my name, email and country, to {facility.name}. It is not a booking and does not create a doctor-patient relationship. *</span></label>
+        <label className="flex items-start gap-3 text-xs text-slate-900 cursor-pointer"><input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[color:var(--t-600)]" required checked={v.consent} onChange={e => setV({ ...v, consent: e.target.checked })} /><span>I agree that MediCred sends this request, with my name, email and country, to {facility.name}. It is not a booking and does not create a doctor-patient relationship. *</span></label>
         {err && <p role="alert" className="text-xs font-bold text-rose-900 bg-rose-50 border border-rose-200 p-3">{err}</p>}
         <div className="flex flex-wrap gap-3 justify-end">
           <button type="button" onClick={onClose} className={plainBtn}>Cancel</button>
@@ -367,7 +367,7 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
               {q.status === 'sent' && c.status === 'quoted' && <QuoteDecision caseId={id} quoteId={q.id} total={formatMoney(q.total)} onDone={d => say(d, 'Recorded.')} />}
             </div>
           ))}
-          <p className="text-xs text-slate-700">Payment is arranged directly with the hospital. MedCred does not take your package payment.</p>
+          <p className="text-xs text-slate-700">Payment is arranged directly with the hospital. MediCred does not take your package payment.</p>
         </section>
       )}
 
@@ -449,7 +449,7 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
             <summary className="min-h-[44px] flex items-center font-bold text-slate-900 cursor-pointer">Report a problem with this hospital or package</summary>
             <form onSubmit={async e => { e.preventDefault(); const d = await jsend('POST', `/api/tourism/cases/${id}/problem`, { details: problem }); if (d.status === 'success') setProblem(''); say(d, 'Reported. We will reply by email.'); }} className="space-y-2 mt-2">
               <textarea className={`${field} py-2`} rows={3} required minLength={10} maxLength={3000} aria-label="What went wrong" placeholder="What went wrong?" value={problem} onChange={e => setProblem(e.target.value)} />
-              <button className="min-h-[44px] px-4 bg-rose-800 text-white font-bold cursor-pointer">Report to MedCred</button>
+              <button className="min-h-[44px] px-4 bg-rose-800 text-white font-bold cursor-pointer">Report to MediCred</button>
             </form>
           </details>
           {['enquiry', 'quoted', 'accepted'].includes(c.status) && (

@@ -6,7 +6,7 @@ import type { Lang, PageContent } from '../components/AudiencePage';
  */
 export const FOR_CLINICS: Record<Lang, PageContent> = {
   en: {
-    title: 'Join MedCred as a clinic or hospital',
+    title: 'Join MediCred as a clinic or hospital',
     description: 'List your facility for international patients, send itemised quotes, and post jobs or find locum cover from practitioners whose licences we have checked.',
     hero: {
       eyebrow: 'For clinics and hospitals',
@@ -56,12 +56,12 @@ export const FOR_CLINICS: Record<Lang, PageContent> = {
         ],
       },
       { kind: 'note', id: 'notyet', title: 'Not built yet', text: 'You cannot edit your own listing yet: the board edits it for you. You cannot edit or close a job post from the screen. Deposits and payments are not handled in the app: payment is arranged directly with your facility. There is no HL7 or FHIR record transfer, no role for travel facilitators, and applicant tracking goes no further than "applied".' },
-      { kind: 'bullets', id: 'fees', title: 'Fees', items: ['The platform does not charge facilities today.', 'Payment for a quote is arranged directly with your facility, not through MedCred.', 'If you want to discuss terms, say so in the form.'] },
+      { kind: 'bullets', id: 'fees', title: 'Fees', items: ['The platform does not charge facilities today.', 'Payment for a quote is arranged directly with your facility, not through MediCred.', 'If you want to discuss terms, say so in the form.'] },
     ],
     apply: { title: 'Ask to join', intro: 'Tell us about your clinic or hospital. A board member will contact you. The board adds facilities and staff accounts, so this form is the way in.' },
   },
   ms: {
-    title: 'Sertai MedCred sebagai klinik atau hospital',
+    title: 'Sertai MediCred sebagai klinik atau hospital',
     description: 'Senaraikan kemudahan anda untuk pesakit antarabangsa, hantar sebut harga terperinci, dan siarkan jawatan atau cari ganti locum daripada pengamal yang lesennya telah kami semak.',
     hero: {
       eyebrow: 'Untuk klinik dan hospital',
@@ -111,12 +111,12 @@ export const FOR_CLINICS: Record<Lang, PageContent> = {
         ],
       },
       { kind: 'note', id: 'notyet', title: 'Belum dibina', text: 'Anda belum boleh menyunting penyenaraian sendiri: lembaga yang menyuntingnya untuk anda. Anda tidak boleh menyunting atau menutup siaran jawatan daripada skrin. Deposit dan pembayaran tidak dikendalikan dalam aplikasi: pembayaran diuruskan terus dengan kemudahan anda. Tiada pemindahan rekod HL7 atau FHIR, tiada peranan untuk fasilitator pelancongan, dan penjejakan pemohon tidak melebihi "telah memohon".' },
-      { kind: 'bullets', id: 'fees', title: 'Yuran', items: ['Platform tidak mengenakan bayaran kepada kemudahan pada masa ini.', 'Pembayaran sebut harga diuruskan terus dengan kemudahan anda, bukan melalui MedCred.', 'Jika anda mahu membincangkan terma, nyatakan dalam borang.'] },
+      { kind: 'bullets', id: 'fees', title: 'Yuran', items: ['Platform tidak mengenakan bayaran kepada kemudahan pada masa ini.', 'Pembayaran sebut harga diuruskan terus dengan kemudahan anda, bukan melalui MediCred.', 'Jika anda mahu membincangkan terma, nyatakan dalam borang.'] },
     ],
     apply: { title: 'Mohon menyertai', intro: 'Ceritakan tentang klinik atau hospital anda. Seorang ahli lembaga akan menghubungi anda. Lembaga menambah kemudahan dan akaun kakitangan, jadi borang ini ialah pintu masuknya.' },
   },
   zh: {
-    title: '以诊所或医院身份加入 MedCred',
+    title: '以诊所或医院身份加入 MediCred',
     description: '把您的机构列入国际患者名录，发送逐项报价，并发布职位或从执照已核查的医疗人员中寻找代班人手。',
     hero: {
       eyebrow: '面向诊所和医院',
@@ -166,7 +166,7 @@ export const FOR_CLINICS: Record<Lang, PageContent> = {
         ],
       },
       { kind: 'note', id: 'notyet', title: '尚未建成', text: '您目前还不能自行编辑机构资料：由委员会代为编辑。您不能在界面上编辑或关闭职位发布。订金和付款不在应用内处理：费用直接与您的机构安排。没有 HL7 或 FHIR 病历传输，没有旅行中介的角色，申请人跟踪也只到“已申请”。' },
-      { kind: 'bullets', id: 'fees', title: '费用', items: ['平台目前不向机构收费。', '报价的付款直接与您的机构安排，不经过 MedCred。', '如果您想讨论条款，请在表格中说明。'] },
+      { kind: 'bullets', id: 'fees', title: '费用', items: ['平台目前不向机构收费。', '报价的付款直接与您的机构安排，不经过 MediCred。', '如果您想讨论条款，请在表格中说明。'] },
     ],
     apply: { title: '申请加入', intro: '请介绍一下您的诊所或医院。委员会成员会与您联系。机构和员工账户由委员会添加，所以这张表格是唯一入口。' },
   },

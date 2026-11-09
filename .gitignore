@@ -9,4 +9,7 @@ coverage/
 
 # Local database and private uploads
 data/
+
+# Images made by npm run image
+generated-images/
 .claude/

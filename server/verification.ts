@@ -161,13 +161,13 @@ export async function executeWebhookDelivery(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-MedCred-Signature": `sha256=${signature}`,
-        "X-MedCred-Signature-256": `sha256=${signature}`,
-        "X-MedCred-Timestamp": Math.floor(Date.now() / 1000).toString(),
-        "X-MedCred-Delivery-Id": logId,
-        "X-MedCred-Event": eventType,
-        "X-MedCred-Delivery-Attempt": String(attempt),
-        "User-Agent": "MedCred-Statutory-Webhook-Dispatcher/2.4 (Act 586 EHR Gateway)",
+        "X-MediCred-Signature": `sha256=${signature}`,
+        "X-MediCred-Signature-256": `sha256=${signature}`,
+        "X-MediCred-Timestamp": Math.floor(Date.now() / 1000).toString(),
+        "X-MediCred-Delivery-Id": logId,
+        "X-MediCred-Event": eventType,
+        "X-MediCred-Delivery-Attempt": String(attempt),
+        "User-Agent": "MediCred-Statutory-Webhook-Dispatcher/2.4 (Act 586 EHR Gateway)",
       },
       body: payloadString,
       signal: controller.signal,
@@ -405,7 +405,7 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
     dispatchHospitalHrWebhooks("test.ping", {
       test: true,
       sender: req.user!.name || "Medical Board Administrator",
-      message: "CareVerified Statutory Hospital HR Webhook Handshake",
+      message: "MediCred Statutory Hospital HR Webhook Handshake",
       timestamp: new Date().toISOString(),
     });
     const logs = db.prepare("SELECT * FROM webhook_dispatch_logs ORDER BY created_at DESC LIMIT 10").all();

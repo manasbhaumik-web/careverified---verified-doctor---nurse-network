@@ -2334,7 +2334,7 @@ export default function AdminDashboard({
 
             <div className="pt-3 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
               <span className="font-mono text-xs">
-                Specification: MedCred Event Dispatcher v2.4 · SHA-256 HMAC
+                Specification: MediCred Event Dispatcher v2.4 · SHA-256 HMAC
               </span>
               <button
                 type="button"

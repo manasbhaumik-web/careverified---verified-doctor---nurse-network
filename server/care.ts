@@ -479,7 +479,7 @@ export function registerCareRoutes(app: Application, ctx: Ctx) {
       country,
       numbers: emergencyNumbers(country),
       verifyLocal: !hasEmergencyNumbersFor(country),
-      disclaimer: "MedCred is not an emergency service and cannot send an ambulance. In an emergency call the number below first.",
+      disclaimer: "MediCred is not an emergency service and cannot send an ambulance. In an emergency call the number below first.",
     } });
   });
 

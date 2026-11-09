@@ -8,7 +8,7 @@ import ThemeSwitcher from './ThemeSwitcher';
 import LocaleSwitcher from './LocaleSwitcher';
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'motion/react';
 import {
-  ShieldCheck, Search, CheckCircle2, RefreshCw,
+  ShieldCheck, Search, PackagePlus, CheckCircle2, RefreshCw,
   AlertTriangle, ArrowRight, Lock, AlertCircle, PlusCircle,
   Building, ChevronRight, Zap, Globe, Award, FileText,
   Stethoscope, Activity, Check,
@@ -136,7 +136,7 @@ interface LandingPageProps {
 }
 
 // ─────────────────────────────────────────────
-// MedCred Medical Cross mark (solid iconic emblem)
+// MediCred Medical Cross mark (solid iconic emblem)
 // ─────────────────────────────────────────────
 function Cross({ className = '' }: { className?: string }) {
   return (
@@ -239,7 +239,7 @@ const PROFESSIONAL_ASSISTANCE_MODULES = [
     tagline: 'Hand-checked licences to protect you and your loved ones',
     icon: ShieldCheck,
     badge: 'Board Reviewed',
-    summary: 'Your peace of mind is our sacred trust. Before any physician or nurse joins MedCred, our medical board carefully verifies their statutory licence and practising certificate against official registers by hand.',
+    summary: 'Your peace of mind is our sacred trust. Before any physician or nurse joins MediCred, our medical board carefully verifies their statutory licence and practising certificate against official registers by hand.',
     highlights: [
       'Continuous Annual Practising Certificate (APC) expiry tracking',
       'Regular 12-month re-verification to maintain patient safety',
@@ -405,7 +405,7 @@ const HERO_SLIDES: HeroSlide[] = [
     id: 'network',
     pill: 'Gentle Doctor Consultations',
     headline: <>Thoughtful {hl('medical care & verified doctors')} <span className="text-black">always by your side.</span></>,
-    body: <>When you or your loved ones feel unwell, MedCred connects you gently with <span className="text-[color:var(--t-600)] font-bold">board-verified doctors</span> across Malaysia for <span className="text-black font-bold">unhurried video or chat consultations</span>, doctor-signed e-prescriptions, and caring support.</>,
+    body: <>When you or your loved ones feel unwell, MediCred connects you gently with <span className="text-[color:var(--t-600)] font-bold">board-verified doctors</span> across Malaysia for <span className="text-black font-bold">unhurried video or chat consultations</span>, doctor-signed e-prescriptions, and caring support.</>,
     cta: { label: 'Talk With a Caring Doctor', role: 'patient', register: true },
     chips: ['Attentive, unhurried consultations', 'Every doctor manually verified', 'Doctor-signed e-prescriptions'],
     card: {
@@ -674,7 +674,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
             </span>
             <span className="flex flex-col leading-none">
               <span className="font-display font-black text-xl sm:text-2xl tracking-tight text-[color:var(--ink)]">
-                MedCred<span className="text-[color:var(--t-600)]">.</span>
+                MediCred<span className="text-[color:var(--t-600)]">.</span>
               </span>
               <span className="hidden sm:block text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--t-600)] mt-1">
                 {t('nav.tagline')}
@@ -775,6 +775,34 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     )}
                   </div>
 
+                  {/* Medical Packages & Directory Hub */}
+                  <div className="border-t border-slate-100 my-1 pt-1.5 px-3 pb-1 text-xs font-mono font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                    <span>Clinical Packages &amp; Directory</span>
+                    <span className="text-2xs font-mono font-bold text-[color:var(--t-600)]">ACT 586</span>
+                  </div>
+                  <div className="px-1.5 pb-1 space-y-0.5">
+                    <a
+                      href="/packages"
+                      onClick={e => {
+                        e.preventDefault();
+                        setQuickViewsOpen(false);
+                        navigate('/packages');
+                      }}
+                      className="flex items-center justify-between px-2.5 py-2 hover:bg-[color:var(--t-50)] transition-colors group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="w-6 h-6 shrink-0 bg-[color:var(--t-600)] text-white flex items-center justify-center text-xs shadow-2xs">
+                          <PackagePlus className="h-3.5 w-3.5" />
+                        </span>
+                        <div className="min-w-0">
+                          <span className="block text-xs font-bold text-[color:var(--ink)] group-hover:text-[color:var(--t-600)]">Medical Packages &amp; Network</span>
+                          <span className="block text-xs text-slate-500 font-medium truncate">14 packages, 10 hospitals &amp; clinics, 23 specialists</span>
+                        </div>
+                      </div>
+                      <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+                    </a>
+                  </div>
+
                   {/* Patient Intake & Access Modalities */}
                   <div className="border-t border-slate-100 my-1 pt-1.5 px-3 pb-1 text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
                     04 · Patient Access &amp; Intake
@@ -817,6 +845,19 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                 </div>
               )}
             </div>
+
+            {/* Packages & Directory Direct Header Link */}
+            <a
+              href="/packages"
+              onClick={e => {
+                e.preventDefault();
+                navigate('/packages');
+              }}
+              className="inline-flex items-center gap-1.5 min-h-[44px] px-3 sm:px-3.5 text-xs sm:text-sm font-extrabold text-[color:var(--t-700)] bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] border border-[color:var(--t-300)] shadow-2xs transition-all cursor-pointer whitespace-nowrap"
+            >
+              <PackagePlus className="h-4 w-4 text-[color:var(--t-600)]" />
+              <span>Packages &amp; Promos</span>
+            </a>
 
             {/* 2. Join Us Navmenu Dropdown */}
             <div ref={joinUsRef} className="relative">
@@ -963,7 +1004,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
         id="top"
         role="region"
         aria-roledescription="carousel"
-        aria-label="MedCred for every user"
+        aria-label="MediCred for every user"
         onMouseEnter={() => setHeroPaused(true)}
         onMouseLeave={() => setHeroPaused(false)}
         onFocus={() => setHeroPaused(true)}
@@ -1188,7 +1229,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
       </header>
 
       {/* ═══════════ LIVE TELEMETRY STRIP (ATTACHED JUST UNDER HERO — HORIZONTALLY ATTACHED GRID) ═══════════ */}
-      <section aria-label="How MedCred works" className="relative z-20 bg-white border-b border-[color:var(--t-200)] shadow-xs">
+      <section aria-label="How MediCred works" className="relative z-20 bg-white border-b border-[color:var(--t-200)] shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
           {/* Continuous Horizontally-Attached Cards (Separated by hairline 1px borders) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-x border-[color:var(--t-200)] divide-y sm:divide-y-0 sm:divide-x divide-[color:var(--t-200)]">
@@ -1399,7 +1440,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
               Emergency 999
             </span>
             <p className="text-xs sm:text-sm text-slate-800 font-medium leading-snug">
-              <strong className="font-extrabold text-slate-900">Your Health &amp; Safety Come First:</strong> MedCred is dedicated to outpatient tele-consultations and practitioner verification. For acute chest discomfort, sudden breathlessness, or severe trauma, please dial <strong className="text-rose-700 font-black">999</strong> (or 112 from a mobile) immediately.
+              <strong className="font-extrabold text-slate-900">Your Health &amp; Safety Come First:</strong> MediCred is dedicated to outpatient tele-consultations and practitioner verification. For acute chest discomfort, sudden breathlessness, or severe trauma, please dial <strong className="text-rose-700 font-black">999</strong> (or 112 from a mobile) immediately.
             </p>
           </div>
           <a

@@ -122,7 +122,7 @@ export function registerPharmacyMy(app: Application) {
     const ph = pharmacyOf(req);
     if (!ph) { fail(res, 403, "This pharmacy account is not active."); return null; }
     const lic = pharmacyLicenceProblem(ph);
-    if (lic) { fail(res, 403, `${lic} Contact the MedCred board to renew it.`); return null; }
+    if (lic) { fail(res, 403, `${lic} Contact the MediCred board to renew it.`); return null; }
     return ph;
   };
 
@@ -283,7 +283,7 @@ export function registerPharmacyMy(app: Application) {
           const key = `${ph.id}:${what}:${d}`;
           if (d <= soon && d >= today() && !remindedKeys.has(key)) {
             remindedKeys.add(key);
-            notifyPharmacy(ph.id, "Renewal due soon", `Your ${what} expires on ${d}. Send the renewed document to the MedCred board to stay listed.`);
+            notifyPharmacy(ph.id, "Renewal due soon", `Your ${what} expires on ${d}. Send the renewed document to the MediCred board to stay listed.`);
           }
         }
       }

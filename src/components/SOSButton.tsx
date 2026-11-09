@@ -70,13 +70,13 @@ export default function SOSButton() {
                 className="w-14 border border-slate-300 p-1 text-center font-bold uppercase" />
             </label>
             {info?.verifyLocal && <p className="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 p-2">We do not have the local number for this country. 112 works on many mobile networks, but check the local emergency number.</p>}
-            <p className="text-xs text-slate-600">{info?.disclaimer ?? 'MedCred is not an emergency service. Call the number above first.'}</p>
+            <p className="text-xs text-slate-600">{info?.disclaimer ?? 'MediCred is not an emergency service. Call the number above first.'}</p>
 
             {!result ? (
               <>
                 {error && <p className="text-xs font-bold text-rose-700">{error}</p>}
                 <button onClick={alertTeam} disabled={busy} className="w-full border-2 border-rose-300 text-rose-800 font-extrabold text-xs py-2.5 hover:bg-rose-50 disabled:opacity-60 cursor-pointer">
-                  {busy ? 'Sending…' : 'Also alert the MedCred on-call team (shares your location)'}
+                  {busy ? 'Sending…' : 'Also alert the MediCred on-call team (shares your location)'}
                 </button>
               </>
             ) : (

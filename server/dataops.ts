@@ -232,7 +232,7 @@ const SUBJECTS_DAYS = 7;
 // ---------- Terms of Service (draft) ----------
 export const TERMS_VERSION = "2026-11";
 function terms(lang: "en" | "ms") {
-  const company = process.env.PRIVACY_CONTROLLER_NAME || "MedCred Healthcare Network Sdn Bhd";
+  const company = process.env.PRIVACY_CONTROLLER_NAME || "MediCred Healthcare Network Sdn Bhd";
   const en = [
     ["About the service", `${company} ("we") runs an online network that lets patients find practitioners whose professional registration has been checked, consult them online or in person, and manage health records. We are a platform: practitioners are independent professionals responsible for the care they give.`],
     ["Not for emergencies", "The service is not an emergency service. In an emergency call 999 (112 from a mobile phone) or your local emergency number."],

@@ -18,7 +18,7 @@ export default function LoadingImage({ className = '', size = 80 }: LoadingImage
       height={size}
       fill="none"
       className={className}
-      aria-label="Loading MedCred"
+      aria-label="Loading MediCred"
       role="img"
     >
       <defs>

@@ -1,6 +1,6 @@
 # Product Requirements Document (PRD)
 
-## Project: MedCred / CareVerified – Verified Doctor & Nurse Network
+## Project: MediCred / MediCred – Verified Doctor & Nurse Network
 **Version:** 3.0  
 **Effective Date:** October 2026  
 **Target Markets:** Malaysia (Domestic Core) & Southeast Asia (MHTC Medical Tourism)  
@@ -12,7 +12,7 @@
 ## 1. Executive Summary & Vision
 
 ### 1.1 Product Mission
-MedCred (CareVerified) is an enterprise healthcare credentialing, telemedicine, and clinical operations network designed to establish zero-trust verification between licensed medical practitioners, healthcare institutions, patients, and pharmacies.
+MediCred (MediCred) is an enterprise healthcare credentialing, telemedicine, and clinical operations network designed to establish zero-trust verification between licensed medical practitioners, healthcare institutions, patients, and pharmacies.
 
 The platform serves two synchronized operational mandates:
 1. **Domestic Malaysian Healthcare:** A regulatory-hardened healthcare operating system operating in direct compliance with the **Medical Act 1971 (Act 50)**, **Nurses Act 1950 (Act 180)**, **Private Healthcare Facilities and Services Act 1998 (Act 586)**, **Poisons Act 1952**, and **Personal Data Protection Act 2010 (PDPA)**.
@@ -28,7 +28,7 @@ The platform serves two synchronized operational mandates:
 
 ## 2. Regulatory & Statutory Compliance Framework
 
-Every architectural decision, data model, and user workflow within MedCred is governed by Malaysian statutory law and professional council ethical codes:
+Every architectural decision, data model, and user workflow within MediCred is governed by Malaysian statutory law and professional council ethical codes:
 
 | Regulatory Body / Act | Statutory Scope | Platform Implementation & Guardrails |
 | :--- | :--- | :--- |
@@ -49,7 +49,7 @@ The system establishes five primary operational personas alongside granular admi
 
 ```
                                   ┌──────────────────────────────┐
-                                  │      MedCred Ecosystem       │
+                                  │      MediCred Ecosystem       │
                                   └──────────────┬───────────────┘
                                                  │
          ┌──────────────────┬────────────────────┼───────────────────┬──────────────────┐
@@ -207,10 +207,10 @@ To ensure compliance with institutional Segregation of Duties (SoD), administrat
   * Upon expiry, the system automatically revokes elevated permissions and downgrades the persona back to standard `Council Medical Registrar` (`registrar`).
 * **Outbound Hospital EHR Webhooks:**
   * Outgoing webhooks attach:
-    * `X-MedCred-Signature-256`: SHA-256 HMAC digest of payload.
-    * `X-MedCred-Timestamp`: Unix epoch timestamp to prevent replay attacks.
-    * `X-MedCred-Delivery-Id`: Unique delivery UUID mapped to the SQLite WAL dispatch log.
-    * `X-MedCred-Delivery-Attempt`: Retry counter with exponential backoff (60s -> 300s -> 1800s).
+    * `X-MediCred-Signature-256`: SHA-256 HMAC digest of payload.
+    * `X-MediCred-Timestamp`: Unix epoch timestamp to prevent replay attacks.
+    * `X-MediCred-Delivery-Id`: Unique delivery UUID mapped to the SQLite WAL dispatch log.
+    * `X-MediCred-Delivery-Attempt`: Retry counter with exponential backoff (60s -> 300s -> 1800s).
 * **Statutory Audit Trail (`AdminAuditLog.tsx`):**
   * Immutable event logging capturing timestamp, actor ID, actor role, IP address, target entity, and complete JSON mutation diffs.
 

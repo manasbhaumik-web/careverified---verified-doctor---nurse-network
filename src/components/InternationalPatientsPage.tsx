@@ -41,7 +41,7 @@ export default function InternationalPatientsPage({ onSignUp }: InternationalPat
     },
     {
       q: 'How do I share my medical records with my family doctor back home?',
-      a: 'Upon discharge, your hospital provides a bilingual English/Malay medical summary. You can store this in your MedCred patient vault and generate an encrypted, time-limited link to share directly with your home country physician.'
+      a: 'Upon discharge, your hospital provides a bilingual English/Malay medical summary. You can store this in your MediCred patient vault and generate an encrypted, time-limited link to share directly with your home country physician.'
     }
   ];
 
@@ -60,7 +60,7 @@ export default function InternationalPatientsPage({ onSignUp }: InternationalPat
                 M
               </span>
               <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">
-                MedCred<span className="text-[color:var(--t-600)]">.</span>
+                MediCred<span className="text-[color:var(--t-600)]">.</span>
               </span>
             </a>
 

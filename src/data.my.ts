@@ -86,7 +86,7 @@ export const MY_DEMO_NURSES: NurseProfile[] = [
 // ───────── Health topics with a Malaysian focus (draft: not yet reviewed by a registered doctor) ─────────
 const EDITORIAL = {
   authorId: 'editorial',
-  authorName: 'MedCred editorial team',
+  authorName: 'MediCred editorial team',
   authorTitle: 'Draft: awaiting review by a registered doctor',
   authorAvatar: '/assets/medcred-loader.svg',
   authorCredentialsVerified: false,

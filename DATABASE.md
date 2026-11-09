@@ -1,12 +1,12 @@
-# CareVerified Relational Database Specification (DATABASE.md)
+# MediCred Relational Database Specification (DATABASE.md)
 
-This document provides the definitive architectural specification, Entity-Relationship mapping, DDL schema reference, indexing blueprint, and statutory data retention manual for the **CareVerified (MedCred)** enterprise digital health platform.
+This document provides the definitive architectural specification, Entity-Relationship mapping, DDL schema reference, indexing blueprint, and statutory data retention manual for the **MediCred (MediCred)** enterprise digital health platform.
 
 ---
 
 ## 1. Executive Summary & Engine Architecture
 
-CareVerified utilizes an embedded, zero-network-overhead relational storage engine powered by Node.js 22+ native SQLite bindings (`node:sqlite` via `DatabaseSync`). The database executes in a high-concurrency, multi-tenant environment serving clinicians, patients, healthcare institutions, pharmacies, and administrative governance officers.
+MediCred utilizes an embedded, zero-network-overhead relational storage engine powered by Node.js 22+ native SQLite bindings (`node:sqlite` via `DatabaseSync`). The database executes in a high-concurrency, multi-tenant environment serving clinicians, patients, healthcare institutions, pharmacies, and administrative governance officers.
 
 ### Engine Configuration & PRAGMA Settings
 

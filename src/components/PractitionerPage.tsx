@@ -65,7 +65,7 @@ const T: Record<Lang, {
   cta: { title: string; text: string; button: string };
 }> = {
   en: {
-    title: 'Join as a Verified Doctor or Nurse | MedCred Malaysia',
+    title: 'Join as a Verified Doctor or Nurse | MediCred Malaysia',
     description: 'Malaysia’s unified healthcare practitioner network. MMC-registered doctors and LJM-registered nurses: verified listing, telemedicine, in-home nursing care, locum shifts, and direct bank payouts.',
     heroSlides: [
       {
@@ -122,7 +122,7 @@ const T: Record<Lang, {
         trust2: 'RM 0 Upfront Fee',
         trust3: '14-Day Direct Payout',
         previewRole: 'Multidisciplinary Clinical Network',
-        previewName: 'MedCred Care Circle',
+        previewName: 'MediCred Care Circle',
         previewCouncil: 'MMC & LJM Unified Governance',
         previewSeal: 'MEDCRED-TEAM-2026-KL01',
         previewChips: [
@@ -191,7 +191,7 @@ const T: Record<Lang, {
         'By default, an initial consultation for long-term chronic conditions must be conducted in person.',
         'No Medical Certificate (MC) may be issued following a video consultation alone, per MMC Ethical Code.',
         'No e-prescriptions for patients residing abroad, and controlled dangerous drugs (Poisons Act) are never e-prescribed.',
-        'MedCred is not an emergency service. Patients experiencing acute distress are directed to call 999.',
+        'MediCred is not an emergency service. Patients experiencing acute distress are directed to call 999.',
         'Patients maintain control over health record access, and every practitioner record access is immutably logged.',
       ],
     },
@@ -207,7 +207,7 @@ const T: Record<Lang, {
     },
   },
   ms: {
-    title: 'Sertai sebagai Doktor atau Jururawat Disahkan | MedCred Malaysia',
+    title: 'Sertai sebagai Doktor atau Jururawat Disahkan | MediCred Malaysia',
     description: 'Rangkaian pengamal penjagaan kesihatan bersepadu Malaysia. Doktor berdaftar MMC dan jururawat berdaftar LJM: penyenaraian disahkan, teleperubatan, penjagaan rumah, syif locum dan bayaran bank terus.',
     heroSlides: [
       {
@@ -264,7 +264,7 @@ const T: Record<Lang, {
         trust2: 'RM 0 Yuran Pendaftaran',
         trust3: 'Bayaran Bank 14 Hari',
         previewRole: 'Rangkaian Klinikal Pelbagai Disiplin',
-        previewName: 'Lingkaran Penjagaan MedCred',
+        previewName: 'Lingkaran Penjagaan MediCred',
         previewCouncil: 'Tadbir Urus Bersama MMC & LJM',
         previewSeal: 'MEDCRED-TEAM-2026-KL01',
         previewChips: [
@@ -333,7 +333,7 @@ const T: Record<Lang, {
         'Secara lalai, lawatan pertama bagi penyakit kronik jangka panjang mesti dijalankan secara bersemuka.',
         'Tiada Sijil Cuti Sakit (MC) boleh dikeluarkan selepas konsultasi video sahaja, mengikut Kod Etika MMC.',
         'Tiada e-preskripsi untuk pesakit di luar negara, dan ubat berbahaya terkawal (Akta Racun) tidak boleh dipreskripsi secara elektronik.',
-        'MedCred bukan perkhidmatan kecemasan. Pesakit yang mengalami kecemasan akut diarahkan menghubungi 999.',
+        'MediCred bukan perkhidmatan kecemasan. Pesakit yang mengalami kecemasan akut diarahkan menghubungi 999.',
         'Pesakit mengawal akses kepada rekod kesihatan mereka, dan setiap akses rekod direkodkan secara kekal.',
       ],
     },
@@ -349,7 +349,7 @@ const T: Record<Lang, {
     },
   },
   zh: {
-    title: '以认证医生或护士身份加入 | MedCred 马来西亚',
+    title: '以认证医生或护士身份加入 | MediCred 马来西亚',
     description: '马来西亚统一医疗人员网络。MMC 注册医生与 LJM 注册护士：权威认证列名、远程医疗问诊、上门护理服务、医院 Locum 代班以及直接银行结算。',
     heroSlides: [
       {
@@ -406,7 +406,7 @@ const T: Record<Lang, {
         trust2: 'RM 0 平台入驻费',
         trust3: '14 天直接银行结算',
         previewRole: '多学科综合临床团队',
-        previewName: 'MedCred 照护圈',
+        previewName: 'MediCred 照护圈',
         previewCouncil: 'MMC 与 LJM 统一治理框架',
         previewSeal: 'MEDCRED-TEAM-2026-KL01',
         previewChips: [
@@ -736,7 +736,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
               navigate('/');
             }}
             className="flex items-center gap-2.5 min-w-0"
-            aria-label="MedCred home"
+            aria-label="MediCred home"
           >
             <span className="w-9 h-9 shrink-0 bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-700)]">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true">
@@ -744,7 +744,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
               </svg>
             </span>
             <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">
-              MedCred<span className="text-[color:var(--t-600)]">.</span>
+              MediCred<span className="text-[color:var(--t-600)]">.</span>
               <span className="ml-2 text-xs font-mono font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
                 Practitioner Network
               </span>
@@ -1246,7 +1246,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                         <div className="text-sm font-black text-slate-800 mt-0.5">RM {fee}.00</div>
                       </div>
                       <div className="p-2 bg-slate-50 border border-slate-100">
-                        <div className="text-xs font-bold text-slate-500 uppercase">MedCred ({pct ?? 15}%)</div>
+                        <div className="text-xs font-bold text-slate-500 uppercase">MediCred ({pct ?? 15}%)</div>
                         <div className="text-sm font-black text-slate-600 mt-0.5">RM {platformFee.toFixed(2)}</div>
                       </div>
                       <div
@@ -1325,7 +1325,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                     the funds directly.
                   </p>
                   <div className="p-3.5 bg-amber-50/80 border border-amber-200 text-xs text-amber-950 font-medium">
-                    <strong>Tax Advisory Notice:</strong> No income tax is automatically deducted at source. MedCred
+                    <strong>Tax Advisory Notice:</strong> No income tax is automatically deducted at source. MediCred
                     provides comprehensive monthly statements and annual itemised earnings summaries formatted for your
                     licensed accountant and LHDN submission.
                   </div>

@@ -18,34 +18,34 @@ const lines = (s: unknown) => String(s ?? "").trim();
 
 export const TEMPLATES = {
   practitioner_welcome: (v: { name: string }) => L(
-    { subject: "Welcome to MedCred", paragraphs: [`Hello ${v.name},`, "Your practitioner account is created. You are not listed yet.", "Next, sign in and send your licence details and certificates. A board reviewer checks your licence against the council register by hand and tells you the result by email."], cta: { label: "Sign in and continue", path: "/login?role=practitioner" } },
-    { subject: "Selamat datang ke MedCred", paragraphs: [`Helo ${v.name},`, "Akaun pengamal anda telah dicipta. Anda belum disenaraikan.", "Seterusnya, log masuk dan hantar butiran lesen dan sijil anda. Penyemak lembaga menyemak lesen anda dengan daftar majlis secara manual dan memaklumkan keputusannya melalui e-mel."], cta: { label: "Log masuk dan teruskan", path: "/login?role=practitioner" } },
-    { subject: "欢迎加入 MedCred", paragraphs: [`${v.name}，您好，`, "您的医疗人员账户已创建，但尚未列名。", "接下来请登录并提交您的执照资料和证书。委员会审核员会对照理事会名册人工核查您的执照，并通过电子邮件通知结果。"], cta: { label: "登录并继续", path: "/login?role=practitioner" } },
+    { subject: "Welcome to MediCred", paragraphs: [`Hello ${v.name},`, "Your practitioner account is created. You are not listed yet.", "Next, sign in and send your licence details and certificates. A board reviewer checks your licence against the council register by hand and tells you the result by email."], cta: { label: "Sign in and continue", path: "/login?role=practitioner" } },
+    { subject: "Selamat datang ke MediCred", paragraphs: [`Helo ${v.name},`, "Akaun pengamal anda telah dicipta. Anda belum disenaraikan.", "Seterusnya, log masuk dan hantar butiran lesen dan sijil anda. Penyemak lembaga menyemak lesen anda dengan daftar majlis secara manual dan memaklumkan keputusannya melalui e-mel."], cta: { label: "Log masuk dan teruskan", path: "/login?role=practitioner" } },
+    { subject: "欢迎加入 MediCred", paragraphs: [`${v.name}，您好，`, "您的医疗人员账户已创建，但尚未列名。", "接下来请登录并提交您的执照资料和证书。委员会审核员会对照理事会名册人工核查您的执照，并通过电子邮件通知结果。"], cta: { label: "登录并继续", path: "/login?role=practitioner" } },
   ),
   verification_approved: (v: { until?: string }) => L(
-    { subject: "You are verified on MedCred", paragraphs: ["The board has verified your licence. Your profile is now public.", v.until ? `Re-verification is due by ${v.until}. We will remind you before then.` : "We will remind you before re-verification is due."], cta: { label: "Open your portal", path: "/login?role=practitioner" } },
-    { subject: "Anda telah disahkan di MedCred", paragraphs: ["Lembaga telah mengesahkan lesen anda. Profil anda kini awam.", v.until ? `Pengesahan semula perlu dibuat sebelum ${v.until}. Kami akan mengingatkan anda sebelum itu.` : "Kami akan mengingatkan anda sebelum pengesahan semula."], cta: { label: "Buka portal anda", path: "/login?role=practitioner" } },
-    { subject: "您已在 MedCred 通过认证", paragraphs: ["委员会已核实您的执照，您的资料现已公开。", v.until ? `请在 ${v.until} 之前完成重新认证，我们会提前提醒您。` : "重新认证到期前我们会提醒您。"], cta: { label: "打开您的门户", path: "/login?role=practitioner" } },
+    { subject: "You are verified on MediCred", paragraphs: ["The board has verified your licence. Your profile is now public.", v.until ? `Re-verification is due by ${v.until}. We will remind you before then.` : "We will remind you before re-verification is due."], cta: { label: "Open your portal", path: "/login?role=practitioner" } },
+    { subject: "Anda telah disahkan di MediCred", paragraphs: ["Lembaga telah mengesahkan lesen anda. Profil anda kini awam.", v.until ? `Pengesahan semula perlu dibuat sebelum ${v.until}. Kami akan mengingatkan anda sebelum itu.` : "Kami akan mengingatkan anda sebelum pengesahan semula."], cta: { label: "Buka portal anda", path: "/login?role=practitioner" } },
+    { subject: "您已在 MediCred 通过认证", paragraphs: ["委员会已核实您的执照，您的资料现已公开。", v.until ? `请在 ${v.until} 之前完成重新认证，我们会提前提醒您。` : "重新认证到期前我们会提醒您。"], cta: { label: "打开您的门户", path: "/login?role=practitioner" } },
   ),
   verification_info_needed: (v: { note?: string }) => L(
-    { subject: "MedCred needs more information", paragraphs: ["The board reviewing your application needs more from you before it can continue.", lines(v.note), "Your profile stays hidden until this is sorted."].filter(Boolean), cta: { label: "Reply in your portal", path: "/login?role=practitioner" } },
-    { subject: "MedCred memerlukan maklumat lanjut", paragraphs: ["Lembaga yang menyemak permohonan anda memerlukan maklumat lanjut sebelum boleh diteruskan.", lines(v.note), "Profil anda kekal tersembunyi sehingga perkara ini selesai."].filter(Boolean), cta: { label: "Balas dalam portal anda", path: "/login?role=practitioner" } },
-    { subject: "MedCred 需要更多资料", paragraphs: ["审核您申请的委员会需要您补充资料才能继续。", lines(v.note), "在此问题解决之前，您的资料将保持隐藏。"].filter(Boolean), cta: { label: "在门户中回复", path: "/login?role=practitioner" } },
+    { subject: "MediCred needs more information", paragraphs: ["The board reviewing your application needs more from you before it can continue.", lines(v.note), "Your profile stays hidden until this is sorted."].filter(Boolean), cta: { label: "Reply in your portal", path: "/login?role=practitioner" } },
+    { subject: "MediCred memerlukan maklumat lanjut", paragraphs: ["Lembaga yang menyemak permohonan anda memerlukan maklumat lanjut sebelum boleh diteruskan.", lines(v.note), "Profil anda kekal tersembunyi sehingga perkara ini selesai."].filter(Boolean), cta: { label: "Balas dalam portal anda", path: "/login?role=practitioner" } },
+    { subject: "MediCred 需要更多资料", paragraphs: ["审核您申请的委员会需要您补充资料才能继续。", lines(v.note), "在此问题解决之前，您的资料将保持隐藏。"].filter(Boolean), cta: { label: "在门户中回复", path: "/login?role=practitioner" } },
   ),
   verification_rejected: (v: { note?: string }) => L(
-    { subject: "Your MedCred application was not approved", paragraphs: ["The board could not approve your application.", lines(v.note), "You can sign in to see the details and send new documents."].filter(Boolean), cta: { label: "Sign in", path: "/login?role=practitioner" } },
-    { subject: "Permohonan MedCred anda tidak diluluskan", paragraphs: ["Lembaga tidak dapat meluluskan permohonan anda.", lines(v.note), "Anda boleh log masuk untuk melihat butiran dan menghantar dokumen baharu."].filter(Boolean), cta: { label: "Log masuk", path: "/login?role=practitioner" } },
-    { subject: "您的 MedCred 申请未获批准", paragraphs: ["委员会未能批准您的申请。", lines(v.note), "您可以登录查看详情并提交新的文件。"].filter(Boolean), cta: { label: "登录", path: "/login?role=practitioner" } },
+    { subject: "Your MediCred application was not approved", paragraphs: ["The board could not approve your application.", lines(v.note), "You can sign in to see the details and send new documents."].filter(Boolean), cta: { label: "Sign in", path: "/login?role=practitioner" } },
+    { subject: "Permohonan MediCred anda tidak diluluskan", paragraphs: ["Lembaga tidak dapat meluluskan permohonan anda.", lines(v.note), "Anda boleh log masuk untuk melihat butiran dan menghantar dokumen baharu."].filter(Boolean), cta: { label: "Log masuk", path: "/login?role=practitioner" } },
+    { subject: "您的 MediCred 申请未获批准", paragraphs: ["委员会未能批准您的申请。", lines(v.note), "您可以登录查看详情并提交新的文件。"].filter(Boolean), cta: { label: "登录", path: "/login?role=practitioner" } },
   ),
   profile_suspended: (v: { reason?: string }) => L(
-    { subject: "Your MedCred profile is suspended", paragraphs: ["Your profile is hidden from the directory for now.", lines(v.reason), "Sign in and upload your renewed documents to be reinstated."].filter(Boolean), cta: { label: "Sign in", path: "/login?role=practitioner" } },
-    { subject: "Profil MedCred anda digantung", paragraphs: ["Profil anda disembunyikan daripada direktori buat masa ini.", lines(v.reason), "Log masuk dan muat naik dokumen yang telah diperbaharui untuk dipulihkan."].filter(Boolean), cta: { label: "Log masuk", path: "/login?role=practitioner" } },
-    { subject: "您的 MedCred 资料已被暂停", paragraphs: ["您的资料暂时从名录中隐藏。", lines(v.reason), "请登录并上传已续期的文件以恢复。"].filter(Boolean), cta: { label: "登录", path: "/login?role=practitioner" } },
+    { subject: "Your MediCred profile is suspended", paragraphs: ["Your profile is hidden from the directory for now.", lines(v.reason), "Sign in and upload your renewed documents to be reinstated."].filter(Boolean), cta: { label: "Sign in", path: "/login?role=practitioner" } },
+    { subject: "Profil MediCred anda digantung", paragraphs: ["Profil anda disembunyikan daripada direktori buat masa ini.", lines(v.reason), "Log masuk dan muat naik dokumen yang telah diperbaharui untuk dipulihkan."].filter(Boolean), cta: { label: "Log masuk", path: "/login?role=practitioner" } },
+    { subject: "您的 MediCred 资料已被暂停", paragraphs: ["您的资料暂时从名录中隐藏。", lines(v.reason), "请登录并上传已续期的文件以恢复。"].filter(Boolean), cta: { label: "登录", path: "/login?role=practitioner" } },
   ),
   profile_reinstated: () => L(
-    { subject: "Your MedCred profile is back", paragraphs: ["Your profile is visible in the directory again."] },
-    { subject: "Profil MedCred anda dipulihkan", paragraphs: ["Profil anda kelihatan semula dalam direktori."] },
-    { subject: "您的 MedCred 资料已恢复", paragraphs: ["您的资料已重新出现在名录中。"] },
+    { subject: "Your MediCred profile is back", paragraphs: ["Your profile is visible in the directory again."] },
+    { subject: "Profil MediCred anda dipulihkan", paragraphs: ["Profil anda kelihatan semula dalam direktori."] },
+    { subject: "您的 MediCred 资料已恢复", paragraphs: ["您的资料已重新出现在名录中。"] },
   ),
   licence_expiry_soon: (v: { what?: string }) => L(
     { subject: "Action needed soon: licence renewal", paragraphs: [lines(v.what) || "A licence or certificate on your profile is about to expire.", "Please upload your renewed documents. If it lapses your profile is suspended automatically."], cta: { label: "Upload documents", path: "/login?role=practitioner" } },
@@ -83,14 +83,14 @@ export const TEMPLATES = {
     { subject: "您的银行资料需要处理", paragraphs: ["委员会未能核实您的银行账户。", lines(v.note), "请在“收入”页面重新输入资料。"].filter(Boolean), cta: { label: "打开收入页面", path: "/login?role=practitioner" } },
   ),
   password_reset: (v: { minutes: number; url: string }) => L(
-    { subject: "Reset your MedCred password", paragraphs: ["Someone asked to reset the password for your MedCred account. If it was you, use the button below.", `This link works once and expires in ${v.minutes} minutes.`, "If it was not you, ignore this email. Your password stays the same."], cta: { label: "Choose a new password", path: v.url } },
-    { subject: "Tetapkan semula kata laluan MedCred anda", paragraphs: ["Seseorang meminta kata laluan akaun MedCred anda ditetapkan semula. Jika itu anda, gunakan butang di bawah.", `Pautan ini hanya boleh digunakan sekali dan tamat dalam ${v.minutes} minit.`, "Jika bukan anda, abaikan e-mel ini. Kata laluan anda tidak berubah."], cta: { label: "Pilih kata laluan baharu", path: v.url } },
-    { subject: "重置您的 MedCred 密码", paragraphs: ["有人申请重置您 MedCred 账户的密码。如果是您本人，请使用下方按钮。", `此链接只能使用一次，${v.minutes} 分钟后失效。`, "如果不是您，请忽略此邮件，您的密码不会改变。"], cta: { label: "设置新密码", path: v.url } },
+    { subject: "Reset your MediCred password", paragraphs: ["Someone asked to reset the password for your MediCred account. If it was you, use the button below.", `This link works once and expires in ${v.minutes} minutes.`, "If it was not you, ignore this email. Your password stays the same."], cta: { label: "Choose a new password", path: v.url } },
+    { subject: "Tetapkan semula kata laluan MediCred anda", paragraphs: ["Seseorang meminta kata laluan akaun MediCred anda ditetapkan semula. Jika itu anda, gunakan butang di bawah.", `Pautan ini hanya boleh digunakan sekali dan tamat dalam ${v.minutes} minit.`, "Jika bukan anda, abaikan e-mel ini. Kata laluan anda tidak berubah."], cta: { label: "Pilih kata laluan baharu", path: v.url } },
+    { subject: "重置您的 MediCred 密码", paragraphs: ["有人申请重置您 MediCred 账户的密码。如果是您本人，请使用下方按钮。", `此链接只能使用一次，${v.minutes} 分钟后失效。`, "如果不是您，请忽略此邮件，您的密码不会改变。"], cta: { label: "设置新密码", path: v.url } },
   ),
   password_changed: () => L(
-    { subject: "Your MedCred password was changed", paragraphs: ["The password for your MedCred account was just changed, and you were signed out everywhere.", "If this was not you, reset your password again now and tell us through Help & support."], cta: { label: "Reset password", path: "/forgot-password" } },
-    { subject: "Kata laluan MedCred anda telah ditukar", paragraphs: ["Kata laluan akaun MedCred anda baru sahaja ditukar, dan anda telah dilog keluar di semua tempat.", "Jika ini bukan anda, tetapkan semula kata laluan sekarang dan beritahu kami melalui Bantuan & sokongan."], cta: { label: "Tetapkan semula kata laluan", path: "/forgot-password" } },
-    { subject: "您的 MedCred 密码已更改", paragraphs: ["您 MedCred 账户的密码刚刚被更改，并且您已在所有设备上退出登录。", "如果这不是您本人操作，请立即再次重置密码，并通过“帮助与支持”告诉我们。"], cta: { label: "重置密码", path: "/forgot-password" } },
+    { subject: "Your MediCred password was changed", paragraphs: ["The password for your MediCred account was just changed, and you were signed out everywhere.", "If this was not you, reset your password again now and tell us through Help & support."], cta: { label: "Reset password", path: "/forgot-password" } },
+    { subject: "Kata laluan MediCred anda telah ditukar", paragraphs: ["Kata laluan akaun MediCred anda baru sahaja ditukar, dan anda telah dilog keluar di semua tempat.", "Jika ini bukan anda, tetapkan semula kata laluan sekarang dan beritahu kami melalui Bantuan & sokongan."], cta: { label: "Tetapkan semula kata laluan", path: "/forgot-password" } },
+    { subject: "您的 MediCred 密码已更改", paragraphs: ["您 MediCred 账户的密码刚刚被更改，并且您已在所有设备上退出登录。", "如果这不是您本人操作，请立即再次重置密码，并通过“帮助与支持”告诉我们。"], cta: { label: "重置密码", path: "/forgot-password" } },
   ),
   support_reply: (v: { subject?: string }) => L(
     { subject: "Support replied to your ticket", paragraphs: [`Our team replied to your ticket${v.subject ? ` "${lines(v.subject)}"` : ""}.`, "Sign in to read the reply."], cta: { label: "Read the reply", path: "/login" } },
@@ -98,17 +98,17 @@ export const TEMPLATES = {
     { subject: "客服已回复您的工单", paragraphs: [`我们的团队已回复您的工单${v.subject ? `“${lines(v.subject)}”` : ""}。`, "请登录阅读回复。"], cta: { label: "阅读回复", path: "/login" } },
   ),
   test_email: () => L(
-    { subject: "MedCred test email", paragraphs: ["This is a test email from MedCred. If you can read it, email sending works."] },
-    { subject: "E-mel ujian MedCred", paragraphs: ["Ini ialah e-mel ujian daripada MedCred. Jika anda boleh membacanya, penghantaran e-mel berfungsi."] },
-    { subject: "MedCred 测试邮件", paragraphs: ["这是来自 MedCred 的测试邮件。如果您能看到它，说明邮件发送正常。"] },
+    { subject: "MediCred test email", paragraphs: ["This is a test email from MediCred. If you can read it, email sending works."] },
+    { subject: "E-mel ujian MediCred", paragraphs: ["Ini ialah e-mel ujian daripada MediCred. Jika anda boleh membacanya, penghantaran e-mel berfungsi."] },
+    { subject: "MediCred 测试邮件", paragraphs: ["这是来自 MediCred 的测试邮件。如果您能看到它，说明邮件发送正常。"] },
   ),
 } satisfies Record<string, Make>;
 export type TemplateName = keyof typeof TEMPLATES;
 
 const FOOT: Record<MailLang, { why: string; noreply: string; safety: string }> = {
-  en: { why: "You are getting this service email because of your MedCred account or an enquiry you sent.", noreply: "Please do not reply to this email: the mailbox is not read.", safety: "MedCred never asks for your password or bank details by email." },
-  ms: { why: "Anda menerima e-mel perkhidmatan ini kerana akaun MedCred anda atau pertanyaan yang anda hantar.", noreply: "Sila jangan balas e-mel ini: peti mel ini tidak dibaca.", safety: "MedCred tidak pernah meminta kata laluan atau butiran bank anda melalui e-mel." },
-  zh: { why: "您收到这封服务邮件，是因为您的 MedCred 账户或您发送的咨询。", noreply: "请勿回复此邮件：该邮箱无人查看。", safety: "MedCred 绝不会通过电子邮件索要您的密码或银行资料。" },
+  en: { why: "You are getting this service email because of your MediCred account or an enquiry you sent.", noreply: "Please do not reply to this email: the mailbox is not read.", safety: "MediCred never asks for your password or bank details by email." },
+  ms: { why: "Anda menerima e-mel perkhidmatan ini kerana akaun MediCred anda atau pertanyaan yang anda hantar.", noreply: "Sila jangan balas e-mel ini: peti mel ini tidak dibaca.", safety: "MediCred tidak pernah meminta kata laluan atau butiran bank anda melalui e-mel." },
+  zh: { why: "您收到这封服务邮件，是因为您的 MediCred 账户或您发送的咨询。", noreply: "请勿回复此邮件：该邮箱无人查看。", safety: "MediCred 绝不会通过电子邮件索要您的密码或银行资料。" },
 };
 
 export const escapeHtml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
@@ -135,7 +135,7 @@ export function renderEmail(template: TemplateName, lang: MailLang, vars: Record
   const html = `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(oneLine(body.subject))}</title></head>
 <body style="margin:0;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif"><div style="max-width:560px;margin:0 auto;padding:24px 16px">
 <div style="background:#ffffff;border-top:3px solid #0270a9;padding:24px">
-<p style="margin:0 0 18px;font-size:20px;font-weight:800;color:#0f172a">MedCred<span style="color:#0270a9">.</span></p>
+<p style="margin:0 0 18px;font-size:20px;font-weight:800;color:#0f172a">MediCred<span style="color:#0270a9">.</span></p>
 ${body.paragraphs.map(p).join("")}${button}
 </div>
 <p style="margin:14px 0 4px;font-size:12px;line-height:1.5;color:#475569">${escapeHtml(foot.safety)}</p>

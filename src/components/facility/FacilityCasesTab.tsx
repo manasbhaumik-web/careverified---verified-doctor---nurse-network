@@ -259,7 +259,7 @@ export default function FacilityCasesTab({
               </h4>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              All success fees recorded below are <strong>strictly institutional facilitation fees</strong> payable by the healthcare facility to CareVerified for patient coordination, cross-border second opinions, and medical logistics. <strong>Doctor professional consultation fees are never split or subject to referral commissions</strong>, ensuring 100% adherence to MMC Ethical Code Chapter 2 & Act 586 statutory directives.
+              All success fees recorded below are <strong>strictly institutional facilitation fees</strong> payable by the healthcare facility to MediCred for patient coordination, cross-border second opinions, and medical logistics. <strong>Doctor professional consultation fees are never split or subject to referral commissions</strong>, ensuring 100% adherence to MMC Ethical Code Chapter 2 & Act 586 statutory directives.
             </p>
           </div>
 

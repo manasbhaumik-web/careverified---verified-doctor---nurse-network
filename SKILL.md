@@ -1,9 +1,9 @@
 ---
 name: careverified-platform-engineering
 description: |
-  Comprehensive engineering, clinical safety, architectural governance, and operating guidelines for CareVerified (MedCred).
+  Comprehensive engineering, clinical safety, architectural governance, and operating guidelines for MediCred (MediCred).
   Use this skill when:
-  - Developing, debugging, testing, or refactoring features in the CareVerified (MedCred) codebase.
+  - Developing, debugging, testing, or refactoring features in the MediCred (MediCred) codebase.
   - Adding or modifying clinical workflows, consultations, SOAP notes, e-prescriptions, or medical certificates.
   - Interfacing with the SQLite embedded database (`data/careverified.db`) using Node.js native `node:sqlite`.
   - Implementing or verifying Segregation of Duties (SoD), dual-signoff authorization, or Break-Glass emergency access.
@@ -12,9 +12,9 @@ description: |
   - Integrating external hospital EHR webhooks using HMAC-SHA256 signatures and exponential backoff retry dispatch.
 ---
 
-# CareVerified (MedCred) Engineering & Clinical Skill Guide
+# MediCred (MediCred) Engineering & Clinical Skill Guide
 
-This skill provides the authoritative engineering playbook, operational directives, database conventions, and clinical safety guardrails for the **CareVerified (MedCred)** enterprise digital healthcare and clinical workforce platform.
+This skill provides the authoritative engineering playbook, operational directives, database conventions, and clinical safety guardrails for the **MediCred (MediCred)** enterprise digital healthcare and clinical workforce platform.
 
 ---
 
@@ -31,7 +31,7 @@ This skill provides the authoritative engineering playbook, operational directiv
 
 ## 2. Mandatory Verification & Clinical Safety Workflows
 
-When working on any module within CareVerified, engineers and agents MUST adhere to the following deterministic workflows:
+When working on any module within MediCred, engineers and agents MUST adhere to the following deterministic workflows:
 
 ### 2.1 Telehealth Consultation Workflow
 1. **Intake & Escrow Pre-authorization**:
@@ -65,9 +65,9 @@ When working on any module within CareVerified, engineers and agents MUST adhere
 ### 2.4 Outbound Hospital EHR Webhook Dispatch
 1. **HMAC-SHA256 Security Headers**:
    - Webhooks sent to hospital endpoints must include:
-     - `X-MedCred-Signature-256`: `sha256=HMAC_SHA256(secret_key, timestamp + "." + payload)`
-     - `X-MedCred-Timestamp`: Unix millisecond timestamp
-     - `X-MedCred-Delivery-Id`: Unique dispatch UUID
+     - `X-MediCred-Signature-256`: `sha256=HMAC_SHA256(secret_key, timestamp + "." + payload)`
+     - `X-MediCred-Timestamp`: Unix millisecond timestamp
+     - `X-MediCred-Delivery-Id`: Unique dispatch UUID
 2. **Retry Protocol**:
    - Retries follow exponential backoff (`1m, 5m, 15m, 1h, 6h`) up to 5 attempts, logged in `webhook_dispatch_logs`.
 

@@ -274,7 +274,7 @@ export default function AdminLiterature({
           <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-4 rounded-none">
             <div>
               <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide">MedlinePlus Condition Fact Sheets Ingestion</h3>
-              <p className="text-xs text-slate-500 font-semibold mt-0.5">Plain-language clinical condition overviews from the U.S. National Library of Medicine. They appear on the condition's guide page in MedCred once verified and approved.</p>
+              <p className="text-xs text-slate-500 font-semibold mt-0.5">Plain-language clinical condition overviews from the U.S. National Library of Medicine. They appear on the condition's guide page in MediCred once verified and approved.</p>
             </div>
             <form onSubmit={fetchSheet} className="flex flex-col sm:flex-row gap-3 max-w-xl">
               <input className={field} value={sheetTopic} onChange={e => setSheetTopic(e.target.value)} placeholder="Enter medical condition topic (e.g. Asthma, Hypertension, Diabetes)" minLength={3} maxLength={80} required aria-label="Fact sheet topic" />

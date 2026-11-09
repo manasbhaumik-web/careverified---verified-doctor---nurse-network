@@ -112,7 +112,7 @@ export default function SupportDesk({
         <WorkspaceHeader
           icon={LifeBuoy}
           eyebrow="Care Assistance & Resolution · 24/7 Support Desk"
-          title="MedCred Support Desk & Help Center"
+          title="MediCred Support Desk & Help Center"
           description="Submit inquiries, report clinical issues, track ticket resolution SLAs, and contact our operations team."
           badges={<BannerBadge tone="brand">Priority Response</BannerBadge>}
         />
@@ -176,7 +176,7 @@ export default function SupportDesk({
               <ul className="space-y-2 max-h-80 overflow-y-auto">
                 {open.messages.map((m: any) => (
                   <li key={m.id} className={`text-xs p-3 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}>
-                    <p className="text-xs font-extrabold uppercase text-slate-500 mb-1">{m.fromStaff ? 'MedCred support' : 'You'} · {when(m.ts)}</p>{m.body}
+                    <p className="text-xs font-extrabold uppercase text-slate-500 mb-1">{m.fromStaff ? 'MediCred support' : 'You'} · {when(m.ts)}</p>{m.body}
                   </li>
                 ))}
               </ul>

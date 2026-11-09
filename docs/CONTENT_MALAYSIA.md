@@ -19,7 +19,7 @@ Covers section 9 of the task list: landing page, language, medical library, demo
 
 ## Medical library
 - Articles can carry a **Malay version** (title, summary, body) with a language toggle in the reader that follows the interface language, plus a **"Malaysia in numbers"** box where every figure has a source link and date.
-- Three new topics: **dengue**, **diabetes** and **high blood pressure** (English and Malay). They are labelled **"Draft: not yet reviewed by a registered doctor"**, credited to the "MedCred editorial team" (not to any doctor), and the Malay text is flagged as an unreviewed translation. **A registered doctor must review the clinical content and a native-speaking clinician the translation before the draft labels are removed.**
+- Three new topics: **dengue**, **diabetes** and **high blood pressure** (English and Malay). They are labelled **"Draft: not yet reviewed by a registered doctor"**, credited to the "MediCred editorial team" (not to any doctor), and the Malay text is flagged as an unreviewed translation. **A registered doctor must review the clinical content and a native-speaking clinician the translation before the draft labels are removed.**
 - Figures used (all sourced in the article):
   - NHMS 2023, Institute for Public Health: diabetes in 15.6% of adults (9.7% known, 5.9% raised glucose not known), high blood pressure in 29.2% (17.3% known, 11.9% not known).
   - Dengue: 123,133 cases and 100 deaths in 2023 (66,102 and 56 in 2022); 121,082 cases and 116 deaths by epidemiological week 51 of 2024. The full-year 2024 total and 2025 figures are not included: no reliable source was found.

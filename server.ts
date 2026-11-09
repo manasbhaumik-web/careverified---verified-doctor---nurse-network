@@ -1590,7 +1590,7 @@ app.post("/api/symptom-matching", (req, res) => {
   const flags = redFlags(symptoms);
   res.json({
     status: "success",
-    source: "MedCred Triage Engine",
+    source: "MediCred Triage Engine",
     data: recommendation,
     emergency: flags.length ? { reasons: flags, numbers: emergencyNumbers() } : null,
   });
@@ -1667,37 +1667,37 @@ app.get("/sitemap.xml", (req, res) => {
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://careverified.pro/</loc>
+    <loc>https://medicred.pro/</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://careverified.pro/about</loc>
+    <loc>https://medicred.pro/about</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://careverified.pro/jobs</loc>
+    <loc>https://medicred.pro/jobs</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careverified.pro/for-doctors</loc>
+    <loc>https://medicred.pro/for-doctors</loc>
     <lastmod>2026-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://careverified.pro/for-pharmacies</loc>
+    <loc>https://medicred.pro/for-pharmacies</loc>
     <lastmod>2026-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://careverified.pro/for-clinics</loc>
+    <loc>https://medicred.pro/for-clinics</loc>
     <lastmod>2026-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -1711,7 +1711,7 @@ app.get("/sitemap.xml", (req, res) => {
     cities.forEach(city => {
       xml += `
   <url>
-    <loc>https://careverified.pro/best-${spec}-in-${city}</loc>
+    <loc>https://medicred.pro/best-${spec}-in-${city}</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -1723,7 +1723,7 @@ app.get("/sitemap.xml", (req, res) => {
   [...doctors, ...nurses].filter(p => p.verificationStatus === VerificationStatus.VERIFIED).forEach(prof => {
     xml += `
   <url>
-    <loc>https://careverified.pro/doctors/${prof.seoSlug}</loc>
+    <loc>https://medicred.pro/doctors/${prof.seoSlug}</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -1754,7 +1754,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`MedCred Full-Stack server is actively listening on http://0.0.0.0:${PORT}`);
+    console.log(`MediCred Full-Stack server is actively listening on http://0.0.0.0:${PORT}`);
   });
 }
 

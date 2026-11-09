@@ -245,7 +245,7 @@ export function registerPaymentRoutes(app: Application) {
         invoiceNumber: "INV-" + p.id.slice(4).toUpperCase(), paymentId: p.id, issuedAt: p.paid_at,
         billedTo: patient, description: p.description, currency: p.currency, total: p.amount_sen / 100,
         subtotal: (p.amount_sen - p.tax_sen) / 100, tax: p.tax_sen / 100, taxRatePct: p.tax_rate_pct,
-        seller: { name: process.env.PRIVACY_CONTROLLER_NAME || "MedCred Healthcare Network Sdn Bhd", sstRegistrationNo: sstConfig().registrationNo || null },
+        seller: { name: process.env.PRIVACY_CONTROLLER_NAME || "MediCred Healthcare Network Sdn Bhd", sstRegistrationNo: sstConfig().registrationNo || null },
         status: p.status, refundedAt: p.refunded_at, provider: p.provider,
         testMode: p.provider === "sandbox",
       },

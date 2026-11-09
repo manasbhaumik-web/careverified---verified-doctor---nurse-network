@@ -54,13 +54,13 @@ export function useLiveAlerts({ newCount, refresh, pollMs = 20_000 }: { newCount
     if (previous.current !== undefined && newCount > previous.current) {
       if (sound) chime();
       if (desktop && supported && Notification.permission === 'granted') {
-        try { new Notification('New prescription received', { body: `${newCount} waiting in your MedCred inbox.` }); } catch { /* not allowed here */ }
+        try { new Notification('New prescription received', { body: `${newCount} waiting in your MediCred inbox.` }); } catch { /* not allowed here */ }
       }
     }
     previous.current = newCount;
   }, [newCount, sound, desktop, supported]);
 
-  // "(2) MedCred ..." in the browser tab so the count is visible from other tabs
+  // "(2) MediCred ..." in the browser tab so the count is visible from other tabs
   useEffect(() => {
     const base = document.title.replace(/^\(\d+\)\s*/, '');
     document.title = newCount ? `(${newCount}) ${base}` : base;

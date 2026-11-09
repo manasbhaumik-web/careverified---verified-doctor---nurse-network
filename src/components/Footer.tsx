@@ -18,7 +18,7 @@ export interface FooterProps {
   onLogout?: () => void;
 }
 
-// MedCred Medical Cross Emblem
+// MediCred Medical Cross Emblem
 function Cross({ className = '' }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
@@ -49,7 +49,7 @@ export default function Footer({
               <span className="w-5 h-5 bg-[color:var(--t-600)] flex items-center justify-center text-white shrink-0 shadow-2xs">
                 <Cross className="h-3 w-3" />
               </span>
-              <span className="font-display font-extrabold text-sm text-white tracking-tight">MedCred</span>
+              <span className="font-display font-extrabold text-sm text-white tracking-tight">MediCred</span>
             </div>
             <span className="text-slate-600 hidden sm:inline">&bull;</span>
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 flex items-center gap-1.5">
@@ -57,7 +57,7 @@ export default function Footer({
               Act 586 Verified
             </span>
             <span className="text-slate-600 hidden sm:inline">&bull;</span>
-            <span className="text-xs text-slate-400">&copy; {currentYear} MedCred Healthcare Network Sdn Bhd</span>
+            <span className="text-xs text-slate-400">&copy; {currentYear} MediCred Healthcare Network Sdn Bhd</span>
           </div>
 
           {/* Right: Essential Legal Links, Emergency Dispatch & Sign Out */}
@@ -104,20 +104,76 @@ export default function Footer({
         {/* ─── TIER 1: 5-COLUMN STRUCTURED NAVIGATION & TELEMETRY HUB ─── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-6 md:pb-8 border-b border-[color:var(--t-800)]">
           
-          {/* Column 1: Ecosystem Identity & Live Status Telemetry (4 Cols) */}
-          <div className="lg:col-span-4 space-y-4">
+          {/* Column 1: Ecosystem Identity & Live Status Telemetry (3 Cols) */}
+          <div className="lg:col-span-3 space-y-4">
             <div className="flex items-center gap-2.5">
               <span className="w-8 h-8 bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-800)] shadow-xs">
                 <Cross className="h-4 w-4" />
               </span>
-              <span className="font-display font-black text-xl text-white tracking-tight">MedCred</span>
+              <span className="font-display font-black text-xl text-white tracking-tight">MediCred</span>
               <span className="text-xs font-black uppercase tracking-widest bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 px-2 py-0.5">
                 Registry v2.4
               </span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
-              A network of verified doctors, nurses and pharmacies in Malaysia: licence checks, online consultations and doctor-signed e-prescriptions.
+              Malaysia's council-verified healthcare network: transparent hospital packages, MMC doctors, LJM home nurses, and licensed community pharmacies.
             </p>
+            <div className="pt-1">
+              <a
+                href="/packages"
+                onClick={e => { e.preventDefault(); navigate('/packages'); }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors shadow-2xs"
+              >
+                <span>Browse Marketplace</span>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </a>
+            </div>
+          </div>
+
+          {/* Column 2: Packages & Medical Directory (3 Cols) */}
+          <div className="space-y-3 lg:col-span-3">
+            <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2 flex items-center justify-between">
+              <span>Packages & Directory</span>
+              <span className="text-2xs font-mono font-bold text-[color:var(--t-300)] uppercase">Act 586</span>
+            </h4>
+            <ul className="space-y-2 text-xs text-slate-400">
+              <li>
+                <a href="/packages" onClick={e => { e.preventDefault(); navigate('/packages'); }} className="hover:text-white transition-colors cursor-pointer flex items-center justify-between group">
+                  <span className="group-hover:text-white font-medium">Healthcare Packages & Offers</span>
+                  <span className="text-2xs font-mono text-[color:var(--t-300)]">14 pkgs</span>
+                </a>
+              </li>
+              <li>
+                <a href="/packages?view=hospitals" onClick={e => { e.preventDefault(); navigate('/packages?view=hospitals'); }} className="hover:text-white transition-colors cursor-pointer flex items-center justify-between group">
+                  <span className="group-hover:text-white font-medium">Accredited Hospitals (MHTC)</span>
+                  <span className="text-2xs font-mono text-slate-500">5 tertiary</span>
+                </a>
+              </li>
+              <li>
+                <a href="/packages?view=clinics" onClick={e => { e.preventDefault(); navigate('/packages?view=clinics'); }} className="hover:text-white transition-colors cursor-pointer flex items-center justify-between group">
+                  <span className="group-hover:text-white font-medium">Specialist & Ambulatory Clinics</span>
+                  <span className="text-2xs font-mono text-slate-500">5 clinics</span>
+                </a>
+              </li>
+              <li>
+                <a href="/packages?view=doctors" onClick={e => { e.preventDefault(); navigate('/packages?view=doctors'); }} className="hover:text-white transition-colors cursor-pointer flex items-center justify-between group">
+                  <span className="group-hover:text-white font-medium">Specialized Doctors (MMC)</span>
+                  <span className="text-2xs font-mono text-slate-500">13 doctors</span>
+                </a>
+              </li>
+              <li>
+                <a href="/packages?view=nurses" onClick={e => { e.preventDefault(); navigate('/packages?view=nurses'); }} className="hover:text-white transition-colors cursor-pointer flex items-center justify-between group">
+                  <span className="group-hover:text-white font-medium">Specialized Nurses (LJM Home Care)</span>
+                  <span className="text-2xs font-mono text-slate-500">10 nurses</span>
+                </a>
+              </li>
+              <li>
+                <a href="/packages?view=pharmacies" onClick={e => { e.preventDefault(); navigate('/packages?view=pharmacies'); }} className="hover:text-white transition-colors cursor-pointer flex items-center justify-between group">
+                  <span className="group-hover:text-white font-medium">Licensed Pharmacies & Vouchers</span>
+                  <span className="text-2xs font-mono text-slate-500">6 centers</span>
+                </a>
+              </li>
+            </ul>
           </div>
 
           {/* Column 2: Portals & Navigation (2 Cols) */}
@@ -255,7 +311,7 @@ export default function Footer({
               <strong className="text-white uppercase tracking-wider text-xs mr-1.5 font-bold">
                 Medical Disclaimer:
               </strong>
-              MedCred operates as an independent medical directory, credential validation authority, and tele-consultation facilitation network. It is not an acute emergency response dispatch. Medical opinions, diagnoses, and prescriptions issued through the platform are rendered solely by autonomous, board-verified practitioners who maintain active Annual Practising Certificates (APC) under the Malaysian Medical Council or Lembaga Jururawat Malaysia. In the event of an urgent or life-threatening emergency, immediately contact national dispatch services at <strong className="text-white font-bold">999</strong> (112 from a mobile phone) or present at the nearest accredited hospital casualty department.
+              MediCred operates as an independent medical directory, credential validation authority, and tele-consultation facilitation network. It is not an acute emergency response dispatch. Medical opinions, diagnoses, and prescriptions issued through the platform are rendered solely by autonomous, board-verified practitioners who maintain active Annual Practising Certificates (APC) under the Malaysian Medical Council or Lembaga Jururawat Malaysia. In the event of an urgent or life-threatening emergency, immediately contact national dispatch services at <strong className="text-white font-bold">999</strong> (112 from a mobile phone) or present at the nearest accredited hospital casualty department.
             </p>
           </div>
         </div>
@@ -263,7 +319,7 @@ export default function Footer({
         {/* ─── TIER 4: BOTTOM UTILITY BAR & LOCALIZATION ─── */}
         <div className="pt-2 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 justify-center md:justify-start">
-            <span>&copy; {currentYear} MedCred Healthcare Network Sdn Bhd. All rights reserved.</span>
+            <span>&copy; {currentYear} MediCred Healthcare Network Sdn Bhd. All rights reserved.</span>
             <span className="text-slate-700 hidden sm:inline">&bull;</span>
             <span onClick={() => openLegal('notice')} className="hover:text-slate-200 cursor-pointer transition-colors">Privacy Policy</span>
             <span className="text-slate-700 hidden sm:inline">&bull;</span>

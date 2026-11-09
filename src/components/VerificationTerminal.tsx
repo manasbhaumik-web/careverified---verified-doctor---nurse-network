@@ -1195,7 +1195,7 @@ export default function VerificationTerminal({
           <div className="space-y-1.5">
             <h3 className="text-base font-black text-slate-900">Application Lodged Successfully!</h3>
             <p className="text-xs text-slate-500 font-medium max-w-md mx-auto leading-relaxed">
-              Dr./Sister {name}, your registry profile has been established on MedCred. 
+              Dr./Sister {name}, your registry profile has been established on MediCred. 
               Admin moderators will complete verification of your state license number <strong>{licenseNumber}</strong> shortly.
             </p>
           </div>

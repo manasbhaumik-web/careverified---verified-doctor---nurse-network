@@ -17,9 +17,9 @@ const pick = (l: LangCode): Lang => (l === 'ms' || l === 'zh' ? l : 'en');
 
 const T = {
   en: {
-    title: 'For Community Pharmacies | MedCred Malaysia',
+    title: 'For Community Pharmacies | MediCred Malaysia',
     description:
-      'Connect your licensed Malaysian community pharmacy to MedCred. Verify cryptographic QR e-prescriptions, review clinical allergy checks, log Poisons Act 1952 records, and coordinate cold-chain delivery.',
+      'Connect your licensed Malaysian community pharmacy to MediCred. Verify cryptographic QR e-prescriptions, review clinical allergy checks, log Poisons Act 1952 records, and coordinate cold-chain delivery.',
     headerBadge: 'Community Pharmacy Network',
     hero: {
       tag: 'LFM & Poisons Act 1952 Verified Pharmacy Network',
@@ -46,7 +46,7 @@ const T = {
       {
         value: 'RM 0',
         label: 'Zero Platform Commission',
-        sub: 'MedCred charges RM 0 commission on dispensed medications or delivery fees. 100% of pharmacy revenue stays with you.',
+        sub: 'MediCred charges RM 0 commission on dispensed medications or delivery fees. 100% of pharmacy revenue stays with you.',
       },
       {
         value: '2FA + PDPA',
@@ -68,7 +68,7 @@ const T = {
       eyebrow: 'Transparent Pharmacy Economics',
       title: 'Digital E-Prescription Volume & Fulfilment Simulator',
       subtitle:
-        'Estimate monthly prescription revenue retained at 0% platform commission and front-counter verification time saved when processing verified MedCred e-prescriptions.',
+        'Estimate monthly prescription revenue retained at 0% platform commission and front-counter verification time saved when processing verified MediCred e-prescriptions.',
       pharmacyType: 'Pharmacy Format',
       types: [
         { id: 'independent', name: 'Independent Community Pharmacy', avgBasket: 65, unit: 'Rx' },
@@ -78,7 +78,7 @@ const T = {
       sliderLabel: 'Daily Digital & Walk-In E-Prescriptions Processed',
       dailyRxUnit: 'Rx / day',
       estMonthlyValue: 'Estimated Monthly Gross E-Rx Value (100% Retained)',
-      estMonthlySub: 'dispensed e-prescriptions per month · RM 0 MedCred fee',
+      estMonthlySub: 'dispensed e-prescriptions per month · RM 0 MediCred fee',
       timeSavedLabel: 'Estimated Pharmacist Verification Time Saved',
       hoursPerMonth: 'hrs / month',
       timeSavedSub:
@@ -118,7 +118,7 @@ const T = {
       eyebrow: 'Legal, Statutory & Operational Governance',
       title: 'Malaysian Pharmacy Statutory Compliance & Platform Scope',
       subtitle:
-        'MedCred is engineered around Malaysian pharmacy legislation and clear operational boundaries so your superintendent pharmacist stays in full regulatory control.',
+        'MediCred is engineered around Malaysian pharmacy legislation and clear operational boundaries so your superintendent pharmacist stays in full regulatory control.',
       items: [
         {
           title: 'Poisons Act 1952 (Act 366) & Dispensing Records',
@@ -134,24 +134,24 @@ const T = {
         },
         {
           title: 'Direct Commercial Settlement & Transparent Integration Scope',
-          desc: 'MedCred charges pharmacies RM 0. Medication charges, co-payments, and delivery fees are collected directly by your pharmacy. Insurance Guarantee Letter (GL) approvals/declines and courier booking references (own rider, GrabExpress, Lalamove) are logged manually in your workspace rather than via live third-party APIs.',
+          desc: 'MediCred charges pharmacies RM 0. Medication charges, co-payments, and delivery fees are collected directly by your pharmacy. Insurance Guarantee Letter (GL) approvals/declines and courier booking references (own rider, GrabExpress, Lalamove) are logged manually in your workspace rather than via live third-party APIs.',
         },
       ],
     },
     apply: {
       eyebrow: 'Begin Your Pharmacy Accreditation',
-      title: 'Accredit Your Pharmacy With MedCred',
+      title: 'Accredit Your Pharmacy With MediCred',
       intro:
         'Join Malaysia’s verified digital dispensing network. Submit your pharmacy details below and our board will contact you to complete your LFM and Premises Licence verification.',
       whoTitle: 'Who Can Join & How Accounts Are Created',
       whoDesc:
-        'Open to licensed Malaysian community pharmacies, retail pharmacy chains, and ambulatory dispensaries holding a valid Premises Licence and registered LFM pharmacist with an active Annual Retention Certificate. Pharmacy accounts are provisioned directly by the MedCred board after licence verification.',
+        'Open to licensed Malaysian community pharmacies, retail pharmacy chains, and ambulatory dispensaries holding a valid Premises Licence and registered LFM pharmacist with an active Annual Retention Certificate. Pharmacy accounts are provisioned directly by the MediCred board after licence verification.',
     },
   },
   ms: {
-    title: 'Untuk Farmasi Komuniti | MedCred Malaysia',
+    title: 'Untuk Farmasi Komuniti | MediCred Malaysia',
     description:
-      'Hubungkan farmasi komuniti berlesen anda dengan MedCred. Sahkan e-preskripsi QR kriptografi, semak amaran alahan klinikal, rekod Buku Racun Akta 1952, dan uruskan penghantaran rantaian sejuk.',
+      'Hubungkan farmasi komuniti berlesen anda dengan MediCred. Sahkan e-preskripsi QR kriptografi, semak amaran alahan klinikal, rekod Buku Racun Akta 1952, dan uruskan penghantaran rantaian sejuk.',
     headerBadge: 'Rangkaian Farmasi Komuniti',
     hero: {
       tag: 'Rangkaian Farmasi Disahkan LFM & Akta Racun 1952',
@@ -178,7 +178,7 @@ const T = {
       {
         value: 'RM 0',
         label: 'Sifar Komisen Platform',
-        sub: 'MedCred tidak mengenakan sebarang komisen ke atas ubat atau yuran penghantaran. 100% hasil kekal milik farmasi anda.',
+        sub: 'MediCred tidak mengenakan sebarang komisen ke atas ubat atau yuran penghantaran. 100% hasil kekal milik farmasi anda.',
       },
       {
         value: '2FA + PDPA',
@@ -200,7 +200,7 @@ const T = {
       eyebrow: 'Ekonomi Operasi Farmasi Telus',
       title: 'Simulator Volum E-Preskripsi & Kecekapan Dispensari',
       subtitle:
-        'Anggarkan nilai preskripsi bulanan yang dikekalkan pada 0% komisen platform serta masa pengesahan kaunter yang dijimatkan melalui e-preskripsi MedCred.',
+        'Anggarkan nilai preskripsi bulanan yang dikekalkan pada 0% komisen platform serta masa pengesahan kaunter yang dijimatkan melalui e-preskripsi MediCred.',
       pharmacyType: 'Kategori Farmasi',
       types: [
         { id: 'independent', name: 'Farmasi Komuniti Bebas', avgBasket: 65, unit: 'Rx' },
@@ -210,7 +210,7 @@ const T = {
       sliderLabel: 'Purata E-Preskripsi Digital & Walk-In Sehari',
       dailyRxUnit: 'Rx / hari',
       estMonthlyValue: 'Anggaran Nilai Kasar E-Rx Bulanan (100% Milik Farmasi)',
-      estMonthlySub: 'e-preskripsi didispens sebulan · RM 0 yuran MedCred',
+      estMonthlySub: 'e-preskripsi didispens sebulan · RM 0 yuran MediCred',
       timeSavedLabel: 'Anggaran Masa Pengesahan Ahli Farmasi Dijimatkan',
       hoursPerMonth: 'jam / bulan',
       timeSavedSub:
@@ -250,7 +250,7 @@ const T = {
       eyebrow: 'Tadbir Urus Undang-Undang & Skop Operasi',
       title: 'Pematuhan Statutori Farmasi Malaysia & Skop Platform',
       subtitle:
-        'MedCred dibina berlandaskan perundangan farmasi Malaysia dan sempadan operasi yang jelas supaya ahli farmasi anda kekal mempunyai kawalan penuh.',
+        'MediCred dibina berlandaskan perundangan farmasi Malaysia dan sempadan operasi yang jelas supaya ahli farmasi anda kekal mempunyai kawalan penuh.',
       items: [
         {
           title: 'Akta Racun 1952 (Akta 366) & Rekod Pendispensan',
@@ -266,24 +266,24 @@ const T = {
         },
         {
           title: 'Penyelesaian Bayaran Terus & Ketelusan Skop Integrasi',
-          desc: 'MedCred tidak mengenakan bayaran kepada farmasi. Bayaran ubat, bayaran bersama (co-pay), dan caj penghantaran dikutip terus oleh farmasi anda. Keputusan Surat Jaminan (GL) insurans dan rujukan tempahan kurier (penunggang sendiri, GrabExpress, Lalamove) direkod secara manual dalam ruang kerja tanpa sambungan API pihak ketiga secara langsung.',
+          desc: 'MediCred tidak mengenakan bayaran kepada farmasi. Bayaran ubat, bayaran bersama (co-pay), dan caj penghantaran dikutip terus oleh farmasi anda. Keputusan Surat Jaminan (GL) insurans dan rujukan tempahan kurier (penunggang sendiri, GrabExpress, Lalamove) direkod secara manual dalam ruang kerja tanpa sambungan API pihak ketiga secara langsung.',
         },
       ],
     },
     apply: {
       eyebrow: 'Mulakan Pengakreditasian Farmasi Anda',
-      title: 'Sertai Rangkaian Farmasi Disahkan MedCred',
+      title: 'Sertai Rangkaian Farmasi Disahkan MediCred',
       intro:
         'Sertai rangkaian pendispensan digital yang disahkan di Malaysia. Hantar butiran farmasi anda di bawah dan ahli lembaga kami akan menghubungi anda untuk pengesahan lesen.',
       whoTitle: 'Siapa Boleh Menyertai & Cara Akaun Dicipta',
       whoDesc:
-        'Terbuka kepada farmasi komuniti berlesen di Malaysia, rangkaian farmasi runcit, dan dispensari pesakit luar yang mempunyai Lesen Premis sah serta ahli farmasi berdaftar LFM dengan Sijil Pengekalan Tahunan (ARC) aktif. Akaun farmasi dicipta oleh lembaga MedCred selepas pengesahan lesen.',
+        'Terbuka kepada farmasi komuniti berlesen di Malaysia, rangkaian farmasi runcit, dan dispensari pesakit luar yang mempunyai Lesen Premis sah serta ahli farmasi berdaftar LFM dengan Sijil Pengekalan Tahunan (ARC) aktif. Akaun farmasi dicipta oleh lembaga MediCred selepas pengesahan lesen.',
     },
   },
   zh: {
-    title: '面向社区药房 | MedCred 马来西亚',
+    title: '面向社区药房 | MediCred 马来西亚',
     description:
-      '将您的马来西亚持牌社区药房接入 MedCred。核验防伪二维码电子处方、查阅患者药物过敏安全排查、登记《1952年毒药法令》配药记录并管理冷链送药上门。',
+      '将您的马来西亚持牌社区药房接入 MediCred。核验防伪二维码电子处方、查阅患者药物过敏安全排查、登记《1952年毒药法令》配药记录并管理冷链送药上门。',
     headerBadge: '认证社区药房网络',
     hero: {
       tag: '马来西亚药剂师委员会 (LFM) 与《1952年毒药法令》认证网络',
@@ -310,7 +310,7 @@ const T = {
       {
         value: 'RM 0',
         label: '零平台抽成与入驻费',
-        sub: 'MedCred 目前不对药房收取入驻费或药品、配送抽成，100% 处方调配与配送收入归药房所有。',
+        sub: 'MediCred 目前不对药房收取入驻费或药品、配送抽成，100% 处方调配与配送收入归药房所有。',
       },
       {
         value: '2FA + PDPA',
@@ -342,7 +342,7 @@ const T = {
       sliderLabel: '每日处理的线上推送及到店电子处方数量',
       dailyRxUnit: '张 / 天',
       estMonthlyValue: '预估月度电子处方总金额（药房 100% 留存）',
-      estMonthlySub: '张月度调配处方 · RM 0 MedCred 平台抽成',
+      estMonthlySub: '张月度调配处方 · RM 0 MediCred 平台抽成',
       timeSavedLabel: '预估每月节省的药剂师人工核查工时',
       hoursPerMonth: '小时 / 月',
       timeSavedSub: '大幅减少电话核实医生 APC 资质、辨认手写处方字迹及手工比对登记簿的时间',
@@ -381,7 +381,7 @@ const T = {
       eyebrow: '法定合规准则与平台职责边界',
       title: '马来西亚药房法定合规与平台服务范围说明',
       subtitle:
-        'MedCred 严格遵循马来西亚药事法规并明确界定平台功能边界，确保您的注册药剂师始终掌握完整的临床与合规主导权。',
+        'MediCred 严格遵循马来西亚药事法规并明确界定平台功能边界，确保您的注册药剂师始终掌握完整的临床与合规主导权。',
       items: [
         {
           title: '《1952年毒药法令》（第 366 号法令）与配药登记簿',
@@ -403,12 +403,12 @@ const T = {
     },
     apply: {
       eyebrow: '开启药房认证入驻',
-      title: '申请将您的药房加入 MedCred 认证网络',
+      title: '申请将您的药房加入 MediCred 认证网络',
       intro:
         '加入马来西亚值得信赖的数字处方调配网络。请在下方填写您的药房资料，委员会成员将与您联系以完成执照核验与账户创建。',
       whoTitle: '准入条件与账户开通方式',
       whoDesc:
-        '面向持有有效营业场所执照、A 类毒药执照及具备有效年度续证证书 (ARC) 的马来西亚注册社区药房与连锁药房开放。药房账户不设公开自助注册，均在申请核验通过后由 MedCred 委员会为您创建。',
+        '面向持有有效营业场所执照、A 类毒药执照及具备有效年度续证证书 (ARC) 的马来西亚注册社区药房与连锁药房开放。药房账户不设公开自助注册，均在申请核验通过后由 MediCred 委员会为您创建。',
     },
   },
 };
@@ -439,7 +439,7 @@ const CAPABILITIES = [
       zh: '防伪二维码扫描与到店处方码核查',
     },
     desc: {
-      en: 'Every MedCred prescription carries a unique alphanumeric code and QR. Verify walk-in patients instantly in your workspace or via the zero-login public check page, including live prescriber APC status.',
+      en: 'Every MediCred prescription carries a unique alphanumeric code and QR. Verify walk-in patients instantly in your workspace or via the zero-login public check page, including live prescriber APC status.',
       ms: 'Setiap preskripsi mempunyai kod unik dan QR. Sahkan preskripsi pesakit walk-in di ruang kerja anda atau halaman semakan awam tanpa log masuk, termasuk status pengesahan doktor.',
       zh: '每张电子处方均具备唯一防伪码与二维码。支持到店患者输入代码秒级验真并核查开方医生的实时执业认证状态，亦提供免登录公开核查页。',
     },
@@ -616,7 +616,7 @@ export default function PharmacyPage() {
               navigate('/');
             }}
             className="flex items-center gap-2.5 min-w-0"
-            aria-label="MedCred home"
+            aria-label="MediCred home"
           >
             <span className="w-9 h-9 shrink-0 bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-700)]">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true">
@@ -624,7 +624,7 @@ export default function PharmacyPage() {
               </svg>
             </span>
             <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">
-              MedCred<span className="text-[color:var(--t-600)]">.</span>
+              MediCred<span className="text-[color:var(--t-600)]">.</span>
               <span className="hidden sm:inline-block ml-2 text-xs font-mono font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
                 {tx.headerBadge}
               </span>

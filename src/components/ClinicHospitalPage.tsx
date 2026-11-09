@@ -17,7 +17,7 @@ const pick = (l: LangCode): Lang => (l === 'ms' || l === 'zh' ? l : 'en');
 
 const T = {
   en: {
-    title: 'For Clinics & Hospitals | MedCred Malaysia',
+    title: 'For Clinics & Hospitals | MediCred Malaysia',
     description: 'Empower your healthcare facility with verified locum doctor and nurse staffing, international medical tourism inquiries, and KKM Act 586 statutory compliance.',
     hero: {
       tag: 'KKM Act 586 Verified Facility Network',
@@ -71,7 +71,7 @@ const T = {
     },
     regulatory: {
       title: 'Malaysian Healthcare Statutory Compliance',
-      subtitle: 'MedCred operates strictly within the Malaysian legal framework to safeguard healthcare facilities, clinicians, and patients.',
+      subtitle: 'MediCred operates strictly within the Malaysian legal framework to safeguard healthcare facilities, clinicians, and patients.',
       items: [
         {
           title: 'Private Healthcare Facilities and Services Act 1998 (Act 586)',
@@ -87,17 +87,17 @@ const T = {
         },
         {
           title: 'Poisons Act 1952 & Controlled Medication Protocols',
-          desc: 'Clinic e-prescriptions issued via MedCred strictly comply with Group B and Group C poison dispensing protocols. Dangerous drugs (Group A) are never e-prescribed.',
+          desc: 'Clinic e-prescriptions issued via MediCred strictly comply with Group B and Group C poison dispensing protocols. Dangerous drugs (Group A) are never e-prescribed.',
         },
       ],
     },
     apply: {
-      title: 'Accredit Your Facility With MedCred',
+      title: 'Accredit Your Facility With MediCred',
       intro: 'Join Malaysia’s premier network of verified healthcare facilities. Fill in your facility details below, and our clinical board will reach out to verify your Act 586 credentials.',
     },
   },
   ms: {
-    title: 'Untuk Klinik & Hospital | MedCred Malaysia',
+    title: 'Untuk Klinik & Hospital | MediCred Malaysia',
     description: 'Perkasakan kemudahan penjagaan kesihatan anda dengan kakitangan locum doktor dan jururawat disahkan, pertanyaan pelancongan perubatan antarabangsa, dan pematuhan Akta 586 KKM.',
     hero: {
       tag: 'Rangkaian Kemudahan Disahkan Akta 586 KKM',
@@ -151,7 +151,7 @@ const T = {
     },
     regulatory: {
       title: 'Pematuhan Statutori Penjagaan Kesihatan Malaysia',
-      subtitle: 'MedCred beroperasi dengan tegas mengikut undang-undang Malaysia untuk melindungi kemudahan, klinisi dan pesakit.',
+      subtitle: 'MediCred beroperasi dengan tegas mengikut undang-undang Malaysia untuk melindungi kemudahan, klinisi dan pesakit.',
       items: [
         {
           title: 'Akta Kemudahan dan Perkhidmatan Jagaan Kesihatan Swasta 1998 (Akta 586)',
@@ -172,12 +172,12 @@ const T = {
       ],
     },
     apply: {
-      title: 'Akreditasi Kemudahan Anda di MedCred',
+      title: 'Akreditasi Kemudahan Anda di MediCred',
       intro: 'Sertai rangkaian kemudahan kesihatan disahkan terkemuka di Malaysia. Isi butiran kemudahan anda di bawah untuk tindakan lembaga klinikal kami.',
     },
   },
   zh: {
-    title: '面向诊所与医院 | MedCred 马来西亚',
+    title: '面向诊所与医院 | MediCred 马来西亚',
     description: '赋能您的医疗机构：经认证的医生与护士 Locum 代班排班、国际医疗旅游转诊对接以及卫生部第 586 条法令全流程合规。',
     hero: {
       tag: '卫生部第 586 号法令认证机构网络',
@@ -231,7 +231,7 @@ const T = {
     },
     regulatory: {
       title: '马来西亚法定医疗合规标准',
-      subtitle: 'MedCred 严格运行于马来西亚法定框架内，全面保障医疗机构、执业医护人员与患者合法权益。',
+      subtitle: 'MediCred 严格运行于马来西亚法定框架内，全面保障医疗机构、执业医护人员与患者合法权益。',
       items: [
         {
           title: '《1998年私立医疗保健设施与服务法令》（第 586 条法令）',
@@ -284,8 +284,8 @@ const CAPABILITIES = [
       zh: 'MHTC 国际医疗旅游跨境转诊对接',
     },
     desc: {
-      en: 'Receive structured clinical inquiries from overseas patients via MedCred’s cross-border portal, including travel dates, diagnostic summaries, and special concierge needs.',
-      ms: 'Terima pertanyaan klinikal berstruktur daripada pesakit luar negara melalui portal MedCred, termasuk tarikh perjalanan, ringkasan diagnosis dan keperluan khas.',
+      en: 'Receive structured clinical inquiries from overseas patients via MediCred’s cross-border portal, including travel dates, diagnostic summaries, and special concierge needs.',
+      ms: 'Terima pertanyaan klinikal berstruktur daripada pesakit luar negara melalui portal MediCred, termasuk tarikh perjalanan, ringkasan diagnosis dan keperluan khas.',
       zh: '通过专属跨境门户接收海外患者的规范化行前咨询，包含抵马日程、历史病历摘要及特需陪护服务需求。',
     },
     badge: 'Cross-Border Concierge',
@@ -332,8 +332,8 @@ const CAPABILITIES = [
       zh: '整合式数字处方智慧配药网络',
     },
     desc: {
-      en: 'Route clinic e-prescriptions with embedded cryptographic QR codes directly to MedCred licensed partner pharmacies for home delivery or patient pickup.',
-      ms: 'Hantar e-preskripsi klinik dengan kod QR kriptografi terus ke farmasi rakan kongsi MedCred untuk penghantaran ke rumah atau kutipan pesakit.',
+      en: 'Route clinic e-prescriptions with embedded cryptographic QR codes directly to MediCred licensed partner pharmacies for home delivery or patient pickup.',
+      ms: 'Hantar e-preskripsi klinik dengan kod QR kriptografi terus ke farmasi rakan kongsi MediCred untuk penghantaran ke rumah atau kutipan pesakit.',
       zh: '诊所医生开具的带防伪二维码处方可一键直连合作执业药房，支持患者就近取药或恒温冷链配送到家。',
     },
     badge: 'Poisons Act Compliant',
@@ -438,7 +438,7 @@ export default function ClinicHospitalPage() {
               navigate('/');
             }}
             className="flex items-center gap-2.5 min-w-0"
-            aria-label="MedCred home"
+            aria-label="MediCred home"
           >
             <span className="w-9 h-9 shrink-0 bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-700)]">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true">
@@ -446,7 +446,7 @@ export default function ClinicHospitalPage() {
               </svg>
             </span>
             <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">
-              MedCred<span className="text-[color:var(--t-600)]">.</span>
+              MediCred<span className="text-[color:var(--t-600)]">.</span>
               <span className="ml-2 text-xs font-mono font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
                 Clinic & Hospital Network
               </span>

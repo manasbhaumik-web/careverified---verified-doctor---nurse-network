@@ -36,7 +36,7 @@ export default function MalaysiaPatientsPage({ onSignUp }: MalaysiaPatientsPageP
       a: 'In accordance with Malaysian Medical Council (MMC) Telemedicine Guidelines, official Medical Certificates (MC) require an in-person physical assessment. Telehealth doctors can issue doctor-signed clinical consultation summaries and medical referral letters.'
     },
     {
-      q: 'Can I claim MedCred consultations from my insurance or employer?',
+      q: 'Can I claim MediCred consultations from my insurance or employer?',
       a: 'Yes. Every consultation and prescription produces an official, itemised receipt with diagnostic ICD-10 coding. These are formatted for submission to corporate TPAs (PMCare, MiCare) and major insurers (AIA, Prudential, Great Eastern, Allianz) as well as LHDN tax relief.'
     },
     {
@@ -60,7 +60,7 @@ export default function MalaysiaPatientsPage({ onSignUp }: MalaysiaPatientsPageP
                 M
               </span>
               <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">
-                MedCred<span className="text-[color:var(--t-600)]">.</span>
+                MediCred<span className="text-[color:var(--t-600)]">.</span>
               </span>
             </a>
 

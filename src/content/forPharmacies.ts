@@ -6,7 +6,7 @@ import type { Lang, PageContent } from '../components/AudiencePage';
  */
 export const FOR_PHARMACIES: Record<Lang, PageContent> = {
   en: {
-    title: 'Join MedCred as a pharmacy',
+    title: 'Join MediCred as a pharmacy',
     description: 'Receive signed prescriptions you can check, update their status, offer home delivery and keep your own records. How joining works and what is not built yet.',
     hero: {
       eyebrow: 'For pharmacies',
@@ -59,12 +59,12 @@ export const FOR_PHARMACIES: Record<Lang, PageContent> = {
         ],
       },
       { kind: 'note', id: 'notyet', title: 'Not built yet', text: 'Connections to insurers for guarantee letters and claims, co-payment amounts, paying a balance in the app, and live Grab or Lalamove booking are not built. The medicine list does not carry Poisons Act groups yet, so a pharmacist must confirm those.' },
-      { kind: 'bullets', id: 'fees', title: 'Fees', items: ['The platform does not charge pharmacies today.', 'Delivery fees are recorded in the app and paid to the pharmacy directly, not through MedCred.', 'If you want to discuss terms, say so in the form.'] },
+      { kind: 'bullets', id: 'fees', title: 'Fees', items: ['The platform does not charge pharmacies today.', 'Delivery fees are recorded in the app and paid to the pharmacy directly, not through MediCred.', 'If you want to discuss terms, say so in the form.'] },
     ],
     apply: { title: 'Ask to join', intro: 'Tell us about your pharmacy. A board member will contact you. Pharmacy accounts are created by the board, so this form is the way in.' },
   },
   ms: {
-    title: 'Sertai MedCred sebagai farmasi',
+    title: 'Sertai MediCred sebagai farmasi',
     description: 'Terima preskripsi bertandatangan yang boleh disemak, kemas kini statusnya, tawarkan penghantaran ke rumah dan simpan rekod anda sendiri. Cara menyertai dan apa yang belum dibina.',
     hero: {
       eyebrow: 'Untuk farmasi',
@@ -117,12 +117,12 @@ export const FOR_PHARMACIES: Record<Lang, PageContent> = {
         ],
       },
       { kind: 'note', id: 'notyet', title: 'Belum dibina', text: 'Sambungan kepada penanggung insurans untuk surat jaminan dan tuntutan, jumlah bayaran bersama, pembayaran baki dalam aplikasi, dan tempahan langsung Grab atau Lalamove belum dibina. Senarai ubat belum mempunyai kumpulan Akta Racun, jadi ahli farmasi mesti mengesahkannya.' },
-      { kind: 'bullets', id: 'fees', title: 'Yuran', items: ['Platform tidak mengenakan bayaran kepada farmasi pada masa ini.', 'Yuran penghantaran direkod dalam aplikasi dan dibayar terus kepada farmasi, bukan melalui MedCred.', 'Jika anda mahu membincangkan terma, nyatakan dalam borang.'] },
+      { kind: 'bullets', id: 'fees', title: 'Yuran', items: ['Platform tidak mengenakan bayaran kepada farmasi pada masa ini.', 'Yuran penghantaran direkod dalam aplikasi dan dibayar terus kepada farmasi, bukan melalui MediCred.', 'Jika anda mahu membincangkan terma, nyatakan dalam borang.'] },
     ],
     apply: { title: 'Mohon menyertai', intro: 'Ceritakan tentang farmasi anda. Seorang ahli lembaga akan menghubungi anda. Akaun farmasi dicipta oleh lembaga, jadi borang ini ialah pintu masuknya.' },
   },
   zh: {
-    title: '以药房身份加入 MedCred',
+    title: '以药房身份加入 MediCred',
     description: '接收可核查的已签名处方，更新处方状态，提供送药上门并保存自己的记录。了解加入流程和尚未建成的功能。',
     hero: {
       eyebrow: '面向药房',
@@ -175,7 +175,7 @@ export const FOR_PHARMACIES: Record<Lang, PageContent> = {
         ],
       },
       { kind: 'note', id: 'notyet', title: '尚未建成', text: '与保险公司对接担保函和理赔、共付额、在应用内支付余款，以及 Grab 或 Lalamove 的实时预订尚未建成。药品清单尚未包含毒药法令分类，需由药剂师确认。' },
-      { kind: 'bullets', id: 'fees', title: '费用', items: ['平台目前不向药房收费。', '配送费会记录在应用中，并直接支付给药房，不经过 MedCred。', '如果您想讨论条款，请在表格中说明。'] },
+      { kind: 'bullets', id: 'fees', title: '费用', items: ['平台目前不向药房收费。', '配送费会记录在应用中，并直接支付给药房，不经过 MediCred。', '如果您想讨论条款，请在表格中说明。'] },
     ],
     apply: { title: '申请加入', intro: '请介绍一下您的药房。委员会成员会与您联系。药房账户由委员会创建，所以这张表格是唯一入口。' },
   },

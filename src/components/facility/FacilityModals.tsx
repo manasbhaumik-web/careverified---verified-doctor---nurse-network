@@ -1329,7 +1329,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
               <div>
                 <span className="text-xs text-slate-400 font-bold uppercase block">Facilitator / Billing Entity</span>
-                <strong className="text-slate-900">CareVerified Healthcare Network</strong>
+                <strong className="text-slate-900">MediCred Healthcare Network</strong>
                 <span className="text-xs text-slate-500 block">Kuala Lumpur, Malaysia · Act 586 Compliant</span>
               </div>
               <div>
@@ -1391,7 +1391,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             {/* Remittance & Compliance */}
             <div className="p-3 bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
               <strong className="text-slate-800 block">Bank Remittance & Regulatory Assurance:</strong>
-              <div>Bank: Maybank Berhad · Acc No: 5140-8891-2300 · Acc Name: CareVerified Network Sdn Bhd</div>
+              <div>Bank: Maybank Berhad · Acc No: 5140-8891-2300 · Acc Name: MediCred Network Sdn Bhd</div>
               <div className="text-xs text-slate-500 pt-1">
                 Issued in full compliance with Malaysian Medical Council (MMC) Guidelines on Medical Tourism & Referrals.
               </div>

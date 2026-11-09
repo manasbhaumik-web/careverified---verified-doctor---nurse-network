@@ -47,7 +47,7 @@ export function appBase(env: NodeJS.ProcessEnv = process.env): string | null {
   if (/^https?:\/\/[^\s/]+/.test(u)) return u.replace(/\/+$/, "");
   return env.NODE_ENV === "production" ? null : `http://localhost:${env.PORT || 3000}`;
 }
-const mailFrom = () => str(process.env.MAIL_FROM, 200) || "MedCred <no-reply@localhost>";
+const mailFrom = () => str(process.env.MAIL_FROM, 200) || "MediCred <no-reply@localhost>";
 const retryDelays = () => (process.env.MAIL_RETRY_MS ?? "2000,10000").split(",").map(s => Number(s)).filter(n => Number.isFinite(n) && n >= 0);
 /** Addresses that can never receive mail (demo and test accounts), so no provider is asked to deliver to them. */
 const RESERVED = /@[^@]+\.(test|invalid|localhost|example)$/i;

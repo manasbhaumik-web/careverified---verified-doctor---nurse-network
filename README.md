@@ -1,4 +1,4 @@
-# MedCred – Verified Doctor & Nurse Network
+# MediCred – Verified Doctor & Nurse Network
 
 A credential-verified registry connecting licensed doctors and nurses with patients and healthcare institutions.
 

@@ -34,7 +34,7 @@ export default function LandingDesignPreview() {
             onClick={() => navigate('/')}
             className="text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1.5 cursor-pointer transition-colors bg-white/10 px-2.5 py-1 border border-white/20"
           >
-            &larr; Back to MedCred Home
+            &larr; Back to MediCred Home
           </button>
           <span className="text-slate-600">|</span>
           <span className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">

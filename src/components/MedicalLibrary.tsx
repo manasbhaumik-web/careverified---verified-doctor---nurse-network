@@ -635,8 +635,8 @@ export default function MedicalLibrary({
               {openArticle.draft && (
                 <p role="note" className="text-xs bg-amber-50 border border-amber-200 text-amber-900 p-3 font-semibold">
                   {ms
-                    ? 'Draf: ditulis oleh pasukan editorial MedCred dan belum disemak oleh doktor berdaftar. Terjemahan ini ialah draf yang belum disemak oleh doktor dan penutur asli bahasa Melayu.'
-                    : 'Draft: written by the MedCred editorial team and not yet reviewed by a registered doctor.' + (openArticle.contentMs ? ' The Malay version is a draft translation, not yet checked by a clinician and a native speaker.' : '')}
+                    ? 'Draf: ditulis oleh pasukan editorial MediCred dan belum disemak oleh doktor berdaftar. Terjemahan ini ialah draf yang belum disemak oleh doktor dan penutur asli bahasa Melayu.'
+                    : 'Draft: written by the MediCred editorial team and not yet reviewed by a registered doctor.' + (openArticle.contentMs ? ' The Malay version is a draft translation, not yet checked by a clinician and a native speaker.' : '')}
                 </p>
               )}
               {openArticle.contentMs && (

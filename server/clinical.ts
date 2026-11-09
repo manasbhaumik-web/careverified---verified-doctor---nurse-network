@@ -99,7 +99,30 @@ CREATE TABLE IF NOT EXISTS pharmacy_notes (
 `);
 
 /** Services a pharmacy can list. Anything else is dropped. */
-export const PHARMACY_SERVICES = ["24 hours", "Home delivery", "Drive-through", "Vaccinations", "Online ordering"] as const;
+export const PHARMACY_SERVICES = [
+  "24 hours",
+  "Home delivery",
+  "Drive-through",
+  "Vaccinations",
+  "Online ordering",
+  "Cold-chain insulin delivery",
+  "Diabetes HbA1c point-of-care rapid testing",
+  "Prescription medication therapy management (MTM)",
+  "Medication blister pack dispensing",
+  "In-store digital health consultation",
+  "Home stroke rehabilitation medication compliance",
+  "Wound dressing supply delivery",
+  "Pharmacist bedside review",
+  "Poisons Type A/B certified dispensary",
+  "Oxygen concentrator rental & supply",
+  "Specialist oncology & biologics cold-chain courier",
+  "International patient medical visa prescription validation",
+  "Vaccine administration clinic",
+  "Same-day express medication home delivery",
+  "Smoking cessation consultation",
+  "Senior citizen health screening & pill organizer service",
+  "Asthma inhaler technique certification"
+] as const;
 export const cleanServices = (v: unknown): string[] => (Array.isArray(v) ? [...new Set(v.filter((x): x is string => typeof x === "string" && (PHARMACY_SERVICES as readonly string[]).includes(x)))] : []);
 export const pharmacyView = (p: any) => ({
   deliveryMethods: (() => { try { return cleanDeliveryMethods(JSON.parse(p.delivery_methods ?? "[]")); } catch { return []; } })(),
@@ -560,6 +583,11 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
   app.get("/api/pharmacies", requireAuth, (_req, res) => {
     // A pharmacy whose licence or pharmacist certificate has expired is not listed.
     res.json({ status: "success", data: rows("SELECT * FROM pharmacies WHERE active = 1 ORDER BY name").filter(pharmacyLicenceOk).map(pharmacyView) });
+  });
+  // Public marketplace: only licence-verified, currently valid pharmacies, business details only (no PIN or staff data)
+  app.get("/api/pharmacies/directory", (_req, res) => {
+    const list = rows("SELECT * FROM pharmacies WHERE active = 1 ORDER BY name").filter(pharmacyLicenceOk).map(pharmacyView).filter(p => p.licenceVerified);
+    res.json({ status: "success", data: list.map(p => ({ id: p.id, name: p.name, city: p.city, address: p.address, phone: p.phone, hours: p.hours, services: p.services, deliveryMethods: p.deliveryMethods, coldChain: p.coldChain, panelInsurers: p.panelInsurers })) });
   });
   app.post("/api/prescriptions/:id/send", requireRole("patient"), (req, res) => {
     const r = row("SELECT * FROM prescriptions WHERE id = ? AND patient_user_id = ?", req.params.id, req.user!.id);

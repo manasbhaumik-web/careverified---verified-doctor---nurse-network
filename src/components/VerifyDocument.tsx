@@ -25,7 +25,7 @@ function Result({ ok, title, children }: { ok: boolean; title: string; children?
     <div className={box}><div className={card} role="status">
       <p className={`flex items-center gap-2 text-lg font-black ${ok ? 'text-emerald-700' : 'text-rose-700'}`}>{ok ? <CheckCircle2 className="h-6 w-6" /> : <XCircle className="h-6 w-6" />}{title}</p>
       {children}
-      <p className="text-xs text-slate-700">Checked live against MedCred records.</p>
+      <p className="text-xs text-slate-700">Checked live against MediCred records.</p>
     </div></div>
   );
 }
@@ -67,9 +67,9 @@ function VerifyCert({ code }: { code: string }) {
         <dt className="text-slate-700">Issued on</dt><dd>{fmt(d.issuedAt)}</dd>
       </dl>
       {d.valid && <p className="text-sm text-slate-800">{PHASE_TEXT[phaseOf(d.fromDate, d.toDate)]}</p>}
-      {stillVerified === true && <p className="text-sm font-bold text-emerald-800">The doctor is currently verified on MedCred.</p>}
-      {stillVerified === false && <p role="alert" className="text-sm font-bold text-rose-800">The doctor is not currently verified on MedCred. Contact the clinic before relying on this certificate.</p>}
-      <p className="text-xs text-slate-700">This page confirms that MedCred issued the certificate and that it has not been changed. It does not show the diagnosis.</p>
+      {stillVerified === true && <p className="text-sm font-bold text-emerald-800">The doctor is currently verified on MediCred.</p>}
+      {stillVerified === false && <p role="alert" className="text-sm font-bold text-rose-800">The doctor is not currently verified on MediCred. Contact the clinic before relying on this certificate.</p>}
+      <p className="text-xs text-slate-700">This page confirms that MediCred issued the certificate and that it has not been changed. It does not show the diagnosis.</p>
     </Result>
   );
 }

@@ -11,7 +11,7 @@ export const HERO_TR: Partial<Record<LangCode, Record<string, HeroText>>> = {
     network: {
       pill: 'Penjagaan Doktor Prihatin & Bertauliah',
       headline: 'Penjagaan perubatan ikhlas & rangkaian doktor mesra, sentiasa di sisi anda.',
-      body: 'Apabila anda atau keluarga kurang sihat, MedCred sedia menghubungkan anda dengan doktor prihatin yang disahkan lembaga di seluruh Malaysia untuk konsultasi tenang, nasihat berhemah, dan preskripsi digital.',
+      body: 'Apabila anda atau keluarga kurang sihat, MediCred sedia menghubungkan anda dengan doktor prihatin yang disahkan lembaga di seluruh Malaysia untuk konsultasi tenang, nasihat berhemah, dan preskripsi digital.',
       cta: 'Bercakap Dengan Doktor',
       chips: ['Konsultasi mesra pesakit', 'Doktor bertauliah MMC', 'E-preskripsi selamat'],
     },
@@ -26,7 +26,7 @@ export const HERO_TR: Partial<Record<LangCode, Record<string, HeroText>>> = {
       pill: 'Privasi & Rekod Kesihatan Peribadi',
       headline: 'Sejarah kesihatan anda, dipelihara dengan penuh rasa hormat dan selamat.',
       body: 'Simpan rekod kesihatan dan bacaan penting keluarga dalam peti peribadi yang dilindungi rapi di bawah PDPA 2010. Anda kekal memegang hak penuh menentukan siapa yang boleh melihat data anda.',
-      cta: 'Sertai Keluarga MedCred',
+      cta: 'Sertai Keluarga MediCred',
       chips: ['Jaminan pulangan 10 minit', 'Privasi terpelihara PDPA', 'Kawalan data di tangan anda'],
     },
     tourism: {
@@ -41,7 +41,7 @@ export const HERO_TR: Partial<Record<LangCode, Record<string, HeroText>>> = {
     network: {
       pill: '温情守护 · 认证执业医生网络',
       headline: '温暖关怀、值得托付的家庭医生，时刻守护在您与家人身旁。',
-      body: '当您或家人感到不适时，MedCred 随时为您连线马来西亚经委员会严格核实的全科及专科医生，提供耐心倾听的在线问诊、合规处方与持续康复关怀。',
+      body: '当您或家人感到不适时，MediCred 随时为您连线马来西亚经委员会严格核实的全科及专科医生，提供耐心倾听的在线问诊、合规处方与持续康复关怀。',
       cta: '开启温馨问诊',
       chips: ['耐心倾听与细致问诊', '医学委员会严格认证', '医生签名规范处方'],
     },
@@ -71,7 +71,7 @@ export const HERO_TR: Partial<Record<LangCode, Record<string, HeroText>>> = {
     network: {
       pill: 'Layanan Dokter Penuh Perhatian',
       headline: 'Perawatan medis hangat & dokter terpercaya, selalu mendampingi Anda.',
-      body: 'Saat Anda atau keluarga merasa kurang sehat, MedCred menghubungkan Anda dengan dokter spesialis dan umum berlisensi resmi di Malaysia untuk konsultasi yang sabar, mendengarkan dengan tulus, dan resep digital terpercaya.',
+      body: 'Saat Anda atau keluarga merasa kurang sehat, MediCred menghubungkan Anda dengan dokter spesialis dan umum berlisensi resmi di Malaysia untuk konsultasi yang sabar, mendengarkan dengan tulus, dan resep digital terpercaya.',
       cta: 'Mulai Konsultasi Hangat',
       chips: ['Konsultasi ramah & sabar', 'Dokter terverifikasi MMC', 'E-resep resmi dokter'],
     },
@@ -101,7 +101,7 @@ export const HERO_TR: Partial<Record<LangCode, Record<string, HeroText>>> = {
     network: {
       pill: 'رعاية طبية إنسانية وأطباء معتمدون',
       headline: 'رعاية صحية مخلصة وأطباء يحيطونك بالاهتمام والسكينة في كل وقت.',
-      body: 'عندما تشعر أنت أو عائلتك بالتعب، يسعد MedCred بتقديم العون وربطكم بأطباء واستشاريين معتمدين في ماليزيا للاستماع باهتمام وتقديم النصح الدافئ والوصفات الطبية الموثقة.',
+      body: 'عندما تشعر أنت أو عائلتك بالتعب، يسعد MediCred بتقديم العون وربطكم بأطباء واستشاريين معتمدين في ماليزيا للاستماع باهتمام وتقديم النصح الدافئ والوصفات الطبية الموثقة.',
       cta: 'تحدث مع طبيب الآن',
       chips: ['استشارات مريحة وإنسانية', 'أطباء معتمدون من MMC', 'وصفات إلكترونية موثقة'],
     },
@@ -116,7 +116,7 @@ export const HERO_TR: Partial<Record<LangCode, Record<string, HeroText>>> = {
       pill: 'خصوصية تامة وحفظ السجلات الصحية',
       headline: 'تاريخك الصحي محفوظ بأعلى درجات الاحترام والأمان بموجب القانون.',
       body: 'احتفظ بسجلاتك الصحية ونتائج فحوصات العائلة في خزانة مشفرة محمية بقانون PDPA 2010. أنت وحدك صاحب القرار فيمن يطلع على رحلتك الصحية.',
-      cta: 'انضم إلى عائلة MedCred',
+      cta: 'انضم إلى عائلة MediCred',
       chips: ['استرداد كامل خلال 10 دقائق', 'حماية خصوصية PDPA 2010', 'بياناتك ملكك بالكامل'],
     },
     tourism: {

@@ -27,7 +27,7 @@ export default function DashboardDesignPreview() {
             onClick={() => navigate('/')} 
             className="text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
           >
-            &larr; Back to MedCred Home
+            &larr; Back to MediCred Home
           </button>
           <span className="text-slate-700">|</span>
           <span className="text-xs font-mono font-bold uppercase tracking-wider text-[color:var(--t-300,#FDA4AF)]">
@@ -85,7 +85,7 @@ export default function DashboardDesignPreview() {
             </div>
             <div className="leading-none">
               <span className="font-display font-extrabold text-xl text-white tracking-tight block">
-                MedCred<span className="text-white/80">.</span>
+                MediCred<span className="text-white/80">.</span>
               </span>
               <span className="text-xs font-mono font-bold text-white/90 uppercase tracking-[0.14em] block mt-1">
                 Member Portal &bull; Act 586 Verified

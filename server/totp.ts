@@ -59,5 +59,5 @@ export function verifyTotp(secret: string, code: string, now = Date.now()): bool
   return ok;
 }
 
-export const otpauthUrl = (account: string, secret: string, issuer = "MedCred") =>
+export const otpauthUrl = (account: string, secret: string, issuer = "MediCred") =>
   `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(account)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=6&period=30`;

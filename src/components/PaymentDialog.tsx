@@ -119,7 +119,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
               <span>PayNet &amp; Bank Negara Certified</span>
             </div>
             <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-              <Lock className="h-4 w-4 text-[color:var(--t-600)]" /> MedCred Secure Clinical Gateway
+              <Lock className="h-4 w-4 text-[color:var(--t-600)]" /> MediCred Secure Clinical Gateway
             </h3>
             <p className="text-xs text-slate-600 mt-0.5">{description}</p>
           </div>

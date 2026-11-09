@@ -5,7 +5,7 @@ import path from "path";
 
 export const dataDir =
   process.env.DATA_DIR ||
-  (process.env.VERCEL ? path.join(os.tmpdir(), "medcred-data") : path.join(process.cwd(), "data"));
+  (process.env.VERCEL ? path.join(os.tmpdir(), "medicred-data") : path.join(process.cwd(), "data"));
 
 try {
   fs.mkdirSync(dataDir, { recursive: true });

@@ -1194,7 +1194,7 @@ export default function MedicalPackagesModule({
                   </div>
 
                   <p className="p-3 bg-slate-50 border border-slate-200 text-xs text-slate-700">
-                    Your details go to {bookingModal.facility_name}'s admissions desk and MedCred. They are used only to arrange this package.
+                    Your details go to {bookingModal.facility_name}'s admissions desk and MediCred. They are used only to arrange this package.
                   </p>
 
                   <div className="flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-slate-200">

@@ -60,7 +60,7 @@ export default function AccountRecovery({ mode }: { mode: 'forgot' | 'reset' }) 
   // Not indexed, and the tab says where you are.
   useEffect(() => {
     const prev = document.title;
-    document.title = (mode === 'forgot' ? tx.forgotTitle : tx.resetTitle) + ' | MedCred';
+    document.title = (mode === 'forgot' ? tx.forgotTitle : tx.resetTitle) + ' | MediCred';
     const meta = document.createElement('meta'); meta.name = 'robots'; meta.content = 'noindex'; document.head.appendChild(meta);
     return () => { document.title = prev; meta.remove(); };
   }, [mode, tx.forgotTitle, tx.resetTitle]);
@@ -99,7 +99,7 @@ export default function AccountRecovery({ mode }: { mode: 'forgot' | 'reset' }) 
     <div className="min-h-dvh bg-[color:var(--t-bg)] text-[color:var(--ink)] font-body flex flex-col antialiased">
       <header className="bg-[color:var(--t-50)] border-b border-[color:var(--t-200)]">
         <div className="max-w-xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
-          <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="font-display font-black text-xl tracking-tight" aria-label="MedCred home">MedCred<span className="text-[color:var(--t-600)]">.</span></a>
+          <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="font-display font-black text-xl tracking-tight" aria-label="MediCred home">MediCred<span className="text-[color:var(--t-600)]">.</span></a>
           <div className="flex items-center gap-2"><LocaleSwitcher /><ThemeSwitcher /></div>
         </div>
       </header>

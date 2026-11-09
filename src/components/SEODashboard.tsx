@@ -17,7 +17,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
   const [selectedSchemaProf, setSelectedSchemaProf] = useState<any | null>(null);
 
   // Programmatic templates
-  const [titleTemplate, setTitleTemplate] = useState('Best [Specialty] in [City] | MedCred ✅');
+  const [titleTemplate, setTitleTemplate] = useState('Best [Specialty] in [City] | MediCred ✅');
   const [descTemplate, setDescriptionTemplate] = useState('Find & book pre-verified, licensed [Specialty] specialists in [City] with transparent credentials, patient reviews, and verified medical council registries.');
 
   const selectedProf = professionals.find(p => p.id === selectedProfId) || professionals[0];
@@ -47,7 +47,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
         "latitude": selectedProf.city === "Kuala Lumpur" ? "3.1390" : selectedProf.city === "Petaling Jaya" ? "3.1073" : "5.4141",
         "longitude": selectedProf.city === "Kuala Lumpur" ? "101.6869" : selectedProf.city === "Petaling Jaya" ? "101.6067" : "100.3288"
       },
-      "url": `https://careverified.pro/doctors/${selectedProf.seoSlug}`,
+      "url": `https://medicred.pro/doctors/${selectedProf.seoSlug}`,
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": selectedProf.rating,
@@ -79,14 +79,14 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
   const generateSitemapText = () => {
     let s = `<?xml version="1.0" encoding="UTF-8"?>\n`;
     s += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
-    s += `  <url>\n    <loc>https://careverified.pro/</loc>\n    <lastmod>2026-07-09</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
-    s += `  <url>\n    <loc>https://careverified.pro/jobs</loc>\n    <lastmod>2026-07-09</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>0.9</priority>\n  </url>\n`;
+    s += `  <url>\n    <loc>https://medicred.pro/</loc>\n    <lastmod>2026-07-09</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
+    s += `  <url>\n    <loc>https://medicred.pro/jobs</loc>\n    <lastmod>2026-07-09</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>0.9</priority>\n  </url>\n`;
     s += `\n  <!-- Programmatic SEO Lands (Auto-Generated) -->\n`;
-    s += `  <url>\n    <loc>https://careverified.pro/best-cardiologist-in-kuala-lumpur</loc>\n    <lastmod>2026-07-09</lastmod>\n    <changefreq>daily</changefreq>\n  </url>\n`;
-    s += `  <url>\n    <loc>https://careverified.pro/best-pediatrician-in-petaling-jaya</loc>\n    <lastmod>2026-07-09</lastmod>\n    <changefreq>daily</changefreq>\n  </url>\n\n`;
+    s += `  <url>\n    <loc>https://medicred.pro/best-cardiologist-in-kuala-lumpur</loc>\n    <lastmod>2026-07-09</lastmod>\n    <changefreq>daily</changefreq>\n  </url>\n`;
+    s += `  <url>\n    <loc>https://medicred.pro/best-pediatrician-in-petaling-jaya</loc>\n    <lastmod>2026-07-09</lastmod>\n    <changefreq>daily</changefreq>\n  </url>\n\n`;
     s += `  <!-- Verified Doctors Profiles -->\n`;
     professionals.forEach(p => {
-      s += `  <url>\n    <loc>https://careverified.pro/doctors/${p.seoSlug}</loc>\n    <lastmod>2026-07-09</lastmod>\n    <changefreq>weekly</changefreq>\n  </url>\n`;
+      s += `  <url>\n    <loc>https://medicred.pro/doctors/${p.seoSlug}</loc>\n    <lastmod>2026-07-09</lastmod>\n    <changefreq>weekly</changefreq>\n  </url>\n`;
     });
     s += `</urlset>`;
     return s;
@@ -297,7 +297,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                 <h4 className="font-black text-slate-800 text-sm uppercase tracking-wider">Google SERP Live Simulator</h4>
                 
                 <div className="bg-white border border-slate-250 p-4 rounded-none space-y-2">
-                  <div className="text-xs text-slate-500 font-mono">https://careverified.pro/best-cardiologist-in-kuala-lumpur</div>
+                  <div className="text-xs text-slate-500 font-mono">https://medicred.pro/best-cardiologist-in-kuala-lumpur</div>
                   <h5 className="text-base text-[color:var(--t-700)] hover:underline cursor-pointer font-black leading-snug">
                     {titleTemplate.replace('[Specialty]', 'Cardiologist').replace('[City]', 'Kuala Lumpur')}
                   </h5>
@@ -307,7 +307,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                 </div>
 
                 <div className="bg-white border border-slate-250 p-4 rounded-none space-y-2">
-                  <div className="text-xs text-slate-500 font-mono">https://careverified.pro/find-icu-nurse-petaling-jaya</div>
+                  <div className="text-xs text-slate-500 font-mono">https://medicred.pro/find-icu-nurse-petaling-jaya</div>
                   <h5 className="text-base text-[color:var(--t-700)] hover:underline cursor-pointer font-black leading-snug">
                     {titleTemplate.replace('[Specialty]', 'ICU Critical Care Nurse').replace('[City]', 'Petaling Jaya')}
                   </h5>

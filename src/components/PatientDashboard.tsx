@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { maskNric } from '../identity';
+import { navigate } from '../nav';
 import { 
   BookOpen, Calendar, Clock, FolderHeart, Heart, Video, 
   CheckCircle2, Search, MessageSquare, ShieldCheck, ArrowRight, User,
@@ -1756,6 +1757,20 @@ export default function PatientDashboard({
             title="Comprehensive Medical Screening & Treatment Packages"
             description="Curated healthcare packages from accredited private hospitals and specialist clinics across Malaysia."
             badges={<BannerBadge tone="brand">Price Transparent</BannerBadge>}
+            aside={
+              <a
+                href="/packages"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/packages');
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors shadow-2xs cursor-pointer shrink-0"
+              >
+                <PackagePlus className="h-4 w-4" />
+                <span>Explore Full Marketplace &amp; Directory</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </a>
+            }
             tabs={[
               { id: 'packages', label: 'Medical Packages' },
               { id: 'promotions', label: 'Promotions & Offers' },
