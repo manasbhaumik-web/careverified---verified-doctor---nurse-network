@@ -165,14 +165,14 @@ export default function DashboardHeader<T extends string>({
  * ---------------------------------------------------------------------------------------------- */
 
 export const bannerPrimaryBtn =
-  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-4 h-11 rounded-none shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
+  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold px-4 h-11 rounded-none shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
 /** Same two buttons for use on the banner: a solid brand button and a crisp bordered white one. */
 export const bannerOnBrandPrimaryBtn =
-  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-4 h-11 rounded-none shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
+  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold px-4 h-11 rounded-none shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
 export const bannerOnBrandSecondaryBtn =
-  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold px-4 h-11 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
+  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-sm font-bold px-4 h-11 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
 export const bannerSecondaryBtn =
-  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold px-4 h-11 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
+  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-sm font-bold px-4 h-11 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
 
 /** Two-column row: identity on the left, KPIs and actions on the right. */
 export function BannerRow({ identity, aside }: { identity: React.ReactNode; aside?: React.ReactNode }) {
@@ -228,8 +228,8 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
           <Heading className="text-xl sm:text-3xl font-extrabold text-[color:var(--ink)] tracking-tight shrink-0">{name}</Heading>
           {badges && <div className="inline-flex items-center gap-2 max-w-full flex-wrap sm:flex-nowrap sm:shrink-0">{badges}</div>}
         </div>
-        {description && <p className="text-xs font-semibold text-[color:var(--ink-2)] leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
-        {meta && <div className="flex items-center gap-2.5 text-xs text-[color:var(--ink-2)] font-semibold flex-wrap">{meta}</div>}
+        {description && <p className="text-sm sm:text-base font-medium text-[color:var(--ink-2)] leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
+        {meta && <div className="flex items-center gap-2.5 text-sm text-[color:var(--ink-2)] font-medium flex-wrap">{meta}</div>}
       </div>
     </div>
   );
@@ -271,7 +271,7 @@ export function FilterSelect({ label, value, onChange, children }: { label: stri
     <label className="flex items-center gap-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-3 h-11 shrink-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors cursor-pointer">
       <span className="text-2xs font-black uppercase tracking-widest text-slate-400 shrink-0">{label}:</span>
       <select value={value} onChange={e => onChange(e.target.value)}
-        className="text-xs font-bold text-[color:var(--ink)] bg-transparent focus:outline-none cursor-pointer pr-1 min-w-[120px]">
+        className="text-sm font-semibold text-[color:var(--ink)] bg-transparent focus:outline-none cursor-pointer pr-1 min-w-[120px]">
         {children}
       </select>
     </label>

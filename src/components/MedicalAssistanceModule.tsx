@@ -541,7 +541,7 @@ export default function MedicalAssistanceModule({
                 {/* STEP 1: who */}
                 <div data-step="1" hidden={step !== 1} className="space-y-4">
                   <fieldset className="space-y-2">
-                    <legend className="text-xs font-bold text-slate-800 block">{tx('Where do you live? *')}</legend>
+                    <legend className="block text-sm font-bold text-slate-900 mb-1">{tx('Where do you live? *')}</legend>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {[
                         { id: 'local_malaysian', title: 'Malaysian citizen', text: 'You hold a MyKad.', home: 'MY' },
@@ -558,7 +558,7 @@ export default function MedicalAssistanceModule({
 
                   {patientType !== 'local_malaysian' && (
                     <div className="space-y-1 sm:max-w-xs">
-                      <label htmlFor="aq-country" className="text-xs font-bold text-slate-800 block">{tx('Country you live in')}</label>
+                      <label htmlFor="aq-country" className="block text-sm font-bold text-slate-900 mb-1">{tx('Country you live in')}</label>
                       <select id="aq-country" value={homeCountry} onChange={(e) => setHomeCountry(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
                         {[['ID', 'Indonesia'], ['SG', 'Singapore'], ['CN', 'China'], ['IN', 'India'], ['AU', 'Australia'], ['GB', 'United Kingdom'], ['US', 'United States'], ['SA', 'Saudi Arabia'], ['AE', 'United Arab Emirates'], ['JP', 'Japan'], ['MY', 'Malaysia'], ['XX', 'Other']].map(([c, n]) => <option key={c} value={c}>{tx(n)}</option>)}
                       </select>
@@ -566,16 +566,16 @@ export default function MedicalAssistanceModule({
                   )}
 
                   <div className="space-y-1">
-                    <label htmlFor="aq-name" className="text-xs font-bold text-slate-800 block">{tx('Full name *')}</label>
+                    <label htmlFor="aq-name" className="block text-sm font-bold text-slate-900 mb-1">{tx('Full name *')}</label>
                     <input id="aq-name" type="text" required autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={tx('e.g. Fatimah binti Ali')} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="aq-email" className="text-xs font-bold text-slate-800 block">{tx('Email *')}</label>
+                      <label htmlFor="aq-email" className="block text-sm font-bold text-slate-900 mb-1">{tx('Email *')}</label>
                       <input id="aq-email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={tx('you@example.com')} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="aq-phone" className="text-xs font-bold text-slate-800 block">{tx('Phone or WhatsApp (helps the hospital reach you)')}</label>
+                      <label htmlFor="aq-phone" className="block text-sm font-bold text-slate-900 mb-1">{tx('Phone or WhatsApp (helps the hospital reach you)')}</label>
                       <input id="aq-phone" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+60 12-345 6789" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                     </div>
                   </div>
@@ -585,7 +585,7 @@ export default function MedicalAssistanceModule({
                 <div data-step="2" hidden={step !== 2} className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="aq-type" className="text-xs font-bold text-slate-800 block">{tx('What do you need? *')}</label>
+                      <label htmlFor="aq-type" className="block text-sm font-bold text-slate-900 mb-1">{tx('What do you need? *')}</label>
                       <select id="aq-type" value={assistanceType} onChange={(e) => setAssistanceType(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
                         <option value="elective_surgery">{tx('A procedure and hospital stay')}</option>
                         <option value="specialist_consult">{tx('A specialist consultation or second opinion')}</option>
@@ -596,7 +596,7 @@ export default function MedicalAssistanceModule({
                       </select>
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="aq-specialty" className="text-xs font-bold text-slate-800 block">{tx('Medical specialty *')}</label>
+                      <label htmlFor="aq-specialty" className="block text-sm font-bold text-slate-900 mb-1">{tx('Medical specialty *')}</label>
                       <select id="aq-specialty" value={specialty} onChange={(e) => setSpecialty(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
                         <option value="Cardiology & Interventional">{tx('Cardiology and heart surgery')}</option>
                         <option value="Orthopaedics & Joint Reconstruction">{tx('Orthopaedics (knee, hip, joints)')}</option>
@@ -611,7 +611,7 @@ export default function MedicalAssistanceModule({
                   </div>
 
                   <fieldset className="space-y-2">
-                    <legend className="text-xs font-bold text-slate-800 block">{tx('How soon do you need a reply? *')}</legend>
+                    <legend className="block text-sm font-bold text-slate-900 mb-1">{tx('How soon do you need a reply? *')}</legend>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {[
                         { id: 'routine', title: 'Routine', text: 'Within a few weeks' },
@@ -635,7 +635,7 @@ export default function MedicalAssistanceModule({
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="aq-facility" className="text-xs font-bold text-slate-800 block">{tx('Hospital *')}</label>
+                      <label htmlFor="aq-facility" className="block text-sm font-bold text-slate-900 mb-1">{tx('Hospital *')}</label>
                       {facilities.length <= 1 ? (
                         <p className={`min-h-[44px] flex items-center text-xs font-semibold ${facilities[0] ? 'text-slate-900' : 'text-rose-900'}`}>{facilities[0] ? `${facilities[0].name}${facilities[0].city ? `, ${tx(facilities[0].city)}` : ''}` : tx('No hospital is available right now. Please try again later.')}</p>
                       ) : (
@@ -645,13 +645,13 @@ export default function MedicalAssistanceModule({
                       )}
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="aq-from" className="text-xs font-bold text-slate-800 block">{tx('Earliest date you could start')}</label>
+                      <label htmlFor="aq-from" className="block text-sm font-bold text-slate-900 mb-1">{tx('Earliest date you could start')}</label>
                       <input id="aq-from" type="date" value={preferredFrom} min={new Date().toISOString().slice(0, 10)} onChange={(e) => setPreferredFrom(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="aq-summary" className="text-xs font-bold text-slate-800 block">{tx('Describe your condition or the treatment you want *')}</label>
+                    <label htmlFor="aq-summary" className="block text-sm font-bold text-slate-900 mb-1">{tx('Describe your condition or the treatment you want *')}</label>
                     <textarea id="aq-summary" rows={5} required minLength={15} value={summary} onChange={(e) => setSummary(e.target.value)} placeholder={tx('Symptoms, any diagnosis you have been given, past operations, the procedure you are asking about…')} className="w-full px-3 py-2 border border-slate-300 text-xs bg-white leading-relaxed focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                     <p className="text-xs text-slate-700">{tx('At least 15 characters. Do not put passport, card or bank numbers here. You can share reports later in Messages.')}</p>
                   </div>
@@ -661,7 +661,7 @@ export default function MedicalAssistanceModule({
                 <div data-step="3" hidden={step !== 3} className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="aq-insurer" className="text-xs font-bold text-slate-800 block">{tx('Insurance provider (optional)')}</label>
+                      <label htmlFor="aq-insurer" className="block text-sm font-bold text-slate-900 mb-1">{tx('Insurance provider (optional)')}</label>
                       <input id="aq-insurer" type="text" value={insuranceCarrier} onChange={(e) => setInsuranceCarrier(e.target.value)} placeholder={tx('e.g. Great Eastern, Bupa, Cigna, Allianz')} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]" />
                     </div>
                     <label className="flex items-center gap-3 min-h-[44px] sm:mt-7 px-3 border border-slate-300 bg-white cursor-pointer text-xs font-semibold text-slate-900">
@@ -671,7 +671,7 @@ export default function MedicalAssistanceModule({
                   </div>
 
                   <fieldset className="space-y-2">
-                    <legend className="text-xs font-bold text-slate-800 block">{tx('Help you would like arranged (optional)')}</legend>
+                    <legend className="block text-sm font-bold text-slate-900 mb-1">{tx('Help you would like arranged (optional)')}</legend>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {[
                         { label: 'A medical interpreter', v: needsInterpreter, set: setNeedsInterpreter },
@@ -689,7 +689,7 @@ export default function MedicalAssistanceModule({
                     </div>
                     {needsInterpreter && (
                       <div className="space-y-1 sm:max-w-xs">
-                        <label htmlFor="aq-lang" className="text-xs font-bold text-slate-800 block">{tx('Language')}</label>
+                        <label htmlFor="aq-lang" className="block text-sm font-bold text-slate-900 mb-1">{tx('Language')}</label>
                         <select id="aq-lang" value={interpreterLanguage} onChange={(e) => setInterpreterLanguage(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]">
                           <option value="Arabic">{tx('Arabic')}</option>
                           <option value="Mandarin">{tx('Mandarin')}</option>

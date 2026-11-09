@@ -89,16 +89,16 @@ export default function PractitionerBookingsTab({
                 <>
                   <FileSignature className="h-5 w-5 text-[color:var(--t-600)]" />
                   <div>
-                    <h4 className="text-sm font-black text-slate-900">{tx('Issue Doctor-Signed E-Prescription')}</h4>
-                    <p className="text-xs text-slate-500 font-medium">Medical Act 1971 &bull; Poisons Act 1952 Compliant</p>
+                    <h4 className="text-base font-bold text-slate-900">{tx('Issue Doctor-Signed E-Prescription')}</h4>
+                    <p className="text-sm text-slate-600 font-medium">Medical Act 1971 &bull; Poisons Act 1952 Compliant</p>
                   </div>
                 </>
               ) : (
                 <>
                   <ClipboardList className="h-5 w-5 text-emerald-600" />
                   <div>
-                    <h4 className="text-sm font-black text-slate-900">{tx('Official Clinical Nursing Care & Procedure Log')}</h4>
-                    <p className="text-xs text-slate-500 font-medium">Lembaga Jururawat Malaysia (LJM) &bull; Nurses Act 1950</p>
+                    <h4 className="text-base font-bold text-slate-900">{tx('Official Clinical Nursing Care & Procedure Log')}</h4>
+                    <p className="text-sm text-slate-600 font-medium">Lembaga Jururawat Malaysia (LJM) &bull; Nurses Act 1950</p>
                   </div>
                 </>
               )}
@@ -137,37 +137,37 @@ export default function PractitionerBookingsTab({
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">{tx('Clinical Diagnosis & Findings')}</label>
+                  <label className="block text-sm font-bold text-slate-900 mb-1">{tx('Clinical Diagnosis & Findings')}</label>
                   <input
                     type="text"
                     placeholder={tx('e.g. Acute Upper Respiratory Tract Infection (URTI)')}
                     value={prescribeDiagnosis}
                     onChange={(e) => setPrescribeDiagnosis(e.target.value)}
-                    className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
+                    className="w-full text-sm border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">{tx('Prescribed Pharmacotherapy (Medicines & Dosage)')}</label>
+                  <label className="block text-sm font-bold text-slate-900 mb-1">{tx('Prescribed Pharmacotherapy (Medicines & Dosage)')}</label>
                   <textarea
                     rows={3}
                     placeholder={tx('e.g. 1. Tab Paracetamol 500mg - 2 tabs QDS (PRN Fever)\n2. Syrup Diphenhydramine 10ml - TDS (Cough)')}
                     value={prescribeMeds}
                     onChange={(e) => setPrescribeMeds(e.target.value)}
-                    className="w-full text-xs border border-[color:var(--t-200)] rounded-none p-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
+                    className="w-full text-sm border border-[color:var(--t-200)] rounded-none p-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">{tx('Specific Care & Lifestyle Instructions')}</label>
+                  <label className="block text-sm font-bold text-slate-900 mb-1">{tx('Specific Care & Lifestyle Instructions')}</label>
                   <input
                     type="text"
                     placeholder={tx('e.g. Plenty of oral fluids. Avoid cold food items. Strict rest for 3 days.')}
                     value={prescribeInstructions}
                     onChange={(e) => setPrescribeInstructions(e.target.value)}
-                    className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
+                    className="w-full text-sm border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
                     required
                   />
                 </div>
@@ -225,7 +225,7 @@ export default function PractitionerBookingsTab({
 
               {/* Procedure Performed */}
               <div className="space-y-1">
-                <label className="block text-xs font-bold text-slate-700">{tx('Clinical Nursing Procedure Performed')}</label>
+                <label className="block text-sm font-bold text-slate-900 mb-1">{tx('Clinical Nursing Procedure Performed')}</label>
                 <select
                   value={nursingProcedure}
                   onChange={(e) => setNursingProcedure(e.target.value)}
@@ -242,7 +242,7 @@ export default function PractitionerBookingsTab({
 
               {/* Vitals Telemetry Grid */}
               <div className="space-y-1">
-                <label className="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <label className="block text-sm font-bold text-slate-900 mb-1 flex items-center gap-1.5">
                   <HeartPulse className="h-3.5 w-3.5 text-rose-500" />
                   <span>{tx('Vital Signs Recorded on Duty')}</span>
                 </label>
@@ -292,13 +292,13 @@ export default function PractitionerBookingsTab({
 
               {/* Nursing Observations */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">{tx('Nursing Observations & Recovery Notes')}</label>
+                <label className="block text-sm font-bold text-slate-900 mb-1">{tx('Nursing Observations & Recovery Notes')}</label>
                 <textarea
                   rows={3}
                   value={nursingNotes}
                   onChange={(e) => setNursingNotes(e.target.value)}
                   placeholder={tx('Record patient comfort, wound margin condition, pain score, or medical instructions given to caregiver...')}
-                  className="w-full text-xs border border-[color:var(--t-200)] rounded-none p-3 outline-none focus:ring-1 focus:ring-emerald-600 font-semibold text-slate-800 bg-white"
+                  className="w-full text-sm border border-[color:var(--t-200)] rounded-none p-3 outline-none focus:ring-1 focus:ring-emerald-600 font-semibold text-slate-800 bg-white"
                   required
                 />
               </div>
@@ -345,11 +345,11 @@ export default function PractitionerBookingsTab({
       <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-3xs space-y-4">
         <div className="border-b border-[color:var(--t-200)] pb-3 flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-black text-rose-600 uppercase tracking-widest flex items-center gap-1.5">
+            <h3 className="text-base font-bold text-rose-600 uppercase tracking-widest flex items-center gap-1.5">
               <Ambulance className="h-4.5 w-4.5 text-rose-500 animate-bounce" />
               {tx('Urgent On-Call Emergency Center')}
             </h3>
-            <p className="text-xs text-slate-500 font-medium mt-0.5">{tx('Claim active emergency dispatch tickets requested by high-risk patients nearby.')}</p>
+            <p className="text-sm text-slate-600 font-medium mt-0.5">{tx('Claim active emergency dispatch tickets requested by high-risk patients nearby.')}</p>
           </div>
           <span className="bg-rose-50 text-rose-700 border border-rose-100 text-2xs font-bold px-2 py-0.5 rounded-none uppercase tracking-wider animate-pulse">{tx('Live Radar Active')}</span>
         </div>
@@ -444,11 +444,11 @@ export default function PractitionerBookingsTab({
       {/* Scheduled Clinical Consultations / Nursing Visits List */}
       <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-3xs space-y-4">
         <div className="border-b border-[color:var(--t-200)] pb-3">
-          <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+          <h3 className="text-base font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
             <Calendar className="h-4.5 w-4.5 text-[color:var(--t-600)]" />
             {isDoc ? tx('Scheduled Doctor Consultations ({n})', { n: myBookings.length }) : tx('Scheduled Home Nursing Duties ({n})', { n: myBookings.length })}
           </h3>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
+          <p className="text-sm text-slate-600 font-medium mt-0.5">
             {isDoc
               ? tx('Review appointments booked by patients and generate doctor-signed e-prescriptions upon consultation completion.')
               : tx('Review patient home nursing bookings, post-op visits, and record certified clinical nursing care logs.')}
@@ -476,7 +476,7 @@ export default function PractitionerBookingsTab({
                         {booking.patientName[0]}
                       </div>
                       <div>
-                        <h4 className="text-sm font-black text-slate-800">{booking.patientName}</h4>
+                        <h4 className="text-base font-bold text-slate-900">{booking.patientName}</h4>
                         <p className="text-xs text-slate-400 font-semibold font-mono">ID Ref: {booking.patientId}</p>
                       </div>
                     </div>
@@ -493,7 +493,7 @@ export default function PractitionerBookingsTab({
                     </div>
 
                     {booking.symptoms && (
-                      <p className="text-xs text-slate-600">
+                      <p className="text-sm text-slate-700 font-medium">
                         <strong className="text-slate-800 font-bold">{tx('Patient Complaint:')}</strong> "{booking.symptoms}"
                       </p>
                     )}
@@ -540,7 +540,7 @@ export default function PractitionerBookingsTab({
                       <span className="text-xs text-slate-400 font-bold block uppercase">
                         {isDoc ? tx('Consultation Fee') : tx('Nursing Fee')}
                       </span>
-                      <span className="text-xs font-black text-slate-900">RM {booking.fee}</span>
+                      <span className="text-base font-extrabold text-slate-900">RM {booking.fee}</span>
                       <span className={`block text-2xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-none text-center border mt-1 ${
                         isUpcoming
                           ? 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border-[color:var(--t-200)]'

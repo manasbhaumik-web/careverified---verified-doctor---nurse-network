@@ -356,7 +356,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-extrabold uppercase text-slate-700 block">
+              <label className="block text-sm font-bold text-slate-900 mb-1">
                 {tx('Internal Notes (Optional)')}
               </label>
               <textarea
@@ -419,7 +419,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
             <form onSubmit={handleCreateJob} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="block text-sm font-bold text-slate-900 mb-1">
                   Job Title *
                 </label>
                 <input
@@ -434,7 +434,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     Target Role *
                   </label>
                   <select
@@ -449,7 +449,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     Engagement Type *
                   </label>
                   <select
@@ -466,7 +466,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     Specialty / Department *
                   </label>
                   <input
@@ -480,7 +480,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     {tx('Facility Ward / Location')}
                   </label>
                   <input
@@ -495,7 +495,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     {tx('Min Rate (MYR)')}
                   </label>
                   <input
@@ -508,7 +508,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     {tx('Max Rate (MYR)')}
                   </label>
                   <input
@@ -521,7 +521,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     Period
                   </label>
                   <select
@@ -537,7 +537,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="block text-sm font-bold text-slate-900 mb-1">
                   {tx('Description & Clinical Scope')}
                 </label>
                 <textarea
@@ -603,7 +603,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
             <form onSubmit={handleInviteSubmit} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="block text-sm font-bold text-slate-900 mb-1">
                   {tx('Select Shift / Vacancy (Optional)')}
                 </label>
                 <select
@@ -621,7 +621,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="block text-sm font-bold text-slate-900 mb-1">
                   {tx('Personalised Invitation Message')}
                 </label>
                 <textarea
@@ -768,7 +768,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
             <form onSubmit={handleQuoteSubmit} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="block text-sm font-bold text-slate-900 mb-1">
                   Procedure / Treatment Package Name *
                 </label>
                 <input
@@ -783,7 +783,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     Estimated Total (MYR) *
                   </label>
                   <input
@@ -798,7 +798,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     {tx('Est. Stay (Days)')}
                   </label>
                   <input
@@ -812,7 +812,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="block text-sm font-bold text-slate-900 mb-1">
                   {tx('Clinical Inclusions')}
                 </label>
                 <textarea
@@ -825,7 +825,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="block text-sm font-bold text-slate-900 mb-1">
                   {tx('Exclusions & Conditions')}
                 </label>
                 <textarea
@@ -885,7 +885,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             <form onSubmit={handleSavePackage} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1 sm:col-span-2">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     Package Title *
                   </label>
                   <input
@@ -899,7 +899,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     {tx('Package Code')}
                   </label>
                   <input
@@ -914,7 +914,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     Category *
                   </label>
                   <select
@@ -929,7 +929,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     {tx('Duration / Stay')}
                   </label>
                   <input
@@ -942,7 +942,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     {tx('Target Audience')}
                   </label>
                   <select
@@ -959,7 +959,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     Package Price (MYR) *
                   </label>
                   <input
@@ -974,7 +974,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     {tx('Original Price (MYR)')}
                   </label>
                   <input
@@ -988,7 +988,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     {tx('Publishing Status')}
                   </label>
                   <select
@@ -1016,7 +1016,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="block text-sm font-bold text-slate-900 mb-1">
                   {tx('Package Overview & Clinical Rationale')}
                 </label>
                 <textarea
@@ -1030,7 +1030,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               {/* Inclusions List Builder */}
               <div className="space-y-2 border-t border-slate-100 pt-3">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="block text-sm font-bold text-slate-900 mb-1">
                   Included Tests, Procedures & Consultations ({pkgInclusions.length}):
                 </label>
                 <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-slate-50 border border-slate-200">
@@ -1088,7 +1088,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="block text-sm font-bold text-slate-900 mb-1">
                   {tx('Exclusions & Pre-Procedure Instructions')}
                 </label>
                 <textarea
@@ -1148,7 +1148,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             <form onSubmit={handleSavePromo} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     Promo Code *
                   </label>
                   <input
@@ -1162,7 +1162,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     {tx('Badge Highlight')}
                   </label>
                   <input
@@ -1176,7 +1176,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="block text-sm font-bold text-slate-900 mb-1">
                   Campaign Title *
                 </label>
                 <input
@@ -1191,7 +1191,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     Discount Type *
                   </label>
                   <select
@@ -1205,7 +1205,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     Discount Value *
                   </label>
                   <input
@@ -1221,7 +1221,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="block text-sm font-bold text-slate-900 mb-1">
                   {tx('Applicable Package')}
                 </label>
                 <select
@@ -1240,7 +1240,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     {tx('Valid From')}
                   </label>
                   <input
@@ -1252,7 +1252,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="block text-sm font-bold text-slate-900 mb-1">
                     Valid Until *
                   </label>
                   <input
@@ -1266,7 +1266,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="block text-sm font-bold text-slate-900 mb-1">
                   {tx('Campaign Description & Terms')}
                 </label>
                 <textarea

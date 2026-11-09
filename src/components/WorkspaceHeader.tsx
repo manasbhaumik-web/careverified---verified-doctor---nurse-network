@@ -61,13 +61,13 @@ export default function WorkspaceHeader<T extends string = string>({
               </span>
             )}
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] tracking-tight leading-snug">
+              <h2 className="font-display font-black text-lg sm:text-xl text-[color:var(--ink)] tracking-tight leading-snug">
                 {title}
               </h2>
               {badges}
             </div>
             {description && (
-              <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed line-clamp-2 md:line-clamp-none">
+              <p className="text-sm text-slate-600 font-medium mt-0.5 leading-relaxed line-clamp-2 md:line-clamp-none">
                 {description}
               </p>
             )}
