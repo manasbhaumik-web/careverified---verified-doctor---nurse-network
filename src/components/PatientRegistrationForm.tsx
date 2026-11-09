@@ -242,14 +242,14 @@ export default function PatientRegistrationForm({
           <div className="space-y-4 animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-900 block mb-1">{tx('Full Name (as on your ID) *')}</label>
+                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">{tx('Full Name (as on your ID) *')}</label>
                 <div className="relative">
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                   <input type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ahmad Fauzi Bin Ramli" className="form-input pl-10" required />
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-900 block mb-1">{tx('Email Address *')}</label>
+                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">{tx('Email Address *')}</label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                   <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" spellCheck={false} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ahmad@gmail.com" className="form-input pl-10" required />
@@ -257,7 +257,7 @@ export default function PatientRegistrationForm({
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-slate-900 block mb-1">{tx('Account Password *')}</label>
+              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">{tx('Account Password *')}</label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                 <input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={tx('At least 8 characters, letters and numbers')} className="form-input pl-10" required />
@@ -280,7 +280,7 @@ export default function PatientRegistrationForm({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <PhoneField id="reg-phone" title={tx('Mobile number')} value={phone} onChange={setPhone} />
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-900 block mb-1" htmlFor="reg-gender">{tx('Gender')}</label>
+                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block" htmlFor="reg-gender">{tx('Gender')}</label>
                 <select id="reg-gender" value={gender} onChange={(e) => setGender(e.target.value)} className="form-select">
                   <option value="Male">{tx('Male')}</option>
                   <option value="Female">{tx('Female')}</option>
@@ -290,7 +290,7 @@ export default function PatientRegistrationForm({
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-slate-900 block mb-1" htmlFor="reg-lang">{tx('Preferred language for care')}</label>
+              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block" htmlFor="reg-lang">{tx('Preferred language for care')}</label>
               <select id="reg-lang" value={preferredLanguage} onChange={(e) => setPreferredLanguage(e.target.value)} className="form-select">
                 {PREFERRED_LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
               </select>
@@ -318,7 +318,7 @@ export default function PatientRegistrationForm({
           <div className="space-y-5 animate-fade-in">
             {/* Chronic Conditions */}
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-900 block mb-1">{tx('Pre-Existing Chronic Conditions')}</label>
+              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">{tx('Pre-Existing Chronic Conditions')}</label>
               <div className="flex flex-wrap gap-2 pt-1">
                 {['Hypertension', 'Diabetes Mellitus', 'Asthma', 'Heart Conditions', 'Chronic Kidney Disease'].map((cond) => {
                   const isChecked = selectedConditions.includes(cond);
@@ -342,7 +342,7 @@ export default function PatientRegistrationForm({
 
             {/* Drug Allergies */}
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-slate-900 block mb-1">{tx('Drug or General Allergies (Optional)')}</label>
+              <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">{tx('Drug or General Allergies (Optional)')}</label>
               <input
                 type="text"
                 value={allergiesText}
@@ -354,14 +354,14 @@ export default function PatientRegistrationForm({
 
             {/* Emergency Contacts */}
             <div className="space-y-3.5 pt-2 border-t border-[color:var(--t-200)]">
-              <span className="text-sm font-bold text-slate-900 block mb-1">{tx('Emergency Contact (used for Doctor-on-Call dispatches) *')}</span>
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">{tx('Emergency Contact (used for Doctor-on-Call dispatches) *')}</span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-slate-900 block mb-1">{tx('Contact Person Name')}</label>
+                  <label className="text-xs font-extrabold uppercase tracking-wider text-slate-600 block">{tx('Contact Person Name')}</label>
                   <input type="text" value={emergencyContactName} onChange={(e) => setEmergencyContactName(e.target.value)} placeholder="Fatimah Binti Fauzi" className="form-input" required />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-slate-900 block mb-1">{tx('Relationship')}</label>
+                  <label className="text-xs font-extrabold uppercase tracking-wider text-slate-600 block">{tx('Relationship')}</label>
                   <select value={emergencyRelationship} onChange={(e) => setEmergencyRelationship(e.target.value)} className="form-select">
                     {RELATIONSHIPS.map(r => <option key={r} value={r}>{tx(r)}</option>)}
                   </select>

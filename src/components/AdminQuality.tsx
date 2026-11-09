@@ -10,7 +10,7 @@ const jreq = (url: string, method = 'POST', body?: unknown) =>
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString() : '—');
 const lab = 'text-xs font-extrabold uppercase tracking-wider text-slate-500';
 const btn = 'text-xs font-bold cursor-pointer';
-const field = 'form-input h-9 text-xs';
+const field = 'border border-slate-200 px-3 py-2 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
 
 export type QualitySubTab = 'support' | 'partners' | 'reviews' | 'incidents' | 'peer' | 'credentials';
 
@@ -53,7 +53,7 @@ export default function AdminQuality({
               role="tab"
               aria-selected={sub === t.id}
               onClick={() => { setSub(t.id); setMsg(''); }}
-              className={`px-3 py-2.5 text-sm font-bold cursor-pointer rounded-none ${
+              className={`px-3 py-2.5 text-xs font-bold cursor-pointer rounded-none ${
                 sub === t.id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-500 hover:text-slate-700'
               }`}
             >

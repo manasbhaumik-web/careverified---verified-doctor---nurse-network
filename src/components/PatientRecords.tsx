@@ -8,7 +8,7 @@ import { Activity, AlertTriangle, ClipboardList, FileText, FlaskConical, Pill, S
 const jpost = (url: string, body?: unknown, method = 'POST') =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
 const fmt = fmtDate;
-const field = 'form-input';
+const field = 'border border-[color:var(--t-200)] bg-white px-3.5 h-11 text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all';
 
 /** A <input type="datetime-local"> value for "now", in the person's own time zone. */
 const localNow = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };
@@ -120,7 +120,7 @@ export default function PatientRecords({
         <div role="tablist" className="flex flex-wrap gap-1 border-b border-slate-200">
           {tabs.map(([id, text, Icon]) => (
             <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setMsg(null); onSubTabChange?.(id); }}
-              className={`px-3 py-2.5 text-sm font-bold flex items-center gap-1.5 cursor-pointer ${tab === id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-600'}`}>
+              className={`px-3 py-2.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer ${tab === id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-600'}`}>
               <Icon className="h-3.5 w-3.5" /> {tx(text)}
             </button>
           ))}
@@ -210,7 +210,7 @@ export default function PatientRecords({
                       <li key={i.id} className="py-1.5 flex items-center justify-between gap-2 text-xs group">
                         <div className="min-w-0">
                           <strong className="text-rose-900 font-bold block truncate">{tx(i.name)}</strong>
-                          {i.detail && <p className="text-sm font-medium text-slate-700 truncate">{i.detail}</p>}
+                          {i.detail && <p className="text-xs text-slate-600 truncate">{i.detail}</p>}
                         </div>
                         <button
                           type="button"
@@ -252,7 +252,7 @@ export default function PatientRecords({
                       <li key={i.id} className="py-1.5 flex items-center justify-between gap-2 text-xs group">
                         <div className="min-w-0">
                           <strong className="text-[color:var(--ink)] font-bold block truncate">{tx(i.name)}</strong>
-                          {i.detail && <p className="text-sm font-medium text-slate-700 truncate">{i.detail}</p>}
+                          {i.detail && <p className="text-xs text-slate-600 truncate">{i.detail}</p>}
                         </div>
                         <button
                           type="button"
@@ -289,9 +289,9 @@ export default function PatientRecords({
                     <p className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--t-700)] mb-1">{tx('Prescribed by your doctors')}</p>
                     <ul className="divide-y divide-[color:var(--t-100)] max-h-48 overflow-y-auto">
                       {prescribed.map((m, k) => (
-                        <li key={k} className="py-1.5 text-sm">
+                        <li key={k} className="py-1.5 text-xs">
                           <strong className="text-[color:var(--ink)] font-bold block truncate">{m.name}{m.strength ? ` ${m.strength}` : ''}</strong>
-                          <p className="text-sm font-medium text-slate-700">{m.detail}{m.doctor ? ` · ${m.doctor}` : ''}{m.until ? tx(' · until {date}', { date: fmt(m.until) }) : ''}</p>
+                          <p className="text-xs text-slate-600">{m.detail}{m.doctor ? ` · ${m.doctor}` : ''}{m.until ? tx(' · until {date}', { date: fmt(m.until) }) : ''}</p>
                         </li>
                       ))}
                     </ul>
@@ -310,7 +310,7 @@ export default function PatientRecords({
                       <li key={i.id} className="py-1.5 flex items-center justify-between gap-2 text-xs group">
                         <div className="min-w-0">
                           <strong className="text-[color:var(--ink)] font-bold block truncate">{tx(i.name)}</strong>
-                          {i.detail && <p className="text-sm font-medium text-slate-700 truncate">{i.detail}</p>}
+                          {i.detail && <p className="text-xs text-slate-600 truncate">{i.detail}</p>}
                         </div>
                         <button
                           type="button"
@@ -397,22 +397,22 @@ export default function PatientRecords({
             const d = await act(() => jpost('/api/records/vitals', { kind: vital.kind, value1: Number(vital.value1), value2: vital.kind === 'bp' ? Number(vital.value2) : undefined, takenAt: vital.takenAt ? new Date(vital.takenAt).toISOString() : undefined }), 'Reading saved.');
             if (d.status === 'success') { setVital({ ...vital, value1: '', value2: '', takenAt: localNow() }); setTrendKind(vital.kind); setVitalFlag(d.data.flag ? d.data.flag.text : null); }
           }}>
-            <label className="text-sm font-bold text-slate-900 w-full sm:w-56 sm:flex-none">{tx('Reading')}<select className={`${field} block w-full mt-1.5`} value={vital.kind} onChange={e => setVital({ ...vital, kind: e.target.value, value1: '', value2: '' })}>{Object.entries(VITAL_LABEL).map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}</select><span className="block font-normal text-xs text-slate-700 mt-1">{tx('What you measured')}</span></label>
-            <label className="text-sm font-bold text-slate-900 flex-1 min-w-[200px]">{tx(vital.kind === 'bp' ? 'Top number (systolic)' : 'Value')}
+            <label className="text-xs font-bold text-slate-700 w-full sm:w-56 sm:flex-none">{tx('Reading')}<select className={`${field} block w-full mt-1.5`} value={vital.kind} onChange={e => setVital({ ...vital, kind: e.target.value, value1: '', value2: '' })}>{Object.entries(VITAL_LABEL).map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}</select><span className="block font-normal text-slate-700 mt-1">{tx('What you measured')}</span></label>
+            <label className="text-xs font-bold text-slate-700 flex-1 min-w-[200px]">{tx(vital.kind === 'bp' ? 'Top number (systolic)' : 'Value')}
               <span className="flex items-center gap-2 mt-1.5">
                 <input type="number" step="any" inputMode="decimal" className={`${field} block w-full min-w-0 flex-1`} value={vital.value1} onChange={e => setVital({ ...vital, value1: e.target.value })} min={vitalSpec?.min} max={vitalSpec?.max} required />
                 <span className="text-xs font-semibold text-slate-700">{vitalSpec?.unit}</span>
               </span>
               {vitalSpec && <span className="block font-normal text-slate-700 mt-1">{tx('Between {a} and {b}', { a: vitalSpec.min, b: vitalSpec.max })}</span>}
             </label>
-            {vital.kind === 'bp' && <label className="text-sm font-bold text-slate-900 flex-1 min-w-[200px]">{tx('Bottom number (diastolic)')}
+            {vital.kind === 'bp' && <label className="text-xs font-bold text-slate-700 flex-1 min-w-[200px]">{tx('Bottom number (diastolic)')}
               <span className="flex items-center gap-2 mt-1.5">
                 <input type="number" inputMode="decimal" className={`${field} block w-full min-w-0 flex-1`} value={vital.value2} onChange={e => setVital({ ...vital, value2: e.target.value })} min={vitalSpec?.min2} max={vitalSpec?.max2} required />
                 <span className="text-xs font-semibold text-slate-700">{vitalSpec?.unit}</span>
               </span>
               {vitalSpec && <span className="block font-normal text-slate-700 mt-1">{tx('Between {a} and {b}', { a: vitalSpec.min2, b: vitalSpec.max2 })}</span>}
             </label>}
-            <label className="text-sm font-bold text-slate-900 flex-[1.3] min-w-[240px]">{tx('When it was taken')}
+            <label className="text-xs font-bold text-slate-700 flex-[1.3] min-w-[240px]">{tx('When it was taken')}
               <input type="datetime-local" className={`${field} block w-full mt-1.5`} value={vital.takenAt} max={localNow()} onChange={e => setVital({ ...vital, takenAt: e.target.value })} required />
               <span className="block font-normal text-slate-700 mt-1">{tx('Now, unless you change it')}</span>
             </label>
@@ -427,7 +427,7 @@ export default function PatientRecords({
           <section aria-labelledby="trend-heading" className="min-w-0 bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 space-y-3">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <h3 id="trend-heading" className="font-display font-black text-sm text-[color:var(--ink)]">{tx('Trend')}</h3>
-              <label className="text-sm font-bold text-slate-900 flex items-center gap-2">{tx('Show')}
+              <label className="text-xs font-bold text-slate-700 flex items-center gap-2">{tx('Show')}
                 <select className={`${field} text-xs`} value={trendKind} onChange={e => setTrendKind(e.target.value)}>
                   {Object.entries(VITAL_LABEL).map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}
                 </select>
@@ -443,7 +443,7 @@ export default function PatientRecords({
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-xs">
                   <thead>
                     <tr className="text-left text-xs font-mono font-extrabold uppercase text-slate-600 border-b border-[color:var(--t-200)] pb-2">
                       <th className="py-2">{tx('Date & Time')}</th>
@@ -455,9 +455,9 @@ export default function PatientRecords({
                   <tbody className="divide-y divide-[color:var(--t-100)]">
                     {data.vitals.map((v: any) => (
                       <tr key={v.id} className="hover:bg-[color:var(--t-50)]/30 transition-colors">
-                        <td className="py-2.5 font-mono tabular-nums text-slate-600">{new Date(v.ts).toLocaleString()}</td>
+                        <td className="py-2.5 font-mono text-slate-600">{new Date(v.ts).toLocaleString()}</td>
                         <td className="font-bold text-[color:var(--ink)]">{tx(VITAL_LABEL[v.kind])}</td>
-                        <td className={`py-2 font-mono font-bold tabular-nums ${v.flag?.level === 'urgent' ? 'text-rose-700' : 'text-slate-800'}`}>
+                        <td className={`py-2 font-mono font-bold ${v.flag?.level === 'urgent' ? 'text-rose-700' : 'text-slate-800'}`}>
                           {v.value1}{v.value2 ? `/${v.value2}` : ''} {v.unit}
                           {v.flag && (
                             <span className={`mt-1 flex items-start gap-1.5 font-sans font-semibold text-xs leading-snug max-w-md ${v.flag.level === 'urgent' ? 'text-rose-800' : 'text-amber-900'}`}>
@@ -517,7 +517,7 @@ export default function PatientRecords({
               {o.notes && <p className="text-xs">{o.notes}</p>}
               {o.status === 'resulted'
                 ? <p className="text-xs font-bold text-emerald-800">{tx('Result uploaded {date} ·', { date: fmt(o.resultedAt) })} <a className="underline" href={`/api/documents/${o.resultDocumentId}/download`}>{tx('download')}</a></p>
-                : <label className="text-sm font-bold border border-dashed border-slate-300 px-3 py-2 inline-block cursor-pointer">
+                : <label className="text-xs font-bold border border-dashed border-slate-300 px-3 py-2 inline-block cursor-pointer">
                     {tx('Upload result (PDF, JPG or PNG)')}
                     <input type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={async e => {
                       const f = e.target.files?.[0]; if (!f) return;
@@ -556,7 +556,7 @@ export default function PatientRecords({
           </section>
           {data.sharableWith.length > 0 && (
             <form className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap gap-2 items-end" onSubmit={e => { e.preventDefault(); if (shareWith) act(() => jpost('/api/records/grants', { professionalId: shareWith, days: 30 }), 'Shared for 30 days.'); }}>
-              <label className="text-sm font-bold flex-1 min-w-[12rem]">{tx('Share with a doctor you have seen')}
+              <label className="text-xs font-bold flex-1 min-w-[12rem]">{tx('Share with a doctor you have seen')}
                 <select className={`${field} block w-full mt-1`} value={shareWith} onChange={e => setShareWith(e.target.value)}><option value="">{tx('Choose…')}</option>{data.sharableWith.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
               <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">{tx('Share for 30 days')}</button>
             </form>

@@ -446,7 +446,7 @@ export default function PatientDashboard({
           if (onOpenHelp) onOpenHelp();
           else window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
         }}
-        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-sm flex items-center gap-2 cursor-pointer transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
+        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
         title={tx('Patient Help & Concierge Support Desk')}
       >
         <LifeBuoy className="h-4 w-4 text-slate-500" />
@@ -500,7 +500,7 @@ export default function PatientDashboard({
       />
 
       {/* 3. MAIN WORKSPACE CONTENT CONTAINER */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-4">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* NOTIFICATION / STATUS DISMISSAL */}
       {msg && (
         <div
@@ -728,7 +728,7 @@ export default function PatientDashboard({
                               <button
                                 type="button"
                                 onClick={() => onSelectProfessional(b.professionalId)}
-                                className="font-display font-bold text-sm sm:text-base text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left transition-colors cursor-pointer"
+                                className="font-display font-black text-xs sm:text-base text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left transition-colors cursor-pointer"
                               >
                                 {b.professionalName}
                               </button>
@@ -752,13 +752,13 @@ export default function PatientDashboard({
                             </div>
 
                             {/* Specialty & Location Subtitle */}
-                            <p className="text-sm font-semibold text-[color:var(--t-700)] mt-0.5">
+                            <p className="text-xs font-bold text-[color:var(--t-700)] mt-0.5">
                               {prof?.specialization ? tx(prof.specialization) : tx('General Practice & Primary Care')}
                               {prof?.city ? <span className="text-slate-500 font-medium"> · {prof.city}</span> : null}
                             </p>
 
                             {/* Date / Time / Mode / Fee Strip */}
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-sm text-slate-600 font-medium">
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-slate-600 font-medium">
                               <span className="inline-flex items-center gap-1.5 font-bold text-slate-800">
                                 <Calendar className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> {b.date}
                               </span>
@@ -801,7 +801,7 @@ export default function PatientDashboard({
                             <button
                               type="button"
                               onClick={() => setPaying(b)}
-                              className="min-h-[40px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
+                              className="min-h-[40px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
                             >
                               <span>{tx('Pay {amount}', { amount: formatMoney(b.fee) })}</span>
                               <ArrowRight className="h-3.5 w-3.5" />
@@ -1963,7 +1963,7 @@ export default function PatientDashboard({
                     placeholder={tx('Search by doctor name, specialty, hospital, city, or MMC number…')}
                     value={registryQuery}
                     onChange={e => setRegistryQuery(e.target.value)}
-                    className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-sm font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
+                    className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
                   />
                   {registryQuery && (
                     <button
@@ -2074,7 +2074,7 @@ export default function PatientDashboard({
                         <UserAvatar src={prof.avatar} role="doctor" alt={prof.name} className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-2">
-                            <button type="button" onClick={() => onSelectProfessional(prof.id)} className="font-display font-bold text-sm sm:text-base text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left truncate block cursor-pointer">
+                            <button type="button" onClick={() => onSelectProfessional(prof.id)} className="font-display font-extrabold text-xs text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left truncate block cursor-pointer">
                               {prof.name}
                             </button>
                             {prof.rating > 0 && (
@@ -2083,7 +2083,7 @@ export default function PatientDashboard({
                               </span>
                             )}
                           </div>
-                          <p className="text-sm font-semibold text-[color:var(--t-700)] mt-0.5">{tx(prof.specialization)}</p>
+                          <p className="text-xs text-[color:var(--t-700)] font-bold mt-0.5">{tx(prof.specialization)}</p>
                           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
                             <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
                               {tx('MMC Verified · Active')}
@@ -2097,7 +2097,7 @@ export default function PatientDashboard({
                         </div>
                       </div>
 
-                      <div className="pt-2 border-t border-[color:var(--t-100)] text-sm text-slate-600 space-y-1">
+                      <div className="pt-2 border-t border-[color:var(--t-100)] text-xs text-slate-600 space-y-1">
                         {(prof.practiceAddress || prof.city) && (
                           <p className="flex items-center gap-1.5 truncate">
                             <MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
@@ -2120,12 +2120,12 @@ export default function PatientDashboard({
                     <div className="pt-2.5 border-t border-[color:var(--t-100)] flex items-center justify-between mt-auto">
                       <div>
                         <span className="text-2xs font-bold uppercase tracking-wider text-slate-400 block">{tx('Consultation Fee')}</span>
-                        <span className="font-mono text-sm sm:text-base font-extrabold text-[color:var(--ink)]">RM {prof.fee}</span>
+                        <span className="font-mono text-xs font-extrabold text-[color:var(--ink)]">RM {prof.fee}</span>
                       </div>
                       <button
                         type="button"
                         onClick={() => onSelectProfessional(prof.id)}
-                        className="h-9 px-3.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                        className="h-9 px-3.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors"
                       >
                         <span>{tx('Book Visit')}</span>
                         <ArrowRight className="h-3.5 w-3.5" />
@@ -2209,7 +2209,7 @@ export default function PatientDashboard({
                     placeholder={tx('Search by nurse name, nursing specialty, city, or LJM number…')}
                     value={nursesQuery}
                     onChange={e => setNursesQuery(e.target.value)}
-                    className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-sm font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
+                    className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
                   />
                   {nursesQuery && (
                     <button
@@ -2304,7 +2304,7 @@ export default function PatientDashboard({
                         <UserAvatar src={prof.avatar} role="nurse" alt={prof.name} className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-2">
-                            <button type="button" onClick={() => onSelectProfessional(prof.id)} className="font-display font-bold text-sm sm:text-base text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left truncate block cursor-pointer">
+                            <button type="button" onClick={() => onSelectProfessional(prof.id)} className="font-display font-extrabold text-xs text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left truncate block cursor-pointer">
                               {prof.name}
                             </button>
                             {prof.rating > 0 && (
@@ -2313,7 +2313,7 @@ export default function PatientDashboard({
                               </span>
                             )}
                           </div>
-                          <p className="text-sm font-semibold text-[color:var(--t-700)] mt-0.5">{tx(prof.specialization || 'Clinical Staff Nurse')}</p>
+                          <p className="text-xs text-[color:var(--t-700)] font-bold mt-0.5">{tx(prof.specialization || 'Clinical Staff Nurse')}</p>
                           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
                             <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
                               {tx('LJM Verified · Active')}
@@ -2327,7 +2327,7 @@ export default function PatientDashboard({
                         </div>
                       </div>
 
-                      <div className="pt-2 border-t border-[color:var(--t-100)] text-sm text-slate-600 space-y-1">
+                      <div className="pt-2 border-t border-[color:var(--t-100)] text-xs text-slate-600 space-y-1">
                         {(prof.practiceAddress || prof.city) && (
                           <p className="flex items-center gap-1.5 truncate">
                             <MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
@@ -2350,12 +2350,12 @@ export default function PatientDashboard({
                     <div className="pt-2.5 border-t border-[color:var(--t-100)] flex items-center justify-between mt-auto">
                       <div>
                         <span className="text-2xs font-bold uppercase tracking-wider text-slate-400 block">{tx('Care Rate')}</span>
-                        <span className="font-mono text-sm sm:text-base font-extrabold text-[color:var(--ink)]">RM {prof.fee || 60} / hr</span>
+                        <span className="font-mono text-xs font-extrabold text-[color:var(--ink)]">RM {prof.fee || 60} / hr</span>
                       </div>
                       <button
                         type="button"
                         onClick={() => onSelectProfessional(prof.id)}
-                        className="h-9 px-3.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                        className="h-9 px-3.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors"
                       >
                         <span>{tx('Book Nurse')}</span>
                         <ArrowRight className="h-3.5 w-3.5" />

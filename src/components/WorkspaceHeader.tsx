@@ -46,13 +46,13 @@ export default function WorkspaceHeader<T extends string = string>({
   const tx = useTr();
   return (
     <div
-      className={`bg-white border border-[color:var(--t-200)] border-l-4 border-l-[color:var(--t-600)] px-4 py-3 sm:px-5 sm:py-3.5 shadow-2xs ${className}`}
+      className={`bg-white border border-[color:var(--t-200)] border-l-4 border-l-[color:var(--t-600)] p-4 sm:p-5 shadow-2xs ${className}`}
     >
       {/* Top Header Row */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3.5">
         <div className="flex items-start sm:items-center gap-3 min-w-0">
-          <div className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shrink-0 shadow-2xs">
-            <Icon className="h-4 w-4" />
+          <div className="w-10 h-10 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shrink-0 shadow-2xs">
+            <Icon className="h-5 w-5" />
           </div>
           <div className="min-w-0">
             {eyebrow && (
@@ -61,13 +61,13 @@ export default function WorkspaceHeader<T extends string = string>({
               </span>
             )}
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="font-display font-black text-lg sm:text-xl text-[color:var(--ink)] tracking-tight leading-snug">
+              <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] tracking-tight leading-snug">
                 {title}
               </h2>
               {badges}
             </div>
             {description && (
-              <p className="text-sm text-slate-600 font-medium mt-0.5 leading-relaxed line-clamp-2 md:line-clamp-none">
+              <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed line-clamp-2 md:line-clamp-none">
                 {description}
               </p>
             )}
@@ -90,7 +90,7 @@ export default function WorkspaceHeader<T extends string = string>({
 
       {/* Attached Inner Workspace Subtab Strip */}
       {tabs && tabs.length > 0 && (
-        <div className="border-t border-[color:var(--t-100)] pt-2.5 mt-2.5 flex flex-wrap items-center justify-between gap-2">
+        <div className="border-t border-[color:var(--t-100)] pt-3 mt-3.5 flex flex-wrap items-center justify-between gap-2.5">
           <div
             role="tablist"
             aria-label={tabsLabel || tx('Workspace section tabs')}
@@ -106,7 +106,7 @@ export default function WorkspaceHeader<T extends string = string>({
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => onTabChange?.(tab.id)}
-                  className={`min-h-[36px] px-3 text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`min-h-[44px] px-3.5 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                     isActive
                       ? 'bg-[color:var(--t-600)] text-white shadow-2xs border border-[color:var(--t-700)]'
                       : 'bg-[color:var(--t-50)]/70 hover:bg-[color:var(--t-100)] text-slate-700 hover:text-[color:var(--t-700)] border border-[color:var(--t-200)]'

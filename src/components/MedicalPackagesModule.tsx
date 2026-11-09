@@ -1156,24 +1156,24 @@ export default function MedicalPackagesModule({
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="pkg-name" className="block text-sm font-bold text-slate-900 mb-1">{tx('Full name (as in passport or NRIC) *')}</label>
+                    <label htmlFor="pkg-name" className="text-xs font-bold text-slate-800 block">{tx('Full name (as in passport or NRIC) *')}</label>
                     <input id="pkg-name" type="text" required value={bookName} onChange={(e) => setBookName(e.target.value)} placeholder={tx('e.g. Siti Sarah binti Ahmad')} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <label htmlFor="pkg-phone" className="block text-sm font-bold text-slate-900 mb-1">{tx('Mobile phone (WhatsApp) *')}</label>
+                      <label htmlFor="pkg-phone" className="text-xs font-bold text-slate-800 block">{tx('Mobile phone (WhatsApp) *')}</label>
                       <input id="pkg-phone" type="tel" required value={bookPhone} onChange={(e) => setBookPhone(e.target.value)} placeholder="+60 12-345 6789" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="pkg-email" className="block text-sm font-bold text-slate-900 mb-1">{tx('Email *')}</label>
+                      <label htmlFor="pkg-email" className="text-xs font-bold text-slate-800 block">{tx('Email *')}</label>
                       <input id="pkg-email" type="email" required value={bookEmail} onChange={(e) => setBookEmail(e.target.value)} placeholder={tx('you@example.com')} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <label htmlFor="pkg-country" className="block text-sm font-bold text-slate-900 mb-1">{tx('Country of residence')}</label>
+                      <label htmlFor="pkg-country" className="text-xs font-bold text-slate-800 block">{tx('Country of residence')}</label>
                       <select id="pkg-country" value={bookCountry} onChange={(e) => setBookCountry(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]">
                         <option value="Malaysia">{tx('Malaysia')}</option>
                         <option value="Indonesia">{tx('Indonesia')}</option>
@@ -1185,13 +1185,13 @@ export default function MedicalPackagesModule({
                       </select>
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="pkg-date" className="block text-sm font-bold text-slate-900 mb-1">{tx('Preferred date')}</label>
+                      <label htmlFor="pkg-date" className="text-xs font-bold text-slate-800 block">{tx('Preferred date')}</label>
                       <input id="pkg-date" type="date" value={bookDate} onChange={(e) => setBookDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="pkg-notes" className="block text-sm font-bold text-slate-900 mb-1">{tx('Anything the hospital should know (optional)')}</label>
+                    <label htmlFor="pkg-notes" className="text-xs font-bold text-slate-800 block">{tx('Anything the hospital should know (optional)')}</label>
                     <textarea id="pkg-notes" rows={2} value={bookNotes} onChange={(e) => setBookNotes(e.target.value)} placeholder={tx('Health conditions, mobility needs, dietary needs…')} className="w-full px-3 py-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
                   </div>
 

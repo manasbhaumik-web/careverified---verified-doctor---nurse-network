@@ -94,11 +94,11 @@ export default function PractitionerSettingsTab({
       {/* LEFT PANE: Configuration Form */}
       <div className="flex-1 bg-white border border-[color:var(--t-200)] rounded-none p-6 sm:p-8 shadow-xs w-full">
         <div className="border-b border-[color:var(--t-200)] pb-3.5 mb-6">
-          <h3 className="text-base font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+          <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
             <Edit className="h-4.5 w-4.5 text-[color:var(--t-600)]" />
             {tx('Registry Listing Configuration')}
           </h3>
-          <p className="text-sm text-slate-600 font-medium">{tx('Update the public information patients find when searching the registry.')}</p>
+          <p className="text-xs text-slate-500 font-medium">{tx('Update the public information patients find when searching the registry.')}</p>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-6">
@@ -106,7 +106,7 @@ export default function PractitionerSettingsTab({
           {/* Biography & Philosophy with formatting tools */}
           <div className="space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <label className="block text-sm font-bold text-slate-900 mb-1">{tx('Clinical Biography & Care Philosophy')}</label>
+              <label className="block text-xs font-black text-slate-700">{tx('Clinical Biography & Care Philosophy')}</label>
 
               {/* Formatting Tools */}
               <div className="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-none">
@@ -187,7 +187,7 @@ export default function PractitionerSettingsTab({
 
           {/* Medical Certifications Tag Manager */}
           <div className="space-y-2 pt-2 border-t border-[color:var(--t-200)]">
-            <label className="block text-sm font-bold text-slate-900 mb-1">{tx('Active Medical Certifications')}</label>
+            <label className="block text-xs font-black text-slate-700">{tx('Active Medical Certifications')}</label>
             <p className="text-xs text-slate-500 font-semibold">{tx('Verify specialized training tags displayed on your public patient card.')}</p>
 
             <div className="flex flex-wrap gap-1.5 mb-2">
@@ -239,7 +239,7 @@ export default function PractitionerSettingsTab({
           {/* Professional Fee, City & Clinical Center */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-[color:var(--t-200)]">
             <div>
-              <label className="block text-sm font-bold text-slate-900 mb-1.5">
+              <label className="block text-xs font-black text-slate-700 mb-1.5">
                 {isDoc ? tx('Standard Co-Pay Fee (RM)') : tx('Hourly Clinical Service Fee (RM)')}
               </label>
               <div className="relative">
@@ -256,7 +256,7 @@ export default function PractitionerSettingsTab({
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-slate-900 mb-1.5">{tx('Registered Practice City')}</label>
+              <label className="block text-xs font-black text-slate-700 mb-1.5">{tx('Registered Practice City')}</label>
               <select
                 value={editCity}
                 onChange={(e) => setEditCity(e.target.value)}
@@ -293,7 +293,7 @@ export default function PractitionerSettingsTab({
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-slate-900 mb-2">{tx('Practice Days of the Week')}</label>
+              <label className="block text-xs font-black text-slate-700 mb-2">{tx('Practice Days of the Week')}</label>
               <div className="flex flex-wrap gap-1.5">
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
                   const isActive = editDays.includes(day);
@@ -322,7 +322,7 @@ export default function PractitionerSettingsTab({
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-slate-900 mb-2">{tx('Configure Time Slots')}</label>
+              <label className="block text-xs font-black text-slate-700 mb-2">{tx('Configure Time Slots')}</label>
               <div className="flex gap-2 mb-3 max-w-sm">
                 <input
                   type="text"
@@ -366,7 +366,7 @@ export default function PractitionerSettingsTab({
 
             {!isDoc && (
               <div className="pt-3 border-t border-[color:var(--t-200)]/60">
-                <label className="block text-sm font-bold text-slate-900 mb-1.5">
+                <label className="block text-xs font-black text-slate-700 mb-1.5">
                   {tx('Clinical Nursing Duty Shift Coverage')}
                 </label>
                 <div className="flex flex-wrap gap-2 text-xs">

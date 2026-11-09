@@ -50,15 +50,15 @@ export default function PractitionerSignUp({ onSuccess, onCancel }: {
           </div>
         )}
         <div className="space-y-2">
-          <label htmlFor="pr-name" className="text-sm font-bold text-slate-900 block mb-1">Full name (as on licence)</label>
+          <label htmlFor="pr-name" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Full name (as on licence)</label>
           <input id="pr-name" className={field} value={name} onChange={e => setName(e.target.value)} required maxLength={100} />
         </div>
         <div className="space-y-2">
-          <label htmlFor="pr-email" className="text-sm font-bold text-slate-900 block mb-1">Email address</label>
+          <label htmlFor="pr-email" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Email address</label>
           <input id="pr-email" type="email" inputMode="email" autoComplete="email" autoCapitalize="none" spellCheck={false} className={field} value={email} onChange={e => setEmail(e.target.value)} required />
         </div>
         <div className="space-y-2">
-          <label htmlFor="pr-password" className="text-sm font-bold text-slate-900 block mb-1">Password</label>
+          <label htmlFor="pr-password" className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Password</label>
           <input id="pr-password" type="password" className={field} value={password} onChange={e => setPassword(e.target.value)} required minLength={8} autoComplete="new-password" />
           <p className="text-xs text-slate-500">At least 8 characters, with letters and numbers.</p>
         </div>

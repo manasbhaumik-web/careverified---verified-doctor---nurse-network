@@ -171,7 +171,7 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
         onClick={() => {
           window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
         }}
-        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-sm flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-semibold text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
+        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
         title={tx('Open Support Desk & Help Center')}
       >
         <LifeBuoy className="h-4 w-4 text-slate-500" />
@@ -223,7 +223,7 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
         />
       </DashboardHeader>
 
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-4">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {me?.account.mustChangePassword && (
           <div role="alert" className="bg-amber-50 border border-amber-200 text-amber-900 p-4 flex flex-wrap items-center gap-3 text-xs">
             <KeyRound className="h-5 w-5 shrink-0" />
@@ -464,7 +464,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
 
       <ul className="space-y-1.5">
         {rx.items.map((i, k) => (
-          <li key={k} className="text-sm text-slate-800 flex gap-2 [overflow-wrap:anywhere]">
+          <li key={k} className="text-xs text-slate-800 flex gap-2 [overflow-wrap:anywhere]">
             <Pill className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" />
             <span><strong>{i.name}</strong> {[i.strength, i.form].filter(Boolean).join(' ')} · {i.dose}, {i.frequency} for {i.durationDays} days · qty {i.quantity}{i.instructions ? ` · ${i.instructions}` : ''}</span>
           </li>

@@ -73,7 +73,7 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                   <button
                     type="button"
                     onClick={onOpenNewPackageModal}
-                    className="px-3.5 py-2 text-sm font-bold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer shadow-xs flex items-center gap-1.5"
+                    className="px-3.5 py-2 text-xs font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white cursor-pointer shadow-xs flex items-center gap-1.5"
                   >
                     <Plus className="h-4 w-4" />
                     <span>{tx('Publish Medical Package')}</span>
@@ -81,7 +81,7 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                   <button
                     type="button"
                     onClick={onOpenNewPromoModal}
-                    className="px-3.5 py-2 text-sm font-bold border border-slate-300 hover:bg-slate-50 text-slate-800 cursor-pointer flex items-center gap-1.5"
+                    className="px-3.5 py-2 text-xs font-bold border border-slate-300 hover:bg-slate-50 text-slate-800 cursor-pointer flex items-center gap-1.5"
                   >
                     <Tag className="h-3.5 w-3.5 text-amber-600" />
                     <span>{tx('Create Promotion')}</span>

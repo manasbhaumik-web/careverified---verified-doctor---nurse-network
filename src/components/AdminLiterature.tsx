@@ -4,7 +4,7 @@ import { useTr } from '../locale';
 
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
-const field = 'form-input h-9 text-xs';
+const field = 'border border-slate-200 bg-white px-3 py-2 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
 const lab = 'text-xs font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '—');
 
@@ -173,7 +173,7 @@ export default function AdminLiterature({
                   role="tab"
                   aria-selected={tab === id}
                   onClick={() => setTab(id)}
-                  className={`px-3 py-1.5 text-sm font-black uppercase tracking-wider rounded-none cursor-pointer transition-all border ${
+                  className={`px-3 py-1.5 text-xs font-black uppercase tracking-wider rounded-none cursor-pointer transition-all border ${
                     tab === id
                       ? 'bg-[color:var(--t-600)] border-[color:var(--t-700)] text-white shadow-none'
                       : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900'

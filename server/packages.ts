@@ -313,14 +313,14 @@ export function initPackagesSchema() {
 
     const stmt = db.prepare(`
       INSERT INTO medical_promotions (
-        id, facility_id, code, title, description, discount_type, discount_value, package_id, badge_text, valid_from, valid_until, terms, image_url, status, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        id, facility_id, code, title, description, discount_type, discount_value, package_id, badge_text, valid_from, valid_until, terms, status, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const now = iso();
     for (const pr of defaultPromos) {
       stmt.run(
-        pr.id, pr.facility_id, pr.code, pr.title, pr.description, pr.discount_type, pr.discount_value, pr.package_id, pr.badge_text, pr.valid_from, pr.valid_until, pr.terms, pr.image_url, pr.status, now, now
+        pr.id, pr.facility_id, pr.code, pr.title, pr.description, pr.discount_type, pr.discount_value, pr.package_id, pr.badge_text, pr.valid_from, pr.valid_until, pr.terms, pr.status, pr.image_url, now, now
       );
     }
   }
@@ -695,8 +695,8 @@ export function registerPackagesRoutes(app: Application) {
 
     db.prepare(`
       INSERT INTO medical_promotions (
-        id, facility_id, code, title, description, discount_type, discount_value, package_id, badge_text, valid_from, valid_until, terms, image_url, status, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        id, facility_id, code, title, description, discount_type, discount_value, package_id, badge_text, valid_from, valid_until, terms, status, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       id, facilityId, code, title, description, discountType, storedValue, packageId, badgeText, validFrom, validUntil, terms, status, now, now
     );

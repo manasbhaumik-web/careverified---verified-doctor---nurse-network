@@ -7,8 +7,8 @@ import { FilterSelect } from './DashboardHeader';
 const jget = (url: string) => fetch(url).then(r => r.json());
 const jsend = (method: string, url: string, body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
-const input = 'form-input';
-const label = 'form-label';
+const input = 'border border-[color:var(--t-200)] h-11 px-3 text-xs font-semibold bg-[color:var(--t-bg)] text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors';
+const label = 'block text-2xs font-black uppercase tracking-wider text-slate-500 mb-1.5';
 
 export const SECTOR_LABEL: Record<string, string> = { public: 'Public sector', private: 'Private sector', other: 'Other sector' };
 

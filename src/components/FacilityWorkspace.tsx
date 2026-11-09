@@ -1150,7 +1150,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         onClick={() => {
           window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
         }}
-        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-sm flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
+        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
         title={tx('Facility Help & Support Desk')}
       >
         <LifeBuoy className="h-4 w-4 text-slate-500" />
@@ -1239,7 +1239,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
       )}
 
       {/* Main Inner Workspace Content Container */}
-      <div className={embedded ? "space-y-4" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-4"}>
+      <div className={embedded ? "space-y-6" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
         {/* Toast / Status Notification */}
         {notificationMsg && (
           <div

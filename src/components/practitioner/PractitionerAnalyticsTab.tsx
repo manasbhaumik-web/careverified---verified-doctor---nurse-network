@@ -48,44 +48,44 @@ export default function PractitionerAnalyticsTab({
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-sm font-semibold text-slate-700 block">{tx('Generated Income')}</span>
+          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Generated Income')}</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{formatMoney(totalEarnings)}</span>
-          <p className="text-sm text-emerald-700 font-medium flex items-center gap-0.5">
+          <p className="text-xs text-emerald-600 font-bold flex items-center gap-0.5">
             <TrendingUp className="h-3 w-3" />
             <span>{tx('100% practitioner distribution')}</span>
           </p>
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-sm font-semibold text-slate-700 block">{tx('Patients Attended')}</span>
+          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Patients Attended')}</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{tx('{n} Patients', { n: totalAttendedCount })}</span>
-          <p className="text-sm text-slate-600 font-medium">{tx('{a} consults • {b} dispatches', { a: completedBookings.length, b: completedDispatches.length })}</p>
+          <p className="text-xs text-slate-500 font-semibold">{tx('{a} consults • {b} dispatches', { a: completedBookings.length, b: completedDispatches.length })}</p>
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-sm font-semibold text-slate-700 block">{tx('Practice Rating')}</span>
+          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Practice Rating')}</span>
           <div className="flex items-center gap-1.5">
             <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{avgOverall ?? "—"}</span>
             <Star className="h-4.5 w-4.5 text-amber-500 fill-amber-500" />
           </div>
-          <p className="text-sm text-slate-600 font-medium">{tx('Based on {n} clinical ratings', { n: reviewCount })}</p>
+          <p className="text-xs text-slate-500 font-semibold">{tx('Based on {n} clinical ratings', { n: reviewCount })}</p>
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-sm font-semibold text-slate-700 block">{tx('Clinical Accuracy')}</span>
+          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Clinical Accuracy')}</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--e-700)] tabular-nums">99.8%</span>
-          <p className="text-sm text-slate-600 font-medium">{tx('Government standard audit cleared')}</p>
+          <p className="text-xs text-slate-500 font-semibold">{tx('Government standard audit cleared')}</p>
         </div>
       </div>
 
       {/* Earnings Visualizer Chart */}
       <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-xs space-y-5">
         <div>
-          <h4 className="text-lg font-bold text-[color:var(--ink)]">{tx('Revenue Stream Distribution')}</h4>
-          <p className="text-sm text-slate-600 font-medium">{tx('Visualizing contribution proportions across clinical channels')}</p>
+          <h4 className="text-base font-bold text-[color:var(--ink)]">{tx('Revenue Stream Distribution')}</h4>
+          <p className="text-xs text-[color:var(--ink-2)]">{tx('Visualizing contribution proportions across clinical channels')}</p>
         </div>
 
-        <div className="space-y-3 max-w-xl text-sm font-semibold text-slate-800">
+        <div className="space-y-3 max-w-xl text-xs font-bold text-slate-700">
           <div>
             <div className="flex justify-between mb-1">
               <span>{tx('Video Telehealth Booking ({amount})', { amount: formatMoney(videoEarned) })}</span>
@@ -121,8 +121,8 @@ export default function PractitionerAnalyticsTab({
       {/* Patient History Logs */}
       <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-xs space-y-4">
         <div>
-          <h4 className="text-lg font-bold text-[color:var(--ink)]">{tx('Clinical Attended Ledger')}</h4>
-          <p className="text-sm text-slate-600 font-medium">{tx('Chronological history log of all patients evaluated and treatments finalized')}</p>
+          <h4 className="text-base font-bold text-[color:var(--ink)]">{tx('Clinical Attended Ledger')}</h4>
+          <p className="text-xs text-[color:var(--ink-2)]">{tx('Chronological history log of all patients evaluated and treatments finalized')}</p>
         </div>
 
         <div className="overflow-x-auto">

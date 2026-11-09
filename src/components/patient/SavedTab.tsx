@@ -262,15 +262,15 @@ export default function SavedTab({
                         </span>
                       )}
                     </div>
-                    <h4 className="font-display font-bold text-sm sm:text-base text-[color:var(--ink)] leading-snug truncate mt-1">{p.name}</h4>
-                    <p className="text-sm font-semibold text-[color:var(--t-700)] truncate">{tx(p.specialization)}</p>
+                    <h4 className="font-display font-extrabold text-sm text-[color:var(--ink)] leading-snug truncate mt-1">{p.name}</h4>
+                    <p className="text-xs text-[color:var(--t-700)] font-bold truncate">{tx(p.specialization)}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 pt-2.5 border-t border-[color:var(--t-100)] mt-auto">
                   <button
                     type="button"
                     onClick={() => message(p.id)}
-                    className="h-9 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-sm font-bold px-3 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="h-9 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold px-2.5 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <MessageSquare className="h-3.5 w-3.5 text-[color:var(--t-600)]" aria-hidden="true" />
                     <span>{tx('Message')}</span>
@@ -278,7 +278,7 @@ export default function SavedTab({
                   <button
                     type="button"
                     onClick={() => onSelectProfessional(p.id)}
-                    className="h-9 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold px-3 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-[color:var(--t-700)]"
+                    className="h-9 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-2.5 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-[color:var(--t-700)]"
                   >
                     <CalendarRange className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>{tx('Book Again')}</span>
@@ -307,8 +307,8 @@ export default function SavedTab({
       <section aria-labelledby="care-team-saved" className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h3 id="care-team-saved" className="font-display font-bold text-lg sm:text-xl text-[color:var(--ink)]">Saved for Later</h3>
-            <p className="text-sm text-slate-600">Practitioners you bookmarked for future consultations or home care.</p>
+            <h3 id="care-team-saved" className="font-display font-black text-base text-[color:var(--ink)]">Saved for Later</h3>
+            <p className="text-xs text-slate-600">Practitioners you bookmarked for future consultations or home care.</p>
           </div>
           <span className="text-2xs font-mono font-bold uppercase px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
             {tx('{n} Saved', { n: filteredSaved.length })}
@@ -359,8 +359,8 @@ export default function SavedTab({
                         <UserAvatar src={p.avatar} role={p.role === UserRole.DOCTOR ? 'doctor' : 'nurse'} alt={p.name} className="h-12 w-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" />
                         <div className="min-w-0">
                           <Standing p={p} />
-                          <h4 className="font-display font-bold text-sm sm:text-base text-[color:var(--ink)] leading-snug truncate mt-1">{p.name}</h4>
-                          <p className="text-sm font-semibold text-[color:var(--t-700)] truncate">{tx(p.specialization)}</p>
+                          <h4 className="font-display font-extrabold text-sm text-[color:var(--ink)] leading-snug truncate mt-1">{p.name}</h4>
+                          <p className="text-xs text-[color:var(--t-700)] font-bold truncate">{tx(p.specialization)}</p>
                         </div>
                       </div>
                       <button
@@ -396,7 +396,7 @@ export default function SavedTab({
                         <button
                           type="button"
                           onClick={() => message(p.id)}
-                          className="h-9 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-sm font-bold px-3 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                          className="h-9 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold px-2.5 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                         >
                           <MessageSquare className="h-3.5 w-3.5 text-[color:var(--t-600)]" aria-hidden="true" />
                           <span>{tx('Message')}</span>
@@ -414,7 +414,7 @@ export default function SavedTab({
                       <button
                         type="button"
                         onClick={() => onSelectProfessional(p.id)}
-                        className="h-9 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold px-3 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-[color:var(--t-700)]"
+                        className="h-9 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-2.5 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-[color:var(--t-700)]"
                       >
                         <CalendarRange className="h-3.5 w-3.5" aria-hidden="true" />
                         <span>{tx('Book Visit')}</span>
