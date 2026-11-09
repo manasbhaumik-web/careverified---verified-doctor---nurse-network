@@ -270,7 +270,7 @@ export default function SavedTab({
                   <button
                     type="button"
                     onClick={() => message(p.id)}
-                    className="h-9 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold px-2.5 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="btn btn-sm btn-secondary whitespace-nowrap shrink-0"
                   >
                     <MessageSquare className="h-3.5 w-3.5 text-[color:var(--t-600)]" aria-hidden="true" />
                     <span>{tx('Message')}</span>
@@ -278,7 +278,7 @@ export default function SavedTab({
                   <button
                     type="button"
                     onClick={() => onSelectProfessional(p.id)}
-                    className="h-9 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-2.5 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-[color:var(--t-700)]"
+                    className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
                   >
                     <CalendarRange className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>{tx('Book Again')}</span>
@@ -351,7 +351,7 @@ export default function SavedTab({
                 <motion.article
                   variants={itemVariants}
                   key={p.id}
-                  className="group relative bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-4 shadow-2xs flex flex-col justify-between gap-3 transition-all"
+                  className="group relative app-card-interactive app-card-equal p-5 transition-all"
                 >
                   <div className="space-y-3">
                     <div className="flex gap-3 items-start justify-between">
@@ -405,7 +405,7 @@ export default function SavedTab({
                         <button
                           type="button"
                           onClick={() => onVerifyCredentials(p)}
-                          className="h-9 bg-[color:var(--t-50)] border border-[color:var(--t-200)] hover:bg-[color:var(--t-100)] text-[color:var(--t-700)] text-xs font-bold px-2.5 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                          className="btn btn-sm btn-secondary whitespace-nowrap shrink-0"
                         >
                           <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
                           <span>{tx('Credentials')}</span>
@@ -447,7 +447,7 @@ export default function SavedTab({
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {suggestedProviders.map(prof => (
-              <article key={prof.id} className="p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all bg-white flex flex-col justify-between gap-3 shadow-2xs group">
+              <article key={prof.id} className="app-card-interactive app-card-equal p-5 group">
                 <div className="space-y-2.5">
                   <div className="flex items-start gap-3">
                     <UserAvatar src={prof.avatar} role={prof.role === UserRole.DOCTOR ? 'doctor' : 'nurse'} alt={prof.name} className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" />
@@ -497,7 +497,7 @@ export default function SavedTab({
                     <button
                       type="button"
                       onClick={() => onRestoreSaved(prof.id)}
-                      className="h-9 px-3 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                      className="btn btn-sm btn-secondary whitespace-nowrap shrink-0"
                     >
                       <Heart className="h-3.5 w-3.5 text-rose-500" />
                       <span>Save to Team</span>
@@ -506,7 +506,7 @@ export default function SavedTab({
                   <button
                     type="button"
                     onClick={() => onSelectProfessional(prof.id)}
-                    className="h-9 px-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                    className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
                   >
                     <span>{tx('Book Visit')}</span>
                     <ArrowRight className="h-3.5 w-3.5" />

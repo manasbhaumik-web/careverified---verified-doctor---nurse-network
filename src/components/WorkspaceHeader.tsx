@@ -46,7 +46,7 @@ export default function WorkspaceHeader<T extends string = string>({
   const tx = useTr();
   return (
     <div
-      className={`bg-white border border-[color:var(--t-200)] border-l-4 border-l-[color:var(--t-600)] p-4 sm:p-5 shadow-2xs ${className}`}
+      className={`bg-white border border-[color:var(--t-200)] border-l-4 border-l-[color:var(--t-600)] p-3.5 sm:p-4 shadow-2xs ${className}`}
     >
       {/* Top Header Row */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3.5">
@@ -106,7 +106,7 @@ export default function WorkspaceHeader<T extends string = string>({
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => onTabChange?.(tab.id)}
-                  className={`min-h-[44px] px-3.5 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`h-9 px-3 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                     isActive
                       ? 'bg-[color:var(--t-600)] text-white shadow-2xs border border-[color:var(--t-700)]'
                       : 'bg-[color:var(--t-50)]/70 hover:bg-[color:var(--t-100)] text-slate-700 hover:text-[color:var(--t-700)] border border-[color:var(--t-200)]'

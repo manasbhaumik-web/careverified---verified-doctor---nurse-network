@@ -801,7 +801,7 @@ export default function PatientDashboard({
                             <button
                               type="button"
                               onClick={() => setPaying(b)}
-                              className="min-h-[40px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
+                              className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
                             >
                               <span>{tx('Pay {amount}', { amount: formatMoney(b.fee) })}</span>
                               <ArrowRight className="h-3.5 w-3.5" />
@@ -815,7 +815,7 @@ export default function PatientDashboard({
                                     setActiveTab('consult');
                                     setConsultSubTab('instant');
                                   }}
-                                  className="min-h-[40px] px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
+                                  className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
                                 >
                                   <Video className="h-3.5 w-3.5" />
                                   <span>{tx('Join Video Room')}</span>
@@ -824,7 +824,7 @@ export default function PatientDashboard({
                               <button
                                 type="button"
                                 onClick={onNavigateToMessages}
-                                className="min-h-[40px] px-3.5 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                                className="btn btn-sm btn-secondary whitespace-nowrap shrink-0"
                               >
                                 <MessageSquare className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                                 <span>{tx('Message')}</span>
@@ -832,7 +832,7 @@ export default function PatientDashboard({
                               <button
                                 type="button"
                                 onClick={() => onSelectProfessional(b.professionalId)}
-                                className="min-h-[40px] px-3.5 bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] text-[color:var(--t-700)] text-xs font-bold border border-[color:var(--t-200)] transition-all cursor-pointer"
+                                className="btn btn-sm btn-secondary whitespace-nowrap shrink-0"
                               >
                                 {tx('Doctor Profile')}
                               </button>
@@ -842,7 +842,7 @@ export default function PatientDashboard({
                           <button
                             type="button"
                             onClick={() => cancelBooking(b)}
-                            className="min-h-[40px] px-3 text-xs font-semibold text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
+                            className="btn btn-sm btn-ghost text-slate-600 hover:text-rose-700 whitespace-nowrap shrink-0"
                             title={tx('Cancel appointment')}
                           >
                             {tx('Cancel')}
@@ -911,7 +911,7 @@ export default function PatientDashboard({
                   <button
                     type="button"
                     onClick={onConsultNow}
-                    className="w-full min-h-[34px] px-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black border border-[color:var(--t-700)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    className="btn btn-sm btn-primary whitespace-nowrap w-full"
                   >
                     <Video className="h-3.5 w-3.5" />
                     <span>{tx('Start Instant Consult')}</span>
@@ -951,7 +951,7 @@ export default function PatientDashboard({
                   <button
                     type="button"
                     onClick={() => { setActiveTab('consult'); setConsultSubTab('triage'); }}
-                    className="w-full min-h-[34px] px-3 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    className="btn btn-sm btn-secondary whitespace-nowrap w-full"
                   >
                     <Stethoscope className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                     <span>{tx('Run Symptom Triage')}</span>
@@ -1091,14 +1091,14 @@ export default function PatientDashboard({
                           <button
                             type="button"
                             onClick={() => { setRecordsSubTab('overview'); setActiveTab('records'); }}
-                            className="min-h-[34px] px-3 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] border border-[color:var(--t-200)] text-xs font-bold transition-colors cursor-pointer"
+                            className="btn btn-sm btn-secondary whitespace-nowrap shrink-0"
                           >
                             {tx('Notes & Rx')}
                           </button>
                           <button
                             type="button"
                             onClick={() => onSelectProfessional(b.professionalId)}
-                            className="min-h-[34px] px-3 bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] hover:text-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
+                            className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
                           >
                             <span>{tx('Book Follow-Up')}</span>
                             <ArrowRight className="h-3 w-3" />
@@ -2068,7 +2068,7 @@ export default function PatientDashboard({
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {filteredDoctors.map(prof => (
-                  <article key={prof.id} className="p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all bg-white flex flex-col justify-between gap-3 shadow-2xs group">
+                  <article key={prof.id} className="app-card-interactive app-card-equal p-5 group">
                     <div className="space-y-2.5">
                       <div className="flex items-start gap-3">
                         <UserAvatar src={prof.avatar} role="doctor" alt={prof.name} className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" />
@@ -2125,7 +2125,7 @@ export default function PatientDashboard({
                       <button
                         type="button"
                         onClick={() => onSelectProfessional(prof.id)}
-                        className="h-9 px-3.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                        className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
                       >
                         <span>{tx('Book Visit')}</span>
                         <ArrowRight className="h-3.5 w-3.5" />
@@ -2298,7 +2298,7 @@ export default function PatientDashboard({
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {filteredNurses.map(prof => (
-                  <article key={prof.id} className="p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all bg-white flex flex-col justify-between gap-3 shadow-2xs group">
+                  <article key={prof.id} className="app-card-interactive app-card-equal p-5 group">
                     <div className="space-y-2.5">
                       <div className="flex items-start gap-3">
                         <UserAvatar src={prof.avatar} role="nurse" alt={prof.name} className="w-12 h-12 rounded-full object-cover border border-[color:var(--t-200)] shrink-0" />
@@ -2355,7 +2355,7 @@ export default function PatientDashboard({
                       <button
                         type="button"
                         onClick={() => onSelectProfessional(prof.id)}
-                        className="h-9 px-3.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                        className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
                       >
                         <span>{tx('Book Nurse')}</span>
                         <ArrowRight className="h-3.5 w-3.5" />

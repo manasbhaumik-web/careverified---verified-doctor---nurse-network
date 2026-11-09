@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Clock, MapPin, Phone, Pill, Search, Send, ShieldCheck, X } from 'lucide-react';
+import { Clock, MapPin, Phone, Pill, Search, Send, ShieldCheck, X, Thermometer, Truck, CheckCircle2 } from 'lucide-react';
 import DashboardHeader, { BannerKpis, FilterSelect } from './DashboardHeader';
 import { useTr } from '../locale';
 
 interface Pharmacy { id: string; name: string; address: string; city: string | null; phone: string | null; hours: string | null; services: string[]; deliveryMethods?: string[]; coldChain?: boolean; panelInsurers?: string[]; licenceVerified?: boolean; licenceExpiresOn?: string | null }
 interface Rx { id: string; code: string; status: string; validUntil: string; pharmacyId: string | null; fillStatus?: string | null; fillReason?: string | null; items: { name: string; strength?: string }[] }
 const FILL_LABEL: Record<string, string> = { received: 'received', preparing: 'being prepared', ready: 'ready for pickup', cannot_fill: 'could not be filled' };
-const DELIVERY_LABEL: Record<string, string> = { pharmacy_courier: 'own rider', grab: 'Grab', lalamove: 'Lalamove', other_courier: 'courier' };
+const DELIVERY_LABEL: Record<string, string> = { pharmacy_courier: 'Cold-Chain Courier', grab: 'GrabExpress', lalamove: 'Lalamove Express', other_courier: 'Nationwide Courier', courier: 'Courier Delivery', pickup: 'Self-Pickup' };
 
 const ALL = 'all';
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '');
@@ -177,87 +177,92 @@ export default function PharmacyFinder({ embedded = false }: { embedded?: boolea
               const sentHere = activeRx.filter(r => r.pharmacyId === p.id);
               const isOpen = openId === p.id;
               return (
-                <article key={p.id} className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-colors rounded-none p-5 flex flex-col gap-3.5 min-w-0 shadow-2xs">
-                  {/* Card Header + Verified Badge */}
-                  <div className="min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <h2 className="text-base font-black text-slate-900 leading-snug [overflow-wrap:anywhere] uppercase tracking-wide">{p.name}</h2>
-                      <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-black uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-none">
-                        <ShieldCheck className="h-3 w-3 text-emerald-600" /> {tx('Verified')}
+                <article key={p.id} className="app-card-interactive app-card-equal p-5">
+                  <div className="space-y-3">
+                    {/* Eyebrow Badges: Full-width top row prevents title crushing */}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="app-badge badge-success">
+                        <ShieldCheck className="h-3 w-3 shrink-0" />
+                        {tx('NPRA Licensed')}
                       </span>
+                      {p.coldChain ? (
+                        <span className="app-badge badge-cyan shrink-0">
+                          <Thermometer className="h-3 w-3 shrink-0" />
+                          {tx('Cold Chain ❄️')}
+                        </span>
+                      ) : (
+                        <span className="app-badge badge-neutral shrink-0">
+                          {tx('Standard Storage')}
+                        </span>
+                      )}
                     </div>
-                    <p className="text-xs text-slate-600 font-semibold mt-2 flex gap-2 [overflow-wrap:anywhere]">
-                      <MapPin className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" />
-                      <span>{p.address}{p.city && !p.address.toLowerCase().includes(p.city.toLowerCase()) ? `, ${tx(p.city)}` : ''}</span>
-                    </p>
-                    {p.phone && (
-                      <p className="text-xs font-semibold text-slate-700 mt-1.5 flex gap-2">
-                        <Phone className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" />
-                        <a href={`tel:${p.phone.replace(/[^+\d]/g, '')}`} className="font-bold text-[color:var(--t-700)] hover:underline">{p.phone}</a>
-                      </p>
-                    )}
-                    {p.hours && (
-                      <p className="text-xs font-semibold text-slate-600 mt-1.5 flex gap-2 [overflow-wrap:anywhere]">
-                        <Clock className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" />
-                        <span>{tx(p.hours)}</span>
-                      </p>
-                    )}
-                  </div>
 
-                  {/* Service Pill Badges (10px / text-2xs) */}
-                  {p.services.length > 0 && (
-                    <ul className="flex flex-wrap gap-1.5">
-                      {p.services.map(s => (
-                        <li
-                          key={s}
-                          className={`text-2xs font-black uppercase tracking-wider px-2 py-0.5 border rounded-none ${
-                            s === '24 hours'
-                              ? 'text-emerald-800 bg-emerald-50 border-emerald-300'
-                              : 'text-[color:var(--t-700)] bg-[color:var(--t-50)] border-[color:var(--t-200)]'
-                          }`}
-                        >
-                          {tx(s)}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  {/* Consistent Licence & Fulfilment Metadata */}
-                  <div className="text-xs text-slate-600 font-semibold space-y-1 pt-2 border-t border-[color:var(--t-100)]">
-                    <p className="text-emerald-800 flex items-center gap-1.5">
-                      <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
-                      <span>
-                        {p.licenceVerified
-                          ? `${tx('Licence and pharmacist checked by MediCred')}${p.licenceExpiresOn ? ` · ${tx('valid to {date}', { date: p.licenceExpiresOn })}` : ''}`
-                          : tx('MOH Partner Pharmacy · Registered dispensing facility')}
-                      </span>
-                    </p>
-                    {p.deliveryMethods && p.deliveryMethods.length > 0 && (
-                      <p>
-                        {tx('Delivers (Malaysia): ')}{p.deliveryMethods.map(m => tx(DELIVERY_LABEL[m] ?? m)).join(', ')}
-                        {p.coldChain ? ` · ${tx('cold-chain medicines (e.g. insulin) can be delivered')}` : ''}
+                    {/* Full-width 2-line title & location */}
+                    <div>
+                      <h3 className="font-display font-bold text-base sm:text-lg text-slate-900 leading-snug line-clamp-2 min-h-[3rem]" title={p.name}>
+                        {p.name}
+                      </h3>
+                      <p className="text-xs text-slate-600 flex items-start gap-1.5 mt-1 min-h-[2rem] line-clamp-2" title={p.address}>
+                        <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5 text-slate-400" />
+                        <span>{p.address}{p.city && !p.address.toLowerCase().includes(p.city.toLowerCase()) ? `, ${tx(p.city)}` : ''}</span>
                       </p>
-                    )}
-                    {p.panelInsurers && p.panelInsurers.length > 0 && (
-                      <p>{tx('Insurance panel: ')}{p.panelInsurers.join(', ')}</p>
+                    </div>
+
+                    {/* Operational Hours, Contact & Delivery Method Box */}
+                    <div className="app-info-box space-y-1.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <Clock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                          <span className="truncate">{p.hours ? tx(p.hours) : '09:00 AM – 10:00 PM'}</span>
+                        </div>
+                        {p.phone && (
+                          <div className="flex items-center gap-1 shrink-0">
+                            <Phone className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                            <a href={`tel:${p.phone.replace(/[^+\d]/g, '')}`} className="font-mono font-medium text-slate-900 hover:text-[color:var(--t-700)] hover:underline">{p.phone}</a>
+                          </div>
+                        )}
+                      </div>
+                      {p.deliveryMethods && p.deliveryMethods.length > 0 && (
+                        <div className="flex items-start gap-1.5 pt-1 border-t border-[color:var(--t-100)]/80 text-xs">
+                          <Truck className="h-3.5 w-3.5 text-slate-400 shrink-0 mt-0.5" />
+                          <span className="line-clamp-1 text-slate-600">
+                            <strong className="font-semibold text-slate-800">{tx('Delivery:')}</strong> {p.deliveryMethods.map(m => tx(DELIVERY_LABEL[m] ?? m)).join(' · ')}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Specialized Clinical Services */}
+                    {p.services.length > 0 && (
+                      <div className="space-y-1 pt-0.5">
+                        <span className="text-2xs font-mono font-bold uppercase tracking-wider text-slate-400 block">{tx('Specialized Clinical Services')}</span>
+                        <div className="grid grid-cols-2 gap-1 text-xs text-slate-700">
+                          {p.services.slice(0, 4).map(s => (
+                            <div key={s} className="flex items-center gap-1 truncate" title={s}>
+                              <CheckCircle2 className="h-3 w-3 text-emerald-600 shrink-0" />
+                              <span className="truncate">{tx(s)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     )}
                   </div>
 
                   {/* Bottom-Aligned Routing Status & Action Area */}
-                  <div className="mt-auto pt-3 border-t border-[color:var(--t-100)] space-y-3">
+                  <div className="app-card-footer mt-auto pt-3 flex flex-col gap-2.5">
                     {sentHere.length > 0 && (
-                      <p className="text-xs font-bold text-emerald-900 bg-emerald-50 border border-emerald-300 rounded-none p-3">
+                      <p className="w-full text-xs font-bold text-emerald-900 bg-emerald-50 border border-emerald-300 rounded-none p-2.5">
                         {tx('Your prescription')} {sentHere.map(r => `${r.code}${r.fillStatus ? ` (${tx(FILL_LABEL[r.fillStatus] ?? r.fillStatus)}${r.fillStatus === 'cannot_fill' && r.fillReason ? `: ${r.fillReason}` : ''})` : ''}`).join(', ')} {sentHere.length === 1 ? tx('was routed here. Show the code at the counter or wait for pickup confirmation.') : tx('were routed here. Show the code at the counter or wait for pickup confirmation.')}
                       </p>
                     )}
                     {msg?.id === p.id && (
-                      <p role="status" className={`text-xs font-bold p-3 border rounded-none ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-300' : 'text-rose-900 bg-rose-50 border-rose-300'}`}>{msg.text}</p>
+                      <p role="status" className={`w-full text-xs font-bold p-2.5 border rounded-none ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-300' : 'text-rose-900 bg-rose-50 border-rose-300'}`}>{msg.text}</p>
                     )}
 
-                    {isOpen && (
-                      <div className="space-y-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3.5 rounded-none">
+                    {isOpen ? (
+                      <div className="w-full space-y-2.5 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3 rounded-none">
                         <label htmlFor={`rx-${p.id}`} className="text-xs font-black uppercase tracking-wider text-slate-700 block">{tx('Select active prescription to route')}</label>
-                        <select id={`rx-${p.id}`} value={chosen} onChange={e => setChosen(e.target.value)} className="w-full border border-[color:var(--t-200)] bg-white px-3 h-10 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)]">
+                        <select id={`rx-${p.id}`} value={chosen} onChange={e => setChosen(e.target.value)} className="w-full border border-[color:var(--t-200)] bg-white px-3 h-9 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)]">
                           <option value="">{tx('Select prescription…')}</option>
                           {activeRx.map(r => (
                             <option key={r.id} value={r.id}>{r.code} · {r.items[0]?.name ?? tx('Prescription')}{r.items.length > 1 ? ` +${r.items.length - 1}` : ''} · {tx('valid until {date}', { date: fmt(r.validUntil) })}</option>
@@ -267,19 +272,32 @@ export default function PharmacyFinder({ embedded = false }: { embedded?: boolea
                           <input type="checkbox" checked={share} onChange={e => setShare(e.target.checked)} className="mt-0.5 h-4 w-4 rounded-none accent-[color:var(--t-600)]" />
                           <span>{tx('Share my registered allergies and medication list with this pharmacy for contraindication checks')} <b>{tx('(recommended)')}</b>.</span>
                         </label>
-                        <div className="flex gap-2 pt-1">
-                          <button type="button" onClick={() => send(p)} disabled={!chosen || sending} className="flex-1 h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--dark)] disabled:bg-slate-300 text-white text-xs font-bold uppercase tracking-wider cursor-pointer rounded-none transition-all">{sending ? tx('Routing…') : tx('Send Prescription')}</button>
-                          <button type="button" onClick={() => { setOpenId(null); setChosen(''); }} className="h-10 px-4 border border-[color:var(--t-200)] bg-white text-slate-700 text-xs font-bold uppercase tracking-wider cursor-pointer rounded-none hover:bg-slate-100 transition-all">{tx('Cancel')}</button>
+                        <div className="flex items-center gap-2 pt-1">
+                          <button type="button" onClick={() => send(p)} disabled={!chosen || sending} className="btn btn-sm btn-primary whitespace-nowrap flex-1">{sending ? tx('Routing…') : tx('Send Prescription')}</button>
+                          <button type="button" onClick={() => { setOpenId(null); setChosen(''); }} className="btn btn-sm btn-secondary whitespace-nowrap">{tx('Cancel')}</button>
                         </div>
                       </div>
+                    ) : (
+                      <div className="w-full flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <span className="block text-2xs uppercase font-bold text-slate-400 tracking-wider">NPRA Registered</span>
+                          <span className="text-xs font-semibold text-slate-700 truncate block">Dispensary</span>
+                        </div>
+                        <button
+                          type="button"
+                          disabled={activeRx.length === 0}
+                          onClick={() => { setOpenId(p.id); setChosen(activeRx.length === 1 ? activeRx[0].id : ''); setMsg(null); }}
+                          className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
+                          title={activeRx.length === 0 ? tx('You have no active prescription to route') : tx('Send prescription here')}
+                        >
+                          <Send className="h-3.5 w-3.5 shrink-0" />
+                          <span>{tx('Send Rx Here')}</span>
+                        </button>
+                      </div>
                     )}
-                    {!isOpen && (
-                      <button type="button" disabled={activeRx.length === 0} onClick={() => { setOpenId(p.id); setChosen(activeRx.length === 1 ? activeRx[0].id : ''); setMsg(null); }}
-                        className="w-full h-11 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] active:bg-[color:var(--t-800)] border border-[color:var(--t-700)] disabled:bg-slate-200 disabled:text-slate-500 disabled:cursor-not-allowed text-white text-xs font-bold uppercase tracking-wider rounded-none inline-flex items-center justify-center gap-2 cursor-pointer transition-all shadow-none">
-                        <Send className="h-4 w-4" /> {tx('Send my prescription here')}
-                      </button>
+                    {!isOpen && activeRx.length === 0 && (
+                      <p className="text-xs text-slate-500 font-medium">{tx('No active prescription pending. Counter visits and walk-in consultations welcomed.')}</p>
                     )}
-                    {!isOpen && activeRx.length === 0 && <p className="text-xs text-slate-500 font-medium">{tx('You have no active prescription to route. Once prescribed by a doctor, it will appear here.')}</p>}
                   </div>
                 </article>
               );
