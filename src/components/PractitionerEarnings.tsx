@@ -6,7 +6,7 @@ import { formatDate, formatMoney, useTr } from '../locale';
 const jget = (url: string) => fetch(url).then(r => r.json());
 const jput = (url: string, body: unknown) => fetch(url, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json());
 const BANKS = ['Maybank', 'CIMB Bank', 'Public Bank', 'RHB Bank', 'Hong Leong Bank', 'AmBank', 'Bank Islam', 'Bank Rakyat', 'BSN', 'Affin Bank', 'Alliance Bank', 'OCBC Bank', 'HSBC Bank Malaysia', 'UOB Malaysia', 'Standard Chartered Malaysia', 'MBSB Bank', 'Agrobank'];
-const label = 'text-xs font-extrabold uppercase tracking-wider text-slate-700 block mb-1.5';
+const label = 'text-sm font-bold text-slate-900 block mb-1.5';
 const input = 'w-full bg-white border border-[color:var(--t-200)] px-3 h-11 text-xs font-medium focus:outline-none focus:border-[color:var(--t-600)]';
 
 interface Data {

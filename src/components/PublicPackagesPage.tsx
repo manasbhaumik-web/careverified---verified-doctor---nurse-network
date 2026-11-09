@@ -360,7 +360,7 @@ function VisitorChips({ p, max }: { p: Pkg; max?: number }) {
   if (tags.length === 0) return null;
   return (
     <ul aria-label="For visitors from abroad" className="flex flex-wrap gap-1.5">
-      {tags.map(t => <li key={t} className="text-[11px] font-bold px-2 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-800)]">{t}</li>)}
+      {tags.map(t => <li key={t} className="text-xs font-bold px-2 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-800)]">{t}</li>)}
     </ul>
   );
 }
@@ -376,7 +376,7 @@ function PackageCard({ p, onEnquire }: { p: Pkg; onEnquire?: (pkg: Pkg) => void 
       </div>
       <div className="p-4 flex flex-col gap-2 flex-1">
         <span className="text-xs font-extrabold uppercase tracking-wide text-[color:var(--t-700)]">{p.category}</span>
-        <a href={`/packages?pkg=${p.id}`} onClick={e => { e.preventDefault(); navigate(`/packages?pkg=${p.id}`); }} className="font-semibold text-[15px] leading-snug text-[color:var(--ink)] line-clamp-2 group-hover:text-[color:var(--t-700)] group-hover:underline">
+        <a href={`/packages?pkg=${p.id}`} onClick={e => { e.preventDefault(); navigate(`/packages?pkg=${p.id}`); }} className="font-semibold text-sm leading-snug text-[color:var(--ink)] line-clamp-2 group-hover:text-[color:var(--t-700)] group-hover:underline">
           {p.title}
         </a>
         <span className="text-xs text-slate-600 flex items-start gap-1">
@@ -441,13 +441,13 @@ function Detail({ p, signedIn, onEnquire, more, facilityOffers }: { p: Pkg; sign
               {p.verified_facilitator ? <span className="ml-2 inline-flex items-center gap-1 font-bold text-emerald-800"><ShieldCheck className="h-4 w-4" aria-hidden="true" />Verified facilitator</span> : null}
             </p>
           </div>
-          {p.description && <p className="text-[15px] leading-relaxed text-slate-900">{p.description}</p>}
+          {p.description && <p className="text-sm leading-relaxed text-slate-900">{p.description}</p>}
           {p.inclusions.length > 0 && (
             <section className="bg-white border border-[color:var(--t-200)] p-5">
               <h2 className={h2}>What is included</h2>
               <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2">
                 {p.inclusions.map((i, k) => (
-                  <li key={k} className="flex items-start gap-2 text-[15px]">
+                  <li key={k} className="flex items-start gap-2 text-sm">
                     <Check className="h-4 w-4 mt-1 text-emerald-700 shrink-0" aria-hidden="true" />
                     {i}
                   </li>
@@ -458,14 +458,14 @@ function Detail({ p, signedIn, onEnquire, more, facilityOffers }: { p: Pkg; sign
           {p.exclusions && (
             <section className="bg-white border border-[color:var(--t-200)] p-5">
               <h2 className={h2}>Not included</h2>
-              <p className="text-[15px] leading-relaxed text-slate-700">{p.exclusions}</p>
+              <p className="text-sm leading-relaxed text-slate-700">{p.exclusions}</p>
             </section>
           )}
           {(p.preparation_instructions || p.fastingRequired) && (
             <section className="bg-white border border-[color:var(--t-200)] p-5">
               <h2 className={h2}>Before you go</h2>
-              {p.fastingRequired && <p className="text-[15px] font-bold text-amber-900 mb-2">Fasting is required before this package.</p>}
-              {p.preparation_instructions && <p className="text-[15px] leading-relaxed text-slate-700">{p.preparation_instructions}</p>}
+              {p.fastingRequired && <p className="text-sm font-bold text-amber-900 mb-2">Fasting is required before this package.</p>}
+              {p.preparation_instructions && <p className="text-sm leading-relaxed text-slate-700">{p.preparation_instructions}</p>}
             </section>
           )}
         </div>
@@ -719,7 +719,7 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
 
             <div className={`relative ${wrap} h-full flex items-center py-6`}>
               <div className="w-full max-w-2xl flex flex-col gap-2.5 z-10">
-                <span className={`self-start text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 border ${s.kind === 'offer' ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]' : 'bg-white text-[color:var(--t-700)] border-[color:var(--t-200)] shadow-2xs'}`}>
+                <span className={`self-start text-xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 border ${s.kind === 'offer' ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]' : 'bg-white text-[color:var(--t-700)] border-[color:var(--t-200)] shadow-2xs'}`}>
                   {s.badge}
                 </span>
                 <h2 className="font-display font-black text-2xl sm:text-3xl leading-[1.18] tracking-tight line-clamp-3 sm:line-clamp-2">
@@ -731,7 +731,7 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
                     href={s.href}
                     tabIndex={on ? 0 : -1}
                     onClick={e => { e.preventDefault(); s.onGo(); }}
-                    className="min-h-[42px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white font-extrabold text-[14px] inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer"
+                    className="min-h-[42px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white font-extrabold text-sm inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer"
                   >
                     {s.cta}
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -859,7 +859,7 @@ function ClinicCard({ c, onPickClinic, onEnquire }: { c: FacilityCard; onPickCli
             Clinic
           </span>
           {c.isLicenceValid && (
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
               <CheckCircle className="h-3 w-3" /> Licence Verified
             </span>
           )}
@@ -911,12 +911,12 @@ function HospitalCard({ h, onPickHospital, onEnquire }: { h: FacilityCard; onPic
           </span>
           <div className="flex flex-wrap gap-1 justify-end">
             {h.mhtcMember && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 bg-amber-50 text-amber-900 border border-amber-200">
+              <span className="text-2xs font-bold px-1.5 py-0.5 bg-amber-50 text-amber-900 border border-amber-200">
                 MHTC Member
               </span>
             )}
             {accs.length > 0 && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 bg-blue-50 text-blue-900 border border-blue-200">
+              <span className="text-2xs font-bold px-1.5 py-0.5 bg-blue-50 text-blue-900 border border-blue-200">
                 {accs.join(' / ')}
               </span>
             )}
@@ -967,10 +967,10 @@ function NurseCard({ n, signedIn = false, onEnquire }: { n: Professional; signed
             <Photo src={n.avatar || '/assets/malaysian_female_nurse.jpg'} alt={n.name} />
           </div>
           <div className="min-w-0 flex-1">
-            <span className="inline-block text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+            <span className="inline-block text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-200">
               LJM Certified Nurse
             </span>
-            <h3 className="font-display font-bold text-[15px] text-slate-900 leading-tight mt-1 truncate" title={n.name}>
+            <h3 className="font-display font-bold text-sm text-slate-900 leading-tight mt-1 truncate" title={n.name}>
               {n.name}
             </h3>
             <div className="text-xs font-semibold text-[color:var(--t-700)] mt-0.5">{n.specialization}</div>
@@ -1003,7 +1003,7 @@ function NurseCard({ n, signedIn = false, onEnquire }: { n: Professional; signed
 
       <div className="mt-4 pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between gap-2">
         <div>
-          <span className="block text-[11px] text-slate-500">Hourly Rate</span>
+          <span className="block text-xs text-slate-500">Hourly Rate</span>
           <span className="font-display font-black text-lg text-[color:var(--ink)]">{myr(n.fee)}<span className="text-xs font-normal text-slate-500">/hr</span></span>
         </div>
         <button
@@ -1033,10 +1033,10 @@ function DoctorCard({ d, signedIn = false, onEnquire }: { d: Professional; signe
             <Photo src={d.avatar || '/assets/malaysian_female_doctor.jpg'} alt={d.name} />
           </div>
           <div className="min-w-0 flex-1">
-            <span className="inline-block text-[11px] font-bold text-blue-800 bg-blue-50 px-2 py-0.5 border border-blue-200">
+            <span className="inline-block text-xs font-bold text-blue-800 bg-blue-50 px-2 py-0.5 border border-blue-200">
               MMC Registered Specialist
             </span>
-            <h3 className="font-display font-bold text-[15px] text-slate-900 leading-tight mt-1 truncate" title={d.name}>
+            <h3 className="font-display font-bold text-sm text-slate-900 leading-tight mt-1 truncate" title={d.name}>
               {d.name}
             </h3>
             <div className="text-xs font-semibold text-[color:var(--t-700)] mt-0.5">{d.specialization}</div>
@@ -1067,7 +1067,7 @@ function DoctorCard({ d, signedIn = false, onEnquire }: { d: Professional; signe
 
       <div className="mt-4 pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between gap-2">
         <div>
-          <span className="block text-[11px] text-slate-500">Consultation Fee</span>
+          <span className="block text-xs text-slate-500">Consultation Fee</span>
           <span className="font-display font-black text-lg text-[color:var(--ink)]">{myr(d.fee)}</span>
         </div>
         <button
@@ -1108,17 +1108,17 @@ function PharmacyCard({ ph, onEnquire }: { ph: Pharmacy; onEnquire: (target: Enq
       <div className="space-y-3.5">
         {/* Eyebrow Status Badges */}
         <div className="flex items-center justify-between gap-2">
-          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-wider text-teal-900 bg-teal-50 px-2.5 py-0.5 border border-teal-200">
+          <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-teal-900 bg-teal-50 px-2.5 py-0.5 border border-teal-200">
             <ShieldCheck className="h-3 w-3 text-teal-600 shrink-0" />
             NPRA Licensed
           </span>
           {ph.coldChain ? (
-            <span className="text-[11px] font-bold px-2 py-0.5 bg-cyan-50 text-cyan-900 border border-cyan-200 inline-flex items-center gap-1 shrink-0">
+            <span className="text-xs font-bold px-2 py-0.5 bg-cyan-50 text-cyan-900 border border-cyan-200 inline-flex items-center gap-1 shrink-0">
               <Thermometer className="h-3 w-3 text-cyan-600 shrink-0" />
               Cold Chain ❄️
             </span>
           ) : (
-            <span className="text-[11px] font-semibold text-slate-500 bg-slate-50 px-2 py-0.5 border border-slate-200 inline-flex items-center gap-1 shrink-0">
+            <span className="text-xs font-semibold text-slate-500 bg-slate-50 px-2 py-0.5 border border-slate-200 inline-flex items-center gap-1 shrink-0">
               Standard Storage
             </span>
           )}
@@ -1149,7 +1149,7 @@ function PharmacyCard({ ph, onEnquire }: { ph: Pharmacy; onEnquire: (target: Enq
               </div>
             )}
           </div>
-          <div className="flex items-start gap-1.5 pt-1 border-t border-[color:var(--t-100)]/80 text-[11px]">
+          <div className="flex items-start gap-1.5 pt-1 border-t border-[color:var(--t-100)]/80 text-xs">
             <Truck className="h-3.5 w-3.5 text-slate-400 shrink-0 mt-0.5" />
             <span className="line-clamp-1 text-slate-600" title={deliveryLabel}>
               <strong className="font-semibold text-slate-800">Delivery:</strong> {deliveryLabel}
@@ -1160,7 +1160,7 @@ function PharmacyCard({ ph, onEnquire }: { ph: Pharmacy; onEnquire: (target: Enq
         {/* Specialized Clinical Services - Single column full width */}
         {ph.services && ph.services.length > 0 && (
           <div className="space-y-1.5">
-            <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+            <div className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
               Specialized Clinical Services
             </div>
             <ul className="space-y-1 min-h-[4.25rem]">
@@ -1172,7 +1172,7 @@ function PharmacyCard({ ph, onEnquire }: { ph: Pharmacy; onEnquire: (target: Enq
               ))}
             </ul>
             {ph.services.length > 3 && (
-              <div className="text-[11px] font-semibold text-[color:var(--t-700)]">
+              <div className="text-xs font-semibold text-[color:var(--t-700)]">
                 +{ph.services.length - 3} more clinical services
               </div>
             )}
@@ -1183,7 +1183,7 @@ function PharmacyCard({ ph, onEnquire }: { ph: Pharmacy; onEnquire: (target: Enq
       {/* Card Footer with Verified Dispensary and Non-wrapping Action Button */}
       <div className="mt-4 pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between gap-2">
         <div className="min-w-0">
-          <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">NPRA Registered</span>
+          <span className="block text-2xs uppercase font-bold text-slate-400 tracking-wider">NPRA Registered</span>
           <span className="text-xs font-semibold text-slate-700 truncate block">Dispensary</span>
         </div>
         <button
@@ -1430,7 +1430,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
 
       {/* Top Banner Bar */}
       <div className="bg-[color:var(--t-900)] text-white/90">
-        <nav aria-label="Audiences" className={`${wrap} flex flex-wrap items-center gap-x-5 gap-y-1 py-1 text-[13px] font-semibold`}>
+        <nav aria-label="Audiences" className={`${wrap} flex flex-wrap items-center gap-x-5 gap-y-1 py-1 text-sm font-semibold`}>
           <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="min-h-[44px] inline-flex items-center gap-1 hover:text-white hover:underline cursor-pointer"><ChevronLeft className="h-3.5 w-3.5" aria-hidden="true" />Home</a>
           <span className="font-extrabold text-white">For patients</span>
           {([['For hospitals and clinics', '/for-clinics'], ['For doctors and nurses', '/for-practitioners'], ['For pharmacies', '/for-pharmacies']] as const).map(([label, to]) => (
@@ -1449,7 +1449,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
               </span>
               <span className="font-display font-black text-xl tracking-tight">MediCred<span className="text-[color:var(--t-600)]">.</span></span>
             </a>
-            <nav aria-label="Marketplace sections" className="hidden lg:flex self-stretch items-stretch gap-2 text-[15px] font-semibold">
+            <nav aria-label="Marketplace sections" className="hidden lg:flex self-stretch items-stretch gap-2 text-sm font-semibold">
               <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="relative min-h-[44px] px-3 inline-flex items-center whitespace-nowrap text-slate-700 hover:text-[color:var(--t-700)]">Home</a>
               <a href="/packages" onClick={e => { e.preventDefault(); goToView('overview'); }} aria-current="page" className="relative min-h-[44px] px-3 inline-flex items-center whitespace-nowrap font-bold text-[color:var(--t-700)] after:absolute after:inset-x-3 after:bottom-0 after:h-[3px] after:bg-[color:var(--t-600)]">Packages & Directory</a>
               <a href="/verify-practitioners" onClick={e => { e.preventDefault(); navigate('/verify-practitioners'); }} className="relative min-h-[44px] px-3 inline-flex items-center whitespace-nowrap text-slate-700 hover:text-[color:var(--t-700)]">Verify a licence</a>
@@ -2041,11 +2041,11 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                         {offers.map(o => (
                           <div key={o.id} className="border border-[color:var(--t-200)] bg-[color:var(--t-50)]/40 p-3.5 flex flex-col justify-between">
                             <div>
-                              <span className="inline-block text-[10px] font-extrabold uppercase text-white bg-[color:var(--t-700)] px-2 py-0.5 mb-1.5">
+                              <span className="inline-block text-2xs font-extrabold uppercase text-white bg-[color:var(--t-700)] px-2 py-0.5 mb-1.5">
                                 {o.badge_text || 'Active Promo'}
                               </span>
                               <div className="font-bold text-sm text-slate-900 line-clamp-2 leading-snug">{o.title}</div>
-                              {o.valid_until && <div className="text-[11px] text-slate-500 mt-1">Valid until {o.valid_until}</div>}
+                              {o.valid_until && <div className="text-xs text-slate-500 mt-1">Valid until {o.valid_until}</div>}
                             </div>
                             <div className="mt-3 pt-2.5 border-t border-[color:var(--t-200)] flex items-center justify-between gap-2">
                               <span className="font-mono text-xs font-bold text-[color:var(--t-800)]">{o.code}</span>

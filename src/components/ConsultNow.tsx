@@ -261,7 +261,7 @@ export default function ConsultNow({ myUserId, embedded = false, onNavigateToPre
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label htmlFor="cn-symptoms" className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--ink)]">
+                  <label htmlFor="cn-symptoms" className="text-sm font-bold text-[color:var(--ink)]">
                     {tx('2. Describe your clinical complaint')}
                   </label>
                   <span className="text-xs text-slate-600 font-mono tabular-nums">{symptoms.length} / 1000</span>

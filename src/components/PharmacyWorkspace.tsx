@@ -464,7 +464,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
 
       <ul className="space-y-1.5">
         {rx.items.map((i, k) => (
-          <li key={k} className="text-xs text-slate-800 flex gap-2 [overflow-wrap:anywhere]">
+          <li key={k} className="text-sm text-slate-800 flex gap-2 [overflow-wrap:anywhere]">
             <Pill className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" />
             <span><strong>{i.name}</strong> {[i.strength, i.form].filter(Boolean).join(' ')} · {i.dose}, {i.frequency} for {i.durationDays} days · qty {i.quantity}{i.instructions ? ` · ${i.instructions}` : ''}</span>
           </li>

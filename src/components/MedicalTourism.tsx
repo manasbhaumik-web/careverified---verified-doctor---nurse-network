@@ -26,7 +26,7 @@ const SERVICE_LABEL: Record<string, string> = { interpreter: 'Interpreter', airp
 const COUNTRIES: [string, string][] = [['MY', 'Malaysia'], ['ID', 'Indonesia'], ['SG', 'Singapore'], ['CN', 'China'], ['IN', 'India'], ['AU', 'Australia'], ['GB', 'United Kingdom'], ['US', 'United States'], ['SA', 'Saudi Arabia'], ['AE', 'United Arab Emirates'], ['JP', 'Japan'], ['XX', 'Other']];
 
 const field = 'w-full border border-slate-300 bg-white px-3 min-h-[44px] text-xs text-slate-900 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]';
-const label = 'block text-xs font-bold text-slate-800';
+const label = 'block text-sm font-bold text-slate-900 mb-1';
 const primaryBtn = 'min-h-[44px] px-4 inline-flex items-center justify-center gap-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 disabled:text-slate-700 text-white text-xs font-bold cursor-pointer';
 const plainBtn = 'min-h-[44px] px-4 inline-flex items-center justify-center gap-2 border border-slate-300 bg-white hover:bg-slate-50 text-slate-900 text-xs font-bold cursor-pointer';
 const card = 'bg-white border border-[color:var(--t-200)] p-5';

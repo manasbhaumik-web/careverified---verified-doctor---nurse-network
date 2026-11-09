@@ -6,7 +6,7 @@ import {
   type Address,
 } from '../identity';
 
-const label = 'text-xs font-extrabold uppercase tracking-wider text-slate-700 block';
+const label = 'text-sm font-bold text-slate-900 block mb-1';
 const hint = 'text-xs font-semibold mt-1';
 
 // ───────── ID: MyKad for citizens and permanent residents, passport for visitors ─────────

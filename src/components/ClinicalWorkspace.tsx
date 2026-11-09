@@ -16,7 +16,7 @@ const SEV: Record<string, string> = {
 };
 const blankItem = () => ({ name: '', strength: '', form: 'tablet', dose: '', frequency: '', durationDays: 5, quantity: 10, instructions: '', npraReg: '' });
 const field = 'w-full border border-slate-200 bg-white px-2.5 py-1.5 text-xs focus:outline-none focus:border-[color:var(--t-600)]';
-const label = 'text-xs font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
+const label = 'text-sm font-bold text-slate-800 block mb-1';
 
 /** The doctor's clinical tools for one booking or consultation: record, notes, prescriptions, certificates, referrals, labs. */
 export default function ClinicalWorkspace({ kind, refId }: Props) {
@@ -154,7 +154,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
             <section><h4 className={label}>{tx('Allergies & Sensitivities')}</h4>{ctx.record.allergies.length ? ctx.record.allergies.map((a: any, i: number) => <p key={i} className="font-bold text-rose-700 bg-rose-50 border border-rose-200 p-2 my-1">{a.name}{a.severity ? ` (${a.severity})` : ''}{a.detail ? ` — ${a.detail}` : ''}</p>) : <p className="text-slate-500">{tx('None recorded.')}</p>}</section>
             <section><h4 className={label}>{tx('Chronic Medical Conditions')}</h4>{ctx.record.conditions.length ? ctx.record.conditions.map((c: any, i: number) => <p key={i} className="font-semibold text-slate-800 py-0.5">{c.name}{c.detail ? ` — ${c.detail}` : ''}</p>) : <p className="text-slate-500">{tx('None recorded.')}</p>}</section>
             <section><h4 className={label}>{tx('Current Active Medications')}</h4>{ctx.record.medications.length ? ctx.record.medications.map((m: any, i: number) => <p key={i} className="font-semibold text-slate-800 py-0.5">{m.name}{m.detail ? ` — ${m.detail}` : ''}</p>) : <p className="text-slate-500">{tx('None recorded.')}</p>}</section>
-            <section><h4 className={label}>{tx('Vitals & Physiological Readings')}</h4>{ctx.record.vitals.length ? ctx.record.vitals.slice(0, 8).map((v: any, i: number) => <p key={i} className="tabular-nums font-mono py-0.5">{new Date(v.ts).toLocaleDateString()} · {v.kind.replace('_', ' ')}: <b className="text-[color:var(--t-700)]">{v.value1}{v.value2 ? `/${v.value2}` : ''} {v.unit}</b></p>) : <p className="text-slate-500">{tx('None.')}</p>}</section>
+            <section><h4 className={label}>{tx('Vitals & Physiological Readings')}</h4>{ctx.record.vitals.length ? ctx.record.vitals.slice(0, 8).map((v: any, i: number) => <p key={i} className="text-sm tabular-nums font-mono py-0.5">{new Date(v.ts).toLocaleDateString()} · {v.kind.replace('_', ' ')}: <b className="text-[color:var(--t-700)]">{v.value1}{v.value2 ? `/${v.value2}` : ''} {v.unit}</b></p>) : <p className="text-slate-500">{tx('None.')}</p>}</section>
             <section><h4 className={label}>{tx('Active Prescriptions')}</h4>{ctx.record.activePrescriptions.length ? ctx.record.activePrescriptions.map((p: any, i: number) => <p key={i} className="py-0.5 font-medium">{p.items.join(', ')}</p>) : <p className="text-slate-500">{tx('None.')}</p>}</section>
             <section><h4 className={label}>{tx('Verified Diagnostic Lab Results')}</h4>{ctx.record.labResults.length ? ctx.record.labResults.map((l: any) => <p key={l.id} className="py-1 flex items-center justify-between">{l.tests} <a className="underline font-bold text-[color:var(--t-700)]" href={`/api/documents/${l.result_document_id}/download`}>{tx('Download verified report')}</a></p>) : <p className="text-slate-500">{tx('None.')}</p>}</section>
           </div>

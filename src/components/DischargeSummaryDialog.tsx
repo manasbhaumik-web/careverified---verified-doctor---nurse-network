@@ -343,9 +343,9 @@ export default function DischargeSummaryDialog({
                   <div key={itemIdx} className="bg-white border border-cyan-100 p-2.5 text-xs flex justify-between items-center rounded-none">
                     <div>
                       <span className="font-extrabold text-[color:var(--ink)] block">{item.name}</span>
-                      {item.instructions && <span className="text-xs text-slate-500">{item.instructions}</span>}
+                      {item.instructions && <span className="text-sm font-medium text-slate-700 block mt-0.5">{item.instructions}</span>}
                     </div>
-                    <span className="font-mono font-semibold text-slate-700 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-none">
+                    <span className="font-mono font-semibold text-sm text-slate-800 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-none">
                       {item.dose || "As directed"} · {item.frequency || "Daily"}
                     </span>
                   </div>

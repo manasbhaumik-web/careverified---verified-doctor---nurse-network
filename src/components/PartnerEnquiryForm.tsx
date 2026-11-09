@@ -43,7 +43,7 @@ const T: Record<Lang, {
   },
 };
 
-const label = 'text-xs font-extrabold uppercase tracking-wider text-slate-700 block mb-1.5';
+const label = 'text-sm font-bold text-slate-900 block mb-1.5';
 const inputCls = 'w-full bg-white border border-[color:var(--t-200)] rounded-none px-4 h-12 text-sm font-medium text-[color:var(--ink)] focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]';
 
 export default function PartnerEnquiryForm({ kind }: { kind: 'clinic' | 'pharmacy' }) {

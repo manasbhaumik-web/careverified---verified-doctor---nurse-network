@@ -158,7 +158,7 @@ export default function PrescriptionList({ prescriptions, pharmacies, scope, onC
       {scope === 'active' && meds.length > 0 && (
         <section aria-labelledby="meds-now" className="bg-white border border-[color:var(--t-200)] p-4">
           <h3 id="meds-now" className="text-sm font-extrabold text-[color:var(--ink)] flex items-center gap-2"><Pill className="h-4 w-4 text-[color:var(--t-600)]" aria-hidden="true" /> {tx('Medicines on your active prescriptions')}</h3>
-          <ul className="mt-2 grid gap-x-6 gap-y-1 sm:grid-cols-2 text-xs text-slate-800">
+          <ul className="mt-2 grid gap-x-6 gap-y-1 sm:grid-cols-2 text-sm text-slate-800">
             {meds.map((m: any) => <li key={m.key}><b>{m.name}</b>{m.how ? <span className="text-slate-700"> · {m.how}</span> : null}</li>)}
           </ul>
         </section>
@@ -182,7 +182,7 @@ export default function PrescriptionList({ prescriptions, pharmacies, scope, onC
                 {p.items.map((i: any, k: number) => (
                   <li key={k} className="text-base text-[color:var(--ink)]">
                     <b className="font-extrabold">{i.name} {i.strength}</b> <span className="text-xs text-slate-700">{i.form}</span>
-                    <p className="text-xs text-slate-800">{tx('{dose}, {freq} for {days} days · qty {qty}', { dose: i.dose, freq: i.frequency, days: i.durationDays, qty: i.quantity })}{i.instructions ? ` · ${i.instructions}` : ''}</p>
+                    <p className="text-sm font-medium text-slate-800">{tx('{dose}, {freq} for {days} days · qty {qty}', { dose: i.dose, freq: i.frequency, days: i.durationDays, qty: i.quantity })}{i.instructions ? ` · ${i.instructions}` : ''}</p>
                   </li>
                 ))}
               </ul>

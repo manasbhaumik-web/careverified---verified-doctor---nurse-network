@@ -157,7 +157,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
 
             {/* PAYMENT RAIL SELECTOR TABS */}
             <div>
-              <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
+              <label className="block text-sm font-bold text-slate-900 mb-2">
                 {tx('Select Malaysian Payment Channel:')}
               </label>
               <div className="grid grid-cols-4 gap-1.5">
@@ -225,7 +225,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                   </span>
                 </div>
                 <div>
-                  <label htmlFor="fpx-bank-select" className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label htmlFor="fpx-bank-select" className="block text-sm font-bold text-slate-900 mb-1">
                     {tx('Choose Bank:')}
                   </label>
                   <select
@@ -250,7 +250,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="fpx-buyer-email" className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label htmlFor="fpx-buyer-email" className="block text-sm font-bold text-slate-900 mb-1">
                     {tx('FPX E-Receipt Email (Optional):')}
                   </label>
                   <input
