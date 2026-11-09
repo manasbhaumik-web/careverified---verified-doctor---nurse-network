@@ -41,7 +41,7 @@ export default function Footer({
   if (variant === 'app') {
     return (
       <footer className="app-dark-footer bg-[color:var(--dark)] text-slate-400 border-t border-[color:var(--t-800)]/60 shrink-0 mt-auto py-3.5 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-[1920px] mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+        <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
           
           {/* Left: Brand Emblem, Act 586 Status & Copyright */}
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-slate-400 text-center md:text-left justify-center md:justify-start">

@@ -66,7 +66,7 @@ export default function MedicalTourism({
           onTabChange={t => setTab(t as MedicalTourismTab)}
         />
       )}
-      <div className={embedded ? "space-y-5 pt-2" : "max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
+      <div className={embedded ? "space-y-5 pt-2" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
         {tab === 'find' && <Facilities onSent={id => { setTab('cases'); setOpenCase(id); }} />}
         {tab === 'cases' && <MyCases openId={openCase} onOpen={setOpenCase} onOpenProfessional={onOpenProfessional} onFind={() => setTab('find')} />}
         {tab === 'info' && <TravelInfo />}

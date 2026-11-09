@@ -989,7 +989,7 @@ export default function AdminDashboard({
         />
       </DashboardHeader>
 
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {!isGroupPermitted ? (
           <div className="max-w-3xl mx-auto my-8 bg-white border-2 border-amber-400 rounded-none shadow-md p-6 sm:p-8 space-y-6 animate-fade-in">
             <div className="flex items-start gap-4">

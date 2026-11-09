@@ -71,7 +71,7 @@ export default function DashboardDesignPreview() {
 
       {/* ─── 1. MEDCRED PRIMARY APPLICATION HEADER (IN APPLICATION COLOR) ─── */}
       <header className="bg-[color:var(--t-600)] text-white border-0 sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-[0_2px_6px_-1px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.06)]">
-        <div className="max-w-[1920px] mx-auto flex items-center justify-between h-16">
+        <div className="max-w-[1440px] mx-auto flex items-center justify-between h-16">
 
           {/* Brand Logo */}
           <div
@@ -137,7 +137,7 @@ export default function DashboardDesignPreview() {
 
       {/* ─── 2. ELEVATED SECONDARY NAVBAR (IN APPLICATION COLOR) ─── */}
       <nav aria-label="Dashboard navigation" className="hidden lg:block bg-[color:var(--t-800)] text-white border-0 px-4 sm:px-6 lg:px-8 shrink-0 sticky top-16 z-30">
-        <div className="w-full max-w-[1920px] mx-auto flex items-stretch justify-between gap-4">
+        <div className="w-full max-w-[1440px] mx-auto flex items-stretch justify-between gap-4">
           <div className="flex items-stretch min-w-0 flex-1">
 
             {/* Navigation Tabs - Full Height & Width Coverage on Hover/Selection */}

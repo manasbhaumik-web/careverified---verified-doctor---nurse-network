@@ -93,7 +93,7 @@ export default function TourismDesk({
           activeTab={tab} onTabChange={t => { setTab(t as any); setOpen(null); }}
         />
       )}
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {tab === 'cases' && (me && me.facilities.length === 0
           ? <p className="text-xs bg-white border border-dashed border-slate-300 p-6 text-center text-slate-600">You are not assigned to a facility yet. An admin adds you from Global Patient Services &gt; Facilities.</p>
           : open ? <StaffCase id={open} onBack={() => setOpen(null)} /> : <CaseQueue onOpen={setOpen} />)}
