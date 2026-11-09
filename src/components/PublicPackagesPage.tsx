@@ -705,8 +705,8 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
             aria-label={`${k + 1} of ${n}`}
             className={`absolute inset-0 transition-opacity duration-1000 ${on ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
           >
-            {/* Background Image: 100% natural photo without color overlay */}
-            <div className={`absolute right-0 top-0 bottom-0 w-full sm:w-7/12 lg:w-1/2 overflow-hidden ${on ? 'pp-kenburns' : ''}`}>
+            {/* Full Background Image: spans 100% width and height across entire banner */}
+            <div className={`absolute inset-0 overflow-hidden ${on ? 'pp-kenburns' : ''}`}>
               {s.image ? (
                 <Photo src={s.image} alt="" />
               ) : (
@@ -714,8 +714,8 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
               )}
             </div>
 
-            {/* Seamless readability fade for text, leaving photo 100% natural and unobscured */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-transparent sm:via-white/80 sm:w-3/5 lg:w-1/2 pointer-events-none" />
+            {/* Readability fade: natural white scrim on the left so Black & Brand text stays crisp with NO color overlay tint */}
+            <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-white/10 sm:from-white/95 sm:via-white/70 sm:to-transparent pointer-events-none" />
 
             <div className={`relative ${wrap} h-full flex items-center py-6`}>
               <div className="w-full max-w-2xl flex flex-col gap-2.5 z-10">
