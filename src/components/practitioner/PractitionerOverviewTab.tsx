@@ -34,7 +34,7 @@ export default function PractitionerOverviewTab({
 
       {/* 2. UNIQUE CLINICAL OPERATIONS & PERFORMANCE SPEED METRICS (NON-DUPLICATED) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 shadow-xs space-y-2">
+        <div className="app-card-interactive app-card-equal p-5 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-[color:var(--ink-2)]">
               {isDoc ? tx('Response SLA Speed') : tx('Home Care Arrival SLA')}
@@ -51,7 +51,7 @@ export default function PractitionerOverviewTab({
           </p>
         </div>
 
-        <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 shadow-xs space-y-2">
+        <div className="app-card-interactive app-card-equal p-5 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-[color:var(--ink-2)]">
               {isDoc ? tx('E-Prescription Compliance') : tx('Aseptic Procedure Protocol')}
@@ -68,7 +68,7 @@ export default function PractitionerOverviewTab({
           </p>
         </div>
 
-        <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 shadow-xs space-y-2">
+        <div className="app-card-interactive app-card-equal p-5 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-[color:var(--ink-2)]">
               {isDoc ? tx('Diagnostic Accuracy') : tx('Patient Comfort & Care')}
@@ -87,7 +87,7 @@ export default function PractitionerOverviewTab({
       </div>
 
       {/* 3. CLINICAL WORKFLOW ACTIONS GRID */}
-      <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-xs space-y-4">
+      <div className="app-card p-5 space-y-4">
         <h4 className="text-base font-bold text-[color:var(--ink)] border-b border-[color:var(--t-200)] pb-3 flex items-center gap-2">
           <Zap className="h-4 w-4 text-[color:var(--t-600)]" />
           {isDoc ? tx('Doctor Clinical Operations Shortcuts') : tx('Nursing Operations & Care Shortcuts')}

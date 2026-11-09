@@ -6,8 +6,8 @@ import { formatDate, formatMoney, useTr } from '../locale';
 const jget = (url: string) => fetch(url).then(r => r.json());
 const jput = (url: string, body: unknown) => fetch(url, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json());
 const BANKS = ['Maybank', 'CIMB Bank', 'Public Bank', 'RHB Bank', 'Hong Leong Bank', 'AmBank', 'Bank Islam', 'Bank Rakyat', 'BSN', 'Affin Bank', 'Alliance Bank', 'OCBC Bank', 'HSBC Bank Malaysia', 'UOB Malaysia', 'Standard Chartered Malaysia', 'MBSB Bank', 'Agrobank'];
-const label = 'text-xs font-extrabold uppercase tracking-wider text-slate-700 block mb-1.5';
-const input = 'w-full bg-white border border-[color:var(--t-200)] px-3 h-11 text-xs font-medium focus:outline-none focus:border-[color:var(--t-600)]';
+const label = 'form-label';
+const input = 'form-input';
 
 interface Data {
   terms: { schedule: string; holdDays: number; minimumPayout: number; method: string; runBy: string };
@@ -77,7 +77,7 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
       )}
 
       {/* Bank account */}
-      <section aria-labelledby="bank-h" className="bg-white border border-[color:var(--t-200)] p-5 space-y-4">
+      <section aria-labelledby="bank-h" className="app-card space-y-4">
         <h2 id="bank-h" className="text-sm font-extrabold flex items-center gap-2"><Landmark className="h-4 w-4" aria-hidden="true" />{tx('Bank account for payouts')}</h2>
         {!d.bankAvailable && <p className="text-xs bg-amber-50 border border-amber-200 text-amber-900 p-3 font-semibold">{tx('Bank details cannot be saved yet because the server has no encryption key. Ask the board.')}</p>}
         {d.bank && !editing && (
@@ -88,7 +88,7 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
             {bankStatus === 'unverified' && <p className="inline-flex items-center gap-1.5 text-amber-950 bg-amber-50 border border-amber-300 px-2.5 py-1 text-xs font-bold"><AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />{tx('Waiting for the board to verify it. You will not be paid until it is.')}</p>}
             {bankStatus === 'rejected' && <p className="text-rose-900 bg-rose-50 border border-rose-300 px-2.5 py-1.5 text-xs font-bold">The board could not verify this account{d.bank.note ? `: ${d.bank.note}` : '.'} Please enter it again.</p>}
             {bankStatus === 'unverified' && d.bank.note && <p className="text-xs text-slate-700">{d.bank.note}</p>}
-            <button type="button" onClick={() => setEditing(true)} className="mt-1 min-h-[40px] px-4 text-xs font-extrabold border border-slate-300 cursor-pointer hover:bg-slate-50">{tx('Change bank details')}</button>
+            <button type="button" onClick={() => setEditing(true)} className="btn btn-sm btn-secondary whitespace-nowrap shrink-0 mt-1">{tx('Change bank details')}</button>
           </div>
         )}
         {(!d.bank || editing) && d.bankAvailable && (
@@ -112,8 +112,8 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
               <input id="pb-pw" type="password" className={input} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required autoComplete="current-password" />
             </div>
             <div className="sm:col-span-2 flex flex-wrap gap-2">
-              <button type="submit" disabled={busy} className="min-h-[44px] px-6 text-xs font-extrabold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] cursor-pointer disabled:opacity-60">{busy ? 'Saving…' : 'Save bank details'}</button>
-              {editing && <button type="button" onClick={() => { setEditing(false); setMsg(null); }} className="min-h-[44px] px-5 text-xs font-bold border border-slate-300 cursor-pointer">{tx('Cancel')}</button>}
+              <button type="submit" disabled={busy} className="btn btn-sm btn-primary whitespace-nowrap shrink-0">{busy ? 'Saving…' : 'Save bank details'}</button>
+              {editing && <button type="button" onClick={() => { setEditing(false); setMsg(null); }} className="btn btn-sm btn-secondary whitespace-nowrap shrink-0">{tx('Cancel')}</button>}
             </div>
           </form>
         )}
@@ -122,7 +122,7 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
 
       {/* What is coming */}
       {s && (d.upcoming.length > 0 || d.adjustments.length > 0) && (
-        <section aria-labelledby="up-h" className="bg-white border border-[color:var(--t-200)] p-5">
+        <section aria-labelledby="up-h" className="app-card">
           <h2 id="up-h" className="text-sm font-extrabold mb-3">{tx('Not yet paid out')}</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
@@ -150,7 +150,7 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
       )}
 
       {/* History */}
-      <section aria-labelledby="hist-h" className="bg-white border border-[color:var(--t-200)] p-5">
+      <section aria-labelledby="hist-h" className="app-card">
         <h2 id="hist-h" className="text-sm font-extrabold mb-3">{tx('Payouts')}</h2>
         {d.payouts.length === 0 ? <p className="text-xs text-slate-600">{tx('No payouts yet.')}</p> : (
           <div className="overflow-x-auto">
@@ -164,7 +164,7 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
                     <td className="pr-3">{p.bank}</td>
                     <td className="pr-3 font-mono">{p.reference ?? ''}</td>
                     <td className="pr-3 text-right tabular-nums font-bold">{formatMoney(p.amount)}</td>
-                    <td>{p.status !== 'failed' && p.status !== 'cancelled' && <a href={`/api/me/payouts/${p.id}/statement.csv`} className="inline-flex items-center gap-1 font-bold text-[color:var(--t-700)] hover:underline min-h-[36px]"><Download className="h-3.5 w-3.5" aria-hidden="true" />{tx('Statement')}</a>}</td>
+                    <td>{p.status !== 'failed' && p.status !== 'cancelled' && <a href={`/api/me/payouts/${p.id}/statement.csv`} className="btn btn-sm btn-secondary whitespace-nowrap shrink-0"><Download className="h-3.5 w-3.5" aria-hidden="true" />{tx('Statement')}</a>}</td>
                   </tr>
                 ))}
               </tbody>

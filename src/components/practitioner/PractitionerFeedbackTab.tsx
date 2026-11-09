@@ -39,7 +39,7 @@ export default function PractitionerFeedbackTab({
     <div id="panel-reviews" role="tabpanel" aria-labelledby="tab-reviews" tabIndex={0} className="space-y-6 animate-fade-in">
       {/* Reviews Metric Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
+        <div className="app-card space-y-1">
           <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Overall Clinical Rating')}</span>
           <div className="flex items-center gap-2">
             <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{avgOverall ?? "—"}</span>
@@ -52,7 +52,7 @@ export default function PractitionerFeedbackTab({
           </p>
         </div>
 
-        <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
+        <div className="app-card space-y-1">
           <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Bedside Manners')}</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgComm} / 5.0` : '—'}</span>
           <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
@@ -60,7 +60,7 @@ export default function PractitionerFeedbackTab({
           </div>
         </div>
 
-        <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
+        <div className="app-card space-y-1">
           <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Clinic Punctuality')}</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgPunct} / 5.0` : '—'}</span>
           <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
@@ -68,7 +68,7 @@ export default function PractitionerFeedbackTab({
           </div>
         </div>
 
-        <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
+        <div className="app-card space-y-1">
           <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Care Satisfaction')}</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgSatis} / 5.0` : '—'}</span>
           <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
@@ -78,7 +78,7 @@ export default function PractitionerFeedbackTab({
       </div>
 
       {/* List of Patient Feedback */}
-      <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-xs space-y-5">
+      <div className="app-card space-y-5">
         <div className="border-b border-[color:var(--t-200)] pb-3">
           <h3 className="text-base font-bold text-[color:var(--ink)]">{tx('Patient Care Logbook')}</h3>
           <p className="text-xs text-slate-500 font-medium mt-0.5">{tx('Below are verified experiences left by patients post-treatment.')}</p>

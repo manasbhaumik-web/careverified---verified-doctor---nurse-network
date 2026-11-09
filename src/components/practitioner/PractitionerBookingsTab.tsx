@@ -403,7 +403,7 @@ export default function PractitionerBookingsTab({
                     {dispatch.dispatchStatus === 'Pending Dispatch' && (
                       <button
                         onClick={() => onUpdateDispatchStatus(dispatch.id, 'En-Route')}
-                        className="w-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-black py-2 rounded-none transition-all shadow-3xs cursor-pointer flex items-center justify-center gap-1.5"
+                        className="btn btn-sm btn-danger whitespace-nowrap w-full"
                       >
                         <Ambulance className="h-4 w-4" />
                         <span>{tx('CLAIM EMERGENCY TRANSIT')}</span>
@@ -413,7 +413,7 @@ export default function PractitionerBookingsTab({
                     {dispatch.dispatchStatus === 'En-Route' && isClaimedByMe && (
                       <button
                         onClick={() => onUpdateDispatchStatus(dispatch.id, 'Arrived')}
-                        className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black py-2 rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                        className="btn btn-sm btn-primary whitespace-nowrap w-full"
                       >
                         <MapPin className="h-4 w-4" />
                         <span>{tx('MARK ARRIVED AT PATIENT')}</span>
@@ -469,7 +469,7 @@ export default function PractitionerBookingsTab({
               const isUpcoming = booking.status === 'Upcoming';
 
               return (
-                <div key={booking.id} className="border border-[color:var(--t-200)] p-4 rounded-none flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white hover:border-slate-300 transition-colors">
+                <div key={booking.id} className="app-card-interactive app-card-equal p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all">
                   <div className="space-y-2.5">
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 bg-slate-100 rounded-none flex items-center justify-center font-bold text-slate-700 text-xs">
@@ -553,7 +553,7 @@ export default function PractitionerBookingsTab({
                     {isUpcoming && (
                       <button
                         onClick={() => onStartPrescription(booking)}
-                        className="text-white text-xs font-black py-2 px-4 rounded-none transition-all cursor-pointer flex items-center gap-1 shadow-3xs bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)]"
+                        className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
                       >
                         {isDoc ? (
                           <>

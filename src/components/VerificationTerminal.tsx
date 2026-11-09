@@ -496,7 +496,7 @@ export default function VerificationTerminal({
                 <button
                   type="button"
                   onClick={() => setActiveDashboardTab('bookings')}
-                  className="px-4 py-2.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5 border border-[color:var(--t-700)]"
+                  className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
                 >
                   <Calendar className="h-3.5 w-3.5" />
                   <span>{tx('Manage Consultation Schedule ({n})', { n: upcomingBookingsCount })}</span>
@@ -580,7 +580,7 @@ export default function VerificationTerminal({
                 <button
                   type="button"
                   onClick={onRefreshData}
-                  className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-300 transition-colors cursor-pointer flex items-center gap-1.5"
+                  className="btn btn-sm btn-secondary whitespace-nowrap shrink-0"
                   title={tx('Re-verify Credentials')}
                 >
                   <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />

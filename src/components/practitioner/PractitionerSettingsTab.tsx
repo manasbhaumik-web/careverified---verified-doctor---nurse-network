@@ -437,7 +437,7 @@ export default function PractitionerSettingsTab({
                 </p>
 
                 <div className="flex items-center gap-1 text-xs font-extrabold text-slate-500">
-                  <span className="text-amber-500">â˜…</span>
+                  <span className="text-amber-500">★</span>
                   <span className="text-slate-800">{avgOverall ?? tx("New")}</span>
                   <span>({tx(reviewCount === 1 ? '{n} Patient Review' : '{n} Patient Reviews', { n: reviewCount })})</span>
                 </div>
