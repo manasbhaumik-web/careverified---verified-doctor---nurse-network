@@ -348,7 +348,7 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
       <div role="tablist" aria-label={tx('Request sections')} className="flex flex-wrap gap-1.5">
         {tabs.map(t => (
           <button key={t.id} role="tab" aria-selected={active === t.id} onClick={() => { setTab(t.id); setConfirm(null); }}
-            className={`min-h-[44px] px-4 text-xs font-bold cursor-pointer border ${active === t.id ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]' : 'bg-white text-slate-900 border-slate-300 hover:bg-slate-50'}`}>
+            className={`min-h-[44px] px-4 text-sm font-bold cursor-pointer border ${active === t.id ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]' : 'bg-white text-slate-900 border-slate-300 hover:bg-slate-50'}`}>
             {t.text}{t.count !== undefined && t.count > 0 ? ` (${t.count})` : ''}
           </button>
         ))}

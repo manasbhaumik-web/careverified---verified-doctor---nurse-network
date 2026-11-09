@@ -649,7 +649,7 @@ export default function App() {
               role="dialog"
               aria-label="Menu"
             >
-              <div className="py-3 space-y-1 text-xs font-bold text-[color:var(--ink)] pb-6">
+              <div className="py-3 space-y-1 text-sm font-bold text-[color:var(--ink)] pb-6">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = isNavItemActive(item.id, activeView);
@@ -789,7 +789,7 @@ export default function App() {
                     key={item.id}
                     data-active={isActive}
                     onClick={() => { setActiveView(item.id); setSelectedProfId(null); }}
-                    className={`relative flex items-center gap-2.5 px-4 xl:px-5 h-12 text-xs font-extrabold whitespace-nowrap shrink-0 transition-colors duration-150 cursor-pointer select-none rounded-none ${
+                    className={`relative flex items-center gap-2.5 px-4 xl:px-5 h-12 text-sm font-extrabold whitespace-nowrap shrink-0 transition-colors duration-150 cursor-pointer select-none rounded-none ${
                       isActive
                         ? 'text-white bg-white/15 font-black'
                         : 'text-white/75 hover:text-white hover:bg-white/10'

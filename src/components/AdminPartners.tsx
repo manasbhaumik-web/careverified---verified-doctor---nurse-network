@@ -33,7 +33,7 @@ export default function AdminPartners({ say }: { say: (t: string) => void }) {
   return (
     <div className="space-y-4">
       <p className="text-xs text-slate-600 max-w-2xl">Clinics, hospitals and pharmacies that asked to join. You create their accounts (Pharmacies and Medical tourism &gt; Facilities). These are a business contact&apos;s personal details: delete declined enquiries rather than keeping them.</p>
-      <div className="flex flex-wrap gap-2 text-xs font-bold" role="tablist" aria-label={tx('Enquiry status')}>
+      <div className="flex flex-wrap gap-2 text-sm font-bold" role="tablist" aria-label={tx('Enquiry status')}>
         {(['new', 'contacted', 'onboarded', 'declined', 'all'] as const).map(v => (
           <button key={v} role="tab" aria-selected={view === v} onClick={() => setView(v)} className={`px-3 py-1.5 cursor-pointer ${view === v ? 'bg-[color:var(--t-600)] text-white' : 'bg-slate-100'}`}>
             {v}{v !== 'all' && data ? ` (${data.counts[v]})` : ''}

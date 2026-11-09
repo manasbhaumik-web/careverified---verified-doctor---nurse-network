@@ -140,7 +140,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
       <div role="tablist" className="flex flex-wrap gap-2 border-b border-[color:var(--t-200)] pb-2">
         {tabs.map(([id, text, Icon]) => (
           <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setError(''); setOk(''); }}
-            className={`px-3.5 py-2 text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors ${tab === id ? 'bg-[color:var(--t-600)] text-white shadow-xs' : 'bg-white border border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'}`}>
+            className={`px-3.5 py-2 text-sm font-bold flex items-center gap-2 cursor-pointer transition-colors ${tab === id ? 'bg-[color:var(--t-600)] text-white shadow-xs' : 'bg-white border border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'}`}>
             <Icon className="h-4 w-4" /> {text}
           </button>
         ))}

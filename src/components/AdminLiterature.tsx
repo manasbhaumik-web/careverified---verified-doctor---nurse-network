@@ -173,7 +173,7 @@ export default function AdminLiterature({
                   role="tab"
                   aria-selected={tab === id}
                   onClick={() => setTab(id)}
-                  className={`px-3 py-1.5 text-xs font-black uppercase tracking-wider rounded-none cursor-pointer transition-all border ${
+                  className={`px-3 py-1.5 text-sm font-black uppercase tracking-wider rounded-none cursor-pointer transition-all border ${
                     tab === id
                       ? 'bg-[color:var(--t-600)] border-[color:var(--t-700)] text-white shadow-none'
                       : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900'

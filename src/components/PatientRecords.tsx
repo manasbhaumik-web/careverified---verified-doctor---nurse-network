@@ -120,7 +120,7 @@ export default function PatientRecords({
         <div role="tablist" className="flex flex-wrap gap-1 border-b border-slate-200">
           {tabs.map(([id, text, Icon]) => (
             <button key={id} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setMsg(null); onSubTabChange?.(id); }}
-              className={`px-3 py-2.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer ${tab === id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-600'}`}>
+              className={`px-3 py-2.5 text-sm font-bold flex items-center gap-1.5 cursor-pointer ${tab === id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-600'}`}>
               <Icon className="h-3.5 w-3.5" /> {tx(text)}
             </button>
           ))}

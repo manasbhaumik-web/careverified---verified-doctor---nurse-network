@@ -142,7 +142,7 @@ export default function AdminOps({
               role="tab"
               aria-selected={sub === t.id}
               onClick={() => { setSub(t.id); setMsg(''); }}
-              className={`px-3 py-2.5 text-xs font-bold cursor-pointer rounded-none ${
+              className={`px-3 py-2.5 text-sm font-bold cursor-pointer rounded-none ${
                 sub === t.id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-500 hover:text-slate-700'
               }`}
             >

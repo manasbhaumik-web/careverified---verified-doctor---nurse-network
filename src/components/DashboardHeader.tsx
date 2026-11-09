@@ -131,7 +131,7 @@ export default function DashboardHeader<T extends string>({
                     tabIndex={selected ? 0 : -1}
                     onClick={() => onTabChange?.(tab.id)}
                     onKeyDown={handleKeyDown}
-                    className={`shrink-0 min-h-[48px] px-4 text-xs flex items-center gap-2 cursor-pointer transition-colors ${
+                    className={`shrink-0 min-h-[48px] px-4 text-sm flex items-center gap-2 cursor-pointer transition-colors ${
                       selected
                         ? 'font-semibold text-[color:var(--t-700)] bg-[color:var(--t-50)]'
                         : 'font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
