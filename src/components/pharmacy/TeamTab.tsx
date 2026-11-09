@@ -40,7 +40,7 @@ export default function TeamTab() {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] items-start">
-      <section aria-label={tx('Staff logins')} className="bg-white border border-[color:var(--t-200)] rounded-none min-w-0">
+      <section aria-label={tx('Staff logins')} className="app-card rounded-xl border border-slate-200 overflow-hidden min-w-0">
         <div className="p-5 border-b border-slate-200 bg-slate-50">
           <h2 className="text-sm font-black uppercase tracking-wider text-slate-800 flex items-center gap-2"><Users className="h-4 w-4 text-[color:var(--t-600)]" /> {tx('Authorized Staff Logins')}</h2>
           <p className="text-xs text-slate-500 font-semibold mt-1">{tx('Staff members sign in individually so each clinical status update and dispense action in the audit trail is attributable. Staff can process prescriptions but cannot manage logins.')}</p>
@@ -52,8 +52,8 @@ export default function TeamTab() {
                 <div className="min-w-0">
                   <p className="text-xs font-black text-slate-900 [overflow-wrap:anywhere] flex items-center gap-2">
                     {m.name}
-                    {m.isOwner && <span className="text-2xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 rounded-none">{tx('Owner')}</span>}
-                    {!m.active && <span className="text-2xs font-black uppercase tracking-wider text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-none">{tx('Disabled')}</span>}
+                    {m.isOwner && <span className="text-2xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 rounded-md">{tx('Owner')}</span>}
+                    {!m.active && <span className="text-2xs font-black uppercase tracking-wider text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">{tx('Disabled')}</span>}
                   </p>
                   <p className="text-xs font-semibold text-slate-600 [overflow-wrap:anywhere] mt-0.5">{m.email} · added {fmtDate(m.createdAt)}</p>
                   <p className="text-xs mt-1 flex flex-wrap gap-x-3">
@@ -73,17 +73,17 @@ export default function TeamTab() {
         )}
       </section>
 
-      <form onSubmit={add} className="bg-white border border-[color:var(--t-200)] rounded-none p-6 space-y-5 min-w-0">
+      <form onSubmit={add} className="app-card rounded-xl border border-slate-200 p-6 space-y-5 min-w-0">
         <div className="border-b border-slate-100 pb-3">
           <h2 className="text-sm font-black uppercase tracking-wider text-slate-800">{tx('Provision Staff Account')}</h2>
           <p className="text-xs text-slate-500 font-semibold mt-1">{tx('Issue a secure sign-in for a licensed pharmacist or dispensary assistant.')}</p>
         </div>
-        <label className="block"><span className={fieldLabel}>{tx('Staff Full Name')}</span><input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="h-12 w-full border border-slate-300 rounded-none px-3.5 bg-white text-xs font-semibold text-slate-900 outline-none focus:border-[color:var(--t-600)]" /></label>
-        <label className="block"><span className={fieldLabel}>{tx('Staff Email Address')}</span><input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="h-12 w-full border border-slate-300 rounded-none px-3.5 bg-white text-xs font-semibold text-slate-900 outline-none focus:border-[color:var(--t-600)]" /></label>
+        <label className="block"><span className={fieldLabel}>{tx('Staff Full Name')}</span><input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="h-10 w-full border border-slate-300 rounded-lg px-3 bg-white text-xs font-semibold text-slate-900 outline-none focus:border-[color:var(--t-600)] transition-colors" /></label>
+        <label className="block"><span className={fieldLabel}>{tx('Staff Email Address')}</span><input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="h-10 w-full border border-slate-300 rounded-lg px-3 bg-white text-xs font-semibold text-slate-900 outline-none focus:border-[color:var(--t-600)] transition-colors" /></label>
         <button type="submit" className={bannerPrimaryBtn}>{tx('Issue Staff Credentials')}</button>
-        {msg && <p role="status" className={`text-xs font-bold p-3 border rounded-none ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-300' : 'text-rose-900 bg-rose-50 border-rose-300'}`}>{msg.text}</p>}
+        {msg && <p role="status" className={`text-xs font-bold p-3 border rounded-md ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-300' : 'text-rose-900 bg-rose-50 border-rose-300'}`}>{msg.text}</p>}
         {issued && (
-          <div role="status" className="text-xs bg-amber-50 border border-amber-300 rounded-none p-4 font-semibold [overflow-wrap:anywhere] space-y-2">
+          <div role="status" className="text-xs bg-amber-50 border border-amber-300 rounded-md p-4 font-semibold [overflow-wrap:anywhere] space-y-2">
             <p className="font-black uppercase tracking-wider text-amber-900">One-Time Temporary Credentials for {issued.who}</p>
             <p className="text-slate-700">{tx('Share these details immediately. The generated password cannot be retrieved again.')}</p>
             <div className="bg-white border border-amber-200 p-2.5 font-mono text-xs space-y-1">
