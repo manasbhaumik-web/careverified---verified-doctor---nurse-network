@@ -223,7 +223,7 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
         />
       </DashboardHeader>
 
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-4">
         {me?.account.mustChangePassword && (
           <div role="alert" className="bg-amber-50 border border-amber-200 text-amber-900 p-4 flex flex-wrap items-center gap-3 text-xs">
             <KeyRound className="h-5 w-5 shrink-0" />
