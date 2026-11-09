@@ -80,7 +80,7 @@ export default function PatientHeroBanner<T extends string = string>({
         id="tab-patient-help"
         aria-selected={helpActive}
         onClick={handleHelpClick}
-        className={`shrink-0 min-h-[48px] px-3.5 sm:px-4 text-sm flex items-center gap-2 cursor-pointer transition-colors ${
+        className={`shrink-0 min-h-[40px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer transition-colors ${
           helpActive
             ? 'font-semibold text-[color:var(--t-700)] bg-[color:var(--t-50)]'
             : 'font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
@@ -131,8 +131,8 @@ export default function PatientHeroBanner<T extends string = string>({
                     <span
                       className={
                         bpSummary.flag?.level === 'urgent'
-                          ? 'text-2xs font-mono font-bold tabular-nums text-white bg-red-700 px-1.5 py-0.5'
-                          : 'text-2xs font-mono font-bold tabular-nums text-[color:var(--t-700)] bg-white px-1.5 py-0.5 border border-[color:var(--t-200)] shadow-2xs'
+                          ? 'text-2xs text-white font-bold bg-red-700 px-1.5 py-0.5'
+                          : 'text-2xs font-mono font-bold text-[color:var(--t-700)] bg-white px-1.5 py-0.5 border border-[color:var(--t-200)] shadow-2xs'
                       }
                     >
                       {tx('BP: {a}/{b} mmHg', { a: bpSummary.value1 ?? '', b: bpSummary.value2 ?? '' })}

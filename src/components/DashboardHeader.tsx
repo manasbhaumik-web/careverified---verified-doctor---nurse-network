@@ -131,7 +131,7 @@ export default function DashboardHeader<T extends string>({
                     tabIndex={selected ? 0 : -1}
                     onClick={() => onTabChange?.(tab.id)}
                     onKeyDown={handleKeyDown}
-                    className={`shrink-0 min-h-[40px] px-3.5 text-sm flex items-center gap-2 cursor-pointer transition-colors ${
+                    className={`shrink-0 min-h-[40px] px-4 text-xs flex items-center gap-2 cursor-pointer transition-colors ${
                       selected
                         ? 'font-semibold text-[color:var(--t-700)] bg-[color:var(--t-50)]'
                         : 'font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
@@ -165,21 +165,21 @@ export default function DashboardHeader<T extends string>({
  * ---------------------------------------------------------------------------------------------- */
 
 export const bannerPrimaryBtn =
-  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold px-3.5 h-9 rounded-none shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
+  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-3.5 h-9 rounded-none shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
 /** Same two buttons for use on the banner: a solid brand button and a crisp bordered white one. */
 export const bannerOnBrandPrimaryBtn =
-  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-sm font-bold px-3.5 h-9 rounded-none shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
+  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-3.5 h-9 rounded-none shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
 export const bannerOnBrandSecondaryBtn =
-  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-sm font-bold px-3.5 h-9 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
+  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold px-3.5 h-9 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
 export const bannerSecondaryBtn =
-  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-sm font-bold px-3.5 h-9 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
+  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold px-3.5 h-9 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
 
 /** Two-column row: identity on the left, KPIs and actions on the right. */
 export function BannerRow({ identity, aside }: { identity: React.ReactNode; aside?: React.ReactNode }) {
   return (
     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
       {identity}
-      {aside && <div className="flex items-center gap-3 sm:gap-4 flex-wrap lg:justify-end border-t lg:border-t-0 border-[color:var(--t-200)] pt-2 sm:pt-2.5 lg:pt-0 shrink-0">{aside}</div>}
+      {aside && <div className="flex items-center gap-4 flex-wrap lg:justify-end border-t lg:border-t-0 border-[color:var(--t-200)] pt-2.5 lg:pt-0 shrink-0">{aside}</div>}
     </div>
   );
 }
@@ -206,10 +206,10 @@ interface BannerIdentityProps {
 export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading = 'h2', description, avatarBadge, badges, meta }: BannerIdentityProps) {
   const initials = typeof name === 'string' ? name.replace(/^Dr\.?\s+/i, '').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() : '';
   return (
-    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+    <div className="flex items-center gap-3 sm:gap-5 min-w-0">
       <div className="relative shrink-0">
         {Icon ? (
-          <div aria-hidden="true" className="h-11 w-11 sm:h-13 sm:w-13 rounded-xl border-2 border-white shadow-xs bg-white text-[color:var(--t-700)] flex items-center justify-center text-base sm:text-lg font-bold">
+          <div aria-hidden="true" className="h-11 w-11 sm:h-13 sm:w-13 rounded-xl border-2 border-white shadow-xs bg-white text-[color:var(--t-700)] flex items-center justify-center text-lg sm:text-2xl font-bold">
             <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
         ) : (
@@ -225,11 +225,11 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
       </div>
       <div className="space-y-0.5 sm:space-y-1 min-w-0">
         <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap sm:flex-nowrap">
-          <Heading className="text-lg sm:text-2xl font-bold text-[color:var(--ink)] tracking-tight shrink-0">{name}</Heading>
+          <Heading className="text-lg sm:text-2xl font-black text-[color:var(--ink)] tracking-tight shrink-0">{name}</Heading>
           {badges && <div className="inline-flex items-center gap-2 max-w-full flex-wrap sm:flex-nowrap sm:shrink-0">{badges}</div>}
         </div>
-        {description && <p className="text-sm font-medium text-[color:var(--ink-2)] leading-normal max-w-3xl line-clamp-1 sm:line-clamp-2">{description}</p>}
-        {meta && <div className="flex items-center gap-2.5 text-sm text-[color:var(--ink-2)] font-medium flex-wrap">{meta}</div>}
+        {description && <p className="text-xs font-semibold text-[color:var(--ink-2)] leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
+        {meta && <div className="flex items-center gap-2.5 text-xs text-[color:var(--ink-2)] font-semibold flex-wrap">{meta}</div>}
       </div>
     </div>
   );
@@ -257,8 +257,8 @@ export function BannerKpis({ items }: { items: { value: React.ReactNode; label: 
     <div className="flex items-stretch w-full sm:w-auto sm:h-9 bg-white border border-[color:var(--t-200)] rounded-none shadow-2xs">
       {items.map((k, i) => (
         <div key={k.label} className={`flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-0 min-w-0 ${i > 0 ? 'border-l border-[color:var(--t-100)]' : ''}`}>
-          <span className="text-sm sm:text-base font-extrabold text-[color:var(--ink)] leading-none tabular-nums">{k.value}</span>
-          <span className="text-2xs font-bold text-[color:var(--t-600)] uppercase tracking-wider leading-tight text-center">{k.label}</span>
+          <span className="text-sm font-extrabold text-[color:var(--ink)] leading-none tabular-nums">{k.value}</span>
+          <span className="text-[11px] font-bold text-[color:var(--t-600)] uppercase tracking-wider leading-tight text-center">{k.label}</span>
         </div>
       ))}
     </div>
@@ -271,7 +271,7 @@ export function FilterSelect({ label, value, onChange, children }: { label: stri
     <label className="flex items-center gap-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-3 h-11 shrink-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors cursor-pointer">
       <span className="text-2xs font-black uppercase tracking-widest text-slate-400 shrink-0">{label}:</span>
       <select value={value} onChange={e => onChange(e.target.value)}
-        className="text-sm font-semibold text-[color:var(--ink)] bg-transparent focus:outline-none cursor-pointer pr-1 min-w-[120px]">
+        className="text-xs font-bold text-[color:var(--ink)] bg-transparent focus:outline-none cursor-pointer pr-1 min-w-[120px]">
         {children}
       </select>
     </label>
