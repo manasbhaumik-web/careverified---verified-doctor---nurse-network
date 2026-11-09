@@ -553,17 +553,17 @@ function Detail({ p, signedIn, onEnquire, more, facilityOffers }: { p: Pkg; sign
   );
 }
 
-/** Dual-colour heading: first half in crisp white, second half highlighted in application brand color */
+/** Dual-colour heading: first half in Black, second half highlighted in application brand color */
 function TwoTone({ text }: { text: string }) {
   const w = text.split(' ');
   const k = Math.max(1, Math.ceil(w.length / 2));
   return (
     <>
-      <span className="text-white">{w.slice(0, k).join(' ')}</span>
+      <span className="text-slate-900">{w.slice(0, k).join(' ')}</span>
       {w.length > k && (
         <>
           {' '}
-          <span className="text-[color:var(--t-300)] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+          <span className="text-[color:var(--t-600)]">
             {w.slice(k).join(' ')}
           </span>
         </>
@@ -587,7 +587,7 @@ interface Slide {
 
 const SLIDE_MS = 5000;
 
-/** Hero Slider: dual-tone text, background images on offer slides, sleek floating controls without dark box */
+/** Hero Slider: dual-tone text (Black + Application color), clean natural background image without color overlay */
 function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; offers: Offer[]; copied: string; onCopy: (code: string) => void }) {
   const slides = useMemo<Slide[]>(() => {
     const promoted = [...packages].sort((a, b) => Number(b.featured) - Number(a.featured) || savingPct(b) - savingPct(a)).slice(0, 3);
@@ -599,16 +599,16 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
       title: p.title,
       sub: (
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm sm:text-base font-medium">
-          <span className="text-white/90">Starting at</span>
-          <span className="font-extrabold text-[color:var(--t-300)] text-base sm:text-lg">{myr(p.priceMyr)}</span>
-          {savingAmt(p) > 0 && <span className="text-white/70 line-through text-xs sm:text-sm">{myr(p.originalPriceMyr!)}</span>}
-          <span className="text-white/40">•</span>
-          <span className="text-white/90">Facility:</span>
-          <span className="font-semibold text-[color:var(--t-300)]">{p.facility_name}</span>
+          <span className="text-slate-900 font-bold">Starting at</span>
+          <span className="font-extrabold text-[color:var(--t-600)] text-base sm:text-lg">{myr(p.priceMyr)}</span>
+          {savingAmt(p) > 0 && <span className="text-slate-400 line-through text-xs sm:text-sm">{myr(p.originalPriceMyr!)}</span>}
+          <span className="text-slate-300">•</span>
+          <span className="text-slate-900 font-bold">Facility:</span>
+          <span className="font-semibold text-[color:var(--t-600)]">{p.facility_name}</span>
           {place(p) && (
             <>
-              <span className="text-white/40">•</span>
-              <span className="text-white/80">{place(p)}</span>
+              <span className="text-slate-300">•</span>
+              <span className="text-slate-600 font-medium">{place(p)}</span>
             </>
           )}
         </div>
@@ -629,19 +629,19 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
         title: o.title,
         sub: (
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm sm:text-base font-medium">
-            <span className="text-white/95">{o.badge_text || 'Exclusive Offer'}</span>
+            <span className="text-slate-900 font-bold">{o.badge_text || 'Exclusive Offer'}</span>
             {o.facility_name && (
               <>
-                <span className="text-white/40">•</span>
-                <span className="text-white/90">Partner:</span>
-                <span className="font-semibold text-[color:var(--t-300)]">{o.facility_name}</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-900 font-bold">Partner:</span>
+                <span className="font-semibold text-[color:var(--t-600)]">{o.facility_name}</span>
               </>
             )}
             {o.valid_until && (
               <>
-                <span className="text-white/40">•</span>
-                <span className="text-white/80">Valid until</span>
-                <span className="font-bold text-[color:var(--t-300)]">{o.valid_until}</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-600 font-medium">Valid until</span>
+                <span className="font-bold text-[color:var(--t-600)]">{o.valid_until}</span>
               </>
             )}
           </div>
@@ -671,10 +671,14 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
 
   if (n === 0) {
     return (
-      <section className="bg-[color:var(--t-900)] text-white">
+      <section className="bg-white border-b border-[color:var(--t-200)]">
         <div className={`${wrap} py-10`}>
-          <h1 className="font-display font-black text-3xl sm:text-4xl tracking-tight">Verified Healthcare Packages & Providers</h1>
-          <p className="mt-2 max-w-2xl text-base sm:text-lg text-white/90">Malaysia's trusted network for licence-checked hospitals, clinics, nurses, and doctors.</p>
+          <h1 className="font-display font-black text-3xl sm:text-4xl tracking-tight text-slate-900">
+            Verified Healthcare Packages &amp; <span className="text-[color:var(--t-600)]">Providers</span>
+          </h1>
+          <p className="mt-2 max-w-2xl text-base sm:text-lg text-slate-700">
+            <span className="text-slate-900 font-bold">Malaysia's trusted network</span> for <span className="text-[color:var(--t-600)] font-semibold">licence-checked hospitals, clinics, nurses, and doctors.</span>
+          </p>
         </div>
       </section>
     );
@@ -688,7 +692,7 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
-      className="pp-hero relative h-[360px] sm:h-[300px] overflow-hidden bg-[color:var(--t-900)]"
+      className="pp-hero relative h-[360px] sm:h-[310px] overflow-hidden bg-white border-b border-[color:var(--t-200)]"
     >
       <h1 className="sr-only">Hospital and clinic packages</h1>
       {slides.map((s, k) => {
@@ -701,33 +705,33 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
             aria-label={`${k + 1} of ${n}`}
             className={`absolute inset-0 transition-opacity duration-1000 ${on ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
           >
-            {/* Background Image: renders for both packages and offer slides with Ken Burns motion */}
-            <div className={`absolute inset-0 ${on ? 'pp-kenburns' : ''}`}>
+            {/* Background Image: 100% natural photo without color overlay */}
+            <div className={`absolute right-0 top-0 bottom-0 w-full sm:w-7/12 lg:w-1/2 overflow-hidden ${on ? 'pp-kenburns' : ''}`}>
               {s.image ? (
                 <Photo src={s.image} alt="" />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-[color:var(--t-900)] via-[color:var(--t-800)] to-[color:var(--t-700)]" />
+                <div className="w-full h-full bg-[color:var(--t-50)]" />
               )}
             </div>
-            {/* Gradients for crisp contrast & high text readability */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[color:var(--t-900)]/95 via-[color:var(--t-900)]/80 to-[color:var(--t-900)]/30 pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[color:var(--t-900)]/70 via-transparent to-transparent pointer-events-none" />
 
-            <div className={`relative ${wrap} h-full flex items-start pt-7 pb-14`}>
-              <div className="text-white w-full max-w-4xl flex flex-col gap-2 [text-shadow:0_1px_2px_rgba(0,0,0,0.75),0_2px_14px_rgba(0,0,0,0.5)]">
-                <span className={`self-start text-white text-[12px] font-bold px-3 py-1 ${s.kind === 'offer' ? 'bg-[color:var(--t-600)]' : 'bg-[color:var(--t-700)]'}`}>
+            {/* Seamless readability fade for text, leaving photo 100% natural and unobscured */}
+            <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-transparent sm:via-white/80 sm:w-3/5 lg:w-1/2 pointer-events-none" />
+
+            <div className={`relative ${wrap} h-full flex items-center py-6`}>
+              <div className="w-full max-w-2xl flex flex-col gap-2.5 z-10">
+                <span className={`self-start text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 border ${s.kind === 'offer' ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]' : 'bg-white text-[color:var(--t-700)] border-[color:var(--t-200)] shadow-2xs'}`}>
                   {s.badge}
                 </span>
-                <h2 className="font-display font-black text-2xl sm:text-3xl leading-[1.15] tracking-tight line-clamp-3 sm:line-clamp-2">
+                <h2 className="font-display font-black text-2xl sm:text-3xl leading-[1.18] tracking-tight line-clamp-3 sm:line-clamp-2">
                   <TwoTone text={s.title} />
                 </h2>
-                <div className="text-sm sm:text-base font-medium line-clamp-2">{s.sub}</div>
-                <div className="flex flex-wrap items-center gap-2 pt-1">
+                <div className="line-clamp-2">{s.sub}</div>
+                <div className="flex flex-wrap items-center gap-2 pt-1.5">
                   <a
                     href={s.href}
                     tabIndex={on ? 0 : -1}
                     onClick={e => { e.preventDefault(); s.onGo(); }}
-                    className="[text-shadow:none] min-h-[42px] px-5 bg-white text-[color:var(--t-700)] font-extrabold text-[14px] inline-flex items-center gap-2 hover:bg-[color:var(--t-50)] transition-colors shadow-sm"
+                    className="min-h-[42px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white font-extrabold text-[14px] inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer"
                   >
                     {s.cta}
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -738,7 +742,7 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
                       tabIndex={on ? 0 : -1}
                       onClick={() => onCopy(s.code!)}
                       aria-label={`Copy offer code ${s.code}`}
-                      className="[text-shadow:none] min-h-[42px] px-4 border border-white/80 text-white font-mono font-bold text-xs hover:bg-white/15 cursor-pointer transition-colors"
+                      className="min-h-[42px] px-4 border border-[color:var(--t-300)] bg-[color:var(--t-50)] text-[color:var(--t-800)] font-mono font-bold text-xs hover:bg-[color:var(--t-100)] cursor-pointer transition-colors"
                     >
                       {copied === s.code ? 'Copied' : `Code ${s.code}`}
                     </button>
@@ -750,9 +754,9 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
         );
       })}
 
-      {/* Floating Carousel Controls: Completely transparent without dark background */}
+      {/* Floating Carousel Controls */}
       {n > 1 && (
-        <div className="absolute inset-x-0 bottom-12 z-20 pointer-events-none">
+        <div className="absolute inset-x-0 bottom-4 sm:bottom-6 z-20 pointer-events-none">
           <div className={`${wrap} flex items-center justify-end gap-3`}>
             {/* Progress indicators */}
             <div className="pointer-events-auto hidden sm:flex items-center h-8 gap-1.5">
@@ -765,10 +769,10 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
                   aria-current={k === cur}
                   className="relative h-8 w-8 sm:w-12 flex items-center cursor-pointer group"
                 >
-                  <span className="relative block h-[3px] w-full bg-white/30 rounded-full overflow-hidden group-hover:bg-white/60 transition-colors">
+                  <span className="relative block h-[3px] w-full bg-slate-200 rounded-full overflow-hidden group-hover:bg-slate-300 transition-colors">
                     <span
                       key={`${k}-${cur}-${paused}`}
-                      className={`absolute inset-0 bg-[color:var(--t-300)] origin-left ${k < cur ? '' : 'scale-x-0'} ${k === cur ? 'pp-progress' : ''}`}
+                      className={`absolute inset-0 bg-[color:var(--t-600)] origin-left ${k < cur ? '' : 'scale-x-0'} ${k === cur ? 'pp-progress' : ''}`}
                       style={k === cur ? { animationPlayState: paused ? 'paused' : 'running' } : undefined}
                     />
                   </span>
@@ -776,13 +780,13 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
               ))}
             </div>
 
-            {/* Seamless Border-only buttons (NO dark background) */}
+            {/* Carousel navigation buttons */}
             <div className="pointer-events-auto flex items-center gap-1.5">
               <button
                 type="button"
                 onClick={() => setStopped(v => !v)}
                 aria-label={stopped ? 'Play slideshow' : 'Pause slideshow'}
-                className="w-8 h-8 rounded-full bg-transparent hover:bg-white/20 border border-white/60 text-white inline-flex items-center justify-center cursor-pointer transition-colors"
+                className="w-8 h-8 rounded-full bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 hover:text-[color:var(--t-700)] inline-flex items-center justify-center cursor-pointer shadow-xs transition-colors"
               >
                 {stopped ? <Play className="h-3.5 w-3.5" aria-hidden="true" /> : <Pause className="h-3.5 w-3.5" aria-hidden="true" />}
               </button>
@@ -790,7 +794,7 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
                 type="button"
                 onClick={() => setI((cur + n - 1) % n)}
                 aria-label="Previous slide"
-                className="w-8 h-8 rounded-full bg-transparent hover:bg-white/20 border border-white/60 text-white inline-flex items-center justify-center cursor-pointer transition-colors"
+                className="w-8 h-8 rounded-full bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 hover:text-[color:var(--t-700)] inline-flex items-center justify-center cursor-pointer shadow-xs transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -798,7 +802,7 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
                 type="button"
                 onClick={() => setI((cur + 1) % n)}
                 aria-label="Next slide"
-                className="w-8 h-8 rounded-full bg-transparent hover:bg-white/20 border border-white/60 text-white inline-flex items-center justify-center cursor-pointer transition-colors"
+                className="w-8 h-8 rounded-full bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 hover:text-[color:var(--t-700)] inline-flex items-center justify-center cursor-pointer shadow-xs transition-colors"
               >
                 <ChevronRight className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -1273,8 +1277,8 @@ function DedicatedPageHeader({
               Dedicated Directory
             </span>
             <h1 className="font-display font-black text-3xl sm:text-4xl text-slate-900 flex items-center gap-3">
-              <Icon className="h-8 w-8 text-[color:var(--t-600)]" aria-hidden="true" />
-              {title}
+              <Icon className="h-8 w-8 text-[color:var(--t-600)] shrink-0" aria-hidden="true" />
+              <TwoTone text={title} />
             </h1>
             <p className="text-base text-slate-600 max-w-3xl mt-2 leading-relaxed">{subtitle}</p>
           </div>
