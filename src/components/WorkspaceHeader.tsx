@@ -46,7 +46,7 @@ export default function WorkspaceHeader<T extends string = string>({
   const tx = useTr();
   return (
     <div
-      className={`bg-white border border-[color:var(--t-200)] border-l-4 border-l-[color:var(--t-600)] p-3.5 sm:p-4 shadow-2xs ${className}`}
+      className={`bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] p-3.5 sm:p-4 shadow-2xs ${className}`}
     >
       {/* Top Header Row */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3.5">
