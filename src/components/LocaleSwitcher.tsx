@@ -25,8 +25,8 @@ export default function LocaleSwitcher({ className = '', tone = 'light' }: Props
   }, [open]);
 
   const buttonTone = tone === 'onColor'
-    ? 'text-white border-white/25 hover:border-white/50 bg-white/10 hover:bg-white/20'
-    : 'text-slate-700 border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50';
+    ? 'text-white border-transparent bg-white/15 hover:bg-white/25'
+    : 'text-[color:var(--t-600)] border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-100)]';
 
   return (
     <div ref={rootRef} className={`relative ${className}`}>
@@ -37,7 +37,7 @@ export default function LocaleSwitcher({ className = '', tone = 'light' }: Props
         aria-expanded={open}
         aria-label={tx('Language and region')}
         title={tx('Switch language or audience region (Malaysia / International)')}
-        className={`h-10 px-3.5 rounded-full border flex items-center gap-1.5 transition-all cursor-pointer text-xs font-bold uppercase tracking-wider shadow-2xs focus:outline-none focus:ring-2 focus:ring-white/40 ${buttonTone}`}
+        className={`h-10 px-3 flex items-center gap-1.5 ${tone === 'onColor' ? 'border-0' : 'border'} rounded-none transition-colors cursor-pointer text-xs font-extrabold uppercase tracking-wider ${buttonTone}`}
       >
         <Globe className="h-4 w-4 shrink-0" />
         <span>{region}</span>
@@ -46,7 +46,7 @@ export default function LocaleSwitcher({ className = '', tone = 'light' }: Props
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-64 z-50 bg-white border border-slate-200 shadow-xl text-slate-800 rounded-xl overflow-hidden panel-edge">
+        <div className="absolute right-0 top-full mt-2 w-64 z-50 bg-white border border-slate-200 shadow-xl text-slate-800 rounded-none overflow-hidden panel-edge">
           <p className="px-3.5 pt-3 pb-1.5 text-xs font-mono font-extrabold uppercase tracking-widest text-[color:var(--t-600)] bg-[color:var(--t-50)] border-b border-slate-200">
             {t('common.region')} · Audience Mode
           </p>

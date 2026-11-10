@@ -569,7 +569,7 @@ export default function App() {
               setSelectedProfId(null);
             }}
           >
-            <div className="w-10 h-10 rounded-xl bg-white text-[color:var(--t-600)] flex items-center justify-center shrink-0 group-hover:bg-[color:var(--t-50)] transition-colors shadow-2xs">
+            <div className="w-10 h-10 rounded-none bg-white text-[color:var(--t-600)] flex items-center justify-center shrink-0 group-hover:bg-[color:var(--t-50)] transition-colors">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
             </div>
             <div className="leading-none">
@@ -584,7 +584,7 @@ export default function App() {
 
           {/* Right-Side Desktop Actions & User Session Details - Standardized Gaps & Round Outlines */}
           <div className="hidden lg:flex items-center gap-2.5 sm:gap-3">
-            <div className="flex items-center gap-2 bg-white/10 border border-white/20 shadow-2xs px-3 py-1.5 rounded-full text-xs font-bold text-white">
+            <div className="flex items-center gap-2 bg-white/15 border-0 shadow-none px-3 py-1.5 rounded-none text-xs font-bold text-white">
               <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true"></span>
               <ShieldCheck className="h-3.5 w-3.5 text-white" aria-hidden="true" />
               <span>{tt('Council-Verified Network (Act 586)')}</span>
@@ -600,7 +600,7 @@ export default function App() {
             <div className="h-5 w-px bg-white/20 mx-0.5" aria-hidden="true" />
 
             {/* Profile Badge embedded with Close Session Button */}
-            <div className="flex items-center gap-2.5 bg-white/10 hover:bg-white/15 border border-white/20 shadow-2xs pl-1.5 pr-2 py-1 rounded-full transition-all">
+            <div className="flex items-center gap-2.5 bg-white/15 border-0 shadow-none px-2.5 py-1 rounded-none transition-all">
               <UserAvatar
                 src={currentUser.avatarUrl}
                 role={currentUser.role}
@@ -615,7 +615,7 @@ export default function App() {
               </div>
               <button
                 onClick={handleLogout}
-                className="h-6 w-6 text-white/80 hover:text-white hover:bg-white/20 bg-transparent border-0 rounded-full transition-colors cursor-pointer flex items-center justify-center ml-0.5"
+                className="h-7 w-7 text-white/80 hover:text-white hover:bg-white/20 bg-transparent border-0 rounded-none transition-colors cursor-pointer ml-1 flex items-center justify-center"
                 title={tt('Close Session')}
                 aria-label={tt('Close session')}
               >
@@ -630,7 +630,7 @@ export default function App() {
             <NotificationBell tone="onColor" />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="h-10 w-10 flex items-center justify-center rounded-full border border-white/25 hover:border-white/50 bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-all shadow-2xs"
+              className="min-h-10 min-w-10 flex items-center justify-center rounded-none border-0 text-white hover:bg-white/15 cursor-pointer"
               aria-label={tt('Toggle navigation')}
               aria-expanded={mobileMenuOpen}
             >

@@ -51,7 +51,7 @@ export default function SOSButton() {
     <>
       <button
         onClick={show}
-        className="inline-flex shrink-0 items-center gap-1.5 h-10 px-3.5 rounded-full border border-white/25 hover:border-white/50 bg-white/10 text-white text-xs font-bold whitespace-nowrap hover:bg-white/20 cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-white/40"
+        className="inline-flex shrink-0 items-center gap-1.5 h-10 px-3 bg-white/15 text-white text-xs font-black whitespace-nowrap border-0 hover:bg-white/25 cursor-pointer rounded-none"
         aria-label={tx('Emergency help')}
       >
         <Siren className="h-4 w-4 text-rose-300" />
@@ -59,7 +59,7 @@ export default function SOSButton() {
       </button>
       {open && (
         <div className="fixed inset-0 z-[110] bg-slate-900/60 flex items-center justify-center p-4" role="alertdialog" aria-modal="true" aria-label={tx('Emergency help')}>
-          <div className="bg-white w-full max-w-md border border-slate-200 shadow-2xl rounded-2xl p-6 space-y-4">
+          <div className="bg-white w-full max-w-md border-2 border-rose-500 shadow-2xl rounded-none p-6 space-y-4">
             <div className="flex justify-between items-start">
               <h3 className="text-base font-bold text-rose-700 flex items-center gap-2">
                 <Siren className="h-5 w-5" />
@@ -69,7 +69,7 @@ export default function SOSButton() {
             </div>
             <div className="space-y-2">
               {(info?.numbers ?? [{ label: 'National emergency', number: '999' }]).map(n => (
-                <a key={n.number} href={`tel:${n.number}`} className="flex items-center justify-between bg-rose-600 hover:bg-rose-700 text-white px-4 py-3 rounded-xl font-bold transition-colors">
+                <a key={n.number} href={`tel:${n.number}`} className="flex items-center justify-between bg-rose-600 hover:bg-rose-700 text-white px-4 py-3 rounded-none font-black transition-colors">
                   <span className="text-xs font-bold">{tx(n.label)}</span><span className="text-xl font-mono">{n.number}</span>
                 </a>
               ))}
