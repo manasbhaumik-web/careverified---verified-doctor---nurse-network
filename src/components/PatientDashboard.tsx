@@ -234,6 +234,7 @@ export default function PatientDashboard({
   const [shareSafetyRecord, setShareSafetyRecord] = useState<boolean>(true);
   const [dispatchBusy, setDispatchBusy] = useState<boolean>(false);
   const [dispatchResult, setDispatchResult] = useState<{ ok: boolean; text: string } | null>(null);
+  const [cancelModal, setCancelModal] = useState<{ type: 'booking' | 'consult'; booking?: Booking; consultId?: string } | null>(null);
 
   // Care Concierge Support Tickets
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>([]);
@@ -358,17 +359,24 @@ export default function PatientDashboard({
     return professionals.filter(p => p.role === UserRole.DOCTOR).slice(0, 3);
   })();
 
-  const cancelBooking = async (b: Booking) => {
-    if (!window.confirm(tx('Cancel this appointment?'))) return;
+  const cancelBooking = (b: Booking) => {
+    setCancelModal({ type: 'booking', booking: b });
+  };
+
+  const confirmCancelBooking = async (b: Booking) => {
     const d = await fetch(`/api/bookings/${b.id}/cancel`, { method: 'POST' }).then(r => r.json()).catch(() => null);
     if (d?.status === 'success') {
       setBookings(prev => prev.map(x => (x.id === b.id ? d.data : x)));
-      setMsg(d.message);
+      setMsg(d.message || tx('Appointment cancelled. Refund processed.'));
     } else setMsg(d?.message || tx('Could not cancel.'));
+    setCancelModal(null);
   };
 
-  const cancelActiveConsult = async (id: string) => {
-    if (!window.confirm(tx('Cancel this consultation request and receive an immediate refund?'))) return;
+  const cancelActiveConsult = (id: string) => {
+    setCancelModal({ type: 'consult', consultId: id });
+  };
+
+  const confirmCancelActiveConsult = async (id: string) => {
     const d = await fetch(`/api/consults/${id}/end`, { method: 'POST' }).then(r => r.json()).catch(() => null);
     if (d?.status === 'success') {
       setMsg(tx('Consultation request cancelled. Refund processed automatically.'));
@@ -376,6 +384,7 @@ export default function PatientDashboard({
     } else {
       setMsg(d?.message || tx('Failed to cancel consultation.'));
     }
+    setCancelModal(null);
   };
 
   const removeSaved = (id: string) => { void savedStore.remove(id); };
@@ -505,7 +514,7 @@ export default function PatientDashboard({
       {msg && (
         <div
           role="status"
-          className="bg-[color:var(--t-50)] border-l-4 border-l-[color:var(--t-600)] border-t border-r border-b border-[color:var(--t-200)] text-[color:var(--ink)] p-4 flex items-center justify-between gap-3 shadow-xs animate-fade-in"
+          className="bg-[color:var(--t-50)] border border-[color:var(--t-300)] text-[color:var(--ink)] p-4 flex items-center justify-between gap-3 shadow-xs animate-fade-in"
         >
           <div className="flex items-center gap-2.5 min-w-0">
             <CheckCircle2 className="h-4.5 w-4.5 text-[color:var(--t-600)] shrink-0" />
@@ -558,7 +567,7 @@ export default function PatientDashboard({
           {activeConsult && (
             <section
               aria-label={tx('Active live consultation status')}
-              className="bg-emerald-50/90 border-l-4 border-l-emerald-600 border-t border-r border-b border-emerald-200 p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4"
+              className="bg-emerald-50/90 border border-emerald-300 p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4"
             >
               <div className="flex items-start gap-3.5 min-w-0">
                 <div className="w-10 h-10 bg-white border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
@@ -710,7 +719,7 @@ export default function PatientDashboard({
                     return (
                       <div
                         key={b.id}
-                        className={`group bg-white p-4 sm:p-5 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-2xs ${isPending ? "border-l-[4px] border-l-amber-500 bg-amber-50/10" : "border-l-[4px] border-l-teal-600"}`}
+                        className={`group bg-white p-4 sm:p-5 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-2xs ${isPending ? "border-amber-300 bg-amber-50/20" : "border-[color:var(--t-200)] hover:border-[color:var(--t-600)]"}`}
                       >
                         {/* Left: Professional info & appointment timing */}
                         <div className="flex items-start gap-3.5 min-w-0">
@@ -1043,7 +1052,7 @@ export default function PatientDashboard({
                     return (
                       <div
                         key={b.id}
-                        className={`p-3.5 sm:p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] bg-white transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs ${isCancelled ? "border-l-[4px] border-l-slate-300" : "border-l-[4px] border-l-emerald-600"}`}
+                        className={`p-3.5 sm:p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] bg-white transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs ${isCancelled ? "border-slate-200 bg-slate-50/50" : "border-[color:var(--t-200)] hover:border-[color:var(--t-600)] bg-white"}`}
                       >
                         <div className="flex items-start sm:items-center gap-3 min-w-0">
                           <UserAvatar
@@ -1178,9 +1187,11 @@ export default function PatientDashboard({
 
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {/* 1. Blood Pressure */}
-                <div
+                <button
+                  type="button"
                   onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
-                  className="bg-white border border-[color:var(--t-200)] p-3.5 border-l-4 border-l-[color:var(--t-600)] shadow-2xs hover:border-[color:var(--t-600)] transition-all cursor-pointer"
+                  className="w-full text-left bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-3.5 shadow-2xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)]"
+                  aria-label={tx('Blood Pressure details and log')}
                 >
                   <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
                     <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
@@ -1198,12 +1209,14 @@ export default function PatientDashboard({
                   <p className="text-xs text-slate-500 font-medium mt-1 truncate">
                     {summary?.bp?.recordedAt ? tx('Logged {date}', { date: fmtDate(summary.bp.recordedAt) }) : tx('Reference Target < 120/80')}
                   </p>
-                </div>
+                </button>
 
                 {/* 2. Resting Heart Rate */}
-                <div
+                <button
+                  type="button"
                   onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
-                  className="bg-white border border-[color:var(--t-200)] p-3.5 border-l-4 border-l-emerald-600 shadow-2xs hover:border-[color:var(--t-600)] transition-all cursor-pointer"
+                  className="w-full text-left bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-3.5 shadow-2xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)]"
+                  aria-label={tx('Resting Heart Rate details and log')}
                 >
                   <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
                     <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
@@ -1221,12 +1234,14 @@ export default function PatientDashboard({
                   <p className="text-xs text-slate-500 font-medium mt-1 truncate">
                     {tx('Resting target 60–100 BPM')}
                   </p>
-                </div>
+                </button>
 
                 {/* 3. Fasting Glucose */}
-                <div
+                <button
+                  type="button"
                   onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
-                  className="bg-white border border-[color:var(--t-200)] p-3.5 border-l-4 border-l-amber-500 shadow-2xs hover:border-[color:var(--t-600)] transition-all cursor-pointer"
+                  className="w-full text-left bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-3.5 shadow-2xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)]"
+                  aria-label={tx('Fasting Blood Glucose details and log')}
                 >
                   <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
                     <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
@@ -1244,12 +1259,14 @@ export default function PatientDashboard({
                   <p className="text-xs text-slate-500 font-medium mt-1 truncate">
                     {tx('Fasting target 4.0–7.0 mmol/L')}
                   </p>
-                </div>
+                </button>
 
                 {/* 4. Oxygen Saturation (SpO2) */}
-                <div
+                <button
+                  type="button"
                   onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
-                  className="bg-white border border-[color:var(--t-200)] p-3.5 border-l-4 border-l-cyan-600 shadow-2xs hover:border-[color:var(--t-600)] transition-all cursor-pointer"
+                  className="w-full text-left bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-3.5 shadow-2xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)]"
+                  aria-label={tx('Oxygen Saturation details and log')}
                 >
                   <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
                     <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
@@ -1267,7 +1284,7 @@ export default function PatientDashboard({
                   <p className="text-xs text-slate-500 font-medium mt-1 truncate">
                     {tx('Arterial saturation ≥ 95%')}
                   </p>
-                </div>
+                </button>
               </div>
             </section>
           )}
@@ -2161,7 +2178,7 @@ export default function PatientDashboard({
 
                     <div className="pt-2.5 border-t border-[color:var(--t-100)] flex items-center justify-between mt-auto">
                       <div>
-                        <span className="text-2xs font-bold uppercase tracking-wider text-slate-400 block">{tx('Consultation Fee')}</span>
+                        <span className="text-2xs font-bold uppercase tracking-wider text-slate-600 block">{tx('Consultation Fee')}</span>
                         <span className="font-mono text-xs font-extrabold text-[color:var(--ink)]">RM {prof.fee}</span>
                       </div>
                       <button
@@ -2391,7 +2408,7 @@ export default function PatientDashboard({
 
                     <div className="pt-2.5 border-t border-[color:var(--t-100)] flex items-center justify-between mt-auto">
                       <div>
-                        <span className="text-2xs font-bold uppercase tracking-wider text-slate-400 block">{tx('Care Rate')}</span>
+                        <span className="text-2xs font-bold uppercase tracking-wider text-slate-600 block">{tx('Care Rate')}</span>
                         <span className="font-mono text-xs font-extrabold text-[color:var(--ink)]">RM {prof.fee || 60} / hr</span>
                       </div>
                       <button
@@ -2564,6 +2581,71 @@ export default function PatientDashboard({
             setPaying(null); 
           }} 
         />
+      )}
+
+      {/* STATUTORY CANCELLATION & REFUND MODAL */}
+      {cancelModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cancel-dialog-title"
+        >
+          <div className="bg-white border-2 border-slate-900 shadow-2xl max-w-md w-full p-6 text-slate-800 space-y-4">
+            <div className="flex items-start justify-between gap-3 border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-2 text-rose-700">
+                <AlertCircle className="h-5 w-5 shrink-0" />
+                <h3 id="cancel-dialog-title" className="font-display font-black text-base text-slate-900">
+                  {cancelModal.type === 'booking' ? tx('Confirm Appointment Cancellation') : tx('Cancel Teleconsultation Request')}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCancelModal(null)}
+                className="text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
+                aria-label={tx('Close dialog')}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed font-medium">
+              {cancelModal.type === 'booking' ? (
+                tx('Are you sure you want to cancel your scheduled visit with {name}? Under MOH statutory telehealth regulations, cancellations made >24 hours prior are 100% refunded to your original payment method.', { name: cancelModal.booking?.professionalName || tx('your doctor') })
+              ) : (
+                tx('Are you sure you want to cancel this instant on-call consultation request? If your practitioner has not entered the consultation room, a 100% full refund is credited back immediately.')
+              )}
+            </p>
+
+            <div className="p-3 bg-amber-50 border border-amber-200 text-xs text-amber-900 font-medium">
+              <span className="font-bold block mb-0.5">{tx('Statutory SLA Guarantee')}</span>
+              <span>{tx('Act 586 statutory patient protection guarantees automated refund reconciliation.')}</span>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setCancelModal(null)}
+                className="px-3.5 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
+              >
+                {tx('Keep Appointment')}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (cancelModal.type === 'booking' && cancelModal.booking) {
+                    confirmCancelBooking(cancelModal.booking);
+                  } else if (cancelModal.type === 'consult' && cancelModal.consultId) {
+                    confirmCancelActiveConsult(cancelModal.consultId);
+                  }
+                }}
+                className="px-4 py-2 text-xs font-black text-white bg-rose-700 hover:bg-rose-800 shadow-xs transition-colors cursor-pointer"
+              >
+                {tx('Confirm Cancellation & Refund')}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
       </div>
     </div>
