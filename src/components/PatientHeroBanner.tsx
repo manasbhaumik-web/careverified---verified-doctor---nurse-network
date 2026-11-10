@@ -6,7 +6,6 @@ import DashboardHeader, {
   BannerIdentity,
   BannerBadge,
   BannerKpis,
-  AmbientClinicalHud,
   bannerOnBrandPrimaryBtn,
   bannerOnBrandSecondaryBtn,
   type DashboardTab,
@@ -175,36 +174,6 @@ export default function PatientHeroBanner<T extends string = string>({
             </div>
           </>
         }
-      />
-      <AmbientClinicalHud
-        items={[
-          {
-            label: tx('Clinical Care Status'),
-            value: upcomingCount > 0 ? tx('{n} Upcoming Visits', { n: upcomingCount }) : tx('Care Routine'),
-            detail: nextVisitText,
-            tone: upcomingCount > 0 ? 'normal' : 'success',
-            pulse: upcomingCount > 0,
-          },
-          {
-            label: tx('Biometric Telemetry'),
-            value: bpSummary?.value1 ? `${bpSummary.value1}/${bpSummary.value2} mmHg` : tx('Vitals Stable'),
-            detail: bpSummary?.flag?.level === 'urgent' ? tx('Requires Review') : tx('Last Checked 7d'),
-            tone: bpSummary?.flag?.level === 'urgent' ? 'emergency' : 'normal',
-            pulse: Boolean(bpSummary?.flag?.level === 'urgent'),
-          },
-          {
-            label: tx('e-Prescriptions Active'),
-            value: typeof activeRxCount === 'number' && activeRxCount > 0 ? tx('{n} In Treatment', { n: activeRxCount }) : tx('All Filled'),
-            detail: tx('Poisons Act Regulated'),
-            tone: 'normal',
-          },
-          {
-            label: tx('EHR Data Encryption'),
-            value: tx('Act 586 Compliant'),
-            detail: tx('Private Medical Cloud'),
-            tone: 'success',
-          },
-        ]}
       />
     </DashboardHeader>
   );

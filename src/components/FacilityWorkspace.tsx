@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useTr } from '../locale';
 import DashboardHeader, {
-  BannerRow, BannerIdentity, BannerBadge, BannerKpis, AmbientClinicalHud, DashboardTab, bannerPrimaryBtn
+  BannerRow, BannerIdentity, BannerBadge, BannerKpis, DashboardTab, bannerPrimaryBtn
 } from './DashboardHeader';
 import WorkspaceHeader from './WorkspaceHeader';
 import FacilityShiftsTab from './facility/FacilityShiftsTab';
@@ -1234,35 +1234,6 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                 </div>
               </div>
             }
-          />
-          <AmbientClinicalHud
-            items={[
-              {
-                label: tx('Ward & Clinical Staffing'),
-                value: stats.activeVacancies > 0 ? tx('{n} Shifts Open', { n: stats.activeVacancies }) : tx('Fully Staffed'),
-                detail: tx('{n} Locums Active', { n: stats.acceptedLocums }),
-                tone: stats.activeVacancies > 0 ? 'warning' : 'success',
-                pulse: stats.activeVacancies > 0,
-              },
-              {
-                label: tx('Statutory Facility License'),
-                value: facility?.isLicenceValid ? tx('Act 586 Active') : tx('Audit In Progress'),
-                detail: facility?.licenceNo || 'MOH-REG',
-                tone: facility?.isLicenceValid ? 'success' : 'emergency',
-              },
-              {
-                label: tx('International Patients'),
-                value: tx('{n} Medical Travel Cases', { n: stats.patientCases }),
-                detail: facility?.mhtcMember ? tx('MHTC Accredited') : tx('Standard Admission'),
-                tone: 'normal',
-              },
-              {
-                label: tx('Physician Locum Pool'),
-                value: tx('{n} Verified Applicants', { n: stats.pendingApplicants }),
-                detail: tx('Credentialed MMC/LJM'),
-                tone: 'normal',
-              },
-            ]}
           />
         </DashboardHeader>
       )}

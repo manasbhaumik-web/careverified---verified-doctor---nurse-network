@@ -90,17 +90,17 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white border border-slate-200 shadow-xl text-slate-800 rounded-xl overflow-hidden panel-edge">
-          <p className="px-3.5 pt-3 pb-1.5 text-xs font-bold uppercase tracking-wider text-slate-500">
+        <div className="absolute right-0 top-full mt-2 w-56 z-50 bg-white border border-slate-200 shadow-xl text-slate-800 rounded-none overflow-hidden panel-edge">
+          <p className="px-3.5 py-2 text-2xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] bg-[color:var(--t-50)] border-b border-slate-200">
             {tx('Application theme')}
           </p>
-          <ul role="listbox" aria-label={tx('Application theme')} className="pb-1.5">
+          <ul role="listbox" aria-label={tx('Application theme')} className="py-1">
             {THEMES.map(t => (
               <li key={t.id} role="option" aria-selected={theme === t.id}>
                 <button
                   type="button"
                   onClick={() => choose(t.id)}
-                  className="w-full flex items-center justify-between gap-2.5 px-3.5 py-2 text-xs font-semibold text-left hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-between gap-2.5 px-3.5 py-2 text-xs font-bold text-left hover:bg-[color:var(--t-50)] transition-colors cursor-pointer"
                 >
                   <span className="flex items-center gap-2">
                     <span
@@ -108,7 +108,7 @@ export default function ThemeSwitcher({ className = '', tone = 'light' }: Props)
                       className="inline-block h-3.5 w-3.5 rounded-full border border-black/15 shrink-0"
                       style={{ backgroundColor: t.swatch }}
                     />
-                    <span className="text-slate-800 font-bold">{t.label}</span>
+                    <span className="text-slate-800 font-bold text-xs">{t.label}</span>
                   </span>
                   {theme === t.id && (
                     <Check className="h-4 w-4 text-[color:var(--t-600)] shrink-0" aria-hidden="true" />

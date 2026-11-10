@@ -599,10 +599,10 @@ export default function App() {
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
             </div>
             <div className="leading-none">
-              <span className="font-display font-extrabold text-xl text-white tracking-tight block">
+              <span className="font-display font-black text-xl sm:text-2xl text-white tracking-tight block">
                 MediCred<span className="text-white/80">.</span>
               </span>
-              <span className="text-xs font-mono font-bold text-white/90 uppercase tracking-[0.14em] block mt-1">
+              <span className="text-2xs font-extrabold text-white/90 uppercase tracking-[0.16em] block mt-0.5">
                 {currentUser.role === 'admin' ? tt('Board Console') : currentUser.role === 'practitioner' ? tt('Practitioner Hub') : currentUser.role === 'pharmacy' ? tt('Pharmacy Workspace') : tt('Member Portal')}
               </span>
             </div>
@@ -610,7 +610,7 @@ export default function App() {
 
           {/* Right-Side Desktop Actions & User Session Details - Standardized Gaps & Round Outlines */}
           <div className="hidden lg:flex items-center gap-2.5 sm:gap-3">
-            <div className="flex items-center gap-2 bg-white/15 border-0 shadow-none px-3 py-1.5 rounded-none text-xs font-bold text-white">
+            <div className="flex items-center gap-2 bg-white/15 border-0 shadow-none px-3 py-1.5 rounded-none text-2xs font-extrabold uppercase tracking-wider text-white">
               <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true"></span>
               <ShieldCheck className="h-3.5 w-3.5 text-white" aria-hidden="true" />
               <span>{tt('Council-Verified Network (Act 586)')}</span>
@@ -635,7 +635,7 @@ export default function App() {
               />
               <div className="text-left hidden xl:block leading-tight">
                 <p className="text-xs font-black text-white leading-none truncate max-w-[140px]">{currentUser.name}</p>
-                <p className="text-3xs text-white/80 font-bold uppercase tracking-wider mt-0.5">
+                <p className="text-2xs text-white/85 font-extrabold uppercase tracking-wider mt-0.5">
                   {currentUser.role === 'admin' ? tt('Board Admin') : currentUser.role === 'practitioner' ? tt('Practitioner') : currentUser.role === 'pharmacy' ? tt('Pharmacy') : tt('Member')}
                 </p>
               </div>

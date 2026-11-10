@@ -52,20 +52,23 @@ export default function NotificationBell({ className = '', tone = 'onColor' }: N
       >
         <Bell className="h-4 w-4" />
         {unread > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-3xs font-extrabold flex items-center justify-center shadow-xs border-2 border-[color:var(--t-600)]">
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-2xs font-extrabold flex items-center justify-center shadow-xs border-2 border-[color:var(--t-600)] leading-none tabular-nums">
             {unread}
           </span>
         )}
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-white text-slate-800 border border-slate-200 shadow-xl rounded-xl z-50 divide-y divide-slate-100">
+        <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-white text-slate-800 border border-slate-200 shadow-xl rounded-none z-50 divide-y divide-slate-100">
+          <div className="px-3.5 py-2 bg-[color:var(--t-50)] border-b border-slate-200 text-2xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)]">
+            {tx('Notifications')}
+          </div>
           {items.length === 0 ? (
             <p className="p-4 text-xs text-slate-500 font-medium">No notifications yet.</p>
           ) : items.map(i => (
-            <div key={i.id} className={`p-3.5 text-xs transition-colors ${i.isRead ? '' : 'bg-[color:var(--t-50)]'}`}>
-              <p className="font-bold text-slate-900">{i.title}</p>
-              <p className="text-slate-600 mt-0.5 leading-relaxed">{i.body}</p>
-              <p className="text-2xs font-mono font-semibold text-slate-400 mt-1">{new Date(i.ts).toLocaleString()}</p>
+            <div key={i.id} className={`p-3.5 text-xs transition-colors ${i.isRead ? '' : 'bg-[color:var(--t-50)]/60'}`}>
+              <p className="font-bold text-slate-900 leading-snug">{i.title}</p>
+              <p className="text-slate-600 mt-0.5 leading-relaxed text-xs">{i.body}</p>
+              <p className="text-2xs font-mono font-medium text-slate-400 mt-1">{new Date(i.ts).toLocaleString()}</p>
             </div>
           ))}
         </div>

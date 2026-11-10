@@ -26,9 +26,9 @@ export default function PageBanner({ eyebrow, title, description, actions, icon,
 /** Large number + small caps label, used in banner actions. */
 export function BannerStat({ value, label }: { value: React.ReactNode; label: string }) {
   return (
-    <div className="flex items-baseline gap-2 bg-white px-3 py-1.5 border border-[color:var(--t-200)] rounded-lg shadow-3xs">
-      <span className="font-display font-bold text-lg leading-none tracking-tight text-[color:var(--t-600)] tabular-nums">{value}</span>
-      <span className="text-xs font-extrabold uppercase tracking-widest text-slate-600">{label}</span>
+    <div className="flex items-baseline gap-2 bg-white px-3 py-1.5 border border-[color:var(--t-200)] rounded-none shadow-2xs">
+      <span className="font-display font-black text-lg leading-none tracking-tight text-[color:var(--t-600)] tabular-nums">{value}</span>
+      <span className="text-2xs font-extrabold uppercase tracking-wider text-[color:var(--t-700)]">{label}</span>
     </div>
   );
 }

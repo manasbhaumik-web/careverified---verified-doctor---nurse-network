@@ -100,7 +100,7 @@ export default function DashboardHeader<T extends string>({
       )}
 
       {((tabs && tabs.length > 0) || tabsRight) && (
-        <div className="w-full bg-white/95 backdrop-blur-xs border-b border-[color:var(--t-200)] shadow-2xs">
+        <div className="w-full bg-white border-b border-[color:var(--t-200)] shadow-2xs">
           <div
             role="tablist"
             aria-label={tabsLabel}
@@ -119,7 +119,7 @@ export default function DashboardHeader<T extends string>({
                     <div className="flex items-center shrink-0 mx-2 self-center h-6 select-none" aria-hidden="true">
                       <span className="w-px h-5 bg-[color:var(--t-200)]" />
                       {tab.group && (
-                        <span className="ml-2.5 mr-1 text-xs font-black uppercase tracking-widest text-[color:var(--t-700)]/70 hidden xl:inline-block">
+                        <span className="ml-2.5 mr-1 text-2xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)]/80 hidden xl:inline-block">
                           {tab.group}
                         </span>
                       )}
@@ -135,14 +135,14 @@ export default function DashboardHeader<T extends string>({
                     onKeyDown={handleKeyDown}
                     className={`shrink-0 min-h-[40px] px-4 text-xs flex items-center gap-2 cursor-pointer transition-colors ${
                       selected
-                        ? 'font-semibold text-[color:var(--t-700)] bg-[color:var(--t-50)]'
-                        : 'font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
+                        ? 'font-extrabold text-[color:var(--t-700)] bg-[color:var(--t-50)]'
+                        : 'font-semibold text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
                     }`}
                   >
                     <tab.icon className={`h-4 w-4 ${selected ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
                     <span className="whitespace-nowrap">{tab.label}</span>
                     {tab.count !== undefined && tab.count > 0 && (
-                      <span className="tabular-nums text-2xs min-w-[20px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
+                      <span className="tabular-nums text-2xs min-w-[20px] text-center px-1.5 py-0.5 rounded-none font-extrabold bg-[color:var(--t-600)] text-white leading-none">
                         {tab.count}
                       </span>
                     )}
@@ -211,7 +211,7 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
     <div className="flex items-center gap-3 sm:gap-5 min-w-0">
       <div className="relative shrink-0">
         {Icon ? (
-          <div aria-hidden="true" className="h-11 w-11 sm:h-13 sm:w-13 rounded-xl border-2 border-white shadow-xs bg-white text-[color:var(--t-700)] flex items-center justify-center text-lg sm:text-2xl font-bold">
+          <div aria-hidden="true" className="h-11 w-11 sm:h-13 sm:w-13 rounded-none border border-[color:var(--t-200)] shadow-2xs bg-white text-[color:var(--t-700)] flex items-center justify-center text-lg sm:text-2xl font-bold">
             <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
         ) : (
@@ -230,7 +230,7 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
           <Heading className="text-lg sm:text-2xl font-black text-[color:var(--ink)] tracking-tight shrink-0">{name}</Heading>
           {badges && <div className="inline-flex items-center gap-2 max-w-full flex-wrap sm:flex-nowrap sm:shrink-0">{badges}</div>}
         </div>
-        {description && <p className="text-xs font-semibold text-[color:var(--ink-2)] leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
+        {description && <p className="text-xs font-medium text-[color:var(--ink-2)] leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
         {meta && <div className="flex items-center gap-2.5 text-xs text-[color:var(--ink-2)] font-semibold flex-wrap">{meta}</div>}
       </div>
     </div>
@@ -240,16 +240,16 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
 /** Pill used beside the name: brand, success, neutral, or warning. */
 export function BannerBadge({ tone = 'brand', children }: { tone?: 'brand' | 'success' | 'neutral' | 'warning'; children: React.ReactNode }) {
   if (tone === 'success') {
-    return <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-2xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
+    return <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-2xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   if (tone === 'neutral') {
-    return <span className="bg-slate-50 text-slate-700 border border-slate-300 text-2xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
+    return <span className="bg-slate-50 text-slate-700 border border-slate-300 text-2xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   if (tone === 'warning') {
-    return <span className="bg-amber-50 text-amber-800 border border-amber-300 text-2xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
+    return <span className="bg-amber-50 text-amber-800 border border-amber-300 text-2xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   return (
-    <span className="bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-2xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>
+    <span className="bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-2xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>
   );
 }
 
@@ -277,68 +277,5 @@ export function FilterSelect({ label, value, onChange, children }: { label: stri
         {children}
       </select>
     </label>
-  );
-}
-
-export interface HudMetric {
-  label: string;
-  value: React.ReactNode;
-  detail?: string;
-  pulse?: boolean;
-  tone?: 'normal' | 'emergency' | 'warning' | 'success';
-}
-
-/**
- * Ambient Clinical HUD: Context-aware live telemetry strip embedded into workspace headers.
- * Presents real-time situational awareness (SLA metrics, active alerts, cold-chain parameters)
- * with strict Swiss rectangular geometry and optional animated telemetry pulses.
- */
-export function AmbientClinicalHud({ items }: { items: HudMetric[] }) {
-  const toneMap = {
-    normal: 'border-[color:var(--t-200)] bg-[color:var(--t-50)]/60 text-[color:var(--ink)]',
-    emergency: 'border-rose-300 bg-rose-50/80 text-rose-950',
-    warning: 'border-amber-300 bg-amber-50/80 text-amber-950',
-    success: 'border-emerald-300 bg-emerald-50/80 text-emerald-950',
-  };
-
-  return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 pt-2.5">
-      {items.map((item, idx) => (
-        <div
-          key={idx}
-          className={`p-2 sm:p-2.5 border rounded-none flex flex-col justify-between transition-all shadow-2xs ${toneMap[item.tone || 'normal']}`}
-        >
-          <div className="flex items-center justify-between gap-1.5">
-            <span className="text-3xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] truncate">
-              {item.label}
-            </span>
-            {item.pulse && (
-              <span className="relative flex h-2 w-2 shrink-0">
-                <span
-                  className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                    item.tone === 'emergency' ? 'bg-rose-400' : 'bg-emerald-400'
-                  }`}
-                />
-                <span
-                  className={`relative inline-flex rounded-full h-2 w-2 ${
-                    item.tone === 'emergency' ? 'bg-rose-500' : 'bg-emerald-500'
-                  }`}
-                />
-              </span>
-            )}
-          </div>
-          <div className="mt-1 flex items-baseline justify-between gap-1.5">
-            <span className="text-xs sm:text-sm font-black tabular-nums tracking-tight">
-              {item.value}
-            </span>
-            {item.detail && (
-              <span className="text-3xs font-bold text-slate-500 truncate text-right">
-                {item.detail}
-              </span>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Activity, AlertTriangle, BarChart3, CheckCircle2, Clock, Download, Inbox, KeyRound, LifeBuoy, Pill, Search, ShieldAlert, StickyNote, Store, UserRound, Users } from 'lucide-react';
 import { useTr } from '../locale';
-import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, AmbientClinicalHud, FilterSelect, DashboardTab, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
+import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, FilterSelect, DashboardTab, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
 import { btnDanger, btnPlain, btnPrimary, fmtDate, fmtTime, jfetch } from './pharmacy/shared';
 import { useLiveAlerts } from './pharmacy/useLiveAlerts';
 import SecurityCard from './pharmacy/SecurityCard';
@@ -221,36 +221,6 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
             />
           }
         />
-        <AmbientClinicalHud
-          items={[
-            {
-              label: tx('Dispense Dispatch Queue'),
-              value: counts?.new ? `${counts.new} Action Needed` : tx('Queue Normal'),
-              detail: tx('Poisons Act 1952 SLA'),
-              tone: counts?.new && counts.new > 0 ? 'warning' : 'normal',
-              pulse: Boolean(counts?.new && counts.new > 0),
-            },
-            {
-              label: tx('Cold-Chain Unit'),
-              value: me?.pharmacy.coldChain ? '2°C – 8°C Verified' : tx('Passive Carrier'),
-              detail: tx('Biologics & Vaccines'),
-              tone: 'success',
-            },
-            {
-              label: tx('SLA Alerts (>24h)'),
-              value: counts?.waitingOver24h ? `${counts.waitingOver24h} Overdue` : '0 Breaches',
-              detail: tx('Council Metric'),
-              tone: counts?.waitingOver24h && counts.waitingOver24h > 0 ? 'emergency' : 'normal',
-              pulse: Boolean(counts?.waitingOver24h && counts.waitingOver24h > 0),
-            },
-            {
-              label: tx('Statutory Register'),
-              value: tx('Act 366 Compliant'),
-              detail: tx('Batch Audit Ready'),
-              tone: 'normal',
-            },
-          ]}
-        />
       </DashboardHeader>
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -392,7 +362,7 @@ function InboxTab({ counts, onChanged, tick }: { counts?: Counts; onChanged: () 
           <label className="flex-1 min-w-[240px]">
             <span className="text-xs font-bold uppercase tracking-wide text-slate-700 block mb-1.5 flex items-center gap-1.5">
               <span>{tx('Look up a code (walk-in patient)')}</span>
-              <span className="app-badge badge-neutral text-3xs font-mono">QR / Code</span>
+              <span className="app-badge badge-neutral text-2xs font-bold font-mono">QR / Code</span>
             </span>
             <input 
               value={code} 
@@ -504,21 +474,9 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
   const saveNote = async () => { const d = await run(`/api/pharmacy/prescriptions/${rx.id}/note`, 'PUT', { note }, 'Note saved.'); if (d.status === 'success') setNoting(false); };
 
   const overdue = rx.bucket === 'new' && rx.sentAt && Date.now() - Date.parse(rx.sentAt) > 86_400_000;
-  const isCriticalSafety = overdue || (rx.safety?.shared && (rx.safety.allergies?.length > 0 || rx.safety.doctorWarnings?.length > 0));
-  const isColdChain = rx.coldChainItems?.length > 0;
-  const isInsuranceHold = rx.insurance?.glStatus === 'requested';
-
-  const priorityRail = (() => {
-    if (rx.bucket === 'cancelled') return 'border-l-[4px] border-l-slate-300';
-    if (rx.bucket === 'completed') return 'border-l-[4px] border-l-emerald-500';
-    if (isCriticalSafety) return 'border-l-[4px] border-l-rose-600 bg-rose-50/10';
-    if (isColdChain) return 'border-l-[4px] border-l-sky-500 bg-sky-50/10';
-    if (isInsuranceHold) return 'border-l-[4px] border-l-amber-500 bg-amber-50/10';
-    return 'border-l-[4px] border-l-teal-600';
-  })();
 
   return (
-    <article className={`app-card-interactive border border-slate-200 overflow-hidden flex flex-col justify-between ${priorityRail}`}>
+    <article className="app-card-interactive rounded-xl border border-slate-200 overflow-hidden flex flex-col justify-between">
       <div>
         {/* Tier 1: Patient Header & Verification */}
         <div className="p-4 bg-slate-50/80 border-b border-slate-200 flex items-start justify-between gap-3">
@@ -542,7 +500,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
           </div>
           {overdue && rx.sentAt && (
             <div className="text-right shrink-0">
-              <span className="text-3xs font-semibold uppercase tracking-wider text-slate-400 block">SLA Warning</span>
+              <span className="text-2xs font-extrabold uppercase tracking-wider text-slate-400 block">SLA Warning</span>
               <span className="text-xs font-bold text-rose-700 font-mono flex items-center gap-1"><Clock className="h-3 w-3" /> Waiting {waiting(rx.sentAt)}</span>
             </div>
           )}
@@ -583,7 +541,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
                     <div className="font-bold text-slate-900">{i.name} {[i.strength, i.form].filter(Boolean).join(' ')}</div>
                     <div className="text-2xs text-slate-600">{i.dose}, {i.frequency} for {i.durationDays} days{i.instructions ? ` · ${i.instructions}` : ''}</div>
                     {rx.coldChainItems.includes(i.name) && (
-                      <span className="inline-block mt-1 text-3xs font-semibold text-sky-800 bg-sky-100 px-1.5 py-0.5 rounded border border-sky-300">❄️ Store at 2°C–8°C · Cold-Chain</span>
+                      <span className="inline-block mt-1 text-2xs font-bold text-sky-800 bg-sky-100 px-1.5 py-0.5 rounded-none border border-sky-300">❄️ Store at 2°C–8°C · Cold-Chain</span>
                     )}
                   </div>
                 </div>
@@ -591,18 +549,18 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
               </div>
             ))}
           </div>
-          {rx.notes && <p className="text-2xs text-slate-600 italic bg-slate-50 p-2 rounded border border-slate-200">Doctor note: {rx.notes}</p>}
+          {rx.notes && <p className="text-2xs text-slate-600 italic bg-slate-50 p-2 rounded-none border border-slate-200">Doctor note: {rx.notes}</p>}
 
           {/* Cold-Chain Items summary if not covered */}
           {rx.coldChainItems.length > 0 && !rx.items.some(i => rx.coldChainItems.includes(i.name)) && (
-            <p className="text-2xs font-bold text-sky-900 bg-sky-50 border border-sky-200 p-2.5 rounded-lg">
+            <p className="text-2xs font-bold text-sky-900 bg-sky-50 border border-sky-200 p-2.5 rounded-none">
               Cold chain: {rx.coldChainItems.join(', ')} must stay refrigerated (2°C to 8°C).
             </p>
           )}
 
           {/* Insurance Panel Pill */}
           {rx.insurance && (
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs space-y-2">
+            <div className="rounded-none border border-slate-200 bg-slate-50 p-3 text-xs space-y-2">
               <div className="flex items-center justify-between text-2xs">
                 <span className="font-bold uppercase tracking-wide text-slate-700">Insurance Guarantee</span>
                 <span className={`font-bold ${rx.insurance.glStatus === 'declined' ? 'text-rose-700' : rx.insurance.glStatus === 'approved' ? 'text-emerald-700' : 'text-amber-700'}`}>
@@ -613,8 +571,8 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
               <p className="text-2xs text-slate-700"><b>{rx.insurance.insurer}</b> · Member No: <span className="font-mono font-bold">{rx.insurance.memberNo}</span>{rx.insurance.policyType === 'corporate' && rx.insurance.employer ? ` · Employer: ${rx.insurance.employer}` : ''}</p>
               {active && (
                 <div className="flex flex-wrap gap-2 items-center pt-1">
-                  <input value={glNumber} onChange={e => setGlNumber(e.target.value)} placeholder={tx('GL number')} aria-label={tx('Guarantee letter number')} className="h-8 border border-slate-300 rounded-md px-2 text-xs w-36 bg-white outline-none focus:border-[color:var(--t-600)]" />
-                  <input value={glNote} onChange={e => setGlNote(e.target.value)} placeholder={tx('Note (required to decline)')} aria-label={tx('Guarantee letter note')} className="h-8 border border-slate-300 rounded-md px-2 text-xs flex-1 min-w-[10rem] bg-white outline-none focus:border-[color:var(--t-600)]" />
+                  <input value={glNumber} onChange={e => setGlNumber(e.target.value)} placeholder={tx('GL number')} aria-label={tx('Guarantee letter number')} className="h-8 border border-slate-300 rounded-none px-2 text-xs w-36 bg-white outline-none focus:border-[color:var(--t-600)]" />
+                  <input value={glNote} onChange={e => setGlNote(e.target.value)} placeholder={tx('Note (required to decline)')} aria-label={tx('Guarantee letter note')} className="h-8 border border-slate-300 rounded-none px-2 text-xs flex-1 min-w-[10rem] bg-white outline-none focus:border-[color:var(--t-600)]" />
                   <button type="button" disabled={busy || !glNumber.trim()} onClick={() => decideGl('approved')} className="btn btn-sm btn-secondary text-2xs h-8 px-2.5">{tx('GL approved')}</button>
                   <button type="button" disabled={busy || glNote.trim().length < 3} onClick={() => decideGl('declined')} className="btn btn-sm btn-danger text-2xs h-8 px-2.5">{tx('GL declined')}</button>
                 </div>
@@ -624,7 +582,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
 
           {/* Delivery Dispatch Stepper */}
           {rx.delivery && (
-            <div className="rounded-lg border border-sky-200 bg-sky-50/60 p-3 text-xs space-y-2">
+            <div className="rounded-none border border-sky-200 bg-sky-50/60 p-3 text-xs space-y-2">
               <div className="flex items-center justify-between text-2xs">
                 <span className="font-bold uppercase tracking-wide text-sky-950 flex items-center gap-1">
                   <span>🛵 {tx('Home delivery')}:</span>
@@ -632,14 +590,14 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
                     {{ pharmacy_courier: 'Own Rider', grab: 'GrabExpress', lalamove: 'Lalamove', other_courier: 'Other Courier' }[rx.delivery.method] ?? rx.delivery.method}
                   </span>
                 </span>
-                <span className="app-badge badge-cyan text-3xs">
+                <span className="app-badge badge-cyan text-2xs font-extrabold uppercase tracking-wider">
                   {rx.delivery.status.replace(/_/g, ' ')}
                   {rx.delivery.coldChain ? ' · ❄️ Cold Chain' : ''}
                 </span>
               </div>
               
               {/* 4-step Stepper */}
-              <div className="grid grid-cols-4 gap-1 text-center pt-1 text-3xs">
+              <div className="grid grid-cols-4 gap-1 text-center pt-1 text-2xs">
                 <div className={`p-1 rounded font-bold ${['requested', 'arranged', 'out_for_delivery', 'delivered'].includes(rx.delivery.status) ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-400'}`}>1. Placed ✓</div>
                 <div className={`p-1 rounded font-bold ${['arranged', 'out_for_delivery', 'delivered'].includes(rx.delivery.status) ? 'bg-teal-600 text-white' : rx.delivery.status === 'requested' ? 'bg-teal-100 text-teal-800 border border-teal-300' : 'bg-slate-100 text-slate-400'}`}>2. Arranged</div>
                 <div className={`p-1 rounded font-bold ${['out_for_delivery', 'delivered'].includes(rx.delivery.status) ? 'bg-teal-600 text-white' : rx.delivery.status === 'arranged' ? 'bg-teal-100 text-teal-800 border border-teal-300' : 'bg-slate-100 text-slate-400'}`}>3. On Route</div>
@@ -674,7 +632,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
             <div className="flex items-center justify-between border-b border-[color:var(--t-200)] pb-2">
               <span className="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
                 <span>⚖️ Poisons Act 1952 Dispensing Sign-Off</span>
-                <span className="app-badge badge-brand text-3xs font-mono">Act 366</span>
+                <span className="app-badge badge-brand text-2xs font-extrabold uppercase font-mono">Act 366</span>
               </span>
               <span className="font-mono text-xs font-bold text-[color:var(--t-700)]">{rx.code}</span>
             </div>
@@ -683,24 +641,19 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
             </p>
             <div className="grid sm:grid-cols-2 gap-2">
               <div>
-                <label className="text-3xs uppercase tracking-wider font-bold text-slate-600 block mb-1">Dispensing Pharmacist *</label>
-                <input value={pharmacist} onChange={e => setPharmacist(e.target.value)} placeholder={tx('e.g. Rph. Sarah Nurhaliza')} aria-label={tx('Dispensing pharmacist')} maxLength={100} className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white outline-none focus:border-[color:var(--t-600)] font-semibold" />
+                <label className="text-2xs uppercase tracking-wider font-extrabold text-slate-600 block mb-1">Dispensing Pharmacist *</label>
+                <input value={pharmacist} onChange={e => setPharmacist(e.target.value)} placeholder={tx('e.g. Rph. Sarah Nurhaliza')} aria-label={tx('Dispensing pharmacist')} maxLength={100} className="w-full border border-slate-300 rounded-none px-2.5 py-1.5 text-xs bg-white outline-none focus:border-[color:var(--t-600)] font-semibold" />
               </div>
               <div>
-                <label className="text-3xs uppercase tracking-wider font-bold text-slate-600 block mb-1">Poisons Book Entry Serial No. *</label>
-                <input value={poisonsNo} onChange={e => setPoisonsNo(e.target.value)} placeholder={tx('e.g. PB-2026-0841')} aria-label={tx('Poisons book entry number')} maxLength={40} className="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white outline-none focus:border-[color:var(--t-600)] font-mono font-bold" />
+                <label className="text-2xs uppercase tracking-wider font-extrabold text-slate-600 block mb-1">Poisons Book Entry Serial No. *</label>
+                <input value={poisonsNo} onChange={e => setPoisonsNo(e.target.value)} placeholder={tx('e.g. PB-2026-0841')} aria-label={tx('Poisons book entry number')} maxLength={40} className="w-full border border-slate-300 rounded-none px-2.5 py-1.5 text-xs bg-white outline-none focus:border-[color:var(--t-600)] font-mono font-bold" />
               </div>
             </div>
             {!rx.safety.shared && <p className="text-2xs font-bold text-amber-900 bg-amber-100 border border-amber-300 p-2 rounded-lg">{tx('⚠️ Allergies were not shared digitally. Confirm verbal patient verification.')}</p>}
             {rx.prescriber && !rx.prescriber.stillVerified && <p className="text-2xs font-bold text-rose-800 bg-rose-100 border border-rose-300 p-2 rounded-lg">{tx('Warning: The prescribing doctor is not currently verified by the medical board.')}</p>}
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <button type="button" disabled={busy} onClick={dispense} className="btn btn-sm btn-primary">{tx('🔒 Sign & Mark Dispensed')}</button>
-              <button type="button" onClick={() => setConfirming(false)} className="btn btn-sm btn-secondary inline-flex items-center gap-1.5">
-                <span>{tx('Cancel')}</span>
-                <kbd className="hidden sm:inline-block px-1.5 py-0.5 bg-slate-100 text-slate-500 text-3xs font-mono font-bold tracking-wider border border-slate-300 rounded-none leading-none">
-                  Esc
-                </kbd>
-              </button>
+              <button type="button" onClick={() => setConfirming(false)} className="btn btn-sm btn-secondary">{tx('Cancel')}</button>
             </div>
           </div>
         </div>
@@ -754,11 +707,8 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
             {rx.assignedToMe && !rx.fillStatus && <button type="button" disabled={busy} onClick={() => setStatus('received')} className="btn btn-sm btn-secondary">{tx('Mark received')}</button>}
             {rx.assignedToMe && rx.fillStatus !== 'preparing' && rx.fillStatus !== 'ready' && <button type="button" disabled={busy} onClick={() => setStatus('preparing')} className="btn btn-sm btn-secondary">{tx('Preparing')}</button>}
             {rx.assignedToMe && rx.fillStatus !== 'ready' && <button type="button" disabled={busy} onClick={() => setStatus('ready')} className="btn btn-sm btn-secondary">{tx('Ready for pickup')}</button>}
-            <button type="button" disabled={busy} onClick={() => setConfirming(true)} className="btn btn-sm btn-primary inline-flex items-center gap-1.5" title={tx('Dispense & Sign prescription (Alt+D)')}>
+            <button type="button" disabled={busy} onClick={() => setConfirming(true)} className="btn btn-sm btn-primary">
               <span>⚖️ {tx('Dispense & Sign')}</span>
-              <kbd className="hidden sm:inline-block px-1.5 py-0.5 bg-white/20 text-white text-3xs font-mono font-bold tracking-wider border border-white/30 rounded-none leading-none">
-                Alt+D
-              </kbd>
             </button>
           </div>
         </div>
