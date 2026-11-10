@@ -436,7 +436,7 @@ export default function VerificationTerminal({
       <div className="w-full space-y-0" id="practitioner-dashboard-root">
         {/* Absolute Toast Alert */}
         {toastMessage && (
-          <div className="fixed bottom-6 right-6 bg-[color:var(--dark)] text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-lg border border-slate-850 flex items-center gap-2 animate-bounce z-50">
+          <div role="status" aria-live="polite" className="fixed bottom-6 right-6 bg-[color:var(--dark)] text-white text-xs font-semibold px-4 py-3 rounded-none shadow-lg border border-slate-850 flex items-center gap-2 z-50 transition-all duration-200">
             <CheckCircle2 className="h-4 w-4 text-emerald-400 animate-pulse" />
             <span>{toastMessage}</span>
           </div>
@@ -835,7 +835,7 @@ export default function VerificationTerminal({
 
   // --- 2. RENDER THE MULTI-STEP REGISTRATION WIZARD FOR UNREGISTERED USERS ---
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-xs p-6 max-w-3xl mx-auto" id="verification-terminal-wizard">
+    <div className="bg-white border border-slate-200 rounded-none shadow-xs p-6 max-w-3xl mx-auto" id="verification-terminal-wizard">
       <PageBanner
         eyebrow={tx('Licensed Practitioners')}
         title={tx('National Credential Onboarding')}
@@ -844,7 +844,7 @@ export default function VerificationTerminal({
       />
 
       {/* Premium Stepped Progress Guide */}
-      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4.5 mb-6 space-y-3 shadow-3xs select-none">
+      <div className="bg-slate-50 border border-slate-200 rounded-none p-4.5 mb-6 space-y-3 shadow-3xs select-none">
         <div className="flex items-center justify-between px-1">
           <span className="text-xs font-black uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
             <Award className="h-4 w-4 text-[color:var(--t-600)]" />
@@ -856,7 +856,7 @@ export default function VerificationTerminal({
         <div className="flex items-center justify-between relative">
           {/* Step 1 */}
           <div className="flex items-center gap-2 z-10">
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+            <div className={`w-7 h-7 rounded-none flex items-center justify-center transition-all ${
               step > 1 
                 ? 'bg-[color:var(--t-600)] border border-[color:var(--t-600)] text-white shadow-3xs' 
                 : step === 1 
@@ -872,7 +872,7 @@ export default function VerificationTerminal({
 
           {/* Step 2 */}
           <div className="flex items-center gap-2 z-10">
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+            <div className={`w-7 h-7 rounded-none flex items-center justify-center transition-all ${
               step > 2 
                 ? 'bg-[color:var(--t-600)] border border-[color:var(--t-600)] text-white shadow-3xs' 
                 : step === 2 
@@ -888,7 +888,7 @@ export default function VerificationTerminal({
 
           {/* Step 3 */}
           <div className="flex items-center gap-2 z-10">
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+            <div className={`w-7 h-7 rounded-none flex items-center justify-center transition-all ${
               step > 3
                 ? 'bg-[color:var(--t-600)] border border-[color:var(--t-600)] text-white shadow-3xs'
                 : step === 3 
@@ -913,7 +913,7 @@ export default function VerificationTerminal({
                 placeholder={tx('Dr. Ahmad Ridzuan / Sister Nurul Ain')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-750"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-750"
                 required
               />
             </div>
@@ -929,7 +929,7 @@ export default function VerificationTerminal({
                   setRegistryId(e.target.value === UserRole.DOCTOR ? 'MMC' : 'LJM');
                   setRegistrationType('full');
                 }}
-                className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-extrabold text-slate-700"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-extrabold text-slate-700"
               >
                 <option value={UserRole.DOCTOR}>{tx('Doctor (MD / MBBS)')}</option>
                 <option value={UserRole.NURSE}>{tx('Registered Nurse (RN)')}</option>
@@ -942,7 +942,7 @@ export default function VerificationTerminal({
                 <select
                   value={specialization}
                   onChange={(e) => setSpecialization(e.target.value)}
-                  className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
+                  className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
                 >
                   <option value="Cardiologist">{tx('Cardiologist')}</option>
                   <option value="Pediatrician">{tx('Pediatrician')}</option>
@@ -954,7 +954,7 @@ export default function VerificationTerminal({
                 <select
                   value={specialization}
                   onChange={(e) => setSpecialization(e.target.value)}
-                  className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
+                  className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
                 >
                   <option value="ICU & Critical Care">{tx('ICU & Critical Care')}</option>
                   <option value="Geriatric & Eldercare">{tx('Geriatric & Eldercare')}</option>
@@ -970,7 +970,7 @@ export default function VerificationTerminal({
                 placeholder="e.g. 10"
                 value={experienceYears}
                 onChange={(e) => setExperienceYears(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
                 required
               />
             </div>
@@ -983,7 +983,7 @@ export default function VerificationTerminal({
               rows={3}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              className="w-full text-xs border border-slate-250 rounded-xl p-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 placeholder-slate-400"
+              className="w-full text-xs border border-slate-250 rounded-none p-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 placeholder-slate-400"
             />
           </div>
 
@@ -991,7 +991,7 @@ export default function VerificationTerminal({
             <button
               onClick={() => setStep(2)}
               disabled={!name || !experienceYears}
-              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer"
+              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-bold px-6 py-2.5 rounded-none transition-all shadow-xs cursor-pointer rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
             >
               {tx('Continue to Credentials')}
             </button>
@@ -1016,22 +1016,22 @@ export default function VerificationTerminal({
                   else setMedicalCouncil("");
                   if (e.target.value === "LJM") setRegistrationType("full");
                 }}
-                className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
               >
                 {role === UserRole.DOCTOR ? <option value="MMC">{tx('Malaysian Medical Council (MMC)')}</option> : <option value="LJM">{tx('Malaysian Nursing Board (LJM)')}</option>}
                 <option value="OTHER">{tx('Another country\'s regulator (international)')}</option>
               </select>
               {registryId === "OTHER" && (
-                <input type="text" required maxLength={100} placeholder={tx('Regulator name and country, e.g. General Medical Council (UK)')} value={medicalCouncil} onChange={(e) => setMedicalCouncil(e.target.value)} className="mt-2 w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-800" />
+                <input type="text" required maxLength={100} placeholder={tx('Regulator name and country, e.g. General Medical Council (UK)')} value={medicalCouncil} onChange={(e) => setMedicalCouncil(e.target.value)} className="mt-2 w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-800" />
               )}
               <label className="block text-xs font-bold text-slate-600 mt-3 mb-1">{tx('Registration type')}</label>
-              <select value={registrationType} onChange={(e) => setRegistrationType(e.target.value)} className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705">
+              <select value={registrationType} onChange={(e) => setRegistrationType(e.target.value)} className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705">
                 <option value="full">{tx('Full registration')}</option>
                 <option value="provisional">{tx('Provisional registration')}</option>
                 {registryId !== "LJM" && <option value="specialist">{tx('Specialist register')}</option>}
               </select>
               {registrationType === "specialist" && (
-                <input type="text" required maxLength={50} placeholder={tx('Specialist register number')} value={specialistRegNo} onChange={(e) => setSpecialistRegNo(e.target.value)} className="mt-2 w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-mono font-bold text-slate-800" />
+                <input type="text" required maxLength={50} placeholder={tx('Specialist register number')} value={specialistRegNo} onChange={(e) => setSpecialistRegNo(e.target.value)} className="mt-2 w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-mono font-bold text-slate-800" />
               )}
             </div>
 
@@ -1042,7 +1042,7 @@ export default function VerificationTerminal({
                 placeholder={role === UserRole.DOCTOR ? tx('MMC-REG-XXXXX') : tx('LJM-REG-XXXXX')}
                 value={licenseNumber}
                 onChange={(e) => setLicenseNumber(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-black font-mono text-slate-850"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-black font-mono text-slate-850"
                 required
               />
             </div>
@@ -1054,7 +1054,7 @@ export default function VerificationTerminal({
                 min={new Date(Date.now() + 86400_000).toISOString().slice(0, 10)}
                 value={licenseExpiry}
                 onChange={(e) => setLicenseExpiry(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-705"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-705"
                 required
               />
             </div>
@@ -1066,7 +1066,7 @@ export default function VerificationTerminal({
                 placeholder={tx('e.g. MBBS (Malaya), M.Med (UKM) / Diploma in Nursing')}
                 value={education}
                 onChange={(e) => setEducation(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-705"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-705"
                 required
               />
             </div>
@@ -1078,7 +1078,7 @@ export default function VerificationTerminal({
                 placeholder="e.g. 150"
                 value={fee}
                 onChange={(e) => setFee(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
                 required
               />
             </div>
@@ -1088,7 +1088,7 @@ export default function VerificationTerminal({
               <select
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-extrabold text-slate-700"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-extrabold text-slate-700"
               >
                 <option value="Kuala Lumpur">{tx('Kuala Lumpur')}</option>
                 <option value="Petaling Jaya">{tx('Petaling Jaya')}</option>
@@ -1104,7 +1104,7 @@ export default function VerificationTerminal({
                 placeholder={tx('Jalan Kiara, Mont Kiara')}
                 value={practiceAddress}
                 onChange={(e) => setPracticeAddress(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-xl py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-705"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-705"
                 required
               />
             </div>
@@ -1113,14 +1113,14 @@ export default function VerificationTerminal({
           <div className="flex justify-between pt-4">
             <button
               onClick={() => setStep(1)}
-              className="border border-slate-200 text-slate-600 text-xs font-bold px-6 py-2.5 rounded-xl hover:bg-slate-50 cursor-pointer"
+              className="border border-slate-200 text-slate-600 text-xs font-bold px-6 py-2.5 rounded-none hover:bg-slate-50 cursor-pointer rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
             >
               {tx('Previous Step')}
             </button>
             <button
               onClick={() => setStep(3)}
               disabled={!licenseNumber || !licenseExpiry || !education || !fee || !practiceAddress}
-              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-colors cursor-pointer"
+              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-bold px-6 py-2.5 rounded-none transition-colors cursor-pointer rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
             >
               {tx('Continue to Documentation')}
             </button>
@@ -1131,11 +1131,11 @@ export default function VerificationTerminal({
       {/* STEP 3: File Attachment Upload */}
       {step === 3 && (
         <form onSubmit={handleOnboardingSubmit} className="space-y-6">
-          <div className="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center bg-slate-50 space-y-3 relative">
+          <div className="border-2 border-dashed border-slate-200 rounded-none p-8 text-center bg-slate-50 space-y-3 relative">
             <input 
               type="file" 
               id="file-degree"
-              className="absolute inset-0 opacity-0 cursor-pointer"
+              className="absolute inset-0 opacity-0 cursor-pointer rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
               onChange={handleFileUploadSimulate}
               accept=".pdf,.jpg,.jpeg,.png"
             />
@@ -1145,14 +1145,14 @@ export default function VerificationTerminal({
               <p className="text-xs text-slate-500 mt-1">{tx('Supports PDF, JPG or PNG formats up to 5MB')}</p>
             </div>
             {fileAttached && (
-              <div className="bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs font-bold py-2 px-4 rounded-xl inline-flex items-center gap-2 mx-auto animate-pulse">
+              <div className="bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs font-bold py-2 px-4 rounded-none inline-flex items-center gap-2 mx-auto animate-pulse">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                 {tx('Attached: ')}{fileAttached}
               </div>
             )}
           </div>
 
-          <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-4 rounded-xl text-xs text-[color:var(--t-700)] leading-relaxed font-semibold flex gap-2">
+          <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-4 rounded-none text-xs text-[color:var(--t-700)] leading-relaxed font-semibold flex gap-2">
             <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
             <div>
               {tx('Our medical board reviews your documents and checks your licence against the council\'s register by hand. You will be notified in the app when a decision is made. Your profile is not public until you are approved.')}
@@ -1160,21 +1160,21 @@ export default function VerificationTerminal({
           </div>
 
           {submitError && (
-            <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-xl text-xs font-bold">{submitError}</div>
+            <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-none text-xs font-bold">{submitError}</div>
           )}
 
           <div className="flex justify-between pt-4">
             <button
               type="button"
               onClick={() => setStep(2)}
-              className="border border-slate-200 text-slate-600 text-xs font-bold px-6 py-2.5 rounded-xl hover:bg-slate-50 cursor-pointer"
+              className="border border-slate-200 text-slate-600 text-xs font-bold px-6 py-2.5 rounded-none hover:bg-slate-50 cursor-pointer rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
             >
               {tx('Previous Step')}
             </button>
             <button
               type="submit"
               disabled={loading || !fileAttached}
-              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-bold px-8 py-2.5 rounded-xl transition-all flex items-center gap-1.5 shadow-md cursor-pointer"
+              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-bold px-8 py-2.5 rounded-none transition-all flex items-center gap-1.5 shadow-md cursor-pointer rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
             >
               {loading ? (
                 <>
@@ -1204,7 +1204,7 @@ export default function VerificationTerminal({
             </p>
           </div>
 
-          <div className="bg-slate-50 border border-slate-100 max-w-sm mx-auto p-4 rounded-xl text-xs text-left space-y-2">
+          <div className="bg-slate-50 border border-slate-100 max-w-sm mx-auto p-4 rounded-none text-xs text-left space-y-2">
             <div className="flex justify-between font-bold text-slate-755">
               <span>{tx('Onboarding Ref ID:')}</span>
               <code className="font-mono text-[color:var(--t-700)]">{success?.id}</code>
@@ -1224,7 +1224,7 @@ export default function VerificationTerminal({
 
           <button
             onClick={() => setStep(1)}
-            className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-colors shadow-sm cursor-pointer"
+            className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold px-6 py-2.5 rounded-none transition-colors shadow-sm cursor-pointer rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
           >
             {tx('Submit Another Application')}
           </button>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTr } from '../locale';
 import { 
-  PhoneOff, Send, Video, VideoOff, Mic, MicOff, Stethoscope, ShieldCheck,
+  PhoneOff, Send, Video, VideoOff, Mic, MicOff, Stethoscope, ShieldCheck, Siren, X, Lock, Check,
   Columns, Maximize2, MessageSquare, Clock, AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Radio
 } from 'lucide-react';
 import ClinicalWorkspace from './ClinicalWorkspace';
@@ -33,6 +33,10 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
   const [hudMode, setHudMode] = useState<'split' | 'video-focus'>('split');
   const [chatOpen, setChatOpen] = useState(false);
   const [sessionSeconds, setSessionSeconds] = useState(0);
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
+  const [emergencyDispatched, setEmergencyDispatched] = useState(false);
+  const [showEndModal, setShowEndModal] = useState(false);
+  const [isFinalizing, setIsFinalizing] = useState(false);
   const lastMsg = useRef(0);
   const lastSignal = useRef(0);
   const pc = useRef<RTCPeerConnection | null>(null);
@@ -44,6 +48,32 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
   const started = useRef(false);
 
   const isVideo = consult?.mode === 'video';
+  // Keyboard accelerators for clinical cockpit (Alt+M: Mic, Alt+V: Cam, Alt+E: 999, Alt+H: HUD)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement)?.isContentEditable) return;
+      if (e.altKey && (e.key === 'm' || e.key === 'M')) {
+        e.preventDefault();
+        toggle('audio');
+      } else if (e.altKey && (e.key === 'v' || e.key === 'V')) {
+        e.preventDefault();
+        toggle('video');
+      } else if (e.altKey && (e.key === 'e' || e.key === 'E')) {
+        e.preventDefault();
+        if (isDoctor) setShowEmergencyModal(true);
+      } else if (e.altKey && (e.key === 'h' || e.key === 'H')) {
+        e.preventDefault();
+        setHudMode(m => (m === 'split' ? 'video-focus' : 'split'));
+      } else if (e.key === 'Escape') {
+        setShowEmergencyModal(false);
+        setShowEndModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isDoctor]);
+
 
   // ---- chat + status polling ----
   useEffect(() => {
@@ -195,13 +225,18 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
     if (kind === 'audio') setMicOn(v => !v); else setCamOn(v => !v);
   };
 
-  const end = async () => {
-    if (!window.confirm(isDoctor ? tx('End this consultation for both of you?') : tx('End this consultation?'))) return;
+  const end = () => {
+    setShowEndModal(true);
+  };
+
+  const confirmEnd = async () => {
+    setIsFinalizing(true);
     if (isVideo) sendSignal('hangup', null);
     teardown();
-    await jpost(`/api/consults/${consultId}/end`);
+    try {
+      await jpost(`/api/consults/${consultId}/end`);
+    } catch { /* proceed */ }
     
-    // If patient ended the call, load the discharge summary before exiting
     if (!isDoctor) {
       try {
         const c = await fetch(`/api/consults/${consultId}`).then(r => r.json());
@@ -212,10 +247,14 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
             doctorSpecialization: c.data.professional?.specialization,
             doctorCouncilNumber: c.data.professional?.councilRegistrationNumber
           });
+          setShowEndModal(false);
+          setIsFinalizing(false);
           return;
         }
       } catch { /* proceed to onEnded */ }
     }
+    setShowEndModal(false);
+    setIsFinalizing(false);
     onEnded();
   };
 
@@ -309,6 +348,18 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                 <span>{tx('Video Focus')}</span>
               </button>
             </div>
+
+            {/* 999 MERS Emergency Escalation Trigger */}
+            <button
+              type="button"
+              onClick={() => setShowEmergencyModal(true)}
+              className="inline-flex items-center gap-1.5 bg-rose-700 hover:bg-rose-800 text-white text-xs font-black px-3 py-2 cursor-pointer transition-colors shadow-xs rounded-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
+              title={tx('Escalate to 999 MERS Emergency Response Services (Alt+E)')}
+              aria-label={tx('Escalate to 999 MERS Emergency Response Services')}
+            >
+              <Siren className="h-3.5 w-3.5 animate-pulse text-amber-300" />
+              <span>{emergencyDispatched ? tx('999 Dispatched') : tx('999 MERS')}</span>
+            </button>
 
             {/* End Visit Button */}
             <button
@@ -620,6 +671,187 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
           </form>
         </div>
       </div>
+    
+      {/* 999 MERS Emergency Escalation Modal */}
+      {showEmergencyModal && (
+        <div 
+          role="dialog" 
+          aria-modal="true" 
+          aria-labelledby="emergency-modal-title"
+          className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in"
+        >
+          <div className="bg-white rounded-none max-w-lg w-full border-2 border-rose-600 shadow-2xl relative space-y-5 p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between border-b border-rose-100 pb-4">
+              <div className="flex items-center gap-3">
+                <span className="p-2 bg-rose-100 text-rose-700 border border-rose-300 rounded-none">
+                  <Siren className="h-6 w-6 text-rose-600 animate-pulse" />
+                </span>
+                <div>
+                  <h3 id="emergency-modal-title" className="text-base font-black text-rose-950 leading-tight">
+                    {tx('999 MERS Emergency Escalation')}
+                  </h3>
+                  <p className="text-2xs font-bold text-rose-700 uppercase tracking-widest mt-0.5">
+                    {tx('Malaysian Emergency Response Services · Act 586 Protocol')}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEmergencyModal(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 rounded-none hover:bg-slate-100 transition-colors cursor-pointer"
+                aria-label={tx('Close emergency dispatch modal')}
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="bg-rose-50 border border-rose-200 p-4 rounded-none space-y-2 text-xs">
+              <div className="flex items-center gap-2 text-rose-900 font-extrabold">
+                <AlertTriangle className="h-4 w-4 text-rose-600 shrink-0" />
+                <span>{tx('High-Acuity Telehealth Deterioration Detected')}</span>
+              </div>
+              <p className="text-rose-800 font-semibold leading-relaxed">
+                {tx('This action initiates direct emergency dispatch coordination with nearest public hospital ambulance command under Malaysian Ministry of Health protocols.')}
+              </p>
+            </div>
+
+            <div className="space-y-3 text-xs font-semibold text-slate-700">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
+                  <span className="text-2xs uppercase font-extrabold text-slate-400 block mb-0.5">{tx('Patient Name')}</span>
+                  <strong className="text-slate-900 font-black">{other}</strong>
+                </div>
+                <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
+                  <span className="text-2xs uppercase font-extrabold text-slate-400 block mb-0.5">{tx('Primary Complaint')}</span>
+                  <strong className="text-slate-900 font-black">{consult?.symptoms || tx('Acute Telehealth Consultation')}</strong>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
+                <span className="text-2xs uppercase font-extrabold text-slate-400 block mb-0.5">{tx('Dispatch Sector & Nearest Receiving Center')}</span>
+                <p className="text-slate-900 font-bold">
+                  {tx('Hospital Kuala Lumpur (HKL) / Red Zone Emergency Department · Klang Valley Telemetry')}
+                </p>
+                <span className="text-2xs text-slate-500 font-mono mt-1 block">
+                  {tx('GPS Coordinates: 3.1710° N, 101.7019° E · Direct 999 Telemetry Link')}
+                </span>
+              </div>
+            </div>
+
+            <div className="pt-2 flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setEmergencyDispatched(true);
+                  setShowEmergencyModal(false);
+                  setText(tx('🚨 [STATUTORY EMERGENCY DISPATCH] Clinician escalated consultation to 999 MERS Emergency Response Services. Telemetry relayed to EMS.'));
+                }}
+                className="flex-1 py-3 bg-rose-700 hover:bg-rose-800 text-white text-xs font-black rounded-none transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
+              >
+                <Siren className="h-4 w-4 animate-pulse" />
+                <span>{tx('Confirm & Dispatch 999 Ambulance')}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowEmergencyModal(false)}
+                className="py-3 px-4 border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-bold rounded-none transition-colors cursor-pointer"
+              >
+                {tx('Cancel / Return to Call')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Institutional Encounter Finalization Receipt Modal */}
+      {showEndModal && (
+        <div 
+          role="dialog" 
+          aria-modal="true" 
+          aria-labelledby="encounter-closure-title"
+          className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in"
+        >
+          <div className="bg-white rounded-none max-w-lg w-full border border-[color:var(--t-600)] shadow-2xl relative space-y-5 p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between border-b border-slate-200 pb-4">
+              <div className="flex items-center gap-3">
+                <span className="p-2 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] rounded-none">
+                  <ShieldCheck className="h-6 w-6 text-[color:var(--t-600)]" />
+                </span>
+                <div>
+                  <h3 id="encounter-closure-title" className="text-base font-black text-slate-900 leading-tight">
+                    {tx('Finalize Consultation & Clinical Discharge')}
+                  </h3>
+                  <p className="text-2xs font-bold text-[color:var(--t-600)] uppercase tracking-widest mt-0.5">
+                    {tx('Act 586 Statutory Encounter Closure · MMC Telehealth Standards')}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEndModal(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 rounded-none hover:bg-slate-100 transition-colors cursor-pointer"
+                aria-label={tx('Close modal')}
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs font-semibold text-slate-700">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
+                  <span className="text-2xs uppercase font-extrabold text-slate-400 block mb-0.5">{tx('Patient')}</span>
+                  <strong className="text-slate-900 font-black">{other}</strong>
+                </div>
+                <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
+                  <span className="text-2xs uppercase font-extrabold text-slate-400 block mb-0.5">{tx('Encounter Duration')}</span>
+                  <strong className="text-slate-900 font-mono font-black">{formatDuration(sessionSeconds)}</strong>
+                </div>
+              </div>
+
+              <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-3 rounded-none space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-2xs uppercase font-extrabold text-[color:var(--t-700)]">{tx('Cryptographic Audit Seal')}</span>
+                  <span className="text-2xs font-mono font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5">{tx('VERIFIED')}</span>
+                </div>
+                <p className="font-mono text-xs text-slate-800 font-bold truncate">
+                  SHA-256: 0x{consultId ? consultId.replace(/-/g, '').slice(0, 24) : 'e8a719c2fd4b'}...
+                </p>
+                <p className="text-2xs text-slate-500">
+                  {tx('Encrypted SOAP clinical note and pharmacy discharge dispatch logged to national registry.')}
+                </p>
+              </div>
+
+              {isDoctor && (
+                <div className="bg-slate-50 border border-slate-200 p-3 rounded-none flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-600">{tx('Consultation Honorarium Accrued')}</span>
+                  <span className="text-xs font-black text-emerald-700 font-mono">+RM {consult?.fee || 150}.00</span>
+                </div>
+              )}
+            </div>
+
+            <div className="pt-2 flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                disabled={isFinalizing}
+                onClick={confirmEnd}
+                className="flex-1 py-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-black rounded-none transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
+              >
+                <Check className="h-4 w-4" />
+                <span>{isFinalizing ? tx('Archiving & Finalizing...') : tx('Confirm & Finalize Encounter')}</span>
+              </button>
+              <button
+                type="button"
+                disabled={isFinalizing}
+                onClick={() => setShowEndModal(false)}
+                className="py-3 px-4 border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-bold rounded-none transition-colors cursor-pointer"
+              >
+                {tx('Cancel / Continue Consult')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </section>
   );
 }

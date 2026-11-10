@@ -97,7 +97,7 @@ export default function PractitionerOverviewTab({
           <button
             type="button"
             onClick={onViewBookings}
-            className="p-4 bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] border border-[color:var(--t-200)] text-[color:var(--t-600)] text-left transition-colors cursor-pointer flex flex-col justify-between gap-3"
+            className="p-4 bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] border border-[color:var(--t-200)] text-[color:var(--t-600)] text-left transition-colors cursor-pointer flex flex-col justify-between gap-3 rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
           >
             <span className="font-black text-sm">
               {isDoc ? tx('Issue E-Prescription') : tx('Complete Nursing Care Log')}
@@ -112,7 +112,7 @@ export default function PractitionerOverviewTab({
           <button
             type="button"
             onClick={onViewAnalytics || onViewBookings}
-            className="p-4 bg-white hover:bg-slate-50 border border-[color:var(--t-200)] text-slate-900 text-left transition-colors cursor-pointer flex flex-col justify-between gap-3"
+            className="p-4 bg-white hover:bg-slate-50 border border-[color:var(--t-200)] text-slate-900 text-left transition-colors cursor-pointer flex flex-col justify-between gap-3 rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
           >
             <span className="font-black text-sm">
               {isDoc ? tx('Review Patient Records') : tx('Patient Vitals & Care History')}
@@ -127,7 +127,7 @@ export default function PractitionerOverviewTab({
           <button
             type="button"
             onClick={onViewOnCall || onViewBookings}
-            className="p-4 bg-white hover:bg-slate-50 border border-[color:var(--t-200)] text-slate-900 text-left transition-colors cursor-pointer flex flex-col justify-between gap-3"
+            className="p-4 bg-white hover:bg-slate-50 border border-[color:var(--t-200)] text-slate-900 text-left transition-colors cursor-pointer flex flex-col justify-between gap-3 rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
           >
             <span className="font-black text-sm">
               {isDoc ? tx('Emergency Dispatch Log') : tx('Home Nursing Transit Radar')}

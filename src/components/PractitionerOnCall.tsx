@@ -129,8 +129,11 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
         aside={
           <button
             type="button"
+            role="switch"
+            aria-checked={Boolean(me?.online)}
+            aria-label={me?.online ? tx('On Call Duty: Active. Click to go offline.') : tx('On Call Duty: Offline. Click to go online.')}
             onClick={() => setOnline(!me?.online)}
-            className={`h-9 px-4 text-xs font-black uppercase tracking-wider cursor-pointer transition-all flex items-center justify-center gap-2 shadow-xs whitespace-nowrap ${
+            className={`h-9 px-4 text-xs font-black uppercase tracking-wider cursor-pointer transition-all flex items-center justify-center gap-2 shadow-xs whitespace-nowrap rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none ${
               me?.online
                 ? 'bg-white border border-slate-300 text-slate-800 hover:bg-slate-50'
                 : 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white border border-[color:var(--t-700)]'
