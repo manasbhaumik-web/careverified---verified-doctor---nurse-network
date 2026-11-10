@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { 
-  Activity, Video, Heart, Calendar, FolderHeart, Pill, ShieldCheck, 
+  Activity, Video, Heart, Calendar, FolderHeart, Pill, ShieldCheck, ChevronDown, 
   ArrowRight, Clock, CheckCircle2, ChevronRight, User, AlertCircle, 
   Sparkles, MessageSquare, PhoneCall, HeartPulse, RefreshCw, Layers, Check,
   Plane, BookOpen, LifeBuoy, Search, X, Menu, Bell, Settings, Plus, Stethoscope, Building2
 } from 'lucide-react';
 import { navigate } from '../nav';
+import WorkspaceMegaMenu, { WORKSPACE_MEGAMENUS } from './WorkspaceMegaMenu';
 
 export default function HeaderColorSamples() {
   const [activeRole, setActiveRole] = useState<'practitioner' | 'patient' | 'pharmacy' | 'facility'>('practitioner');
   const [viewMode, setViewMode] = useState<'proposed' | 'current' | 'compare'>('proposed');
+  const [openMegaMenuId, setOpenMegaMenuId] = useState<string | null>(null);
 
   const roleConfig = {
     practitioner: {
@@ -22,10 +24,10 @@ export default function HeaderColorSamples() {
       heroTitle: 'Outpatient Teleconsultation & Clinical Queue',
       heroDesc: 'Manage live triage queues, issue digital prescriptions (e-Rx), and review patient health records under MMC Code of Professional Conduct.',
       tabs: [
-        { name: 'Clinical Queue', active: true, count: '4 Live' },
-        { name: 'Locum Shifts', count: '2 Open' },
-        { name: 'Practice Compliance', count: 'MMC/APC' },
-        { name: 'Performance Profile' }
+        { id: 'onboard', name: 'Clinical Queue', active: true, count: '4 Live' },
+        { id: 'recruitment', name: 'Locum Shifts', count: '2 Open' },
+        { id: 'practice_compliance', name: 'Practice Compliance', count: 'MMC/APC' },
+        { id: 'performance_profile', name: 'Performance Profile' }
       ]
     },
     patient: {
@@ -38,10 +40,10 @@ export default function HeaderColorSamples() {
       heroTitle: 'Patient Care Hub & Medical Records',
       heroDesc: 'Access upcoming consultations, active prescriptions, lab results, and hospital guarantee letters in one encrypted vault.',
       tabs: [
-        { name: 'My Care', active: true, count: '1 Next' },
-        { name: 'Health Records (EHR)', count: '12 Files' },
-        { name: 'Clinical Services', count: 'Packages' },
-        { name: 'Directory & Doctors' }
+        { id: 'patient_care', name: 'My Care', active: true, count: '1 Next' },
+        { id: 'patient_records', name: 'Health Records (EHR)', count: '12 Files' },
+        { id: 'patient_services', name: 'Clinical Services', count: 'Packages' },
+        { id: 'patient_discovery', name: 'Directory & Doctors' }
       ]
     },
     pharmacy: {
@@ -54,10 +56,8 @@ export default function HeaderColorSamples() {
       heroTitle: 'Pharmacy Dispensing Queue & Cold-Chain Dispatch',
       heroDesc: 'Fulfill verified digital prescriptions, sign statutory poison registers, and coordinate Grab/Lalamove 2°C–8°C cold-chain couriers.',
       tabs: [
-        { name: 'Dispensing Queue', active: true, count: '8 Pending' },
-        { name: 'Poisons Logbook', count: 'Statutory' },
-        { name: 'Cold-Chain Logistics', count: '2 Ready' },
-        { name: 'Drug Inventory' }
+        { id: 'pharmacy_dispensing', name: 'Dispensing Queue', active: true, count: '8 Pending' },
+        { id: 'pharmacy_operations', name: 'Poisons Logbook', count: 'Statutory' }
       ]
     },
     facility: {
@@ -70,10 +70,9 @@ export default function HeaderColorSamples() {
       heroTitle: 'Ward Census, OT Scheduling & Locum Staffing',
       heroDesc: 'Monitor bed occupancy rates, allocate operating theatres, and credential locum doctors and private nurses across all clinical units.',
       tabs: [
-        { name: 'Ward & Bed Census', active: true, count: '88% Occupied' },
-        { name: 'Clinical Staffing', count: '6 Shifts' },
-        { name: 'OT Scheduling', count: '4 Active' },
-        { name: 'Facility Profile' }
+        { id: 'facility_staffing', name: 'Clinical Staffing', active: true, count: '6 Shifts' },
+        { id: 'facility_care', name: 'OT Scheduling', count: '4 Active' },
+        { id: 'facility_profile', name: 'Ward & Bed Census', count: '88% Occupied' }
       ]
     }
   };
@@ -281,37 +280,57 @@ export default function HeaderColorSamples() {
           </nav>
 
           {/* TIER 2: Workspace Domain Navigation Strip (Luminous White/Mint) */}
-          <div className="bg-white/95 backdrop-blur-md border-b border-[color:var(--t-200)] px-4 sm:px-6 lg:px-8">
+          <div className="bg-white/95 backdrop-blur-md border-b border-[color:var(--t-200)] px-4 sm:px-6 lg:px-8 relative">
             <div className="flex items-center justify-between gap-4">
               <nav className="flex items-center gap-1 min-w-0 overflow-x-auto py-1">
-                {current.tabs.map((tab, idx) => (
-                  <button
-                    key={idx}
-                    className={`relative flex items-center gap-2 px-3.5 sm:px-4 py-2.5 text-xs font-bold rounded-none cursor-pointer whitespace-nowrap transition-colors ${
-                      tab.active
-                        ? 'text-[color:var(--t-800)] bg-[color:var(--t-50)] border-b-2 border-[color:var(--t-600)] font-black'
-                        : 'text-slate-600 hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]/60'
-                    }`}
-                  >
-                    <span>{tab.name}</span>
-                    {tab.count && (
-                      <span className={`text-2xs font-mono font-bold px-1.5 py-0.2 rounded-none ${
-                        tab.active ? 'bg-[color:var(--t-600)] text-white' : 'bg-[color:var(--t-100)] text-[color:var(--t-800)]'
-                      }`}>
-                        {tab.count}
-                      </span>
-                    )}
-                  </button>
-                ))}
+                {current.tabs.map((tab: any, idx: number) => {
+                  const hasMegaMenu = !!WORKSPACE_MEGAMENUS[`${activeRole}:${tab.id}`];
+                  const isOpen = openMegaMenuId === tab.id;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setOpenMegaMenuId(isOpen ? null : tab.id)}
+                      onMouseEnter={() => { if (hasMegaMenu) setOpenMegaMenuId(tab.id); }}
+                      className={`relative flex items-center gap-2 px-3.5 sm:px-4 py-2.5 text-xs font-bold rounded-none cursor-pointer whitespace-nowrap transition-colors ${
+                        tab.active || isOpen
+                          ? 'text-[color:var(--t-800)] bg-[color:var(--t-50)] border-b-2 border-[color:var(--t-600)] font-black'
+                          : 'text-slate-600 hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]/60'
+                      }`}
+                    >
+                      <span>{tab.name}</span>
+                      {tab.count && (
+                        <span className={`text-2xs font-mono font-bold px-1.5 py-0.5 rounded-none ${
+                          tab.active ? 'bg-[color:var(--t-600)] text-white' : 'bg-[color:var(--t-100)] text-[color:var(--t-800)]'
+                        }`}>
+                          {tab.count}
+                        </span>
+                      )}
+                      {hasMegaMenu && (
+                        <ChevronDown className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180 text-[color:var(--t-600)]' : 'text-slate-400'}`} />
+                      )}
+                    </button>
+                  );
+                })}
               </nav>
 
               <div className="hidden sm:flex items-center gap-2 shrink-0 py-1">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-2xs font-extrabold font-mono uppercase tracking-wider">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  On-Call: Active
+                  Megamenu: Active
                 </span>
               </div>
             </div>
+
+            {/* Megamenu Dropdown Container */}
+            <WorkspaceMegaMenu
+              activeNavId={openMegaMenuId}
+              currentRole={activeRole}
+              isOpen={!!openMegaMenuId}
+              onClose={() => setOpenMegaMenuId(null)}
+              onSelectSubItem={(navId, subItemId) => {
+                setOpenMegaMenuId(null);
+              }}
+            />
           </div>
 
           {/* TIER 3: Workspace Hero Identity & Subtabs */}
