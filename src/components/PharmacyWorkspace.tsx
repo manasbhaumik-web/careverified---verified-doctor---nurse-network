@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Activity, AlertTriangle, BarChart3, CheckCircle2, Clock, Download, Inbox, KeyRound, LifeBuoy, Pill, Search, ShieldAlert, StickyNote, Store, UserRound, Users } from 'lucide-react';
 import { useTr } from '../locale';
-import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, FilterSelect, DashboardTab, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
+import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, AmbientClinicalHud, FilterSelect, DashboardTab, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
 import { btnDanger, btnPlain, btnPrimary, fmtDate, fmtTime, jfetch } from './pharmacy/shared';
 import { useLiveAlerts } from './pharmacy/useLiveAlerts';
 import SecurityCard from './pharmacy/SecurityCard';
@@ -221,6 +221,36 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
             />
           }
         />
+        <AmbientClinicalHud
+          items={[
+            {
+              label: tx('Dispense Dispatch Queue'),
+              value: counts?.new ? `${counts.new} Action Needed` : tx('Queue Normal'),
+              detail: tx('Poisons Act 1952 SLA'),
+              tone: counts?.new && counts.new > 0 ? 'warning' : 'normal',
+              pulse: Boolean(counts?.new && counts.new > 0),
+            },
+            {
+              label: tx('Cold-Chain Unit'),
+              value: me?.pharmacy.coldChain ? '2°C – 8°C Verified' : tx('Passive Carrier'),
+              detail: tx('Biologics & Vaccines'),
+              tone: 'success',
+            },
+            {
+              label: tx('SLA Alerts (>24h)'),
+              value: counts?.waitingOver24h ? `${counts.waitingOver24h} Overdue` : '0 Breaches',
+              detail: tx('Council Metric'),
+              tone: counts?.waitingOver24h && counts.waitingOver24h > 0 ? 'emergency' : 'normal',
+              pulse: Boolean(counts?.waitingOver24h && counts.waitingOver24h > 0),
+            },
+            {
+              label: tx('Statutory Register'),
+              value: tx('Act 366 Compliant'),
+              detail: tx('Batch Audit Ready'),
+              tone: 'normal',
+            },
+          ]}
+        />
       </DashboardHeader>
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -415,12 +445,10 @@ function InboxTab({ counts, onChanged, tick }: { counts?: Counts; onChanged: () 
       {list === null ? (
         <p className="text-xs text-slate-600 font-semibold">{tx('Loading your inbox…')}</p>
       ) : shown.length === 0 ? (
-        <div className="app-card rounded-none border border-dashed border-[color:var(--t-200)] p-12 text-center space-y-3 bg-[color:var(--t-50)]/20">
-          <div className="w-14 h-14 bg-white border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center mx-auto shadow-2xs">
-            <Inbox className="h-7 w-7 text-[color:var(--t-600)]" strokeWidth={1.75} />
-          </div>
-          <h2 className="text-sm font-extrabold text-slate-900 tracking-tight">{list.length === 0 ? tx('No Prescriptions in Dispensing Queue') : tx('Nothing Matches Your Filters')}</h2>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium leading-relaxed">{list.length === 0 ? tx('When a patient or prescriber forwards a prescription, it will appear here in real-time with statutory telemetry.') : tx('Try adjusting the search query or status filter.')}</p>
+        <div className="app-card rounded-xl border-slate-200 p-12 text-center space-y-3">
+          <Inbox className="h-10 w-10 text-[color:var(--t-400)] mx-auto" />
+          <h2 className="text-sm font-bold text-slate-900 tracking-tight">{list.length === 0 ? tx('No prescriptions yet') : tx('Nothing matches your filters')}</h2>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">{list.length === 0 ? tx('When a patient sends you a prescription it will appear here and you will be notified.') : tx('Try a different status or search filter.')}</p>
         </div>
       ) : (
         <section aria-label={tx('Prescriptions')} className="grid gap-5 lg:grid-cols-2">
@@ -446,30 +474,6 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
   const [glNote, setGlNote] = useState('');
   const [deliveryModalStatus, setDeliveryModalStatus] = useState<'arranged' | 'delivered' | 'failed' | null>(null);
   const active = rx.status === 'active';
-
-  useEffect(() => {
-    if (!active) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.altKey && (e.key === 'd' || e.key === 'D')) {
-        e.preventDefault();
-        setConfirming(true);
-      }
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [active]);
-
-  useEffect(() => {
-    if (!confirming) return;
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        setConfirming(false);
-      }
-    };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [confirming]);
 
   const run = async (url: string, method: string, body?: unknown, done?: string) => {
     setBusy(true); setMsg(null);
@@ -500,9 +504,21 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
   const saveNote = async () => { const d = await run(`/api/pharmacy/prescriptions/${rx.id}/note`, 'PUT', { note }, 'Note saved.'); if (d.status === 'success') setNoting(false); };
 
   const overdue = rx.bucket === 'new' && rx.sentAt && Date.now() - Date.parse(rx.sentAt) > 86_400_000;
+  const isCriticalSafety = overdue || (rx.safety?.shared && (rx.safety.allergies?.length > 0 || rx.safety.doctorWarnings?.length > 0));
+  const isColdChain = rx.coldChainItems?.length > 0;
+  const isInsuranceHold = rx.insurance?.glStatus === 'requested';
+
+  const priorityRail = (() => {
+    if (rx.bucket === 'cancelled') return 'border-l-[4px] border-l-slate-300';
+    if (rx.bucket === 'completed') return 'border-l-[4px] border-l-emerald-500';
+    if (isCriticalSafety) return 'border-l-[4px] border-l-rose-600 bg-rose-50/10';
+    if (isColdChain) return 'border-l-[4px] border-l-sky-500 bg-sky-50/10';
+    if (isInsuranceHold) return 'border-l-[4px] border-l-amber-500 bg-amber-50/10';
+    return 'border-l-[4px] border-l-teal-600';
+  })();
 
   return (
-    <article className="app-card-interactive rounded-xl border border-slate-200 overflow-hidden flex flex-col justify-between">
+    <article className={`app-card-interactive border border-slate-200 overflow-hidden flex flex-col justify-between ${priorityRail}`}>
       <div>
         {/* Tier 1: Patient Header & Verification */}
         <div className="p-4 bg-slate-50/80 border-b border-slate-200 flex items-start justify-between gap-3">

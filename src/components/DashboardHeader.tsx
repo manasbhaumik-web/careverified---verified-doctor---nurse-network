@@ -279,3 +279,66 @@ export function FilterSelect({ label, value, onChange, children }: { label: stri
     </label>
   );
 }
+
+export interface HudMetric {
+  label: string;
+  value: React.ReactNode;
+  detail?: string;
+  pulse?: boolean;
+  tone?: 'normal' | 'emergency' | 'warning' | 'success';
+}
+
+/**
+ * Ambient Clinical HUD: Context-aware live telemetry strip embedded into workspace headers.
+ * Presents real-time situational awareness (SLA metrics, active alerts, cold-chain parameters)
+ * with strict Swiss rectangular geometry and optional animated telemetry pulses.
+ */
+export function AmbientClinicalHud({ items }: { items: HudMetric[] }) {
+  const toneMap = {
+    normal: 'border-[color:var(--t-200)] bg-[color:var(--t-50)]/60 text-[color:var(--ink)]',
+    emergency: 'border-rose-300 bg-rose-50/80 text-rose-950',
+    warning: 'border-amber-300 bg-amber-50/80 text-amber-950',
+    success: 'border-emerald-300 bg-emerald-50/80 text-emerald-950',
+  };
+
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 pt-2.5">
+      {items.map((item, idx) => (
+        <div
+          key={idx}
+          className={`p-2 sm:p-2.5 border rounded-none flex flex-col justify-between transition-all shadow-2xs ${toneMap[item.tone || 'normal']}`}
+        >
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="text-3xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] truncate">
+              {item.label}
+            </span>
+            {item.pulse && (
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span
+                  className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                    item.tone === 'emergency' ? 'bg-rose-400' : 'bg-emerald-400'
+                  }`}
+                />
+                <span
+                  className={`relative inline-flex rounded-full h-2 w-2 ${
+                    item.tone === 'emergency' ? 'bg-rose-500' : 'bg-emerald-500'
+                  }`}
+                />
+              </span>
+            )}
+          </div>
+          <div className="mt-1 flex items-baseline justify-between gap-1.5">
+            <span className="text-xs sm:text-sm font-black tabular-nums tracking-tight">
+              {item.value}
+            </span>
+            {item.detail && (
+              <span className="text-3xs font-bold text-slate-500 truncate text-right">
+                {item.detail}
+              </span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

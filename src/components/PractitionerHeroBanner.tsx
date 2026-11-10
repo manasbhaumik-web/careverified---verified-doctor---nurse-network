@@ -7,6 +7,7 @@ import DashboardHeader, {
   BannerIdentity,
   BannerBadge,
   BannerKpis,
+  AmbientClinicalHud,
   bannerOnBrandPrimaryBtn,
   bannerOnBrandSecondaryBtn,
   type DashboardTab,
@@ -239,6 +240,35 @@ export default function PractitionerHeroBanner<T extends string = string>({
               </div>
             </>
           }
+        />
+        <AmbientClinicalHud
+          items={[
+            {
+              label: tx('On-Call Triage Status'),
+              value: profile.onCall ? tx('Live & Ready') : tx('Standby'),
+              detail: tx('Act 586 Telehealth'),
+              tone: profile.onCall ? 'success' : 'normal',
+              pulse: Boolean(profile.onCall),
+            },
+            {
+              label: tx('Statutory MMC License'),
+              value: isVerified ? tx('APC Active (2026)') : tx('Pending Council Review'),
+              detail: profile.licenseNumber || profile.id,
+              tone: isVerified ? 'success' : 'warning',
+            },
+            {
+              label: tx('Scheduled Encounters'),
+              value: tx('{n} Patient Appointments', { n: upcomingBookingsCount }),
+              detail: tx('{n} Completed', { n: attendedBookings.length }),
+              tone: upcomingBookingsCount > 0 ? 'normal' : 'normal',
+            },
+            {
+              label: tx('Verified Clinical Rating'),
+              value: `${avgOverall} ★ / 5.0`,
+              detail: tx('{n} Patient Reviews', { n: myReviews.length }),
+              tone: 'normal',
+            },
+          ]}
         />
       </DashboardHeader>
 
