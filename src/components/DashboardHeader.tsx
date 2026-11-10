@@ -258,7 +258,7 @@ export function BannerKpis({ items }: { items: { value: React.ReactNode; label: 
       {items.map((k, i) => (
         <div key={k.label} className={`flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-0 min-w-0 ${i > 0 ? 'border-l border-[color:var(--t-100)]' : ''}`}>
           <span className="text-sm font-extrabold text-[color:var(--ink)] leading-none tabular-nums">{k.value}</span>
-          <span className="text-[11px] font-bold text-[color:var(--t-600)] uppercase tracking-wider leading-tight text-center">{k.label}</span>
+          <span className="text-2xs font-bold text-[color:var(--t-600)] uppercase tracking-wider leading-tight text-center">{k.label}</span>
         </div>
       ))}
     </div>
