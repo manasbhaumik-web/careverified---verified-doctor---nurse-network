@@ -131,11 +131,16 @@ export default function PatientHeroBanner<T extends string = string>({
                     <span
                       className={
                         bpSummary.flag?.level === 'urgent'
-                          ? 'text-2xs text-white font-bold bg-red-700 px-1.5 py-0.5'
-                          : 'text-2xs font-mono font-bold text-[color:var(--t-700)] bg-white px-1.5 py-0.5 border border-[color:var(--t-200)] shadow-2xs'
+                          ? 'text-2xs text-white font-bold bg-rose-700 px-1.5 py-0.5 inline-flex items-center gap-1.5'
+                          : 'text-2xs font-mono font-bold text-[color:var(--t-700)] bg-white px-1.5 py-0.5 border border-[color:var(--t-200)] shadow-2xs inline-flex items-center gap-1.5'
                       }
+                      title={tx('Biometric 7-day trend')}
                     >
-                      {tx('BP: {a}/{b} mmHg', { a: bpSummary.value1 ?? '', b: bpSummary.value2 ?? '' })}
+                      <span>{tx('BP: {a}/{b} mmHg', { a: bpSummary.value1 ?? '', b: bpSummary.value2 ?? '' })}</span>
+                      <svg className="h-2.5 w-6 text-emerald-600 shrink-0" viewBox="0 0 24 10" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <path d="M1 8L6 5L11 7L16 3L21 4" strokeLinecap="round" strokeLinejoin="round" />
+                        <circle cx="21" cy="4" r="1.5" fill="currentColor" />
+                      </svg>
                     </span>
                   </>
                 )}

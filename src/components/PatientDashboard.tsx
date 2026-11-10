@@ -1371,6 +1371,48 @@ export default function PatientDashboard({
                       })}
                     </div>
                   )}
+
+                  {/* Daily Medication Dose Schedule (Pill Clock) */}
+                  <div className="p-3 bg-[color:var(--t-50)]/50 border border-[color:var(--t-200)] mb-3">
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="flex items-center gap-1.5 text-2xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)]">
+                        <Clock className="h-3 w-3 text-[color:var(--t-600)]" />
+                        {tx("Today's Dose Schedule · Pill Clock")}
+                      </span>
+                      <span className="text-2xs font-mono font-bold text-slate-500">
+                        {tx('2 of 3 Completed')}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                      <div className="p-2 bg-white border border-emerald-200 flex items-center justify-between">
+                        <div>
+                          <span className="text-2xs font-mono font-bold text-emerald-700 block">08:00 · {tx('Morning')}</span>
+                          <span className="font-bold text-slate-800 text-xs">Amlodipine 5mg</span>
+                        </div>
+                        <span className="text-2xs font-mono font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 border border-emerald-200">
+                          ✓ {tx('Taken')}
+                        </span>
+                      </div>
+                      <div className="p-2 bg-white border border-emerald-200 flex items-center justify-between">
+                        <div>
+                          <span className="text-2xs font-mono font-bold text-emerald-700 block">13:00 · {tx('Afternoon')}</span>
+                          <span className="font-bold text-slate-800 text-xs">Metformin 500mg</span>
+                        </div>
+                        <span className="text-2xs font-mono font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 border border-emerald-200">
+                          ✓ {tx('Taken')}
+                        </span>
+                      </div>
+                      <div className="p-2 bg-white border border-[color:var(--t-300)] flex items-center justify-between">
+                        <div>
+                          <span className="text-2xs font-mono font-bold text-[color:var(--t-700)] block">20:00 · {tx('Evening')}</span>
+                          <span className="font-bold text-slate-800 text-xs">Rosuvastatin 10mg</span>
+                        </div>
+                        <span className="text-2xs font-mono font-black text-[color:var(--t-700)] bg-[color:var(--t-50)] px-1.5 py-0.5 border border-[color:var(--t-200)]">
+                          ⏳ {tx('Due 8 PM')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between">
