@@ -65,6 +65,8 @@ export default function DashboardHeader<T extends string>({
     else return;
     e.preventDefault();
     onTabChange(ids[next]);
+    const nextTabEl = document.getElementById(`tab-${ids[next]}`) as HTMLElement | null;
+    nextTabEl?.focus();
   };
 
   return (

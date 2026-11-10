@@ -544,8 +544,34 @@ export default function App() {
     return [...wanted, ...rest].slice(0, 4);
   })();
 
+  const handleNavKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, currentId: string) => {
+    const ids = navItems.map(n => n.id);
+    const currentIndex = ids.indexOf(currentId);
+    let nextIndex = -1;
+    if (e.key === 'ArrowRight') nextIndex = (currentIndex + 1) % ids.length;
+    else if (e.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + ids.length) % ids.length;
+    else if (e.key === 'Home') nextIndex = 0;
+    else if (e.key === 'End') nextIndex = ids.length - 1;
+    else return;
+
+    e.preventDefault();
+    const nextId = ids[nextIndex];
+    setActiveView(nextId);
+    setSelectedProfId(null);
+    const nextEl = document.getElementById(`nav-tab-${nextId}`) as HTMLElement | null;
+    nextEl?.focus();
+  };
+
   return (
     <div className="min-h-dvh bg-[color:var(--t-bg)] text-slate-800 flex flex-col font-sans antialiased selection:bg-[color:var(--t-100)] selection:text-[color:var(--t-600)] pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
+      {/* Skip to Main Content Link (WCAG 2.4.1 Bypass Blocks) */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[200] focus:px-4 focus:py-2.5 focus:bg-slate-900 focus:text-white focus:font-bold focus:text-xs focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-0 rounded-none transition-all uppercase tracking-wider"
+      >
+        {tt('Skip to main content')}
+      </a>
+
       {notice && (
         <div role="status" className="fixed top-[calc(0.75rem+env(safe-area-inset-top))] left-3 right-3 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[120] bg-slate-900 text-white text-xs font-semibold px-4 sm:px-5 py-3 shadow-lg flex items-center justify-between sm:justify-start gap-4">
           {notice}
@@ -782,16 +808,25 @@ export default function App() {
           <div className="flex items-stretch min-w-0 flex-1">
 
             {/* Navigation Tabs - Full Height & Width Coverage on Hover/Selection */}
-            <nav aria-label="Main" className="flex items-stretch gap-1 relative z-0 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <nav
+              aria-label={tt('Main Navigation')}
+              role="tablist"
+              className="flex items-stretch gap-1 relative z-0 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = isNavItemActive(item.id, activeView);
                 return (
                   <button
                     key={item.id}
+                    id={`nav-tab-${item.id}`}
+                    role="tab"
+                    aria-selected={isActive}
+                    tabIndex={isActive ? 0 : -1}
                     data-active={isActive}
                     onClick={() => { setActiveView(item.id); setSelectedProfId(null); }}
-                    className={`relative flex items-center gap-2.5 px-4 xl:px-5 h-12 text-xs font-extrabold whitespace-nowrap shrink-0 transition-colors duration-150 cursor-pointer select-none rounded-none ${
+                    onKeyDown={(e) => handleNavKeyDown(e, item.id)}
+                    className={`relative flex items-center gap-2.5 px-4 xl:px-5 h-12 text-xs font-extrabold whitespace-nowrap shrink-0 transition-colors duration-150 cursor-pointer select-none rounded-none focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-inset ${
                       isActive
                         ? 'text-white bg-white/15 font-black'
                         : 'text-white/75 hover:text-white hover:bg-white/10'
@@ -888,7 +923,7 @@ export default function App() {
       </div>
 
       {/* Primary Screen Area */}
-      <main id="main-content" className="flex-grow mt-0 pt-0 pb-4 sm:pb-8 w-full px-0 max-w-none">
+      <main id="main-content" tabIndex={-1} className="flex-grow mt-0 pt-0 pb-4 sm:pb-8 w-full px-0 max-w-none focus:outline-none">
         {loading ? (
           <div role="status" aria-live="polite" className="text-center min-h-[60vh] space-y-4 animate-fade-in flex flex-col items-center justify-center">
             <div className="relative flex items-center justify-center">
