@@ -90,7 +90,7 @@ export default function WorkspaceHeader<T extends string = string>({
 
       {/* Attached Inner Workspace Subtab Strip */}
       {tabs && tabs.length > 0 && (
-        <div className="border-t border-[color:var(--t-100)] pt-3 mt-3.5 flex flex-wrap items-center justify-between gap-2.5">
+        <div className="border-t border-[color:var(--t-200)] bg-[color:var(--t-50)] p-2.5 -mx-3.5 -mb-3.5 sm:-mx-4 sm:-mb-4 mt-3.5 flex flex-wrap items-center justify-between gap-2.5">
           <div
             role="tablist"
             aria-label={tabsLabel || tx('Workspace section tabs')}
@@ -109,7 +109,7 @@ export default function WorkspaceHeader<T extends string = string>({
                   className={`h-9 px-3 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                     isActive
                       ? 'bg-[color:var(--t-600)] text-white shadow-2xs border border-[color:var(--t-700)]'
-                      : 'bg-[color:var(--t-50)]/70 hover:bg-[color:var(--t-100)] text-slate-700 hover:text-[color:var(--t-700)] border border-[color:var(--t-200)]'
+                      : 'bg-white hover:bg-[color:var(--t-100)] text-slate-700 hover:text-[color:var(--t-700)] border border-[color:var(--t-200)]'
                   }`}
                 >
                   {TabIcon && (
