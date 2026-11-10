@@ -7,7 +7,7 @@ import {
   FileText, Shield, GraduationCap, Plane, Sparkles, ArrowRight, PhoneCall,
   Microscope, Check
 } from 'lucide-react';
-import { useTr } from '../i18n';
+import { useTr } from '../locale';
 
 export interface MegaMenuItem {
   id: string;
