@@ -415,10 +415,12 @@ function InboxTab({ counts, onChanged, tick }: { counts?: Counts; onChanged: () 
       {list === null ? (
         <p className="text-xs text-slate-600 font-semibold">{tx('Loading your inbox…')}</p>
       ) : shown.length === 0 ? (
-        <div className="app-card rounded-xl border-slate-200 p-12 text-center space-y-3">
-          <Inbox className="h-10 w-10 text-[color:var(--t-400)] mx-auto" />
-          <h2 className="text-sm font-bold text-slate-900 tracking-tight">{list.length === 0 ? tx('No prescriptions yet') : tx('Nothing matches your filters')}</h2>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">{list.length === 0 ? tx('When a patient sends you a prescription it will appear here and you will be notified.') : tx('Try a different status or search filter.')}</p>
+        <div className="app-card rounded-none border border-dashed border-[color:var(--t-200)] p-12 text-center space-y-3 bg-[color:var(--t-50)]/20">
+          <div className="w-14 h-14 bg-white border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center mx-auto shadow-2xs">
+            <Inbox className="h-7 w-7 text-[color:var(--t-600)]" strokeWidth={1.75} />
+          </div>
+          <h2 className="text-sm font-extrabold text-slate-900 tracking-tight">{list.length === 0 ? tx('No Prescriptions in Dispensing Queue') : tx('Nothing Matches Your Filters')}</h2>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium leading-relaxed">{list.length === 0 ? tx('When a patient or prescriber forwards a prescription, it will appear here in real-time with statutory telemetry.') : tx('Try adjusting the search query or status filter.')}</p>
         </div>
       ) : (
         <section aria-label={tx('Prescriptions')} className="grid gap-5 lg:grid-cols-2">
@@ -444,6 +446,30 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
   const [glNote, setGlNote] = useState('');
   const [deliveryModalStatus, setDeliveryModalStatus] = useState<'arranged' | 'delivered' | 'failed' | null>(null);
   const active = rx.status === 'active';
+
+  useEffect(() => {
+    if (!active) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.altKey && (e.key === 'd' || e.key === 'D')) {
+        e.preventDefault();
+        setConfirming(true);
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [active]);
+
+  useEffect(() => {
+    if (!confirming) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setConfirming(false);
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [confirming]);
 
   const run = async (url: string, method: string, body?: unknown, done?: string) => {
     setBusy(true); setMsg(null);
@@ -653,7 +679,12 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
             {rx.prescriber && !rx.prescriber.stillVerified && <p className="text-2xs font-bold text-rose-800 bg-rose-100 border border-rose-300 p-2 rounded-lg">{tx('Warning: The prescribing doctor is not currently verified by the medical board.')}</p>}
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <button type="button" disabled={busy} onClick={dispense} className="btn btn-sm btn-primary">{tx('🔒 Sign & Mark Dispensed')}</button>
-              <button type="button" onClick={() => setConfirming(false)} className="btn btn-sm btn-secondary">{tx('Cancel')}</button>
+              <button type="button" onClick={() => setConfirming(false)} className="btn btn-sm btn-secondary inline-flex items-center gap-1.5">
+                <span>{tx('Cancel')}</span>
+                <kbd className="hidden sm:inline-block px-1.5 py-0.5 bg-slate-100 text-slate-500 text-3xs font-mono font-bold tracking-wider border border-slate-300 rounded-none leading-none">
+                  Esc
+                </kbd>
+              </button>
             </div>
           </div>
         </div>
@@ -707,8 +738,11 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
             {rx.assignedToMe && !rx.fillStatus && <button type="button" disabled={busy} onClick={() => setStatus('received')} className="btn btn-sm btn-secondary">{tx('Mark received')}</button>}
             {rx.assignedToMe && rx.fillStatus !== 'preparing' && rx.fillStatus !== 'ready' && <button type="button" disabled={busy} onClick={() => setStatus('preparing')} className="btn btn-sm btn-secondary">{tx('Preparing')}</button>}
             {rx.assignedToMe && rx.fillStatus !== 'ready' && <button type="button" disabled={busy} onClick={() => setStatus('ready')} className="btn btn-sm btn-secondary">{tx('Ready for pickup')}</button>}
-            <button type="button" disabled={busy} onClick={() => setConfirming(true)} className="btn btn-sm btn-primary">
+            <button type="button" disabled={busy} onClick={() => setConfirming(true)} className="btn btn-sm btn-primary inline-flex items-center gap-1.5" title={tx('Dispense & Sign prescription (Alt+D)')}>
               <span>⚖️ {tx('Dispense & Sign')}</span>
+              <kbd className="hidden sm:inline-block px-1.5 py-0.5 bg-white/20 text-white text-3xs font-mono font-bold tracking-wider border border-white/30 rounded-none leading-none">
+                Alt+D
+              </kbd>
             </button>
           </div>
         </div>

@@ -1300,8 +1300,10 @@ export default function PatientDashboard({
 
                   {activePrescriptions.length === 0 ? (
                     <div className="py-7 px-4 text-center bg-[color:var(--t-50)]/30 border border-dashed border-[color:var(--t-200)] my-2">
-                      <Pill className="h-7 w-7 text-slate-400 mx-auto mb-2" />
-                      <p className="text-sm font-bold text-[color:var(--ink)] mb-0.5">
+                      <div className="w-12 h-12 bg-white border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center mx-auto mb-2.5 shadow-2xs">
+                        <Pill className="h-6 w-6 text-[color:var(--t-600)]" strokeWidth={1.75} />
+                      </div>
+                      <p className="text-sm font-extrabold text-[color:var(--ink)] mb-0.5">
                         {tx('No Active Prescriptions Requiring Refill')}
                       </p>
                       <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">

@@ -100,7 +100,7 @@ export default function DashboardHeader<T extends string>({
       )}
 
       {((tabs && tabs.length > 0) || tabsRight) && (
-        <div className="w-full bg-white border-b border-[color:var(--t-200)] shadow-2xs">
+        <div className="w-full bg-white/95 backdrop-blur-xs border-b border-[color:var(--t-200)] shadow-2xs">
           <div
             role="tablist"
             aria-label={tabsLabel}
