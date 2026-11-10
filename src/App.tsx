@@ -830,10 +830,10 @@ export default function App() {
                       setSelectedProfId(null);
                     }}
                     onKeyDown={(e) => handleNavKeyDown(e, item.id)}
-                    className={`relative flex items-center gap-2 px-3.5 xl:px-4.5 h-12 text-xs font-extrabold whitespace-nowrap shrink-0 transition-colors duration-150 cursor-pointer select-none rounded-none focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-inset ${
+                    className={`relative flex items-center gap-2 px-3.5 xl:px-4.5 h-12 text-xs font-extrabold whitespace-nowrap shrink-0 transition-colors duration-150 cursor-pointer select-none rounded-none focus:outline-none border-b-2 ${
                       isActive
-                        ? 'text-white bg-white/15 font-black'
-                        : 'text-white/75 hover:text-white hover:bg-white/10'
+                        ? 'text-white font-black border-b-white bg-transparent'
+                        : 'text-white/75 border-b-transparent hover:text-white hover:bg-white/5'
                     }`}
                   >
                     <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-white/70'}`} />

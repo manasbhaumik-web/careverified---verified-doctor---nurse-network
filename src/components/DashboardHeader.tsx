@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react';
 import { UserAvatar } from '../avatars';
 
 export interface DashboardTab<T extends string = string> {
@@ -53,6 +53,21 @@ export default function DashboardHeader<T extends string>({
   fullWidth = true,
   tabsRight,
 }: DashboardHeaderProps<T>) {
+  const [isCollapsed, setIsCollapsed] = React.useState(() => {
+    try {
+      return localStorage.getItem('medicred_banner_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleCollapse = () => {
+    setIsCollapsed(prev => {
+      const next = !prev;
+      try { localStorage.setItem('medicred_banner_collapsed', String(next)); } catch {}
+      return next;
+    });
+  };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     if (!tabs || !onTabChange || activeTab === undefined) return;
     const ids = tabs.map(t => t.id);
@@ -77,14 +92,33 @@ export default function DashboardHeader<T extends string>({
       }`}
     >
       {(title || children) && (
-        <div className="dh-brand relative border-t-0 text-[color:var(--ink)] overflow-hidden bg-white border-b border-[color:var(--t-200)]">
+        <div 
+          className={`dh-brand relative border-t-0 text-[color:var(--ink)] bg-white transition-all duration-200 ease-in-out ${
+            isCollapsed ? 'max-h-0 opacity-0 overflow-hidden py-0 border-b-0' : 'max-h-[600px] opacity-100 overflow-visible border-b border-[color:var(--t-200)]'
+          }`}
+        >
           {title && (
             <div className={`relative z-10 py-3 sm:py-3.5 ${
               fullWidth ? 'max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8' : 'px-4 sm:px-7'
             }`}>
               <BannerRow
                 identity={<BannerIdentity as="h1" icon={icon ?? ShieldCheck} name={title} badges={eyebrow ? <BannerBadge>{eyebrow}</BannerBadge> : undefined} description={description} />}
-                aside={actions}
+                aside={
+                  <div className="flex items-center gap-2">
+                    {actions}
+                    <button
+                      type="button"
+                      onClick={toggleCollapse}
+                      className="h-9 px-2.5 bg-slate-50 hover:bg-[color:var(--t-50)] text-slate-600 hover:text-[color:var(--t-700)] border border-slate-200 hover:border-[color:var(--t-300)] text-2xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors rounded-none"
+                      title={isCollapsed ? "Expand Banner" : "Collapse Banner"}
+                      aria-expanded={!isCollapsed}
+                      aria-label={isCollapsed ? "Expand banner" : "Collapse banner"}
+                    >
+                      <ChevronUp className="h-3.5 w-3.5 text-slate-500" />
+                      <span className="hidden sm:inline">Collapse</span>
+                    </button>
+                  </div>
+                }
               />
             </div>
           )}
@@ -133,10 +167,10 @@ export default function DashboardHeader<T extends string>({
                     tabIndex={selected ? 0 : -1}
                     onClick={() => onTabChange?.(tab.id)}
                     onKeyDown={handleKeyDown}
-                    className={`shrink-0 min-h-[40px] px-4 text-xs flex items-center gap-2 cursor-pointer transition-colors ${
+                    className={`shrink-0 min-h-[40px] px-4 text-xs flex items-center gap-2 cursor-pointer transition-colors border-b-2 ${
                       selected
-                        ? 'font-extrabold text-[color:var(--t-700)] bg-[color:var(--t-50)]'
-                        : 'font-semibold text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
+                        ? 'font-black text-[color:var(--t-900)] border-b-[color:var(--t-600)] bg-transparent'
+                        : 'font-semibold text-slate-700 border-b-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-100)]/60'
                     }`}
                   >
                     <tab.icon className={`h-4 w-4 ${selected ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
@@ -150,11 +184,29 @@ export default function DashboardHeader<T extends string>({
                 </React.Fragment>
               );
             })}
-            {tabsRight && (
-              <div className="ml-auto shrink-0 flex items-center self-stretch pl-2">
-                {tabsRight}
-              </div>
-            )}
+            <div className="ml-auto shrink-0 flex items-center self-stretch pl-2">
+              {tabsRight}
+              <button
+                type="button"
+                onClick={toggleCollapse}
+                className="px-2.5 py-1 text-2xs font-extrabold uppercase tracking-wider text-slate-600 hover:text-[color:var(--t-800)] hover:bg-[color:var(--t-100)] transition-colors flex items-center gap-1.5 cursor-pointer rounded-none ml-1.5 self-center border border-transparent hover:border-[color:var(--t-200)]"
+                title={isCollapsed ? "Expand Banner details" : "Collapse Banner details"}
+                aria-expanded={!isCollapsed}
+                aria-label={isCollapsed ? "Expand banner" : "Collapse banner"}
+              >
+                {isCollapsed ? (
+                  <>
+                    <ChevronDown className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                    <span className="text-[color:var(--t-700)] font-black">Expand Banner</span>
+                  </>
+                ) : (
+                  <>
+                    <ChevronUp className="h-3.5 w-3.5 text-slate-400" />
+                    <span className="hidden xl:inline">Collapse</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
