@@ -23,7 +23,6 @@ import AdminDashboard from './components/AdminDashboard';
 import NotificationBell from './components/NotificationBell';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import OnCallChip from './components/OnCallChip';
-import WorkspaceMegaMenu, { WORKSPACE_MEGAMENUS } from './components/WorkspaceMegaMenu';
 import LocaleSwitcher from './components/LocaleSwitcher';
 import { useLocale, useTr } from './locale';
 import SOSButton from './components/SOSButton';
@@ -72,48 +71,6 @@ export default function App() {
   }, [activeView]);
   const [selectedProfId, setSelectedProfId] = useState<string | null>(null);
 
-  // User Workspace Megamenu State & Handlers
-  const [hoveredNavId, setHoveredNavId] = useState<string | null>(null);
-  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
-  const megaMenuTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleNavMouseEnter = (itemId: string) => {
-    if (megaMenuTimerRef.current) clearTimeout(megaMenuTimerRef.current);
-    const menuKey = `${currentUser?.role}:${itemId}`;
-    if (WORKSPACE_MEGAMENUS[menuKey]) {
-      setHoveredNavId(itemId);
-      setIsMegaMenuOpen(true);
-    } else {
-      setIsMegaMenuOpen(false);
-      setHoveredNavId(null);
-    }
-  };
-
-  const handleNavMouseLeave = () => {
-    if (megaMenuTimerRef.current) clearTimeout(megaMenuTimerRef.current);
-    megaMenuTimerRef.current = setTimeout(() => {
-      setIsMegaMenuOpen(false);
-      setHoveredNavId(null);
-    }, 200);
-  };
-
-  const handleSelectMegaMenuItem = (navId: string, subItemId: string) => {
-    setIsMegaMenuOpen(false);
-    setHoveredNavId(null);
-    setSelectedProfId(null);
-    setActiveView(subItemId);
-  };
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isMegaMenuOpen) {
-        setIsMegaMenuOpen(false);
-        setHoveredNavId(null);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isMegaMenuOpen]);
   const [selectedSpecialtyFilter, setSelectedSpecialtyFilter] = useState<string>('');
   const [prefilledSymptoms, setPrefilledSymptoms] = useState<string>('');
   const [registryTab, setRegistryTab] = useState<'directory' | 'triage'>('directory');
@@ -860,39 +817,27 @@ export default function App() {
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = isNavItemActive(item.id, activeView);
-                const hasMegaMenu = !!WORKSPACE_MEGAMENUS[`${currentUser?.role}:${item.id}`];
-                const isMenuOpen = isMegaMenuOpen && hoveredNavId === item.id;
                 return (
                   <button
                     key={item.id}
                     id={`nav-tab-${item.id}`}
                     role="tab"
                     aria-selected={isActive}
-                    aria-haspopup={hasMegaMenu ? 'true' : undefined}
-                    aria-expanded={hasMegaMenu ? isMenuOpen : undefined}
                     tabIndex={isActive ? 0 : -1}
                     data-active={isActive}
-                    onMouseEnter={() => handleNavMouseEnter(item.id)}
-                    onMouseLeave={handleNavMouseLeave}
                     onClick={() => {
                       setActiveView(item.id);
                       setSelectedProfId(null);
-                      setIsMegaMenuOpen(false);
-                      setHoveredNavId(null);
                     }}
                     onKeyDown={(e) => handleNavKeyDown(e, item.id)}
                     className={`relative flex items-center gap-2 px-3.5 xl:px-4.5 h-12 text-xs font-extrabold whitespace-nowrap shrink-0 transition-colors duration-150 cursor-pointer select-none rounded-none focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-inset ${
-                      isActive || isMenuOpen
+                      isActive
                         ? 'text-white bg-white/15 font-black'
                         : 'text-white/75 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive || isMenuOpen ? 'text-white' : 'text-white/70'}`} />
+                    <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-white/70'}`} />
                     <span>{tt(item.name)}</span>
-
-                    {hasMegaMenu && (
-                      <ChevronDown className={`h-3 w-3 shrink-0 transition-transform duration-200 ${isMenuOpen ? 'rotate-180 text-white' : 'text-white/60'}`} />
-                    )}
 
                     {item.id === 'patient_care' && (
                       <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ml-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-white/15 text-white/90'}`}>
@@ -980,22 +925,6 @@ export default function App() {
 
         </div>
 
-        {/* Workspace Megamenu Dropdown Container */}
-        <WorkspaceMegaMenu
-          activeNavId={hoveredNavId}
-          currentRole={currentUser?.role || 'patient'}
-          isOpen={isMegaMenuOpen}
-          onClose={() => {
-            setIsMegaMenuOpen(false);
-            setHoveredNavId(null);
-          }}
-          onSelectSubItem={handleSelectMegaMenuItem}
-          onMouseEnter={() => {
-            if (megaMenuTimerRef.current) clearTimeout(megaMenuTimerRef.current);
-            setIsMegaMenuOpen(true);
-          }}
-          onMouseLeave={handleNavMouseLeave}
-        />
       </div>
 
       {/* Primary Screen Area */}

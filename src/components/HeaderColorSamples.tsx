@@ -6,12 +6,10 @@ import {
   Plane, BookOpen, LifeBuoy, Search, X, Menu, Bell, Settings, Plus, Stethoscope, Building2
 } from 'lucide-react';
 import { navigate } from '../nav';
-import WorkspaceMegaMenu, { WORKSPACE_MEGAMENUS } from './WorkspaceMegaMenu';
 
 export default function HeaderColorSamples() {
   const [activeRole, setActiveRole] = useState<'practitioner' | 'patient' | 'pharmacy' | 'facility'>('practitioner');
   const [viewMode, setViewMode] = useState<'proposed' | 'current' | 'compare'>('proposed');
-  const [openMegaMenuId, setOpenMegaMenuId] = useState<string | null>(null);
 
   const roleConfig = {
     practitioner: {
@@ -280,57 +278,37 @@ export default function HeaderColorSamples() {
           </nav>
 
           {/* TIER 2: Workspace Domain Navigation Strip (Luminous White/Mint) */}
-          <div className="bg-white/95 backdrop-blur-md border-b border-[color:var(--t-200)] px-4 sm:px-6 lg:px-8 relative">
+          <div className="bg-white/95 backdrop-blur-md border-b border-[color:var(--t-200)] px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between gap-4">
               <nav className="flex items-center gap-1 min-w-0 overflow-x-auto py-1">
-                {current.tabs.map((tab: any, idx: number) => {
-                  const hasMegaMenu = !!WORKSPACE_MEGAMENUS[`${activeRole}:${tab.id}`];
-                  const isOpen = openMegaMenuId === tab.id;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => setOpenMegaMenuId(isOpen ? null : tab.id)}
-                      onMouseEnter={() => { if (hasMegaMenu) setOpenMegaMenuId(tab.id); }}
-                      className={`relative flex items-center gap-2 px-3.5 sm:px-4 py-2.5 text-xs font-bold rounded-none cursor-pointer whitespace-nowrap transition-colors ${
-                        tab.active || isOpen
-                          ? 'text-[color:var(--t-800)] bg-[color:var(--t-50)] border-b-2 border-[color:var(--t-600)] font-black'
-                          : 'text-slate-600 hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]/60'
-                      }`}
-                    >
-                      <span>{tab.name}</span>
-                      {tab.count && (
-                        <span className={`text-2xs font-mono font-bold px-1.5 py-0.5 rounded-none ${
-                          tab.active ? 'bg-[color:var(--t-600)] text-white' : 'bg-[color:var(--t-100)] text-[color:var(--t-800)]'
-                        }`}>
-                          {tab.count}
-                        </span>
-                      )}
-                      {hasMegaMenu && (
-                        <ChevronDown className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180 text-[color:var(--t-600)]' : 'text-slate-400'}`} />
-                      )}
-                    </button>
-                  );
-                })}
+                {current.tabs.map((tab: any, idx: number) => (
+                  <button
+                    key={idx}
+                    className={`relative flex items-center gap-2 px-3.5 sm:px-4 py-2.5 text-xs font-bold rounded-none cursor-pointer whitespace-nowrap transition-colors ${
+                      tab.active
+                        ? 'text-[color:var(--t-800)] bg-[color:var(--t-50)] border-b-2 border-[color:var(--t-600)] font-black'
+                        : 'text-slate-600 hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]/60'
+                    }`}
+                  >
+                    <span>{tab.name}</span>
+                    {tab.count && (
+                      <span className={`text-2xs font-mono font-bold px-1.5 py-0.5 rounded-none ${
+                        tab.active ? 'bg-[color:var(--t-600)] text-white' : 'bg-[color:var(--t-100)] text-[color:var(--t-800)]'
+                      }`}>
+                        {tab.count}
+                      </span>
+                    )}
+                  </button>
+                ))}
               </nav>
 
               <div className="hidden sm:flex items-center gap-2 shrink-0 py-1">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-2xs font-extrabold font-mono uppercase tracking-wider">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Megamenu: Active
+                  On-Call: Active
                 </span>
               </div>
             </div>
-
-            {/* Megamenu Dropdown Container */}
-            <WorkspaceMegaMenu
-              activeNavId={openMegaMenuId}
-              currentRole={activeRole}
-              isOpen={!!openMegaMenuId}
-              onClose={() => setOpenMegaMenuId(null)}
-              onSelectSubItem={(navId, subItemId) => {
-                setOpenMegaMenuId(null);
-              }}
-            />
           </div>
 
           {/* TIER 3: Workspace Hero Identity & Subtabs */}
