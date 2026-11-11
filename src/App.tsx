@@ -564,7 +564,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-dvh bg-[color:var(--t-bg)] text-slate-800 flex flex-col font-sans antialiased selection:bg-[color:var(--t-100)] selection:text-[color:var(--t-600)] pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
+    <div className="workspace-font-inter min-h-dvh bg-[color:var(--t-bg)] text-slate-800 flex flex-col font-sans antialiased selection:bg-[color:var(--t-100)] selection:text-[color:var(--t-600)] pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
       {/* Skip to Main Content Link (WCAG 2.4.1 Bypass Blocks) */}
       <a
         href="#main-content"
