@@ -84,6 +84,10 @@ export default function DashboardHeader<T extends string>({
     nextTabEl?.focus();
   };
 
+  const hasTabsBar = Boolean((tabs && tabs.length > 0) || tabsRight);
+  const canCollapse = Boolean(title || hasTabsBar);
+  const effectiveCollapsed = canCollapse && isCollapsed;
+
   return (
     <header
       id={id}
@@ -94,7 +98,7 @@ export default function DashboardHeader<T extends string>({
       {(title || children) && (
         <div 
           className={`dh-brand relative border-t-0 text-[color:var(--ink)] bg-white transition-all duration-200 ease-in-out ${
-            isCollapsed ? 'max-h-0 opacity-0 overflow-hidden py-0 border-b-0' : 'max-h-[600px] opacity-100 overflow-visible border-b border-[color:var(--t-200)]'
+            effectiveCollapsed ? 'max-h-0 opacity-0 overflow-hidden py-0 border-b-0' : 'max-h-[600px] opacity-100 overflow-visible border-b border-[color:var(--t-200)]'
           }`}
         >
           {title && (
@@ -106,17 +110,19 @@ export default function DashboardHeader<T extends string>({
                 aside={
                   <div className="flex items-center gap-2">
                     {actions}
-                    <button
-                      type="button"
-                      onClick={toggleCollapse}
-                      className="h-9 px-2.5 bg-slate-50 hover:bg-[color:var(--t-50)] text-slate-600 hover:text-[color:var(--t-700)] border border-slate-200 hover:border-[color:var(--t-300)] text-2xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors rounded-none"
-                      title={isCollapsed ? "Expand Banner" : "Collapse Banner"}
-                      aria-expanded={!isCollapsed}
-                      aria-label={isCollapsed ? "Expand banner" : "Collapse banner"}
-                    >
-                      <ChevronUp className="h-3.5 w-3.5 text-slate-500" />
-                      <span className="hidden sm:inline">Collapse</span>
-                    </button>
+                    {!hasTabsBar && (
+                      <button
+                        type="button"
+                        onClick={toggleCollapse}
+                        className="h-9 px-2.5 bg-slate-50 hover:bg-[color:var(--t-50)] text-slate-600 hover:text-[color:var(--t-700)] border border-slate-200 hover:border-[color:var(--t-300)] text-2xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors rounded-none"
+                        title="Collapse Banner"
+                        aria-expanded={!isCollapsed}
+                        aria-label="Collapse banner"
+                      >
+                        <ChevronUp className="h-3.5 w-3.5 text-slate-500" />
+                        <span className="hidden sm:inline">Collapse</span>
+                      </button>
+                    )}
                   </div>
                 }
               />
@@ -133,7 +139,27 @@ export default function DashboardHeader<T extends string>({
         </div>
       )}
 
-      {((tabs && tabs.length > 0) || tabsRight) && (
+      {!hasTabsBar && effectiveCollapsed && (
+        <div className="w-full bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] shadow-2xs">
+          <div className={`flex items-center justify-end py-1.5 ${
+            fullWidth ? 'max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8' : 'px-3 sm:px-5'
+          }`}>
+            <button
+              type="button"
+              onClick={toggleCollapse}
+              className="px-2.5 py-1 text-2xs font-extrabold uppercase tracking-wider text-slate-600 hover:text-[color:var(--t-800)] hover:bg-[color:var(--t-100)] transition-colors flex items-center gap-1.5 cursor-pointer rounded-none border border-transparent hover:border-[color:var(--t-200)]"
+              title="Expand Banner details"
+              aria-expanded={false}
+              aria-label="Expand banner"
+            >
+              <ChevronDown className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+              <span className="text-[color:var(--t-700)] font-black">Expand Banner</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {hasTabsBar && (
         <div className="w-full bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] shadow-2xs">
           <div
             role="tablist"
