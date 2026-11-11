@@ -503,7 +503,7 @@ export const INITIAL_JOBS: JobPost[] = [
   {
     id: "job-1",
     hospitalName: "Damansara Specialist Medical Center",
-    hospitalLogo: "🏥",
+    hospitalLogo: "hospital",
     title: "Critical Care Nurse (ICU) - Night Shift Focus",
     type: "Shift-based",
     location: "Damansara Utama",
@@ -525,7 +525,7 @@ export const INITIAL_JOBS: JobPost[] = [
   {
     id: "job-2",
     hospitalName: "Kuala Lumpur Specialist Hospital",
-    hospitalLogo: "🩺",
+    hospitalLogo: "stethoscope",
     title: "Junior Consultant - Paediatric Cardiology",
     type: "Full-time",
     location: "Bangsar",
@@ -547,7 +547,7 @@ export const INITIAL_JOBS: JobPost[] = [
   {
     id: "job-3",
     hospitalName: "Metro Home Healthcare",
-    hospitalLogo: "🏠",
+    hospitalLogo: "home",
     title: "Home Geriatric Care Nurse",
     type: "Contract",
     location: "Bandar Sunway",

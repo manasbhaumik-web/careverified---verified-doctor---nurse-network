@@ -1115,7 +1115,7 @@ function PharmacyCard({ ph, onEnquire }: { ph: Pharmacy; onEnquire: (target: Enq
           {ph.coldChain ? (
             <span className="app-badge badge-cyan shrink-0">
               <Thermometer className="h-3 w-3 shrink-0" />
-              Cold Chain ❄️
+              Cold Chain
             </span>
           ) : (
             <span className="app-badge badge-neutral shrink-0">

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Activity, AlertTriangle, BarChart3, CheckCircle2, Clock, Download, Inbox, KeyRound, LifeBuoy, Pill, Search, ShieldAlert, StickyNote, Store, UserRound, Users } from 'lucide-react';
+import { Activity, AlertTriangle, BarChart3, CheckCircle2, Clock, Download, Inbox, KeyRound, LifeBuoy, Lock, Pill, Scale, Search, ShieldAlert, Snowflake, StickyNote, Store, Truck, UserRound, Users } from 'lucide-react';
 import { useTr } from '../locale';
 import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, FilterSelect, DashboardTab, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
 import { btnDanger, btnPlain, btnPrimary, fmtDate, fmtTime, jfetch } from './pharmacy/shared';
@@ -200,7 +200,7 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
                 <div className="flex flex-wrap items-center gap-1.5">
                   <BannerBadge>{tx('Type A Poison Licence')}</BannerBadge>
                   <BannerBadge tone="success">{tx('LFM Accredited')}</BannerBadge>
-                  {me?.pharmacy.coldChain && <BannerBadge tone="brand">{tx('❄️ Cold-Chain Certified')}</BannerBadge>}
+                  {me?.pharmacy.coldChain && <BannerBadge tone="brand"><Snowflake className="h-3 w-3 shrink-0" /> {tx('Cold-Chain Certified')}</BannerBadge>}
                 </div>
               }
               description={
@@ -484,7 +484,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
             <div className="flex flex-wrap items-center gap-1.5 mb-1">
               <span className="font-mono font-bold text-xs text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2 py-0.5 rounded border border-[color:var(--t-200)]">{rx.code}</span>
               <span className={`text-2xs font-bold px-2 py-0.5 border ${BUCKET_STYLE[rx.bucket]}`}>{BUCKET_LABEL[rx.bucket]}{rx.bucket === 'in_progress' && rx.fillStatus ? ` · ${rx.fillStatus === 'received' ? tx('Received') : tx('Preparing')}` : ''}</span>
-              {rx.coldChainItems.length > 0 && <span className="app-badge badge-cyan text-2xs">❄️ Cold Chain Required (2°C–8°C)</span>}
+              {rx.coldChainItems.length > 0 && <span className="app-badge badge-cyan text-2xs inline-flex items-center gap-1"><Snowflake className="h-3 w-3 shrink-0" /> Cold Chain Required (2°C–8°C)</span>}
             </div>
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5 [overflow-wrap:anywhere]">
               <UserRound className="h-4 w-4 shrink-0 text-[color:var(--t-600)]" />
@@ -517,7 +517,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
               <span><b>{tx('Current medicines:')}</b> {rx.safety.medicines.length ? rx.safety.medicines.map(m => `${m.name}${m.detail ? ` ${m.detail}` : ''}`).join(', ') : 'None recorded'}</span>
               {rx.safety.doctorWarnings.length > 0 && (
                 <div className="mt-1 font-bold text-rose-900 flex flex-wrap gap-2">
-                  {rx.safety.doctorWarnings.map((w, i) => <span key={i} className="inline-block bg-rose-100 border border-rose-300 px-1.5 py-0.5 rounded">⚠️ {w.message}</span>)}
+                  {rx.safety.doctorWarnings.map((w, i) => <span key={i} className="inline-flex items-center gap-1 bg-rose-100 border border-rose-300 px-1.5 py-0.5 rounded-none"><AlertTriangle className="h-3 w-3 shrink-0" /> {w.message}</span>)}
                 </div>
               )}
             </div>
@@ -541,7 +541,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
                     <div className="font-bold text-slate-900">{i.name} {[i.strength, i.form].filter(Boolean).join(' ')}</div>
                     <div className="text-2xs text-slate-600">{i.dose}, {i.frequency} for {i.durationDays} days{i.instructions ? ` · ${i.instructions}` : ''}</div>
                     {rx.coldChainItems.includes(i.name) && (
-                      <span className="inline-block mt-1 text-2xs font-bold text-sky-800 bg-sky-100 px-1.5 py-0.5 rounded-none border border-sky-300">❄️ Store at 2°C–8°C · Cold-Chain</span>
+                      <span className="inline-flex items-center gap-1 mt-1 text-2xs font-bold text-sky-800 bg-sky-100 px-1.5 py-0.5 rounded-none border border-sky-300"><Snowflake className="h-3 w-3 shrink-0" /> Store at 2°C–8°C · Cold-Chain</span>
                     )}
                   </div>
                 </div>
@@ -585,14 +585,14 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
             <div className="rounded-none border border-sky-200 bg-sky-50/60 p-3 text-xs space-y-2">
               <div className="flex items-center justify-between text-2xs">
                 <span className="font-bold uppercase tracking-wide text-sky-950 flex items-center gap-1">
-                  <span>🛵 {tx('Home delivery')}:</span>
+                  <span className="inline-flex items-center gap-1"><Truck className="h-3.5 w-3.5 text-sky-700 shrink-0" /> {tx('Home delivery')}:</span>
                   <span className="font-semibold text-slate-700">
                     {{ pharmacy_courier: 'Own Rider', grab: 'GrabExpress', lalamove: 'Lalamove', other_courier: 'Other Courier' }[rx.delivery.method] ?? rx.delivery.method}
                   </span>
                 </span>
                 <span className="app-badge badge-cyan text-2xs font-extrabold uppercase tracking-wider">
                   {rx.delivery.status.replace(/_/g, ' ')}
-                  {rx.delivery.coldChain ? ' · ❄️ Cold Chain' : ''}
+                  {rx.delivery.coldChain ? ' · Cold Chain' : ''}
                 </span>
               </div>
               
@@ -631,7 +631,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
           <div role="alertdialog" aria-label={tx('Confirm dispensing')} className="border border-[color:var(--t-600)] bg-[color:var(--t-50)] rounded-xl p-4 space-y-3 shadow-md">
             <div className="flex items-center justify-between border-b border-[color:var(--t-200)] pb-2">
               <span className="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
-                <span>⚖️ Poisons Act 1952 Dispensing Sign-Off</span>
+                <span className="inline-flex items-center gap-1.5"><Scale className="h-3.5 w-3.5 text-[color:var(--t-700)] shrink-0" /> Poisons Act 1952 Dispensing Sign-Off</span>
                 <span className="app-badge badge-brand text-2xs font-extrabold uppercase font-mono">Act 366</span>
               </span>
               <span className="font-mono text-xs font-bold text-[color:var(--t-700)]">{rx.code}</span>
@@ -649,10 +649,10 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
                 <input value={poisonsNo} onChange={e => setPoisonsNo(e.target.value)} placeholder={tx('e.g. PB-2026-0841')} aria-label={tx('Poisons book entry number')} maxLength={40} className="w-full border border-slate-300 rounded-none px-2.5 py-1.5 text-xs bg-white outline-none focus:border-[color:var(--t-600)] font-mono font-bold" />
               </div>
             </div>
-            {!rx.safety.shared && <p className="text-2xs font-bold text-amber-900 bg-amber-100 border border-amber-300 p-2 rounded-lg">{tx('⚠️ Allergies were not shared digitally. Confirm verbal patient verification.')}</p>}
+            {!rx.safety.shared && <p className="text-2xs font-bold text-amber-900 bg-amber-100 border border-amber-300 p-2 rounded-none flex items-center gap-1.5"><AlertTriangle className="h-3.5 w-3.5 shrink-0" /> {tx('Allergies were not shared digitally. Confirm verbal patient verification.')}</p>}
             {rx.prescriber && !rx.prescriber.stillVerified && <p className="text-2xs font-bold text-rose-800 bg-rose-100 border border-rose-300 p-2 rounded-lg">{tx('Warning: The prescribing doctor is not currently verified by the medical board.')}</p>}
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              <button type="button" disabled={busy} onClick={dispense} className="btn btn-sm btn-primary">{tx('🔒 Sign & Mark Dispensed')}</button>
+              <button type="button" disabled={busy} onClick={dispense} className="btn btn-sm btn-primary inline-flex items-center gap-1.5"><Lock className="h-3.5 w-3.5 shrink-0" /> {tx('Sign & Mark Dispensed')}</button>
               <button type="button" onClick={() => setConfirming(false)} className="btn btn-sm btn-secondary">{tx('Cancel')}</button>
             </div>
           </div>
@@ -708,7 +708,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
             {rx.assignedToMe && rx.fillStatus !== 'preparing' && rx.fillStatus !== 'ready' && <button type="button" disabled={busy} onClick={() => setStatus('preparing')} className="btn btn-sm btn-secondary">{tx('Preparing')}</button>}
             {rx.assignedToMe && rx.fillStatus !== 'ready' && <button type="button" disabled={busy} onClick={() => setStatus('ready')} className="btn btn-sm btn-secondary">{tx('Ready for pickup')}</button>}
             <button type="button" disabled={busy} onClick={() => setConfirming(true)} className="btn btn-sm btn-primary">
-              <span>⚖️ {tx('Dispense & Sign')}</span>
+              <span className="inline-flex items-center gap-1.5"><Scale className="h-3.5 w-3.5 shrink-0" /> {tx('Dispense & Sign')}</span>
             </button>
           </div>
         </div>

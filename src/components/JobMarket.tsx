@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Briefcase, MapPin, Search, PlusCircle, 
-  CheckCircle2, Loader, Tag, Users, ShieldCheck, LayoutGrid, List, Eye, X, Clock 
+  CheckCircle2, Loader, Tag, Users, ShieldCheck, LayoutGrid, List, Eye, X, Clock,
+  Building2, Stethoscope, Home, Banknote
 } from 'lucide-react';
 import { useTr } from '../locale';
 import { JobPost, Professional, Review, Booking } from '../types';
@@ -23,6 +24,24 @@ interface JobMarketProps {
   bookings?: Booking[];
   onOpenHelp?: () => void;
   embedded?: boolean;
+}
+
+function renderFacilityIcon(job: Partial<JobPost>, className = 'h-5 w-5 text-[color:var(--t-600)]') {
+  const logo = (job.hospitalLogo || '').trim();
+  if (/^(https?:\/\/|\/|data:image\/)/.test(logo)) {
+    return <img src={logo} alt={job.hospitalName || ''} className="h-full w-full object-cover" />;
+  }
+  const combined = `${job.title || ''} ${job.hospitalName || ''} ${job.specialtyRequired || ''}`.toLowerCase();
+  if (logo === '🏠' || logo === '🏡' || logo === 'home' || /\bhome\b|geriatric|eldercare/.test(combined)) {
+    return <Home className={className} />;
+  }
+  if (logo === '🩺' || logo === 'stethoscope' || /\bconsultant\b|\bdoctor\b|\bphysician\b|cardiology/.test(combined)) {
+    return <Stethoscope className={className} />;
+  }
+  if (logo && !/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(logo) && logo !== 'hospital' && logo.length <= 4) {
+    return <span className="text-xs font-black tracking-tight text-[color:var(--t-700)]">{logo}</span>;
+  }
+  return <Building2 className={className} />;
 }
 
 export default function JobMarket({
@@ -273,12 +292,14 @@ export default function JobMarket({
                 </button>
               </div>
             ) : timesheetStatus === 'submitted' ? (
-              <span className="font-bold text-amber-800 bg-amber-50 border border-amber-300 px-2 py-1">
-                ⏱️ Timesheet Submitted ({app.actualHours || 8} hrs) &bull; Pending Supervisor Sign-off
+              <span className="inline-flex items-center gap-1.5 font-bold text-amber-800 bg-amber-50 border border-amber-300 px-2 py-1">
+                <Clock className="h-3.5 w-3.5 shrink-0" />
+                <span>Timesheet Submitted ({app.actualHours || 8} hrs) &bull; Pending Supervisor Sign-off</span>
               </span>
             ) : timesheetStatus === 'approved' ? (
-              <span className="font-bold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-1">
-                💰 RM {totalPayout?.toFixed(2) || '---'} Released to Earnings
+              <span className="inline-flex items-center gap-1.5 font-bold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-1">
+                <Banknote className="h-3.5 w-3.5 shrink-0" />
+                <span>RM {totalPayout?.toFixed(2) || '---'} Released to Earnings</span>
               </span>
             ) : null}
           </div>
@@ -788,7 +809,7 @@ export default function JobMarket({
                         className="bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs p-4 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer"
                       >
                         <div className="flex items-center gap-3.5 flex-1 min-w-0">
-                          <div className="h-11 w-11 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center text-base shrink-0">{job.hospitalLogo}</div>
+                          <div className="h-11 w-11 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center shrink-0">{renderFacilityIcon(job)}</div>
                           <div className="min-w-0">
                             <h3 className="text-base font-bold text-[color:var(--ink)] truncate">{job.title}</h3>
                             <p className="text-xs text-[color:var(--ink-2)] truncate">{job.hospitalName}</p>
@@ -823,7 +844,7 @@ export default function JobMarket({
                     >
                       {/* Header Row */}
                       <div className="flex gap-3 items-start">
-                        <div className="h-11 w-11 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center text-base shrink-0">{job.hospitalLogo}</div>
+                        <div className="h-11 w-11 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center shrink-0">{renderFacilityIcon(job)}</div>
                         <div className="min-w-0 flex-1">
                           <h3 className="text-base font-bold text-[color:var(--ink)] leading-snug">{job.title}</h3>
                           <p className="text-xs text-[color:var(--ink-2)] font-medium mt-0.5">{job.hospitalName}</p>
@@ -898,8 +919,8 @@ export default function JobMarket({
             {/* Header banner */}
             <div className="bg-[color:var(--t-50)] text-[color:var(--ink)] border-b border-[color:var(--t-200)] p-5 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-[color:var(--t-600)] border border-slate-700 rounded-xl flex items-center justify-center text-lg shadow-xs shrink-0">
-                  {selectedModalJob.hospitalLogo}
+                <div className="h-10 w-10 bg-white border border-[color:var(--t-200)] rounded-none flex items-center justify-center shadow-2xs shrink-0">
+                  {renderFacilityIcon(selectedModalJob)}
                 </div>
                 <div>
                   <h4 className="text-base font-bold leading-tight">

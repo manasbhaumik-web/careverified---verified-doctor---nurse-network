@@ -827,8 +827,14 @@ export default function MedicalAssistanceModule({
                         <div>
                           <div className="flex items-center gap-1.5">
                             <span className="font-mono text-xs font-black text-slate-900">{c.trackingCode}</span>
-                            <span className="text-2xs uppercase font-extrabold px-1.5 py-0.2 bg-slate-100 text-slate-700">
-                              {c.patientType === 'local_malaysian' ? `🇲🇾 ${tx('Local')}` : c.patientType === 'expat_resident' ? `🌏 ${tx('Expat')}` : `✈️ ${tx('Int’l')}`}
+                            <span className="inline-flex items-center gap-1 text-2xs uppercase font-extrabold px-1.5 py-0.2 bg-slate-100 text-slate-700">
+                              {c.patientType === 'local_malaysian' ? (
+                                <><MapPin className="h-3 w-3 shrink-0" />{tx('Local')}</>
+                              ) : c.patientType === 'expat_resident' ? (
+                                <><Globe className="h-3 w-3 shrink-0" />{tx('Expat')}</>
+                              ) : (
+                                <><Plane className="h-3 w-3 shrink-0" />{tx('Int’l')}</>
+                              )}
                             </span>
                           </div>
                           <p className="text-xs font-bold text-slate-800 mt-1 line-clamp-1">{c.summary}</p>

@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  Building2, FileText, DollarSign, CheckCircle2, BadgeCheck, Receipt, ShieldCheck
+  Building2, FileText, DollarSign, CheckCircle2, BadgeCheck, Receipt, ShieldCheck,
+  Plane, Globe, MapPin, AlertTriangle, Zap
 } from 'lucide-react';
 import { useTr } from '../../locale';
 import WorkspaceHeader from '../WorkspaceHeader';
@@ -92,21 +93,31 @@ export default function FacilityCasesTab({
                           {c.trackingCode}
                         </span>
                       )}
-                      <span className={`px-2 py-0.5 text-2xs font-extrabold uppercase border ${
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-extrabold uppercase border ${
                         c.patientType === 'international_traveler'
                           ? 'bg-sky-50 text-sky-800 border-sky-300'
                           : c.patientType === 'expat_resident'
                           ? 'bg-purple-50 text-purple-800 border-purple-300'
                           : 'bg-emerald-50 text-emerald-800 border-emerald-300'
                       }`}>
-                        {c.patientType === 'international_traveler' ? '✈️ Int’l Traveler' : c.patientType === 'expat_resident' ? '🌏 Expat Resident' : '🇲🇾 Local Citizen'}
+                        {c.patientType === 'international_traveler' ? (
+                          <><Plane className="h-3 w-3 shrink-0" /> Int’l Traveler</>
+                        ) : c.patientType === 'expat_resident' ? (
+                          <><Globe className="h-3 w-3 shrink-0" /> Expat Resident</>
+                        ) : (
+                          <><MapPin className="h-3 w-3 shrink-0" /> Local Citizen</>
+                        )}
                       </span>
                       <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-2xs font-extrabold uppercase">
                         Origin: {c.country}
                       </span>
                       {c.urgency && c.urgency !== 'routine' && (
-                        <span className="px-2 py-0.5 bg-red-50 text-red-700 border border-red-300 text-2xs font-black uppercase">
-                          {c.urgency === 'urgent' ? '🚨 Urgent' : '⚡ Priority'}
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-700 border border-red-300 text-2xs font-black uppercase">
+                          {c.urgency === 'urgent' ? (
+                            <><AlertTriangle className="h-3 w-3 shrink-0" /> Urgent</>
+                          ) : (
+                            <><Zap className="h-3 w-3 shrink-0" /> Priority</>
+                          )}
                         </span>
                       )}
                       {c.guaranteeLetter && (
@@ -140,7 +151,7 @@ export default function FacilityCasesTab({
 
                     {c.revisionNotes && (
                       <div className="p-2 bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold flex items-center gap-1.5">
-                        <span className="font-black text-amber-800 uppercase text-xs">{tx('⚠️ Patient Requested Revision:')}</span>
+                        <span className="inline-flex items-center gap-1 font-black text-amber-800 uppercase text-xs"><AlertTriangle className="h-3.5 w-3.5 shrink-0" />{tx('Patient Requested Revision:')}</span>
                         <span>"{c.revisionNotes}"</span>
                       </div>
                     )}

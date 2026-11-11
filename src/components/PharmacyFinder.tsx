@@ -188,7 +188,7 @@ export default function PharmacyFinder({ embedded = false }: { embedded?: boolea
                       {p.coldChain ? (
                         <span className="app-badge badge-cyan shrink-0">
                           <Thermometer className="h-3 w-3 shrink-0" />
-                          {tx('Cold Chain ❄️')}
+                          {tx('Cold Chain')}
                         </span>
                       ) : (
                         <span className="app-badge badge-neutral shrink-0">

@@ -3989,7 +3989,7 @@ var INITIAL_JOBS = [
   {
     id: "job-1",
     hospitalName: "Damansara Specialist Medical Center",
-    hospitalLogo: "\u{1F3E5}",
+    hospitalLogo: "hospital",
     title: "Critical Care Nurse (ICU) - Night Shift Focus",
     type: "Shift-based",
     location: "Damansara Utama",
@@ -4011,7 +4011,7 @@ var INITIAL_JOBS = [
   {
     id: "job-2",
     hospitalName: "Kuala Lumpur Specialist Hospital",
-    hospitalLogo: "\u{1FA7A}",
+    hospitalLogo: "stethoscope",
     title: "Junior Consultant - Paediatric Cardiology",
     type: "Full-time",
     location: "Bangsar",
@@ -4033,7 +4033,7 @@ var INITIAL_JOBS = [
   {
     id: "job-3",
     hospitalName: "Metro Home Healthcare",
-    hospitalLogo: "\u{1F3E0}",
+    hospitalLogo: "home",
     title: "Home Geriatric Care Nurse",
     type: "Contract",
     location: "Bandar Sunway",
@@ -5040,7 +5040,7 @@ app.post("/api/jobs", requireRole("practitioner", "admin"), (req, res) => {
     id: generateId("job"),
     postedByUserId: req.user.id,
     hospitalName,
-    hospitalLogo: "\u{1F3E5}",
+    hospitalLogo: "hospital",
     title,
     type: type || "Full-time",
     location: str7(req.body.location, 120) || "Main Wing",

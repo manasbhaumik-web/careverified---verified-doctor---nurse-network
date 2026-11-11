@@ -1409,22 +1409,26 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                 POPULAR:
               </span>
               {[
-                { label: '🩺 General Practitioner', key: 'gp', q: 'General' },
-                { label: '👶 Pediatrician', key: 'peds', q: 'Pediatric' },
-                { label: '🩹 Home Nursing', key: 'nursing', q: 'Nurse' },
-                { label: '💊 E-Prescriptions', key: 'prescriptions', q: 'Pharmacy' },
-                { label: '🏥 Specialist Hospitals', key: 'hospitals', q: 'Hospital' },
-                { label: '❤️ Cardiology', key: 'cardio', q: 'Cardio' },
-              ].map((pill) => (
-                <button
-                  key={pill.label}
-                  type="button"
-                  onClick={() => handleQuickTagClick(pill.key, pill.q)}
-                  className="px-2.5 py-1 text-xs font-bold bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] text-[color:var(--t-700)] hover:text-white border border-[color:var(--t-200)] hover:border-[color:var(--t-700)] transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
-                >
-                  {pill.label}
-                </button>
-              ))}
+                { label: 'General Practitioner', key: 'gp', q: 'General', icon: Stethoscope },
+                { label: 'Pediatrician', key: 'peds', q: 'Pediatric', icon: Users },
+                { label: 'Home Nursing', key: 'nursing', q: 'Nurse', icon: Heart },
+                { label: 'E-Prescriptions', key: 'prescriptions', q: 'Pharmacy', icon: Pill },
+                { label: 'Specialist Hospitals', key: 'hospitals', q: 'Hospital', icon: Building2 },
+                { label: 'Cardiology', key: 'cardio', q: 'Cardio', icon: Activity },
+              ].map((pill) => {
+                const PillIcon = pill.icon;
+                return (
+                  <button
+                    key={pill.label}
+                    type="button"
+                    onClick={() => handleQuickTagClick(pill.key, pill.q)}
+                    className="px-2.5 py-1 text-xs font-bold bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] text-[color:var(--t-700)] hover:text-white border border-[color:var(--t-200)] hover:border-[color:var(--t-700)] transition-colors cursor-pointer shadow-2xs whitespace-nowrap inline-flex items-center gap-1.5"
+                  >
+                    <PillIcon className="h-3.5 w-3.5 shrink-0" />
+                    <span>{pill.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
           </div>

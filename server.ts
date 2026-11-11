@@ -1354,7 +1354,7 @@ app.post("/api/jobs", requireRole("practitioner", "admin", "facility"), (req, re
     id: generateId("job"),
     postedByUserId: req.user!.id,
     hospitalName,
-    hospitalLogo: "🏥",
+    hospitalLogo: "hospital",
     title,
     type: f.type,
     sector: f.sector, state: f.state, roleRequired: f.roleRequired, facilityId: f.facilityId,

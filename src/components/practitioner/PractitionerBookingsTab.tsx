@@ -426,7 +426,7 @@ export default function PractitionerBookingsTab({
                         className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black py-2 rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         <CheckCircle2 className="h-4 w-4" />
-                        <span>{tx('✅ COMPLETE CRITICAL CARE DISPATCH')}</span>
+                        <span>{tx('COMPLETE CRITICAL CARE DISPATCH')}</span>
                       </button>
                     )}
 

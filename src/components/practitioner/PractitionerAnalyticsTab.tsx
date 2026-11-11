@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, Star } from 'lucide-react';
+import { TrendingUp, Star, AlertTriangle } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking, OnCallDispatch, ConsultationMode } from '../../types';
 import { formatMoney, useTr } from '../../locale';
 import WorkspaceHeader from '../WorkspaceHeader';
@@ -149,7 +149,7 @@ export default function PractitionerAnalyticsTab({
               {completedDispatches.map(d => (
                 <tr key={d.id} className="hover:bg-slate-55/20 transition-colors">
                   <td className="py-3 font-extrabold text-slate-800">{d.patientName}</td>
-                  <td className="py-3 text-rose-600 font-bold">{tx('🚨 Emergency Dispatch')}</td>
+                  <td className="py-3 text-rose-600 font-bold"><span className="inline-flex items-center gap-1.5"><AlertTriangle className="h-3.5 w-3.5 shrink-0" /> {tx('Emergency Dispatch')}</span></td>
                   <td className="py-3 font-semibold">{(d as any).reason}</td>
                   <td className="py-3 font-mono tabular-nums">{((d as any).timestamp || '').split(' ')[0]}</td>
                   <td className="py-3 text-right font-mono tabular-nums font-bold text-slate-900">{tx('RM 250')}</td>
