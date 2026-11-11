@@ -438,7 +438,7 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
           {/* Unified Single-Row h-11 Filter Control Bar */}
           <div className="bg-white border border-[color:var(--t-200)] p-4 shadow-2xs space-y-3">
             <div className="flex flex-wrap items-center gap-3">
-              <div className="relative flex-1 min-w-[min(100%,260px)]">
+              <div className="relative flex-[999_1_280px] min-w-[min(100%,280px)]">
                 <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
@@ -457,7 +457,7 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center gap-2.5 max-w-full">
+              <div className="flex flex-wrap items-center gap-2.5 flex-auto max-w-full">
                 <FilterSelect label={tx('State')} value={f.state} onChange={v => setF({ ...f, state: v })}>
                   <option value="">{tx('Any state')}</option>
                   {MY_STATES.map(s => <option key={s} value={s}>{tx(s)}</option>)}
@@ -469,10 +469,10 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
                   <option value="nurse">{tx('Nurses')}</option>
                 </FilterSelect>
 
-                <label className="flex items-center gap-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-3 h-11 max-w-full min-w-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors">
+                <label className="flex items-center gap-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-3 h-11 flex-auto max-w-full min-w-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors">
                   <span className="text-2xs font-black uppercase tracking-widest text-slate-400 shrink-0">{tx('Max RM:')}</span>
                   <input
-                    className="w-20 bg-transparent text-xs font-bold text-[color:var(--ink)] outline-none"
+                    className="flex-1 min-w-[70px] bg-transparent text-xs font-bold text-[color:var(--ink)] outline-none"
                     type="number"
                     placeholder={tx('Max RM rate')}
                     value={f.maxRate}
@@ -480,10 +480,10 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
                   />
                 </label>
 
-                <label className="flex items-center gap-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-3 h-11 max-w-full min-w-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors">
+                <label className="flex items-center gap-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-3 h-11 flex-auto max-w-full min-w-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors">
                   <span className="text-2xs font-black uppercase tracking-widest text-slate-400 shrink-0">{tx('Free on:')}</span>
                   <input
-                    className="bg-transparent text-xs font-bold text-[color:var(--ink)] outline-none"
+                    className="flex-1 min-w-0 bg-transparent text-xs font-bold text-[color:var(--ink)] outline-none"
                     type="date"
                     value={f.date}
                     onChange={e => setF({ ...f, date: e.target.value })}

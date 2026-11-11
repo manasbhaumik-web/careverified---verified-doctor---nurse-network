@@ -404,7 +404,7 @@ export default function MedicalPackagesModule({
             <div className="bg-white border border-[color:var(--t-200)] p-4 shadow-2xs space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 {/* 1. Search Input (h-11) */}
-                <div className="relative flex-1 min-w-[min(100%,280px)]">
+                <div className="relative flex-[999_1_320px] min-w-[min(100%,320px)]">
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <input
                     type="text"
@@ -425,9 +425,9 @@ export default function MedicalPackagesModule({
                   )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 max-w-full">
+                <div className="flex flex-wrap items-center gap-2.5 flex-auto max-w-full">
                   {/* 2. Category Dropdown List (h-11) */}
-                  <label className="flex items-center h-11 border border-[color:var(--t-200)] bg-white px-3 gap-2 max-w-full min-w-0 focus-within:border-[color:var(--t-600)]">
+                  <label className="flex items-center h-11 border border-[color:var(--t-200)] bg-white px-3 gap-2 flex-auto max-w-full min-w-0 focus-within:border-[color:var(--t-600)]">
                     <span className="text-2xs font-mono font-black uppercase tracking-wider text-slate-500 shrink-0">
                       {tx('Category:')}
                     </span>
@@ -435,7 +435,7 @@ export default function MedicalPackagesModule({
                       aria-label={tx('Category')}
                       value={selectedCategory}
                       onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="h-full bg-transparent text-xs font-bold text-[color:var(--ink)] pr-2 cursor-pointer focus:outline-none"
+                      className="flex-1 min-w-0 max-w-full h-full bg-transparent text-xs font-bold text-[color:var(--ink)] pr-2 cursor-pointer focus:outline-none"
                     >
                       {CATEGORIES.map((cat) => (
                         <option key={cat} value={cat}>
@@ -446,7 +446,7 @@ export default function MedicalPackagesModule({
                   </label>
 
                   {/* 3. Target Audience Segmented Toggle (Exact h-11 outer height to match Search & Dropdowns) */}
-                  <div className="flex items-center h-11 border border-[color:var(--t-200)] bg-[color:var(--t-50)]/40 p-1 gap-1 max-w-full overflow-x-auto">
+                  <div className="flex items-center h-11 border border-[color:var(--t-200)] bg-[color:var(--t-50)]/40 p-1 gap-1 flex-auto max-w-full overflow-x-auto">
                     <span className="text-2xs font-mono font-black uppercase tracking-wider text-slate-500 px-2 flex items-center gap-1 shrink-0">
                       <Filter className="h-3 w-3 text-[color:var(--t-600)]" />
                       {tx('Audience:')}
@@ -460,7 +460,7 @@ export default function MedicalPackagesModule({
                         key={aud.id}
                         type="button"
                         onClick={() => setSelectedAudience(aud.id as any)}
-                        className={`h-full text-xs font-bold px-3 transition-all cursor-pointer rounded-none flex items-center justify-center whitespace-nowrap ${
+                        className={`flex-1 h-full text-xs font-bold px-3 transition-all cursor-pointer rounded-none flex items-center justify-center whitespace-nowrap ${
                           selectedAudience === aud.id
                             ? 'bg-[color:var(--t-600)] text-white shadow-2xs'
                             : 'text-slate-600 hover:text-[color:var(--ink)] hover:bg-white'
@@ -472,7 +472,7 @@ export default function MedicalPackagesModule({
                   </div>
 
                   {/* 4. Sort By Dropdown (h-11) */}
-                  <label className="flex items-center h-11 border border-[color:var(--t-200)] bg-white px-3 gap-2 max-w-full min-w-0 focus-within:border-[color:var(--t-600)]">
+                  <label className="flex items-center h-11 border border-[color:var(--t-200)] bg-white px-3 gap-2 flex-auto max-w-full min-w-0 focus-within:border-[color:var(--t-600)]">
                     <span className="text-2xs font-mono font-black uppercase tracking-wider text-slate-500 shrink-0">
                       {tx('Sort by:')}
                     </span>
@@ -480,7 +480,7 @@ export default function MedicalPackagesModule({
                       aria-label={tx('Sort by')}
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as PackageSort)}
-                      className="h-full bg-transparent text-xs font-bold text-[color:var(--ink)] pr-2 cursor-pointer focus:outline-none"
+                      className="flex-1 min-w-0 max-w-full h-full bg-transparent text-xs font-bold text-[color:var(--ink)] pr-2 cursor-pointer focus:outline-none"
                     >
                       <option value="featured">{tx('Recommended')}</option>
                       <option value="price-asc">{tx('Price: Low to High')}</option>

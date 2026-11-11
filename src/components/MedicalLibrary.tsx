@@ -393,7 +393,7 @@ export default function MedicalLibrary({
         <section aria-label={tx('Find articles')} className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
           <div className="flex flex-wrap items-center gap-3">
             {/* Search Input */}
-            <div className="flex-1 min-w-[min(100%,280px)] flex items-center gap-3 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-4 h-11 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors">
+            <div className="flex-[999_1_320px] min-w-[min(100%,320px)] flex items-center gap-3 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-4 h-11 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors">
               <label htmlFor="library-search" className="sr-only">{tx('Search articles')}</label>
               <Search className="h-4 w-4 text-slate-400 shrink-0" />
               <input
@@ -407,7 +407,7 @@ export default function MedicalLibrary({
             </div>
 
             {/* Inline Dropdowns & Saved Toggle */}
-            <div className="flex flex-wrap items-center gap-2.5 max-w-full">
+            <div className="flex flex-wrap items-center gap-2.5 flex-auto max-w-full">
               <FilterSelect label={tx('Topic')} value={category} onChange={setCategory}>
                 <option value={ALL}>{tx('All Topics ({n})', { n: articles.length })}</option>
                 {categories.map(([c, n]) => <option key={c} value={c}>{tx(c)} ({n})</option>)}
@@ -431,7 +431,7 @@ export default function MedicalLibrary({
                 </>
               )}
               <button type="button" aria-pressed={onlySaved} onClick={() => setOnlySaved(v => !v)}
-                className={`h-11 px-4 text-xs font-bold border inline-flex items-center gap-2 cursor-pointer transition-colors ${onlySaved ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' : 'bg-[color:var(--t-bg)] border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'}`}>
+                className={`h-11 px-4 text-xs font-bold border inline-flex items-center gap-2 shrink-0 ml-auto cursor-pointer transition-colors ${onlySaved ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' : 'bg-[color:var(--t-bg)] border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-50)]'}`}>
                 <Bookmark className="h-3.5 w-3.5" /> {tx('Saved ({n})', { n: savedIds.length })}
               </button>
             </div>
