@@ -568,9 +568,9 @@ export default function JobMarket({
           <>
             {/* UNIFIED SINGLE-ROW h-11 FILTER CONTROL BAR */}
             <section aria-label={tx('Filters')} className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
-              <div className="flex flex-col xl:flex-row xl:items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 {/* Search Input */}
-                <div className="relative flex-1 min-w-[240px]">
+                <div className="relative flex-1 min-w-[min(100%,280px)]">
                   <label htmlFor="job-search" className="sr-only">{tx('Search shifts')}</label>
                   <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
@@ -594,7 +594,7 @@ export default function JobMarket({
                 </div>
 
                 {/* Inline Dropdowns & Grid/List View Toggle */}
-                <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                <div className="flex flex-wrap items-center gap-2.5 max-w-full">
                   <FilterSelect label={tx('Role')} value={filter.role} onChange={v => setFilter({ ...filter, role: v })}>
                     <option value="all">{tx('Doctors & Nurses')}</option>
                     <option value="doctor">{tx('Doctors Only')}</option>

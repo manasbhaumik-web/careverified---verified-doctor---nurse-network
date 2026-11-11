@@ -79,9 +79,9 @@ export default function PharmacyFinder({ embedded = false }: { embedded?: boolea
       <div className={embedded ? "space-y-5 pt-2" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
         {/* Unified Single-Row Filter Control Bar */}
         <section aria-label={tx('Find pharmacies')} className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
-          <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             {/* Search Input */}
-            <div className="relative flex-1 min-w-[240px]">
+            <div className="relative flex-1 min-w-[min(100%,260px)]">
               <label htmlFor="pharmacy-search" className="sr-only">{tx('Search pharmacies')}</label>
               <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
@@ -105,7 +105,7 @@ export default function PharmacyFinder({ embedded = false }: { embedded?: boolea
             </div>
 
             {/* Inline Dropdown Filters */}
-            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <div className="flex flex-wrap items-center gap-2.5 max-w-full">
               <FilterSelect label={tx('City')} value={city} onChange={setCity}>
                 <option value={ALL}>{tx('All Cities ({n})', { n: cities.length })}</option>
                 {cities.map(c => <option key={c} value={c}>{tx(c)}</option>)}

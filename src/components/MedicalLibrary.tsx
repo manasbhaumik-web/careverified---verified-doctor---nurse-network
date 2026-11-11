@@ -391,9 +391,9 @@ export default function MedicalLibrary({
         )}
         {/* Unified Single-Row Filter Control Bar */}
         <section aria-label={tx('Find articles')} className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
-          <div className="flex flex-col xl:flex-row xl:items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             {/* Search Input */}
-            <div className="flex-1 min-w-[240px] flex items-center gap-3 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-4 h-11 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors">
+            <div className="flex-1 min-w-[min(100%,280px)] flex items-center gap-3 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-4 h-11 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors">
               <label htmlFor="library-search" className="sr-only">{tx('Search articles')}</label>
               <Search className="h-4 w-4 text-slate-400 shrink-0" />
               <input
@@ -407,7 +407,7 @@ export default function MedicalLibrary({
             </div>
 
             {/* Inline Dropdowns & Saved Toggle */}
-            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <div className="flex flex-wrap items-center gap-2.5 max-w-full">
               <FilterSelect label={tx('Topic')} value={category} onChange={setCategory}>
                 <option value={ALL}>{tx('All Topics ({n})', { n: articles.length })}</option>
                 {categories.map(([c, n]) => <option key={c} value={c}>{tx(c)} ({n})</option>)}

@@ -2011,9 +2011,9 @@ export default function PatientDashboard({
 
             {/* Unified Single-Row Filter Control Bar */}
             <section aria-label={tx('Filter doctors')} className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
-              <div className="flex flex-col xl:flex-row xl:items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 {/* Search Input */}
-                <div className="relative flex-1 min-w-[240px]">
+                <div className="relative flex-1 min-w-[min(100%,260px)]">
                   <label htmlFor="registry-doctor-search" className="sr-only">{tx('Search doctors')}</label>
                   <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
@@ -2037,7 +2037,7 @@ export default function PatientDashboard({
                 </div>
 
                 {/* Inline Dropdown Controls */}
-                <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                <div className="flex flex-wrap items-center gap-2.5 max-w-full">
                   <FilterSelect
                     label={tx('Specialty')}
                     value={selectedSpecialtyFilter ? selectedSpecialtyFilter : registrySpecialty}
@@ -2257,9 +2257,9 @@ export default function PatientDashboard({
 
             {/* Unified Single-Row Filter Control Bar */}
             <section aria-label={tx('Filter nurses')} className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
-              <div className="flex flex-col xl:flex-row xl:items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 {/* Search Input */}
-                <div className="relative flex-1 min-w-[240px]">
+                <div className="relative flex-1 min-w-[min(100%,260px)]">
                   <label htmlFor="registry-nurse-search" className="sr-only">{tx('Search nurses')}</label>
                   <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
@@ -2283,7 +2283,7 @@ export default function PatientDashboard({
                 </div>
 
                 {/* Inline Dropdown Controls */}
-                <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                <div className="flex flex-wrap items-center gap-2.5 max-w-full">
                   <FilterSelect label={tx('Specialty')} value={nursesSpecialty} onChange={setNursesSpecialty}>
                     <option value="all">{tx('All Specialties ({n})', { n: nurseSpecialties.length })}</option>
                     {nurseSpecialties.map(spec => (
