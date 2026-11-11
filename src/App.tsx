@@ -830,13 +830,19 @@ export default function App() {
                       setSelectedProfId(null);
                     }}
                     onKeyDown={(e) => handleNavKeyDown(e, item.id)}
-                    className={`relative flex items-center gap-2 px-3.5 xl:px-4.5 h-12 text-xs font-extrabold whitespace-nowrap shrink-0 transition-colors duration-150 cursor-pointer select-none rounded-none focus:outline-none border-b-2 ${
+                    className={`relative flex items-center gap-2 px-3.5 xl:px-4.5 h-12 text-xs whitespace-nowrap shrink-0 transition-colors duration-150 cursor-pointer select-none rounded-none focus:outline-none focus-visible:underline focus-visible:underline-offset-4 bg-transparent ${
                       isActive
-                        ? 'text-white font-black border-b-white bg-transparent'
-                        : 'text-white/75 border-b-transparent hover:text-white hover:bg-white/5'
+                        ? 'text-white font-black'
+                        : 'text-white/70 font-semibold hover:text-white'
                     }`}
                   >
-                    <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-white/70'}`} />
+                    {isActive && (
+                      <span
+                        className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.9)] shrink-0"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <Icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? 'text-emerald-300' : 'text-white/60'}`} />
                     <span>{tt(item.name)}</span>
 
                     {item.id === 'patient_care' && (

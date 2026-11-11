@@ -167,13 +167,19 @@ export default function DashboardHeader<T extends string>({
                     tabIndex={selected ? 0 : -1}
                     onClick={() => onTabChange?.(tab.id)}
                     onKeyDown={handleKeyDown}
-                    className={`shrink-0 min-h-[40px] px-4 text-xs flex items-center gap-2 cursor-pointer transition-colors border-b-2 ${
+                    className={`shrink-0 min-h-[40px] px-4 text-xs flex items-center gap-2 cursor-pointer transition-colors bg-transparent focus:outline-none focus-visible:underline focus-visible:underline-offset-4 ${
                       selected
-                        ? 'font-black text-[color:var(--t-900)] border-b-[color:var(--t-600)] bg-transparent'
-                        : 'font-semibold text-slate-700 border-b-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-100)]/60'
+                        ? 'font-black text-[color:var(--t-900)]'
+                        : 'font-semibold text-slate-600 hover:text-[color:var(--t-800)]'
                     }`}
                   >
-                    <tab.icon className={`h-4 w-4 ${selected ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
+                    {selected && (
+                      <span
+                        className="w-1.5 h-1.5 rounded-full bg-[color:var(--t-600)] shadow-[0_0_6px_rgba(13,148,136,0.65)] shrink-0"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <tab.icon className={`h-4 w-4 transition-colors ${selected ? 'text-[color:var(--t-700)]' : 'text-slate-400'}`} />
                     <span className="whitespace-nowrap">{tab.label}</span>
                     {tab.count !== undefined && tab.count > 0 && (
                       <span className="tabular-nums text-2xs min-w-[20px] text-center px-1.5 py-0.5 rounded-none font-extrabold bg-[color:var(--t-600)] text-white leading-none">

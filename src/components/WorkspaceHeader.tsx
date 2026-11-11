@@ -133,14 +133,20 @@ export default function WorkspaceHeader<T extends string = string>({
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => onTabChange?.(tab.id)}
-                  className={`h-9 px-3.5 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 border-b-2 ${
+                  className={`h-9 px-3.5 text-xs transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 bg-transparent focus:outline-none focus-visible:underline focus-visible:underline-offset-4 ${
                     isActive
-                      ? 'text-[color:var(--t-900)] border-b-[color:var(--t-600)] font-black bg-transparent'
-                      : 'text-slate-700 border-b-transparent hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-100)]/60 bg-transparent'
+                      ? 'text-[color:var(--t-900)] font-black'
+                      : 'text-slate-600 font-semibold hover:text-[color:var(--t-800)]'
                   }`}
                 >
+                  {isActive && (
+                    <span
+                      className="w-1.5 h-1.5 rounded-full bg-[color:var(--t-600)] shadow-[0_0_6px_rgba(13,148,136,0.65)] shrink-0"
+                      aria-hidden="true"
+                    />
+                  )}
                   {TabIcon && (
-                    <TabIcon className={`h-3.5 w-3.5 ${isActive ? 'text-white' : 'text-slate-600'}`} />
+                    <TabIcon className={`h-3.5 w-3.5 transition-colors ${isActive ? 'text-[color:var(--t-700)]' : 'text-slate-400'}`} />
                   )}
                   <span>{tab.label}</span>
                   {tab.count !== undefined && (
