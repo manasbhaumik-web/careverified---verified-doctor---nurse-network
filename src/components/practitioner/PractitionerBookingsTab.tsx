@@ -298,8 +298,6 @@ export default function PractitionerBookingsTab({
                   value={nursingNotes}
                   onChange={(e) => setNursingNotes(e.target.value)}
                   className="form-textarea text-xs"
-                  placeholder={tx('Record patient comfort, wound margin condition, pain score, or medical instructions given to caregiver...')}
-                  className="w-full text-xs border border-[color:var(--t-200)] rounded-none p-3 outline-none focus:ring-1 focus:ring-emerald-600 font-semibold text-slate-800 bg-white"
                   required
                 />
               </div>
