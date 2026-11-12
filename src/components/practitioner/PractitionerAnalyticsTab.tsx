@@ -25,9 +25,10 @@ export default function PractitionerAnalyticsTab({
   const completedDispatches = dispatches.filter(d => d.doctorId === matchedProfile.id && d.dispatchStatus === 'Completed');
 
   const totalBookingsEarned = completedBookings.reduce((sum, b) => sum + b.fee, 0);
-  const totalDispatchesEarned = completedDispatches.length * 250;
+  const totalDispatchesEarned = completedDispatches.reduce((sum, d) => sum + ((d as any).fee ?? 0), 0);
   const totalEarnings = totalBookingsEarned + totalDispatchesEarned;
   const totalAttendedCount = completedBookings.length + completedDispatches.length;
+  const completionRatePct = myBookings.length > 0 ? Math.round((completedBookings.length / myBookings.length) * 100) : null;
 
   const videoEarned = completedBookings.filter(b => b.mode === ConsultationMode.VIDEO).reduce((sum, b) => sum + b.fee, 0);
   const inPersonEarned = completedBookings.filter(b => b.mode === ConsultationMode.IN_PERSON).reduce((sum, b) => sum + b.fee, 0);
@@ -42,7 +43,7 @@ export default function PractitionerAnalyticsTab({
         badges={
           <>
             <BannerBadge tone="brand">{tx('Practice Intelligence')}</BannerBadge>
-            <BannerBadge tone="success">{tx('100% Payout Rate')}</BannerBadge>
+            <BannerBadge tone="success">{tx('Live Ledger')}</BannerBadge>
           </>
         }
       />
@@ -50,9 +51,8 @@ export default function PractitionerAnalyticsTab({
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
           <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Generated Income')}</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{formatMoney(totalEarnings)}</span>
-          <p className="text-xs text-emerald-600 font-bold flex items-center gap-0.5">
-            <TrendingUp className="h-3 w-3" />
-            <span>{tx('100% practitioner distribution')}</span>
+          <p className="text-xs text-slate-600 font-semibold">
+            {tx('{n} finalized items', { n: totalAttendedCount })}
           </p>
         </div>
 
@@ -72,9 +72,9 @@ export default function PractitionerAnalyticsTab({
         </div>
 
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Clinical Accuracy')}</span>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--e-700)] tabular-nums">99.8%</span>
-          <p className="text-xs text-slate-500 font-semibold">{tx('Government standard audit cleared')}</p>
+          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Completion Rate')}</span>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--e-700)] tabular-nums">{completionRatePct != null ? `${completionRatePct}%` : '—'}</span>
+          <p className="text-xs text-slate-500 font-semibold">{tx('{a} of {b} bookings completed', { a: completedBookings.length, b: myBookings.length })}</p>
         </div>
       </div>
 
@@ -152,7 +152,7 @@ export default function PractitionerAnalyticsTab({
                   <td className="py-3 text-rose-600 font-bold"><span className="inline-flex items-center gap-1.5"><AlertTriangle className="h-3.5 w-3.5 shrink-0" /> {tx('Emergency Dispatch')}</span></td>
                   <td className="py-3 font-semibold">{(d as any).reason}</td>
                   <td className="py-3 font-mono tabular-nums">{((d as any).timestamp || '').split(' ')[0]}</td>
-                  <td className="py-3 text-right font-mono tabular-nums font-bold text-slate-900">{tx('RM 250')}</td>
+                  <td className="py-3 text-right font-mono tabular-nums font-bold text-slate-900">{(d as any).fee != null ? formatMoney((d as any).fee) : '—'}</td>
                 </tr>
               ))}
               {completedBookings.length === 0 && completedDispatches.length === 0 && (

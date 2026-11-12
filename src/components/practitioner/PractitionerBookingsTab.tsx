@@ -3,7 +3,7 @@ import {
   FileSignature, X, ShieldCheck, Loader, Ambulance, MapPin, CheckCircle2, Calendar, Clock, Check,
   ClipboardList, HeartPulse, Activity, Bandage, Stethoscope
 } from 'lucide-react';
-import { useTr } from '../../locale';
+import { formatMoney, useTr } from '../../locale';
 import { DoctorProfile, NurseProfile, Booking, OnCallDispatch } from '../../types';
 
 interface PractitionerBookingsTabProps {
@@ -346,7 +346,7 @@ export default function PractitionerBookingsTab({
         <div className="border-b border-[color:var(--t-200)] pb-3 flex items-center justify-between">
           <div>
             <h3 className="text-sm font-black text-rose-600 uppercase tracking-widest flex items-center gap-1.5">
-              <Ambulance className="h-4.5 w-4.5 text-rose-500 animate-bounce" />
+              <Ambulance className="h-4.5 w-4.5 text-rose-500" />
               {tx('Urgent On-Call Emergency Center')}
             </h3>
             <p className="text-xs text-slate-500 font-medium mt-0.5">{tx('Claim active emergency dispatch tickets requested by high-risk patients nearby.')}</p>
@@ -393,7 +393,9 @@ export default function PractitionerBookingsTab({
                   </div>
 
                   <div className="flex justify-between items-center text-xs">
-                    <span className="font-black text-rose-600">{tx('Base Compensation: RM 250')}</span>
+                    <span className="font-black text-rose-600">
+                      {(dispatch as any).fee != null ? `${tx('Compensation:')} ${formatMoney((dispatch as any).fee)}` : tx('Standard Emergency Tariff')}
+                    </span>
                     {dispatch.etaMinutes ? (
                       <span className="text-xs text-slate-400 font-mono font-bold">ETA: {dispatch.etaMinutes} mins</span>
                     ) : null}

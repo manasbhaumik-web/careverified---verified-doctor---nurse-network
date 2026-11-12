@@ -99,29 +99,29 @@ export default function PractitionerHeroBanner<T extends string = string>({
   );
 
   const fallbackProfile: Professional = {
-    id: currentUser?.profileId || currentUser?.id || 'DOC-DEMO',
+    id: currentUser?.profileId || currentUser?.id || '—',
     name: currentUser?.name || 'Practitioner Account',
     avatar: currentUser?.avatarUrl || (currentUser?.role === 'nurse' ? '/assets/malaysian_female_nurse.jpg' : '/assets/malaysian_female_doctor.jpg'),
-    role: UserRole.DOCTOR,
-    specialization: 'General Practice & Telemedicine',
-    licenseNumber: 'MMC-ACTIVE',
-    medicalCouncil: 'Malaysian Medical Council (MMC)',
-    experienceYears: 10,
-    education: ['MBBS (UM)'],
-    bio: 'Licensed healthcare professional verified by the Malaysian Medical Board.',
+    role: currentUser?.role === 'nurse' ? UserRole.NURSE : UserRole.DOCTOR,
+    specialization: currentUser?.role === 'nurse' ? 'Registered Nursing' : 'General Practice',
+    licenseNumber: 'Pending Verification',
+    medicalCouncil: currentUser?.role === 'nurse' ? 'Lembaga Jururawat Malaysia (LJM)' : 'Malaysian Medical Council (MMC)',
+    experienceYears: 0,
+    education: [],
+    bio: 'Practitioner profile awaiting credential synchronization.',
     languages: ['English', 'Bahasa Melayu'],
     consultationModes: [ConsultationMode.VIDEO, ConsultationMode.IN_PERSON],
-    fee: 150,
-    rating: 5.0,
-    reviewCount: 1,
-    verificationStatus: VerificationStatus.VERIFIED,
-    practiceAddress: 'Beach Specialist Center',
+    fee: 0,
+    rating: 0,
+    reviewCount: 0,
+    verificationStatus: VerificationStatus.PENDING,
+    practiceAddress: '—',
     city: 'Kuala Lumpur',
     availability: {
-      days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-      slots: ['09:00 AM', '10:00 AM', '02:00 PM', '04:00 PM'],
+      days: [],
+      slots: [],
     },
-    seoSlug: 'dr-practitioner',
+    seoSlug: '',
   };
 
   const profile = matchedProfile || fallbackProfile;
@@ -136,7 +136,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
   const patientsAttendedCount = new Set(attendedBookings.map(b => b.patientId)).size;
   const avgOverall = myReviews.length > 0
     ? (myReviews.reduce((sum, r) => sum + r.rating, 0) / myReviews.length).toFixed(1)
-    : (profile.rating ? profile.rating.toFixed(1) : '5.0');
+    : (profile.rating > 0 ? profile.rating.toFixed(1) : null);
 
   return (
     <>
@@ -204,7 +204,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
               <BannerKpis items={[
                 { value: patientsAttendedCount, label: tx('Patients') },
                 { value: upcomingBookingsCount, label: tx('Upcoming') },
-                { value: avgOverall ?? '5.0', label: tx('Rating') },
+                { value: avgOverall ?? '—', label: tx('Rating') },
               ]} />
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                 <button type="button" onClick={() => setShowPublicProfilePreview(true)} className={bannerOnBrandPrimaryBtn}>

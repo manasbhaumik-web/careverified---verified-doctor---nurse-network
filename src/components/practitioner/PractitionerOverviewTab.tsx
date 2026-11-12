@@ -23,7 +23,11 @@ export default function PractitionerOverviewTab({
   matchedProfile,
   isDoc = true,
   isVerified,
+  isPending,
   pendingDispatchesCount,
+  upcomingBookingsCount,
+  completedDispatchesCount,
+  avgOverall,
   onViewBookings,
   onViewAnalytics,
   onViewOnCall
@@ -32,56 +36,52 @@ export default function PractitionerOverviewTab({
   return (
     <div id="panel-home" role="tabpanel" aria-labelledby="tab-home" tabIndex={0} className="space-y-6 animate-fade-in font-sans">
 
-      {/* 2. UNIQUE CLINICAL OPERATIONS & PERFORMANCE SPEED METRICS (NON-DUPLICATED) */}
+      {/* 2. LIVE CLINICAL OPERATIONS SUMMARY (NON-DUPLICATED) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="app-card-interactive app-card-equal p-5 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-[color:var(--ink-2)]">
-              {isDoc ? tx('Response SLA Speed') : tx('Home Care Arrival SLA')}
-            </span>
-            <Clock className="h-4 w-4 text-[color:var(--t-600)]" />
-          </div>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">
-            {isDoc ? tx("< 2.5 Mins") : tx("< 20 Mins")}
-          </span>
-          <p className="text-xs text-[color:var(--e-700)] font-semibold">
-            {isDoc
-              ? tx('Fastest 5% response time among {name} specialists.', { name: tx(matchedProfile.specialization) })
-              : tx('Fastest dispatch response time for licensed home nursing in {city}.', { city: tx(matchedProfile.city) })}
-          </p>
-        </div>
-
-        <div className="app-card-interactive app-card-equal p-5 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-[color:var(--ink-2)]">
-              {isDoc ? tx('E-Prescription Compliance') : tx('Aseptic Procedure Protocol')}
-            </span>
-            <FileText className="h-4 w-4 text-emerald-600" />
-          </div>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">
-            {tx('100% Certified')}
-          </span>
-          <p className="text-xs text-slate-600">
-            {isDoc
-              ? tx('Digitally signed via MMC verified encryption keys & NPRA checks.')
-              : tx('Sterile dressing, catheter & IV protocols verified under LJM Act 1950.')}
-          </p>
-        </div>
-
-        <div className="app-card-interactive app-card-equal p-5 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-[color:var(--ink-2)]">
-              {isDoc ? tx('Diagnostic Accuracy') : tx('Patient Comfort & Care')}
+              {tx('Board Verification')}
             </span>
             <ShieldCheck className="h-4 w-4 text-[color:var(--t-600)]" />
           </div>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">
-            {isDoc ? tx("99.4% Rated") : tx("99.8% Rated")}
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] block">
+            {isVerified ? tx('Verified Active') : isPending ? tx('Pending Review') : tx('Unverified')}
           </span>
-          <p className="text-xs text-slate-600">
-            {isDoc
-              ? tx('Validated across patient follow-ups and peer clinical reviews.')
-              : tx('Validated across post-op home visits and bedside bedside reviews.')}
+          <p className="text-xs text-slate-600 font-mono">
+            {matchedProfile.licenseNumber} · {tx(matchedProfile.city)}
+          </p>
+        </div>
+
+        <div className="app-card-interactive app-card-equal p-5 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-[color:var(--ink-2)]">
+              {tx('Active Clinical Queue')}
+            </span>
+            <Clock className="h-4 w-4 text-emerald-600" />
+          </div>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">
+            {upcomingBookingsCount + pendingDispatchesCount}
+          </span>
+          <p className="text-xs text-slate-600 tabular-nums">
+            {tx('{a} upcoming consults · {b} pending dispatches', { a: upcomingBookingsCount, b: pendingDispatchesCount })}
+          </p>
+        </div>
+
+        <div className="app-card-interactive app-card-equal p-5 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-[color:var(--ink-2)]">
+              {tx('Completed Dispatches')}
+            </span>
+            <FileText className="h-4 w-4 text-[color:var(--t-600)]" />
+          </div>
+          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">
+            {completedDispatchesCount}
+          </span>
+          <p className="text-xs text-slate-600 tabular-nums">
+            {avgOverall
+              ? tx('Patient rating: {rating} / 5.0', { rating: avgOverall })
+              : tx('No patient ratings recorded yet.')}
           </p>
         </div>
       </div>
