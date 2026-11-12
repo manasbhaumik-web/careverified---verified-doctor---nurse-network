@@ -191,11 +191,9 @@ body {
   border-radius: 9999px !important;
 }
 
-/* Blinking Dots & Live Pulse Indicator Round Corner Effect across all components */
-.animate-ping,
-.animate-pulse,
-[class*="animate-ping"],
-[class*="animate-pulse"] {
+/* Blinking Dots & Live Pulse Indicator Round Corner Effect (pings only; keep rectangular animate-pulse skeletons/banners sharp) */
+.animate-ping:not(.rounded-none):not(.sharp),
+[class*="animate-ping"]:not(.rounded-none):not(.sharp) {
   border-radius: 9999px !important;
 }
 

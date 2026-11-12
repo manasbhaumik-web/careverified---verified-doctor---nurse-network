@@ -205,7 +205,7 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
                                         </span>
                                       )}
                                     </h4>
-                                    <span className="text-xs text-slate-400 font-bold block mt-1 tracking-wide">
+                                    <span className="text-xs text-slate-600 font-bold block mt-1 tracking-wide">
                                       by {pkgAuthor} · <span className="text-[color:var(--t-600)]">{pkgCategory}</span>
                                     </span>
                                   </div>

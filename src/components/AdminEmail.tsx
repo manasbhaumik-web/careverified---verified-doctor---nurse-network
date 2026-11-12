@@ -42,7 +42,7 @@ export default function AdminEmail() {
       {s.problems.length > 0 && <ul className="text-xs bg-rose-50 border border-rose-200 text-rose-900 font-bold p-3 space-y-1 list-disc pl-6">{s.problems.map(p => <li key={p}>{p}</li>)}</ul>}
       {msg && <p role={msg.ok ? 'status' : 'alert'} className={`text-xs font-bold p-2 border ${msg.ok ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'}`}>{msg.text}</p>}
       <div className="overflow-x-auto">
-        <table className="w-full text-xs">
+        <table className="w-full text-xs tabular-nums">
           <thead><tr className="text-left text-xs uppercase text-slate-600"><th className="py-2 pr-3">{tx('When')}</th><th className="pr-3">{tx('To')}</th><th className="pr-3">{tx('Email')}</th><th className="pr-3">{tx('Status')}</th><th>{tx('Detail')}</th></tr></thead>
           <tbody>
             {s.recent.length === 0 && <tr><td colSpan={5} className="py-3 text-slate-600">{tx('No email yet.')}</td></tr>}

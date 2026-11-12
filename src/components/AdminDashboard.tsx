@@ -1,4 +1,4 @@
-import DashboardHeader, { BannerKpis, BannerBadge, BannerRow, BannerIdentity } from './DashboardHeader';
+import DashboardHeader, { BannerKpis, BannerBadge, BannerRow, BannerIdentity, FilterSelect } from './DashboardHeader';
 import { expiryLabel } from '../registries';
 import { UserAvatar, getRoleFailoverAvatar } from '../avatars';
 import React, { useState, useEffect, useCallback } from 'react';
@@ -499,6 +499,9 @@ export default function AdminDashboard({
   const [packageCategoryFilter, setPackageCategoryFilter] = useState('All');
   const [registrySearch, setRegistrySearch] = useState('');
   const [registryRoleFilter, setRegistryRoleFilter] = useState<'all' | 'doctor' | 'nurse'>('all');
+  const [approvalsQuery, setApprovalsQuery] = useState('');
+  const [approvalsRoleFilter, setApprovalsRoleFilter] = useState<'all' | 'doctor' | 'nurse'>('all');
+  const [approvalsSlaFilter, setApprovalsSlaFilter] = useState<'all' | 'urgent' | 'warning' | 'normal'>('all');
   const [qualitySubTab, setQualitySubTab] = useState<QualitySubTab>('support');
   const [trustSubTab, setTrustSubTab] = useState<'watchlist' | 'complaints' | 'sanctions'>('watchlist');
   const [opsSubTab, setOpsSubTab] = useState<OpsSubTab>('roster');
@@ -1356,6 +1359,58 @@ export default function AdminDashboard({
           </div>
         )}
 
+        {/* Fluid Search & Filter Bar for Pending Approvals */}
+        {!loading && pendingRequests.length > 0 && (
+          <div className="bg-slate-50/70 border border-[color:var(--t-200)] p-3 space-y-2.5">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative flex-[999_1_280px] min-w-[min(100%,280px)]">
+                <label htmlFor="approvals-queue-search" className="sr-only">{tx('Search pending approvals')}</label>
+                <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  id="approvals-queue-search"
+                  type="text"
+                  value={approvalsQuery}
+                  onChange={(e) => setApprovalsQuery(e.target.value)}
+                  placeholder={tx('Search pending requests by practitioner name, specialty, or licence number…')}
+                  className="w-full pl-10 pr-9 h-11 bg-white border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-500 focus:outline-none focus:border-[color:var(--t-600)] transition-colors"
+                />
+                {approvalsQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setApprovalsQuery('')}
+                    aria-label={tx('Clear search')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-slate-800 cursor-pointer"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center gap-2.5 flex-auto max-w-full">
+                <FilterSelect label={tx('Council / Role')} value={approvalsRoleFilter} onChange={(v) => setApprovalsRoleFilter(v as any)}>
+                  <option value="all">{tx('All Roles')}</option>
+                  <option value="doctor">{tx('Doctors (MMC)')}</option>
+                  <option value="nurse">{tx('Nurses (LJM)')}</option>
+                </FilterSelect>
+                <FilterSelect label={tx('SLA Status')} value={approvalsSlaFilter} onChange={(v) => setApprovalsSlaFilter(v as any)}>
+                  <option value="all">{tx('All SLA Windows')}</option>
+                  <option value="urgent">{tx('Urgent (≤4h)')}</option>
+                  <option value="warning">{tx('Active Warning')}</option>
+                  <option value="normal">{tx('On-Track')}</option>
+                </FilterSelect>
+                {(approvalsQuery || approvalsRoleFilter !== 'all' || approvalsSlaFilter !== 'all') && (
+                  <button
+                    type="button"
+                    onClick={() => { setApprovalsQuery(''); setApprovalsRoleFilter('all'); setApprovalsSlaFilter('all'); }}
+                    className="h-11 px-3 bg-white border border-[color:var(--t-200)] text-xs font-bold text-[color:var(--t-700)] hover:bg-[color:var(--t-50)] cursor-pointer shrink-0"
+                  >
+                    {tx('Reset')}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {selectedRequestIds.length > 0 && (
           <div className="bg-slate-900 text-white p-3.5 flex flex-wrap items-center justify-between gap-3 rounded-none shadow-md border-l-4 border-emerald-500 animate-fade-in">
             <div className="flex items-center gap-2.5">
@@ -1390,12 +1445,39 @@ export default function AdminDashboard({
         ) : pendingRequests.length === 0 ? (
           <div className="text-center py-12 border border-dashed border-slate-300 rounded-none bg-slate-50 space-y-2">
             <CheckCircle2 className="h-10 w-10 text-emerald-500 mx-auto" />
-            <h4 className="text-sm font-black text-slate-850 uppercase tracking-wide">{tx('Queue Cleared! All Practitioners Verified')}</h4>
-            <p className="text-xs text-slate-500 font-semibold">{tx('No pending license requests are waiting approval.')}</p>
+            <h4 className="text-sm font-black text-slate-900 uppercase tracking-wide">{tx('Queue Cleared! All Practitioners Verified')}</h4>
+            <p className="text-xs text-slate-600 font-semibold">{tx('No pending license requests are waiting approval.')}</p>
           </div>
-        ) : (
+        ) : (() => {
+          const q = approvalsQuery.trim().toLowerCase();
+          const filteredPending = pendingRequests.filter((req) => {
+            const reqRole = (req.userType || req.role || UserRole.DOCTOR).toLowerCase();
+            if (approvalsRoleFilter === 'doctor' && reqRole !== 'doctor') return false;
+            if (approvalsRoleFilter === 'nurse' && reqRole !== 'nurse') return false;
+            if (approvalsSlaFilter !== 'all' && getSlaStatus(req).tone !== approvalsSlaFilter) return false;
+            if (q) {
+              const hay = `${req.userName || req.name || ''} ${req.licenseNumber || ''} ${req.specialization || ''} ${req.medicalCouncil || req.nursingCouncil || ''}`.toLowerCase();
+              if (!hay.includes(q)) return false;
+            }
+            return true;
+          });
+          if (filteredPending.length === 0) {
+            return (
+              <div className="text-center py-10 border border-dashed border-slate-300 rounded-none bg-slate-50 space-y-2">
+                <p className="text-xs font-bold text-slate-700">{tx('No pending registration requests match your current filters.')}</p>
+                <button
+                  type="button"
+                  onClick={() => { setApprovalsQuery(''); setApprovalsRoleFilter('all'); setApprovalsSlaFilter('all'); }}
+                  className="text-xs font-bold text-[color:var(--t-700)] underline cursor-pointer"
+                >
+                  {tx('Reset Filters')}
+                </button>
+              </div>
+            );
+          }
+          return (
           <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-5" : "space-y-3"}>
-            {pendingRequests.map((req) => {
+            {filteredPending.map((req) => {
               const isApprovedInLoop = votedId === req.id;
               const reqName = req.userName || req.name || "Practitioner";
               const reqRole = req.userType || req.role || UserRole.DOCTOR;
@@ -1562,7 +1644,8 @@ export default function AdminDashboard({
               );
             })}
           </div>
-        )}
+          );
+        })()}
       </div>
 
       {/* Batch Verification Modal */}
@@ -2291,7 +2374,7 @@ export default function AdminDashboard({
                       <th className="p-2.5">{tx('Delivery Status')}</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-150">
+                  <tbody className="divide-y divide-slate-200">
                     {webhookLogs.length > 0 ? (
                       webhookLogs.slice(0, 5).map((log: any) => (
                         <tr key={log.id} className="hover:bg-slate-50 transition-colors">

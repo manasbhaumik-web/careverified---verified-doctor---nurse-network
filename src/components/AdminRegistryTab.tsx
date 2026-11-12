@@ -69,7 +69,7 @@ export const AdminRegistryTab: React.FC<AdminRegistryTabProps> = ({
             </div>
 
             <div className="overflow-x-auto border border-slate-200">
-              <table className="w-full text-left border-collapse text-xs">
+              <table className="w-full text-left border-collapse text-xs tabular-nums">
                 <thead>
                   <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-xs">
                     <th className="p-3">{tx('Practitioner')}</th>
@@ -80,7 +80,7 @@ export const AdminRegistryTab: React.FC<AdminRegistryTabProps> = ({
                     <th className="p-3 text-right">{tx('Action')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-150">
+                <tbody className="divide-y divide-slate-200">
                   {(() => {
                     const filtered = professionals.filter(p => {
                       if (registryRoleFilter !== 'all' && p.role !== (registryRoleFilter === 'doctor' ? UserRole.DOCTOR : UserRole.NURSE)) return false;

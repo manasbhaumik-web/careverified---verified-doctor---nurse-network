@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ShieldAlert } from 'lucide-react';
+import { ShieldAlert, Star } from 'lucide-react';
 import { useTr } from '../locale';
 import { MACROS, MACRO_LANGS, fillMacro, type MacroLang, type SupportHours } from '../supportMy';
 import AdminPartners from './AdminPartners';
@@ -16,12 +16,10 @@ const field = 'border border-slate-200 px-3 py-2 text-xs w-full focus:outline-no
 export type QualitySubTab = 'support' | 'partners' | 'reviews' | 'incidents' | 'peer' | 'credentials';
 
 export const QUALITY_SUBS: { id: QualitySubTab; label: string }[] = [
-  { id: 'support', label: 'Support Desk' },
-  { id: 'partners', label: 'Partner Enquiries' },
-  { id: 'reviews', label: 'Reviews & Testimonials' },
+  { id: 'support', label: 'Support & Enquiries' },
+  { id: 'reviews', label: 'Reviews & Peer' },
   { id: 'incidents', label: 'Incidents' },
-  { id: 'peer', label: 'Peer Review & Audits' },
-  { id: 'credentials', label: 'CPD & Certificates' },
+  { id: 'credentials', label: 'CPD & Certs' },
 ];
 
 export interface AdminQualityProps {
@@ -30,19 +28,22 @@ export interface AdminQualityProps {
   hideHeaderTabs?: boolean;
 }
 
-/** Admin quality and safety: support queue with response targets, review moderation, incidents, peer review, credentials. */
+/** Admin quality and safety: support & partner queue, review/peer moderation, incidents, credentials. */
 export default function AdminQuality({
   activeSub,
   onSubChange,
   hideHeaderTabs = false,
 }: AdminQualityProps = {}) {
+  const tx = useTr();
   const [internalSub, setInternalSub] = useState<QualitySubTab>('support');
-  const sub = activeSub ?? internalSub;
+  const rawSub = activeSub ?? internalSub;
+  const sub: QualitySubTab = rawSub === 'partners' ? 'support' : rawSub === 'peer' ? 'reviews' : rawSub;
   const setSub = (newSub: QualitySubTab) => {
     if (onSubChange) onSubChange(newSub);
     else setInternalSub(newSub);
   };
   const [msg, setMsg] = useState('');
+  const [supportStream, setSupportStream] = useState<'tickets' | 'partners'>(rawSub === 'partners' ? 'partners' : 'tickets');
 
   return (
     <div className="space-y-4 text-slate-800">
@@ -55,7 +56,7 @@ export default function AdminQuality({
               aria-selected={sub === t.id}
               onClick={() => { setSub(t.id); setMsg(''); }}
               className={`px-3 py-2.5 text-xs font-bold cursor-pointer rounded-none ${
-                sub === t.id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-500 hover:text-slate-700'
+                sub === t.id ? 'border-b-2 border-[color:var(--t-600)] text-[color:var(--t-700)]' : 'text-slate-600 hover:text-slate-800'
               }`}
             >
               {t.label}
@@ -64,11 +65,37 @@ export default function AdminQuality({
         </div>
       )}
       {msg && <p role="status" className="text-xs font-bold bg-slate-50 border border-slate-200 rounded-none p-2.5">{msg}</p>}
-      {sub === 'support' && <Support say={setMsg} />}
-      {sub === 'partners' && <AdminPartners say={setMsg} />}
-      {sub === 'reviews' && <Reviews say={setMsg} />}
+      {sub === 'support' && (
+        <div className="space-y-4">
+          <div className="flex gap-2 border-b border-slate-200 pb-2">
+            <button
+              type="button"
+              onClick={() => setSupportStream('tickets')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-none cursor-pointer border ${
+                supportStream === 'tickets'
+                  ? 'bg-[color:var(--t-600)] border-[color:var(--t-700)] text-white shadow-xs'
+                  : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              {tx('Support Desk Tickets')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setSupportStream('partners')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-none cursor-pointer border ${
+                supportStream === 'partners'
+                  ? 'bg-[color:var(--t-600)] border-[color:var(--t-700)] text-white shadow-xs'
+                  : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              {tx('Partner Enquiries')}
+            </button>
+          </div>
+          {supportStream === 'tickets' ? <Support say={setMsg} /> : <AdminPartners say={setMsg} />}
+        </div>
+      )}
+      {sub === 'reviews' && <Reviews say={setMsg} initialMode={rawSub === 'peer' ? 'peer' : undefined} />}
       {sub === 'incidents' && <Incidents say={setMsg} />}
-      {sub === 'peer' && <Peer say={setMsg} />}
       {sub === 'credentials' && <Credentials say={setMsg} />}
     </div>
   );
@@ -128,9 +155,9 @@ function Support({ say }: { say: (t: string) => void }) {
   );
 }
 
-function Reviews({ say }: { say: (t: string) => void }) {
+function Reviews({ say, initialMode }: { say: (t: string) => void; initialMode?: 'practitioner_reviews' | 'testimonials' | 'peer' }) {
   const tx = useTr();
-  const [mode, setMode] = useState<'practitioner_reviews' | 'testimonials'>('practitioner_reviews');
+  const [mode, setMode] = useState<'practitioner_reviews' | 'testimonials' | 'peer'>(initialMode || 'practitioner_reviews');
   const [filter, setFilter] = useState<'reported' | 'all'>('reported');
   const [list, setList] = useState<any[]>([]);
   const [modal, setModal] = useState<AdminActionModalConfig | null>(null);
@@ -154,7 +181,7 @@ function Reviews({ say }: { say: (t: string) => void }) {
   return (
     <div className="space-y-4">
       {/* Moderation Stream Switcher */}
-      <div className="flex gap-2 border-b border-slate-200 pb-2">
+      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
         <button
           type="button"
           onClick={() => setMode('practitioner_reviews')}
@@ -177,10 +204,23 @@ function Reviews({ say }: { say: (t: string) => void }) {
         >
           {tx('Patient Testimonials (Landing Page)')}
         </button>
+        <button
+          type="button"
+          onClick={() => setMode('peer')}
+          className={`px-3 py-1.5 text-xs font-bold rounded-none cursor-pointer border ${
+            mode === 'peer'
+              ? 'bg-[color:var(--t-600)] border-[color:var(--t-700)] text-white shadow-xs'
+              : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+          }`}
+        >
+          {tx('Peer Review & Audits')}
+        </button>
       </div>
 
       {mode === 'testimonials' ? (
         <TestimonialAdmin className="border-0 p-0 shadow-none" />
+      ) : mode === 'peer' ? (
+        <Peer say={say} />
       ) : (
         <div className="space-y-3">
           <div className="flex gap-2 text-xs font-bold">
@@ -202,7 +242,14 @@ function Reviews({ say }: { say: (t: string) => void }) {
           <AdminActionModal config={modal} onClose={() => setModal(null)} />
           {list.map(r => (
             <article key={r.id} className="bg-white border border-slate-200 rounded-none p-4 text-xs space-y-1">
-              <p className="font-bold">{r.professionalName} · {'★'.repeat(r.rating)} <span className="text-xs text-slate-500 font-normal">by {r.patientName} · {r.date} · {r.status ?? 'published'}</span></p>
+              <p className="font-bold flex flex-wrap items-center gap-1.5">
+                <span>{r.professionalName}</span>
+                <span className="inline-flex items-center gap-0.5 text-amber-600 font-mono tabular-nums">
+                  <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                  <span>{r.rating}/5</span>
+                </span>
+                <span className="text-xs text-slate-500 font-normal">by {r.patientName} · {r.date} · {r.status ?? 'published'}</span>
+              </p>
               {r.comment && <p>{r.comment}</p>}
               {r.reportedAt && <p className="text-xs bg-amber-50 border border-amber-200 rounded-none p-2">Reported: {r.reportReason}</p>}
               {r.moderatedAt && <p className="text-xs text-slate-500">Decided: {r.moderationReason}</p>}
