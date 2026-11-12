@@ -187,20 +187,6 @@ export default function PractitionerHeroBanner<T extends string = string>({
                   <span className="font-mono font-bold text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)] text-2xs rounded-none shadow-2xs">
                     {profile.licenseNumber}
                   </span>
-                  <span className="text-slate-400">&bull;</span>
-                  <span className="font-mono text-slate-700 text-2xs bg-white px-1.5 py-0.5 border border-slate-200 rounded-none">
-                    ID: {profile.id}
-                  </span>
-                  {isVerified && <span className="text-slate-400">&bull;</span>}
-                  {isVerified && (
-                    <span className="text-emerald-700 font-extrabold flex items-center gap-1.5">
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                      </span>
-                      {tx('Verified by the medical board')}
-                    </span>
-                  )}
                   {((profile as any).apcExpiry || (profile as any).licenseExpiry) && (
                     <>
                       <span className="text-slate-400">&bull;</span>
