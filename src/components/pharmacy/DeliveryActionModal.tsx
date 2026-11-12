@@ -130,12 +130,12 @@ export default function DeliveryActionModal({
         if (e.key === 'Escape' && !busy) onClose();
       }}
     >
-      <div className="bg-white border border-slate-200 max-w-lg w-full shadow-2xl p-6 space-y-5 rounded-2xl max-h-[92vh] overflow-y-auto">
+      <div className="bg-white border border-slate-200 max-w-lg w-full shadow-2xl p-6 space-y-5 rounded-none max-h-[92vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-start justify-between border-b border-slate-200 pb-3">
           <div className="flex items-center gap-3">
             <div
-              className={`p-2 border rounded-xl ${
+              className={`p-2 border rounded-none ${
                 status === 'arranged'
                   ? 'bg-sky-50 border-sky-200 text-sky-800'
                   : status === 'delivered'
@@ -164,7 +164,7 @@ export default function DeliveryActionModal({
             onClick={onClose}
             disabled={busy}
             aria-label={tx('Close dialog')}
-            className="p-1.5 text-slate-400 hover:text-slate-700 cursor-pointer rounded-lg hover:bg-slate-100 transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-700 cursor-pointer rounded-none hover:bg-slate-100 transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
@@ -192,7 +192,7 @@ export default function DeliveryActionModal({
                   value={partnerRef}
                   onChange={e => setPartnerRef(e.target.value)}
                   placeholder={delivery.method === 'pharmacy_courier' ? 'e.g. RIDER-02-AFTERNOON' : 'e.g. GRAB-948102 or LLM-48192'}
-                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-lg outline-none focus:border-[color:var(--t-600)] transition-colors"
+                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)] transition-colors"
                 />
               </div>
 
@@ -206,12 +206,12 @@ export default function DeliveryActionModal({
                   value={trackingUrl}
                   onChange={e => setTrackingUrl(e.target.value)}
                   placeholder="https://tracker.partner.com/track/..."
-                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-lg outline-none focus:border-[color:var(--t-600)] transition-colors"
+                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)] transition-colors"
                 />
               </div>
 
               {delivery.coldChain && (
-                <div className="bg-sky-50/80 border border-sky-200 p-3.5 space-y-2 rounded-xl">
+                <div className="bg-sky-50/80 border border-sky-200 p-3.5 space-y-2 rounded-none">
                   <div className="flex items-center gap-1.5 text-sky-900 font-black text-xs uppercase tracking-wide">
                     <Snowflake className="h-4 w-4 text-sky-700" />
                     <span>{tx('NPRA GDP Cold-Chain Departure Check')}</span>
@@ -230,7 +230,7 @@ export default function DeliveryActionModal({
                       value={temperature}
                       onChange={e => setTemperature(e.target.value)}
                       placeholder="e.g. 4.2"
-                      className="w-32 h-9 border border-sky-300 bg-white px-3 text-xs font-mono font-bold rounded-lg outline-none focus:border-sky-600"
+                      className="w-32 h-9 border border-sky-300 bg-white px-3 text-xs font-mono font-bold rounded-none outline-none focus:border-sky-600"
                     />
                   </div>
                 </div>
@@ -252,12 +252,12 @@ export default function DeliveryActionModal({
                   value={recipientName}
                   onChange={e => setRecipientName(e.target.value)}
                   placeholder={tx('e.g. Ahmad bin Razak (Patient or authorized proxy)')}
-                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-lg outline-none focus:border-[color:var(--t-600)] transition-colors"
+                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)] transition-colors"
                 />
               </div>
 
               {delivery.coldChain && (
-                <div className="bg-sky-50/80 border border-sky-200 p-3.5 space-y-2 rounded-xl">
+                <div className="bg-sky-50/80 border border-sky-200 p-3.5 space-y-2 rounded-none">
                   <div className="flex items-center gap-1.5 text-sky-900 font-black text-xs uppercase tracking-wide">
                     <Snowflake className="h-4 w-4 text-sky-700" />
                     <span>{tx('Handover Temperature Verification')}</span>
@@ -273,7 +273,7 @@ export default function DeliveryActionModal({
                       value={temperature}
                       onChange={e => setTemperature(e.target.value)}
                       placeholder="e.g. 5.1"
-                      className="w-32 h-9 border border-sky-300 bg-white px-3 text-xs font-mono font-bold rounded-lg outline-none focus:border-sky-600"
+                      className="w-32 h-9 border border-sky-300 bg-white px-3 text-xs font-mono font-bold rounded-none outline-none focus:border-sky-600"
                     />
                   </div>
                 </div>
@@ -305,7 +305,7 @@ export default function DeliveryActionModal({
                   id="failure-reason"
                   value={failureReason}
                   onChange={e => setFailureReason(e.target.value)}
-                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-lg outline-none focus:border-rose-600"
+                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus:border-rose-600"
                 >
                   {FAILURE_REASONS.map(r => (
                     <option key={r} value={r}>
@@ -325,7 +325,7 @@ export default function DeliveryActionModal({
                   value={failureNotes}
                   onChange={e => setFailureNotes(e.target.value)}
                   placeholder={tx('e.g. Called patient 3 times; no answer at premises. Cold-chain medicine returned safely to dispensary refrigerator at 14:35.')}
-                  className="w-full border border-slate-300 bg-white p-3 text-xs font-semibold rounded-lg outline-none focus:border-rose-600"
+                  className="w-full border border-slate-300 bg-white p-3 text-xs font-semibold rounded-none outline-none focus:border-rose-600"
                 />
               </div>
 

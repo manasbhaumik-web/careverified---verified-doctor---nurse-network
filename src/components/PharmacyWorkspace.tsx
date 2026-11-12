@@ -152,7 +152,7 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
           />
         </DashboardHeader>
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
-          <div role="alert" className="bg-amber-50 border border-amber-200 text-amber-900 p-4 flex items-center gap-3 text-xs font-semibold rounded-xl">
+          <div role="alert" className="bg-amber-50 border border-amber-200 text-amber-900 p-4 flex items-center gap-3 text-xs font-semibold rounded-none">
             <ShieldAlert className="h-5 w-5 shrink-0" />
             {tx('Pharmacy accounts handle patients\' health information, so two-factor sign-in is required. Set it up below to continue.')}
           </div>
@@ -170,7 +170,7 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
         onClick={() => {
           window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
         }}
-        className="shrink-0 min-h-[40px] px-3.5 text-xs flex items-center gap-2 cursor-pointer transition-colors font-medium text-slate-600 hover:text-[color:var(--t-700)] hover:bg-slate-50 rounded-lg"
+        className="shrink-0 min-h-[40px] px-3.5 text-xs flex items-center gap-2 cursor-pointer transition-colors font-medium text-slate-600 hover:text-[color:var(--t-700)] hover:bg-slate-50 rounded-none"
         title={tx('Open Support Desk & Help Center')}
       >
         <LifeBuoy className="h-4 w-4 text-slate-500" />
@@ -225,20 +225,20 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {me?.account.mustChangePassword && (
-          <div role="alert" className="bg-amber-50 border border-amber-200 text-amber-900 p-4 flex flex-wrap items-center gap-3 text-xs rounded-xl">
+          <div role="alert" className="bg-amber-50 border border-amber-200 text-amber-900 p-4 flex flex-wrap items-center gap-3 text-xs rounded-none">
             <KeyRound className="h-5 w-5 shrink-0" />
             <span className="flex-1 min-w-[220px] font-semibold">{tx('You are using a temporary password. Please set your own password now.')}</span>
             <button type="button" onClick={() => setTab('profile')} className={btnPlain}>{tx('Change password')}</button>
           </div>
         )}
         {counts && counts.waitingOver24h > 0 && (
-          <div role="status" className="bg-rose-50 border border-rose-200 text-rose-800 p-4 flex items-center gap-3 text-xs font-semibold rounded-xl">
+          <div role="status" className="bg-rose-50 border border-rose-200 text-rose-800 p-4 flex items-center gap-3 text-xs font-semibold rounded-none">
             <AlertTriangle className="h-5 w-5 shrink-0" />
             {counts.waitingOver24h} prescription{counts.waitingOver24h === 1 ? ' has' : 's have'} been waiting over 24 hours without a response.
           </div>
         )}
 
-        <div className="app-card rounded-xl border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-x-5 gap-y-2 text-xs text-slate-600">
+        <div className="app-card rounded-none border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-x-5 gap-y-2 text-xs text-slate-600">
           <span className="inline-flex items-center gap-2 font-medium">
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
             <span>Live: new prescriptions appear automatically · updated {new Date(alerts.updatedAt).toLocaleTimeString()}</span>
@@ -357,7 +357,7 @@ function InboxTab({ counts, onChanged, tick }: { counts?: Counts; onChanged: () 
 
   return (
     <div className="space-y-5">
-      <section aria-label={tx('Find a prescription')} className="app-card rounded-xl border-slate-200 p-5 space-y-3">
+      <section aria-label={tx('Find a prescription')} className="app-card rounded-none border-slate-200 p-5 space-y-3">
         <form onSubmit={lookup} className="flex flex-wrap items-end gap-3">
           <label className="flex-1 min-w-[240px]">
             <span className="text-xs font-bold uppercase tracking-wide text-slate-700 block mb-1.5 flex items-center gap-1.5">
@@ -369,17 +369,17 @@ function InboxTab({ counts, onChanged, tick }: { counts?: Counts; onChanged: () 
               onChange={e => setCode(e.target.value.toUpperCase())} 
               placeholder={tx('e.g. DCLHAS7GS3')} 
               maxLength={20} 
-              className="h-10 w-full border border-slate-300 rounded-lg px-3.5 bg-slate-50 font-mono font-bold text-xs text-slate-900 outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-all" 
+              className="h-10 w-full border border-slate-300 rounded-none px-3.5 bg-slate-50 font-mono font-bold text-xs text-slate-900 outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-all" 
             />
           </label>
           <button type="submit" className="btn btn-sm btn-primary">{tx('Look up code')}</button>
         </form>
-        {lookupMsg && <p role="alert" className="text-xs font-bold text-rose-850 bg-rose-50 border border-rose-300 rounded-lg p-3">{lookupMsg}</p>}
+        {lookupMsg && <p role="alert" className="text-xs font-bold text-rose-850 bg-rose-50 border border-rose-300 rounded-none p-3">{lookupMsg}</p>}
         {found && <RxCard rx={found} onChanged={() => { setFound(null); setCode(''); changed(); }} />}
       </section>
 
-      <section aria-label={tx('Inbox filters')} className="app-card rounded-xl border-slate-200 p-4 space-y-3">
-        <div className="flex items-center gap-3 border border-slate-200 rounded-lg bg-slate-50 px-3.5 h-10 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-all">
+      <section aria-label={tx('Inbox filters')} className="app-card rounded-none border-slate-200 p-4 space-y-3">
+        <div className="flex items-center gap-3 border border-slate-200 rounded-none bg-slate-50 px-3.5 h-10 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-all">
           <Search className="h-4 w-4 text-slate-400 shrink-0" />
           <label htmlFor="inbox-search" className="sr-only">{tx('Search the inbox')}</label>
           <input id="inbox-search" value={query} onChange={e => setQuery(e.target.value)} placeholder={tx('Search by prescription code, patient name, or medicine...')}
@@ -415,7 +415,7 @@ function InboxTab({ counts, onChanged, tick }: { counts?: Counts; onChanged: () 
       {list === null ? (
         <p className="text-xs text-slate-600 font-semibold">{tx('Loading your inbox…')}</p>
       ) : shown.length === 0 ? (
-        <div className="app-card rounded-xl border-slate-200 p-12 text-center space-y-3">
+        <div className="app-card rounded-none border-slate-200 p-12 text-center space-y-3">
           <Inbox className="h-10 w-10 text-[color:var(--t-400)] mx-auto" />
           <h2 className="text-sm font-bold text-slate-900 tracking-tight">{list.length === 0 ? tx('No prescriptions yet') : tx('Nothing matches your filters')}</h2>
           <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">{list.length === 0 ? tx('When a patient sends you a prescription it will appear here and you will be notified.') : tx('Try a different status or search filter.')}</p>
@@ -476,7 +476,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
   const overdue = rx.bucket === 'new' && rx.sentAt && Date.now() - Date.parse(rx.sentAt) > 86_400_000;
 
   return (
-    <article className="app-card-interactive rounded-xl border border-slate-200 overflow-hidden flex flex-col justify-between">
+    <article className="app-card-interactive rounded-none border border-slate-200 overflow-hidden flex flex-col justify-between">
       <div>
         {/* Tier 1: Patient Header & Verification */}
         <div className="p-4 bg-slate-50/80 border-b border-slate-200 flex items-start justify-between gap-3">
@@ -534,7 +534,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
           <div className="text-2xs font-bold uppercase tracking-wider text-slate-500">Prescribed Medications ({rx.items.length} item{rx.items.length === 1 ? '' : 's'})</div>
           <div className="space-y-2">
             {rx.items.map((i, k) => (
-              <div key={k} className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-start justify-between gap-3 text-xs">
+              <div key={k} className="p-2.5 rounded-none bg-slate-50 border border-slate-200 flex items-start justify-between gap-3 text-xs">
                 <div className="flex items-start gap-2 min-w-0">
                   <Pill className="h-4 w-4 text-[color:var(--t-600)] shrink-0 mt-0.5" />
                   <div>
@@ -616,19 +616,19 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
           )}
 
           {rx.status === 'cancelled' && (
-            <p role="alert" className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 p-2.5 rounded-lg [overflow-wrap:anywhere]">
+            <p role="alert" className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 p-2.5 rounded-none [overflow-wrap:anywhere]">
               Cancelled by the doctor{rx.cancelledReason ? `: ${rx.cancelledReason}` : ''}. Do not dispense.
             </p>
           )}
 
-          {rx.assignedElsewhere && <p className="text-xs font-bold text-amber-900 bg-amber-50 border border-amber-300 rounded-lg p-3">This prescription was routed to a different pharmacy; you cannot update or dispense it.</p>}
+          {rx.assignedElsewhere && <p className="text-xs font-bold text-amber-900 bg-amber-50 border border-amber-300 rounded-none p-3">This prescription was routed to a different pharmacy; you cannot update or dispense it.</p>}
         </div>
       </div>
 
       {/* Confirmation & Statutory Dialog */}
       {confirming && (
         <div className="p-4 bg-slate-50 border-t border-slate-200">
-          <div role="alertdialog" aria-label={tx('Confirm dispensing')} className="border border-[color:var(--t-600)] bg-[color:var(--t-50)] rounded-xl p-4 space-y-3 shadow-md">
+          <div role="alertdialog" aria-label={tx('Confirm dispensing')} className="border border-[color:var(--t-600)] bg-[color:var(--t-50)] rounded-none p-4 space-y-3 shadow-md">
             <div className="flex items-center justify-between border-b border-[color:var(--t-200)] pb-2">
               <span className="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
                 <span className="inline-flex items-center gap-1.5"><Scale className="h-3.5 w-3.5 text-[color:var(--t-700)] shrink-0" /> Poisons Act 1952 Dispensing Sign-Off</span>
@@ -650,7 +650,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
               </div>
             </div>
             {!rx.safety.shared && <p className="text-2xs font-bold text-amber-900 bg-amber-100 border border-amber-300 p-2 rounded-none flex items-center gap-1.5"><AlertTriangle className="h-3.5 w-3.5 shrink-0" /> {tx('Allergies were not shared digitally. Confirm verbal patient verification.')}</p>}
-            {rx.prescriber && !rx.prescriber.stillVerified && <p className="text-2xs font-bold text-rose-800 bg-rose-100 border border-rose-300 p-2 rounded-lg">{tx('Warning: The prescribing doctor is not currently verified by the medical board.')}</p>}
+            {rx.prescriber && !rx.prescriber.stillVerified && <p className="text-2xs font-bold text-rose-800 bg-rose-100 border border-rose-300 p-2 rounded-none">{tx('Warning: The prescribing doctor is not currently verified by the medical board.')}</p>}
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <button type="button" disabled={busy} onClick={dispense} className="btn btn-sm btn-primary inline-flex items-center gap-1.5"><Lock className="h-3.5 w-3.5 shrink-0" /> {tx('Sign & Mark Dispensed')}</button>
               <button type="button" onClick={() => setConfirming(false)} className="btn btn-sm btn-secondary">{tx('Cancel')}</button>
@@ -662,9 +662,9 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
       {/* Decline Drawer */}
       {declining && (
         <div className="p-4 bg-slate-50 border-t border-slate-200">
-          <div className="space-y-2.5 bg-white border border-slate-200 p-3.5 rounded-xl">
+          <div className="space-y-2.5 bg-white border border-slate-200 p-3.5 rounded-none">
             <label className="text-xs font-bold uppercase tracking-wide text-slate-700 block" htmlFor={`reason-${rx.id}`}>{tx('Reason for inability to fill (sent to patient)')}</label>
-            <input id={`reason-${rx.id}`} value={reason} onChange={e => setReason(e.target.value)} maxLength={200} placeholder={tx('e.g. Out of stock until Tuesday, recommended alternative clinic')} className="h-10 w-full border border-slate-300 rounded-lg px-3 bg-white text-xs font-semibold outline-none focus:border-[color:var(--t-600)]" />
+            <input id={`reason-${rx.id}`} value={reason} onChange={e => setReason(e.target.value)} maxLength={200} placeholder={tx('e.g. Out of stock until Tuesday, recommended alternative clinic')} className="h-10 w-full border border-slate-300 rounded-none px-3 bg-white text-xs font-semibold outline-none focus:border-[color:var(--t-600)]" />
             <div className="flex gap-2">
               <button type="button" disabled={busy || reason.trim().length < 3} onClick={() => setStatus('cannot_fill')} className="btn btn-sm btn-danger">{tx('Send to patient')}</button>
               <button type="button" onClick={() => setDeclining(false)} className="btn btn-sm btn-secondary">{tx('Cancel')}</button>
@@ -676,9 +676,9 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
       {/* Private Note Drawer */}
       {noting && (
         <div className="p-4 bg-slate-50 border-t border-slate-200">
-          <div className="space-y-2 bg-white border border-slate-200 p-3.5 rounded-xl">
+          <div className="space-y-2 bg-white border border-slate-200 p-3.5 rounded-none">
             <label className="text-xs font-bold uppercase tracking-wide text-slate-700 block" htmlFor={`note-${rx.id}`}>{tx('Internal Pharmacist Note (Private to this pharmacy)')}</label>
-            <textarea id={`note-${rx.id}`} value={note} onChange={e => setNote(e.target.value)} rows={3} maxLength={500} className="w-full border border-slate-300 rounded-lg p-3 bg-white text-xs font-semibold outline-none focus:border-[color:var(--t-600)]" />
+            <textarea id={`note-${rx.id}`} value={note} onChange={e => setNote(e.target.value)} rows={3} maxLength={500} className="w-full border border-slate-300 rounded-none p-3 bg-white text-xs font-semibold outline-none focus:border-[color:var(--t-600)]" />
             <div className="flex gap-2">
               <button type="button" disabled={busy} onClick={saveNote} className="btn btn-sm btn-primary">{tx('Save note')}</button>
               <button type="button" onClick={() => { setNoting(false); setNote(rx.note); }} className="btn btn-sm btn-secondary">{tx('Cancel')}</button>
@@ -772,7 +772,7 @@ function ActivityTab() {
   if (items === null) return <p className="text-xs text-slate-600">{tx('Loading activity…')}</p>;
   if (items.length === 0) {
     return (
-      <div className="app-card rounded-xl border-slate-200 p-10 text-center space-y-2">
+      <div className="app-card rounded-none border-slate-200 p-10 text-center space-y-2">
         <Activity className="h-10 w-10 text-[color:var(--t-300)] mx-auto" />
         <h2 className="text-sm font-bold text-slate-900">{tx('No activity yet')}</h2>
         <p className="text-xs text-slate-600">{tx('Everything your pharmacy does here is recorded in this timeline.')}</p>
@@ -780,7 +780,7 @@ function ActivityTab() {
     );
   }
   return (
-    <section aria-label={tx('Activity log')} className="app-card rounded-xl border-slate-200 overflow-hidden">
+    <section aria-label={tx('Activity log')} className="app-card rounded-none border-slate-200 overflow-hidden">
       <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
         <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
           <Activity className="h-4 w-4 text-[color:var(--t-600)]" />
@@ -822,7 +822,7 @@ function ReportsTab() {
 
   const max = Math.max(1, ...(r?.perDay.map(d => Math.max(d.received, d.dispensed)) ?? [1]));
   const tile = (label: string, value: React.ReactNode, hint?: string) => (
-    <div className="app-card-interactive rounded-xl border border-slate-200 p-4 min-w-0 flex flex-col justify-between gap-1">
+    <div className="app-card-interactive rounded-none border border-slate-200 p-4 min-w-0 flex flex-col justify-between gap-1">
       <p className="text-2xs font-bold uppercase tracking-wider text-slate-500">{label}</p>
       <p className="text-2xl font-bold font-mono text-slate-900 mt-1 tabular-nums">{value}</p>
       {hint && <p className="text-2xs text-slate-500 font-semibold mt-0.5">{hint}</p>}
@@ -831,7 +831,7 @@ function ReportsTab() {
 
   return (
     <div className="space-y-5">
-      <section aria-label={tx('Report period')} className="app-card rounded-xl border-slate-200 p-4 flex flex-wrap items-end gap-4">
+      <section aria-label={tx('Report period')} className="app-card rounded-none border-slate-200 p-4 flex flex-wrap items-end gap-4">
         <FilterSelect label={tx('Reporting Period')} value={days} onChange={setDays}>
           <option value="7">{tx('Last 7 days')}</option>
           <option value="30">{tx('Last 30 days')}</option>
@@ -852,7 +852,7 @@ function ReportsTab() {
           </section>
 
           <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-            <section aria-label={tx('Prescriptions per day')} className="app-card rounded-xl border-slate-200 p-5 min-w-0">
+            <section aria-label={tx('Prescriptions per day')} className="app-card rounded-none border-slate-200 p-5 min-w-0">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
                 <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800">{tx('Daily Prescription Volume')}</h2>
                 <p className="text-xs font-semibold text-slate-600 flex items-center gap-4">
@@ -860,7 +860,7 @@ function ReportsTab() {
                   <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[color:var(--t-600)]" /> {tx('Dispensed')}</span>
                 </p>
               </div>
-              <div className="flex items-end gap-px h-44 bg-slate-50 border border-slate-200 rounded-lg p-2" role="img" aria-label={`Bar chart of prescriptions received and dispensed per day over the last ${r.days} days`}>
+              <div className="flex items-end gap-px h-44 bg-slate-50 border border-slate-200 rounded-none p-2" role="img" aria-label={`Bar chart of prescriptions received and dispensed per day over the last ${r.days} days`}>
                 {r.perDay.map(d => (
                   <div key={d.date} title={`${d.date}: ${d.received} received, ${d.dispensed} dispensed`} className="flex-1 min-w-0 h-full flex items-end gap-px">
                     <div className="flex-1 bg-[color:var(--t-200)] rounded-t-xs" style={{ height: `${(d.received / max) * 100}%`, minHeight: d.received ? 3 : 0 }} />
@@ -871,7 +871,7 @@ function ReportsTab() {
               <div className="flex justify-between text-2xs font-mono font-bold text-slate-500 mt-2"><span>{r.perDay[0]?.date}</span><span>{r.perDay[r.perDay.length - 1]?.date}</span></div>
             </section>
 
-            <section aria-label={tx('Most prescribed medicines')} className="app-card rounded-xl border-slate-200 p-5 min-w-0">
+            <section aria-label={tx('Most prescribed medicines')} className="app-card rounded-none border-slate-200 p-5 min-w-0">
               <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 mb-4 border-b border-slate-100 pb-3">{tx('Top Formulations Dispensed')}</h2>
               {r.topMedicines.length === 0 ? <p className="text-xs text-slate-600 font-semibold">{tx('Nothing in this period yet.')}</p> : (
                 <ol className="divide-y divide-slate-100">
@@ -929,10 +929,10 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
   };
 
   const field = 'text-xs font-bold uppercase tracking-wide text-slate-700 block mb-1.5';
-  const inputCls = 'h-10 w-full border border-slate-300 rounded-lg px-3 bg-white text-xs font-semibold text-slate-900 outline-none focus:border-[color:var(--t-600)] transition-colors';
+  const inputCls = 'h-10 w-full border border-slate-300 rounded-none px-3 bg-white text-xs font-semibold text-slate-900 outline-none focus:border-[color:var(--t-600)] transition-colors';
   return (
     <div className="grid gap-5 lg:grid-cols-2 items-start">
-      <form onSubmit={save} className="app-card rounded-xl border border-slate-200 p-6 space-y-5 min-w-0">
+      <form onSubmit={save} className="app-card rounded-none border border-slate-200 p-6 space-y-5 min-w-0">
         <div className="border-b border-slate-100 pb-3">
           <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800">{tx('Public Pharmacy Registry Listing')}</h2>
           <p className="text-xs text-slate-500 font-semibold mt-1">{tx('This information appears directly on the patient-facing Pharmacies directory. The legal registered name can only be edited by the Board Admin.')}</p>
@@ -947,7 +947,7 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
           <label className="block"><span className={field}>{tx('Contact Phone')}</span><input value={phone} onChange={e => setPhone(e.target.value)} maxLength={30} className={inputCls} /></label>
         </div>
         <label className="block"><span className={field}>{tx('Operational Opening Hours')}</span><input value={hours} onChange={e => setHours(e.target.value)} maxLength={120} placeholder={tx('e.g. Mon–Sat 9am–10pm')} className={inputCls} /></label>
-        <fieldset className="border border-slate-200 p-4 rounded-xl bg-slate-50">
+        <fieldset className="border border-slate-200 p-4 rounded-none bg-slate-50">
           <legend className="text-2xs font-bold uppercase tracking-wider text-slate-700 px-1.5 bg-white border border-slate-200 rounded">{tx('Dispensing Services Available')}</legend>
           <div className="flex flex-wrap gap-x-5 gap-y-2.5 pt-1">
             {SERVICES.map(s => (
@@ -958,7 +958,7 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
             ))}
           </div>
         </fieldset>
-        <fieldset className="border border-slate-200 p-4 rounded-xl bg-slate-50">
+        <fieldset className="border border-slate-200 p-4 rounded-none bg-slate-50">
           <legend className="text-2xs font-bold uppercase tracking-wider text-slate-700 px-1.5 bg-white border border-slate-200 rounded">{tx('Home delivery partners (Malaysia)')}</legend>
           <div className="flex flex-wrap gap-x-5 gap-y-2.5 pt-1">
             {([['pharmacy_courier', 'Own rider'], ['grab', 'Grab'], ['lalamove', 'Lalamove'], ['other_courier', 'Other courier']] as const).map(([id, label]) => (
@@ -977,12 +977,12 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
         <label className="block"><span className={field}>{tx('Insurance panel (comma-separated insurers)')}</span><input value={panel} onChange={e => setPanel(e.target.value)} maxLength={400} placeholder={tx('e.g. AIA, Great Eastern, Allianz')} className={inputCls} /></label>
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <button type="submit" disabled={saving} className="btn btn-sm btn-primary">{saving ? tx('Saving Changes…') : tx('Save Registry Listing')}</button>
-          {msg && <p role="status" className={`text-xs font-bold p-3 border rounded-lg ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-300' : 'text-rose-900 bg-rose-50 border-rose-300'}`}>{msg.text}</p>}
+          {msg && <p role="status" className={`text-xs font-bold p-3 border rounded-none ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-300' : 'text-rose-900 bg-rose-50 border-rose-300'}`}>{msg.text}</p>}
         </div>
       </form>
 
       <div className="space-y-5 min-w-0">
-        <form onSubmit={changePw} className="app-card rounded-xl border border-slate-200 p-6 space-y-5 min-w-0">
+        <form onSubmit={changePw} className="app-card rounded-none border border-slate-200 p-6 space-y-5 min-w-0">
           <div className="border-b border-slate-100 pb-3">
             <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2"><KeyRound className="h-4 w-4 text-[color:var(--t-600)]" /> {tx('Account Password & Access')}</h2>
             <p className="text-xs text-slate-500 font-semibold mt-1 [overflow-wrap:anywhere]">Signed in as {me.account.email}. Updating your password terminates active sessions on external devices.</p>
@@ -992,7 +992,7 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
             <span className="text-2xs text-slate-500 font-semibold mt-1 block">{tx('At least 8 characters, combining uppercase, lowercase and numerals.')}</span></label>
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <button type="submit" className="btn btn-sm btn-primary">{tx('Update Password')}</button>
-            {pwMsg && <p role="status" className={`text-xs font-bold p-3 border rounded-lg ${pwMsg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-300' : 'text-rose-900 bg-rose-50 border-rose-300'}`}>{pwMsg.text}</p>}
+            {pwMsg && <p role="status" className={`text-xs font-bold p-3 border rounded-none ${pwMsg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-300' : 'text-rose-900 bg-rose-50 border-rose-300'}`}>{pwMsg.text}</p>}
           </div>
         </form>
         <SecurityCard twoFactor={me.account.twoFactor} email={me.account.email} onChanged={onSaved} />

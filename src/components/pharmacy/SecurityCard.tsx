@@ -40,7 +40,7 @@ export default function SecurityCard({ twoFactor, email, onChanged }: { twoFacto
   };
 
   return (
-    <section aria-label={tx('Two-factor sign-in')} className="app-card rounded-xl border border-slate-200 p-6 space-y-5 min-w-0">
+    <section aria-label={tx('Two-factor sign-in')} className="app-card rounded-none border border-slate-200 p-6 space-y-5 min-w-0">
       <div className="border-b border-slate-100 pb-3">
         <h2 className="text-sm font-black uppercase tracking-wider text-slate-800 flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[color:var(--t-600)]" /> {tx('Two-Factor Authentication (TOTP)')}</h2>
         <p className="text-xs text-slate-500 font-semibold mt-1">
@@ -56,13 +56,13 @@ export default function SecurityCard({ twoFactor, email, onChanged }: { twoFacto
       )}
 
       {!twoFactor.enabled && setup && (
-        <form onSubmit={enable} className="space-y-4 bg-slate-50 border border-slate-200 p-4 rounded-xl">
+        <form onSubmit={enable} className="space-y-4 bg-slate-50 border border-slate-200 p-4 rounded-none">
           <ol className="text-xs text-slate-700 font-semibold space-y-1.5 list-decimal ml-5">
             <li>{tx('Open an approved authenticator application (Google Authenticator, Microsoft Authenticator, or Aegis).')}</li>
             <li>Scan the encrypted QR code or enter the key manually for {email}.</li>
           </ol>
           <div className="flex flex-wrap items-center gap-4 bg-white p-3 border border-slate-250">
-{setup.qr && <img src={setup.qr} alt={tx('QR code to add MediCred to your authenticator app')} width={140} height={140} className="border border-slate-300 bg-white rounded-lg" />}
+{setup.qr && <img src={setup.qr} alt={tx('QR code to add MediCred to your authenticator app')} width={140} height={140} className="border border-slate-300 bg-white rounded-none" />}
             <div className="text-xs text-slate-600 min-w-0 space-y-1">
               <span className="text-xs font-black uppercase tracking-wider text-slate-500 block">{tx('Manual Configuration Key:')}</span>
               <span className="font-mono font-bold text-2xs text-[color:var(--ink)] bg-slate-100 border border-slate-300 px-2 py-1 block [overflow-wrap:anywhere]">{setup.secret}</span>
@@ -75,10 +75,10 @@ export default function SecurityCard({ twoFactor, email, onChanged }: { twoFacto
       )}
 
       {twoFactor.enabled && !twoFactor.required && (
-        <form onSubmit={disable} className="space-y-4 bg-slate-50 border border-slate-200 p-4 rounded-xl">
+        <form onSubmit={disable} className="space-y-4 bg-slate-50 border border-slate-200 p-4 rounded-none">
           <p className="text-xs text-slate-600 font-semibold">{tx('To disable two-factor authentication, confirm with your password and a current TOTP token.')}</p>
           <div className="grid sm:grid-cols-2 gap-3">
-            <label className="block"><span className={fieldLabel}>{tx('Password')}</span><input type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" className="h-10 w-full border border-slate-300 rounded-lg px-3 bg-white text-xs font-semibold text-slate-900 outline-none focus:border-[color:var(--t-600)] transition-colors" /></label>
+            <label className="block"><span className={fieldLabel}>{tx('Password')}</span><input type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" className="h-10 w-full border border-slate-300 rounded-none px-3 bg-white text-xs font-semibold text-slate-900 outline-none focus:border-[color:var(--t-600)] transition-colors" /></label>
             <label className="block"><span className={fieldLabel}>{tx('Current 6-digit token')}</span><input value={code} onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" required className="h-12 w-full border border-slate-300 rounded-none px-3.5 bg-white font-mono font-bold tracking-widest text-slate-900 outline-none focus:border-[color:var(--t-600)]" placeholder="000000" /></label>
           </div>
           <button type="submit" disabled={busy} className={btnDanger}>{tx('Deactivate Two-Factor')}</button>
