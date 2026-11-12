@@ -1120,7 +1120,7 @@ export default function App() {
               />
             )}
 
-            {activeView === 'help' && currentUser.role !== 'admin' && (
+            {activeView === 'help' && (
               <SupportDesk
                 currentUser={currentUser}
                 professionals={professionals}

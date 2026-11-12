@@ -103,6 +103,7 @@ const FLAG_LABEL: Record<string, { text: string; cls: string }> = {
 };
 
 import SanctionsDrawer from './SanctionsDrawer';
+import AdminActionModal, { type AdminActionModalConfig } from './AdminActionModal';
 
 export type TrustSubTab = 'watchlist' | 'complaints' | 'sanctions';
 
@@ -123,6 +124,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
   const [filter, setFilter] = useState<'attention' | 'all'>('attention');
   const [selectedPractitionerForSanction, setSelectedPractitionerForSanction] = useState<any | null>(null);
   const [countersigningId, setCountersigningId] = useState<string | null>(null);
+  const [modal, setModal] = useState<AdminActionModalConfig | null>(null);
 
   const load = async () => {
     const [p, c, s] = await Promise.all([
@@ -157,21 +159,35 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
     }
   };
 
-  const handleDismissSanction = async (sanctionId: string) => {
-    if (window.confirm(tx('Dismiss this proposed disciplinary sanction?'))) {
-      await act(() => post(`/api/admin/sanctions/${sanctionId}/dismiss`, {}));
-    }
+  const handleDismissSanction = (sanctionId: string) => {
+    setModal({
+      title: tx('Dismiss Sanction Proposal'),
+      description: tx('Dismiss this proposed disciplinary sanction? It will be removed from the pending countersignature queue.'),
+      tone: 'warning',
+      confirmLabel: tx('Dismiss Proposal'),
+      onConfirm: async () => {
+        await act(() => post(`/api/admin/sanctions/${sanctionId}/dismiss`, {}));
+      },
+    });
   };
 
   const resolve = (c: any, outcome: 'investigating' | 'upheld' | 'dismissed') => {
-    let resolution = '';
-    let suspendToo = false;
-    if (outcome !== 'investigating') {
-      resolution = window.prompt(`Resolution note for the ${outcome} outcome:`) || '';
-      if (!resolution) return;
-      if (outcome === 'upheld') suspendToo = window.confirm(tx('Also suspend this practitioner now?'));
+    if (outcome === 'investigating') {
+      act(() => post(`/api/complaints/${c.id}/resolve`, { outcome, resolution: '', suspend: false }));
+      return;
     }
-    act(() => post(`/api/complaints/${c.id}/resolve`, { outcome, resolution, suspend: suspendToo }));
+    setModal({
+      title: outcome === 'upheld' ? tx('Uphold Complaint') : tx('Dismiss Complaint'),
+      description: tx('Document the resolution rationale for the statutory complaint ledger.'),
+      tone: outcome === 'upheld' ? 'danger' : 'brand',
+      inputLabel: `${tx('Resolution Note')} (${outcome}) *`,
+      inputPlaceholder: tx('Enter investigation findings and board determination'),
+      checkboxLabel: outcome === 'upheld' ? tx('Also suspend this practitioner immediately') : undefined,
+      confirmLabel: tx('Record Resolution'),
+      onConfirm: async (resolution, suspendToo) => {
+        await act(() => post(`/api/complaints/${c.id}/resolve`, { outcome, resolution, suspend: suspendToo }));
+      },
+    });
   };
 
   const shown = practitioners.filter(p => filter === 'all' || p.flag || p.verificationStatus === 'Suspended');
@@ -375,6 +391,7 @@ export default function AdminTrustPanel({ onChanged, activeSub, currentSubRole =
       )}
 
       {/* Structured Institutional Sanctions Drawer */}
+      <AdminActionModal config={modal} onClose={() => setModal(null)} />
       <SanctionsDrawer
         isOpen={Boolean(selectedPractitionerForSanction)}
         onClose={() => setSelectedPractitionerForSanction(null)}

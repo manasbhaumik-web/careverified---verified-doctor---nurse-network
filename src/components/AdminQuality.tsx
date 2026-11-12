@@ -4,6 +4,7 @@ import { useTr } from '../locale';
 import { MACROS, MACRO_LANGS, fillMacro, type MacroLang, type SupportHours } from '../supportMy';
 import AdminPartners from './AdminPartners';
 import { TestimonialAdmin } from './TestimonialPanels';
+import AdminActionModal, { type AdminActionModalConfig } from './AdminActionModal';
 
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -132,11 +133,23 @@ function Reviews({ say }: { say: (t: string) => void }) {
   const [mode, setMode] = useState<'practitioner_reviews' | 'testimonials'>('practitioner_reviews');
   const [filter, setFilter] = useState<'reported' | 'all'>('reported');
   const [list, setList] = useState<any[]>([]);
+  const [modal, setModal] = useState<AdminActionModalConfig | null>(null);
   const load = useCallback(() => fetch(`/api/admin/reviews${filter === 'reported' ? '?filter=reported' : ''}`).then(r => r.json()).then(d => d.status === 'success' && setList(d.data)), [filter]);
   useEffect(() => { load(); }, [load]);
-  const decide = async (id: string, action: 'hide' | 'keep' | 'restore') => {
-    const reason = window.prompt(`Reason for the decision (${action})?`); if (!reason) return;
-    const d = await jreq(`/api/admin/reviews/${id}/moderate`, 'POST', { action, reason }); say(d.status === 'success' ? 'Decision recorded.' : d.message); load();
+  const decide = (id: string, action: 'hide' | 'keep' | 'restore') => {
+    setModal({
+      title: tx('Moderate Review'),
+      description: tx('Record the audit reason for this moderation action.'),
+      tone: action === 'hide' ? 'danger' : 'brand',
+      inputLabel: `${tx('Reason for decision')} (${action}) *`,
+      inputPlaceholder: tx('e.g. Verified spam / policy violation / substantiated patient feedback'),
+      confirmLabel: action === 'hide' ? tx('Remove Review') : action === 'restore' ? tx('Restore Review') : tx('Keep Review'),
+      onConfirm: async (reason) => {
+        const d = await jreq(`/api/admin/reviews/${id}/moderate`, 'POST', { action, reason });
+        say(d.status === 'success' ? 'Decision recorded.' : d.message);
+        load();
+      },
+    });
   };
   return (
     <div className="space-y-4">
@@ -186,6 +199,7 @@ function Reviews({ say }: { say: (t: string) => void }) {
             ))}
           </div>
           {list.length === 0 && <p className="text-xs text-slate-500 bg-white border border-slate-200 rounded-none p-4">{tx('Nothing to moderate.')}</p>}
+          <AdminActionModal config={modal} onClose={() => setModal(null)} />
           {list.map(r => (
             <article key={r.id} className="bg-white border border-slate-200 rounded-none p-4 text-xs space-y-1">
               <p className="font-bold">{r.professionalName} · {'★'.repeat(r.rating)} <span className="text-xs text-slate-500 font-normal">by {r.patientName} · {r.date} · {r.status ?? 'published'}</span></p>
@@ -208,15 +222,28 @@ function Reviews({ say }: { say: (t: string) => void }) {
 function Incidents({ say }: { say: (t: string) => void }) {
   const tx = useTr();
   const [list, setList] = useState<any[]>([]);
+  const [modal, setModal] = useState<AdminActionModalConfig | null>(null);
   const load = useCallback(() => fetch('/api/admin/incidents').then(r => r.json()).then(d => d.status === 'success' && setList(d.data)), []);
   useEffect(() => { load(); }, [load]);
-  const update = async (id: string, status: 'investigating' | 'resolved' | 'closed') => {
-    const note = window.prompt(status === 'investigating' ? tx('Note (optional)') : tx('Outcome / actions taken (required)')) ?? ''; if (status !== 'investigating' && !note) return;
-    const d = await jreq(`/api/admin/incidents/${id}/update`, 'POST', { status, note }); say(d.status === 'success' ? 'Updated.' : d.message); load();
+  const update = (id: string, status: 'investigating' | 'resolved' | 'closed') => {
+    setModal({
+      title: status === 'investigating' ? tx('Start Incident Investigation') : status === 'resolved' ? tx('Resolve Incident') : tx('Close Incident'),
+      tone: status === 'closed' ? 'warning' : 'brand',
+      inputLabel: status === 'investigating' ? tx('Investigation Note (Optional)') : tx('Outcome / Actions Taken *'),
+      inputRequired: status !== 'investigating',
+      inputPlaceholder: tx('Document findings, escalation steps, or resolution summary'),
+      confirmLabel: tx('Update Incident'),
+      onConfirm: async (note) => {
+        const d = await jreq(`/api/admin/incidents/${id}/update`, 'POST', { status, note });
+        say(d.status === 'success' ? 'Updated.' : d.message);
+        load();
+      },
+    });
   };
   const tone: Record<string, string> = { critical: 'bg-rose-200 text-rose-900', high: 'bg-rose-100 text-rose-800', medium: 'bg-amber-100 text-amber-800', low: 'bg-slate-100 text-slate-700' };
   return (
     <div className="space-y-3">
+      <AdminActionModal config={modal} onClose={() => setModal(null)} />
       {list.length === 0 && <p className="text-xs text-slate-500 bg-white border border-slate-200 p-4">{tx('No incidents reported.')}</p>}
       {list.map(i => (
         <article key={i.id} className="bg-white border border-slate-200 p-4 text-xs space-y-1.5">
@@ -298,17 +325,35 @@ function Peer({ say }: { say: (t: string) => void }) {
 function Credentials({ say }: { say: (t: string) => void }) {
   const tx = useTr();
   const [data, setData] = useState<any | null>(null);
+  const [modal, setModal] = useState<AdminActionModalConfig | null>(null);
   const load = useCallback(() => fetch('/api/admin/credentials').then(r => r.json()).then(d => d.status === 'success' && setData(d.data)), []);
   useEffect(() => { load(); }, [load]);
   const decide = async (kind: 'cpd' | 'specialty-certs', id: string, decision: 'approved' | 'rejected') => {
-    const note = decision === 'rejected' ? window.prompt('Reason for rejecting?') ?? '' : '';
-    if (decision === 'rejected' && !note) return;
-    const d = await jreq(`/api/admin/${kind}/${id}/review`, 'POST', { decision, note }); say(d.status === 'success' ? 'Recorded.' : d.message); load();
+    if (decision === 'rejected') {
+      setModal({
+        title: tx('Reject Credential Submission'),
+        description: tx('Provide a clear reason so the practitioner can upload corrected evidence.'),
+        tone: 'danger',
+        inputLabel: tx('Rejection Reason *'),
+        inputPlaceholder: tx('e.g. Certificate expired or illegible scan'),
+        confirmLabel: tx('Reject Submission'),
+        onConfirm: async (note) => {
+          const d = await jreq(`/api/admin/${kind}/${id}/review`, 'POST', { decision, note });
+          say(d.status === 'success' ? 'Recorded.' : d.message);
+          load();
+        },
+      });
+      return;
+    }
+    const d = await jreq(`/api/admin/${kind}/${id}/review`, 'POST', { decision, note: '' });
+    say(d.status === 'success' ? 'Recorded.' : d.message);
+    load();
   };
   if (!data) return <p className="text-xs text-slate-500">{tx('Loading…')}</p>;
-  const evidence = (id?: string | null) => id ? <a className="underline font-bold" href={`/api/documents/${id}/download`}>{tx('evidence')}</a> : <span className="text-slate-400">{tx('no evidence')}</span>;
+  const evidence = (id?: string | null) => id ? <a className="underline font-bold" href={`/api/documents/${id}/download`}>{tx('evidence')}</a> : <span className="text-slate-600">{tx('no evidence')}</span>;
   return (
     <div className="space-y-4">
+      <AdminActionModal config={modal} onClose={() => setModal(null)} />
       <section className="bg-white border border-slate-200 p-4 space-y-2">
         <h3 className="text-sm font-extrabold">CPD entries to verify ({data.pendingCpd.length})</h3>
         {data.pendingCpd.map((e: any) => (

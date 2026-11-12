@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { formatMoney, useTr } from '../locale';
+import AdminActionModal, { type AdminActionModalConfig } from './AdminActionModal';
 
 const jreq = (url: string, method = 'GET', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -28,6 +29,7 @@ export default function AdminPayouts() {
   const [batch, setBatch] = useState<Batch | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [note, setNote] = useState('');
+  const [modal, setModal] = useState<AdminActionModalConfig | null>(null);
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(() => jreq('/api/admin/payouts/overview').then(d => d.status === 'success' && setO(d.data)), []);
@@ -49,22 +51,54 @@ export default function AdminPayouts() {
   };
   const verify = (pid: string, verified: boolean) => {
     if (verified) {
-      if (!window.confirm(tx('Confirm you have checked that the account holder name matches the practitioner\'s name.'))) return;
-      return act(() => jreq(`/api/admin/payout-accounts/${pid}/verify`, 'POST', { verified: true, nameChecked: true }), 'Account verified.');
+      setModal({
+        title: tx('Verify Bank Account'),
+        description: tx("Confirm you have checked that the account holder name matches the practitioner's name."),
+        tone: 'brand',
+        confirmLabel: tx('Verify Account'),
+        onConfirm: async () => {
+          await act(() => jreq(`/api/admin/payout-accounts/${pid}/verify`, 'POST', { verified: true, nameChecked: true }), 'Account verified.');
+        },
+      });
+      return;
     }
-    const note = window.prompt('Why can this account not be verified? The practitioner will see this.');
-    if (!note) return;
-    return act(() => jreq(`/api/admin/payout-accounts/${pid}/verify`, 'POST', { verified: false, note }), 'Account rejected.');
+    setModal({
+      title: tx('Reject Bank Account'),
+      description: tx('The practitioner will see this explanation in their payout settings.'),
+      tone: 'danger',
+      inputLabel: tx('Rejection Reason *'),
+      inputPlaceholder: tx('e.g. Account holder name does not match MMC/LJM registration'),
+      confirmLabel: tx('Reject Account'),
+      onConfirm: async (reason) => {
+        await act(() => jreq(`/api/admin/payout-accounts/${pid}/verify`, 'POST', { verified: false, note: reason }), 'Account rejected.');
+      },
+    });
   };
-  const markPaid = async (id: string) => {
-    const reference = window.prompt('The bank\'s reference for this transfer:');
-    if (!reference) return;
-    await act(() => jreq(`/api/admin/payouts/${id}/paid`, 'POST', { reference }), 'Marked paid. The practitioner has been told.');
+  const markPaid = (id: string) => {
+    setModal({
+      title: tx('Record Bank Transfer'),
+      description: tx('Enter the bank transfer reference so the practitioner receives confirmation.'),
+      tone: 'brand',
+      inputLabel: tx('Bank Reference Number *'),
+      inputPlaceholder: tx('e.g. IBG-20261112-88412'),
+      confirmLabel: tx('Mark Paid'),
+      onConfirm: async (reference) => {
+        await act(() => jreq(`/api/admin/payouts/${id}/paid`, 'POST', { reference }), 'Marked paid. The practitioner has been told.');
+      },
+    });
   };
-  const markFailed = async (id: string) => {
-    const reason = window.prompt('Why did the transfer fail? The practitioner will see this.');
-    if (!reason) return;
-    await act(() => jreq(`/api/admin/payouts/${id}/failed`, 'POST', { reason }), 'Marked failed. The earnings are released for the next batch.');
+  const markFailed = (id: string) => {
+    setModal({
+      title: tx('Mark Transfer Failed'),
+      description: tx('Earnings will be released back to the practitioner for the next payout batch.'),
+      tone: 'danger',
+      inputLabel: tx('Failure Reason (Visible to Practitioner) *'),
+      inputPlaceholder: tx('e.g. Invalid bank account number / dormant account'),
+      confirmLabel: tx('Mark Failed'),
+      onConfirm: async (reason) => {
+        await act(() => jreq(`/api/admin/payouts/${id}/failed`, 'POST', { reason }), 'Marked failed. The earnings are released for the next batch.');
+      },
+    });
   };
 
   if (!o) return <p role="status" className="text-xs text-slate-600">{tx('Loading payouts…')}</p>;
@@ -149,7 +183,7 @@ export default function AdminPayouts() {
                     <div className="flex flex-wrap gap-2">
                       {batch.status === 'draft' && <button type="button" className={btnPrimary} disabled={busy} onClick={() => act(() => jreq(`/api/admin/payout-batches/${b.id}/approve`, 'POST'), 'Batch approved.')}>{tx('Approve')}</button>}
                       {['approved', 'exported'].includes(batch.status) && <a className={`${btnPrimary} inline-flex items-center`} href={`/api/admin/payout-batches/${b.id}/export.csv`} onClick={() => setTimeout(() => { load(); loadBatch(b.id); }, 1200)}>{tx('Download bank file (contains account numbers)')}</a>}
-                      {['draft', 'approved', 'exported'].includes(batch.status) && <button type="button" className={btn} disabled={busy} onClick={() => window.confirm(tx('Cancel this batch? Its earnings go back to the next run.')) && act(() => jreq(`/api/admin/payout-batches/${b.id}/cancel`, 'POST'), 'Batch cancelled.')}>{tx('Cancel batch')}</button>}
+                      {['draft', 'approved', 'exported'].includes(batch.status) && <button type="button" className={btn} disabled={busy} onClick={() => setModal({ title: tx('Cancel Payout Batch'), description: tx('Cancel this batch? Its earnings go back to the next run.'), tone: 'warning', confirmLabel: tx('Cancel Batch'), onConfirm: async () => { await act(() => jreq(`/api/admin/payout-batches/${b.id}/cancel`, 'POST'), 'Batch cancelled.'); } })}>{tx('Cancel batch')}</button>}
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full">
@@ -178,6 +212,7 @@ export default function AdminPayouts() {
           </ul>
         )}
       </div>
+      <AdminActionModal config={modal} onClose={() => setModal(null)} />
     </section>
   );
 }

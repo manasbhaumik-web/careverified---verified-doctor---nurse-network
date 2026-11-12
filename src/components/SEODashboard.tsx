@@ -19,7 +19,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
   const [selectedSchemaProf, setSelectedSchemaProf] = useState<any | null>(null);
 
   // Programmatic templates
-  const [titleTemplate, setTitleTemplate] = useState('Best [Specialty] in [City] | MediCred ✅');
+  const [titleTemplate, setTitleTemplate] = useState('Best [Specialty] in [City] | MediCred');
   const [descTemplate, setDescriptionTemplate] = useState('Find & book pre-verified, licensed [Specialty] specialists in [City] with transparent credentials, patient reviews, and verified medical council registries.');
 
   const selectedProf = professionals.find(p => p.id === selectedProfId) || professionals[0];
@@ -182,13 +182,14 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                   {professionals.map((p) => {
                     const isSelected = p.id === selectedProfId;
                     return (
-                      <div
+                      <button
+                        type="button"
                         key={p.id}
                         onClick={() => setSelectedProfId(p.id)}
-                        className={`p-3.5 rounded-none border cursor-pointer transition-all flex items-center justify-between gap-3 ${
+                        className={`w-full text-left p-3.5 rounded-none border cursor-pointer transition-all flex items-center justify-between gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] ${
                           isSelected
                             ? "bg-[color:var(--t-50)] border-[color:var(--t-600)]"
-                            : "bg-white border-slate-200 hover:border-slate-350"
+                            : "bg-white border-slate-200 hover:border-slate-300"
                         }`}
                       >
                         <div className="flex items-center gap-3 min-w-0">
@@ -218,7 +219,7 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
                           <Eye className="h-3.5 w-3.5" />
                           <span>{tx('View')}</span>
                         </button>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
@@ -424,6 +425,11 @@ export default function SEODashboard({ professionals, embedded = false }: SEODas
       {/* Schema Structure Lightbox Modal */}
       {selectedSchemaProf && (
         <div 
+          role="dialog"
+          aria-modal="true"
+          aria-label={tx('Structured Schema Preview')}
+          onKeyDown={(e) => e.key === 'Escape' && setSelectedSchemaProf(null)}
+          tabIndex={-1}
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
           onClick={() => setSelectedSchemaProf(null)}
           id="schema-modal-backdrop"

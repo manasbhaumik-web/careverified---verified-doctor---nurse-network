@@ -3,6 +3,7 @@ import AdminPayouts from './AdminPayouts';
 import AdminEmail from './AdminEmail';
 import { Siren, TrendingUp, BarChart2, CheckCircle2, Clock, Calendar, ShieldCheck } from 'lucide-react';
 import { formatMoney, useTr } from '../locale';
+import AdminActionModal, { type AdminActionModalConfig } from './AdminActionModal';
 
 const post = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -74,6 +75,7 @@ export default function AdminOps({
   const [verifyDraft, setVerifyDraft] = useState(blankVerify);
   const [hoveredShiftDay, setHoveredShiftDay] = useState<number | null>(null);
   const [hoveredSettlementDay, setHoveredSettlementDay] = useState<number | null>(null);
+  const [modal, setModal] = useState<AdminActionModalConfig | null>(null);
 
   const load = async () => {
     const [c, e, p] = await Promise.all([
@@ -92,12 +94,20 @@ export default function AdminOps({
   useEffect(() => { load().catch(() => setMsg(tx('Could not load data.'))); const t = setInterval(() => load().catch(() => {}), 15000); return () => clearInterval(t); }, []);
 
   const handle = async (id: string) => { await post(`/api/admin/emergencies/${id}/handle`); load(); };
-  const refund = async (id: string) => {
-    const reason = window.prompt('Reason for the refund?');
-    if (!reason) return;
-    const d = await post(`/api/payments/${id}/refund`, { reason });
-    setMsg(d.status === 'success' ? 'Refunded.' : d.message || tx('Refund failed.'));
-    load();
+  const refund = (id: string) => {
+    setModal({
+      title: tx('Issue Patient Refund'),
+      description: tx('Record the statutory reason for refunding this consultation payment.'),
+      tone: 'danger',
+      inputLabel: tx('Refund Reason *'),
+      inputPlaceholder: tx('e.g. Practitioner unavailable within 10-minute SLA'),
+      confirmLabel: tx('Confirm Refund'),
+      onConfirm: async (reason) => {
+        const d = await post(`/api/payments/${id}/refund`, { reason });
+        setMsg(d.status === 'success' ? 'Refunded.' : d.message || tx('Refund failed.'));
+        load();
+      },
+    });
   };
 
   const addPharmacy = async (e: React.FormEvent) => {
@@ -216,7 +226,7 @@ export default function AdminOps({
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-extrabold text-slate-900">{tx('30-Day Shift Fill Rate & Locum Telemetry')}</h3>
-                    <span className="text-2xs font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">{tx('Rolling Window')}</span>
+                    <span className="text-2xs font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5">{tx('Sample Baseline · 30-Day')}</span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">{tx('Automated tracking of clinical shift placements across emergency departments and inpatient wards.')}</p>
                 </div>
@@ -341,7 +351,7 @@ export default function AdminOps({
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-extrabold text-slate-900">{tx('30-Day Rolling Escrow & Settlement Telemetry')}</h3>
-                    <span className="text-2xs font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5">{tx('Audited Financials')}</span>
+                    <span className="text-2xs font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5">{tx('Illustrative Baseline · 30-Day')}</span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">{tx('Automated reconciliation of platform escrow holds, locum doctor wages, and 8% facilitator commissions.')}</p>
                 </div>
@@ -550,6 +560,7 @@ export default function AdminOps({
           </ul>
         </section>
       )}
+      <AdminActionModal config={modal} onClose={() => setModal(null)} />
     </div>
   );
 }

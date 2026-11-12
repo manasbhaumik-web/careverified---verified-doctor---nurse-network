@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Puzzle,
   CheckCircle2,
@@ -9,6 +9,7 @@ import {
 import { useTr } from '../locale';
 import WorkspaceHeader from './WorkspaceHeader';
 import { BannerBadge } from './DashboardHeader';
+import AdminActionModal, { type AdminActionModalConfig } from './AdminActionModal';
 
 export interface AdminPackagesTabProps {
   packageSearch: string;
@@ -48,6 +49,7 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
   renderIcon,
 }) => {
   const tx = useTr();
+  const [modal, setModal] = useState<AdminActionModalConfig | null>(null);
   return (
         <div id="panel-packages" role="tabpanel" aria-labelledby="tab-packages" tabIndex={0} className="space-y-6 animate-fade-in text-slate-800">
           <WorkspaceHeader
@@ -231,7 +233,7 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
                                   role="switch"
                                   aria-checked={isEnabled}
                                   aria-label={`${isEnabled ? tx('Unpublish') : tx('Publish')} ${pkgName}`}
-                                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-none border border-slate-300 transition-colors duration-150 ease-in-out focus:outline-none ${
+                                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-none border border-slate-300 transition-colors duration-150 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] ${
                                     isEnabled ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)]' : 'bg-slate-200'
                                   }`}
                                 >
@@ -249,8 +251,14 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
                               {pkg.isRemovable ? (
                                 <button
                                   type="button"
-                                  onClick={() => { if (window.confirm(`Delete "${pkgName}"? Patients will no longer see it, and this cannot be undone.`)) handleUninstallPackage(pkg.id); }}
-                                  className="h-8 px-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-none border border-transparent hover:border-rose-200 transition-all cursor-pointer flex items-center gap-1 text-xs font-bold"
+                                  onClick={() => setModal({
+                                    title: tx('Remove Package'),
+                                    description: `Delete "${pkgName}"? Patients will no longer see it, and this cannot be undone.`,
+                                    tone: 'danger',
+                                    confirmLabel: tx('Delete Package'),
+                                    onConfirm: () => handleUninstallPackage(pkg.id),
+                                  })}
+                                  className="h-8 px-2.5 text-slate-600 hover:text-rose-700 hover:bg-rose-50 rounded-none border border-transparent hover:border-rose-200 transition-all cursor-pointer flex items-center gap-1 text-xs font-bold"
                                   title={tx('Delete this package')}
                                 >
                                   <Trash2 className="h-3.5 w-3.5" />
@@ -270,6 +278,7 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
               </div>
             </div>
           )}
+          <AdminActionModal config={modal} onClose={() => setModal(null)} />
         </div>
   );
 };
