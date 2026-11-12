@@ -557,7 +557,9 @@ select::-ms-expand {
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   appearance: none !important;
-  background-image: none !important;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-color: transparent !important;
   border-radius: 0px !important;
   vertical-align: middle;
 }

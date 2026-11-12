@@ -359,7 +359,13 @@ export function FilterSelect({ label, value, onChange, children, className = '' 
       <select
         value={value}
         onChange={e => onChange(e.target.value)}
-        style={{ appearance: 'none', WebkitAppearance: 'none', MozAppearance: 'none' }}
+        style={{
+          appearance: 'none',
+          WebkitAppearance: 'none',
+          MozAppearance: 'none',
+          backgroundImage: "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E\")",
+          backgroundRepeat: 'no-repeat',
+        }}
         className="appearance-none filter-select-input flex-1 h-full bg-transparent text-xs font-bold text-[color:var(--ink)] focus:outline-none cursor-pointer border-0 p-0 m-0 min-w-0 max-w-full leading-none whitespace-nowrap inline-flex items-center"
       >
         {children}
