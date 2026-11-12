@@ -55,7 +55,7 @@ test('a request made on the Assistance page appears in the same list as Global P
   sql('UPDATE tourism_facilities SET licence_expiry = NULL, active = 1');
   const facilityId = (await tourismIds())[0];
   assert.ok(facilityId);
-  const sent = await patient.call('POST', '/api/assistance/enquiries', { facilityId, summary: 'Please send a quote for an executive health screening.', patientName: 'Demo Patient', patientEmail: DEMO.patient });
+  const sent = await patient.call('POST', '/api/assistance/enquiries', { facilityId, summary: 'Please send a quote for an executive health screening.', patientName: 'Aisyah Rahman', patientEmail: DEMO.patient });
   assert.equal(sent.status, 201, JSON.stringify(sent.data));
   const mine = (await patient.call('GET', '/api/tourism/cases')).data.data as any[];
   assert.ok(mine.some(c => c.id === sent.data.data.id), 'one list of requests for both pages');

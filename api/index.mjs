@@ -4333,7 +4333,7 @@ function ensureDemoData() {
   if (!docProfile) {
     docProfile = {
       id: "doc-demo-1",
-      name: "Dr Demo Physician",
+      name: "Dr. Arjun Menon",
       avatar: "/assets/malaysian_male_doctor.jpg",
       role: "doctor" /* DOCTOR */,
       specialization: "General Physician",
@@ -4349,13 +4349,13 @@ function ensureDemoData() {
       rating: 4.9,
       reviewCount: 12,
       verificationStatus: "Verified \u2705" /* VERIFIED */,
-      practiceAddress: "1 Jalan Demo, Kuala Lumpur",
+      practiceAddress: "12 Jalan Bangsar Utama, Kuala Lumpur",
       city: "Kuala Lumpur",
       availability: {
         days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
         slots: ["09:00 AM", "10:00 AM", "02:00 PM", "04:00 PM"]
       },
-      seoSlug: "dr-demo-physician-general-physician-kuala-lumpur"
+      seoSlug: "dr-arjun-menon-general-physician-kuala-lumpur"
     };
     doctors.push(docProfile);
   }
@@ -4366,7 +4366,7 @@ function ensureDemoData() {
       email: "demo.doctor@careverified.test",
       password: DEMO_PASSWORD,
       role: "practitioner",
-      name: "Dr Demo Physician",
+      name: "Dr. Arjun Menon",
       avatarUrl: "/assets/malaysian_male_doctor.jpg",
       profileId: docProfile.id,
       consentVersion: "2026-11"
@@ -4387,7 +4387,7 @@ function ensureDemoData() {
       email: "demo.patient@careverified.test",
       password: DEMO_PASSWORD,
       role: "patient",
-      name: "Demo Patient",
+      name: "Aisyah Rahman",
       avatarUrl: "/assets/malaysian_male_patient.jpg",
       consentVersion: "2026-11"
     });
@@ -4397,7 +4397,7 @@ function ensureDemoData() {
     patProfile = {
       id: "pat-99912",
       userId: patUser.id,
-      name: "Demo Patient",
+      name: "Aisyah Rahman",
       email: "demo.patient@careverified.test",
       icNumber: "900101-14-0000",
       age: 34,
@@ -4414,7 +4414,7 @@ function ensureDemoData() {
   for (const b of bookings) {
     if (b.patientId === "pat-99912" && !b.patientUserId) {
       b.patientUserId = patUser.id;
-      b.patientName = "Demo Patient";
+      b.patientName = "Aisyah Rahman";
       b.patientEmail = "demo.patient@careverified.test";
     }
   }
@@ -4429,24 +4429,24 @@ function ensureDemoData() {
     ).run("vit-demo-bp-1", patUser.id, now);
   }
   createGrant(patUser.id, docProfile.id, "booking", "bkg-202223", 365);
-  let demoPharm = db.prepare("SELECT * FROM pharmacies WHERE name = 'Demo Pharmacy'").get();
+  let demoPharm = db.prepare("SELECT * FROM pharmacies WHERE id = 'phm-demo-1' OR name IN ('Demo Pharmacy', 'Bangsar Care Pharmacy')").get();
   if (!demoPharm) {
     const id = "phm-demo-1";
     db.prepare(
       `INSERT INTO pharmacies (id, name, address, city, phone, hours, services, pin_hash, active, licence_no, pharmacist_name, pharmacist_reg, verified_at, verified_by, created_at)
-       VALUES (?, 'Demo Pharmacy', '2 Jalan Demo, Kuala Lumpur', 'Kuala Lumpur', '03-5550 0100', 'Mon\u2013Sat 9am\u201310pm', ?, ?, 1, 'DEMO-PH-0001', 'Demo Pharmacist', 'DEMO-RPh-0001', ?, 'usr-demo-admin', ?)`
+       VALUES (?, 'Bangsar Care Pharmacy', '28 Jalan Telawi 3, Bangsar, Kuala Lumpur', 'Kuala Lumpur', '03-5550 0100', 'Mon\u2013Sat 9am\u201310pm', ?, ?, 1, 'DEMO-PH-0001', 'RPh. Nurul Huda Aziz', 'DEMO-RPh-0001', ?, 'usr-demo-admin', ?)`
     ).run(id, JSON.stringify(["Home delivery", "Vaccinations"]), hashPassword("123456"), now, now);
     demoPharm = db.prepare("SELECT * FROM pharmacies WHERE id = ?").get(id);
   } else if (!demoPharm.verified_at) {
     db.prepare(
-      "UPDATE pharmacies SET active = 1, licence_no = 'DEMO-PH-0001', pharmacist_name = 'Demo Pharmacist', pharmacist_reg = 'DEMO-RPh-0001', verified_at = ? WHERE id = ?"
+      "UPDATE pharmacies SET name = 'Bangsar Care Pharmacy', address = '28 Jalan Telawi 3, Bangsar, Kuala Lumpur', active = 1, licence_no = 'DEMO-PH-0001', pharmacist_name = 'RPh. Nurul Huda Aziz', pharmacist_reg = 'DEMO-RPh-0001', verified_at = ? WHERE id = ?"
     ).run(now, demoPharm.id);
   }
-  const secondPharm = db.prepare("SELECT 1 AS x FROM pharmacies WHERE name = 'Demo 24h Pharmacy'").get();
+  const secondPharm = db.prepare("SELECT 1 AS x FROM pharmacies WHERE id = 'phm-demo-2' OR name IN ('Demo 24h Pharmacy', 'Georgetown 24-Hour Dispensary')").get();
   if (!secondPharm) {
     db.prepare(
       `INSERT INTO pharmacies (id, name, address, city, phone, hours, services, pin_hash, active, licence_no, pharmacist_name, pharmacist_reg, verified_at, verified_by, created_at)
-       VALUES ('phm-demo-2', 'Demo 24h Pharmacy', '15 Jalan Contoh, George Town', 'Penang', '04-5550 0200', 'Open 24 hours', ?, ?, 1, 'DEMO-PH-0002', 'Lim Wei', 'DEMO-RPh-0002', ?, 'usr-demo-admin', ?)`
+       VALUES ('phm-demo-2', 'Georgetown 24-Hour Dispensary', '15 Jalan Burma, George Town', 'Penang', '04-5550 0200', 'Open 24 hours', ?, ?, 1, 'DEMO-PH-0002', 'RPh. Lim Wei Jie', 'DEMO-RPh-0002', ?, 'usr-demo-admin', ?)`
     ).run(JSON.stringify(["24 hours", "Drive-through", "Online ordering"]), hashPassword("654321"), now, now);
   }
   let pharmUser = db.prepare("SELECT * FROM users WHERE email = ?").get("demo.pharmacy@careverified.test");
@@ -4456,7 +4456,7 @@ function ensureDemoData() {
       email: "demo.pharmacy@careverified.test",
       password: DEMO_PASSWORD,
       role: "pharmacy",
-      name: "Demo Pharmacy Team",
+      name: "Bangsar Care Pharmacy Team",
       profileId: demoPharm.id
     });
     db.prepare("UPDATE users SET pharmacy_owner = 1, must_change_password = 0 WHERE id = ?").run(pharmUser.id);

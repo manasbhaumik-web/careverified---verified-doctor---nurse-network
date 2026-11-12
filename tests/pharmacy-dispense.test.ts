@@ -22,7 +22,7 @@ test('a prescription can be dispensed once, and the transaction commits', async 
   const pharmacy = await signedIn('demo.pharmacy@careverified.test', 'pharmacy');
 
   const bookings = (await patient.call('GET', '/api/bookings')).data.data as any[];
-  const booking = bookings.find(b => /Demo Physician/.test(b.professionalName));
+  const booking = bookings.find(b => /Arjun Menon/.test(b.professionalName));
   assert.ok(booking, 'the demo patient has a booking with the demo doctor');
 
   const issued = await doctor.call('POST', '/api/prescriptions', {

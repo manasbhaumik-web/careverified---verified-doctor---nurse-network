@@ -13,7 +13,7 @@ const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString
 // ---------- unit ----------
 test('bank details: validation and normalisation', () => {
   assert.equal(normaliseAccountNumber('1234-5678 9012'), '123456789012');
-  const ok = { bankName: 'Maybank', accountName: 'Dr Demo Physician', accountNumber: '1234 5678 9012' };
+  const ok = { bankName: 'Maybank', accountName: 'Dr. Arjun Menon', accountNumber: '1234 5678 9012' };
   assert.equal(bankProblem(ok), null);
   assert.match(bankProblem({ ...ok, bankName: '' })!, /bank/i);
   assert.match(bankProblem({ ...ok, accountName: 'A' })!, /holder/i);
@@ -57,7 +57,7 @@ function addConsult(opts: { endedDaysAgo?: number | null; status?: string; amoun
 }
 const mine = async () => (await doctor.call('GET', '/api/me/payouts')).data.data;
 const overview = async () => (await admin.call('GET', '/api/admin/payouts/overview')).data.data;
-const bank = { bankName: 'Maybank', accountName: 'Dr Demo Physician', accountNumber: '1234 5678 9012', password: DEMO_PASSWORD };
+const bank = { bankName: 'Maybank', accountName: 'Dr. Arjun Menon', accountNumber: '1234 5678 9012', password: DEMO_PASSWORD };
 
 before(async () => {
   srv = await startTestServer({ PAYOUT_HOLD_DAYS: '7', PAYOUT_MIN_MYR: '50', PAYOUT_FOUR_EYES: 'false' });
@@ -96,7 +96,7 @@ test('bank details: password required, validated, stored encrypted, shown masked
   assert.equal((await doctor.call('PUT', '/api/me/payout-account', bank)).status, 200);
 
   const m = await mine();
-  assert.deepEqual({ ...m.bank, updatedAt: undefined, verifiedAt: undefined, note: undefined }, { bankName: 'Maybank', accountName: 'Dr Demo Physician', last4: '9012', status: 'unverified', verifiedAt: undefined, note: undefined, updatedAt: undefined });
+  assert.deepEqual({ ...m.bank, updatedAt: undefined, verifiedAt: undefined, note: undefined }, { bankName: 'Maybank', accountName: 'Dr. Arjun Menon', last4: '9012', status: 'unverified', verifiedAt: undefined, note: undefined, updatedAt: undefined });
   assert.ok(!JSON.stringify(m).includes('123456789012'), 'the full number never leaves the server');
   const stored = (db.prepare('SELECT account_enc FROM payout_accounts WHERE professional_id = ?').get(pid) as any).account_enc as string;
   assert.ok(!stored.includes('123456789012') && stored.startsWith('v1:'));

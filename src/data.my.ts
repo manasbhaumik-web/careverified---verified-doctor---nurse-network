@@ -28,26 +28,26 @@ export const MY_DEMO_DOCTORS: DoctorProfile[] = [
     id: 'doc-my-1', name: 'Dr. Kavitha Subramaniam (demo)', avatar: '/assets/doctor_female_indian.jpg', specialization: 'General Physician',
     licenseNumber: 'DEMO-MMC-0101', city: 'George Town', fee: 60, experienceYears: 11, education: ['MBBS (demo)', 'Diploma in Family Medicine (demo)'],
     bio: 'Demo profile. Family doctor for adults and children, with a focus on diabetes and blood pressure follow-up.',
-    languages: ['English', 'Malay', 'Tamil'], practiceAddress: 'Demo Clinic, Jalan Demo, George Town, Pulau Pinang', seoSlug: 'demo-dr-kavitha-general-physician-george-town',
+    languages: ['English', 'Malay', 'Tamil'], practiceAddress: 'Klinik Kesihatan Pulau Tikus, Jalan Burma, George Town, Pulau Pinang', seoSlug: 'demo-dr-kavitha-general-physician-george-town',
   }),
   doctor({
     id: 'doc-my-2', name: 'Dr. Jonathan Anak Rentap (demo)', avatar: '/assets/malaysian_male_doctor.jpg', specialization: 'Orthopaedic Surgeon',
     licenseNumber: 'DEMO-MMC-0102', city: 'Kuching', fee: 180, experienceYears: 15, registrationType: 'specialist', education: ['MBBS (demo)', 'Master of Surgery, Orthopaedics (demo)'],
     bio: 'Demo profile. Joint and sports injuries, with outreach clinics for interior Sarawak.',
-    languages: ['English', 'Malay', 'Iban'], practiceAddress: 'Demo Specialist Centre, Jalan Demo, Kuching, Sarawak', seoSlug: 'demo-dr-jonathan-orthopaedic-kuching',
+    languages: ['English', 'Malay', 'Iban'], practiceAddress: 'Sarawak Specialist Medical Centre, Jalan Tun Jugah, Kuching, Sarawak', seoSlug: 'demo-dr-jonathan-orthopaedic-kuching',
     availability: { days: ['Tuesday', 'Thursday'], slots: ['10:00 AM', '01:00 PM', '03:00 PM'] },
   }),
   doctor({
     id: 'doc-my-3', name: 'Dr. Nurul Hidayah Binti Abdullah (demo)', avatar: '/assets/malaysian_female_doctor.jpg', specialization: 'General Physician',
     licenseNumber: 'DEMO-MMC-0103', city: 'Kota Kinabalu', fee: 70, experienceYears: 9,
     bio: 'Demo profile. Family medicine and women\'s health, with video consultations for patients outside the city.',
-    languages: ['English', 'Malay', 'Kadazan-Dusun'], practiceAddress: 'Demo Klinik, Jalan Demo, Kota Kinabalu, Sabah', seoSlug: 'demo-dr-nurul-hidayah-general-kota-kinabalu',
+    languages: ['English', 'Malay', 'Kadazan-Dusun'], practiceAddress: 'Klinik Kinabalu Care, Jalan Gaya, Kota Kinabalu, Sabah', seoSlug: 'demo-dr-nurul-hidayah-general-kota-kinabalu',
   }),
   doctor({
     id: 'doc-my-4', name: 'Dr. Lim Wei Jie (demo)', avatar: '/assets/doctor_male_chinese.jpg', specialization: 'Endocrinologist',
     licenseNumber: 'DEMO-MMC-0104', city: 'Johor Bahru', fee: 160, experienceYears: 13, registrationType: 'specialist', education: ['MBBS (demo)', 'Master of Medicine, Internal Medicine (demo)'],
     bio: 'Demo profile. Diabetes, thyroid and hormone disorders. Sees international patients from Singapore for follow-up.',
-    languages: ['English', 'Malay', 'Mandarin', 'Cantonese'], practiceAddress: 'Demo Medical Centre, Jalan Demo, Johor Bahru, Johor', seoSlug: 'demo-dr-lim-wei-jie-endocrinologist-johor-bahru',
+    languages: ['English', 'Malay', 'Mandarin', 'Cantonese'], practiceAddress: 'Johor Specialist Medical Centre, Jalan Abdul Samad, Johor Bahru, Johor', seoSlug: 'demo-dr-lim-wei-jie-endocrinologist-johor-bahru',
   }),
 ];
 

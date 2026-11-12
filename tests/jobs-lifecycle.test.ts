@@ -127,7 +127,7 @@ test('Locum availability directory and direct invitation', async () => {
   const searchRes = await admin.call('GET', '/api/locums?state=W.P.+Kuala+Lumpur&role=doctor');
   assert.equal(searchRes.status, 200);
   assert.ok(Array.isArray(searchRes.data.data));
-  const found = searchRes.data.data.find((l: any) => l.name === 'Dr Demo Physician');
+  const found = searchRes.data.data.find((l: any) => l.name === 'Dr. Arjun Menon');
   assert.ok(found);
   assert.equal(found.registeredInMalaysia, true);
   assert.equal(found.verified, true);

@@ -20,7 +20,7 @@ test('a patient sees the practitioners they have booked, each marked verified fr
   assert.equal(r.status, 200);
   const threads = r.data.data as { id: string; name: string; verified?: boolean }[];
   assert.ok(threads.length > 0, 'the demo patient has care-team contacts');
-  const demoDoctor = threads.find(t => /Demo Physician/.test(t.name));
+  const demoDoctor = threads.find(t => /Arjun Menon/.test(t.name));
   assert.ok(demoDoctor, 'the demo doctor is listed');
   assert.equal(demoDoctor!.verified, true, 'verified comes from the practitioner record');
   assert.ok(threads.every(t => typeof t.verified === 'boolean'), 'every practitioner thread says verified or not; none is assumed');
@@ -28,7 +28,7 @@ test('a patient sees the practitioners they have booked, each marked verified fr
 
 test('a message goes both ways and shows in each person\'s mailbox', async () => {
   const threads = (await patient.call('GET', '/api/chats/threads')).data.data as { id: string; name: string }[];
-  const doc = threads.find(t => /Demo Physician/.test(t.name))!;
+  const doc = threads.find(t => /Arjun Menon/.test(t.name))!;
   const sent = await patient.call('POST', '/api/chats', { receiverId: doc.id, receiverName: doc.name, text: 'Hello doctor, can I ask about my prescription?' });
   assert.equal(sent.status, 201, JSON.stringify(sent.data));
 
