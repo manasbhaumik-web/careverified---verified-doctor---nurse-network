@@ -831,13 +831,13 @@ function ReportsTab() {
 
   return (
     <div className="space-y-5">
-      <section aria-label={tx('Report period')} className="app-card rounded-none border-slate-200 p-4 flex flex-wrap items-end gap-4">
-        <FilterSelect label={tx('Reporting Period')} value={days} onChange={setDays}>
+      <section aria-label={tx('Report period')} className="app-card rounded-none border-slate-200 p-4 flex flex-wrap items-center justify-between gap-4">
+        <FilterSelect label={tx('Reporting Period')} value={days} onChange={setDays} className="w-full sm:w-64 flex-none">
           <option value="7">{tx('Last 7 days')}</option>
           <option value="30">{tx('Last 30 days')}</option>
           <option value="90">{tx('Last 90 days')}</option>
         </FilterSelect>
-        <a href={`/api/pharmacy/reports?days=${days}&format=csv`} className={`${bannerSecondaryBtn} ml-auto`}><Download className="h-4 w-4" /> {tx('Download Audited CSV')}</a>
+        <a href={`/api/pharmacy/reports?days=${days}&format=csv`} className={bannerSecondaryBtn}><Download className="h-4 w-4" /> {tx('Download Audited CSV')}</a>
       </section>
 
       {!r ? <p className="text-xs text-slate-600 font-semibold">{tx('Loading report…')}</p> : (

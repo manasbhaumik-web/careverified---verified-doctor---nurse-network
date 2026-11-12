@@ -352,9 +352,9 @@ export function BannerKpis({ items }: { items: { value: React.ReactNode; label: 
 }
 
 /** Inline h-11 labelled dropdown used in single-row filter bars (library, pharmacies, packages). */
-export function FilterSelect({ label, value, onChange, children }: { label: string; value: string; onChange: (v: string) => void; children: React.ReactNode }) {
+export function FilterSelect({ label, value, onChange, children, className = '' }: { label: string; value: string; onChange: (v: string) => void; children: React.ReactNode; className?: string }) {
   return (
-    <label className="flex items-center gap-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-3 h-11 flex-auto max-w-full min-w-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors cursor-pointer">
+    <label className={`flex items-center gap-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-3 h-11 min-w-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors cursor-pointer ${className || 'flex-auto max-w-full'}`}>
       <span className="text-2xs font-black uppercase tracking-widest text-slate-400 shrink-0">{label}:</span>
       <select value={value} onChange={e => onChange(e.target.value)}
         className="flex-1 text-xs font-bold text-[color:var(--ink)] bg-transparent focus:outline-none cursor-pointer pr-1 min-w-0 max-w-full">
