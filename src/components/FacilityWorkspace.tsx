@@ -1180,9 +1180,6 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                 name={facility?.name || tx('Healthcare Facility & Clinic')}
                 badges={
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="bg-slate-50 text-slate-700 border border-slate-300 text-2xs font-black uppercase px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">
-                      {facility?.kind || tx('Medical Centre')}
-                    </span>
                     {facility?.isLicenceValid && (
                       <BannerBadge tone="success">
                         <ShieldCheck className="h-3 w-3 inline mr-1" />
@@ -1191,25 +1188,27 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                     )}
                     {facility?.mhtcMember && (
                       <BannerBadge tone="brand">
-                        {tx('MHTC Medical Travel')}
+                        {tx('MHTC Member')}
                       </BannerBadge>
                     )}
                   </div>
                 }
                 description={
                   <span>
-                    {facility?.city || tx('Kuala Lumpur')}, {facility?.state || tx('Malaysia')} • Licence: {facility?.licenceNo || tx('Act 586 Verified')} • {facility?.phone || '+60 3-2296 0888'}
+                    {facility?.city && facility?.state && facility.city.toLowerCase() !== facility.state.toLowerCase()
+                      ? `${facility.city}, ${facility.state}`
+                      : facility?.city || facility?.state || tx('Kuala Lumpur')}{' '}
+                    &bull; {facility?.licenceNo || tx('Act 586 Verified')}
                   </span>
                 }
               />
             }
             aside={
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2.5">
                 <BannerKpis
                   items={[
                     { label: tx('Active Jobs'), value: stats.activeVacancies },
                     { label: tx('Applicants'), value: stats.pendingApplicants },
-                    { label: tx('Confirmed'), value: stats.acceptedLocums },
                     { label: tx('Referrals'), value: stats.patientCases },
                   ]}
                 />
@@ -1218,8 +1217,9 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                     type="button"
                     onClick={loadFacilityData}
                     disabled={loading}
-                    className="p-2 text-slate-600 hover:text-slate-900 border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer disabled:opacity-50 h-11 w-11 flex items-center justify-center"
+                    className="p-2 text-slate-600 hover:text-slate-900 border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer disabled:opacity-50 h-9 w-9 flex items-center justify-center rounded-none"
                     title={tx('Refresh Data')}
+                    aria-label={tx('Refresh Data')}
                   >
                     <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                   </button>

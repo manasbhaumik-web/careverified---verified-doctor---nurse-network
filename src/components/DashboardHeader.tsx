@@ -263,9 +263,9 @@ export const bannerSecondaryBtn =
 /** Two-column row: identity on the left, KPIs and actions on the right. */
 export function BannerRow({ identity, aside }: { identity: React.ReactNode; aside?: React.ReactNode }) {
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
+    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 sm:gap-4">
       {identity}
-      {aside && <div className="flex items-center gap-4 flex-wrap lg:justify-end border-t lg:border-t-0 border-[color:var(--t-200)] pt-2.5 lg:pt-0 shrink-0">{aside}</div>}
+      {aside && <div className="flex items-center gap-3 flex-wrap xl:justify-end border-t xl:border-t-0 border-[color:var(--t-200)] pt-2.5 xl:pt-0 shrink-0 max-w-full">{aside}</div>}
     </div>
   );
 }
@@ -292,7 +292,7 @@ interface BannerIdentityProps {
 export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading = 'h2', description, avatarBadge, badges, meta }: BannerIdentityProps) {
   const initials = typeof name === 'string' ? name.replace(/^Dr\.?\s+/i, '').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() : '';
   return (
-    <div className="flex items-center gap-3 sm:gap-5 min-w-0">
+    <div className="flex items-center gap-3 sm:gap-5 min-w-0 flex-1">
       <div className="relative shrink-0">
         {Icon ? (
           <div aria-hidden="true" className="h-11 w-11 sm:h-13 sm:w-13 rounded-none border border-[color:var(--t-200)] shadow-2xs bg-white text-[color:var(--t-700)] flex items-center justify-center text-lg sm:text-2xl font-bold">
@@ -309,10 +309,10 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
         )}
         {avatarBadge}
       </div>
-      <div className="space-y-0.5 sm:space-y-1 min-w-0">
-        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap sm:flex-nowrap">
-          <Heading className="text-lg sm:text-2xl font-black text-[color:var(--ink)] tracking-tight shrink-0">{name}</Heading>
-          {badges && <div className="inline-flex items-center gap-2 max-w-full flex-wrap sm:flex-nowrap sm:shrink-0">{badges}</div>}
+      <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
+        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+          <Heading className="text-lg sm:text-2xl font-black text-[color:var(--ink)] tracking-tight leading-tight min-w-0">{name}</Heading>
+          {badges && <div className="inline-flex items-center gap-1.5 max-w-full flex-wrap">{badges}</div>}
         </div>
         {description && <p className="text-xs font-medium text-[color:var(--ink-2)] leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}
         {meta && <div className="flex items-center gap-2.5 text-xs text-[color:var(--ink-2)] font-semibold flex-wrap">{meta}</div>}
