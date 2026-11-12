@@ -428,14 +428,18 @@ function ensureDemoData() {
     }
   }
 
-  // Seed sample prescriptions in Demo Pharmacy inbox if empty
+  // Seed sample prescriptions in Demo Pharmacy inbox if empty (or upgrade legacy DEMORX codes)
+  db.prepare("UPDATE prescriptions SET code = 'RX-2026-2001' WHERE code = 'DEMORX2001'").run();
+  db.prepare("UPDATE prescriptions SET code = 'RX-2026-2002' WHERE code = 'DEMORX2002'").run();
+  db.prepare("UPDATE prescriptions SET code = 'RX-2026-2003' WHERE code = 'DEMORX2003'").run();
+
   const rxCount = (db.prepare("SELECT COUNT(*) AS c FROM prescriptions WHERE pharmacy_id = ?").get(demoPharm.id) as { c: number })?.c ?? 0;
   if (rxCount === 0) {
     const validUntil = new Date(Date.now() + 30 * 86400_000).toISOString();
     const samples = [
       {
         id: "rx-demo-1",
-        code: "DEMORX2001",
+        code: "RX-2026-2001",
         diagnosis: "Seasonal allergic rhinitis",
         items: [{ name: "cetirizine", strength: "10 mg", form: "tablet", dose: "1 tablet", frequency: "once daily", durationDays: 7, quantity: 7, instructions: "At night" }],
         fillStatus: null,
@@ -443,7 +447,7 @@ function ensureDemoData() {
       },
       {
         id: "rx-demo-2",
-        code: "DEMORX2002",
+        code: "RX-2026-2002",
         diagnosis: "Viral upper respiratory infection",
         items: [{ name: "paracetamol", strength: "500 mg", form: "tablet", dose: "1 tablet", frequency: "every 6 hours if needed", durationDays: 3, quantity: 12, instructions: "After food" }],
         fillStatus: "preparing",
@@ -451,7 +455,7 @@ function ensureDemoData() {
       },
       {
         id: "rx-demo-3",
-        code: "DEMORX2003",
+        code: "RX-2026-2003",
         diagnosis: "Allergic rhinitis, follow-up",
         items: [{ name: "cetirizine", strength: "10 mg", form: "tablet", dose: "1 tablet", frequency: "once daily", durationDays: 14, quantity: 14, instructions: "In the morning" }],
         fillStatus: "cannot_fill",
