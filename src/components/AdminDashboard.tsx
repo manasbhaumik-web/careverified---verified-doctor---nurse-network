@@ -221,20 +221,6 @@ export default function AdminDashboard({
   const [adminNotice, setAdminNotice] = useState<string | null>(null);
   const [actionModal, setActionModal] = useState<AdminActionModalConfig | null>(null);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
-      if (elevationModalOpen) { setElevationModalOpen(false); return; }
-      if (auditModalOpen) { setAuditModalOpen(false); return; }
-      if (webhookModalOpen) { setWebhookModalOpen(false); return; }
-      if (rbacModalOpen) { setRbacModalOpen(false); return; }
-      if (batchModalOpen && !batchProcessing) { setBatchModalOpen(false); return; }
-      if (selectedModalRequest) { setSelectedModalRequest(null); return; }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [elevationModalOpen, auditModalOpen, webhookModalOpen, rbacModalOpen, batchModalOpen, batchProcessing, selectedModalRequest]);
-
   const formatTimer = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -525,6 +511,20 @@ export default function AdminDashboard({
   const [batchProcessing, setBatchProcessing] = useState(false);
   const [batchSuccessMsg, setBatchSuccessMsg] = useState('');
   const [copiedLicence, setCopiedLicence] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (elevationModalOpen) { setElevationModalOpen(false); return; }
+      if (auditModalOpen) { setAuditModalOpen(false); return; }
+      if (webhookModalOpen) { setWebhookModalOpen(false); return; }
+      if (rbacModalOpen) { setRbacModalOpen(false); return; }
+      if (batchModalOpen && !batchProcessing) { setBatchModalOpen(false); return; }
+      if (selectedModalRequest) { setSelectedModalRequest(null); return; }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [elevationModalOpen, auditModalOpen, webhookModalOpen, rbacModalOpen, batchModalOpen, batchProcessing, selectedModalRequest]);
 
   // SLA Telemetry Calculation (24h statutory target)
   const getSlaStatus = (req: any) => {
