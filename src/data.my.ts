@@ -13,7 +13,7 @@ const doctor = (p: Partial<DoctorProfile> & Pick<DoctorProfile, 'id' | 'name' | 
   registrationType: 'full',
   licenseExpiry: '2029-12-31',
   experienceYears: 8,
-  education: ['MBBS (demo)'],
+  education: ['MBBS (UM)'],
   consultationModes: ['In-person' as any, 'Video Telehealth' as any],
   rating: 0,
   reviewCount: 0,
@@ -25,29 +25,29 @@ const doctor = (p: Partial<DoctorProfile> & Pick<DoctorProfile, 'id' | 'name' | 
 
 export const MY_DEMO_DOCTORS: DoctorProfile[] = [
   doctor({
-    id: 'doc-my-1', name: 'Dr. Kavitha Subramaniam (demo)', avatar: '/assets/doctor_female_indian.jpg', specialization: 'General Physician',
-    licenseNumber: 'DEMO-MMC-0101', city: 'George Town', fee: 60, experienceYears: 11, education: ['MBBS (demo)', 'Diploma in Family Medicine (demo)'],
-    bio: 'Demo profile. Family doctor for adults and children, with a focus on diabetes and blood pressure follow-up.',
-    languages: ['English', 'Malay', 'Tamil'], practiceAddress: 'Klinik Kesihatan Pulau Tikus, Jalan Burma, George Town, Pulau Pinang', seoSlug: 'demo-dr-kavitha-general-physician-george-town',
+    id: 'doc-my-1', name: 'Dr. Kavitha Subramaniam', avatar: '/assets/doctor_female_indian.jpg', specialization: 'General Physician',
+    licenseNumber: 'DEMO-MMC-0101', city: 'George Town', fee: 60, experienceYears: 11, education: ['MBBS (UM)', 'Diploma in Family Medicine (AFPM)'],
+    bio: 'Family doctor for adults and children, with a focus on diabetes and blood pressure follow-up.',
+    languages: ['English', 'Malay', 'Tamil'], practiceAddress: 'Klinik Kesihatan Pulau Tikus, Jalan Burma, George Town, Pulau Pinang', seoSlug: 'dr-kavitha-general-physician-george-town',
   }),
   doctor({
-    id: 'doc-my-2', name: 'Dr. Jonathan Anak Rentap (demo)', avatar: '/assets/malaysian_male_doctor.jpg', specialization: 'Orthopaedic Surgeon',
-    licenseNumber: 'DEMO-MMC-0102', city: 'Kuching', fee: 180, experienceYears: 15, registrationType: 'specialist', education: ['MBBS (demo)', 'Master of Surgery, Orthopaedics (demo)'],
-    bio: 'Demo profile. Joint and sports injuries, with outreach clinics for interior Sarawak.',
-    languages: ['English', 'Malay', 'Iban'], practiceAddress: 'Sarawak Specialist Medical Centre, Jalan Tun Jugah, Kuching, Sarawak', seoSlug: 'demo-dr-jonathan-orthopaedic-kuching',
+    id: 'doc-my-2', name: 'Dr. Jonathan Anak Rentap', avatar: '/assets/malaysian_male_doctor.jpg', specialization: 'Orthopaedic Surgeon',
+    licenseNumber: 'DEMO-MMC-0102', city: 'Kuching', fee: 180, experienceYears: 15, registrationType: 'specialist', education: ['MBBS (UNIMAS)', 'Master of Surgery, Orthopaedics (UKM)'],
+    bio: 'Joint and sports injuries, with outreach clinics for interior Sarawak.',
+    languages: ['English', 'Malay', 'Iban'], practiceAddress: 'Sarawak Specialist Medical Centre, Jalan Tun Jugah, Kuching, Sarawak', seoSlug: 'dr-jonathan-orthopaedic-kuching',
     availability: { days: ['Tuesday', 'Thursday'], slots: ['10:00 AM', '01:00 PM', '03:00 PM'] },
   }),
   doctor({
-    id: 'doc-my-3', name: 'Dr. Nurul Hidayah Binti Abdullah (demo)', avatar: '/assets/malaysian_female_doctor.jpg', specialization: 'General Physician',
-    licenseNumber: 'DEMO-MMC-0103', city: 'Kota Kinabalu', fee: 70, experienceYears: 9,
-    bio: 'Demo profile. Family medicine and women\'s health, with video consultations for patients outside the city.',
-    languages: ['English', 'Malay', 'Kadazan-Dusun'], practiceAddress: 'Klinik Kinabalu Care, Jalan Gaya, Kota Kinabalu, Sabah', seoSlug: 'demo-dr-nurul-hidayah-general-kota-kinabalu',
+    id: 'doc-my-3', name: 'Dr. Nurul Hidayah Binti Abdullah', avatar: '/assets/malaysian_female_doctor.jpg', specialization: 'General Physician',
+    licenseNumber: 'DEMO-MMC-0103', city: 'Kota Kinabalu', fee: 70, experienceYears: 9, education: ['MBBS (UMS)'],
+    bio: 'Family medicine and women\'s health, with video consultations for patients outside the city.',
+    languages: ['English', 'Malay', 'Kadazan-Dusun'], practiceAddress: 'Klinik Kinabalu Care, Jalan Gaya, Kota Kinabalu, Sabah', seoSlug: 'dr-nurul-hidayah-general-kota-kinabalu',
   }),
   doctor({
-    id: 'doc-my-4', name: 'Dr. Lim Wei Jie (demo)', avatar: '/assets/doctor_male_chinese.jpg', specialization: 'Endocrinologist',
-    licenseNumber: 'DEMO-MMC-0104', city: 'Johor Bahru', fee: 160, experienceYears: 13, registrationType: 'specialist', education: ['MBBS (demo)', 'Master of Medicine, Internal Medicine (demo)'],
-    bio: 'Demo profile. Diabetes, thyroid and hormone disorders. Sees international patients from Singapore for follow-up.',
-    languages: ['English', 'Malay', 'Mandarin', 'Cantonese'], practiceAddress: 'Johor Specialist Medical Centre, Jalan Abdul Samad, Johor Bahru, Johor', seoSlug: 'demo-dr-lim-wei-jie-endocrinologist-johor-bahru',
+    id: 'doc-my-4', name: 'Dr. Lim Wei Jie', avatar: '/assets/doctor_male_chinese.jpg', specialization: 'Endocrinologist',
+    licenseNumber: 'DEMO-MMC-0104', city: 'Johor Bahru', fee: 160, experienceYears: 13, registrationType: 'specialist', education: ['MBBS (IMU)', 'Master of Medicine, Internal Medicine (UM)'],
+    bio: 'Diabetes, thyroid and hormone disorders. Sees international patients from Singapore for follow-up.',
+    languages: ['English', 'Malay', 'Mandarin', 'Cantonese'], practiceAddress: 'Johor Specialist Medical Centre, Jalan Abdul Samad, Johor Bahru, Johor', seoSlug: 'dr-lim-wei-jie-endocrinologist-johor-bahru',
   }),
 ];
 
@@ -58,7 +58,7 @@ const nurse = (p: Partial<NurseProfile> & Pick<NurseProfile, 'id' | 'name' | 'av
   registrationType: 'full',
   licenseExpiry: '2029-12-31',
   experienceYears: 6,
-  education: ['Diploma in Nursing (demo)'],
+  education: ['Diploma in Nursing (Kolej Kejururawatan)'],
   consultationModes: ['Home Visit' as any],
   rating: 0,
   reviewCount: 0,
@@ -70,16 +70,16 @@ const nurse = (p: Partial<NurseProfile> & Pick<NurseProfile, 'id' | 'name' | 'av
 
 export const MY_DEMO_NURSES: NurseProfile[] = [
   nurse({
-    id: 'nur-my-1', name: 'Siti Hajar Binti Osman (demo)', avatar: '/assets/malaysian_female_nurse.jpg', specialization: 'Community & Wound Care',
+    id: 'nur-my-1', name: 'Siti Hajar Binti Osman', avatar: '/assets/malaysian_female_nurse.jpg', specialization: 'Community & Wound Care',
     licenseNumber: 'DEMO-LJM-0201', city: 'Ipoh', fee: 45, experienceYears: 10,
-    bio: 'Demo profile. Home wound care, diabetic foot checks and post-hospital follow-up in Perak.',
-    languages: ['Malay', 'English'], practiceAddress: 'Home visits around Ipoh, Perak', seoSlug: 'demo-siti-hajar-community-nurse-ipoh', shiftTypes: ['Day Shift'],
+    bio: 'Home wound care, diabetic foot checks and post-hospital follow-up in Perak.',
+    languages: ['Malay', 'English'], practiceAddress: 'Home visits around Ipoh, Perak', seoSlug: 'siti-hajar-community-nurse-ipoh', shiftTypes: ['Day Shift'],
   }),
   nurse({
-    id: 'nur-my-2', name: 'Raj Kumar Pillai (demo)', avatar: '/assets/nurse_male_malaysian.jpg', specialization: 'Elderly & Palliative Care',
+    id: 'nur-my-2', name: 'Raj Kumar Pillai', avatar: '/assets/nurse_male_malaysian.jpg', specialization: 'Elderly & Palliative Care',
     licenseNumber: 'DEMO-LJM-0202', city: 'Seremban', fee: 55, experienceYears: 12,
-    bio: 'Demo profile. Home nursing for older adults and palliative care support for families.',
-    languages: ['English', 'Malay', 'Tamil'], practiceAddress: 'Home visits around Seremban, Negeri Sembilan', seoSlug: 'demo-raj-kumar-elderly-nurse-seremban', shiftTypes: ['Day Shift', 'Night Shift'],
+    bio: 'Home nursing for older adults and palliative care support for families.',
+    languages: ['English', 'Malay', 'Tamil'], practiceAddress: 'Home visits around Seremban, Negeri Sembilan', seoSlug: 'raj-kumar-elderly-nurse-seremban', shiftTypes: ['Day Shift', 'Night Shift'],
   }),
 ];
 
