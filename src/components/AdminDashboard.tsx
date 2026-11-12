@@ -24,6 +24,7 @@ import TourismDesk from './TourismDesk';
 import SEODashboard from './SEODashboard';
 import WorkspaceHeader from './WorkspaceHeader';
 import AdminAuditLog from './AdminAuditLog';
+import AdminActionModal, { type AdminActionModalConfig } from './AdminActionModal';
 import { DoctorProfile, NurseProfile, UserRole, AppPackage, VerificationStatus, JobPost, Review, Booking, AdminSubRole, AdminSubRoleConfig, ADMIN_SUB_ROLES } from '../types';
 
 export type AdminDashboardTab = 
@@ -208,6 +209,22 @@ export default function AdminDashboard({
   const [countersigningSanctionId, setCountersigningSanctionId] = useState<string | null>(null);
   const [sanctionSuccessBanner, setSanctionSuccessBanner] = useState<string | null>(null);
   const [sanctionErrorBanner, setSanctionErrorBanner] = useState<string | null>(null);
+  const [adminNotice, setAdminNotice] = useState<string | null>(null);
+  const [actionModal, setActionModal] = useState<AdminActionModalConfig | null>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (elevationModalOpen) { setElevationModalOpen(false); return; }
+      if (auditModalOpen) { setAuditModalOpen(false); return; }
+      if (webhookModalOpen) { setWebhookModalOpen(false); return; }
+      if (rbacModalOpen) { setRbacModalOpen(false); return; }
+      if (batchModalOpen && !batchProcessing) { setBatchModalOpen(false); return; }
+      if (selectedModalRequest) { setSelectedModalRequest(null); return; }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [elevationModalOpen, auditModalOpen, webhookModalOpen, rbacModalOpen, batchModalOpen, batchProcessing, selectedModalRequest]);
 
   const formatTimer = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -245,7 +262,7 @@ export default function AdminDashboard({
       const diff = Math.floor((expiry - Date.now()) / 1000);
       if (diff <= 0) {
         revertElevationToRegistrar();
-        alert(tx('Break-Glass Ephemeral Lease Expired (15 Minutes). Privilege elevation automatically revoked and persona reverted to Council Medical Registrar per Segregation of Duties.'));
+        setAdminNotice(tx('Break-Glass Ephemeral Lease Expired (15 Minutes). Privilege elevation automatically revoked and persona reverted to Council Medical Registrar per Segregation of Duties.'));
       } else {
         setElevationSecondsLeft(diff);
       }
@@ -299,25 +316,28 @@ export default function AdminDashboard({
     }
   };
 
-  const handleDashboardDismissSanction = async (sanctionId: string) => {
-    if (!window.confirm(tx('Dismiss this pending disciplinary sanction proposal?'))) return;
-    setSanctionSuccessBanner(null);
-    setSanctionErrorBanner(null);
-    try {
-      const res = await fetch(`/api/admin/sanctions/${sanctionId}/dismiss`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setSanctionSuccessBanner(tx('Sanction proposal dismissed.'));
-        await fetchPendingSanctions();
-      } else {
-        setSanctionErrorBanner(data.message || tx('Failed to dismiss sanction.'));
-      }
-    } catch (err: any) {
-      setSanctionErrorBanner(err.message || tx('Network error dismissing sanction.'));
-    }
+  const handleDashboardDismissSanction = (sanctionId: string) => {
+    setActionModal({
+      title: tx('Dismiss Disciplinary Sanction Proposal'),
+      description: tx('Dismiss this pending disciplinary sanction proposal? It will be removed from the countersignature inbox.'),
+      tone: 'warning',
+      confirmLabel: tx('Dismiss Proposal'),
+      onConfirm: async () => {
+        setSanctionSuccessBanner(null);
+        setSanctionErrorBanner(null);
+        const res = await fetch(`/api/admin/sanctions/${sanctionId}/dismiss`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          setSanctionSuccessBanner(tx('Sanction proposal dismissed.'));
+          await fetchPendingSanctions();
+        } else {
+          setSanctionErrorBanner(data.message || tx('Failed to dismiss sanction.'));
+        }
+      },
+    });
   };
 
   const promptSwitchSubRole = (targetRole: AdminSubRole) => {
@@ -480,7 +500,7 @@ export default function AdminDashboard({
   const [registrySearch, setRegistrySearch] = useState('');
   const [registryRoleFilter, setRegistryRoleFilter] = useState<'all' | 'doctor' | 'nurse'>('all');
   const [qualitySubTab, setQualitySubTab] = useState<QualitySubTab>('support');
-  const [trustSubTab, setTrustSubTab] = useState<'watchlist' | 'complaints'>('watchlist');
+  const [trustSubTab, setTrustSubTab] = useState<'watchlist' | 'complaints' | 'sanctions'>('watchlist');
   const [opsSubTab, setOpsSubTab] = useState<OpsSubTab>('roster');
   const [litSubTab, setLitSubTab] = useState<LitSubTab>('queue');
   const [packageSubTab, setPackageSubTab] = useState<PackageSubTab>('installed');
@@ -488,8 +508,8 @@ export default function AdminDashboard({
   // Batch verification state
   const [selectedRequestIds, setSelectedRequestIds] = useState<string[]>([]);
   const [batchModalOpen, setBatchModalOpen] = useState(false);
-  const [batchRegistryRef, setBatchRegistryRef] = useState('MMC / LJM Official Statutory Batch Clearance');
-  const [batchNote, setBatchNote] = useState('Statutory batch verification approved by medical board credentialing committee.');
+  const [batchRegistryRef, setBatchRegistryRef] = useState('');
+  const [batchNote, setBatchNote] = useState('');
   const [batchProcessing, setBatchProcessing] = useState(false);
   const [batchSuccessMsg, setBatchSuccessMsg] = useState('');
   const [copiedLicence, setCopiedLicence] = useState(false);
@@ -668,7 +688,7 @@ export default function AdminDashboard({
       if (data.status === 'success') {
         onPackagesChanged();
       } else {
-        alert(data.message || tx('Failed to install package.'));
+        setAdminNotice(data.message || tx('Failed to install package.'));
       }
     } catch (err) {
       console.error("Error installing package:", err);
@@ -684,7 +704,7 @@ export default function AdminDashboard({
       if (data.status === 'success') {
         onPackagesChanged();
       } else {
-        alert(data.message || tx('Failed to remove package.'));
+        setAdminNotice(data.message || tx('Failed to remove package.'));
       }
     } catch (err) {
       console.error("Error uninstating package:", err);
@@ -694,7 +714,7 @@ export default function AdminDashboard({
   const handleCreateCustomPackage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPkgId || !newPkgName || !newPkgDesc) {
-      alert("Please fill in all required fields (ID, Name, and Description).");
+      setAdminNotice(tx('Please fill in all required fields (ID, Name, and Description).'));
       return;
     }
 
@@ -725,7 +745,7 @@ export default function AdminDashboard({
         setShowCustomForm(false);
         setPackageSubTab('installed');
       } else {
-        alert(data.message || tx('Failed to compile custom package.'));
+        setAdminNotice(data.message || tx('Failed to compile custom package.'));
       }
     } catch (err) {
       console.error("Error compiling custom package:", err);
@@ -788,32 +808,40 @@ export default function AdminDashboard({
   };
 
   const handleBatchApprove = async () => {
-    if (selectedRequestIds.length === 0) return;
+    if (selectedRequestIds.length === 0 || !batchRegistryRef.trim()) return;
     setBatchProcessing(true);
     let successCount = 0;
+    const failedNames: string[] = [];
     try {
       for (const id of selectedRequestIds) {
+        const reqItem = pendingRequests.find(r => r.id === id);
         const res = await fetch(`/api/verification-requests/${id}/decision`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             decision: 'approve',
-            note: batchNote,
-            registryReference: batchRegistryRef
+            note: batchNote.trim() || 'Statutory batch verification approved by medical board credentialing committee.',
+            registryReference: batchRegistryRef.trim()
           })
         });
         const data = await res.json();
         if (data.status === 'success') {
           successCount++;
+        } else {
+          failedNames.push(reqItem?.userName || reqItem?.name || id);
         }
       }
-      setBatchSuccessMsg(`Successfully verified and approved ${successCount} practitioner(s) under statutory batch.`);
+      setBatchSuccessMsg(
+        failedNames.length === 0
+          ? `Successfully verified and approved ${successCount} practitioner(s) under statutory batch.`
+          : `Approved ${successCount} practitioner(s); ${failedNames.length} failed (${failedNames.join(', ')}).`
+      );
       setSelectedRequestIds([]);
       setBatchModalOpen(false);
       await fetchPending();
       if (onRefreshData) onRefreshData();
-    } catch (err) {
-      console.error('Batch verification error:', err);
+    } catch (err: any) {
+      setAdminNotice(err?.message || tx('Batch verification encountered a network error.'));
     } finally {
       setBatchProcessing(false);
     }
@@ -952,30 +980,7 @@ export default function AdminDashboard({
               role="admin"
               name={currentUser?.name || tx('Datin Dr. Sharifah Halimah')}
               badges={
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <BannerBadge tone={currentSubRoleConfig.badgeTone}>{currentSubRoleConfig.shortTitle}</BannerBadge>
-                  {elevationSecondsLeft !== null && elevationSecondsLeft > 0 && (
-                    <div className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-black uppercase tracking-wider bg-amber-400 text-slate-950 border border-amber-500 rounded-none">
-                      <Clock className="h-3 w-3 text-slate-950" />
-                      <span>Lease: {formatTimer(elevationSecondsLeft)}</span>
-                      <button
-                        type="button"
-                        onClick={revertElevationToRegistrar}
-                        className="ml-1 underline font-black hover:text-slate-700 cursor-pointer"
-                      >
-                        Revert
-                      </button>
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setRbacModalOpen(true)}
-                    className="inline-flex items-center gap-1 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-slate-900 text-amber-300 border border-amber-400 hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <Sliders className="h-3 w-3 text-amber-400" />
-                    <span>{tx('Switch Persona')}</span>
-                  </button>
-                </div>
+                <BannerBadge tone={currentSubRoleConfig.badgeTone}>{currentSubRoleConfig.shortTitle}</BannerBadge>
               }
               description={`${currentSubRoleConfig.department} · ${currentSubRoleConfig.authority}`}
             />
@@ -993,6 +998,12 @@ export default function AdminDashboard({
       </DashboardHeader>
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {adminNotice && (
+          <div role="status" className="bg-amber-50 border border-amber-300 text-amber-950 px-4 py-3 text-xs font-bold flex items-center justify-between gap-3">
+            <span>{adminNotice}</span>
+            <button type="button" onClick={() => setAdminNotice(null)} className="underline text-xs font-black cursor-pointer shrink-0">{tx('Dismiss')}</button>
+          </div>
+        )}
         {!isGroupPermitted ? (
           <div className="max-w-3xl mx-auto my-8 bg-white border-2 border-amber-400 rounded-none shadow-md p-6 sm:p-8 space-y-6 animate-fade-in">
             <div className="flex items-start gap-4">
@@ -1173,12 +1184,18 @@ export default function AdminDashboard({
                         <button
                           type="button"
                           disabled={!canCountersign || countersigningSanctionId === s.id}
-                          onClick={() => handleDashboardCountersign(s.id)}
+                          onClick={() => setActionModal({
+                            title: tx('Countersign & Enforce Suspension'),
+                            description: tx('Confirm dual-signoff disciplinary suspension under Medical Act 1971 / Nurses Act 1950 for {name}?', { name: s.practitionerName }),
+                            tone: 'danger',
+                            confirmLabel: tx('Countersign & Enforce'),
+                            onConfirm: () => handleDashboardCountersign(s.id),
+                          })}
                           title={!canCountersign ? tx('Four-Eyes Principle: Cannot countersign your own order without super_admin authority') : tx('Confirm and enforce statutory suspension')}
                           className={`px-4 py-2 text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 transition-colors cursor-pointer rounded-none ${
                             canCountersign
                               ? 'bg-rose-700 hover:bg-rose-800 text-white shadow-xs'
-                              : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                              : 'bg-slate-200 text-slate-600 cursor-not-allowed'
                           }`}
                         >
                           {countersigningSanctionId === s.id ? (
@@ -1198,37 +1215,7 @@ export default function AdminDashboard({
             </div>
           )}
 
-          {/* Overview stats cards with high visual distinction */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 flex flex-col gap-2.5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-700">{tx('Accredited Directory')}</span>
-            <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--t-50)] border-[color:var(--t-200)] text-[color:var(--t-600)] rounded-none"><UserCheck className="h-4 w-4" /></span>
-          </div>
-          <span className="text-2xl sm:text-3xl font-black tracking-tight text-[color:var(--ink)] tabular-nums">{professionals.length} Verified</span>
-          <span className="text-xs text-slate-600 font-semibold">{tx('Registered with medical & nursing councils.')}</span>
-        </div>
-
-        <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 flex flex-col gap-2.5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-700">{tx('Pending Approvals')}</span>
-            <span className="h-8 w-8 flex items-center justify-center border bg-amber-50 border-amber-200 text-amber-700 rounded-none"><ShieldAlert className="h-4 w-4 animate-pulse" /></span>
-          </div>
-          <span className="text-2xl sm:text-3xl font-black tracking-tight text-[color:var(--ink)] tabular-nums">{pendingRequests.length} Pending</span>
-          <span className="text-xs text-slate-600 font-semibold">{tx('Awaiting administrative credential review.')}</span>
-        </div>
-
-        <div className="bg-white border border-[color:var(--t-200)] rounded-none p-5 flex flex-col gap-2.5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-700">{tx('Verified Status')}</span>
-            <span className="h-8 w-8 flex items-center justify-center border bg-[color:var(--e-50)] border-[color:var(--e-200)] text-[color:var(--e-600)] rounded-none"><CheckCircle2 className="h-4 w-4" /></span>
-          </div>
-          <span className="text-2xl sm:text-3xl font-black tracking-tight text-[color:var(--ink)] tabular-nums">{tx('Board reviewed')}</span>
-          <span className="text-xs text-slate-600 font-semibold">{tx('Each licence is checked by a board reviewer.')}</span>
-        </div>
-      </div>
-
-      {/* Statutory 30-Day Operational SLA & Telemetry Strip */}
+          {/* Statutory 30-Day Operational SLA & Telemetry Strip */}
       <div className="bg-slate-900 text-white border border-slate-800 p-5 rounded-none shadow-md">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-4 border-b border-slate-800">
           <div className="flex items-center gap-2.5">
@@ -1238,7 +1225,7 @@ export default function AdminDashboard({
             <div>
               <div className="flex items-center gap-2">
                 <h4 className="text-sm font-black uppercase tracking-wider text-white">{tx('Statutory Credentialing SLA & Cohort Telemetry')}</h4>
-                <span className="text-2xs font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5">{tx('30-Day Rolling Window')}</span>
+                <span className="text-2xs font-mono font-bold bg-amber-950 text-amber-300 border border-amber-700 px-2 py-0.5">{tx('Sample Baseline · 30-Day')}</span>
               </div>
               <p className="text-xs text-slate-400 font-semibold mt-0.5">{tx('Statutory 24-hour turnaround target under MMC & LJM accreditation frameworks.')}</p>
             </div>
@@ -1421,23 +1408,18 @@ export default function AdminDashboard({
                 return (
                   <div 
                     key={req.id} 
-                    onClick={() => setSelectedModalRequest(req)}
-                    className={`border rounded-none p-4.5 transition-all flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 cursor-pointer hover:border-[color:var(--t-600)] ${
-                      isApprovedInLoop ? "bg-emerald-50/50 border-emerald-300" : "bg-white border-slate-250"
+                    className={`border rounded-none p-4.5 transition-all flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 hover:border-[color:var(--t-600)] ${
+                      isApprovedInLoop ? "bg-emerald-50/50 border-emerald-300" : "bg-white border-slate-200"
                     }`}
                   >
                     <div className="flex gap-3.5 items-center flex-1 min-w-0 w-full lg:w-auto">
-                      <div 
-                        onClick={(e) => toggleSelectRequest(req.id, e)}
-                        className={`h-5 w-5 rounded-none border flex items-center justify-center shrink-0 cursor-pointer transition-colors ${
-                          selectedRequestIds.includes(req.id) 
-                            ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' 
-                            : 'bg-white border-slate-300 hover:border-slate-500'
-                        }`}
-                        title={tx('Select for statutory batch verification')}
-                      >
-                        {selectedRequestIds.includes(req.id) && <Check className="h-3.5 w-3.5 stroke-[3]" />}
-                      </div>
+                      <input
+                        type="checkbox"
+                        checked={selectedRequestIds.includes(req.id)}
+                        onChange={(e) => toggleSelectRequest(req.id, e as any)}
+                        aria-label={tx('Select {name} for batch verification', { name: reqName })}
+                        className="h-4.5 w-4.5 accent-[color:var(--t-600)] rounded-none cursor-pointer shrink-0"
+                      />
                       <UserAvatar 
                         src={reqAvatar} 
                         role={reqRole === UserRole.DOCTOR ? 'doctor' : 'nurse'}
@@ -1496,22 +1478,18 @@ export default function AdminDashboard({
                 <div 
                   key={req.id} 
                   className={`border rounded-none p-5 transition-all flex flex-col justify-between gap-5 relative overflow-hidden ${
-                    isApprovedInLoop ? "bg-emerald-50/50 border-emerald-300" : "bg-white border-slate-250"
+                    isApprovedInLoop ? "bg-emerald-50/50 border-emerald-300" : "bg-white border-slate-200"
                   }`}
                 >
                   <div className="space-y-4 flex-1">
                     <div className="flex gap-3.5 items-center">
-                      <div 
-                        onClick={(e) => toggleSelectRequest(req.id, e)}
-                        className={`h-5 w-5 rounded-none border flex items-center justify-center shrink-0 cursor-pointer transition-colors ${
-                          selectedRequestIds.includes(req.id) 
-                            ? 'bg-[color:var(--t-600)] border-[color:var(--t-600)] text-white' 
-                            : 'bg-white border-slate-300 hover:border-slate-500'
-                        }`}
-                        title={tx('Select for statutory batch verification')}
-                      >
-                        {selectedRequestIds.includes(req.id) && <Check className="h-3.5 w-3.5 stroke-[3]" />}
-                      </div>
+                      <input
+                        type="checkbox"
+                        checked={selectedRequestIds.includes(req.id)}
+                        onChange={(e) => toggleSelectRequest(req.id, e as any)}
+                        aria-label={tx('Select {name} for batch verification', { name: reqName })}
+                        className="h-4.5 w-4.5 accent-[color:var(--t-600)] rounded-none cursor-pointer shrink-0"
+                      />
                       <UserAvatar 
                         src={reqAvatar} 
                         role={reqRole === UserRole.DOCTOR ? 'doctor' : 'nurse'}
@@ -1590,6 +1568,9 @@ export default function AdminDashboard({
       {/* Batch Verification Modal */}
       {batchModalOpen && (
         <div 
+          role="dialog"
+          aria-modal="true"
+          aria-label={tx('Batch Verify & Approve')}
           className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
           onClick={() => !batchProcessing && setBatchModalOpen(false)}
         >
@@ -1674,9 +1655,9 @@ export default function AdminDashboard({
               </button>
               <button
                 type="button"
-                disabled={batchProcessing}
+                disabled={batchProcessing || !batchRegistryRef.trim()}
                 onClick={handleBatchApprove}
-                className="px-5 py-2.5 text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
+                className="px-5 py-2.5 text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
                 {batchProcessing ? (
                   <>
@@ -1698,6 +1679,9 @@ export default function AdminDashboard({
       {/* Verification Details Modal Overlay */}
       {selectedModalRequest && (
         <div 
+          role="dialog"
+          aria-modal="true"
+          aria-label={tx('Practitioner Credential Review')}
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
           onClick={() => setSelectedModalRequest(null)}
           id="admin-credentials-backdrop"
@@ -2017,6 +2001,9 @@ export default function AdminDashboard({
       {/* RBAC Compliance Persona Switcher Modal */}
       {rbacModalOpen && (
         <div 
+          role="dialog"
+          aria-modal="true"
+          aria-label={tx('Administrative Persona & Statutory Compliance Scope')}
           className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
           onClick={() => setRbacModalOpen(false)}
         >
@@ -2137,6 +2124,9 @@ export default function AdminDashboard({
       {/* Hospital HR Webhooks Telemetry & Dispatch Monitor Modal */}
       {webhookModalOpen && (
         <div 
+          role="dialog"
+          aria-modal="true"
+          aria-label={tx('Hospital HR Webhooks')}
           className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
           onClick={() => setWebhookModalOpen(false)}
         >
@@ -2290,7 +2280,7 @@ export default function AdminDashboard({
                 {tx('Recent Webhook Dispatch Telemetry')}
               </h4>
               <div className="overflow-x-auto border border-slate-200">
-                <table className="w-full text-left border-collapse text-xs">
+                <table className="w-full text-left border-collapse text-xs tabular-nums">
                   <thead>
                     <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-xs">
                       <th className="p-2.5">{tx('Time')}</th>
@@ -2325,7 +2315,7 @@ export default function AdminDashboard({
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={6} className="p-4 text-center text-slate-400 text-xs">
+                        <td colSpan={6} className="p-4 text-center text-slate-600 text-xs">
                           {tx('No webhook dispatches recorded in current session. Click "Test Ping" above to simulate an Act 586 hospital notification.')}
                         </td>
                       </tr>
@@ -2357,6 +2347,7 @@ export default function AdminDashboard({
       )}
 
       {/* Break-Glass Privilege Elevation Justification Modal */}
+      <AdminActionModal config={actionModal} onClose={() => setActionModal(null)} />
       {elevationModalOpen && pendingSubRoleTarget && (
         <div 
           className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs animate-fade-in"
