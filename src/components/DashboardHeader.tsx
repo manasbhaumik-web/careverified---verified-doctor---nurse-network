@@ -359,7 +359,8 @@ export function FilterSelect({ label, value, onChange, children, className = '' 
       <select
         value={value}
         onChange={e => onChange(e.target.value)}
-        className="filter-select-input flex-1 h-full bg-transparent text-xs font-bold text-[color:var(--ink)] focus:outline-none cursor-pointer border-0 p-0 m-0 min-w-0 max-w-full leading-none whitespace-nowrap inline-flex items-center"
+        style={{ appearance: 'none', WebkitAppearance: 'none', MozAppearance: 'none' }}
+        className="appearance-none filter-select-input flex-1 h-full bg-transparent text-xs font-bold text-[color:var(--ink)] focus:outline-none cursor-pointer border-0 p-0 m-0 min-w-0 max-w-full leading-none whitespace-nowrap inline-flex items-center"
       >
         {children}
       </select>
