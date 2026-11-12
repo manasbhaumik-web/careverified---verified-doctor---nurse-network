@@ -353,24 +353,23 @@ export function BannerKpis({ items }: { items: { value: React.ReactNode; label: 
 
 /** Inline h-11 labelled dropdown used in single-row filter bars (library, pharmacies, packages). */
 export function FilterSelect({ label, value, onChange, children, className = '' }: { label: string; value: string; onChange: (v: string) => void; children: React.ReactNode; className?: string }) {
+  const options = React.Children.toArray(children) as React.ReactElement<{ value: string; children: React.ReactNode }>[];
+  const selectedOption = options.find(opt => opt && React.isValidElement(opt) && String(opt.props?.value) === String(value));
+  const displayLabel = selectedOption?.props?.children ?? value;
+
   return (
-    <label className={`relative flex items-center bg-[color:var(--t-bg)] border border-[color:var(--t-200)] pl-3.5 pr-8 h-11 min-w-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors cursor-pointer rounded-none shadow-2xs ${className || 'w-full sm:w-auto sm:min-w-[200px]'}`}>
-      <span className="text-2xs font-black uppercase tracking-wider text-slate-500 shrink-0 select-none mr-2.5 whitespace-nowrap inline-flex items-center h-full leading-none">{label}:</span>
+    <div className={`relative flex items-center bg-[color:var(--t-bg)] border border-[color:var(--t-200)] pl-3.5 pr-3 h-11 min-w-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white focus-within:ring-1 focus-within:ring-[color:var(--t-600)] transition-colors rounded-none shadow-2xs ${className || 'w-full sm:w-auto sm:min-w-[200px]'}`}>
+      <span className="text-2xs font-black uppercase tracking-wider text-slate-500 shrink-0 select-none mr-2 whitespace-nowrap leading-none flex items-center h-full">{label}:</span>
+      <span className="flex-1 text-xs font-bold text-[color:var(--ink)] truncate pr-2 select-none leading-none flex items-center h-full">{displayLabel}</span>
+      <ChevronDown className="h-3.5 w-3.5 text-slate-500 pointer-events-none shrink-0" aria-hidden="true" />
       <select
         value={value}
         onChange={e => onChange(e.target.value)}
-        style={{
-          appearance: 'none',
-          WebkitAppearance: 'none',
-          MozAppearance: 'none',
-          backgroundImage: "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E\")",
-          backgroundRepeat: 'no-repeat',
-        }}
-        className="appearance-none filter-select-input flex-1 h-full bg-transparent text-xs font-bold text-[color:var(--ink)] focus:outline-none cursor-pointer border-0 p-0 m-0 min-w-0 max-w-full leading-none whitespace-nowrap inline-flex items-center"
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+        aria-label={label}
       >
         {children}
       </select>
-      <ChevronDown className="h-3.5 w-3.5 text-slate-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none shrink-0" aria-hidden="true" />
-    </label>
+    </div>
   );
 }
