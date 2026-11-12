@@ -354,12 +354,16 @@ export function BannerKpis({ items }: { items: { value: React.ReactNode; label: 
 /** Inline h-11 labelled dropdown used in single-row filter bars (library, pharmacies, packages). */
 export function FilterSelect({ label, value, onChange, children, className = '' }: { label: string; value: string; onChange: (v: string) => void; children: React.ReactNode; className?: string }) {
   return (
-    <label className={`flex items-center gap-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-3 h-11 min-w-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors cursor-pointer ${className || 'flex-auto max-w-full'}`}>
-      <span className="text-2xs font-black uppercase tracking-widest text-slate-400 shrink-0">{label}:</span>
-      <select value={value} onChange={e => onChange(e.target.value)}
-        className="flex-1 text-xs font-bold text-[color:var(--ink)] bg-transparent focus:outline-none cursor-pointer pr-1 min-w-0 max-w-full">
+    <label className={`relative flex items-center bg-[color:var(--t-bg)] border border-[color:var(--t-200)] pl-3 pr-8 h-11 min-w-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors cursor-pointer rounded-none shadow-2xs ${className || 'flex-auto max-w-full'}`}>
+      <span className="text-2xs font-black uppercase tracking-wider text-slate-500 shrink-0 select-none mr-2 whitespace-nowrap">{label}:</span>
+      <select
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className="filter-select-input flex-1 bg-transparent text-xs font-bold text-[color:var(--ink)] focus:outline-none cursor-pointer border-0 p-0 m-0 min-w-0 max-w-full leading-none whitespace-nowrap"
+      >
         {children}
       </select>
+      <ChevronDown className="h-3.5 w-3.5 text-slate-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none shrink-0" aria-hidden="true" />
     </label>
   );
 }

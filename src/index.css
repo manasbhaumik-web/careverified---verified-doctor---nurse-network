@@ -522,6 +522,16 @@ footer button.bg-slate-800:hover,
   box-shadow: 0 0 0 1px var(--t-600);
 }
 
+.filter-select-input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none !important;
+}
+.filter-select-input::-ms-expand {
+  display: none;
+}
+
 .form-textarea {
   width: 100%;
   min-height: 88px;

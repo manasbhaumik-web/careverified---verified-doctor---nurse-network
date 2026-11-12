@@ -832,7 +832,7 @@ function ReportsTab() {
   return (
     <div className="space-y-5">
       <section aria-label={tx('Report period')} className="app-card rounded-none border-slate-200 p-4 flex flex-wrap items-center justify-between gap-4">
-        <FilterSelect label={tx('Reporting Period')} value={days} onChange={setDays} className="w-full sm:w-64 flex-none">
+        <FilterSelect label={tx('Reporting Period')} value={days} onChange={setDays} className="w-full sm:w-72 flex-none">
           <option value="7">{tx('Last 7 days')}</option>
           <option value="30">{tx('Last 30 days')}</option>
           <option value="90">{tx('Last 90 days')}</option>
