@@ -1198,16 +1198,22 @@ export default function PatientDashboard({
                       <HeartPulse className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                       {tx('Blood Pressure')}
                     </span>
-                    <span className={`text-2xs font-bold px-1.5 py-0.2 border ${classifyBp(summary?.bp?.value1 || 120, summary?.bp?.value2 || 78).badgeClass}`}>
-                      {tx(classifyBp(summary?.bp?.value1 || 120, summary?.bp?.value2 || 78).label.split('/')[0].trim())}
-                    </span>
+                    {summary?.bp ? (
+                      <span className={`text-2xs font-bold px-1.5 py-0.2 border ${classifyBp(summary.bp.value1, summary.bp.value2).badgeClass}`}>
+                        {tx(classifyBp(summary.bp.value1, summary.bp.value2).label.split('/')[0].trim())}
+                      </span>
+                    ) : (
+                      <span className="text-2xs font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 border border-slate-300">
+                        {tx('Not logged')}
+                      </span>
+                    )}
                   </div>
-                  <div className="text-xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
-                    <span>{summary?.bp ? `${summary.bp.value1}/${summary.bp.value2}` : '120/78'}</span>
-                    <span className="text-xs font-normal text-slate-500 font-sans">mmHg</span>
+                  <div className="text-xl font-black text-slate-900 mt-1.5 font-mono tabular-nums flex items-baseline gap-1">
+                    <span>{summary?.bp ? `${summary.bp.value1}/${summary.bp.value2}` : '—'}</span>
+                    {summary?.bp && <span className="text-xs font-normal text-slate-500 font-sans">mmHg</span>}
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-1 truncate">
-                    {summary?.bp?.recordedAt ? tx('Logged {date}', { date: fmtDate(summary.bp.recordedAt) }) : tx('Reference Target < 120/80')}
+                    {summary?.bp?.recordedAt ? tx('Logged {date}', { date: fmtDate(summary.bp.recordedAt) }) : tx('Click to log reading')}
                   </p>
                 </button>
 
@@ -1223,16 +1229,26 @@ export default function PatientDashboard({
                       <Activity className="h-3.5 w-3.5 text-emerald-600" />
                       {tx('Heart Rate')}
                     </span>
-                    <span className="text-2xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
-                      {tx('Normal')}
-                    </span>
+                    {summary?.pulse?.value1 != null ? (
+                      <span className={`text-2xs font-bold px-1.5 py-0.2 border ${
+                        summary.pulse.value1 >= 60 && summary.pulse.value1 <= 100
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          : 'bg-amber-50 text-amber-800 border-amber-200'
+                      }`}>
+                        {summary.pulse.value1 >= 60 && summary.pulse.value1 <= 100 ? tx('Normal') : tx('Check')}
+                      </span>
+                    ) : (
+                      <span className="text-2xs font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 border border-slate-300">
+                        {tx('Not logged')}
+                      </span>
+                    )}
                   </div>
-                  <div className="text-xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
-                    <span>{summary?.pulse?.value1 || '72'}</span>
-                    <span className="text-xs font-normal text-slate-500 font-sans">BPM</span>
+                  <div className="text-xl font-black text-slate-900 mt-1.5 font-mono tabular-nums flex items-baseline gap-1">
+                    <span>{summary?.pulse?.value1 ?? '—'}</span>
+                    {summary?.pulse?.value1 != null && <span className="text-xs font-normal text-slate-500 font-sans">BPM</span>}
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-1 truncate">
-                    {tx('Resting target 60–100 BPM')}
+                    {summary?.pulse?.recordedAt ? tx('Logged {date}', { date: fmtDate(summary.pulse.recordedAt) }) : tx('Click to log reading')}
                   </p>
                 </button>
 
@@ -1248,16 +1264,26 @@ export default function PatientDashboard({
                       <Sparkles className="h-3.5 w-3.5 text-amber-600" />
                       {tx('Blood Glucose')}
                     </span>
-                    <span className="text-2xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
-                      {summary?.glucose?.value1 ? (summary.glucose.value1 > 6.0 ? tx('Elevated') : tx('Target')) : tx('Target')}
-                    </span>
+                    {summary?.glucose?.value1 != null ? (
+                      <span className={`text-2xs font-bold px-1.5 py-0.2 border ${
+                        summary.glucose.value1 > 6.0
+                          ? 'bg-amber-50 text-amber-800 border-amber-200'
+                          : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                      }`}>
+                        {summary.glucose.value1 > 6.0 ? tx('Elevated') : tx('Target')}
+                      </span>
+                    ) : (
+                      <span className="text-2xs font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 border border-slate-300">
+                        {tx('Not logged')}
+                      </span>
+                    )}
                   </div>
-                  <div className="text-xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
-                    <span>{summary?.glucose?.value1 || '5.4'}</span>
-                    <span className="text-xs font-normal text-slate-500 font-sans">{summary?.glucose?.unit || 'mmol/L'}</span>
+                  <div className="text-xl font-black text-slate-900 mt-1.5 font-mono tabular-nums flex items-baseline gap-1">
+                    <span>{summary?.glucose?.value1 ?? '—'}</span>
+                    {summary?.glucose?.value1 != null && <span className="text-xs font-normal text-slate-500 font-sans">{summary?.glucose?.unit || 'mmol/L'}</span>}
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-1 truncate">
-                    {tx('Fasting target 4.0–7.0 mmol/L')}
+                    {summary?.glucose?.recordedAt ? tx('Logged {date}', { date: fmtDate(summary.glucose.recordedAt) }) : tx('Click to log reading')}
                   </p>
                 </button>
 
@@ -1273,16 +1299,26 @@ export default function PatientDashboard({
                       <ShieldCheck className="h-3.5 w-3.5 text-cyan-600" />
                       {tx('Oxygen (SpO₂)')}
                     </span>
-                    <span className="text-2xs font-bold px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
-                      {tx('Optimal')}
-                    </span>
+                    {summary?.spo2?.value1 != null ? (
+                      <span className={`text-2xs font-bold px-1.5 py-0.2 border ${
+                        summary.spo2.value1 >= 95
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          : 'bg-rose-50 text-rose-800 border-rose-200'
+                      }`}>
+                        {summary.spo2.value1 >= 95 ? tx('Optimal') : tx('Low')}
+                      </span>
+                    ) : (
+                      <span className="text-2xs font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 border border-slate-300">
+                        {tx('Not logged')}
+                      </span>
+                    )}
                   </div>
-                  <div className="text-xl font-black text-slate-900 mt-1.5 font-mono flex items-baseline gap-1">
-                    <span>{summary?.spo2?.value1 || '99'}</span>
-                    <span className="text-xs font-normal text-slate-500 font-sans">%</span>
+                  <div className="text-xl font-black text-slate-900 mt-1.5 font-mono tabular-nums flex items-baseline gap-1">
+                    <span>{summary?.spo2?.value1 ?? '—'}</span>
+                    {summary?.spo2?.value1 != null && <span className="text-xs font-normal text-slate-500 font-sans">%</span>}
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-1 truncate">
-                    {tx('Arterial saturation ≥ 95%')}
+                    {summary?.spo2?.recordedAt ? tx('Logged {date}', { date: fmtDate(summary.spo2.recordedAt) }) : tx('Click to log reading')}
                   </p>
                 </button>
               </div>
