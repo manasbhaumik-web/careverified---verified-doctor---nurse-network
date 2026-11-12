@@ -1246,8 +1246,8 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
             role="status"
             className={`p-4 border text-xs font-bold flex items-center justify-between shadow-xs animate-fade-in ${
               notificationMsg.type === 'success'
-                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 border-l-4 border-l-emerald-600'
-                : 'bg-rose-50 text-rose-800 border-rose-300 border-l-4 border-l-rose-600'
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 border-t-2 border-t-emerald-600'
+                : 'bg-rose-50 text-rose-800 border-rose-300 border-t-2 border-t-rose-600'
             }`}
           >
             <div className="flex items-center gap-2.5 min-w-0">

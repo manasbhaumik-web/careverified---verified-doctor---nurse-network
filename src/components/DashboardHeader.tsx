@@ -263,9 +263,9 @@ export const bannerSecondaryBtn =
 /** Two-column row: identity on the left, KPIs and actions on the right. */
 export function BannerRow({ identity, aside }: { identity: React.ReactNode; aside?: React.ReactNode }) {
   return (
-    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 sm:gap-4">
+    <div className="flex flex-col xl:flex-row xl:flex-wrap xl:items-center justify-between gap-3 sm:gap-4">
       {identity}
-      {aside && <div className="flex items-center gap-3 flex-wrap xl:justify-end border-t xl:border-t-0 border-[color:var(--t-200)] pt-2.5 xl:pt-0 shrink-0 max-w-full">{aside}</div>}
+      {aside && <div className="flex items-center gap-3 flex-wrap xl:justify-end border-t xl:border-t-0 border-[color:var(--t-200)] pt-2.5 xl:pt-0 min-w-0 max-w-full">{aside}</div>}
     </div>
   );
 }
