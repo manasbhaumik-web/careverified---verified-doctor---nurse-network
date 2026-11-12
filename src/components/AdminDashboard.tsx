@@ -163,6 +163,15 @@ export default function AdminDashboard({
   const [votedId, setVotedId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [selectedModalRequest, setSelectedModalRequest] = useState<any | null>(null);
+  const [slaTelemetry, setSlaTelemetry] = useState<{
+    pendingCount: number;
+    reviewedCount: number;
+    avgTurnaroundHours: number | null;
+    adherencePct: number | null;
+    onTimeCount: number;
+    totalReviewedWithTime: number;
+    velocityPerDay: number;
+  } | null>(null);
 
   // Administrative Sub-Role & Statutory Segregation of Duties (RBAC)
   const [subRole, setSubRole] = useState<AdminSubRole>(() => {
@@ -773,15 +782,24 @@ export default function AdminDashboard({
     }
   };
 
-  // Fetch pending registrations from full-stack server
+  // Fetch pending registrations and live 30-day SLA telemetry from full-stack server
   const fetchPending = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/verification-requests');
-      const data = await response.json();
+      const [reqResp, telResp] = await Promise.all([
+        fetch('/api/verification-requests'),
+        fetch('/api/admin/telemetry').catch(() => null),
+      ]);
+      const data = await reqResp.json();
       if (data.status === 'success') {
         // Filter for requests that are still Pending
         setPendingRequests(data.data.filter((r: any) => r.status === 'Pending'));
+      }
+      if (telResp && telResp.ok) {
+        const tel = await telResp.json();
+        if (tel.status === 'success' && tel.data?.sla) {
+          setSlaTelemetry(tel.data.sla);
+        }
       }
     } catch (error) {
       console.error(error);
@@ -1228,18 +1246,22 @@ export default function AdminDashboard({
             <div>
               <div className="flex items-center gap-2">
                 <h4 className="text-sm font-black uppercase tracking-wider text-white">{tx('Statutory Credentialing SLA & Cohort Telemetry')}</h4>
-                <span className="text-2xs font-mono font-bold bg-amber-950 text-amber-300 border border-amber-700 px-2 py-0.5">{tx('Sample Baseline · 30-Day')}</span>
+                <span className="text-2xs font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5">{tx('Live SQLite · 30-Day')}</span>
               </div>
               <p className="text-xs text-slate-400 font-semibold mt-0.5">{tx('Statutory 24-hour turnaround target under MMC & LJM accreditation frameworks.')}</p>
             </div>
           </div>
           <div className="flex items-center gap-4 text-xs">
-            <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
+            <div className="flex items-center gap-1.5 text-emerald-400 font-bold tabular-nums">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>{tx('96.4% SLA Adherence')}</span>
+              <span>
+                {slaTelemetry?.adherencePct != null
+                  ? `${slaTelemetry.adherencePct}% ${tx('SLA Adherence')}`
+                  : tx('No Timed SLA Baseline')}
+              </span>
             </div>
-            <div className="text-slate-400 font-mono text-xs">
-              Target: &lt;24h · Avg: <strong className="text-white">14.8h</strong>
+            <div className="text-slate-400 font-mono text-xs tabular-nums">
+              Target: &lt;24h · Avg: <strong className="text-white">{slaTelemetry?.avgTurnaroundHours != null ? `${slaTelemetry.avgTurnaroundHours}h` : '—'}</strong>
             </div>
           </div>
         </div>
@@ -1247,29 +1269,38 @@ export default function AdminDashboard({
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
           <div className="space-y-1">
             <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">{tx('Avg Turnaround')}</span>
-            <div className="text-xl font-black text-white flex items-baseline gap-1.5">
-              <span>{tx('14.8 hrs')}</span>
-              <span className="text-xs text-emerald-400 font-semibold font-mono">{tx('(-2.1h MoM)')}</span>
+            <div className="text-xl font-black text-white flex items-baseline gap-1.5 tabular-nums">
+              <span>{slaTelemetry?.avgTurnaroundHours != null ? `${slaTelemetry.avgTurnaroundHours} hrs` : '—'}</span>
+              <span className="text-xs text-slate-400 font-semibold font-mono">
+                {slaTelemetry ? `(${slaTelemetry.totalReviewedWithTime} timed)` : ''}
+              </span>
             </div>
             <p className="text-xs text-slate-400">{tx('Statutory SLA limit: 24h')}</p>
           </div>
 
           <div className="space-y-1">
             <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">{tx('Statutory Adherence')}</span>
-            <div className="text-xl font-black text-white flex items-baseline gap-1.5">
-              <span>96.4%</span>
-              <span className="text-xs text-emerald-400 font-semibold font-mono">(+1.2%)</span>
+            <div className="text-xl font-black text-white flex items-baseline gap-1.5 tabular-nums">
+              <span>{slaTelemetry?.adherencePct != null ? `${slaTelemetry.adherencePct}%` : '—'}</span>
             </div>
-            <p className="text-xs text-slate-400">{tx('137 of 142 on-time')}</p>
+            <p className="text-xs text-slate-400 tabular-nums">
+              {slaTelemetry
+                ? `${slaTelemetry.onTimeCount} of ${slaTelemetry.totalReviewedWithTime} on-time`
+                : tx('Awaiting timed reviews')}
+            </p>
           </div>
 
           <div className="space-y-1">
             <span className="text-xs uppercase font-mono font-bold text-slate-400 tracking-wider">{tx('Clearance Velocity')}</span>
-            <div className="text-xl font-black text-white flex items-baseline gap-1.5">
-              <span>{tx('4.8 / day')}</span>
-              <span className="text-xs text-cyan-400 font-semibold font-mono">{tx('(Cohort Mode)')}</span>
+            <div className="text-xl font-black text-white flex items-baseline gap-1.5 tabular-nums">
+              <span>{slaTelemetry ? `${slaTelemetry.velocityPerDay} / day` : '—'}</span>
+              <span className="text-xs text-cyan-400 font-semibold font-mono">
+                {slaTelemetry ? `(${slaTelemetry.reviewedCount} reviewed)` : ''}
+              </span>
             </div>
-            <p className="text-xs text-slate-400">{tx('Peak throughput reached')}</p>
+            <p className="text-xs text-slate-400 tabular-nums">
+              {slaTelemetry ? `${slaTelemetry.pendingCount} pending in queue` : tx('30-day rolling SQLite window')}
+            </p>
           </div>
 
           <div className="space-y-1">

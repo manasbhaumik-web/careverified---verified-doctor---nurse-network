@@ -900,6 +900,107 @@ app.get("/api/admin/audit-log", requireRole("admin"), (req, res) => {
   res.json({ status: "success", data: rows });
 });
 
+// Admin: real 30-day SQLite operational & SLA telemetry
+app.get("/api/admin/telemetry", requireRole("admin"), (_req, res) => {
+  const nowMs = Date.now();
+  const sinceIso = new Date(nowMs - 29 * 86400_000).toISOString().slice(0, 10);
+  const days: string[] = [];
+  for (let i = 29; i >= 0; i--) {
+    days.push(new Date(nowMs - i * 86400_000).toISOString().slice(0, 10));
+  }
+
+  // 1. Credentialing SLA from verificationRequests
+  const reviewedWithTimes = verificationRequests.filter(
+    (r: any) => r.status !== "Pending" && r.submittedAt && r.reviewedAt
+  );
+  const turnaroundHours = reviewedWithTimes
+    .map((r: any) => Math.max(0, (Date.parse(r.reviewedAt) - Date.parse(r.submittedAt)) / 3600_000))
+    .filter((h: number) => Number.isFinite(h));
+  const avgTurnaroundHours =
+    turnaroundHours.length > 0
+      ? Number((turnaroundHours.reduce((a: number, b: number) => a + b, 0) / turnaroundHours.length).toFixed(1))
+      : null;
+  const onTimeCount = turnaroundHours.filter((h: number) => h <= 24).length;
+  const adherencePct =
+    turnaroundHours.length > 0 ? Number(((onTimeCount / turnaroundHours.length) * 100).toFixed(1)) : null;
+  const reviewedLast30d = verificationRequests.filter(
+    (r: any) => r.status !== "Pending" && r.reviewedAt && String(r.reviewedAt).slice(0, 10) >= sinceIso
+  ).length;
+  const velocityPerDay = Number((reviewedLast30d / 30).toFixed(1));
+
+  // 2. Shift fill & locum applications from SQLite + jobs
+  const appStats = db.prepare(
+    `SELECT substr(applied_at, 1, 10) AS day, COUNT(*) AS applications,
+            SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) AS accepted
+     FROM job_applications WHERE substr(applied_at, 1, 10) >= ? GROUP BY day`
+  ).all(sinceIso) as { day: string; applications: number; accepted: number }[];
+  const appByDay = new Map(appStats.map(r => [r.day, r]));
+  const totalJobs = jobs.length;
+  const filledJobIds = new Set(
+    (db.prepare("SELECT DISTINCT job_id FROM job_applications WHERE status = 'accepted'").all() as { job_id: string }[]).map(r => r.job_id)
+  );
+  const totalApplications = (db.prepare("SELECT COUNT(*) AS c FROM job_applications").get() as { c: number })?.c ?? 0;
+  const acceptedApplications = (db.prepare("SELECT COUNT(*) AS c FROM job_applications WHERE status = 'accepted'").get() as { c: number })?.c ?? 0;
+  const fillRatePct = totalJobs > 0 ? Math.round((filledJobIds.size / totalJobs) * 100) : 0;
+
+  // 3. Settlements & escrow from SQLite payments
+  const payStats = db.prepare(
+    `SELECT substr(COALESCE(paid_at, created_at), 1, 10) AS day,
+            COUNT(*) AS txCount,
+            COALESCE(SUM(amount_sen), 0) AS grossSen,
+            COALESCE(SUM(platform_fee_sen), 0) AS feeSen
+     FROM payments
+     WHERE status = 'paid' AND substr(COALESCE(paid_at, created_at), 1, 10) >= ?
+     GROUP BY day`
+  ).all(sinceIso) as { day: string; txCount: number; grossSen: number; feeSen: number }[];
+  const payByDay = new Map(payStats.map(r => [r.day, r]));
+  const payTotals = db.prepare(
+    `SELECT COALESCE(SUM(CASE WHEN status = 'paid' THEN amount_sen ELSE 0 END), 0) AS grossSen,
+            COALESCE(SUM(CASE WHEN status = 'paid' THEN platform_fee_sen ELSE 0 END), 0) AS platformFeeSen,
+            COALESCE(SUM(CASE WHEN status = 'paid' THEN tax_sen ELSE 0 END), 0) AS taxSen,
+            SUM(CASE WHEN status = 'paid' THEN 1 ELSE 0 END) AS paidCount,
+            SUM(CASE WHEN status = 'refunded' THEN 1 ELSE 0 END) AS refundedCount
+     FROM payments WHERE substr(COALESCE(paid_at, created_at), 1, 10) >= ?`
+  ).get(sinceIso) as { grossSen: number; platformFeeSen: number; taxSen: number; paidCount: number; refundedCount: number };
+
+  res.json({
+    status: "success",
+    data: {
+      sla: {
+        pendingCount: verificationRequests.filter((r: any) => r.status === "Pending").length,
+        reviewedCount: verificationRequests.filter((r: any) => r.status !== "Pending").length,
+        avgTurnaroundHours,
+        adherencePct,
+        onTimeCount,
+        totalReviewedWithTime: turnaroundHours.length,
+        velocityPerDay,
+      },
+      shifts: {
+        totalJobs,
+        filledJobs: filledJobIds.size,
+        fillRatePct,
+        totalApplications,
+        acceptedApplications,
+        daily: days.map((date, idx) => {
+          const hit = appByDay.get(date);
+          return { day: idx + 1, date, applications: hit?.applications ?? 0, accepted: hit?.accepted ?? 0 };
+        }),
+      },
+      settlements: {
+        grossSen: payTotals?.grossSen ?? 0,
+        platformFeeSen: payTotals?.platformFeeSen ?? 0,
+        taxSen: payTotals?.taxSen ?? 0,
+        paidCount: payTotals?.paidCount ?? 0,
+        refundedCount: payTotals?.refundedCount ?? 0,
+        daily: days.map((date, idx) => {
+          const hit = payByDay.get(date);
+          return { day: idx + 1, date, grossSen: hit?.grossSen ?? 0, feeSen: hit?.feeSen ?? 0, count: hit?.txCount ?? 0 };
+        }),
+      },
+    },
+  });
+});
+
 app.use("/api/documents", documentsRouter);
 
 // -------------------------------------------------------------

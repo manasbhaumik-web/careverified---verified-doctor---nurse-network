@@ -9,22 +9,24 @@ const post = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-// 30-Day Historical Trend Data for Operations Telemetry
-const SHIFT_FILL_TREND = Array.from({ length: 30 }, (_, i) => {
-  const day = i + 1;
-  const rate = Math.min(100, Math.max(82, 88 + Math.round(Math.sin(i * 0.7) * 7 + (i / 10))));
-  const shiftsPosted = 12 + (i % 6);
-  const shiftsFilled = Math.round((shiftsPosted * rate) / 100);
-  return { day, date: `Day ${day}`, rate, shiftsPosted, shiftsFilled };
-});
-
-const SETTLEMENT_TREND = Array.from({ length: 30 }, (_, i) => {
-  const day = i + 1;
-  const volume = Math.round(1100 + (Math.sin(i * 0.5) * 450) + (i * 35));
-  const platformFee = Math.round(volume * 0.08);
-  const transactions = 3 + (i % 4);
-  return { day, date: `Day ${day}`, volume, platformFee, transactions };
-});
+interface AdminTelemetry {
+  shifts: {
+    totalJobs: number;
+    filledJobs: number;
+    fillRatePct: number;
+    totalApplications: number;
+    acceptedApplications: number;
+    daily: Array<{ day: number; date: string; applications: number; accepted: number }>;
+  };
+  settlements: {
+    grossSen: number;
+    platformFeeSen: number;
+    taxSen: number;
+    paidCount: number;
+    refundedCount: number;
+    daily: Array<{ day: number; date: string; grossSen: number; feeSen: number; count: number }>;
+  };
+}
 
 export type OpsSubTab = 'roster' | 'settlements' | 'email' | 'pharmacies';
 
@@ -76,16 +78,19 @@ export default function AdminOps({
   const [hoveredShiftDay, setHoveredShiftDay] = useState<number | null>(null);
   const [hoveredSettlementDay, setHoveredSettlementDay] = useState<number | null>(null);
   const [modal, setModal] = useState<AdminActionModalConfig | null>(null);
+  const [telemetry, setTelemetry] = useState<AdminTelemetry | null>(null);
 
   const load = async () => {
-    const [c, e, p] = await Promise.all([
+    const [c, e, p, tel] = await Promise.all([
       fetch('/api/admin/coverage').then(r => r.json()),
       fetch('/api/admin/emergencies').then(r => r.json()),
       fetch('/api/admin/payments').then(r => r.json()),
+      fetch('/api/admin/telemetry').then(r => r.json()).catch(() => null),
     ]);
     if (c.status === 'success') setCoverage(c.data);
     if (e.status === 'success') setEmergencies(e.data);
     if (p.status === 'success') setPayments(p.data);
+    if (tel?.status === 'success' && tel.data) setTelemetry(tel.data);
     const ph = await fetch('/api/admin/pharmacies').then(r => r.json());
     if (ph.status === 'success') setPharmacies(ph.data);
     const sm = await fetch('/api/admin/pharmacies/summary').then(r => r.json()).catch(() => null);
@@ -226,15 +231,17 @@ export default function AdminOps({
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-extrabold text-slate-900">{tx('30-Day Shift Fill Rate & Locum Telemetry')}</h3>
-                    <span className="text-2xs font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5">{tx('Sample Baseline · 30-Day')}</span>
+                    <span className="text-2xs font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5">{tx('Live SQLite · 30-Day')}</span>
                   </div>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">{tx('Automated tracking of clinical shift placements across emergency departments and inpatient wards.')}</p>
+                  <p className="text-xs text-slate-600 font-medium mt-0.5">{tx('Live tracking of posted clinical shifts and locum applications from SQLite.')}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <div className="text-right">
-                  <span className="text-xs font-bold text-slate-500 uppercase block tracking-wider">{tx('30-Day Average')}</span>
-                  <span className="text-lg font-black text-emerald-700 font-mono">{tx('92.4% Filled')}</span>
+                  <span className="text-xs font-bold text-slate-500 uppercase block tracking-wider">{tx('Current Fill Rate')}</span>
+                  <span className="text-lg font-black text-emerald-700 font-mono tabular-nums">
+                    {telemetry ? `${telemetry.shifts.fillRatePct}% ${tx('Filled')}` : '—'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -242,44 +249,45 @@ export default function AdminOps({
             {/* Quick KPI cohort indicators */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('Total Staffed Hours')}</span>
-                <span className="text-base font-black text-slate-900 font-mono">{tx('3,072 hrs')}</span>
-                <span className="text-xs text-emerald-700 font-bold block mt-0.5">{tx('+14% vs Prev Month')}</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('Total Posted Shifts')}</span>
+                <span className="text-base font-black text-slate-900 font-mono tabular-nums">{telemetry ? telemetry.shifts.totalJobs : '—'}</span>
+                <span className="text-xs text-slate-600 font-medium block mt-0.5">{tx('Active + filled shifts')}</span>
               </div>
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('Avg Triage Dispatch')}</span>
-                <span className="text-base font-black text-slate-900 font-mono">{tx('4.2 mins')}</span>
-                <span className="text-xs text-emerald-700 font-bold block mt-0.5">Target: &lt;10 mins</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('Filled Shifts')}</span>
+                <span className="text-base font-black text-emerald-700 font-mono tabular-nums">{telemetry ? telemetry.shifts.filledJobs : '—'}</span>
+                <span className="text-xs text-slate-600 font-medium block mt-0.5">{tx('Accepted or completed')}</span>
               </div>
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('Zero-Coverage Elimination')}</span>
-                <span className="text-base font-black text-slate-900 font-mono">{tx('-84% gaps')}</span>
-                <span className="text-xs text-slate-600 font-medium block mt-0.5">{tx('Tier-1 coverage intact')}</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('30-Day Applications')}</span>
+                <span className="text-base font-black text-slate-900 font-mono tabular-nums">{telemetry ? telemetry.shifts.totalApplications : '—'}</span>
+                <span className="text-xs text-slate-600 font-medium block mt-0.5">{tx('Submitted in window')}</span>
               </div>
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('On-Call Readiness')}</span>
-                <span className="text-base font-black text-emerald-700 font-mono">99.1%</span>
-                <span className="text-xs text-slate-600 font-medium block mt-0.5">{tx('Emergency SOS active')}</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('Accepted Applications')}</span>
+                <span className="text-base font-black text-emerald-700 font-mono tabular-nums">{telemetry ? telemetry.shifts.acceptedApplications : '—'}</span>
+                <span className="text-xs text-slate-600 font-medium block mt-0.5">{tx('30-day approved')}</span>
               </div>
             </div>
 
-            {/* Interactive 30-Day Fill Rate Chart */}
+            {/* Interactive 30-Day Applications Chart */}
             <div className="space-y-2 pt-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-slate-700">{tx('Daily Shift Fill Rate Progression (30 Days)')}</span>
-                {hoveredShiftDay ? (
-                  <span className="font-mono text-2xs font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
-                    Day {hoveredShiftDay}: {SHIFT_FILL_TREND[hoveredShiftDay - 1].rate}% Fill Rate · {SHIFT_FILL_TREND[hoveredShiftDay - 1].shiftsFilled}/{SHIFT_FILL_TREND[hoveredShiftDay - 1].shiftsPosted} Shifts Filled
+                <span className="font-bold text-slate-700">{tx('Daily Locum Applications (30 Days)')}</span>
+                {hoveredShiftDay && telemetry?.shifts.daily[hoveredShiftDay - 1] ? (
+                  <span className="font-mono text-2xs font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 tabular-nums">
+                    {telemetry.shifts.daily[hoveredShiftDay - 1].date}: {telemetry.shifts.daily[hoveredShiftDay - 1].applications} applications · {telemetry.shifts.daily[hoveredShiftDay - 1].accepted} accepted
                   </span>
                 ) : (
-                  <span className="text-xs text-slate-400">{tx('Hover over bars to inspect daily shift metrics')}</span>
+                  <span className="text-xs text-slate-600">{tx('Hover over bars to inspect daily application counts')}</span>
                 )}
               </div>
 
               <div className="h-28 flex items-end gap-1.5 pt-4 pb-1 px-1 bg-slate-50 border border-slate-200 overflow-x-auto">
-                {SHIFT_FILL_TREND.map((item) => {
+                {(telemetry?.shifts.daily || []).map((item) => {
                   const isHovered = hoveredShiftDay === item.day;
-                  const heightPct = Math.round(((item.rate - 75) / 25) * 100);
+                  const maxApps = Math.max(1, ...(telemetry?.shifts.daily.map(d => d.applications) || [1]));
+                  const heightPct = item.applications === 0 ? 4 : Math.max(12, Math.round((item.applications / maxApps) * 100));
                   return (
                     <div
                       key={item.day}
@@ -288,21 +296,23 @@ export default function AdminOps({
                       className="flex-1 min-w-[14px] flex flex-col items-center justify-end h-full cursor-pointer group"
                     >
                       <div
-                        style={{ height: `${Math.max(15, heightPct)}%` }}
+                        style={{ height: `${heightPct}%` }}
                         className={`w-full transition-all rounded-none ${
-                          isHovered 
-                            ? 'bg-[color:var(--t-600)]' 
-                            : item.rate >= 92 
-                            ? 'bg-emerald-600 hover:bg-emerald-500' 
+                          isHovered
+                            ? 'bg-[color:var(--t-600)]'
+                            : item.applications === 0
+                            ? 'bg-slate-200'
+                            : item.accepted > 0
+                            ? 'bg-emerald-600 hover:bg-emerald-500'
                             : 'bg-emerald-400 hover:bg-emerald-500'
                         }`}
-                        title={`Day ${item.day}: ${item.rate}% fill rate`}
+                        title={`${item.date}: ${item.applications} applications (${item.accepted} accepted)`}
                       />
                     </div>
                   );
                 })}
               </div>
-              <div className="flex justify-between text-xs font-mono text-slate-400 px-1">
+              <div className="flex justify-between text-xs font-mono text-slate-600 px-1">
                 <span>{tx('30 Days Ago')}</span>
                 <span>{tx('15 Days Ago')}</span>
                 <span>{tx('Today')}</span>
@@ -351,15 +361,17 @@ export default function AdminOps({
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-extrabold text-slate-900">{tx('30-Day Rolling Escrow & Settlement Telemetry')}</h3>
-                    <span className="text-2xs font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5">{tx('Illustrative Baseline · 30-Day')}</span>
+                    <span className="text-2xs font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5">{tx('Live SQLite · 30-Day')}</span>
                   </div>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">{tx('Automated reconciliation of platform escrow holds, locum doctor wages, and 8% facilitator commissions.')}</p>
+                  <p className="text-xs text-slate-600 font-medium mt-0.5">{tx('Live SQLite ledger reconciliation of paid escrow settlements, facilitator fees, and statutory tax.')}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <div className="text-right">
                   <span className="text-xs font-bold text-slate-500 uppercase block tracking-wider">{tx('30-Day Gross Volume')}</span>
-                  <span className="text-lg font-black text-slate-900 font-mono">{tx('RM 48,250.00')}</span>
+                  <span className="text-lg font-black text-slate-900 font-mono tabular-nums">
+                    {telemetry ? formatMoney(telemetry.settlements.grossSen, { fromMinor: true }) : '—'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -367,24 +379,34 @@ export default function AdminOps({
             {/* Financial telemetry stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('Gross Facilitator GMV')}</span>
-                <span className="text-base font-black text-slate-900 font-mono">{tx('RM 48,250.00')}</span>
-                <span className="text-xs text-emerald-700 font-bold block mt-0.5">{tx('142 total transactions')}</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('Gross Paid GMV')}</span>
+                <span className="text-base font-black text-slate-900 font-mono tabular-nums">
+                  {telemetry ? formatMoney(telemetry.settlements.grossSen, { fromMinor: true }) : '—'}
+                </span>
+                <span className="text-xs text-slate-600 font-medium block mt-0.5 tabular-nums">
+                  {telemetry ? `${telemetry.settlements.paidCount} ${tx('paid transactions')}` : '—'}
+                </span>
               </div>
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('Platform Commission (8%)')}</span>
-                <span className="text-base font-black text-[color:var(--t-700)] font-mono">{tx('RM 3,860.00')}</span>
-                <span className="text-xs text-emerald-700 font-bold block mt-0.5">{tx('Realized net revenue')}</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('Platform Commission')}</span>
+                <span className="text-base font-black text-[color:var(--t-700)] font-mono tabular-nums">
+                  {telemetry ? formatMoney(telemetry.settlements.platformFeeSen, { fromMinor: true }) : '—'}
+                </span>
+                <span className="text-xs text-slate-600 font-medium block mt-0.5">{tx('Realized fee ledger')}</span>
               </div>
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('Statutory SST Remitted')}</span>
-                <span className="text-base font-black text-slate-800 font-mono">{tx('RM 308.80')}</span>
-                <span className="text-xs text-slate-600 font-medium block mt-0.5">{tx('Royal Malaysian Customs')}</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('Statutory Tax Collected')}</span>
+                <span className="text-base font-black text-slate-800 font-mono tabular-nums">
+                  {telemetry ? formatMoney(telemetry.settlements.taxSen, { fromMinor: true }) : '—'}
+                </span>
+                <span className="text-xs text-slate-600 font-medium block mt-0.5">{tx('SST ledger total')}</span>
               </div>
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-none">
-                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('Escrow Release Integrity')}</span>
-                <span className="text-base font-black text-emerald-700 font-mono">100.0%</span>
-                <span className="text-xs text-slate-600 font-medium block mt-0.5">{tx('0 disputes · 0 chargebacks')}</span>
+                <span className="text-xs uppercase font-bold text-slate-500 block">{tx('Refunded Settlements')}</span>
+                <span className="text-base font-black text-slate-900 font-mono tabular-nums">
+                  {telemetry ? telemetry.settlements.refundedCount : '—'}
+                </span>
+                <span className="text-xs text-slate-600 font-medium block mt-0.5">{tx('30-day window')}</span>
               </div>
             </div>
 
@@ -392,20 +414,20 @@ export default function AdminOps({
             <div className="space-y-2 pt-2">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-slate-700">{tx('Daily Settlement Volume (30 Days)')}</span>
-                {hoveredSettlementDay ? (
-                  <span className="font-mono text-2xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5">
-                    Day {hoveredSettlementDay}: RM {SETTLEMENT_TREND[hoveredSettlementDay - 1].volume.toLocaleString()}.00 Gross · RM {SETTLEMENT_TREND[hoveredSettlementDay - 1].platformFee}.00 Facilitator Fee ({SETTLEMENT_TREND[hoveredSettlementDay - 1].transactions} txs)
+                {hoveredSettlementDay && telemetry?.settlements.daily[hoveredSettlementDay - 1] ? (
+                  <span className="font-mono text-2xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5 tabular-nums">
+                    {telemetry.settlements.daily[hoveredSettlementDay - 1].date}: {formatMoney(telemetry.settlements.daily[hoveredSettlementDay - 1].grossSen, { fromMinor: true })} Gross · {formatMoney(telemetry.settlements.daily[hoveredSettlementDay - 1].feeSen, { fromMinor: true })} Fee ({telemetry.settlements.daily[hoveredSettlementDay - 1].count} txs)
                   </span>
                 ) : (
-                  <span className="text-xs text-slate-400">{tx('Hover over bars to inspect daily gross settlement amounts')}</span>
+                  <span className="text-xs text-slate-600">{tx('Hover over bars to inspect daily gross settlement amounts')}</span>
                 )}
               </div>
 
               <div className="h-28 flex items-end gap-1.5 pt-4 pb-1 px-1 bg-slate-50 border border-slate-200 overflow-x-auto">
-                {SETTLEMENT_TREND.map((item) => {
+                {(telemetry?.settlements.daily || []).map((item) => {
                   const isHovered = hoveredSettlementDay === item.day;
-                  const maxVol = 2500;
-                  const heightPct = Math.round((item.volume / maxVol) * 100);
+                  const maxVol = Math.max(1, ...(telemetry?.settlements.daily.map(d => d.grossSen) || [1]));
+                  const heightPct = item.grossSen === 0 ? 4 : Math.max(12, Math.round((item.grossSen / maxVol) * 100));
                   return (
                     <div
                       key={item.day}
@@ -414,19 +436,21 @@ export default function AdminOps({
                       className="flex-1 min-w-[14px] flex flex-col items-center justify-end h-full cursor-pointer group"
                     >
                       <div
-                        style={{ height: `${Math.max(15, heightPct)}%` }}
+                        style={{ height: `${heightPct}%` }}
                         className={`w-full transition-all rounded-none ${
-                          isHovered 
-                            ? 'bg-[color:var(--t-700)]' 
+                          isHovered
+                            ? 'bg-[color:var(--t-700)]'
+                            : item.grossSen === 0
+                            ? 'bg-slate-200'
                             : 'bg-emerald-700 hover:bg-emerald-600'
                         }`}
-                        title={`Day ${item.day}: RM ${item.volume}`}
+                        title={`${item.date}: ${formatMoney(item.grossSen, { fromMinor: true })}`}
                       />
                     </div>
                   );
                 })}
               </div>
-              <div className="flex justify-between text-xs font-mono text-slate-400 px-1">
+              <div className="flex justify-between text-xs font-mono text-slate-600 px-1">
                 <span>{tx('30 Days Ago')}</span>
                 <span>{tx('15 Days Ago')}</span>
                 <span>{tx('Today')}</span>
