@@ -356,7 +356,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-extrabold uppercase text-slate-700 block">
+              <label className="form-label">
                 {tx('Internal Notes (Optional)')}
               </label>
               <textarea
@@ -364,7 +364,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 placeholder={tx('e.g. Briefing with department unit manager upon arrival.')}
                 value={decisionNotes}
                 onChange={e => setDecisionNotes(e.target.value)}
-                className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                className="form-input text-xs"
               />
             </div>
 
@@ -419,7 +419,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
             <form onSubmit={handleCreateJob} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="form-label">
                   Job Title *
                 </label>
                 <input
@@ -428,19 +428,19 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   placeholder={tx('e.g. Medical Officer (Emergency Department Locum)')}
                   value={newJobTitle}
                   onChange={e => setNewJobTitle(e.target.value)}
-                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="form-input text-xs"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     Target Role *
                   </label>
                   <select
                     value={newJobRole}
                     onChange={e => setNewJobRole(e.target.value as any)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-select text-xs"
                   >
                     <option value="doctor">{tx('Doctor / Medical Officer')}</option>
                     <option value="nurse">{tx('Nurse / Staff Nurse')}</option>
@@ -449,13 +449,13 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     Engagement Type *
                   </label>
                   <select
                     value={newJobType}
                     onChange={e => setNewJobType(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-select text-xs"
                   >
                     <option value="Locum">{tx('Locum (Shift Cover)')}</option>
                     <option value="Sessional">{tx('Sessional / Part-Time')}</option>
@@ -466,7 +466,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     Specialty / Department *
                   </label>
                   <input
@@ -475,12 +475,12 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     placeholder={tx('e.g. Emergency Medicine, ICU, Paediatrics')}
                     value={newJobSpecialty}
                     onChange={e => setNewJobSpecialty(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-input text-xs"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     {tx('Facility Ward / Location')}
                   </label>
                   <input
@@ -488,14 +488,14 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     placeholder={tx('e.g. Emergency Department / Ward 4B')}
                     value={newJobLocation}
                     onChange={e => setNewJobLocation(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-input text-xs"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     {tx('Min Rate (MYR)')}
                   </label>
                   <input
@@ -503,12 +503,12 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     min="1"
                     value={newJobSalaryMin}
                     onChange={e => setNewJobSalaryMin(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-input text-xs"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     {tx('Max Rate (MYR)')}
                   </label>
                   <input
@@ -516,18 +516,18 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     min="1"
                     value={newJobSalaryMax}
                     onChange={e => setNewJobSalaryMax(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-input text-xs"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     Period
                   </label>
                   <select
                     value={newJobSalaryPeriod}
                     onChange={e => setNewJobSalaryPeriod(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-select text-xs"
                   >
                     <option value="hour">{tx('Per Hour')}</option>
                     <option value="shift">{tx('Per Shift')}</option>
@@ -537,7 +537,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="form-label">
                   {tx('Description & Clinical Scope')}
                 </label>
                 <textarea
@@ -545,7 +545,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   placeholder={tx('Outline key clinical duties, patient triage scope, required certifications (e.g. ACLS, NSR, LJM registration).')}
                   value={newJobDesc}
                   onChange={e => setNewJobDesc(e.target.value)}
-                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="form-input text-xs"
                 />
               </div>
 
@@ -603,13 +603,13 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
             <form onSubmit={handleInviteSubmit} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="form-label">
                   {tx('Select Shift / Vacancy (Optional)')}
                 </label>
                 <select
                   value={inviteJobId}
                   onChange={e => setInviteJobId(e.target.value)}
-                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="form-select text-xs"
                 >
                   <option value="">{tx('General Facility Clinical Invitation')}</option>
                   {jobs.filter(j => j.status === 'Active').map(j => (
@@ -621,14 +621,14 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="form-label">
                   {tx('Personalised Invitation Message')}
                 </label>
                 <textarea
                   rows={3}
                   value={inviteMessage}
                   onChange={e => setInviteMessage(e.target.value)}
-                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="form-input text-xs"
                 />
               </div>
 
@@ -768,7 +768,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
             <form onSubmit={handleQuoteSubmit} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="form-label">
                   Procedure / Treatment Package Name *
                 </label>
                 <input
@@ -777,13 +777,13 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   placeholder={tx('e.g. Total Knee Arthroplasty (TKA) Package')}
                   value={quoteProcedure}
                   onChange={e => setQuoteProcedure(e.target.value)}
-                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="form-input text-xs"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     Estimated Total (MYR) *
                   </label>
                   <input
@@ -793,12 +793,12 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     placeholder="e.g. 18500"
                     value={quoteAmount}
                     onChange={e => setQuoteAmount(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-input text-xs"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     {tx('Est. Stay (Days)')}
                   </label>
                   <input
@@ -806,13 +806,13 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     min="1"
                     value={quoteDays}
                     onChange={e => setQuoteDays(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-input text-xs"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="form-label">
                   {tx('Clinical Inclusions')}
                 </label>
                 <textarea
@@ -820,19 +820,19 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   placeholder={tx('e.g. Surgeon fee, anaesthetist, operating theatre, 2 nights single room, routine lab tests.')}
                   value={quoteInclusions}
                   onChange={e => setQuoteInclusions(e.target.value)}
-                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="form-input text-xs"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="form-label">
                   {tx('Exclusions & Conditions')}
                 </label>
                 <textarea
                   rows={2}
                   value={quoteExclusions}
                   onChange={e => setQuoteExclusions(e.target.value)}
-                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="form-input text-xs"
                 />
               </div>
 
@@ -885,7 +885,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             <form onSubmit={handleSavePackage} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1 sm:col-span-2">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     Package Title *
                   </label>
                   <input
@@ -894,12 +894,12 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     placeholder={tx('e.g. Executive Full-Body Health Screening')}
                     value={pkgTitle}
                     onChange={e => setPkgTitle(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-input text-xs"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     {tx('Package Code')}
                   </label>
                   <input
@@ -907,20 +907,20 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     placeholder={tx('e.g. PKG-EXEC-01')}
                     value={pkgCode}
                     onChange={e => setPkgCode(e.target.value.toUpperCase())}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none font-mono focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-input text-xs font-mono"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     Category *
                   </label>
                   <select
                     value={pkgCategory}
                     onChange={e => setPkgCategory(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-select text-xs"
                   >
                     {['Health Screening', 'Cardiology', 'Orthopaedics', 'Maternity', 'Fertility', 'Oncology', 'Ophthalmology', 'Dental', 'Surgery', 'Aesthetics'].map(c => (
                       <option key={c} value={c}>{c}</option>
@@ -929,7 +929,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     {tx('Duration / Stay')}
                   </label>
                   <input
@@ -937,18 +937,18 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     placeholder={tx('e.g. 1 Day Outpatient (4 hrs)')}
                     value={pkgDuration}
                     onChange={e => setPkgDuration(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-input text-xs"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     {tx('Target Audience')}
                   </label>
                   <select
                     value={pkgAudience}
                     onChange={e => setPkgAudience(e.target.value as any)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-select text-xs"
                   >
                     <option value="all">{tx('All Patients')}</option>
                     <option value="local">{tx('Malaysian Residents Only')}</option>
@@ -959,7 +959,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     Package Price (MYR) *
                   </label>
                   <input
@@ -969,12 +969,12 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     placeholder="e.g. 1280"
                     value={pkgPrice}
                     onChange={e => setPkgPrice(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)] font-bold text-slate-900"
+                    className="form-input text-xs font-bold text-slate-900"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     {tx('Original Price (MYR)')}
                   </label>
                   <input
@@ -983,18 +983,18 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     placeholder={tx('e.g. 1600 (optional)')}
                     value={pkgOriginalPrice}
                     onChange={e => setPkgOriginalPrice(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)] text-slate-500"
+                    className="form-input text-xs text-slate-500"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     {tx('Publishing Status')}
                   </label>
                   <select
                     value={pkgStatus}
                     onChange={e => setPkgStatus(e.target.value as any)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-select text-xs"
                   >
                     <option value="published">{tx('Published (Live to public)')}</option>
                     <option value="draft">{tx('Draft (Private)')}</option>
@@ -1016,7 +1016,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="form-label">
                   {tx('Package Overview & Clinical Rationale')}
                 </label>
                 <textarea
@@ -1024,13 +1024,13 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   placeholder={tx('Outline who this package is recommended for and primary clinical diagnostic objectives.')}
                   value={pkgDescription}
                   onChange={e => setPkgDescription(e.target.value)}
-                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="form-input text-xs"
                 />
               </div>
 
               {/* Inclusions List Builder */}
               <div className="space-y-2 border-t border-slate-100 pt-3">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="form-label">
                   Included Tests, Procedures & Consultations ({pkgInclusions.length}):
                 </label>
                 <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-slate-50 border border-slate-200">
@@ -1088,7 +1088,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="form-label">
                   {tx('Exclusions & Pre-Procedure Instructions')}
                 </label>
                 <textarea
@@ -1096,7 +1096,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   placeholder={tx('e.g. Strict 10-hour fasting. Medication adjustments. Additional pathology charged separately.')}
                   value={pkgPreparation}
                   onChange={e => setPkgPreparation(e.target.value)}
-                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="form-input text-xs"
                 />
               </div>
 
@@ -1148,7 +1148,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
             <form onSubmit={handleSavePromo} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     Promo Code *
                   </label>
                   <input
@@ -1157,12 +1157,12 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     placeholder={tx('e.g. CAREMERDEKA')}
                     value={promoCode}
                     onChange={e => setPromoCode(e.target.value.toUpperCase())}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none font-mono font-bold focus:outline-none focus:border-[color:var(--t-600)] uppercase"
+                    className="form-input text-xs font-mono font-bold uppercase"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     {tx('Badge Highlight')}
                   </label>
                   <input
@@ -1170,13 +1170,13 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     placeholder={tx('e.g. 20% OFF National Special')}
                     value={promoBadge}
                     onChange={e => setPromoBadge(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-input text-xs"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="form-label">
                   Campaign Title *
                 </label>
                 <input
@@ -1185,19 +1185,19 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   placeholder={tx('e.g. Merdeka National Wellness Special 2026')}
                   value={promoTitle}
                   onChange={e => setPromoTitle(e.target.value)}
-                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="form-input text-xs"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     Discount Type *
                   </label>
                   <select
                     value={promoType}
                     onChange={e => setPromoType(e.target.value as any)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-select text-xs"
                   >
                     <option value="percentage">{tx('Percentage (%) Discount')}</option>
                     <option value="fixed">{tx('Fixed Amount (RM) Rebate')}</option>
@@ -1205,7 +1205,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     Discount Value *
                   </label>
                   <input
@@ -1215,19 +1215,19 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     placeholder={promoType === 'percentage' ? 'e.g. 20 (for 20%)' : 'e.g. 250 (for RM 250)'}
                     value={promoValue}
                     onChange={e => setPromoValue(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)] font-bold"
+                    className="form-input text-xs font-bold"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="form-label">
                   {tx('Applicable Package')}
                 </label>
                 <select
                   value={promoPkgId}
                   onChange={e => setPromoPkgId(e.target.value)}
-                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="form-select text-xs"
                 >
                   <option value="">{tx('All Facility Packages (Universal Promo)')}</option>
                   {packages.map(p => (
@@ -1240,19 +1240,19 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     {tx('Valid From')}
                   </label>
                   <input
                     type="date"
                     value={promoValidFrom}
                     onChange={e => setPromoValidFrom(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-select text-xs"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                  <label className="form-label">
                     Valid Until *
                   </label>
                   <input
@@ -1260,13 +1260,13 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     required
                     value={promoValidUntil}
                     onChange={e => setPromoValidUntil(e.target.value)}
-                    className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-select text-xs"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold uppercase text-slate-700 block">
+                <label className="form-label">
                   {tx('Campaign Description & Terms')}
                 </label>
                 <textarea
@@ -1274,7 +1274,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   placeholder={tx('Terms and conditions, eligible age groups, or resident requirements.')}
                   value={promoDesc}
                   onChange={e => setPromoDesc(e.target.value)}
-                  className="w-full border border-[color:var(--t-200)] p-2 text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+                  className="form-input text-xs"
                 />
               </div>
 

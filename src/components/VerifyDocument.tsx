@@ -79,7 +79,7 @@ function PharmacyConsole() {
   const [code, setCode] = useState('');
   const [rx, setRx] = useState<any | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
-  const input = 'border border-slate-200 px-3 py-2 text-sm w-full focus:outline-none focus:border-[color:var(--t-600)]';
+  const input = 'form-input text-xs';
   const post = (url: string, body: object) => fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json());
 
   const lookup = async (e: React.FormEvent) => {

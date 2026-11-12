@@ -354,12 +354,12 @@ export function BannerKpis({ items }: { items: { value: React.ReactNode; label: 
 /** Inline h-11 labelled dropdown used in single-row filter bars (library, pharmacies, packages). */
 export function FilterSelect({ label, value, onChange, children, className = '' }: { label: string; value: string; onChange: (v: string) => void; children: React.ReactNode; className?: string }) {
   return (
-    <label className={`relative flex items-center bg-[color:var(--t-bg)] border border-[color:var(--t-200)] pl-3 pr-8 h-11 min-w-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors cursor-pointer rounded-none shadow-2xs ${className || 'flex-auto max-w-full'}`}>
-      <span className="text-2xs font-black uppercase tracking-wider text-slate-500 shrink-0 select-none mr-2 whitespace-nowrap">{label}:</span>
+    <label className={`relative flex items-center bg-[color:var(--t-bg)] border border-[color:var(--t-200)] pl-3.5 pr-8 h-11 min-w-0 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors cursor-pointer rounded-none shadow-2xs ${className || 'w-full sm:w-auto sm:min-w-[200px]'}`}>
+      <span className="text-2xs font-black uppercase tracking-wider text-slate-500 shrink-0 select-none mr-2.5 whitespace-nowrap inline-flex items-center h-full leading-none">{label}:</span>
       <select
         value={value}
         onChange={e => onChange(e.target.value)}
-        className="filter-select-input flex-1 bg-transparent text-xs font-bold text-[color:var(--ink)] focus:outline-none cursor-pointer border-0 p-0 m-0 min-w-0 max-w-full leading-none whitespace-nowrap"
+        className="filter-select-input flex-1 h-full bg-transparent text-xs font-bold text-[color:var(--ink)] focus:outline-none cursor-pointer border-0 p-0 m-0 min-w-0 max-w-full leading-none whitespace-nowrap inline-flex items-center"
       >
         {children}
       </select>

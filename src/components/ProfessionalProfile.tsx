@@ -184,7 +184,7 @@ export default function ProfessionalProfile({
 
   if (loading) {
     return (
-      <div className="bg-white border border-slate-100 rounded-2xl p-10 text-center space-y-4 shadow-sm">
+      <div className="bg-white border border-slate-100 rounded-none p-10 text-center space-y-4 shadow-sm">
         <RefreshCw className="h-8 w-8 text-[color:var(--t-600)] animate-spin mx-auto" />
         <p className="text-xs text-slate-500 font-semibold">{tx('Retrieving verified credential profile records...')}</p>
       </div>
@@ -193,10 +193,10 @@ export default function ProfessionalProfile({
 
   if (!prof) {
     return (
-      <div className="bg-white border border-slate-100 rounded-2xl p-10 text-center space-y-4 shadow-sm">
+      <div className="bg-white border border-slate-100 rounded-none p-10 text-center space-y-4 shadow-sm">
         <ShieldAlert className="h-10 w-10 text-red-500 mx-auto animate-pulse" />
         <h4 className="text-sm font-bold text-slate-800">{tx('Credential profile not found or suspended')}</h4>
-        <button onClick={onBack} className="text-xs font-semibold bg-[color:var(--dark)] text-white rounded-lg py-2 px-4 hover:bg-[color:var(--t-600)]">
+        <button onClick={onBack} className="text-xs font-semibold bg-[color:var(--dark)] text-white rounded-none py-2 px-4 hover:bg-[color:var(--t-600)]">
           {tx('Back to Directory')}
         </button>
       </div>
@@ -227,7 +227,7 @@ export default function ProfessionalProfile({
       <div className="flex justify-between items-center flex-wrap gap-3">
         <button 
           onClick={onBack}
-          className="text-xs font-bold bg-white text-slate-700 hover:text-slate-900 border border-slate-200/80 rounded-xl px-4 py-2 flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
+          className="text-xs font-bold bg-white text-slate-700 hover:text-slate-900 border border-slate-200/80 rounded-none px-4 py-2 flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
           {tx('Back to Verified Network Directory')}
@@ -235,7 +235,7 @@ export default function ProfessionalProfile({
 
         <button
           onClick={handleToggleSave}
-          className={`text-xs font-bold border rounded-xl px-4 py-2 flex items-center gap-1.5 transition-all shadow-sm cursor-pointer ${
+          className={`text-xs font-bold border rounded-none px-4 py-2 flex items-center gap-1.5 transition-all shadow-sm cursor-pointer ${
             isSaved 
               ? 'bg-rose-50 border-rose-200 text-rose-600' 
               : 'bg-white border-slate-200 text-slate-700 hover:text-slate-900 font-bold'
@@ -381,30 +381,30 @@ export default function ProfessionalProfile({
           </div>
 
           {/* Practice Location with Interactive Coordinates Map */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm space-y-4">
+          <div className="bg-white border border-slate-100 rounded-none p-6 shadow-sm space-y-4">
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-              <MapPin className="h-4 w-4 text-[color:var(--t-600)] animate-bounce" />
+              <MapPin className="h-4 w-4 text-[color:var(--t-600)]" />
               {tx('Practice Locations & Clinic Coordinates')}
             </h3>
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs flex justify-between items-center">
+            <div className="bg-slate-50 p-4 rounded-none border border-slate-100 text-xs flex justify-between items-center">
               <div>
                 <p className="font-extrabold text-slate-800">{tx('Primary Outpatient Ward')}</p>
                 <p className="text-slate-500 mt-1 font-medium">{prof.practiceAddress}</p>
               </div>
-              <span className="bg-emerald-50 text-emerald-800 text-2xs font-extrabold px-2.5 py-1 rounded-lg border border-emerald-100">
+              <span className="bg-emerald-50 text-emerald-800 text-2xs font-extrabold px-2.5 py-1 rounded-none border border-emerald-100">
                 {tx('Active Now')}
               </span>
             </div>
           </div>
 
           {/* Feedback & Patient Reviews */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm space-y-6">
+          <div className="bg-white border border-slate-100 rounded-none p-6 shadow-sm space-y-6">
             <h3 className="text-sm font-bold text-slate-900">
               {tx('Patient Feedback & Verified Reviews')}
             </h3>
 
             {/* Metrics Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50 p-5 rounded-none border border-slate-100">
               <div className="text-center md:border-r border-slate-200/50">
                 <span className="text-3xl font-extrabold text-slate-900 block">{avgOverall ?? tx("New")}</span>
                 <div className="flex justify-center my-1">
@@ -457,7 +457,7 @@ export default function ProfessionalProfile({
                     <p className="text-xs text-slate-600 leading-relaxed font-medium">"{rev.comment}"</p>
 
                     {rev.replyText && (
-                      <div className="bg-slate-50 rounded-xl p-3 border border-slate-100 mt-2 text-xs">
+                      <div className="bg-slate-50 rounded-none p-3 border border-slate-100 mt-2 text-xs">
                         <span className="font-bold text-slate-800 block mb-1">{tx('Reply from {name}:', { name: prof.name })}</span>
                         <p className="text-slate-600 leading-relaxed font-normal">"{rev.replyText}"</p>
                       </div>
@@ -476,7 +476,7 @@ export default function ProfessionalProfile({
               <h4 className="font-bold text-slate-800 text-sm">{tx('You have completed a visit with this specialist. Write a review')}</h4>
               
               {reviewSuccess ? (
-                <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-xs text-emerald-800 font-semibold flex items-center gap-1.5">
+                <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-none text-xs text-emerald-800 font-semibold flex items-center gap-1.5">
                   <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                   {tx('Review submitted and verified successfully!')}
                 </div>
@@ -490,7 +490,7 @@ export default function ProfessionalProfile({
                         value={reviewName}
                         onChange={(e) => setReviewName(e.target.value)}
                         placeholder="Ahmad Fauzi Bin Ramli"
-                        className="w-full text-xs border border-slate-200/80 rounded-xl py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700"
+                        className="w-full text-xs border border-slate-200/80 rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700"
                       />
                     </div>
 
@@ -500,7 +500,7 @@ export default function ProfessionalProfile({
                         <select 
                           value={reviewPunctuality} 
                           onChange={(e) => setReviewPunctuality(Number(e.target.value))}
-                          className="w-full border border-slate-200 rounded-lg p-1 outline-none"
+                          className="w-full border border-slate-200 rounded-none p-1 outline-none"
                         >
                           {[5,4,3,2,1].map(n => <option key={n} value={n}>⭐ {n}</option>)}
                         </select>
@@ -510,7 +510,7 @@ export default function ProfessionalProfile({
                         <select 
                           value={reviewCommunication} 
                           onChange={(e) => setReviewCommunication(Number(e.target.value))}
-                          className="w-full border border-slate-200 rounded-lg p-1 outline-none"
+                          className="w-full border border-slate-200 rounded-none p-1 outline-none"
                         >
                           {[5,4,3,2,1].map(n => <option key={n} value={n}>⭐ {n}</option>)}
                         </select>
@@ -526,14 +526,14 @@ export default function ProfessionalProfile({
                         value={reviewComment}
                         onChange={(e) => setReviewComment(e.target.value)}
                         placeholder={tx('Write your clinical experience details...')}
-                        className="w-full text-xs border border-slate-200/80 rounded-xl p-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 placeholder-slate-400"
+                        className="w-full text-xs border border-slate-200/80 rounded-none p-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 placeholder-slate-400"
                         required
                       />
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white rounded-xl py-2.5 text-xs font-bold shadow-sm transition-colors"
+                      className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white rounded-none py-2.5 text-xs font-bold shadow-sm transition-colors"
                     >
                       {tx('Publish Patient Review')}
                     </button>

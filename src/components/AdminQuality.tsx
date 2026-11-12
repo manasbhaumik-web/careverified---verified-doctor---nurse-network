@@ -11,7 +11,7 @@ const jreq = (url: string, method = 'POST', body?: unknown) =>
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString() : '—');
 const lab = 'text-xs font-extrabold uppercase tracking-wider text-slate-500';
 const btn = 'text-xs font-bold cursor-pointer';
-const field = 'border border-slate-200 px-3 py-2 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
+const field = 'form-input text-xs';
 
 export type QualitySubTab = 'support' | 'partners' | 'reviews' | 'incidents' | 'peer' | 'credentials';
 
@@ -134,14 +134,14 @@ function Support({ say }: { say: (t: string) => void }) {
           {!open ? <p className="text-xs text-slate-500">{tx('Select a ticket.')}</p> : (
             <>
               <div className="flex justify-between gap-2"><div><h3 className="text-sm font-extrabold">{open.subject}</h3><p className="text-xs text-slate-500">{open.requester} · {open.category}{open.target ? ` · about: ${open.target}` : ''}</p></div>
-                <select aria-label={tx('Priority')} className="border border-slate-200 text-xs px-2 h-fit" value={open.priority} onChange={async e => { await jreq(`/api/admin/support/tickets/${open.id}/priority`, 'POST', { priority: e.target.value }); openT(open.id); load(); }}>
+                <select aria-label={tx('Priority')} className="form-select text-xs h-9 w-auto" value={open.priority} onChange={async e => { await jreq(`/api/admin/support/tickets/${open.id}/priority`, 'POST', { priority: e.target.value }); openT(open.id); load(); }}>
                   {['urgent', 'high', 'normal', 'low'].map(p => <option key={p}>{p}</option>)}</select></div>
               <ul className="space-y-2 max-h-64 overflow-y-auto">{open.messages.map((m: any) => <li key={m.id} className={`text-xs p-2.5 border ${m.fromStaff ? 'bg-[color:var(--t-50)] border-[color:var(--t-200)]' : 'bg-slate-50 border-slate-200'}`}><p className="text-xs font-extrabold uppercase text-slate-500">{m.fromStaff ? tx('Staff') : tx('User')} · {when(m.ts)}</p>{m.body}</li>)}</ul>
               <div className="flex flex-wrap gap-2 items-center text-xs">
                 <label className="font-bold text-slate-600" htmlFor="macro-lang">{tx('Reply template')}</label>
-                <select id="macro-lang" aria-label={tx('Template language')} className="border border-slate-200 px-2 h-9" value={macroLang} onChange={e => setMacroLang(e.target.value as MacroLang)}>
+                <select id="macro-lang" aria-label={tx('Template language')} className="form-select text-xs h-9 w-auto" value={macroLang} onChange={e => setMacroLang(e.target.value as MacroLang)}>
                   {MACRO_LANGS.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}</select>
-                <select aria-label={tx('Reply template')} className="border border-slate-200 px-2 h-9 min-w-0 flex-1" value="" onChange={e => { const m = MACROS.find(x => x.id === e.target.value); if (m) setReply(fillMacro(m, macroLang, { name: open.requester, hours: hoursCfg })); }}>
+                <select aria-label={tx('Reply template')} className="form-select text-xs h-9 min-w-0 flex-1" value="" onChange={e => { const m = MACROS.find(x => x.id === e.target.value); if (m) setReply(fillMacro(m, macroLang, { name: open.requester, hours: hoursCfg })); }}>
                   <option value="">{tx('Insert a template…')}</option>
                   {MACROS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}</select>
               </div>

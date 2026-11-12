@@ -90,36 +90,36 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">{tx('Describe your symptoms (e.g. chest pressure, rash, migraine):')}</label>
+          <label className="form-label">{tx('Describe your symptoms (e.g. chest pressure, rash, migraine):')}</label>
           <textarea
             value={symptoms}
             onChange={(e) => setSymptoms(e.target.value)}
             placeholder={tx('Describe symptoms... (e.g. A persistent dry cough and light fever since yesterday)')}
             rows={2}
-            className="w-full text-xs border border-[color:var(--t-200)] p-3 bg-[color:var(--t-bg)] focus:bg-white outline-none focus:border-[color:var(--t-600)] font-medium text-[color:var(--ink)] placeholder-slate-400 transition-colors"
+            className="form-textarea text-xs"
             required
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">{tx('Age (Optional)')}</label>
+            <label className="form-label">{tx('Age (Optional)')}</label>
             <input
               type="number"
               value={age}
               onChange={(e) => setAge(e.target.value)}
               placeholder="e.g. 35"
-              className="w-full h-12 text-xs border border-[color:var(--t-200)] px-3.5 bg-[color:var(--t-bg)] focus:bg-white outline-none focus:border-[color:var(--t-600)] font-semibold text-[color:var(--ink)] transition-colors"
+              className="form-input text-xs"
               min={0}
               max={120}
             />
           </div>
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)] mb-1.5">{tx('Gender')}</label>
+            <label className="form-label">{tx('Gender')}</label>
             <select
               value={gender}
               onChange={(e) => setGender(e.target.value)}
-              className="w-full h-12 text-xs border border-[color:var(--t-200)] px-3 bg-[color:var(--t-bg)] focus:bg-white outline-none focus:border-[color:var(--t-600)] font-semibold text-[color:var(--ink)] cursor-pointer transition-colors"
+              className="form-select text-xs"
             >
               <option value="any">{tx('Any Gender')}</option>
               <option value="Male">{tx('Male')}</option>
@@ -148,7 +148,7 @@ export default function AISymptomMatcher({ onSelectSpecialty, onApplyTriage }: A
       </form>
 
       {error && (
-        <div className="mt-4 bg-red-50 border-2 border-red-100 text-red-700 p-3 rounded-xl text-xs flex items-start gap-2">
+        <div className="mt-4 bg-red-50 border-2 border-red-100 text-red-700 p-3 rounded-none text-xs flex items-start gap-2">
           <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
           <div className="font-semibold">{error}</div>
         </div>

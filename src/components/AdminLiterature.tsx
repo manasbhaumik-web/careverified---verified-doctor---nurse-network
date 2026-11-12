@@ -4,7 +4,7 @@ import { useTr } from '../locale';
 
 const jreq = (url: string, method = 'POST', body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
-const field = 'border border-slate-200 bg-white px-3 py-2 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
+const field = 'form-input text-xs';
 const lab = 'text-xs font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : '—');
 
@@ -333,7 +333,7 @@ export default function AdminLiterature({
               </div>
               <div>
                 <label className={lab} htmlFor="lit-years">{tx('Publication Window')}</label>
-                <select id="lit-years" className={field} value={years} onChange={e => setYears(Number(e.target.value))}>
+                <select id="lit-years" className="form-select text-xs" value={years} onChange={e => setYears(Number(e.target.value))}>
                   {[1, 3, 5, 10].map(y => <option key={y} value={y}>{y} year{y === 1 ? '' : 's'}</option>)}
                 </select>
               </div>

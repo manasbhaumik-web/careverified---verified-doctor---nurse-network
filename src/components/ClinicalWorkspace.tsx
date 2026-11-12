@@ -15,8 +15,10 @@ const SEV: Record<string, string> = {
   moderate: 'bg-slate-100 border-slate-300 text-slate-800',
 };
 const blankItem = () => ({ name: '', strength: '', form: 'tablet', dose: '', frequency: '', durationDays: 5, quantity: 10, instructions: '', npraReg: '' });
-const field = 'w-full border border-slate-200 bg-white px-2.5 py-1.5 text-xs focus:outline-none focus:border-[color:var(--t-600)]';
-const label = 'text-xs font-extrabold uppercase tracking-wider text-slate-500 block mb-1';
+const field = 'form-input text-xs';
+const selectField = 'form-select text-xs';
+const textareaField = 'form-textarea text-xs';
+const label = 'form-label';
 
 /** The doctor's clinical tools for one booking or consultation: record, notes, prescriptions, certificates, referrals, labs. */
 export default function ClinicalWorkspace({ kind, refId }: Props) {
@@ -356,8 +358,8 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
           <div className="space-y-2 max-w-md">
             <h4 className={label}>{tx('Referral')}</h4>
             <input className={field} placeholder={tx('Specialty (e.g. Cardiologist)')} value={ref.toSpecialty} onChange={e => setRef({ ...ref, toSpecialty: e.target.value })} maxLength={100} />
-            <textarea className={field} rows={3} placeholder={tx('Reason for referral')} value={ref.reason} onChange={e => setRef({ ...ref, reason: e.target.value })} maxLength={1000} />
-            <select className={field} value={ref.urgency} onChange={e => setRef({ ...ref, urgency: e.target.value })}><option value="routine">{tx('Routine')}</option><option value="soon">{tx('Soon')}</option><option value="urgent">{tx('Urgent')}</option></select>
+            <textarea className={textareaField} rows={3} placeholder={tx('Reason for referral')} value={ref.reason} onChange={e => setRef({ ...ref, reason: e.target.value })} maxLength={1000} />
+            <select className={selectField} value={ref.urgency} onChange={e => setRef({ ...ref, urgency: e.target.value })}><option value="routine">{tx('Routine')}</option><option value="soon">{tx('Soon')}</option><option value="urgent">{tx('Urgent')}</option></select>
             <button onClick={() => submit('/api/referrals', ref, () => setRef({ toSpecialty: '', reason: '', urgency: 'routine' }))} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">{tx('Issue referral')}</button>
             {ctx.referrals.length > 0 && <ul className="text-xs space-y-1 pt-2 border-t border-slate-200">{ctx.referrals.map((r: any) => <li key={r.id}>{r.toSpecialty} · {r.urgency}</li>)}</ul>}
           </div>

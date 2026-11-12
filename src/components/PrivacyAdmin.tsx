@@ -9,7 +9,7 @@ const BASIS_LABEL: Record<string, string> = {
   malaysia: 'In Malaysia (no transfer)', similar_law_tia: 'Destination has similar law + TIA', adequate_protection_tia: 'Adequate protection + TIA',
   consent: 'Explicit consent (s.129(3))', contract_necessity: 'Contract necessity (s.129(3))', other_129_3: 'Other s.129(3) exception',
 };
-const input = 'border border-slate-300 p-1.5 text-xs';
+const input = 'form-input text-xs min-h-[44px]';
 const h3 = 'text-xs font-black uppercase tracking-wide text-slate-700 mb-2';
 
 /** Admin tools behind the privacy notice: transfer register, erasure, retention and the breach register. */

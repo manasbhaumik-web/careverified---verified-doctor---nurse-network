@@ -299,7 +299,7 @@ const T: Record<Lang, {
 
 const SERVICE_ICON: Record<string, React.ComponentType<{ className?: string }>> = { interpreter: Languages, airportPickup: Car, halalFood: Utensils, prayerRoom: HeartHandshake };
 const CARD_ICONS = [FileText, Building2, BadgeCheck, ShieldCheck, Plane, Plane];
-const field = 'border border-slate-300 bg-white px-3 h-11 text-xs w-full focus:outline-none focus:border-[color:var(--t-600)]';
+const field = 'form-input text-xs';
 const HUB_CITIES = ['', 'Kuala Lumpur', 'Penang', 'Johor Bahru', 'Melaka'];
 
 export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {

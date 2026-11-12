@@ -5,7 +5,7 @@ import { formatDate } from '../locale';
 const jget = (url: string) => fetch(url).then(r => r.json());
 const jsend = (method: string, url: string, body?: unknown) =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
-const input = 'border border-slate-300 p-2 text-xs bg-white';
+const input = 'form-input text-xs min-h-[44px]';
 
 /** Patients who have paid for care can share their experience. Hidden for everyone else. */
 export function TestimonialForm() {

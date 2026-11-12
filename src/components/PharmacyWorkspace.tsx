@@ -928,8 +928,8 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
     if (d.status === 'success') { setCur(''); setNw(''); onSaved(); }
   };
 
-  const field = 'text-xs font-bold uppercase tracking-wide text-slate-700 block mb-1.5';
-  const inputCls = 'h-10 w-full border border-slate-300 rounded-none px-3 bg-white text-xs font-semibold text-slate-900 outline-none focus:border-[color:var(--t-600)] transition-colors';
+  const field = 'form-label';
+  const inputCls = 'form-input text-xs';
   return (
     <div className="grid gap-5 lg:grid-cols-2 items-start">
       <form onSubmit={save} className="app-card rounded-none border border-slate-200 p-6 space-y-5 min-w-0">
@@ -948,7 +948,7 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
         </div>
         <label className="block"><span className={field}>{tx('Operational Opening Hours')}</span><input value={hours} onChange={e => setHours(e.target.value)} maxLength={120} placeholder={tx('e.g. Mon–Sat 9am–10pm')} className={inputCls} /></label>
         <fieldset className="border border-slate-200 p-4 rounded-none bg-slate-50">
-          <legend className="text-2xs font-bold uppercase tracking-wider text-slate-700 px-1.5 bg-white border border-slate-200 rounded">{tx('Dispensing Services Available')}</legend>
+          <legend className="text-2xs font-bold uppercase tracking-wider text-slate-700 px-1.5 bg-white border border-slate-200 rounded-none">{tx('Dispensing Services Available')}</legend>
           <div className="flex flex-wrap gap-x-5 gap-y-2.5 pt-1">
             {SERVICES.map(s => (
               <label key={s} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer">
@@ -959,7 +959,7 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
           </div>
         </fieldset>
         <fieldset className="border border-slate-200 p-4 rounded-none bg-slate-50">
-          <legend className="text-2xs font-bold uppercase tracking-wider text-slate-700 px-1.5 bg-white border border-slate-200 rounded">{tx('Home delivery partners (Malaysia)')}</legend>
+          <legend className="text-2xs font-bold uppercase tracking-wider text-slate-700 px-1.5 bg-white border border-slate-200 rounded-none">{tx('Home delivery partners (Malaysia)')}</legend>
           <div className="flex flex-wrap gap-x-5 gap-y-2.5 pt-1">
             {([['pharmacy_courier', 'Own rider'], ['grab', 'Grab'], ['lalamove', 'Lalamove'], ['other_courier', 'Other courier']] as const).map(([id, label]) => (
               <label key={id} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer">

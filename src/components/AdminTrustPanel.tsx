@@ -43,7 +43,7 @@ export function ReviewActions({ request, onDone }: { request: any; onDone: () =>
     }
   };
 
-  const field = 'w-full border border-slate-300 rounded-none px-3.5 py-2.5 text-xs focus:outline-none focus:border-[color:var(--t-600)] font-semibold text-slate-800 bg-white';
+  const field = 'form-input text-xs';
   return (
     <div className="mt-6 border-t border-slate-200 pt-4 space-y-4">
       {history.length > 0 && (

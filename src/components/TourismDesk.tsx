@@ -12,7 +12,7 @@ const jsend = (method: string, url: string, body?: unknown) =>
 const STATUS_LABEL: Record<string, string> = { enquiry: 'Enquiry', quoted: 'Quoted', accepted: 'Accepted', in_treatment: 'In treatment', completed: 'Completed', closed: 'Closed' };
 const CATEGORIES: [string, string][] = [['procedure', 'Procedure'], ['doctor_fees', 'Doctor fees'], ['hospital_stay', 'Hospital stay'], ['tests', 'Tests'], ['medication', 'Medication'], ['follow_up', 'Follow-up'], ['interpreter', 'Interpreter'], ['transport', 'Transport'], ['accommodation', 'Accommodation'], ['other', 'Other']];
 const ITIN: [string, string][] = [['arrival', 'Arrival'], ['consultation', 'Consultation'], ['tests', 'Tests'], ['procedure', 'Procedure'], ['recovery', 'Recovery'], ['follow_up', 'Follow-up'], ['discharge', 'Discharge'], ['departure', 'Departure'], ['other', 'Other']];
-const input = 'border border-slate-300 p-1.5 text-xs bg-white';
+const input = 'form-input text-xs min-h-[44px]';
 const btn = 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold px-3 py-2 cursor-pointer';
 
 interface TourismDeskProps {

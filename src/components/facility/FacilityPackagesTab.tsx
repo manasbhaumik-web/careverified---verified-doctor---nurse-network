@@ -109,14 +109,14 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                       value={packageSearch}
                       onChange={e => setPackageSearch(e.target.value)}
                       placeholder={tx('Search packages by title or code…')}
-                      className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                      className="form-input text-xs pl-9 pr-3 h-10"
                     />
                   </div>
 
                   <select
                     value={packageCategoryFilter}
                     onChange={e => setPackageCategoryFilter(e.target.value)}
-                    className="p-1.5 text-xs border border-slate-200 bg-white"
+                    className="form-select text-xs h-10"
                   >
                     {['All', 'Health Screening', 'Cardiology', 'Orthopaedics', 'Maternity', 'Fertility', 'Oncology', 'Ophthalmology', 'Dental', 'Surgery', 'Aesthetics'].map(c => (
                       <option key={c} value={c}>{c === 'All' ? 'All Categories' : c}</option>
@@ -126,7 +126,7 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                   <select
                     value={packageStatusFilter}
                     onChange={e => setPackageStatusFilter(e.target.value as any)}
-                    className="p-1.5 text-xs border border-slate-200 bg-white"
+                    className="form-select text-xs h-10"
                   >
                     <option value="all">{tx('All Publishing Statuses')}</option>
                     <option value="published">{tx('Published (Live to Patients)')}</option>

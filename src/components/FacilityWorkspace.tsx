@@ -1277,7 +1277,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         )}
 
         {error && (
-          <div className="p-4 bg-rose-50 text-rose-800 text-xs font-bold border border-rose-200 border-l-4 border-l-rose-600 shadow-xs">
+          <div className="p-4 bg-rose-50 text-rose-800 text-xs font-bold border border-rose-300 border-t-2 border-t-rose-600 shadow-xs">
             {error}
           </div>
         )}

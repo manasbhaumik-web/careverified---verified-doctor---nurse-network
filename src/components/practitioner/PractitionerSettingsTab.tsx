@@ -217,7 +217,7 @@ export default function PractitionerSettingsTab({
                 placeholder={tx('e.g. Advanced Pediatric Life Support')}
                 value={newCert}
                 onChange={(e) => setNewCert(e.target.value)}
-                className="text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 flex-1 min-w-0 bg-white"
+                className="form-input text-xs flex-1 min-w-0"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -239,7 +239,7 @@ export default function PractitionerSettingsTab({
           {/* Professional Fee, City & Clinical Center */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-[color:var(--t-200)]">
             <div>
-              <label className="block text-xs font-black text-slate-700 mb-1.5">
+              <label className="form-label">
                 {isDoc ? tx('Standard Co-Pay Fee (RM)') : tx('Hourly Clinical Service Fee (RM)')}
               </label>
               <div className="relative">
@@ -248,7 +248,7 @@ export default function PractitionerSettingsTab({
                   type="number"
                   value={editFee}
                   onChange={(e) => setEditFee(Number(e.target.value))}
-                  className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2.5 pl-9 pr-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-700 bg-white"
+                  className="form-input text-xs pl-10 pr-3 font-bold"
                   placeholder="e.g. 150"
                   required
                 />
@@ -256,11 +256,11 @@ export default function PractitionerSettingsTab({
             </div>
 
             <div>
-              <label className="block text-xs font-black text-slate-700 mb-1.5">{tx('Registered Practice City')}</label>
+              <label className="form-label">{tx('Registered Practice City')}</label>
               <select
                 value={editCity}
                 onChange={(e) => setEditCity(e.target.value)}
-                className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-700 bg-white"
+                className="form-select text-xs font-bold"
               >
                 <option value="Kuala Lumpur">{tx('Kuala Lumpur')}</option>
                 <option value="Petaling Jaya">{tx('Petaling Jaya')}</option>
@@ -276,7 +276,7 @@ export default function PractitionerSettingsTab({
               type="text"
               value={editAddress}
               onChange={(e) => setEditAddress(e.target.value)}
-              className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 bg-white"
+              className="form-input text-xs font-semibold"
               placeholder={tx('e.g. Metropolitan Specialist Center, 8 Bukit Pantai')}
               required
             />
@@ -366,7 +366,7 @@ export default function PractitionerSettingsTab({
 
             {!isDoc && (
               <div className="pt-3 border-t border-[color:var(--t-200)]/60">
-                <label className="block text-xs font-black text-slate-700 mb-1.5">
+                <label className="form-label">
                   {tx('Clinical Nursing Duty Shift Coverage')}
                 </label>
                 <div className="flex flex-wrap gap-2 text-xs">

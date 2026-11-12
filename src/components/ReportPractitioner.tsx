@@ -33,15 +33,15 @@ export default function ReportPractitioner({ professionalId }: { professionalId:
     } finally { setBusy(false); }
   };
 
-  const field = 'w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[color:var(--t-600)]';
+  const field = 'form-input text-xs';
   return (
     <div>
       <button onClick={() => setOpen(o => !o)}
-        className="text-xs font-bold border border-slate-200 bg-white text-slate-700 hover:text-rose-700 rounded-xl px-4 py-2 flex items-center gap-1.5 shadow-sm cursor-pointer">
+        className="text-xs font-bold border border-slate-200 bg-white text-slate-700 hover:text-rose-700 rounded-none px-4 py-2 flex items-center gap-1.5 shadow-sm cursor-pointer">
         <Flag className="h-4 w-4" /> {tx('Report a concern')}
       </button>
       {open && (
-        <form onSubmit={submit} className="mt-3 bg-white border border-slate-200 rounded-xl p-4 space-y-3 max-w-md">
+        <form onSubmit={submit} className="mt-3 bg-white border border-slate-200 rounded-none p-4 space-y-3 max-w-md">
           <p className="text-xs text-slate-600">{tx('Reports go to the medical board, not to the practitioner. You can only report someone you have booked.')}</p>
           <select className={field} value={category} onChange={e => setCategory(e.target.value)} required>
             <option value="">{tx('Choose a category…')}</option>
@@ -50,7 +50,7 @@ export default function ReportPractitioner({ professionalId }: { professionalId:
           <textarea className={field} rows={4} value={description} onChange={e => setDescription(e.target.value)}
             placeholder={tx('What happened? (at least 20 characters)')} minLength={20} maxLength={2000} required />
           {msg && <p className={`text-xs font-bold ${msg.ok ? 'text-emerald-700' : 'text-rose-700'}`}>{msg.text}</p>}
-          <button disabled={busy} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:opacity-60 text-white text-xs font-extrabold px-4 py-2 rounded-xl cursor-pointer">
+          <button disabled={busy} className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:opacity-60 text-white text-xs font-extrabold px-4 py-2 rounded-none cursor-pointer">
             {busy ? tx('Sending…') : tx('Submit report')}
           </button>
         </form>

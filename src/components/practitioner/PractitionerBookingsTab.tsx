@@ -225,11 +225,11 @@ export default function PractitionerBookingsTab({
 
               {/* Procedure Performed */}
               <div className="space-y-1">
-                <label className="block text-xs font-bold text-slate-700">{tx('Clinical Nursing Procedure Performed')}</label>
+                <label className="form-label">{tx('Clinical Nursing Procedure Performed')}</label>
                 <select
                   value={nursingProcedure}
                   onChange={(e) => setNursingProcedure(e.target.value)}
-                  className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-emerald-600 font-semibold text-slate-800 bg-white"
+                  className="form-select text-xs font-semibold"
                 >
                   <option value="Sterile Wound Dressing (Stage II / Post-Op)">{tx('Sterile Wound Dressing (Stage II / Post-Op)')}</option>
                   <option value="Intramuscular / Subcutaneous Medication Administration">{tx('Intramuscular / Subcutaneous Medication Administration')}</option>
@@ -292,11 +292,12 @@ export default function PractitionerBookingsTab({
 
               {/* Nursing Observations */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">{tx('Nursing Observations & Recovery Notes')}</label>
+                <label className="form-label">{tx('Nursing Observations & Recovery Notes')}</label>
                 <textarea
                   rows={3}
                   value={nursingNotes}
                   onChange={(e) => setNursingNotes(e.target.value)}
+                  className="form-textarea text-xs"
                   placeholder={tx('Record patient comfort, wound margin condition, pain score, or medical instructions given to caregiver...')}
                   className="w-full text-xs border border-[color:var(--t-200)] rounded-none p-3 outline-none focus:ring-1 focus:ring-emerald-600 font-semibold text-slate-800 bg-white"
                   required
