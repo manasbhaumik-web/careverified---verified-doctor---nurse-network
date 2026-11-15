@@ -40,11 +40,10 @@ Two repository bugs found on the way and fixed, because they stopped every test 
 ## Known gaps and TODOs
 
 - **No real integrations.** Registry checks and e-KYC are mocks (`TODO: real integration`). The MMC provider is a stub, there is no public nurse register, and e-KYC would need a paid provider.
-- **Facility staff accounts get a temporary password shown once.** The account is flagged "must change password", but only the pharmacy workspace enforces that flag today; the facility workspace does not yet prompt for a change. There is no invitation email yet.
-- **Facility staff roles are enforced on the new routes and on billing settings only.** The older facility routes (jobs, applicants, cases, packages) allow any facility account for that facility.
+- **Facility staff accounts get a temporary password shown once.** The facility workspace asks them to change it, but this is a prompt, not a block: the API does not refuse requests until the password is changed. There is no invitation email yet.
+- **Facility staff roles:** profile, photos, accreditation claims, staff and billing settings need a facility admin. Jobs, applicants, cases, packages and promotions are open to any account of the facility (staff included) by design; decide whether packages and promotions should be admin only.
 - **Facility self-service does not yet cover facility licence checking:** the board records the licence through the existing admin route; a facility with an unchecked licence cannot advertise private-sector jobs.
 - **Sensitive personal data at rest.** Uploaded files and bank numbers are encrypted. Other profile fields in the database are not; use disk or database encryption in production. ID numbers are not stored (last four characters only).
-- **Practitioners and caregivers cannot yet see their own badge or QR code in the verification screen.** `GET /api/my-verification` returns the badge token; the screen does not show it.
 - **Data store.** The Vercel deployment still uses a temporary database folder; use a persistent database before live use (see [PAYOUTS.md](PAYOUTS.md) and the README go-live notes).
 - **Full-suite run time.** Each test file starts its own server; `npm test` runs three at a time to avoid start-up timeouts. On Windows, folders with `&` in the name break `npm run`; see the README.
 - **Legal copy.** New screens use plain placeholder wording that needs legal review before launch.

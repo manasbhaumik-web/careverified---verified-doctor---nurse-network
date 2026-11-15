@@ -35,6 +35,10 @@ export default function FacilityPublicProfile() {
   }, []);
   useEffect(() => { load().catch(() => setMsg({ ok: false, text: tx('Could not load.') })); }, [load]);
 
+  const [mustChange, setMustChange] = useState(false);
+  const [pw, setPw] = useState({ currentPassword: '', newPassword: '' });
+  useEffect(() => { send('/api/facility/account', 'GET').then(r => r.status === 'success' && setMustChange(!!r.data.mustChangePassword)).catch(() => {}); }, []);
+
   if (!p) return <p role="status" className="text-xs text-slate-600 p-4">{tx('Loading…')}</p>;
   const admin = p.staffRole === 'admin';
   const done = (r: any, okText: string) => { setMsg({ ok: r.status === 'success', text: r.status === 'success' ? okText : r.message || tx('Could not save.') }); if (r.status === 'success') load(); return r.status === 'success'; };
@@ -57,6 +61,19 @@ export default function FacilityPublicProfile() {
   return (
     <section aria-labelledby="fp-h" className="space-y-4">
       <h2 id="fp-h" className="text-sm font-extrabold">{tx('Public profile and staff')}</h2>
+      {mustChange && (
+        <form className="app-card grid sm:grid-cols-3 gap-2 items-end border-amber-300" onSubmit={async e => {
+          e.preventDefault();
+          const r = await send('/api/auth/change-password', 'POST', pw);
+          if (r.status === 'success') { setMustChange(false); setPw({ currentPassword: '', newPassword: '' }); setMsg({ ok: true, text: tx('Password changed.') }); }
+          else setMsg({ ok: false, text: r.message || tx('Could not save.') });
+        }}>
+          <p className="sm:col-span-3 text-xs font-bold text-amber-950">{tx('You are using a temporary password. Choose your own now.')}</p>
+          <div><label htmlFor="pw-c" className="form-label">{tx('Temporary password')}</label><input id="pw-c" type="password" autoComplete="current-password" className="form-input" value={pw.currentPassword} onChange={e => setPw({ ...pw, currentPassword: e.target.value })} required /></div>
+          <div><label htmlFor="pw-n" className="form-label">{tx('New password')}</label><input id="pw-n" type="password" autoComplete="new-password" className="form-input" value={pw.newPassword} onChange={e => setPw({ ...pw, newPassword: e.target.value })} required /></div>
+          <button type="submit" className="btn btn-sm btn-primary">{tx('Change password')}</button>
+        </form>
+      )}
       {banner && <p role="status" className={`text-xs font-bold p-3 border ${banner.cls}`}>{banner.text}</p>}
       {!admin && <p className="text-xs text-slate-700 bg-white border border-[color:var(--t-200)] p-3">{tx('Only a facility admin can change the profile or the staff. You can read them here.')}</p>}
       {msg && <p role={msg.ok ? 'status' : 'alert'} className={`text-xs font-bold p-3 border ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-200' : 'text-rose-900 bg-rose-50 border-rose-200'}`}>{msg.text}</p>}

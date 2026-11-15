@@ -143,6 +143,12 @@ export function registerFacilityProfiles(app: Application) {
     res.json({ status: "success" });
   });
 
+  // Staff accounts are created with a temporary password: the workspace asks the person to change it.
+  app.get("/api/facility/account", requireRole("facility"), (req, res) => {
+    const u = row("SELECT must_change_password AS m FROM users WHERE id = ?", req.user!.id);
+    res.json({ status: "success", data: { mustChangePassword: !!u?.m } });
+  });
+
   // ---------- own profile ----------
   app.get("/api/facility/profile", requireRole("facility", "admin"), (req, res) => {
     const id = requireFacilityAccess(req, res, false);

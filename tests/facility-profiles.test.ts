@@ -116,6 +116,21 @@ test('staff roles: admin manages staff and profile, staff cannot, and a facility
   assert.notEqual((await srv.client().login('ben@example.com', temp, 'facility')).status, 200, 'removed staff cannot sign in');
 });
 
+test('staff start with a temporary password and are asked to change it', async () => {
+  const owner = srv.client();
+  await owner.login('lotus@example.com', 'Passw0rd!ok', 'facility');
+  assert.equal((await owner.call('GET', '/api/facility/account')).data.data.mustChangePassword, false, 'the registrant chose their own');
+  const added = await owner.call('POST', '/api/facility/staff', { name: 'Cara Lim', email: 'cara@example.com', staffRole: 'staff' });
+  const temp = added.data.data.temporaryPassword as string;
+  const staff = srv.client();
+  assert.equal((await staff.login('cara@example.com', temp, 'facility')).status, 200);
+  assert.equal((await staff.call('GET', '/api/facility/account')).data.data.mustChangePassword, true);
+  assert.equal((await staff.call('POST', '/api/auth/change-password', { currentPassword: temp, newPassword: 'weak' })).status, 400);
+  assert.equal((await staff.call('POST', '/api/auth/change-password', { currentPassword: temp, newPassword: 'Passw0rd!new1' })).status, 200);
+  assert.equal((await staff.call('GET', '/api/facility/account')).data.data.mustChangePassword, false);
+  assert.equal((await srv.client().call('GET', '/api/facility/account')).status, 401);
+});
+
 test('one facility cannot touch another, and other roles cannot use the facility routes', async () => {
   const other = srv.client();
   assert.equal((await other.call('POST', '/api/auth/register-facility', reg({ facilityName: 'Other Clinic', email: 'other@example.com', licenceNo: 'PHFSA-TEST-002' }))).status, 201);

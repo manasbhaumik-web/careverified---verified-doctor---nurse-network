@@ -3863,5 +3863,8 @@
  "Reason (needed to reject)": "Sebab (diperlukan untuk menolak)",
  "Expired: Your Profile is Hidden": "Tamat Tempoh: Profil Anda Disembunyikan",
  "QR code of your public verification page": "Kod QR halaman pengesahan awam anda",
- "Public verification link": "Pautan pengesahan awam"
+ "Public verification link": "Pautan pengesahan awam",
+ "Password changed.": "Kata laluan ditukar.",
+ "You are using a temporary password. Choose your own now.": "Anda menggunakan kata laluan sementara. Pilih kata laluan anda sendiri sekarang.",
+ "Temporary password": "Kata laluan sementara"
 }
