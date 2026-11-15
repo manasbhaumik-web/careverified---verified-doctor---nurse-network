@@ -41,6 +41,7 @@ export function deriveState(input: StateInput, today: Date = new Date()): Creden
   if (requestStatus === INFO_REQUESTED_STATUS) return "info_requested";
   if (status === VerificationStatus.SUSPENDED) return "suspended";
   if (status === VerificationStatus.REJECTED) return "rejected";
+  if (status === VerificationStatus.EXPIRED) return "expired";
   if (status === VerificationStatus.VERIFIED) {
     if (!licenseExpiry) return "expired"; // a verified profile with no expiry date cannot be trusted as current
     if (licenseExpiry <= isoDay(today)) return "expired";
@@ -48,6 +49,34 @@ export function deriveState(input: StateInput, today: Date = new Date()): Creden
     return "verified";
   }
   return "pending";
+}
+
+export interface SweepChange { id: string; name?: string; from: CredentialState; to: CredentialState }
+
+/**
+ * Daily expiry sweep over the profile list (mutates the profiles it changes; the caller persists and records audit entries).
+ *  - a verified profile whose licence expires within EXPIRING_DAYS becomes `expiring` (still verified and visible);
+ *  - a verified or expiring profile whose licence date has passed becomes `expired` (status Expired, hidden from the directory);
+ *  - an `expiring` profile whose expiry moved out of the window (renewed) goes back to `verified`.
+ * Profiles with no expiry date are left alone: that is flagged for the admin, not auto-expired.
+ */
+export function sweepExpiry(profiles: any[], now: Date = new Date()): SweepChange[] {
+  const changes: SweepChange[] = [];
+  for (const p of profiles) {
+    if (p.verificationStatus !== VerificationStatus.VERIFIED || !p.licenseExpiry) continue;
+    const from: CredentialState = p.credentialState ?? "verified";
+    const to = deriveState({ status: p.verificationStatus, licenseExpiry: p.licenseExpiry }, now);
+    if (to === from) continue;
+    if (to === "expired") {
+      p.verificationStatus = VerificationStatus.EXPIRED;
+      p.credentialState = "expired";
+      p.expiredAt = now.toISOString();
+    } else if (to === "expiring" || (to === "verified" && from === "expiring")) {
+      p.credentialState = to;
+    } else continue;
+    changes.push({ id: p.id, name: p.name, from, to });
+  }
+  return changes;
 }
 
 /** What the public may be told. Suspended, expired and expiring are shown; pending, rejected and unknown are not distinguishable from "not found". */

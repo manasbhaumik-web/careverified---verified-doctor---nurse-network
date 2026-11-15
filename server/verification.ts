@@ -6,6 +6,8 @@ import { audit } from "./audit";
 import { requireAuth, requireRole } from "./auth";
 import { VerificationStatus } from "../src/types";
 import { findRegistry, inferRegistryId, scopeFor } from "./registries";
+import { sweepExpiry } from "./credentialState";
+import { adapterFor } from "./registryProviders";
 
 /**
  * Practitioner trust pipeline: review decisions with history, licence expiry and
@@ -267,6 +269,44 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
   const latestRequestFor = (profileId: string) =>
     [...ctx.requests()].reverse().find(r => r.userId === profileId);
 
+  /** Daily expiry sweep: flags credentials that are about to lapse and expires the ones that have. Every change is audited and the practitioner is told. */
+  const runExpirySweep = (now: Date = new Date()) => {
+    const changes = sweepExpiry(ctx.allProfessionals(), now);
+    if (!changes.length) return changes;
+    ctx.persist();
+    for (const c of changes) {
+      logEvent(null, c.id, null, `credential_${c.to}`, `Automatic: ${c.from} to ${c.to}`, true);
+      audit(null, `verification.auto_${c.to}`, { actor: { id: "system", role: "system" }, target: ["professional", c.id], details: { from: c.from, to: c.to } });
+      const target = accountOfProfile(c.id);
+      if (c.to === "expiring") notify(target, "Your licence is expiring soon", "Submit your renewed licence from Verification so your profile stays visible.");
+      if (c.to === "expired") notify(target, "Your licence has expired", "Your profile is hidden until you submit a renewal and the board approves it.");
+    }
+    return changes;
+  };
+  setTimeout(() => { try { runExpirySweep(); } catch (e) { console.error("expiry sweep", e); } }, 5_000).unref();
+  setInterval(() => { try { runExpirySweep(); } catch (e) { console.error("expiry sweep", e); } }, 24 * 3600_000).unref();
+  // Registry check adapter with manual fallback: returns the register's answer when an adapter can be used, else tells the reviewer to check by hand.
+  app.get("/api/admin/registry-check/:registryId/:registrationNumber", requireRole("admin"), async (req, res) => {
+    const registry = findRegistry(req.params.registryId);
+    if (!registry) return fail(res, 404, "Unknown registry.");
+    const adapter = adapterFor(registry.id);
+    const reason = adapter?.unavailableReason() ?? "No automatic adapter for this register.";
+    if (!adapter || reason) return res.json({ status: "success", data: { mode: "manual", reason, lookup: registry.lookup } });
+    try {
+      const result = await adapter.lookup(str(req.params.registrationNumber, 50));
+      audit(req, "verification.registry_check", { target: ["registry", registry.id], details: { mode: adapter.mode, found: result.found } });
+      res.json({ status: "success", data: { mode: adapter.mode, result } });
+    } catch (e: any) {
+      res.json({ status: "success", data: { mode: "manual", reason: String(e?.message || e), lookup: registry.lookup } });
+    }
+  });
+
+  app.post("/api/admin/verification/run-expiry-sweep", requireRole("admin"), (req, res) => {
+    const changes = runExpirySweep();
+    audit(req, "verification.expiry_sweep_manual", { details: { changed: changes.length } });
+    res.json({ status: "success", data: { changed: changes.length, changes } });
+  });
+
   // ---------- Practitioner: own verification status ----------
   app.get("/api/my-verification", requireRole("practitioner"), (req, res) => {
     const profileId = req.user!.profileId;
@@ -323,8 +363,8 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
     const profileId = req.user!.profileId;
     const prof = profileId ? findProf(profileId) : null;
     if (!prof) return fail(res, 404, "No professional profile found.");
-    if (prof.verificationStatus !== VerificationStatus.VERIFIED && prof.verificationStatus !== VerificationStatus.SUSPENDED) {
-      return fail(res, 409, "Renewal applies to verified or suspended profiles only.");
+    if (prof.verificationStatus !== VerificationStatus.VERIFIED && prof.verificationStatus !== VerificationStatus.SUSPENDED && prof.verificationStatus !== VerificationStatus.EXPIRED) {
+      return fail(res, 409, "Renewal applies to verified, expired or suspended profiles only.");
     }
     const open = ctx.requests().find(r => r.userId === prof.id && (r.status === VerificationStatus.PENDING || r.status === INFO_REQUESTED));
     if (open) return fail(res, 409, "You already have a review in progress.");
@@ -461,6 +501,8 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
       request.reviewedBy = actor.id;
       request.registryCheck = { reference: registryReference, checkedAt: now.toISOString(), checkedBy: actor.id };
       prof.verificationStatus = VerificationStatus.VERIFIED;
+      prof.credentialState = "verified";
+      delete prof.expiredAt;
       prof.verifiedAt = now.toISOString();
       prof.registryId = findRegistry(prof.registryId)?.id ?? inferRegistryId(prof.medicalCouncil ?? prof.nursingCouncil);
       prof.verificationScope = scopeFor(prof.registryId);
