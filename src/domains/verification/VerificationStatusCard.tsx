@@ -26,9 +26,10 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
   const verified = status.startsWith('Verified');
   const suspended = status === 'Suspended';
   const rejected = status === 'Rejected';
+  const expired = status === 'Expired';
   const expiryDays = daysUntil(info.licenseExpiry);
   const dueSoon = verified && ((expiryDays !== null && expiryDays <= 30) || (daysUntil(info.verifiedUntil) ?? 999) <= 30);
-  const canRenew = (suspended || dueSoon) && info.requestStatus !== 'Pending' && !infoRequested;
+  const canRenew = (suspended || expired || dueSoon) && info.requestStatus !== 'Pending' && !infoRequested;
 
   const upload = async (requestId: string) => {
     if (!file) return true;
@@ -103,6 +104,7 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
               <h3 className="text-base font-black text-[color:var(--ink)] uppercase tracking-wide leading-tight">
                 {verified ? tx('Verified: Your Profile is Public')
                   : suspended ? tx('Suspended: Your Profile is Hidden')
+                  : expired ? tx('Expired: Your Profile is Hidden')
                   : rejected ? tx('Application Rejected')
                   : infoRequested ? tx('The Board Needs More Information')
                   : tx('Pending: Under Review by the Medical Board')}
@@ -116,6 +118,12 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
               {verified ? ` · ${tx('Re-verification due {date}', { date: fmt(info.verifiedUntil) })}` : ''}
               {dueSoon ? ` · ${tx('Renewal needed soon')}` : ''}
             </p>
+            {info.badge && (verified || expired || suspended) && (
+              <div className="flex items-center gap-3 pt-2">
+                <img src={`/api/public/credentials/${info.badge}/qr.svg`} alt={tx('QR code of your public verification page')} width={64} height={64} className="border border-[color:var(--t-200)]" />
+                <a href={`/verify?badge=${encodeURIComponent(info.badge)}`} className="text-xs font-bold underline text-[color:var(--t-700)]">{tx('Public verification link')}</a>
+              </div>
+            )}
             {suspended && info.suspensionReason && (
               <p className="text-xs font-bold text-rose-800 bg-rose-50 border border-rose-200 px-3 py-1.5 mt-1.5">
                 Reason: {info.suspensionReason}
