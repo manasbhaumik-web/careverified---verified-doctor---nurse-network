@@ -95,7 +95,7 @@ app.use("/api/auth/login", rateLimit({ windowMs: 15 * 60_000, limit: 30, standar
   message: { status: "error", message: "Too many attempts. Please wait and try again." } }));
 app.use("/api/auth/register-practitioner", rateLimit({ windowMs: 60 * 60_000, limit: 20, standardHeaders: true, legacyHeaders: false }));
 app.use("/api/register-patient", rateLimit({ windowMs: 60 * 60_000, limit: 20, standardHeaders: true, legacyHeaders: false }));
-app.use("/api/", rateLimit({ windowMs: 60_000, limit: 300, standardHeaders: true, legacyHeaders: false }));
+app.use("/api/", rateLimit({ windowMs: 60_000, limit: Number(process.env.API_RATE_LIMIT) || 300, standardHeaders: true, legacyHeaders: false }));
 
 app.use(loadSession);
 
