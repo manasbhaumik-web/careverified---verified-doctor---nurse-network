@@ -37,7 +37,8 @@ import { registerPayouts } from "./server/payouts";
 import { registerMail, email as sendMail } from "./server/mail";
 import { registerRecovery } from "./server/accountRecovery";
 import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
-import { registerFacilityProfiles } from "./server/facilityProfiles";
+import { registerFacilityProfiles, migrateFacilitySchema } from "./server/facilityProfiles";
+import { seedPhase1Demo } from "./server/phase1Seed";
 import { CAREGIVER_ROLE, MIN_REFERENCES, cleanReferences, ekycAdapter, type CaregiverChecks } from "./server/caregiverTier";
 
 // Load environment variables
@@ -728,6 +729,10 @@ function ensureDemoData() {
 }
 
 if (demoEnabled()) ensureDemoData();
+if (demoEnabled()) {
+  migrateFacilitySchema(); // the Phase 1 columns must exist before the demo facilities are written
+  seedPhase1Demo({ doctors, nurses, jobs, verificationRequests });
+}
 
 // Seed data added after a database was created: add what is missing, and rename the original demo registration numbers
 // (which looked like real MMC / Nursing Board numbers) so a demo profile can never be mistaken for a real practitioner.
