@@ -8,6 +8,7 @@ import { VerificationStatus } from "../src/types";
 import { findRegistry, inferRegistryId, scopeFor } from "./registries";
 import { sweepExpiry } from "./credentialState";
 import { adapterFor } from "./registryProviders";
+import { registerPublicLookup, presentCredential, badgeTokenFor } from "./publicLookup";
 
 /**
  * Practitioner trust pipeline: review decisions with history, licence expiry and
@@ -269,6 +270,8 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
   const latestRequestFor = (profileId: string) =>
     [...ctx.requests()].reverse().find(r => r.userId === profileId);
 
+  registerPublicLookup(app, ctx);
+
   /** Daily expiry sweep: flags credentials that are about to lapse and expires the ones that have. Every change is audited and the practitioner is told. */
   const runExpirySweep = (now: Date = new Date()) => {
     const changes = sweepExpiry(ctx.allProfessionals(), now);
@@ -323,6 +326,7 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
       status: "success",
       data: {
         profileId,
+        badge: badgeTokenFor(profileId),
         verificationStatus: prof?.verificationStatus,
         requestId: request?.id,
         requestStatus: request?.status,
@@ -787,16 +791,19 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
   // ---------- Public licence lookup (minimal, verified-only) ----------
   app.get("/api/verify-license/:licenseNumber", (req, res) => {
     const lic = str(req.params.licenseNumber, 50).toLowerCase();
-    const p = ctx.allProfessionals().find(x => x.licenseNumber.toLowerCase() === lic);
-    if (!p || p.verificationStatus !== VerificationStatus.VERIFIED) {
-      // Same answer for unknown, pending, rejected and suspended so status is not leaked.
+    const p = ctx.allProfessionals().find(x => String(x.licenseNumber ?? "").toLowerCase() === lic);
+    const c = p ? presentCredential(p) : null;
+    if (!p || !c) {
+      // Same answer for unknown, pending and rejected so status is not leaked.
       return res.json({ status: "success", data: { verified: false } });
     }
     res.json({
       status: "success",
       data: {
-        verified: true, name: p.name, verificationScope: p.verificationScope ?? scopeFor(p.registryId ?? inferRegistryId(p.medicalCouncil ?? p.nursingCouncil)), registrationType: p.registrationType ?? "full", registryId: p.registryId ?? null, role: p.role, specialization: p.specialization,
-        council: p.medicalCouncil ?? p.nursingCouncil, verifiedUntil: p.verifiedUntil ?? null,
+        // `verified` stays true only while the registration is current (verified or expiring); `state` tells expired and suspended apart.
+        verified: c.status === "verified" || c.status === "expiring", state: c.status,
+        name: p.name, verificationScope: p.verificationScope ?? scopeFor(p.registryId ?? inferRegistryId(p.medicalCouncil ?? p.nursingCouncil)), registrationType: p.registrationType ?? "full", registryId: p.registryId ?? null, role: p.role, specialization: p.specialization,
+        council: p.medicalCouncil ?? p.nursingCouncil, verifiedUntil: c.validUntil, facility: c.facility, badge: c.badge,
       },
     });
   });

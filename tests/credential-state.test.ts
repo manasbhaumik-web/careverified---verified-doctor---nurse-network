@@ -17,7 +17,7 @@ test('deriveState: stored status and expiry give the lifecycle state', () => {
   assert.equal(deriveState({ status: v, licenseExpiry: '2026-12-17' }, today), 'verified');
   assert.equal(deriveState({ status: v, licenseExpiry: '2026-11-16' }, today), 'expired');
   assert.equal(deriveState({ status: v, licenseExpiry: '2025-01-01' }, today), 'expired');
-  assert.equal(deriveState({ status: v }, today), 'expired', 'verified with no expiry date is not current');
+  assert.equal(deriveState({ status: v }, today), 'verified', 'legacy verified profile with no expiry date stays verified (flagged for the admin)');
   assert.equal(deriveState({ status: VerificationStatus.PENDING, requestStatus: 'Info Requested' }, today), 'info_requested');
 });
 

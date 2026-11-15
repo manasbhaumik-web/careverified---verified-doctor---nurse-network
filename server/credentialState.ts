@@ -43,7 +43,8 @@ export function deriveState(input: StateInput, today: Date = new Date()): Creden
   if (status === VerificationStatus.REJECTED) return "rejected";
   if (status === VerificationStatus.EXPIRED) return "expired";
   if (status === VerificationStatus.VERIFIED) {
-    if (!licenseExpiry) return "expired"; // a verified profile with no expiry date cannot be trusted as current
+    // Approval requires a future expiry date, so a verified profile without one is legacy data: keep it verified (the admin overview flags it).
+    if (!licenseExpiry) return "verified";
     if (licenseExpiry <= isoDay(today)) return "expired";
     if (licenseExpiry <= isoDay(new Date(today.getTime() + EXPIRING_DAYS * dayMs))) return "expiring";
     return "verified";
