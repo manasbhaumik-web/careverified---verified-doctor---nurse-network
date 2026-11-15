@@ -42,3 +42,32 @@ npm run seed:demo
 ```
 
 It prints the sign-in details, is safe to run repeatedly, uses test-mode payments only, and refuses to run against anything but a local server.
+
+## Phase 1: trust layer and supply marketplace
+
+What it covers is in [docs/phase-1.md](docs/phase-1.md): the public credential lookup (name, registration number, QR badge), the verification lifecycle with a daily expiry job, the caregiver tier, facility registration and approval, facility staff roles, jobs, locum roles and open shifts, access rules for every role, and English and Bahasa Malaysia text.
+
+**Environment variables** (all in [.env.example](.env.example); set the first three on a real deployment):
+
+| Variable | What it does |
+| --- | --- |
+| `FILE_ENCRYPTION_KEY` | 64 hex characters. Encrypts uploaded documents, patient files and facility photos at rest. Production refuses uploads without it. |
+| `PAYOUT_ENCRYPTION_KEY` | Same format. Encrypts payout bank account numbers. |
+| `SESSION_SECRET` | Signs session tokens. |
+| `BADGE_SECRET` | Signs the QR and badge links of the public lookup. If unset, a random one is kept in the database. |
+| `MEDCRED_WEBHOOK_SECRET` | Signs webhooks sent to hospital systems. Without it no webhook is sent. |
+| `REGISTRY_ADAPTER` | `mock` uses a fake regulator register in development. Unset means manual review only. |
+| `API_RATE_LIMIT` | API calls per minute per IP (default 300). |
+
+**Seed data.** With `NODE_ENV` not set to `production` (demo mode), every start adds the Phase 1 demo data if it is missing: five facilities (one pending approval), 26 invented practitioners and caregivers across every verification state, and jobs, locum roles and open shifts. It is all marked DEMO. `npm run seed:demo` adds the demo accounts and sample records on top.
+
+**Run, test, check:**
+
+```
+npm run dev        # http://localhost:3000
+npm test           # node:test suites in tests/ (each starts its own server on a free port with a throwaway database)
+npm run lint       # type-check (tsc --noEmit; needs about 6 GB of memory: node --max-old-space-size=6144)
+npm run build
+```
+
+On Windows, `npm run` scripts fail when the project folder name contains `&`. Run the same commands with node directly, for example `node node_modules/tsx/dist/cli.mjs --test tests/*.test.ts`.

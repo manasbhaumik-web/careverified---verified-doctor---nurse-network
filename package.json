@@ -15,7 +15,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "test": "tsx --test \"tests/*.test.ts\"",
+    "test": "tsx --test --test-concurrency=3 \"tests/*.test.ts\"",
     "build:vercel": "vite build && esbuild server.ts --bundle --platform=node --format=esm --packages=external --outfile=api/index.mjs"
   },
   "dependencies": {
