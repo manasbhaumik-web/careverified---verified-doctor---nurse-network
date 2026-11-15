@@ -62,7 +62,7 @@ test('expiry sweep: flags expiring, expires lapsed, restores renewed, skips no-e
   const get = (id: string) => list.find(p => p.id === id)!;
   assert.equal(get('soon').verificationStatus, VerificationStatus.VERIFIED, 'expiring stays verified and visible');
   assert.equal(get('lapsed').verificationStatus, VerificationStatus.EXPIRED, 'expired is no longer verified');
-  assert.ok(get('lapsed').expiredAt);
+  assert.ok((get('lapsed') as any).expiredAt);
   assert.equal(get('noexpiry').verificationStatus, VerificationStatus.VERIFIED, 'no expiry date: flagged, not auto-expired');
   assert.equal(get('pending').verificationStatus, VerificationStatus.PENDING);
   assert.equal(get('suspended').verificationStatus, VerificationStatus.SUSPENDED);

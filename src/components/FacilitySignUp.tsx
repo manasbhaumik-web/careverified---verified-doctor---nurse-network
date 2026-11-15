@@ -23,7 +23,7 @@ export default function FacilitySignUp() {
   };
 
   const field = (k: keyof typeof f, label: string, type = 'text', required = true) => (
-    <div><label htmlFor={`fs-${k}`} className="form-label">{tx(label)}{required ? ' *' : ''}</label><input id={`fs-${k}`} type={type} className="form-input" required={required} value={f[k] as string} onChange={e => set(k, e.target.value)} /></div>
+    <div><label htmlFor={`fs-${String(k)}`} className="form-label">{tx(label)}{required ? ' *' : ''}</label><input id={`fs-${String(k)}`} type={type} className="form-input" required={required} value={f[k] as string} onChange={e => set(k, e.target.value)} /></div>
   );
 
   return (

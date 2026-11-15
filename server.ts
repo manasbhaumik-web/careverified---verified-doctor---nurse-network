@@ -339,8 +339,8 @@ function ensureDemoData() {
     }
   }
   for (const r of reviews) {
-    if (r.professionalId === docProfile.id && r.professionalName === "Dr Demo Physician") {
-      r.professionalName = "Dr. Arjun Menon";
+    if (r.professionalId === docProfile.id && (r as any).professionalName === "Dr Demo Physician") {
+      (r as any).professionalName = "Dr. Arjun Menon";
     }
   }
 
@@ -567,12 +567,12 @@ function ensureDemoData() {
       role: "nurse",
       name: nurseProfile?.name || "Maya Lim (RN)",
       profileId: nurseProfile?.id || null,
-      avatarUrl: nurseProfile?.avatarUrl || "/assets/nurse_female_malay.jpg",
+      avatarUrl: (nurseProfile as any)?.avatarUrl || "/assets/nurse_female_malay.jpg",
     });
   } else if (nurseProfile) {
     db.prepare("UPDATE users SET profile_id = ?, avatar_url = ? WHERE id = ?").run(
       nurseProfile.id,
-      nurseProfile.avatarUrl || "/assets/nurse_female_malay.jpg",
+      (nurseProfile as any).avatarUrl || "/assets/nurse_female_malay.jpg",
       demoNurseUser.id
     );
   }
@@ -589,8 +589,8 @@ function ensureDemoData() {
         patientEmail: "demo.patient@careverified.test",
         date: "2026-11-15",
         timeSlot: "09:00 AM",
-        mode: ConsultationMode.HOME_CARE,
-        fee: nurseProfile.hourlyRate || 85,
+        mode: ConsultationMode.HOME_VISIT,
+        fee: (nurseProfile as any).hourlyRate || 85,
         paymentStatus: "Paid",
         status: "Upcoming",
         symptoms: "Post-operative wound dressing change & morning vitals monitoring at Bangsar residence.",
@@ -607,8 +607,8 @@ function ensureDemoData() {
         patientEmail: "tan.wm@example.com",
         date: "2026-11-15",
         timeSlot: "02:30 PM",
-        mode: ConsultationMode.HOME_CARE,
-        fee: nurseProfile.hourlyRate || 85,
+        mode: ConsultationMode.HOME_VISIT,
+        fee: (nurseProfile as any).hourlyRate || 85,
         paymentStatus: "Paid",
         status: "Upcoming",
         symptoms: "Elderly mobility assistance, blood pressure check, and evening medication reconciliation.",
