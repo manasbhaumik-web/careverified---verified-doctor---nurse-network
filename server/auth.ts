@@ -192,7 +192,7 @@ export function attemptLogin(req: Request, email: string, password: string, role
   const ok = verifyPassword(password, row.password_hash);
   // A pharmacy login only works while the pharmacy is active and has been verified by the board.
   const pharmacyOff = row.role === "pharmacy" && !db.prepare("SELECT 1 AS x FROM pharmacies WHERE id = ? AND active = 1 AND verified_at IS NOT NULL").get(row.profile_id);
-  const facilityOff = row.role === "facility" && !db.prepare("SELECT 1 AS x FROM tourism_facilities WHERE id = ? AND active = 1").get(row.facility_id || row.profile_id);
+  const facilityOff = row.role === "facility" && !db.prepare("SELECT 1 AS x FROM tourism_facilities WHERE id = ? AND (active = 1 OR approval_status = 'pending')").get(row.facility_id || row.profile_id);
   if (!ok || row.status !== "active" || pharmacyOff || facilityOff || (role && role !== row.role)) {
     if (!ok) {
       const failed = row.failed_logins + 1;

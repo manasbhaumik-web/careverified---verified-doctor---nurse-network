@@ -37,6 +37,7 @@ import { registerPayouts } from "./server/payouts";
 import { registerMail, email as sendMail } from "./server/mail";
 import { registerRecovery } from "./server/accountRecovery";
 import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
+import { registerFacilityProfiles } from "./server/facilityProfiles";
 import { CAREGIVER_ROLE, MIN_REFERENCES, cleanReferences, ekycAdapter, type CaregiverChecks } from "./server/caregiverTier";
 
 // Load environment variables
@@ -995,6 +996,7 @@ registerPharmacyMy(app);
 registerTestimonials(app);
 registerJobsMy(app, { findProfessional, allProfessionals, jobs: () => jobs });
 registerTourism(app, { findProfessional, allProfessionals });
+registerFacilityProfiles(app);
 registerAssistanceRoutes(app, { findProfessional, allProfessionals });
 registerPackagesRoutes(app);
 registerFacilityRoutes(app, { jobs: () => jobs, findProfessional });

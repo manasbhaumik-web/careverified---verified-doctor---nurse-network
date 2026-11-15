@@ -155,6 +155,9 @@ export function registerTourism(app: Application, ctx: { findProfessional: (id: 
       accreditations: liveAccreditations(f).map(a => ({ body: a.body, number: a.number, validUntil: a.validUntil })),
       licenceChecked: !!f.licence_checked_at && licenceOk(f), licenceExpiry: f.licence_expiry ?? null,
       practitioners,
+      departments: parse<{ name: string; description?: string }[]>(f.departments, []),
+      serviceList: parse<string[]>(f.service_list, []),
+      photos: parse<string[]>(f.photos, []).map(pid => `/api/public/facilities/${f.id}/photos/${pid}`),
     };
   };
   // One rule for "listed": the hospital is switched on and its licence has not expired. Whether it welcomes international patients is

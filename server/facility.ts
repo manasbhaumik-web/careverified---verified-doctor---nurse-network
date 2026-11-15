@@ -5,6 +5,7 @@ import { db } from "./db";
 import { audit } from "./audit";
 import { requireRole } from "./auth";
 import { notify } from "./verification";
+import { canManageFacility } from "./facilityProfiles";
 
 interface FacilityRouteDeps {
   jobs: () => any[];
@@ -334,6 +335,7 @@ app.post("/api/facility/jobs/:jobId/applicants/:applicantUserId/timesheet/approv
 // Facility billing preference update (Escrow vs Corporate Net-30)
 app.put("/api/facility/billing-settings", requireRole("facility", "admin"), (req, res) => {
   const facilityId = req.user!.facilityId || req.user!.profileId || "fac-demo-1";
+  if (req.user!.role === "facility" && !canManageFacility(req.user, facilityId)) return fail(res, 403, "Only a facility admin can change billing settings.");
   const { billingPreference, billingContactEmail, sstRegistrationNo } = req.body;
 
   if (billingPreference && !["escrow", "invoice"].includes(billingPreference)) {
