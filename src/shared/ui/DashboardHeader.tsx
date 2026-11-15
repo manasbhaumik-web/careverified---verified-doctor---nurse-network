@@ -341,7 +341,7 @@ export default function DashboardHeader<T extends string>({
                       ) : null}
                       {tab.count !== undefined && tab.count > 0 && (
                         <span
-                          className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[11px] font-bold leading-none tabular-nums border ${
+                          className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-2xs font-bold leading-none tabular-nums border ${
                             selected
                               ? 'bg-[color:var(--t-100)] text-[color:var(--t-900)] border-[color:var(--t-300)]'
                               : 'bg-white text-[color:var(--t-700)] border-[color:var(--t-200)]'
@@ -365,7 +365,7 @@ export default function DashboardHeader<T extends string>({
                           <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)]">
                             {tab.label}
                           </span>
-                          <span className="text-[10px] font-bold text-slate-400 tabular-nums">
+                          <span className="text-2xs font-bold text-slate-400 tabular-nums">
                             {tab.subItems.length}
                           </span>
                         </div>
@@ -403,7 +403,7 @@ export default function DashboardHeader<T extends string>({
                               <span className="flex items-center gap-1.5 shrink-0">
                                 {sub.count !== undefined && sub.count > 0 && (
                                   <span
-                                    className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[11px] font-bold leading-none tabular-nums border ${
+                                    className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-2xs font-bold leading-none tabular-nums border ${
                                       subActive
                                         ? 'bg-[color:var(--t-100)] text-[color:var(--t-900)] border-[color:var(--t-300)]'
                                         : 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]'
@@ -465,7 +465,7 @@ export default function DashboardHeader<T extends string>({
                       <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)]">
                         {megaTab.label}
                       </span>
-                      <span className="text-[11px] font-semibold text-slate-600 tabular-nums">
+                      <span className="text-xs font-semibold text-slate-600 tabular-nums">
                         {megaTab.subItems.length} sections
                       </span>
                     </div>
@@ -492,12 +492,12 @@ export default function DashboardHeader<T extends string>({
                           {SubIcon && <SubIcon className="h-[18px] w-[18px] shrink-0 mt-px text-[color:var(--t-600)]" />}
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className={`text-[13px] font-bold truncate ${subActive ? 'text-[color:var(--t-900)]' : 'text-[color:var(--ink)]'}`}>
+                              <span className={`text-sm font-bold truncate ${subActive ? 'text-[color:var(--t-900)]' : 'text-[color:var(--ink)]'}`}>
                                 {sub.label}
                               </span>
                               {sub.count !== undefined && sub.count > 0 && (
                                 <span
-                                  className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[11px] font-bold leading-none tabular-nums border shrink-0 ${
+                                  className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold leading-none tabular-nums border shrink-0 ${
                                     subActive
                                       ? 'bg-[color:var(--t-100)] text-[color:var(--t-900)] border-[color:var(--t-300)]'
                                       : 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]'
@@ -526,7 +526,7 @@ export default function DashboardHeader<T extends string>({
                         <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)]">
                           Quick action
                         </span>
-                        <span className="hidden sm:inline-block border border-[color:var(--t-200)] bg-white px-1.5 py-0.5 text-[10px] font-bold text-[color:var(--t-700)]">Esc</span>
+                        <span className="hidden sm:inline-block border border-[color:var(--t-200)] bg-white px-1.5 py-0.5 text-2xs font-bold text-[color:var(--t-700)]">Esc</span>
                       </div>
                       <h4 className="text-sm font-bold text-[color:var(--ink)] mt-2.5">
                         {megaTab.label}
@@ -547,7 +547,7 @@ export default function DashboardHeader<T extends string>({
                           }
                           setOpenMenuId(null);
                         }}
-                        className="w-full h-10 bg-[color:var(--t-700)] hover:bg-[color:var(--t-800)] text-white border border-[color:var(--t-800)] text-[13px] font-bold px-3 cursor-pointer transition-colors flex items-center justify-center gap-2 rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40"
+                        className="w-full h-10 bg-[color:var(--t-700)] hover:bg-[color:var(--t-800)] text-white border border-[color:var(--t-800)] text-sm font-bold px-3 cursor-pointer transition-colors flex items-center justify-center gap-2 rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40"
                       >
                         {megaTab.cta ? megaTab.cta.label : `Open ${megaTab.subItems[0].label}`} →
                       </button>

@@ -49,8 +49,8 @@ test('only the board or a facility can change a package', async () => {
 });
 
 test('hospital packages are never menu items, and the admin screen does not call them software modules', () => {
-  const app = fs.readFileSync('src/App.tsx', 'utf8');
+  const app = fs.readFileSync('src/app/moduleRegistry.ts', 'utf8');
   assert.match(app, /!\(p as any\)\.facility_id/, 'the navbar leaves out packages that belong to a hospital');
-  const admin = fs.readFileSync('src/components/AdminDashboard.tsx', 'utf8');
+  const admin = fs.readFileSync('src/workspaces/admin/AdminDashboard.tsx', 'utf8');
   assert.doesNotMatch(admin, /Cloud Marketplace|Custom Module Compiler|Modular System Runtime|Active navigation endpoints in sidebar/, 'the made-up "module runtime" wording is gone');
 });

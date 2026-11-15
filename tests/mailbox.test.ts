@@ -40,7 +40,7 @@ test('a message goes both ways and shows in each person\'s mailbox', async () =>
 
 test('the mailbox does not claim encryption the server does not do', () => {
   // Messages are stored as ordinary database text, so the pages must not promise encryption.
-  for (const file of ['src/components/SecureMessenger.tsx', 'src/components/PatientDashboard.tsx', 'src/components/VerificationTerminal.tsx']) {
+  for (const file of ['src/domains/telemedicine/SecureMessenger.tsx', 'src/components/PatientDashboard.tsx', 'src/components/VerificationTerminal.tsx']) {
     const text = fs.readFileSync(file, 'utf8');
     assert.doesNotMatch(text, /256-bit Encrypted|End-to-end encrypted messaging|End-to-End Encrypted\"|PDPA Encrypted/i, `${file} claims message encryption`);
   }

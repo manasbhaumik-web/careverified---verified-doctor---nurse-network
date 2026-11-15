@@ -65,7 +65,7 @@ test('text from people is escaped in HTML and cannot break the subject', () => {
 test('every email carries the safety line and never asks for secrets', () => {
   for (const t of names) for (const l of MAIL_LANGS) {
     const r = renderEmail(t, l, VARS, BASE);
-    assert.ok(/MedCred/.test(r.text));
+    assert.ok(/MediCred/.test(r.text));
     assert.ok(!/(enter|send|reply with) your password/i.test(r.text), `${t}/${l}`);
   }
   assert.match(renderEmail('payout_paid', 'en', VARS, BASE).text, /never asks for your password or bank details/);

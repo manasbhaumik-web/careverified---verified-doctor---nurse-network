@@ -463,7 +463,7 @@ export default function CaregiverWorkspace({
                           <span className={`text-xs font-bold ${item.done ? 'line-through text-slate-500' : 'text-[color:var(--ink)]'}`}>
                             {item.patientName} · {item.category}
                           </span>
-                          <span className="text-[11px] font-semibold text-slate-400 tabular-nums">{item.time}</span>
+                          <span className="text-xs font-semibold text-slate-400 tabular-nums">{item.time}</span>
                         </div>
                         <p className={`text-xs mt-0.5 ${item.done ? 'line-through' : 'text-[color:var(--ink-2)]'}`}>{item.task}</p>
                       </div>
