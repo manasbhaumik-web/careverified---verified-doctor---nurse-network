@@ -46,7 +46,7 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
   const bankStatus = d.bank?.status;
 
   return (
-    <div className={embedded ? "space-y-6" : "w-full space-y-0"}>
+    <div className={embedded ? "space-y-4" : "w-full space-y-0"}>
       {!embedded && (
         <DashboardHeader
           icon={Wallet}
@@ -56,21 +56,21 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
         />
       )}
 
-      <div className={embedded ? "space-y-6" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
+      <div className={embedded ? "space-y-4" : "page-w mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4"}>
         {!s && <p className="text-xs bg-amber-50 border border-amber-200 text-amber-900 p-3 font-semibold">{tx('Finish your practitioner registration to see earnings.')}</p>}
 
         {s && (
-          <section aria-label={tx('Balances')} className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <section aria-label={tx('Balances')} className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-[color:var(--t-200)] border border-[color:var(--t-200)]">
           {[
             ['Waiting', s.waiting, tx('Visit not completed yet, or still inside the {n}-day hold', { n: t.holdDays })],
             ['Ready for the next payout', s.available, s.belowMinimum ? tx('Under the {min} minimum, so it rolls over', { min: formatMoney(t.minimumPayout) }) : tx('Included in the next run')],
             ['In a payout being prepared', s.inPayout, tx('Prepared by the board, not yet sent')],
             ['Paid to you', s.paid, tx('Sent to your bank so far')],
           ].map(([l, v, hint]) => (
-            <div key={l as string} className="bg-white border border-[color:var(--t-200)] p-4">
-              <p className="text-xs font-extrabold uppercase tracking-wider text-slate-600">{tx(l as string)}</p>
-              <p className="text-2xl font-black tabular-nums mt-1">{formatMoney(v as number)}</p>
-              <p className="text-xs text-slate-600 mt-1 leading-snug">{hint}</p>
+            <div key={l as string} className="bg-white px-4 py-3">
+              <p className="text-2xs font-extrabold uppercase tracking-wider text-slate-600">{tx(l as string)}</p>
+              <p className="text-xl font-black tabular-nums leading-tight">{formatMoney(v as number)}</p>
+              <p className="text-xs text-slate-600 leading-snug">{hint}</p>
             </div>
           ))}
         </section>
@@ -92,8 +92,8 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
           </div>
         )}
         {(!d.bank || editing) && d.bankAvailable && (
-          <form onSubmit={save} className="grid sm:grid-cols-2 gap-4">
-            <p className="sm:col-span-2 text-xs text-slate-700">{tx('A Malaysian bank account in your own name. Changing details pauses payouts until the board verifies them again, and you must enter your password.')}</p>
+          <form onSubmit={save} className="grid sm:grid-cols-3 gap-3">
+            <p className="sm:col-span-3 text-xs text-slate-700">{tx('A Malaysian bank account in your own name. Changing details pauses payouts until the board verifies them again, and you must enter your password.')}</p>
             <div>
               <label htmlFor="pb-bank" className={label}>{tx('Bank *')}</label>
               <input id="pb-bank" list="pb-banks" className={input} value={form.bankName} onChange={e => setForm({ ...form, bankName: e.target.value })} required minLength={2} maxLength={60} autoComplete="off" />
@@ -111,7 +111,7 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
               <label htmlFor="pb-pw" className={label}>{tx('Your password *')}</label>
               <input id="pb-pw" type="password" className={input} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required autoComplete="current-password" />
             </div>
-            <div className="sm:col-span-2 flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-end gap-2">
               <button type="submit" disabled={busy} className="btn btn-sm btn-primary whitespace-nowrap shrink-0">{busy ? 'Saving…' : 'Save bank details'}</button>
               {editing && <button type="button" onClick={() => { setEditing(false); setMsg(null); }} className="btn btn-sm btn-secondary whitespace-nowrap shrink-0">{tx('Cancel')}</button>}
             </div>
