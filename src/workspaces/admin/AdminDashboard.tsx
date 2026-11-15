@@ -2380,11 +2380,7 @@ export default function AdminDashboard({
               </div>
 
               <div className="space-y-2.5">
-                {(webhooks.length > 0 ? webhooks : [
-                  { id: 'wh_pantai_kl', hospital_name: 'Pantai Hospital Kuala Lumpur', system_name: 'IHH Healthcare HIS · Enterprise Staffing Sync', endpoint_url: 'https://api.pantai.com.my/v2/medcred-hr/sync', is_active: 1, secret_token: 'whsec_pantai_ihh_live_9a8f2' },
-                  { id: 'wh_kpj_central', hospital_name: 'KPJ Healthcare Berhad', system_name: 'KPJ Clinical Credentialing Hub', endpoint_url: 'https://connect.kpjhealth.com.my/api/creds/listen', is_active: 1, secret_token: 'whsec_kpj_central_4b2c1' },
-                  { id: 'wh_gleneagles_kl', hospital_name: 'Gleneagles Hospital Kuala Lumpur', system_name: 'Gleneagles Enterprise Staffing System', endpoint_url: 'https://integrations.gleneagles.com.my/hr/medcred', is_active: 1, secret_token: 'whsec_gleneagles_live_7e1d4' },
-                ]).map((wh: any) => (
+                {webhooks.map((wh: any) => (
                   <div key={wh.id} className="p-3.5 border border-slate-200 bg-white hover:border-slate-300 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">

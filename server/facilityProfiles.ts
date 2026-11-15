@@ -8,6 +8,7 @@ import { audit } from "./audit";
 import { requireRole, createUser, createSession, passwordProblem, emailTaken, type AuthUser } from "./auth";
 import { notifyAdmins, notify } from "./verification";
 import { recordConsent, CONSENT_VERSION } from "./privacy";
+import { decryptFile } from "./fileCrypto";
 
 /**
  * Facility self-service: registration, admin approval, profile (departments, services, accreditation claims, photos) and staff with roles.
@@ -217,7 +218,7 @@ export function registerFacilityProfiles(app: Application) {
     res.setHeader("Cache-Control", "public, max-age=3600");
     const file = path.join(uploadsRoot, doc.stored_name);
     if (!fs.existsSync(file)) return res.status(404).end();
-    res.sendFile(file);
+    try { res.send(decryptFile(fs.readFileSync(file))); } catch { res.status(404).end(); }
   });
 
   // ---------- staff with roles ----------

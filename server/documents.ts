@@ -6,6 +6,7 @@ import { Router } from "express";
 import { db, dataDir } from "./db";
 import { audit } from "./audit";
 import { requireAuth } from "./auth";
+import { encryptFile, decryptFile, fileEncryptionAvailable } from "./fileCrypto";
 
 // Private storage: never served statically, only through the authorised download route below.
 const root = path.join(dataDir, "uploads");
@@ -61,7 +62,8 @@ documentsRouter.post("/", requireAuth, (req, res) => {
     }
     const id = "doc-" + crypto.randomBytes(8).toString("hex");
     const storedName = `${crypto.randomBytes(16).toString("hex")}.${type.ext}`;
-    fs.writeFileSync(path.join(root, storedName), file.buffer, { mode: 0o600 });
+    if (!fileEncryptionAvailable()) return res.status(503).json({ status: "error", message: "Uploads are not available yet: the server has no file encryption key. Ask the board." });
+    fs.writeFileSync(path.join(root, storedName), encryptFile(file.buffer), { mode: 0o600 });
     db.prepare(
       "INSERT INTO documents (id,owner_id,kind,original_name,mime,size,stored_name,sha256,verification_request_id,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)"
     ).run(
@@ -104,5 +106,6 @@ documentsRouter.get("/:id/download", requireAuth, (req, res) => {
   res.setHeader("Content-Type", row.mime);
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Content-Disposition", `attachment; filename="${row.original_name.replace(/[^\w.\- ]/g, "_")}"`);
-  res.sendFile(path.join(root, row.stored_name));
+  try { res.send(decryptFile(fs.readFileSync(path.join(root, row.stored_name)))); }
+  catch { res.status(404).json({ status: "error", message: "Document not found." }); }
 });
