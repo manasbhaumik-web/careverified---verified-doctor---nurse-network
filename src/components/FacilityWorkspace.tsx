@@ -17,6 +17,7 @@ import FacilityLocumsTab from './facility/FacilityLocumsTab';
 import FacilityCasesTab from './facility/FacilityCasesTab';
 import { FacilityPackagesTab } from './facility/FacilityPackagesTab';
 import { FacilityProfileTab } from './facility/FacilityProfileTab';
+import FacilityPublicProfile from './facility/FacilityPublicProfile';
 import { FacilityModals } from './facility/FacilityModals';
 import { useFacilityWorkspace } from './facility/hooks/useFacilityWorkspace';
 import {
@@ -660,6 +661,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
               setNotificationMsg={setNotificationMsg}
             />
           )}
+          {tab === 'profile' && <FacilityPublicProfile />}
         </div>
       </div>
 

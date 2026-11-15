@@ -65,6 +65,7 @@ import {
   TourismDesk,
   VerificationTerminal,
   VerifyPractitionersPage,
+  FacilitySignUp,
 } from './app/lazyComponents';
 
 // Types import
@@ -396,6 +397,7 @@ export default function App() {
   if (route.path === '/landing-preview' || route.path === '/design-preview') return <Suspense fallback={routeFallback}><LandingDesignPreview /></Suspense>;
 
   // Dedicated Target Audience and Verification Routes (Accessible by patients and observers)
+  if (route.path === '/register-facility') return <Suspense fallback={routeFallback}><FacilitySignUp /></Suspense>;
   if (route.path === '/verify' || route.path === '/verify-practitioners') {
     return <Suspense fallback={routeFallback}><VerifyPractitionersPage professionals={professionals} onSignUp={() => navigate(loginUrl('patient', true))} /></Suspense>;
   }

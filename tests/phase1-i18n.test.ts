@@ -6,7 +6,12 @@ import { fileURLToPath } from 'node:url';
 
 /** Every user-facing phrase in the Phase 1 screens must have a Bahasa Malaysia translation. English is the lookup key, so a missing key would show English. */
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PHASE1_SCREENS = ['src/domains/verification/PublicCredentialLookup.tsx'];
+const PHASE1_SCREENS = [
+  'src/domains/verification/PublicCredentialLookup.tsx',
+  'src/components/facility/FacilityPublicProfile.tsx',
+  'src/components/FacilitySignUp.tsx',
+  'src/workspaces/admin/AdminFacilityApprovals.tsx',
+];
 
 const ms: Record<string, string> = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/locales/ms.json'), 'utf8'));
 
@@ -15,6 +20,8 @@ function phrases(file: string): string[] {
   const found = new Set<string>();
   for (const m of src.matchAll(/tx\(\s*'((?:[^'\\]|\\.)*)'/g)) found.add(m[1].replace(/\\'/g, "'"));
   for (const m of src.matchAll(/label:\s*'((?:[^'\\]|\\.)*)'/g)) found.add(m[1].replace(/\\'/g, "'")); // labels passed to tx() later
+  for (const m of src.matchAll(/\[\s*'[a-z]+'\s*,\s*'([^']+)'\s*\]/g)) found.add(m[1]); // ['key', 'Label'] pairs passed to tx() later
+  for (const m of src.matchAll(/field\(\s*'[a-zA-Z]+'\s*,\s*'([^']+)'/g)) found.add(m[1]); // field('key', 'Label')
   return [...found];
 }
 

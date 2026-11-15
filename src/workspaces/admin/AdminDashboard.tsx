@@ -16,6 +16,7 @@ import AdminPackagesTab from './AdminPackagesTab';
 import AdminRegistryTab from './AdminRegistryTab';
 import AdminTrustPanel, { ReviewActions } from './AdminTrustPanel';
 import AdminOps, { OPS_SUBS, OpsSubTab } from './AdminOps';
+import AdminFacilityApprovals from './AdminFacilityApprovals';
 import AdminQuality, { QUALITY_SUBS, QualitySubTab } from './AdminQuality';
 import AdminLiterature, { LIT_SUBS, LitSubTab } from './AdminLiterature';
 import FacilityWorkspace from '../../components/FacilityWorkspace';
@@ -2109,6 +2110,7 @@ export default function AdminDashboard({
       )}
       {activeTab === 'facilities' && (
         <div id="panel-facilities" role="tabpanel" tabIndex={0}>
+          <AdminFacilityApprovals />
           <FacilityWorkspace activeGroup="staffing" embedded={true} />
         </div>
       )}
