@@ -37,6 +37,7 @@ import { registerPayouts } from "./server/payouts";
 import { registerMail, email as sendMail } from "./server/mail";
 import { registerRecovery } from "./server/accountRecovery";
 import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
+import { CAREGIVER_ROLE, MIN_REFERENCES, cleanReferences, ekycAdapter, type CaregiverChecks } from "./server/caregiverTier";
 
 // Load environment variables
 dotenv.config();
@@ -1208,10 +1209,61 @@ app.get("/api/admin/registry-integrations", requireRole("admin"), (_req, res) =>
 
 app.get("/api/registries", (_req, res) => res.json({ status: "success", data: { registries: REGISTRIES, registrationTypes: REGISTRATION_TYPES } }));
 
+// Caregiver registration: our own verification tier (identity, certificate, references) instead of a council licence.
+// A caregiver is a practitioner-account profile with role "caregiver"; it is stored with the nurse profiles.
+async function registerCaregiver(req: express.Request, res: express.Response) {
+  const user = req.user!;
+  const name = str(req.body.name, 100);
+  const specialization = str(req.body.specialization, 100) || "Home care";
+  const city = str(req.body.city, 80);
+  const idNumber = str(req.body.idNumber, 40);
+  const certificateExpiry = typeof req.body.certificateExpiry === "string" ? req.body.certificateExpiry : "";
+  if (!name || !city || !idNumber) return fail(res, 400, "Name, city and ID number are required.");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(certificateExpiry) || certificateExpiry <= new Date().toISOString().slice(0, 10)) {
+    return fail(res, 400, "Enter the expiry date of your main certificate (it must be in the future).");
+  }
+  const references = cleanReferences(req.body.references);
+  if (references.length < MIN_REFERENCES) return fail(res, 400, `Give at least ${MIN_REFERENCES} references (name, relationship, contact).`);
+
+  const ekyc = await ekycAdapter().verify({ fullName: name, idNumber });
+  const newId = generateId("cg");
+  const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  // The full ID number is used for the e-KYC check only and is never stored; we keep the last four digits.
+  const checks: CaregiverChecks = { idNumberLast4: idNumber.replace(/\W/g, "").slice(-4), ekyc, references };
+
+  (nurses as any[]).push({
+    id: newId, name, avatar: "/assets/malaysian_female_nurse.jpg", role: CAREGIVER_ROLE, specialization,
+    licenseNumber: `CG-${newId.slice(3)}`, licenseExpiry: certificateExpiry, nursingCouncil: "CareVerified caregiver tier",
+    registeringBody: "CareVerified caregiver tier", registryId: "CAREGIVER_TIER", registrationType: "full",
+    experienceYears: Number(req.body.experienceYears) || 1, education: [], bio: str(req.body.bio, 1000) || "Verified caregiver.",
+    languages: Array.isArray(req.body.languages) ? req.body.languages.map((l: unknown) => str(l, 40)) : ["English"],
+    consultationModes: ["Home Visit"], fee: Math.max(0, Number(req.body.fee) || 0), rating: 0, reviewCount: 0,
+    verificationStatus: VerificationStatus.PENDING, practiceAddress: str(req.body.practiceAddress, 250), city,
+    availability: { days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], slots: ["09:00 AM - 05:00 PM"] },
+    seoSlug: `${slug(name)}-${slug(specialization)}-${slug(city)}`, shiftTypes: Array.isArray(req.body.shiftTypes) ? req.body.shiftTypes : ["Day Shift"],
+  });
+  db.prepare("UPDATE users SET profile_id = ? WHERE id = ?").run(newId, user.id);
+
+  const vReq = {
+    id: generateId("ver"), userId: newId, accountId: user.id, userName: name, userType: CAREGIVER_ROLE as any,
+    licenseNumber: `CG-${newId.slice(3)}`, medicalCouncil: "CareVerified caregiver tier", degreeName: "", fileUrl: "",
+    submittedAt: new Date().toISOString(), status: VerificationStatus.PENDING, kind: "caregiver", caregiverChecks: checks,
+  };
+  verificationRequests.push(vReq);
+  audit(req, "caregiver.submit", { target: ["verification", vReq.id], details: { profileId: newId, ekyc: ekyc.status } });
+  notifyAdmins("New caregiver verification request", `${name} submitted identity, certificate and references for review.`);
+  res.status(201).json({
+    status: "success",
+    message: ekyc.status === "passed" ? "Registration submitted. Upload your certificate so the board can review it." : "Registration submitted, but the identity check did not pass. The board will contact you.",
+    data: { id: newId, seoSlug: `${slug(name)}-${slug(specialization)}-${slug(city)}`, verificationRequestId: vReq.id, ekyc: ekyc.status },
+  });
+}
+
 // Submit practitioner profile + licence details for verification (one profile per account)
 app.post("/api/register", requireRole("practitioner"), (req, res) => {
   const user = req.user!;
   if (user.profileId) return fail(res, 409, "A professional profile already exists for this account.");
+  if (req.body.role === CAREGIVER_ROLE) return void registerCaregiver(req, res).catch(() => fail(res, 500, "Could not register."));
 
   const role = req.body.role === UserRole.NURSE ? UserRole.NURSE : UserRole.DOCTOR;
   const name = str(req.body.name, 100);

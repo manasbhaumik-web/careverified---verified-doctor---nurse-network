@@ -51,7 +51,7 @@ export function presentCredential(p: any, now: Date = new Date()): PublicCredent
     role: String(p.role ?? ""),
     specialty: p.specialization ?? null,
     registrationNumber: String(p.licenseNumber ?? ""),
-    registeringBody: p.medicalCouncil ?? p.nursingCouncil ?? null,
+    registeringBody: p.registeringBody ?? p.medicalCouncil ?? p.nursingCouncil ?? null,
     status: state as PublicCredential["status"],
     validFrom: day(p.verifiedAt),
     validUntil: day(p.licenseExpiry ?? p.verifiedUntil),

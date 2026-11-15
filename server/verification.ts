@@ -7,6 +7,7 @@ import { requireAuth, requireRole } from "./auth";
 import { VerificationStatus } from "../src/types";
 import { findRegistry, inferRegistryId, scopeFor } from "./registries";
 import { sweepExpiry } from "./credentialState";
+import { CAREGIVER_ROLE, missingForApproval } from "./caregiverTier";
 import { adapterFor } from "./registryProviders";
 import { registerPublicLookup, presentCredential, badgeTokenFor } from "./publicLookup";
 
@@ -496,8 +497,14 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
       if (!expiry || expiry <= new Date().toISOString().slice(0, 10)) {
         return fail(res, 400, "Cannot approve: the licence expiry date is missing or already past.");
       }
-      const registryReference = str(req.body.registryReference, 200);
-      if (!registryReference) {
+      const isCaregiver = request.userType === CAREGIVER_ROLE;
+      let registryReference = str(req.body.registryReference, 200);
+      if (isCaregiver) {
+        // No statutory register for caregivers: our own tier (identity, certificate, references) must be complete.
+        const missing = missingForApproval(request.caregiverChecks, docCount);
+        if (missing.length) return fail(res, 400, `Cannot approve: ${missing.join("; ")}.`);
+        registryReference = "caregiver-tier: identity, certificate and references checked";
+      } else if (!registryReference) {
         return fail(res, 400, "Record how the licence was checked with the council register (reference or URL) before approving.");
       }
       const now = new Date();
@@ -508,8 +515,12 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
       prof.credentialState = "verified";
       delete prof.expiredAt;
       prof.verifiedAt = now.toISOString();
-      prof.registryId = findRegistry(prof.registryId)?.id ?? inferRegistryId(prof.medicalCouncil ?? prof.nursingCouncil);
-      prof.verificationScope = scopeFor(prof.registryId);
+      if (isCaregiver) {
+        prof.verificationScope = "platform-tier";
+      } else {
+        prof.registryId = findRegistry(prof.registryId)?.id ?? inferRegistryId(prof.medicalCouncil ?? prof.nursingCouncil);
+        prof.verificationScope = scopeFor(prof.registryId);
+      }
       request.registryCheck.scope = prof.verificationScope;
       prof.verifiedUntil = addMonths(now, REVERIFY_MONTHS).toISOString().slice(0, 10);
       delete prof.suspensionReason;

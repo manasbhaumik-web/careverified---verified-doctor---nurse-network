@@ -10,6 +10,7 @@ import VerificationScopeBadge from '../domains/verification/VerificationScopeBad
 import ThemeSwitcher from './ThemeSwitcher';
 import LocaleSwitcher from './LocaleSwitcher';
 import Footer from './Footer';
+import PublicCredentialLookup from '../domains/verification/PublicCredentialLookup';
 import { navigate, loginUrl } from '../nav';
 
 interface VerifyPractitionersPageProps {
@@ -311,6 +312,9 @@ export default function VerifyPractitionersPage({
             )}
           </div>
         </div>
+
+        {/* Live registration status from the public credential lookup */}
+        <PublicCredentialLookup query={searchQuery} role={councilFilter} />
 
         {/* ─── RESULTS LIST ─── */}
         <div className="space-y-4">
