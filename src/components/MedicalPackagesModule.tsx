@@ -339,7 +339,7 @@ export default function MedicalPackagesModule({
         />
       )}
 
-      <div className={embedded ? "space-y-4" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-4"}>
+      <div className={embedded ? "space-y-4" : "page-w mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-4"}>
 
         {/* ------------------------------------------------------------------- */}
         {/* COMPACT PARTNER PROMOTIONS BAR (Shown on packages tab) */}

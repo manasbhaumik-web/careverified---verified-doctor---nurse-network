@@ -480,7 +480,7 @@ export default function App() {
 
       {/* MediCred Elevated Primary Header */}
       <header className="bg-[color:var(--t-600)]/95 backdrop-blur-md text-white border-0 sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-[0_2px_6px_-1px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.06)]">
-        <div className="max-w-[1440px] mx-auto flex items-center justify-between h-16">
+        <div className="page-w mx-auto flex items-center justify-between h-16">
 
           {/* Brand Logo */}
           <button
@@ -499,6 +499,7 @@ export default function App() {
             <BrandLogo
               tone="onColor"
               size="lg"
+              layout="badge"
               subtitle={
                 currentUser.role === 'admin'
                   ? tt('Board Console')
@@ -744,7 +745,7 @@ export default function App() {
                   tabsLabel="Directory sections"
                 />
 
-                <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+                <div className="page-w mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
                   {/* TAB CONTENT 1: Symptom Triage Search Panel */}
                   {registryTab === 'triage' && (
                     <div className="max-w-3xl mx-auto animate-fade-in">
@@ -803,7 +804,7 @@ export default function App() {
                     }}
                   />
                 )}
-                <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+                <div className="page-w mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
                   <ProfessionalProfile
                     professionalId={selectedProfId}
                     onBack={() => setSelectedProfId(null)}
@@ -1080,7 +1081,7 @@ export default function App() {
                 const activePkg = packages.find(p => p.id === activeView);
                 if (!activePkg) return null;
                 return (
-                  <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 animate-fade-in text-slate-800">
+                  <div className="page-w mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 animate-fade-in text-slate-800">
                     <div className="bg-white border-2 border-slate-200/85 p-8 rounded-2xl shadow-sm space-y-6">
                       <PageBanner
                         eyebrow="Marketplace Module"

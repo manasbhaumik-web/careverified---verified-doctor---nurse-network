@@ -607,7 +607,7 @@ export default function PharmacyPage() {
 
       {/* TOP HEADER */}
       <header className="sticky top-0 z-40 bg-[color:var(--t-50)]/95 backdrop-blur-md border-b border-[color:var(--t-200)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
+        <div className="page-w mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
           <a
             href="/"
             onClick={e => {
@@ -653,7 +653,7 @@ export default function PharmacyPage() {
             }}
           />
 
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 w-full">
+          <div className="relative z-10 page-w mx-auto px-4 sm:px-6 w-full">
             <div className="grid lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-8 flex flex-col justify-center max-w-2xl">
                 <div>
@@ -708,7 +708,7 @@ export default function PharmacyPage() {
 
         {/* ─── SECTION 2: 4-STAT AUTHORITY BAR ─── */}
         <section aria-label="Pharmacy Network Metrics" className="py-8 bg-white border-b border-[color:var(--t-200)]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {tx.metrics.map(m => (
                 <div
@@ -728,7 +728,7 @@ export default function PharmacyPage() {
 
         {/* ─── SECTION 3: PLATFORM CAPABILITIES BENTO GRID WITH FILTER ─── */}
         <section className="py-14 sm:py-18 bg-[color:var(--t-50)]/30 border-b border-[color:var(--t-200)]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
               <div>
                 <p className="text-xs font-mono font-bold uppercase tracking-widest text-[color:var(--t-700)] mb-1">
@@ -813,7 +813,7 @@ export default function PharmacyPage() {
 
         {/* ─── SECTION 4: INTERACTIVE PRESCRIPTION VOLUME & DISPENSING SIMULATOR ─── */}
         <section className="py-14 sm:py-18 bg-white border-b border-[color:var(--t-200)]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6">
             <div className="max-w-3xl mb-8">
               <p className="text-xs font-mono font-bold uppercase tracking-widest text-[color:var(--t-700)] mb-1">
                 {tx.calculator.eyebrow}
@@ -934,7 +934,7 @@ export default function PharmacyPage() {
 
         {/* ─── SECTION 5: 4-STEP PHARMACY ONBOARDING JOURNEY ─── */}
         <section className="py-14 sm:py-18 bg-[color:var(--t-50)]/30 border-b border-[color:var(--t-200)]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6">
             <div className="max-w-2xl mb-8">
               <p className="text-xs font-mono font-bold uppercase tracking-widest text-[color:var(--t-700)] mb-1">
                 {tx.steps.eyebrow}
@@ -967,7 +967,7 @@ export default function PharmacyPage() {
 
         {/* ─── SECTION 6: MALAYSIAN STATUTORY COMPLIANCE & PLATFORM GOVERNANCE ─── */}
         <section className="py-14 sm:py-18 bg-white border-b border-[color:var(--t-200)]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6">
             <div className="max-w-3xl mb-8">
               <p className="text-xs font-mono font-bold uppercase tracking-widest text-[color:var(--t-700)] mb-1">
                 {tx.regulatory.eyebrow}
@@ -999,7 +999,7 @@ export default function PharmacyPage() {
 
         {/* ─── SECTION 7: PHARMACY ACCREDITATION & INQUIRY FORM ─── */}
         <section id="apply" aria-labelledby="apply-h" className="py-14 sm:py-20 bg-white scroll-mt-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6">
             <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10 items-start">
               <div>
                 <p className="text-xs font-mono font-bold uppercase tracking-widest text-[color:var(--t-700)] mb-1">

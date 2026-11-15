@@ -96,7 +96,7 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
   const btnPrimary = 'btn btn-lg btn-primary';
   const btnSecondary = 'btn btn-lg btn-secondary';
   const h2 = 'font-display font-black text-2xl sm:text-3xl tracking-tight text-[color:var(--ink)] leading-tight';
-  const wrap = 'max-w-6xl mx-auto px-4 sm:px-6';
+  const wrap = 'page-w mx-auto px-4 sm:px-6';
   const bg = (i: number, tint?: boolean) => (tint ?? i % 2 === 1 ? 'bg-[color:var(--t-50)]' : 'bg-white');
 
   const iconBox = (name: string | undefined, fallback: string) => {

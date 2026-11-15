@@ -1059,7 +1059,7 @@ export default function AdminDashboard({
         />
       </DashboardHeader>
 
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className="page-w mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {adminNotice && (
           <div role="status" className="bg-amber-50 border border-amber-300 text-amber-950 px-4 py-3 text-xs font-bold flex items-center justify-between gap-3">
             <span>{adminNotice}</span>

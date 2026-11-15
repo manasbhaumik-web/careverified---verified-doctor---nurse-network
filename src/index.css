@@ -1135,3 +1135,7 @@ a, button, [role="button"], summary, label, select, input { touch-action: manipu
 @keyframes pp-kb{from{transform:scale(1.02)}to{transform:scale(1.1)}}
 @keyframes pp-bar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @media (prefers-reduced-motion:reduce){.pp-hero .pp-kenburns,.pp-hero .pp-progress{animation:none}}
+
+/* Application width: percentage-based so layouts fill wide screens at every resolution. */
+.page-w { width: 96%; max-width: none; }
+@media (min-width: 1920px) { .page-w { width: 94%; } }
