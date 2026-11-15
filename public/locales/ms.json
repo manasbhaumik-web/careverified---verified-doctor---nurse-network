@@ -3815,5 +3815,13 @@
  "Two-factor sign-in is on.": "Log masuk dua faktor dihidupkan.",
  "Two-factor sign-in is off.": "Log masuk dua faktor dimatikan.",
  "Could not add the login.": "Tidak dapat menambah log masuk.",
- "Could not update the login.": "Tidak dapat mengemas kini log masuk."
+ "Could not update the login.": "Tidak dapat mengemas kini log masuk.",
+ "Registering body": "Badan pendaftaran",
+ "Valid": "Sah",
+ "Practising at": "Berkhidmat di",
+ "Expiring soon": "Hampir tamat tempoh",
+ "QR code for this practitioner’s verification page": "Kod QR untuk halaman pengesahan pengamal ini",
+ "Live registration status": "Status pendaftaran semasa",
+ "No current registration was found for that badge.": "Tiada pendaftaran semasa ditemui untuk lencana itu.",
+ "No verified registration matched your search.": "Tiada pendaftaran yang disahkan sepadan dengan carian anda."
 }
