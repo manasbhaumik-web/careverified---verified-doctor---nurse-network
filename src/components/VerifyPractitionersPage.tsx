@@ -5,7 +5,7 @@ import {
   Building2, ExternalLink, Filter, Sparkles, Check
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile } from '../types';
-import VerificationScopeBadge from './VerificationScopeBadge';
+import VerificationScopeBadge from '../domains/verification/VerificationScopeBadge';
 import ThemeSwitcher from './ThemeSwitcher';
 import LocaleSwitcher from './LocaleSwitcher';
 import Footer from './Footer';

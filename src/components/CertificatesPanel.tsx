@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AlertTriangle, CalendarCheck, CheckCircle2, Clock, Copy, FileDown, HeartHandshake, Info, Printer, Stethoscope } from 'lucide-react';
-import { Qr, fmtDate } from './PrescriptionList';
+import { Qr, fmtDate } from '../domains/prescriptions/PrescriptionList';
 import { useTr, tr, getLocale } from '../locale';
 /** Translate outside a component (these helpers run during render, so they follow the current language). */
 const T = (k: string, v?: Record<string, string | number>) => tr(getLocale().lang, k, v);

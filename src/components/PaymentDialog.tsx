@@ -1,3 +1,4 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useEffect, useState } from 'react';
 import { CheckCircle2, FlaskConical, Lock, X, Building2, QrCode, CreditCard, Wallet, ShieldCheck, ArrowRight } from 'lucide-react';
 import { useTr } from '../locale';
@@ -228,11 +229,11 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                   <label htmlFor="fpx-bank-select" className="block text-xs font-semibold text-slate-700 mb-1">
                     {tx('Choose Bank:')}
                   </label>
-                  <select
+                  <CustomSelect
                     id="fpx-bank-select"
                     value={selectedBank}
                     onChange={e => setSelectedBank(e.target.value)}
-                    className="w-full bg-white border border-slate-300 h-10 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="form-select w-full bg-white border border-slate-300 h-10 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-[color:var(--t-600)]"
                   >
                     {(b.fpxBanks || [
                       { code: 'MBB0227', name: 'Maybank2u' },
@@ -247,7 +248,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                         {bank.name}
                       </option>
                     ))}
-                  </select>
+                  </CustomSelect>
                 </div>
                 <div>
                   <label htmlFor="fpx-buyer-email" className="block text-xs font-semibold text-slate-700 mb-1">

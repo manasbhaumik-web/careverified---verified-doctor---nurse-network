@@ -1,8 +1,9 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Briefcase, Building2, Download, FolderOpen, Plane } from 'lucide-react';
-import DashboardHeader, { BannerBadge } from './DashboardHeader';
+import DashboardHeader, { BannerBadge } from '../shared/ui/DashboardHeader';
 import PractitionerHeroBanner from './PractitionerHeroBanner';
-import WorkspaceHeader from './WorkspaceHeader';
+import WorkspaceHeader from '../shared/ui/WorkspaceHeader';
 import { formatMoney, formatDate, useTr } from '../locale';
 
 const jget = (url: string) => fetch(url).then(r => r.json());
@@ -12,7 +13,8 @@ const jsend = (method: string, url: string, body?: unknown) =>
 const STATUS_LABEL: Record<string, string> = { enquiry: 'Enquiry', quoted: 'Quoted', accepted: 'Accepted', in_treatment: 'In treatment', completed: 'Completed', closed: 'Closed' };
 const CATEGORIES: [string, string][] = [['procedure', 'Procedure'], ['doctor_fees', 'Doctor fees'], ['hospital_stay', 'Hospital stay'], ['tests', 'Tests'], ['medication', 'Medication'], ['follow_up', 'Follow-up'], ['interpreter', 'Interpreter'], ['transport', 'Transport'], ['accommodation', 'Accommodation'], ['other', 'Other']];
 const ITIN: [string, string][] = [['arrival', 'Arrival'], ['consultation', 'Consultation'], ['tests', 'Tests'], ['procedure', 'Procedure'], ['recovery', 'Recovery'], ['follow_up', 'Follow-up'], ['discharge', 'Discharge'], ['departure', 'Departure'], ['other', 'Other']];
-const input = 'form-input text-xs min-h-[44px]';
+const input = 'form-input text-xs h-11 min-h-[44px]';
+const select = 'form-select text-xs h-11 min-h-[44px]';
 const btn = 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold px-3 py-2 cursor-pointer';
 
 interface TourismDeskProps {
@@ -111,7 +113,7 @@ function CaseQueue({ onOpen }: { onOpen: (id: string) => void }) {
   useEffect(() => { jget(`/api/tourism/desk/cases${status ? `?status=${status}` : ''}`).then(d => setList(d.status === 'success' ? d.data : [])).catch(() => setList([])); }, [status]);
   return (
     <div className="space-y-3">
-      <select className={input} value={status} onChange={e => setStatus(e.target.value)} aria-label={tx('Status filter')}><option value="">{tx('All open and closed')}</option>{Object.entries(STATUS_LABEL).map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}</select>
+      <CustomSelect className={select} value={status} onChange={e => setStatus(e.target.value)} aria-label={tx('Status filter')}><option value="">{tx('All open and closed')}</option>{Object.entries(STATUS_LABEL).map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}</CustomSelect>
       {list && list.length === 0 && <p className="text-xs text-slate-500">{tx('No cases.')}</p>}
       <ul className="space-y-2">{list?.map(c => (
         <li key={c.id}><button onClick={() => onOpen(c.id)} className="w-full text-left bg-white border border-slate-200 hover:border-[color:var(--t-600)] p-3 cursor-pointer text-xs">
@@ -183,7 +185,7 @@ function QuoteBuilder({ caseId, onDone }: { caseId: string; onDone: (d: any, ok?
       {items.map((it, i) => (
         <div key={i} className="grid grid-cols-[1fr_9rem_7rem_auto] gap-2">
           <input className={input} required placeholder={tx('Item (e.g. Knee replacement, 5 nights ward)')} value={it.label} onChange={e => set(i, { label: e.target.value })} />
-          <select className={input} value={it.category} onChange={e => set(i, { category: e.target.value })}>{CATEGORIES.map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}</select>
+          <CustomSelect className={select} value={it.category} onChange={e => set(i, { category: e.target.value })}>{CATEGORIES.map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}</CustomSelect>
           <input className={input} required type="number" min={0} step="0.01" placeholder={tx('RM')} value={it.amount} onChange={e => set(i, { amount: e.target.value })} />
           <button type="button" className="text-rose-700 font-bold cursor-pointer" onClick={() => items.length > 1 && setItems(items.filter((_, k) => k !== i))}>×</button>
         </div>
@@ -210,7 +212,7 @@ function Itinerary({ c, onDone }: { c: any; onDone: (d: any, ok?: string) => any
       {c.status !== 'closed' && (
         <form onSubmit={async e => { e.preventDefault(); const d = onDone(await jsend('POST', `/api/tourism/desk/cases/${c.id}/itinerary`, v), 'Added. The patient was notified.'); if (d) setV({ ...v, title: '', note: '' }); }} className="flex flex-wrap gap-2">
           <input type="date" className={input} required value={v.date} onChange={e => setV({ ...v, date: e.target.value })} />
-          <select className={input} value={v.kind} onChange={e => setV({ ...v, kind: e.target.value })}>{ITIN.map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}</select>
+          <CustomSelect className={select} value={v.kind} onChange={e => setV({ ...v, kind: e.target.value })}>{ITIN.map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}</CustomSelect>
           <input className={`${input} flex-1 min-w-[10rem]`} required placeholder={tx('Title (e.g. Airport pickup 14:00)')} value={v.title} onChange={e => setV({ ...v, title: e.target.value })} />
           <input className={`${input} flex-1 min-w-[8rem]`} placeholder={tx('Note')} value={v.note} onChange={e => setV({ ...v, note: e.target.value })} />
           <button className={btn}>{tx('Add')}</button>
@@ -250,7 +252,7 @@ function FacilityAdmin() {
       <form onSubmit={async e => { e.preventDefault(); say(await jsend('POST', '/api/admin/tourism/facilities', { ...nf, languages: csv(nf.languages), specialties: csv(nf.specialties), acceptsInternational: true, services: {} }), 'Facility added. Now record its licence and accreditation, and assign staff.'); setNf({ name: '', kind: 'hospital', city: '', state: '', languages: '', specialties: '' }); }} className="bg-white border border-slate-200 p-4 grid grid-cols-2 gap-2">
         <h3 className="col-span-2 font-black uppercase tracking-wide">{tx('Add a facility')}</h3>
         <input className={input} required placeholder={tx('Name')} value={nf.name} onChange={e => setNf({ ...nf, name: e.target.value })} />
-        <select className={input} value={nf.kind} onChange={e => setNf({ ...nf, kind: e.target.value })}><option value="hospital">{tx('Hospital')}</option><option value="specialist_centre">{tx('Specialist centre')}</option><option value="clinic">{tx('Clinic')}</option><option value="dental">{tx('Dental')}</option></select>
+        <CustomSelect className={select} value={nf.kind} onChange={e => setNf({ ...nf, kind: e.target.value })}><option value="hospital">{tx('Hospital')}</option><option value="specialist_centre">{tx('Specialist centre')}</option><option value="clinic">{tx('Clinic')}</option><option value="dental">{tx('Dental')}</option></CustomSelect>
         <input className={input} placeholder={tx('City')} value={nf.city} onChange={e => setNf({ ...nf, city: e.target.value })} />
         <input className={input} placeholder={tx('State')} value={nf.state} onChange={e => setNf({ ...nf, state: e.target.value })} />
         <input className={input} placeholder={tx('Languages (comma-separated)')} value={nf.languages} onChange={e => setNf({ ...nf, languages: e.target.value })} />
@@ -284,7 +286,7 @@ function FacilityRow({ f, say }: { f: any; say: (d: any, ok?: string) => void; k
         </form>
         <form onSubmit={async e => { e.preventDefault(); say(await jsend('POST', `/api/admin/tourism/facilities/${f.id}/accreditations`, acc), 'Accreditation recorded.'); }} className="grid grid-cols-2 gap-2 border border-slate-100 p-2">
           <p className="col-span-2 font-bold">{tx('Record a JCI or MSQH accreditation you verified')}</p>
-          <select className={input} value={acc.body} onChange={e => setAcc({ ...acc, body: e.target.value })}><option value="JCI">{tx('JCI')}</option><option value="MSQH">{tx('MSQH')}</option><option value="other">{tx('Other')}</option></select>
+          <CustomSelect className={select} value={acc.body} onChange={e => setAcc({ ...acc, body: e.target.value })}><option value="JCI">{tx('JCI')}</option><option value="MSQH">{tx('MSQH')}</option><option value="other">{tx('Other')}</option></CustomSelect>
           <input className={input} required placeholder={tx('Certificate number')} value={acc.number} onChange={e => setAcc({ ...acc, number: e.target.value })} />
           <input className={input} required type="date" value={acc.validUntil} onChange={e => setAcc({ ...acc, validUntil: e.target.value })} />
           <input className={input} required placeholder={tx('How you checked it')} value={acc.reference} onChange={e => setAcc({ ...acc, reference: e.target.value })} />

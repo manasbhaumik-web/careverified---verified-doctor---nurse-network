@@ -1,3 +1,4 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
@@ -1519,18 +1520,18 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                       </div>
                       <div>
                         <label htmlFor="pp-cat" className="sr-only">Specialty</label>
-                        <select id="pp-cat" value={category} onChange={e => setCategory(e.target.value)} className={`${control} w-full`}>
+                        <CustomSelect id="pp-cat" value={category} onChange={e => setCategory(e.target.value)} className={`form-select ${control} w-full`}>
                           {categories.map(c => <option key={c} value={c}>{c === 'All' ? 'All specialties' : c}</option>)}
-                        </select>
+                        </CustomSelect>
                       </div>
                       <div>
                         <label htmlFor="pp-sort" className="sr-only">Sort by</label>
-                        <select id="pp-sort" value={sort} onChange={e => setSort(e.target.value as typeof sort)} className={`${control} w-full`}>
+                        <CustomSelect id="pp-sort" value={sort} onChange={e => setSort(e.target.value as typeof sort)} className={`form-select ${control} w-full`}>
                           <option value="featured">Featured first</option>
                           <option value="price-asc">Price, low to high</option>
                           <option value="price-desc">Price, high to low</option>
                           <option value="saving">Biggest saving</option>
-                        </select>
+                        </CustomSelect>
                       </div>
                     </form>
 
@@ -1784,17 +1785,17 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                       />
                     </div>
                     <div>
-                      <select value={category} onChange={e => setCategory(e.target.value)} className={`${control} w-full`}>
+                      <CustomSelect value={category} onChange={e => setCategory(e.target.value)} className={`form-select ${control} w-full`}>
                         {categories.map(c => <option key={c} value={c}>{c === 'All' ? 'All specialties' : c}</option>)}
-                      </select>
+                      </CustomSelect>
                     </div>
                     <div>
-                      <select value={sort} onChange={e => setSort(e.target.value as typeof sort)} className={`${control} w-full`}>
+                      <CustomSelect value={sort} onChange={e => setSort(e.target.value as typeof sort)} className={`form-select ${control} w-full`}>
                         <option value="featured">Featured first</option>
                         <option value="price-asc">Price, low to high</option>
                         <option value="price-desc">Price, high to low</option>
                         <option value="saving">Biggest saving</option>
-                      </select>
+                      </CustomSelect>
                     </div>
                   </div>
 
@@ -1842,13 +1843,13 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                       />
                     </div>
                     <div>
-                      <select value={cityFilter} onChange={e => setCityFilter(e.target.value)} className={`${control} w-full`}>
+                      <CustomSelect value={cityFilter} onChange={e => setCityFilter(e.target.value)} className={`form-select ${control} w-full`}>
                         <option value="All">All Regions / Cities</option>
                         <option value="Kuala Lumpur">Kuala Lumpur</option>
                         <option value="Petaling Jaya">Petaling Jaya (Selangor)</option>
                         <option value="George Town">George Town (Penang)</option>
                         <option value="Johor Bahru">Johor Bahru (Johor)</option>
-                      </select>
+                      </CustomSelect>
                     </div>
                   </div>
 
@@ -1891,13 +1892,13 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                       />
                     </div>
                     <div>
-                      <select value={cityFilter} onChange={e => setCityFilter(e.target.value)} className={`${control} w-full`}>
+                      <CustomSelect value={cityFilter} onChange={e => setCityFilter(e.target.value)} className={`form-select ${control} w-full`}>
                         <option value="All">All Regions / Cities</option>
                         <option value="Kuala Lumpur">Kuala Lumpur</option>
                         <option value="Subang Jaya">Subang Jaya (Selangor)</option>
                         <option value="George Town">George Town (Penang)</option>
                         <option value="Johor Bahru">Johor Bahru (Johor)</option>
-                      </select>
+                      </CustomSelect>
                     </div>
                   </div>
 
@@ -1940,7 +1941,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                       />
                     </div>
                     <div>
-                      <select value={cityFilter} onChange={e => setCityFilter(e.target.value)} className={`${control} w-full`}>
+                      <CustomSelect value={cityFilter} onChange={e => setCityFilter(e.target.value)} className={`form-select ${control} w-full`}>
                         <option value="All">All Locations</option>
                         <option value="Kuala Lumpur">Kuala Lumpur</option>
                         <option value="Petaling Jaya">Petaling Jaya (Selangor)</option>
@@ -1948,7 +1949,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                         <option value="Cheras">Cheras</option>
                         <option value="Penang">Penang</option>
                         <option value="Johor Bahru">Johor Bahru</option>
-                      </select>
+                      </CustomSelect>
                     </div>
                   </div>
 
@@ -1991,13 +1992,13 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                       />
                     </div>
                     <div>
-                      <select value={cityFilter} onChange={e => setCityFilter(e.target.value)} className={`${control} w-full`}>
+                      <CustomSelect value={cityFilter} onChange={e => setCityFilter(e.target.value)} className={`form-select ${control} w-full`}>
                         <option value="All">All Locations</option>
                         <option value="Kuala Lumpur">Kuala Lumpur</option>
                         <option value="Petaling Jaya">Petaling Jaya (Selangor)</option>
                         <option value="Penang">Penang</option>
                         <option value="Johor Bahru">Johor Bahru</option>
-                      </select>
+                      </CustomSelect>
                     </div>
                   </div>
 
@@ -2076,13 +2077,13 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                       />
                     </div>
                     <div>
-                      <select value={cityFilter} onChange={e => setCityFilter(e.target.value)} className={`${control} w-full`}>
+                      <CustomSelect value={cityFilter} onChange={e => setCityFilter(e.target.value)} className={`form-select ${control} w-full`}>
                         <option value="All">All Cities</option>
                         <option value="Kuala Lumpur">Kuala Lumpur</option>
                         <option value="Petaling Jaya">Petaling Jaya (Selangor)</option>
                         <option value="George Town">George Town (Penang)</option>
                         <option value="Johor Bahru">Johor Bahru (Johor)</option>
-                      </select>
+                      </CustomSelect>
                     </div>
                   </div>
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import QRCode from 'qrcode';
 import { ShieldCheck } from 'lucide-react';
 import { useTr } from '../../locale';
-import { bannerPrimaryBtn } from '../DashboardHeader';
+import { bannerPrimaryBtn } from '../../shared/ui/DashboardHeader';
 import { btnDanger, fieldLabel, jfetch } from './shared';
 
 /** Two-factor sign-in with an authenticator app (Google Authenticator, Microsoft Authenticator, Authy...). */
@@ -69,7 +69,7 @@ export default function SecurityCard({ twoFactor, email, onChanged }: { twoFacto
             </div>
           </div>
           <label className="block"><span className={fieldLabel}>{tx('Verification 6-Digit Code')}</span>
-            <input value={code} onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" autoComplete="one-time-code" required className="h-12 w-full border border-slate-300 rounded-none px-3.5 bg-white text-base font-mono font-bold tracking-widest text-slate-900 outline-none focus:border-[color:var(--t-600)]" placeholder="000000" /></label>
+            <input value={code} onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" autoComplete="one-time-code" required className="h-12 w-full border border-slate-300 rounded-none px-3.5 bg-white text-base font-mono font-bold tracking-widest text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]" placeholder="000000" /></label>
           <button type="submit" disabled={busy || code.length !== 6} className={bannerPrimaryBtn}>{tx('Verify & Activate 2FA')}</button>
         </form>
       )}
@@ -78,8 +78,8 @@ export default function SecurityCard({ twoFactor, email, onChanged }: { twoFacto
         <form onSubmit={disable} className="space-y-4 bg-slate-50 border border-slate-200 p-4 rounded-none">
           <p className="text-xs text-slate-600 font-semibold">{tx('To disable two-factor authentication, confirm with your password and a current TOTP token.')}</p>
           <div className="grid sm:grid-cols-2 gap-3">
-            <label className="block"><span className={fieldLabel}>{tx('Password')}</span><input type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" className="h-10 w-full border border-slate-300 rounded-none px-3 bg-white text-xs font-semibold text-slate-900 outline-none focus:border-[color:var(--t-600)] transition-colors" /></label>
-            <label className="block"><span className={fieldLabel}>{tx('Current 6-digit token')}</span><input value={code} onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" required className="h-12 w-full border border-slate-300 rounded-none px-3.5 bg-white font-mono font-bold tracking-widest text-slate-900 outline-none focus:border-[color:var(--t-600)]" placeholder="000000" /></label>
+            <label className="block"><span className={fieldLabel}>{tx('Password')}</span><input type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" className="h-10 w-full border border-slate-300 rounded-none px-3 bg-white text-xs font-semibold text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors" /></label>
+            <label className="block"><span className={fieldLabel}>{tx('Current 6-digit token')}</span><input value={code} onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" required className="h-12 w-full border border-slate-300 rounded-none px-3.5 bg-white font-mono font-bold tracking-widest text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]" placeholder="000000" /></label>
           </div>
           <button type="submit" disabled={busy} className={btnDanger}>{tx('Deactivate Two-Factor')}</button>
         </form>

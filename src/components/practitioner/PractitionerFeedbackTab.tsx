@@ -161,7 +161,7 @@ export default function PractitionerFeedbackTab({
                             </span>
                             <button
                               onClick={onCancelReply}
-                              className="p-1 hover:bg-slate-200 text-slate-400 hover:text-slate-700 rounded-none transition-all cursor-pointer"
+                              className="p-1 hover:bg-slate-200 text-slate-400 hover:text-slate-700 rounded-none transition-colors cursor-pointer"
                             >
                               <X className="h-3.5 w-3.5" />
                             </button>
@@ -171,7 +171,7 @@ export default function PractitionerFeedbackTab({
                             rows={3}
                             value={replyTextMap[rev.id] || ''}
                             onChange={(e) => onReplyTextChange(rev.id, e.target.value)}
-                            className="w-full text-xs border border-slate-250 bg-white rounded-none p-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700"
+                            className="w-full text-xs border border-slate-250 bg-white rounded-none p-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700"
                             placeholder={tx('Address feedback objectively and respect confidentiality guidelines...')}
                             required
                           />

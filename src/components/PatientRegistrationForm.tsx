@@ -1,3 +1,4 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import { getLocale } from '../locale/store';
 import { useTr } from '../locale';
 import React, { useState } from 'react';
@@ -281,19 +282,19 @@ export default function PatientRegistrationForm({
               <PhoneField id="reg-phone" title={tx('Mobile number')} value={phone} onChange={setPhone} />
               <div className="space-y-1.5">
                 <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block" htmlFor="reg-gender">{tx('Gender')}</label>
-                <select id="reg-gender" value={gender} onChange={(e) => setGender(e.target.value)} className="form-select">
+                <CustomSelect id="reg-gender" value={gender} onChange={(e) => setGender(e.target.value)} className="form-select">
                   <option value="Male">{tx('Male')}</option>
                   <option value="Female">{tx('Female')}</option>
                   <option value="Other">{tx('Other')}</option>
-                </select>
+                </CustomSelect>
                 {nric && nric.gender !== gender && <p className="text-xs font-semibold text-amber-700 mt-1">{tx('Your MyKad number suggests {x}. Keep your choice if you prefer.', { x: tx(nric.gender) })}</p>}
               </div>
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 block" htmlFor="reg-lang">{tx('Preferred language for care')}</label>
-              <select id="reg-lang" value={preferredLanguage} onChange={(e) => setPreferredLanguage(e.target.value)} className="form-select">
+              <CustomSelect id="reg-lang" value={preferredLanguage} onChange={(e) => setPreferredLanguage(e.target.value)} className="form-select">
                 {PREFERRED_LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
-              </select>
+              </CustomSelect>
               <p className="text-xs text-slate-500 font-semibold mt-1">{tx('Used to match you with a practitioner who speaks your language')}{age ? tx('. Age on record: {age}.', { age }) : '.'}</p>
             </div>
             <AddressFields value={address} onChange={setAddress} />
@@ -362,9 +363,9 @@ export default function PatientRegistrationForm({
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-extrabold uppercase tracking-wider text-slate-600 block">{tx('Relationship')}</label>
-                  <select value={emergencyRelationship} onChange={(e) => setEmergencyRelationship(e.target.value)} className="form-select">
+                  <CustomSelect value={emergencyRelationship} onChange={(e) => setEmergencyRelationship(e.target.value)} className="form-select">
                     {RELATIONSHIPS.map(r => <option key={r} value={r}>{tx(r)}</option>)}
-                  </select>
+                  </CustomSelect>
                 </div>
               </div>
               <PhoneField id="reg-emergency-phone" title={tx('Emergency phone number')} value={emergencyPhone} onChange={setEmergencyPhone} />
@@ -375,9 +376,9 @@ export default function PatientRegistrationForm({
               {separateNok && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-[color:var(--t-200)] p-3">
                   <input type="text" value={nokName} onChange={(e) => setNokName(e.target.value)} placeholder={tx('Next of kin name')} aria-label={tx('Next of kin name')} className="form-input" required />
-                  <select value={nokRelationship} onChange={(e) => setNokRelationship(e.target.value)} aria-label={tx('Next of kin relationship')} className="form-select">
+                  <CustomSelect value={nokRelationship} onChange={(e) => setNokRelationship(e.target.value)} aria-label={tx('Next of kin relationship')} className="form-select">
                     {RELATIONSHIPS.map(r => <option key={r} value={r}>{tx(r)}</option>)}
-                  </select>
+                  </CustomSelect>
                   <div className="sm:col-span-2"><PhoneField id="reg-nok-phone" title={tx('Next of kin phone')} value={nokPhone} onChange={setNokPhone} /></div>
                 </div>
               )}

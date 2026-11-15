@@ -1,3 +1,4 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useCallback, useEffect, useState } from 'react';
 import PrivacyAdmin from './PrivacyAdmin';
 import { X, ShieldCheck, Download, FileText } from 'lucide-react';
@@ -171,9 +172,9 @@ export default function PrivacyCentre() {
                 <h3 className="text-sm font-black uppercase tracking-wide text-slate-700 mb-2">Ask us about my data</h3>
                 <a href="/api/me/export" className="inline-flex items-center gap-1.5 text-xs font-bold text-[color:var(--t-700)] hover:underline mb-3"><Download className="h-3.5 w-3.5" /> Download my data now (JSON)</a>
                 <form onSubmit={submit} className="space-y-2">
-                  <select value={kind} onChange={e => setKind(e.target.value)} className="form-select text-xs font-bold">
+                  <CustomSelect value={kind} onChange={e => setKind(e.target.value)} className="form-select text-xs font-bold">
                     {Object.entries(REQUEST_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
-                  </select>
+                  </CustomSelect>
                   <textarea value={details} onChange={e => setDetails(e.target.value)} rows={3} maxLength={1000} placeholder={kind === 'correction' ? 'What is wrong and what should it say?' : 'Details (optional for access requests)'}
                     className="form-textarea text-xs" />
                   <button className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold px-4 py-2 cursor-pointer">Send request</button>

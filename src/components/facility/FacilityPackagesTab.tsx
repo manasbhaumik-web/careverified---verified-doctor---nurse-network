@@ -11,8 +11,8 @@ import {
   CreditCard,
 } from 'lucide-react';
 import { useTr } from '../../locale';
-import WorkspaceHeader from '../WorkspaceHeader';
-import { BannerBadge } from '../DashboardHeader';
+import WorkspaceHeader from '../../shared/ui/WorkspaceHeader';
+import { BannerBadge, FilterSelect } from '../../shared/ui/DashboardHeader';
 import { MedicalPackage, MedicalPromotion, PackageOrder } from './types';
 
 export interface FacilityPackagesTabProps {
@@ -101,8 +101,8 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
             {packageSubTab === 'packages' && (
               <div className="space-y-4">
                 {/* Search & Filter Bar */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white border border-[color:var(--t-200)] p-3">
-                  <div className="relative">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 bg-white border border-[color:var(--t-200)] p-3">
+                  <div className="relative flex-1 min-w-[200px]">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                     <input
                       type="text"
@@ -113,25 +113,28 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                     />
                   </div>
 
-                  <select
-                    value={packageCategoryFilter}
-                    onChange={e => setPackageCategoryFilter(e.target.value)}
-                    className="form-select text-xs h-10"
-                  >
-                    {['All', 'Health Screening', 'Cardiology', 'Orthopaedics', 'Maternity', 'Fertility', 'Oncology', 'Ophthalmology', 'Dental', 'Surgery', 'Aesthetics'].map(c => (
-                      <option key={c} value={c}>{c === 'All' ? 'All Categories' : c}</option>
-                    ))}
-                  </select>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <FilterSelect
+                      label={tx('Category')}
+                      value={packageCategoryFilter}
+                      onChange={v => setPackageCategoryFilter(v)}
+                      options={['All', 'Health Screening', 'Cardiology', 'Orthopaedics', 'Maternity', 'Fertility', 'Oncology', 'Ophthalmology', 'Dental', 'Surgery', 'Aesthetics'].map(c => ({
+                        value: c,
+                        label: c === 'All' ? tx('All Categories') : tx(c),
+                      }))}
+                    />
 
-                  <select
-                    value={packageStatusFilter}
-                    onChange={e => setPackageStatusFilter(e.target.value as any)}
-                    className="form-select text-xs h-10"
-                  >
-                    <option value="all">{tx('All Publishing Statuses')}</option>
-                    <option value="published">{tx('Published (Live to Patients)')}</option>
-                    <option value="draft">{tx('Draft / Unpublished')}</option>
-                  </select>
+                    <FilterSelect
+                      label={tx('Status')}
+                      value={packageStatusFilter}
+                      onChange={v => setPackageStatusFilter(v as any)}
+                      options={[
+                        { value: 'all', label: tx('All Publishing Statuses') },
+                        { value: 'published', label: tx('Published (Live to Patients)') },
+                        { value: 'draft', label: tx('Draft / Unpublished') },
+                      ]}
+                    />
+                  </div>
                 </div>
 
                 {/* Package Cards Grid */}
@@ -402,10 +405,10 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                           key={st}
                           type="button"
                           onClick={() => setOrderStatusFilter(st as any)}
-                          className={`px-2.5 py-1 text-xs font-bold uppercase cursor-pointer ${
+                          className={`px-2.5 py-1 text-xs font-bold uppercase cursor-pointer rounded-none border transition-colors ${
                             orderStatusFilter === st
-                              ? 'bg-slate-900 text-white'
-                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                              ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]'
+                              : 'bg-[color:var(--t-bg)] text-slate-600 border-[color:var(--t-200)] hover:bg-[color:var(--t-50)]'
                           }`}
                         >
                           {st}

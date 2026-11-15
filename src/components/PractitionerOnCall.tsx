@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AlertTriangle, Power, Radio, CheckCircle2 } from 'lucide-react';
-import ConsultRoom from './ConsultRoom';
+import ConsultRoom from '../domains/telemedicine/ConsultRoom';
 import { formatMoney, useTr } from '../locale';
-import WorkspaceHeader from './WorkspaceHeader';
-import { BannerBadge } from './DashboardHeader';
+import WorkspaceHeader from '../shared/ui/WorkspaceHeader';
+import { BannerBadge } from '../shared/ui/DashboardHeader';
 
 const jpost = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -318,7 +318,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
                 <div key={l as string} className="bg-slate-50 border border-slate-100 p-2.5"><p className="text-xs uppercase font-bold text-slate-500">{l}</p><p className="text-xs font-black tabular-nums">{fmtRM(v as number)}</p></div>
               ))}
             </div>
-            <p className="text-xs text-slate-500">{tx('Payouts are not automated yet; the board settles earnings manually.')}</p>
+            <p className="text-xs text-slate-500">{tx('Earnings follow the standard settlement hold and are disbursed to your verified Malaysian bank account under Earnings & Payouts.')}</p>
             {earnings.rows.length > 0 ? (
               <ul className="divide-y divide-slate-100 text-xs">
                 {earnings.rows.slice(0, 10).map((r: any) => (

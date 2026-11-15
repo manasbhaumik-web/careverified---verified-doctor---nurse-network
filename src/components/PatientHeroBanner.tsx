@@ -1,6 +1,10 @@
 import React from 'react';
 import { useTr } from '../locale';
-import { CheckCircle2, LifeBuoy, Video, Sparkles, FolderHeart } from 'lucide-react';
+import {
+  CheckCircle2, LifeBuoy, Video, Sparkles, FolderHeart,
+  Heart, Calendar, MessageSquare, Pill, FlaskConical, FileText,
+  Search, UserCheck, Store, BookOpen, PackagePlus, HeartHandshake, Plane
+} from 'lucide-react';
 import DashboardHeader, {
   BannerRow,
   BannerIdentity,
@@ -9,7 +13,7 @@ import DashboardHeader, {
   bannerOnBrandPrimaryBtn,
   bannerOnBrandSecondaryBtn,
   type DashboardTab,
-} from './DashboardHeader';
+} from '../shared/ui/DashboardHeader';
 
 export interface PatientHeroBannerProps<T extends string = string> {
   userName?: string;
@@ -98,14 +102,101 @@ export default function PatientHeroBanner<T extends string = string>({
     </div>
   );
 
+  const navigatePatientGroup = (groupKey: string, subId?: string) => {
+    const viewMap: Record<string, string> = {
+      care: 'patient_care',
+      records: 'patient_records',
+      discovery: 'patient_discovery',
+      services: 'patient_services',
+    };
+    try {
+      if (subId) sessionStorage.setItem('medcred_patient_subtab', subId);
+    } catch { /* ignore */ }
+    if (onTabChange && !subId) {
+      onTabChange(groupKey as T);
+      return;
+    }
+    const targetView = viewMap[groupKey] || 'patient_care';
+    window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: targetView }));
+  };
+
+  const defaultPatientTabs: DashboardTab<any>[] = [
+    {
+      id: 'care',
+      label: tx('My Care'),
+      icon: Heart,
+      count: upcomingCount || undefined,
+      summary: tx('Upcoming visits, live consults, and your saved clinicians.'),
+      cta: { label: tx('Start Instant Consult'), onClick: () => navigatePatientGroup('care', 'consult') },
+      onSubTabChange: (subId) => navigatePatientGroup('care', subId),
+      subItems: [
+        { id: 'appointments', label: tx('Appointments'), description: tx('Manage upcoming visits, reschedules & history'), icon: Calendar, count: upcomingCount || undefined },
+        { id: 'consult', label: tx('Instant Consult'), description: tx('24/7 video consults & AI symptom triage'), icon: Video },
+        { id: 'messages', label: tx('Messages'), description: tx('Encrypted chat with your doctors & clinics'), icon: MessageSquare },
+        { id: 'saved', label: tx('My Care Team'), description: tx('Bookmarked specialists, nurses & clinics'), icon: Heart, count: careTeamCount || undefined },
+      ],
+    },
+    {
+      id: 'records',
+      label: tx('Health Records'),
+      icon: FolderHeart,
+      summary: tx('Verified EHR vitals, prescriptions, labs, and digital MCs.'),
+      cta: { label: tx('View Prescriptions'), onClick: () => navigatePatientGroup('records', 'prescriptions') },
+      onSubTabChange: (subId) => navigatePatientGroup('records', subId),
+      subItems: [
+        { id: 'records', label: tx('Vitals & Profile'), description: tx('Blood pressure, allergies, chronic conditions & EHR'), icon: FolderHeart },
+        { id: 'prescriptions', label: tx('Prescriptions'), description: tx('Active e-prescriptions, refills & pharmacy pickup'), icon: Pill },
+        { id: 'labs', label: tx('Lab Results'), description: tx('Diagnostic panels, imaging & pathology reports'), icon: FlaskConical },
+        { id: 'certs', label: tx('MC & Referrals'), description: tx('Digital medical certificates & specialist letters'), icon: FileText },
+      ],
+    },
+    {
+      id: 'discovery',
+      label: tx('Find Care'),
+      icon: Search,
+      summary: tx('Search MMC doctors, LJM nurses, and verified pharmacies.'),
+      cta: { label: tx('Find a Doctor'), onClick: () => navigatePatientGroup('discovery', 'registry') },
+      onSubTabChange: (subId) => navigatePatientGroup('discovery', subId),
+      subItems: [
+        { id: 'registry', label: tx('Doctors & Specialists'), description: tx('Search MMC-verified physicians by specialty'), icon: Search },
+        { id: 'nurses', label: tx('Nurses & Home Care'), description: tx('LJM-verified nurses for home recovery & care'), icon: UserCheck },
+        { id: 'pharmacies', label: tx('Pharmacies'), description: tx('Nearby verified dispensaries & cold-chain delivery'), icon: Store },
+        { id: 'articles', label: tx('Health Library'), description: tx('Clinician-reviewed guides & medication advice'), icon: BookOpen },
+      ],
+    },
+    {
+      id: 'services',
+      label: tx('Packages & Quotes'),
+      icon: PackagePlus,
+      summary: tx('Bundled screening plans, cost estimates, and medical travel.'),
+      cta: { label: tx('Browse Health Packages'), onClick: () => navigatePatientGroup('services', 'packages') },
+      onSubTabChange: (subId) => navigatePatientGroup('services', subId),
+      subItems: [
+        { id: 'packages', label: tx('Health Packages'), description: tx('Bundled screening, maternity & checkup plans'), icon: PackagePlus },
+        { id: 'assistance', label: tx('Cost Quotes & Aid'), description: tx('Treatment estimates & financial assistance requests'), icon: HeartHandshake },
+        { id: 'tourism', label: tx('Medical Travel'), description: tx('Cross-border hospital coordination & concierge'), icon: Plane },
+      ],
+    },
+  ];
+
+  const resolvedTabs = tabs ?? (defaultPatientTabs as DashboardTab<T>[]);
+  const handleDefaultTabChange = (grp: T) => {
+    if (onTabChange) {
+      onTabChange(grp);
+      return;
+    }
+    navigatePatientGroup(String(grp));
+  };
+
   return (
     <DashboardHeader
       fullWidth={true}
-      tabs={tabs}
+      tabs={resolvedTabs}
       activeTab={activeTab}
-      onTabChange={onTabChange}
+      onTabChange={handleDefaultTabChange}
       tabsLabel={tabsLabel || tx('{name} sections', { name: tx(groupName) })}
       tabsRight={helpRightNode}
+      menuStyle="mega"
     >
       <BannerRow
         identity={

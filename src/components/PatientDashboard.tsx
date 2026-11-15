@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { maskNric } from '../identity';
 import { navigate } from '../nav';
 import { 
@@ -11,24 +11,29 @@ import {
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking, PatientProfile, UserRole, Article, ConsultationMode } from '../types';
 import { INITIAL_ARTICLES } from '../data';
-import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, FilterSelect, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from './DashboardHeader';
-import PatientRecords, { RecordSubTab } from './PatientRecords';
+import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, FilterSelect, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from '../shared/ui/DashboardHeader';
+import type { RecordSubTab } from './PatientRecords';
 import SavedTab from './patient/SavedTab';
+import PatientAppointmentsTab from './patient/PatientAppointmentsTab';
 import PaymentDialog from './PaymentDialog';
-import { formatMoney, formatDate, useTr } from '../locale';
-import ConsultNow from './ConsultNow';
-import SecureMessenger from './SecureMessenger';
-import MedicalPackagesModule from './MedicalPackagesModule';
-import MedicalAssistanceModule from './MedicalAssistanceModule';
-import MedicalTourism from './MedicalTourism';
-import PharmacyFinder from './PharmacyFinder';
-import MedicalLibrary from './MedicalLibrary';
-import AISymptomMatcher from './AISymptomMatcher';
+import { formatMoney, useTr } from '../locale';
 import PatientHeroBanner from './PatientHeroBanner';
 import { useOnCallStatus, onCallLabel } from '../useOnCallStatus';
 import { useSavedProviders } from '../savedProviders';
 import { UserAvatar } from '../avatars';
-import WorkspaceHeader from './WorkspaceHeader';
+import WorkspaceHeader from '../shared/ui/WorkspaceHeader';
+import { patientApi } from './patient/api';
+import { classifyBp, fmtPatientDate as fmtDate, matchRecommendedSpecialists } from './patient/clinicalHelpers';
+
+const PatientRecords = lazy(() => import('./PatientRecords'));
+const ConsultNow = lazy(() => import('../domains/telemedicine/ConsultNow'));
+const SecureMessenger = lazy(() => import('../domains/telemedicine/SecureMessenger'));
+const MedicalPackagesModule = lazy(() => import('./MedicalPackagesModule'));
+const MedicalAssistanceModule = lazy(() => import('./MedicalAssistanceModule'));
+const MedicalTourism = lazy(() => import('./MedicalTourism'));
+const PharmacyFinder = lazy(() => import('./PharmacyFinder'));
+const MedicalLibrary = lazy(() => import('./MedicalLibrary'));
+const AISymptomMatcher = lazy(() => import('../domains/telemedicine/AISymptomMatcher'));
 
 export type PatientDashboardTab = 
   | 'appointments' 
@@ -52,45 +57,45 @@ export type PatientTabGroup = 'care' | 'records' | 'services' | 'discovery';
 export const PATIENT_GROUPS: Record<PatientTabGroup, {
   name: string;
   defaultTab: PatientDashboardTab;
-  tabs: { id: PatientDashboardTab; label: string; icon: any; count?: number }[];
+  tabs: { id: PatientDashboardTab; label: string; description: string; icon: any; count?: number }[];
 }> = {
   care: {
-    name: 'My Care & Consultations',
+    name: 'My Care',
     defaultTab: 'appointments',
     tabs: [
-      { id: 'appointments', label: 'Appointments & Visits', icon: Calendar },
-      { id: 'consult', label: 'Consult Now', icon: Video },
-      { id: 'messages', label: 'Care Mailbox', icon: MessageSquare },
-      { id: 'saved', label: 'Care Team', icon: Heart },
+      { id: 'appointments', label: 'Appointments', description: 'Manage upcoming visits, reschedules & history', icon: Calendar },
+      { id: 'consult', label: 'Instant Consult', description: '24/7 video consults & AI symptom triage', icon: Video },
+      { id: 'messages', label: 'Messages', description: 'Encrypted chat with your doctors & clinics', icon: MessageSquare },
+      { id: 'saved', label: 'My Care Team', description: 'Bookmarked specialists, nurses & clinics', icon: Heart },
     ],
   },
   records: {
-    name: 'Health Records & Prescriptions',
+    name: 'Health Records',
     defaultTab: 'records',
     tabs: [
-      { id: 'records', label: 'Clinical Profile & Vitals', icon: FolderHeart },
-      { id: 'prescriptions', label: 'Prescriptions & Meds', icon: Pill },
-      { id: 'certs', label: 'Certificates & Referrals', icon: FileText },
-      { id: 'labs', label: 'Labs & Doctor Notes', icon: FlaskConical },
-    ],
-  },
-  services: {
-    name: 'Packages & Assistance',
-    defaultTab: 'packages',
-    tabs: [
-      { id: 'packages', label: 'Medical Packages', icon: PackagePlus },
-      { id: 'assistance', label: 'Assistance & Quotes', icon: HeartHandshake },
-      { id: 'tourism', label: 'Global Patient Care', icon: Plane },
+      { id: 'records', label: 'Vitals & Profile', description: 'Blood pressure, allergies, chronic conditions & EHR', icon: FolderHeart },
+      { id: 'prescriptions', label: 'Prescriptions', description: 'Active e-prescriptions, refills & pharmacy pickup', icon: Pill },
+      { id: 'labs', label: 'Lab Results', description: 'Diagnostic panels, imaging & pathology reports', icon: FlaskConical },
+      { id: 'certs', label: 'MC & Referrals', description: 'Digital medical certificates & specialist letters', icon: FileText },
     ],
   },
   discovery: {
-    name: 'Medical Network & Library',
+    name: 'Find Care',
     defaultTab: 'registry',
     tabs: [
-      { id: 'registry', label: 'Doctors & Specialists', icon: Search },
-      { id: 'nurses', label: 'Clinical Nurses', icon: UserCheck },
-      { id: 'pharmacies', label: 'Pharmacies', icon: Store },
-      { id: 'articles', label: 'Medical Library', icon: BookOpen },
+      { id: 'registry', label: 'Doctors & Specialists', description: 'Search MMC-verified physicians by specialty', icon: Search },
+      { id: 'nurses', label: 'Nurses & Home Care', description: 'LJM-verified nurses for home recovery & care', icon: UserCheck },
+      { id: 'pharmacies', label: 'Pharmacies', description: 'Nearby verified dispensaries & cold-chain delivery', icon: Store },
+      { id: 'articles', label: 'Health Library', description: 'Clinician-reviewed guides & medication advice', icon: BookOpen },
+    ],
+  },
+  services: {
+    name: 'Packages & Quotes',
+    defaultTab: 'packages',
+    tabs: [
+      { id: 'packages', label: 'Health Packages', description: 'Bundled screening, maternity & checkup plans', icon: PackagePlus },
+      { id: 'assistance', label: 'Cost Quotes & Aid', description: 'Treatment estimates & financial assistance requests', icon: HeartHandshake },
+      { id: 'tourism', label: 'Medical Travel', description: 'Cross-border hospital coordination & concierge', icon: Plane },
     ],
   },
 };
@@ -143,16 +148,6 @@ interface SupportTicket {
 }
 
 
-const fmtDate = (iso?: string | null) => {
-  if (!iso) return '';
-  try {
-    const d = new Date(iso);
-    return formatDate(d, { day: 'numeric', month: 'short', year: 'numeric' });
-  } catch {
-    return iso;
-  }
-};
-
 export default function PatientDashboard({
   bookings, setBookings, professionals, onSelectProfessional, onNavigateToMessages, onConsultNow, onOpenArticle, onFindDoctors, onOpenTriage, onOpenPharmacies, onOpenHelp, activeGroup, initialTab, currentUser, articles,
   selectedSpecialtyFilter, onSelectSpecialtyFilter, onClearSpecialtyFilter,
@@ -166,11 +161,26 @@ export default function PatientDashboard({
     ) : 'care'
   );
 
-  const [activeTab, setActiveTab] = useState<PatientDashboardTab>(
-    initialTab || PATIENT_GROUPS[currentGroup].defaultTab
-  );
+  const [activeTab, setActiveTab] = useState<PatientDashboardTab>(() => {
+    try {
+      const pending = sessionStorage.getItem('medcred_patient_subtab') as PatientDashboardTab | null;
+      if (pending) {
+        sessionStorage.removeItem('medcred_patient_subtab');
+        return pending;
+      }
+    } catch { /* ignore */ }
+    return initialTab || PATIENT_GROUPS[currentGroup].defaultTab;
+  });
 
   useEffect(() => {
+    try {
+      const pending = sessionStorage.getItem('medcred_patient_subtab') as PatientDashboardTab | null;
+      if (pending) {
+        sessionStorage.removeItem('medcred_patient_subtab');
+        setActiveTab(pending);
+        return;
+      }
+    } catch { /* ignore */ }
     if (activeGroup) {
       const allowed = PATIENT_GROUPS[activeGroup].tabs.map(t => t.id);
       if (initialTab && allowed.includes(initialTab)) {
@@ -246,7 +256,7 @@ export default function PatientDashboard({
 
   // Load Recommended Reading
   useEffect(() => {
-    fetch('/api/me/recommended-reading').then(r => r.json()).then(d => d.status === 'success' && setReading(d.data)).catch(() => {});
+    patientApi.getRecommendedReading().then(d => d?.status === 'success' && setReading(d.data));
   }, []);
 
   const patientUser: (PatientProfile & { avatarUrl?: string }) | null = (() => {
@@ -260,7 +270,7 @@ export default function PatientDashboard({
 
   // Load Primary Records Data
   const loadSummary = useCallback(async () => {
-    const d = await fetch('/api/records/me').then(r => r.json()).catch(() => null);
+    const d = await patientApi.getMyRecords();
     if (d?.status !== 'success' || !d.data) return;
     setRecordsData(d.data);
     const vitals = d.data.vitals || [];
@@ -277,10 +287,10 @@ export default function PatientDashboard({
   // Load On-Call, Consults, Pharmacies, and Support Inquiries
   const loadClinicalIntegrations = useCallback(async () => {
     const [onCall, consults, pharms, support] = await Promise.all([
-      fetch('/api/on-call/status').then(r => r.json()).catch(() => null),
-      fetch('/api/consults/mine').then(r => r.json()).catch(() => null),
-      fetch('/api/pharmacies').then(r => r.json()).catch(() => null),
-      fetch('/api/support/tickets').then(r => r.json()).catch(() => null),
+      patientApi.getOnCallStatus(),
+      patientApi.getMyConsults(),
+      patientApi.getPharmacies(),
+      patientApi.getSupportTickets(),
     ]);
 
     if (onCall?.status === 'success') setOnCallStatus(onCall.data);
@@ -338,33 +348,14 @@ export default function PatientDashboard({
   })();
 
   // Condition-Aware Specialist Matching Engine
-  const recommendedSpecialists: (DoctorProfile | NurseProfile)[] = (() => {
-    const conditionsStr = patientConditions.join(' ').toLowerCase();
-    const hasHypertension = conditionsStr.includes('hyper') || conditionsStr.includes('pressure') || (summary?.bp && summary.bp.value1 >= 130);
-    const hasDermatology = conditionsStr.includes('skin') || conditionsStr.includes('derm') || conditionsStr.includes('eczema') || conditionsStr.includes('rash');
-    const hasPediatric = conditionsStr.includes('pediat') || conditionsStr.includes('child');
-    const hasNeuro = conditionsStr.includes('neuro') || conditionsStr.includes('migraine') || conditionsStr.includes('headache');
-
-    const matched = professionals.filter(p => {
-      const spec = p.specialization.toLowerCase();
-      if (hasHypertension && (spec.includes('cardio') || spec.includes('physician') || spec.includes('general'))) return true;
-      if (hasDermatology && spec.includes('derm')) return true;
-      if (hasPediatric && spec.includes('pediat')) return true;
-      if (hasNeuro && spec.includes('neuro')) return true;
-      return false;
-    });
-
-    if (matched.length > 0) return matched.slice(0, 3);
-    // Fallback: top verified doctors
-    return professionals.filter(p => p.role === UserRole.DOCTOR).slice(0, 3);
-  })();
+  const recommendedSpecialists = matchRecommendedSpecialists(professionals, patientConditions, summary?.bp?.value1);
 
   const cancelBooking = (b: Booking) => {
     setCancelModal({ type: 'booking', booking: b });
   };
 
   const confirmCancelBooking = async (b: Booking) => {
-    const d = await fetch(`/api/bookings/${b.id}/cancel`, { method: 'POST' }).then(r => r.json()).catch(() => null);
+    const d = await patientApi.cancelBooking(b.id);
     if (d?.status === 'success') {
       setBookings(prev => prev.map(x => (x.id === b.id ? d.data : x)));
       setMsg(d.message || tx('Appointment cancelled. Refund processed.'));
@@ -377,7 +368,7 @@ export default function PatientDashboard({
   };
 
   const confirmCancelActiveConsult = async (id: string) => {
-    const d = await fetch(`/api/consults/${id}/end`, { method: 'POST' }).then(r => r.json()).catch(() => null);
+    const d = await patientApi.endConsult(id);
     if (d?.status === 'success') {
       setMsg(tx('Consultation request cancelled. Refund processed automatically.'));
       loadClinicalIntegrations();
@@ -390,27 +381,6 @@ export default function PatientDashboard({
   const removeSaved = (id: string) => { void savedStore.remove(id); };
   const restoreSaved = (id: string) => { void savedStore.add(id); };
 
-  const classifyBp = (v1?: number | string | null, v2?: number | string | null) => {
-    const sys = Number(v1);
-    const dia = Number(v2);
-    if (!sys || !dia) {
-      return { label: 'Optimal / Normal', badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-300' };
-    }
-    if (sys >= 140 || dia >= 90) {
-      return { label: 'Stage 2 Hypertension', badgeClass: 'bg-rose-50 text-rose-800 border-rose-300' };
-    }
-    if ((sys >= 130 && sys < 140) || (dia >= 80 && dia < 90)) {
-      return { label: 'Stage 1 Hypertension', badgeClass: 'bg-amber-50 text-amber-800 border-amber-300' };
-    }
-    if (sys >= 120 && sys < 130 && dia < 80) {
-      return { label: 'Elevated BP', badgeClass: 'bg-[color:var(--t-50)] text-[color:var(--t-800)] border-[color:var(--t-200)]' };
-    }
-    if (sys < 90 || dia < 60) {
-      return { label: 'Low BP (Hypotension)', badgeClass: 'bg-amber-50 text-amber-800 border-amber-300' };
-    }
-    return { label: 'Normal Target Range', badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-300' };
-  };
-
   // Dispatch Prescription Handler
   const handleDispatchPrescription = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -418,28 +388,18 @@ export default function PatientDashboard({
     setDispatchBusy(true);
     setDispatchResult(null);
 
-    try {
-      const resp = await fetch(`/api/prescriptions/${dispatchingRx.id}/send`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pharmacyId: selectedPharmacyId, shareSafety: shareSafetyRecord })
-      });
-      const data = await resp.json();
-      if (data.status === 'success') {
-        setDispatchResult({ ok: true, text: data.message || tx('Prescription transferred to pharmacy.') });
-        loadSummary();
-        setTimeout(() => {
-          setDispatchingRx(null);
-          setDispatchResult(null);
-        }, 1500);
-      } else {
-        setDispatchResult({ ok: false, text: data.message || tx('Could not transfer prescription.') });
-      }
-    } catch {
-      setDispatchResult({ ok: false, text: tx('Server connection error.') });
-    } finally {
-      setDispatchBusy(false);
+    const data = await patientApi.dispatchPrescription(dispatchingRx.id, selectedPharmacyId, shareSafetyRecord);
+    if (data?.status === 'success') {
+      setDispatchResult({ ok: true, text: data.message || tx('Prescription transferred to pharmacy.') });
+      loadSummary();
+      setTimeout(() => {
+        setDispatchingRx(null);
+        setDispatchResult(null);
+      }, 1500);
+    } else {
+      setDispatchResult({ ok: false, text: data?.message || tx('Could not transfer prescription.') });
     }
+    setDispatchBusy(false);
   };
 
   const openTickets = supportTickets.filter(t => t.status !== 'resolved');
@@ -469,6 +429,38 @@ export default function PatientDashboard({
     </div>
   );
 
+  const navigateToTab = (tab: PatientDashboardTab) => {
+    const tabToGroup: Record<PatientDashboardTab, PatientTabGroup> = {
+      appointments: 'care',
+      consult: 'care',
+      messages: 'care',
+      saved: 'care',
+      records: 'records',
+      prescriptions: 'records',
+      labs: 'records',
+      certs: 'records',
+      registry: 'discovery',
+      nurses: 'discovery',
+      pharmacies: 'discovery',
+      articles: 'discovery',
+      packages: 'services',
+      assistance: 'services',
+      tourism: 'services',
+    };
+    const viewMap: Record<PatientTabGroup, string> = {
+      care: 'patient_care',
+      records: 'patient_records',
+      services: 'patient_services',
+      discovery: 'patient_discovery',
+    };
+    const grp = tabToGroup[tab] || 'care';
+    try {
+      sessionStorage.setItem('medcred_patient_subtab', tab);
+    } catch { /* ignore */ }
+    window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: viewMap[grp] }));
+    setActiveTab(tab);
+  };
+
   return (
     <div className="w-full space-y-0" id="patient-dashboard-root">
       {/* 2. INSTITUTIONAL PATIENT HEADER (HERO BANNER FULL WIDTH AS MAIN HEADER) */}
@@ -482,34 +474,109 @@ export default function PatientDashboard({
         activeRxCount={summary?.activeRx ?? '–'}
         careTeamCount={careTeam.length}
         bpSummary={summary?.bp}
-        tabs={PATIENT_GROUPS[currentGroup].tabs.map(tab => ({ ...tab, label: tx(tab.label) })).map(t => {
-          if (t.id === 'appointments') return { ...t, count: upcoming.length };
-          if (t.id === 'prescriptions') return { ...t, count: activePrescriptions.length || undefined };
-          if (t.id === 'saved') return { ...t, count: savedIds.length };
-          return t;
-        })}
-        activeTab={activeTab}
-        onTabChange={(t) => {
-          setActiveTab(t);
-          if (t === 'records') setRecordsSubTab('overview');
-          if (t === 'prescriptions') setRxSubTab('active');
-          if (t === 'certs') setCertsSubTab('mc');
-          if (t === 'labs') setLabsSubTab('labs');
-          if (t === 'consult') setConsultSubTab('instant');
+        tabs={[
+          { key: 'care' as PatientTabGroup, viewId: 'patient_care', icon: Heart, count: upcoming.length || undefined },
+          { key: 'records' as PatientTabGroup, viewId: 'patient_records', icon: FolderHeart, count: activePrescriptions.length || undefined },
+          { key: 'discovery' as PatientTabGroup, viewId: 'patient_discovery', icon: Search },
+          { key: 'services' as PatientTabGroup, viewId: 'patient_services', icon: PackagePlus },
+        ].map(g => ({
+          id: g.key,
+          label: tx(PATIENT_GROUPS[g.key].name),
+          icon: g.icon,
+          count: g.count,
+          summary:
+            g.key === 'care'
+              ? tx('Upcoming visits, live consults, and your saved clinicians.')
+              : g.key === 'records'
+              ? tx('Verified EHR vitals, prescriptions, labs, and digital MCs.')
+              : g.key === 'discovery'
+              ? tx('Search MMC doctors, LJM nurses, and verified pharmacies.')
+              : tx('Bundled screening plans, cost estimates, and medical travel.'),
+          cta:
+            g.key === 'care'
+              ? { label: tx('Start Instant Consult'), onClick: () => { navigateToTab('consult'); setConsultSubTab('instant'); } }
+              : g.key === 'records'
+              ? { label: tx('View Prescriptions'), onClick: () => { setRxSubTab('active'); navigateToTab('prescriptions'); } }
+              : g.key === 'discovery'
+              ? { label: tx('Find a Doctor'), onClick: () => navigateToTab('registry') }
+              : { label: tx('Browse Health Packages'), onClick: () => navigateToTab('packages') },
+          activeSubTab: activeTab,
+          onSubTabChange: (subId: string) => {
+            const t = subId as PatientDashboardTab;
+            window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: g.viewId }));
+            setActiveTab(t);
+            if (t === 'records') setRecordsSubTab('overview');
+            if (t === 'prescriptions') setRxSubTab('active');
+            if (t === 'certs') setCertsSubTab('mc');
+            if (t === 'labs') setLabsSubTab('labs');
+            if (t === 'consult') setConsultSubTab('instant');
+          },
+          subItems: PATIENT_GROUPS[g.key].tabs.map(tab => ({
+            ...tab,
+            label: tx(tab.label),
+            description: tx(tab.description),
+            count:
+              tab.id === 'appointments'
+                ? upcoming.length
+                : tab.id === 'prescriptions'
+                ? (activePrescriptions.length || undefined)
+                : tab.id === 'saved'
+                ? savedIds.length
+                : undefined,
+          })),
+        }))}
+        activeTab={currentGroup}
+        onTabChange={(grp) => {
+          const viewMap: Record<PatientTabGroup, string> = {
+            care: 'patient_care',
+            records: 'patient_records',
+            services: 'patient_services',
+            discovery: 'patient_discovery',
+          };
+          window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: viewMap[grp] }));
+          setActiveTab(PATIENT_GROUPS[grp].defaultTab);
         }}
         tabsLabel={tx('{name} sections', { name: tx(PATIENT_GROUPS[currentGroup].name) })}
         onOpenHelp={onOpenHelp}
         openTicketsCount={openTickets.length}
-        onConsultNow={onConsultNow}
+        onConsultNow={() => {
+          navigateToTab('consult');
+          setConsultSubTab('instant');
+        }}
         onOpenTriage={() => {
-          setActiveTab('consult');
+          navigateToTab('consult');
           setConsultSubTab('triage');
         }}
-        onOpenRecords={() => { setActiveTab('records'); setRecordsSubTab('overview'); }}
+        onOpenRecords={() => {
+          setRecordsSubTab('overview');
+          navigateToTab('records');
+        }}
       />
 
       {/* 3. MAIN WORKSPACE CONTENT CONTAINER */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <Suspense
+        fallback={
+          <div className="space-y-4 animate-pulse" aria-busy="true" aria-label={tx('Loading workspace section')}>
+            <div className="h-20 bg-white border border-[color:var(--t-200)] p-4 flex items-center justify-between">
+              <div className="space-y-2 w-1/2">
+                <div className="h-3 w-28 bg-[color:var(--t-100)]" />
+                <div className="h-5 w-64 bg-slate-200" />
+              </div>
+              <div className="h-9 w-36 bg-[color:var(--t-100)]" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="h-24 bg-white border border-[color:var(--t-200)]" />
+              <div className="h-24 bg-white border border-[color:var(--t-200)]" />
+              <div className="h-24 bg-white border border-[color:var(--t-200)]" />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+              <div className="lg:col-span-5 h-72 bg-white border border-[color:var(--t-200)]" />
+              <div className="lg:col-span-7 h-72 bg-white border border-[color:var(--t-200)]" />
+            </div>
+          </div>
+        }
+      >
         {/* NOTIFICATION / STATUS DISMISSAL */}
       {msg && (
         <div
@@ -522,7 +589,7 @@ export default function PatientDashboard({
           </div>
           <button
             type="button"
-            className="text-xs font-bold text-[color:var(--t-600)] hover:text-white hover:bg-[color:var(--t-600)] px-3 py-1 bg-white border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer shrink-0"
+            className="text-xs font-bold text-[color:var(--t-600)] hover:text-white hover:bg-[color:var(--t-600)] px-3 py-1 bg-white border border-[color:var(--t-200)] shadow-2xs transition-colors cursor-pointer shrink-0"
             onClick={() => setMsg(null)}
           >
             {tx('Dismiss')}
@@ -532,1052 +599,33 @@ export default function PatientDashboard({
 
       {/* 4. MAIN WORKSPACE VIEW */}
       {activeTab === 'appointments' && (
-        <div id="panel-appointments" role="tabpanel" aria-labelledby="tab-appointments" tabIndex={0} className="space-y-5">
-          {/* INNER WORKSPACE HEADER TITLE SECTION */}
-          <WorkspaceHeader
-            icon={Calendar}
-            eyebrow={tx('My Care · Clinical Encounters')}
-            title={tx('Appointments & Consultation Visits')}
-            description={tx('Manage your upcoming confirmed visits, instant video consult rooms, and clinical consultation history archive.')}
-            badges={<BannerBadge tone="brand">{tx('MOH Protocol')}</BannerBadge>}
-            aside={
-              <div className="flex flex-wrap items-center gap-2">
-                {onFindDoctors && (
-                  <button
-                    type="button"
-                    onClick={onFindDoctors}
-                    className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
-                  >
-                    <Calendar className="h-3.5 w-3.5" />
-                    <span>{tx('Schedule Doctor Visit')}</span>
-                  </button>
-                )}
-              </div>
-            }
-            tabs={[
-              { id: 'all', label: tx('All Encounters'), count: bookings.length },
-              { id: 'upcoming', label: tx('Upcoming Visits'), count: upcoming.length },
-              { id: 'past', label: tx('Consultation Archive'), count: past.length },
-            ]}
-            activeTab={appointmentsSubTab}
-            onTabChange={setAppointmentsSubTab}
-          />
-
-          {/* LIVE ON-CALL CONSULTATION BANNER (Rendered if patient has an active/queued instant consult) */}
-          {activeConsult && (
-            <section
-              aria-label={tx('Active live consultation status')}
-              className="bg-emerald-50/90 border border-emerald-300 p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4"
-            >
-              <div className="flex items-start gap-3.5 min-w-0">
-                <div className="w-10 h-10 bg-white border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
-                  <Radio className="h-5 w-5 animate-pulse" />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-2xs font-mono font-black uppercase tracking-wider px-2 py-0.5 bg-emerald-600 text-white">
-                      {activeConsult.status === 'active'
-                        ? tx('Live Room Open')
-                        : activeConsult.status === 'queued'
-                        ? tx('In Triage Queue')
-                        : tx('Awaiting Payment')}
-                    </span>
-                    <h3 className="font-display font-black text-sm sm:text-base text-emerald-950">
-                      {activeConsult.status === 'active'
-                        ? tx('Your On-Call Doctor has joined the Video Room')
-                        : tx('Instant Telehealth Consultation in Progress')}
-                    </h3>
-                  </div>
-                  <p className="text-xs text-emerald-900 font-medium mt-1">
-                    {activeConsult.symptoms
-                      ? tx('Chief complaint: “{text}”', { text: activeConsult.symptoms })
-                      : tx('Encrypted WebRTC audio/video consultation room ready.')}
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab('consult');
-                    setConsultSubTab('instant');
-                  }}
-                  className="min-h-[38px] px-4 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
-                >
-                  <Video className="h-3.5 w-3.5" />
-                  <span>{tx('Enter Consultation Room')}</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => cancelActiveConsult(activeConsult.id)}
-                  className="min-h-[38px] px-3 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-emerald-200 text-xs font-bold transition-colors cursor-pointer"
-                >
-                  {tx('Cancel Request')}
-                </button>
-              </div>
-            </section>
-          )}
-
-          {/* TIER 1: UPCOMING SCHEDULED CONSULTATIONS (Shown in 'all' and 'upcoming' sub-tabs) */}
-          {(appointmentsSubTab === 'all' || appointmentsSubTab === 'upcoming') && (
-            <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6" aria-label={tx('Upcoming appointments')}>
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-3.5 border-b border-[color:var(--t-100)]">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shadow-2xs">
-                    <Clock className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
-                        {tx('Upcoming Consultations')}
-                      </h2>
-                      <span className="text-2xs font-mono font-extrabold bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-2 py-0.5">
-                        {tx('{n} Scheduled', { n: upcoming.length })}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 font-medium mt-0.5">
-                      {tx('Confirmed visits, video consult rooms, and scheduled clinic appointments')}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  {past.length > 0 && appointmentsSubTab === 'upcoming' && (
-                    <button
-                      type="button"
-                      onClick={() => setAppointmentsSubTab('past')}
-                      className="text-xs font-bold text-slate-600 hover:text-[color:var(--t-600)] cursor-pointer"
-                    >
-                      {tx('View Archive ({n})', { n: past.length })}
-                    </button>
-                  )}
-                  {onFindDoctors && (
-                    <button
-                      type="button"
-                      onClick={onFindDoctors}
-                      className="text-xs font-bold text-[color:var(--t-600)] hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <Search className="h-3.5 w-3.5" /> {tx('Book Another Doctor')}
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {upcoming.length === 0 ? (
-                <div className="p-8 sm:p-10 text-center flex flex-col items-center justify-center bg-[color:var(--t-50)]/40 border border-dashed border-[color:var(--t-200)] my-1">
-                  <div className="w-14 h-14 bg-white border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center mb-3.5 shadow-2xs">
-                    <Calendar className="h-6 w-6 text-[color:var(--t-600)]" />
-                  </div>
-                  <h3 className="font-display font-black text-sm text-[color:var(--ink)] mb-1">
-                    {tx('No Consultations Currently Scheduled')}
-                  </h3>
-                  <p className="text-xs text-slate-600 max-w-md font-medium leading-relaxed mb-6">
-                    {tx('Maintain your proactive care schedule. Connect immediately with an on-call triage doctor or book a future consultation with a council-verified practitioner.')}
-                  </p>
-                  <div className="flex flex-wrap items-center justify-center gap-3">
-                    <button
-                      type="button"
-                      onClick={onConsultNow}
-                      className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer"
-                    >
-                      <Video className="h-4 w-4" />
-                      <span>{tx('Consult On-Call Doctor Now')}</span>
-                    </button>
-                    {onFindDoctors && (
-                      <button
-                        type="button"
-                        onClick={onFindDoctors}
-                        className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] border border-[color:var(--t-200)] text-xs font-bold shadow-2xs transition-all cursor-pointer"
-                      >
-                        <Search className="h-4 w-4 text-[color:var(--t-600)]" />
-                        <span>{tx('Browse Medical Registry')}</span>
-                      </button>
-                    )}
-                    {onOpenTriage && (
-                      <button
-                        type="button"
-                        onClick={() => { setActiveTab('consult'); setConsultSubTab('triage'); }}
-                        className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] border border-[color:var(--t-200)] text-xs font-bold shadow-2xs transition-all cursor-pointer"
-                      >
-                        <Sparkles className="h-4 w-4 text-[color:var(--t-600)]" />
-                        <span>{tx('Check Symptoms')}</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3.5">
-                  {upcoming.map(b => {
-                    const prof = professionals.find(p => p.id === b.professionalId);
-                    const isPending = b.paymentStatus === 'Pending';
-                    const isNurse = prof?.role === UserRole.NURSE || (prof as any)?.category === 'Nurse';
-                    const modeLower = (b.mode || '').toLowerCase();
-                    const isVideo = modeLower.includes('video') || modeLower.includes('tele') || modeLower.includes('online');
-                    const isHomeVisit = modeLower.includes('home');
-
-                    return (
-                      <div
-                        key={b.id}
-                        className={`group bg-white p-4 sm:p-5 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-2xs ${isPending ? "border-amber-300 bg-amber-50/20" : "border-[color:var(--t-200)] hover:border-[color:var(--t-600)]"}`}
-                      >
-                        {/* Left: Professional info & appointment timing */}
-                        <div className="flex items-start gap-3.5 min-w-0">
-                          <div className="w-13 h-13 shrink-0 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center text-[color:var(--t-600)] overflow-hidden shadow-2xs">
-                            <UserAvatar
-                              src={prof?.avatar}
-                              role={prof?.role || 'doctor'}
-                              alt={b.professionalName}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-
-                          <div className="min-w-0">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => onSelectProfessional(b.professionalId)}
-                                className="font-display font-black text-xs sm:text-base text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left transition-colors cursor-pointer"
-                              >
-                                {b.professionalName}
-                              </button>
-                              <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
-                                <ShieldCheck className="h-3 w-3 text-emerald-600" />
-                                {isNurse ? tx('LJM Board Verified') : tx('MMC Council Verified')}
-                              </span>
-                              {isVideo ? (
-                                <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> {tx('WebRTC Audio/Video Encrypted')}
-                                </span>
-                              ) : isHomeVisit ? (
-                                <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-cyan-800 bg-cyan-50 border border-cyan-200 px-2 py-0.5">
-                                  <MapPin className="h-3 w-3 text-cyan-600" /> {tx('Home Care Visit')}
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5">
-                                  <MapPin className="h-3 w-3 text-slate-600" /> {tx('In-Clinic Consultation')}
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Specialty & Location Subtitle */}
-                            <p className="text-xs font-bold text-[color:var(--t-700)] mt-0.5">
-                              {prof?.specialization ? tx(prof.specialization) : tx('General Practice & Primary Care')}
-                              {prof?.city ? <span className="text-slate-500 font-medium"> · {prof.city}</span> : null}
-                            </p>
-
-                            {/* Date / Time / Mode / Fee Strip */}
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-slate-600 font-medium">
-                              <span className="inline-flex items-center gap-1.5 font-bold text-slate-800">
-                                <Calendar className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> {b.date}
-                              </span>
-                              <span className="text-slate-300">&bull;</span>
-                              <span className="inline-flex items-center gap-1.5 font-mono">
-                                <Clock className="h-3.5 w-3.5 text-slate-400" /> {b.timeSlot}
-                              </span>
-                              <span className="text-slate-300">&bull;</span>
-                              <span className="inline-flex items-center gap-1.5">
-                                {isVideo ? (
-                                  <Video className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                                ) : (
-                                  <MapPin className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                                )}
-                                {tx(String(b.mode))}
-                              </span>
-                              <span className="text-slate-300">&bull;</span>
-                              <span className="font-mono font-bold text-[color:var(--t-700)]">
-                                {formatMoney(b.fee)}
-                              </span>
-                              <span className="text-slate-300">&bull;</span>
-                              {isPending ? (
-                                <span className="inline-flex items-center gap-1 text-2xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
-                                  {tx('Awaiting Payment')}
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 text-2xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
-                                  <CheckCircle2 className="h-3 w-3 text-emerald-600" />
-                                  {tx('Confirmed & Paid')}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Right: Actions */}
-                        <div className="flex flex-wrap items-center gap-2 pt-3 lg:pt-0 border-t lg:border-t-0 border-[color:var(--t-100)] shrink-0">
-                          {isPending ? (
-                            <button
-                              type="button"
-                              onClick={() => setPaying(b)}
-                              className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
-                            >
-                              <span>{tx('Pay {amount}', { amount: formatMoney(b.fee) })}</span>
-                              <ArrowRight className="h-3.5 w-3.5" />
-                            </button>
-                          ) : (
-                            <>
-                              {isVideo && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setActiveTab('consult');
-                                    setConsultSubTab('instant');
-                                  }}
-                                  className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
-                                >
-                                  <Video className="h-3.5 w-3.5" />
-                                  <span>{tx('Join Video Room')}</span>
-                                </button>
-                              )}
-                              <button
-                                type="button"
-                                onClick={onNavigateToMessages}
-                                className="btn btn-sm btn-secondary whitespace-nowrap shrink-0"
-                              >
-                                <MessageSquare className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                                <span>{tx('Message')}</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => onSelectProfessional(b.professionalId)}
-                                className="btn btn-sm btn-secondary whitespace-nowrap shrink-0"
-                              >
-                                {tx('Doctor Profile')}
-                              </button>
-                            </>
-                          )}
-
-                          <button
-                            type="button"
-                            onClick={() => cancelBooking(b)}
-                            className="btn btn-sm btn-ghost text-slate-600 hover:text-rose-700 whitespace-nowrap shrink-0"
-                            title={tx('Cancel appointment')}
-                          >
-                            {tx('Cancel')}
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              <div className="mt-4 pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between text-xs text-slate-500 font-medium">
-                <span>{tx('Cancellations >24h in advance are 100% refunded to the original payment method.')}</span>
-                <span className="font-bold text-[color:var(--t-600)] hidden sm:inline">{tx('Statutory SLA Compliant')}</span>
-              </div>
-            </section>
-          )}
-
-          {/* TIER 2: COMPACT IMMEDIATE MEDICAL ASSISTANCE ACTION BAR (Shown in 'all' and 'upcoming') */}
-          {(appointmentsSubTab === 'all' || appointmentsSubTab === 'upcoming') && (
-            <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-3.5 sm:p-4" aria-label={tx('Immediate medical assistance channels')}>
-              <div className="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2.5 border-b border-[color:var(--t-100)]">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
-                    {tx('Immediate Medical Assistance')}
-                  </h2>
-                  <span className="hidden sm:inline text-xs text-slate-400">&bull;</span>
-                  <span className="hidden sm:inline text-xs text-slate-500 font-medium">{tx('On-demand video doctor, clinical AI triage & dispensary routing')}</span>
-                </div>
-                <span className="text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
-                  {onCallStatus && onCallStatus.onlineDoctors > 0 ? tx('{n} Doctors Online', { n: onCallStatus.onlineDoctors }) : tx('24/7 Care Triage')}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {/* CARD 1: ON-CALL VIDEO DOCTOR */}
-                <div className="border-2 border-[color:var(--t-600)] hover:border-[color:var(--t-700)] bg-white p-3 shadow-2xs flex flex-col justify-between transition-colors">
-                  <div>
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-7 h-7 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shrink-0">
-                          <Video className="h-3.5 w-3.5" />
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="font-display font-black text-sm text-[color:var(--ink)] leading-tight truncate">
-                            {tx('On-Call Video Doctor')}
-                          </h3>
-                          <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
-                            {tx('< 3 min wait · MMC Certified')}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 shrink-0">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> {tx('Live')}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap gap-1 mb-2.5">
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('Digital MC')}</span>
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('e-Prescription')}</span>
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">WebRTC HD</span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={onConsultNow}
-                    className="btn btn-sm btn-primary whitespace-nowrap w-full"
-                  >
-                    <Video className="h-3.5 w-3.5" />
-                    <span>{tx('Start Instant Consult')}</span>
-                    <ArrowRight className="h-3 w-3" />
-                  </button>
-                </div>
-
-                {/* CARD 2: AI CLINICAL SYMPTOM MATCHER */}
-                <div className="border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] bg-white p-3 shadow-2xs flex flex-col justify-between transition-colors group">
-                  <div>
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-7 h-7 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shrink-0">
-                          <Stethoscope className="h-3.5 w-3.5" />
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="font-display font-black text-sm text-[color:var(--ink)] leading-tight truncate">
-                            {tx('AI Symptom Triage')}
-                          </h3>
-                          <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
-                            {tx('MOH Protocol · Free Assessment')}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-1.5 py-0.2 shrink-0">
-                        {tx('Triage')}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap gap-1 mb-2.5">
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('180+ Conditions')}</span>
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('Red-Flag Check')}</span>
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('Dept Route')}</span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => { setActiveTab('consult'); setConsultSubTab('triage'); }}
-                    className="btn btn-sm btn-secondary whitespace-nowrap w-full"
-                  >
-                    <Stethoscope className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                    <span>{tx('Run Symptom Triage')}</span>
-                    <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)]" />
-                  </button>
-                </div>
-
-                {/* CARD 3: E-PRESCRIPTION & PHARMACY REFILL */}
-                <div className="border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] bg-white p-3 shadow-2xs flex flex-col justify-between transition-colors group">
-                  <div>
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-7 h-7 bg-cyan-50 border border-cyan-200 text-cyan-600 flex items-center justify-center shrink-0">
-                          <Pill className="h-3.5 w-3.5" />
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="font-display font-black text-sm text-[color:var(--ink)] leading-tight truncate">
-                            {tx('Pharmacy Dispensary')}
-                          </h3>
-                          <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
-                            {tx('{n} Active Prescriptions', { n: summary?.activeRx || 0 })}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-2xs font-mono font-bold text-cyan-800 bg-cyan-50 border border-cyan-200 px-1.5 py-0.2 shrink-0">
-                        {tx('Dispensary')}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap gap-1 mb-2.5">
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('50+ Retail Branches')}</span>
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('QR Verified')}</span>
-                      <span className="text-2xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.2">{tx('Home Courier')}</span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={onOpenPharmacies ? onOpenPharmacies : () => { setRecordsSubTab('rx'); setActiveTab('records'); }}
-                    className="w-full min-h-[34px] px-3 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                  >
-                    <Pill className="h-3.5 w-3.5 text-cyan-600" />
-                    <span>{tx('Refill Prescriptions')}</span>
-                    <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-[color:var(--t-600)]" />
-                  </button>
-                </div>
-              </div>
-            </section>
-          )}
-
-          {/* TIER 3: CONSULTATION HISTORY & EHR ARCHIVE (Shown in 'all' and 'past' sub-tabs) */}
-          {(appointmentsSubTab === 'all' || appointmentsSubTab === 'past') && (
-            <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6" aria-label={tx('Completed consultation history')}>
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-[color:var(--t-100)]">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shadow-2xs">
-                    <ClipboardList className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
-                        {tx('Consultation History & Encounter Archive')}
-                      </h2>
-                      <span className="text-2xs font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 border border-slate-200">
-                        {tx('{n} Encounters', { n: past.length })}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 font-medium mt-0.5">
-                      {tx('Past appointments, completed clinical visits, and follow-up rebooking')}
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => { setRecordsSubTab('overview'); setActiveTab('records'); }}
-                  className="text-xs font-bold text-[color:var(--t-600)] hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <span>{tx('Full Clinical EHR')}</span>
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </button>
-              </div>
-
-              {past.length > 0 ? (
-                <div className="space-y-3">
-                  {(appointmentsSubTab === 'past' ? past : past.slice(0, 4)).map(b => {
-                    const prof = professionals.find(p => p.id === b.professionalId);
-                    const isCancelled = b.status === 'Cancelled';
-                    return (
-                      <div
-                        key={b.id}
-                        className={`p-3.5 sm:p-4 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] bg-white transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs ${isCancelled ? "border-slate-200 bg-slate-50/50" : "border-[color:var(--t-200)] hover:border-[color:var(--t-600)] bg-white"}`}
-                      >
-                        <div className="flex items-start sm:items-center gap-3 min-w-0">
-                          <UserAvatar
-                            src={prof?.avatar}
-                            role={prof?.role || 'doctor'}
-                            alt={b.professionalName}
-                            className="w-10 h-10 object-cover border border-[color:var(--t-200)] shrink-0"
-                          />
-                          <div className="min-w-0">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => onSelectProfessional(b.professionalId)}
-                                className="font-display font-extrabold text-xs text-[color:var(--ink)] hover:text-[color:var(--t-600)] transition-colors cursor-pointer text-left"
-                              >
-                                {b.professionalName}
-                              </button>
-                              <span className="text-xs font-semibold text-[color:var(--t-700)]">
-                                {prof?.specialization ? tx(prof.specialization) : tx('Clinical Specialist')}
-                              </span>
-                              <span
-                                className={`inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-mono font-bold border ${
-                                  isCancelled
-                                    ? 'bg-slate-100 text-slate-600 border-slate-200'
-                                    : 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                                }`}
-                              >
-                                <CheckCircle2 className={`h-3 w-3 ${isCancelled ? 'text-slate-500' : 'text-emerald-600'}`} />
-                                {tx(b.status)}{b.paymentStatus === 'Refunded' ? tx(' · Refunded') : ''}
-                              </span>
-                            </div>
-                            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-500 font-medium mt-1">
-                              <span className="font-mono text-slate-700 font-semibold">{b.date}</span>
-                              <span>&bull;</span>
-                              <span className="font-mono">{b.timeSlot}</span>
-                              <span>&bull;</span>
-                              <span>{tx(String(b.mode))}</span>
-                              <span>&bull;</span>
-                              <span className="font-mono font-bold text-slate-700">{formatMoney(b.fee)}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-[color:var(--t-100)] shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => { setRecordsSubTab('overview'); setActiveTab('records'); }}
-                            className="btn btn-sm btn-secondary whitespace-nowrap shrink-0"
-                          >
-                            {tx('Notes & Rx')}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onSelectProfessional(b.professionalId)}
-                            className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
-                          >
-                            <span>{tx('Book Follow-Up')}</span>
-                            <ArrowRight className="h-3 w-3" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  {appointmentsSubTab === 'all' && past.length > 4 && (
-                    <div className="pt-2 text-center">
-                      <button
-                        type="button"
-                        onClick={() => setAppointmentsSubTab('past')}
-                        className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
-                      >
-                        {tx('View All {n} Past Consultations →', { n: past.length })}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="py-8 text-center bg-[color:var(--t-50)]/30 border border-dashed border-[color:var(--t-200)] my-1">
-                  <Calendar className="h-6 w-6 text-slate-400 mx-auto mb-1.5" />
-                  <p className="text-sm font-bold text-slate-700">{tx('No Past Consultations Yet')}</p>
-                  <p className="text-xs text-slate-500 mt-0.5 max-w-xs mx-auto">
-                    {tx('Completed consultations and clinical visits will be archived here for your permanent record.')}
-                  </p>
-                </div>
-              )}
-            </section>
-          )}
-
-          {/* TIER 4: UNIFIED CLINICAL VITALS & SAFETY SNAPSHOT (Shown on 'all' overview only — single source of truth) */}
-          {appointmentsSubTab === 'all' && (
-            <section
-              aria-label={tx('Clinical vitals and safety snapshot')}
-              className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-4 sm:p-5 space-y-4"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[color:var(--t-100)]">
-                <div className="flex items-center gap-2">
-                  <HeartPulse className="h-4 w-4 text-[color:var(--t-600)]" />
-                  <h2 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
-                    {tx('Pre-Consultation Vitals & Safety Snapshot')}
-                  </h2>
-                  <span className="hidden sm:inline text-xs text-slate-600">&bull;</span>
-                  <span className="hidden sm:inline text-xs text-slate-600 font-medium">
-                    {tx('Your doctor sees this only if you share your record')}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`text-2xs font-mono font-bold px-2 py-0.5 border ${
-                      patientAllergies.length > 0
-                        ? 'bg-rose-50 text-rose-800 border-rose-200'
-                        : recordsData?.allergyStatement?.kind === 'none_known'
-                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                          : 'bg-slate-100 text-slate-800 border-slate-300'
-                    }`}
-                  >
-                    {patientAllergies.length > 0
-                      ? tx('Allergies: {list}', { list: patientAllergies.map(a => tx(a)).join(', ') })
-                      : recordsData?.allergyStatement?.kind === 'none_known'
-                        ? tx('You said: no known allergies')
-                        : tx('No allergies recorded yet')}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
-                    className="text-xs font-bold text-[color:var(--t-600)] hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>{tx('Update Vitals')}</span>
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                {/* 1. Blood Pressure */}
-                <button
-                  type="button"
-                  onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
-                  className="w-full text-left bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-3.5 shadow-2xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)]"
-                  aria-label={tx('Blood Pressure details and log')}
-                >
-                  <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
-                    <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
-                      <HeartPulse className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                      {tx('Blood Pressure')}
-                    </span>
-                    {summary?.bp ? (
-                      <span className={`text-2xs font-bold px-1.5 py-0.2 border ${classifyBp(summary.bp.value1, summary.bp.value2).badgeClass}`}>
-                        {tx(classifyBp(summary.bp.value1, summary.bp.value2).label.split('/')[0].trim())}
-                      </span>
-                    ) : (
-                      <span className="text-2xs font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 border border-slate-300">
-                        {tx('Not logged')}
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xl font-black text-slate-900 mt-1.5 font-mono tabular-nums flex items-baseline gap-1">
-                    <span>{summary?.bp ? `${summary.bp.value1}/${summary.bp.value2}` : '—'}</span>
-                    {summary?.bp && <span className="text-xs font-normal text-slate-500 font-sans">mmHg</span>}
-                  </div>
-                  <p className="text-xs text-slate-500 font-medium mt-1 truncate">
-                    {summary?.bp?.recordedAt ? tx('Logged {date}', { date: fmtDate(summary.bp.recordedAt) }) : tx('Click to log reading')}
-                  </p>
-                </button>
-
-                {/* 2. Resting Heart Rate */}
-                <button
-                  type="button"
-                  onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
-                  className="w-full text-left bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-3.5 shadow-2xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)]"
-                  aria-label={tx('Resting Heart Rate details and log')}
-                >
-                  <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
-                    <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
-                      <Activity className="h-3.5 w-3.5 text-emerald-600" />
-                      {tx('Heart Rate')}
-                    </span>
-                    {summary?.pulse?.value1 != null ? (
-                      <span className={`text-2xs font-bold px-1.5 py-0.2 border ${
-                        summary.pulse.value1 >= 60 && summary.pulse.value1 <= 100
-                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                          : 'bg-amber-50 text-amber-800 border-amber-200'
-                      }`}>
-                        {summary.pulse.value1 >= 60 && summary.pulse.value1 <= 100 ? tx('Normal') : tx('Check')}
-                      </span>
-                    ) : (
-                      <span className="text-2xs font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 border border-slate-300">
-                        {tx('Not logged')}
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xl font-black text-slate-900 mt-1.5 font-mono tabular-nums flex items-baseline gap-1">
-                    <span>{summary?.pulse?.value1 ?? '—'}</span>
-                    {summary?.pulse?.value1 != null && <span className="text-xs font-normal text-slate-500 font-sans">BPM</span>}
-                  </div>
-                  <p className="text-xs text-slate-500 font-medium mt-1 truncate">
-                    {summary?.pulse?.recordedAt ? tx('Logged {date}', { date: fmtDate(summary.pulse.recordedAt) }) : tx('Click to log reading')}
-                  </p>
-                </button>
-
-                {/* 3. Fasting Glucose */}
-                <button
-                  type="button"
-                  onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
-                  className="w-full text-left bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-3.5 shadow-2xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)]"
-                  aria-label={tx('Fasting Blood Glucose details and log')}
-                >
-                  <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
-                    <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
-                      <Sparkles className="h-3.5 w-3.5 text-amber-600" />
-                      {tx('Blood Glucose')}
-                    </span>
-                    {summary?.glucose?.value1 != null ? (
-                      <span className={`text-2xs font-bold px-1.5 py-0.2 border ${
-                        summary.glucose.value1 > 6.0
-                          ? 'bg-amber-50 text-amber-800 border-amber-200'
-                          : 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                      }`}>
-                        {summary.glucose.value1 > 6.0 ? tx('Elevated') : tx('Target')}
-                      </span>
-                    ) : (
-                      <span className="text-2xs font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 border border-slate-300">
-                        {tx('Not logged')}
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xl font-black text-slate-900 mt-1.5 font-mono tabular-nums flex items-baseline gap-1">
-                    <span>{summary?.glucose?.value1 ?? '—'}</span>
-                    {summary?.glucose?.value1 != null && <span className="text-xs font-normal text-slate-500 font-sans">{summary?.glucose?.unit || 'mmol/L'}</span>}
-                  </div>
-                  <p className="text-xs text-slate-500 font-medium mt-1 truncate">
-                    {summary?.glucose?.recordedAt ? tx('Logged {date}', { date: fmtDate(summary.glucose.recordedAt) }) : tx('Click to log reading')}
-                  </p>
-                </button>
-
-                {/* 4. Oxygen Saturation (SpO2) */}
-                <button
-                  type="button"
-                  onClick={() => { setRecordsSubTab('vitals'); setActiveTab('records'); }}
-                  className="w-full text-left bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-3.5 shadow-2xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)]"
-                  aria-label={tx('Oxygen Saturation details and log')}
-                >
-                  <div className="flex items-center justify-between gap-1 text-slate-500 text-xs font-black uppercase tracking-wider">
-                    <span className="flex items-center gap-1.5 text-[color:var(--ink)]">
-                      <ShieldCheck className="h-3.5 w-3.5 text-cyan-600" />
-                      {tx('Oxygen (SpO₂)')}
-                    </span>
-                    {summary?.spo2?.value1 != null ? (
-                      <span className={`text-2xs font-bold px-1.5 py-0.2 border ${
-                        summary.spo2.value1 >= 95
-                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                          : 'bg-rose-50 text-rose-800 border-rose-200'
-                      }`}>
-                        {summary.spo2.value1 >= 95 ? tx('Optimal') : tx('Low')}
-                      </span>
-                    ) : (
-                      <span className="text-2xs font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 border border-slate-300">
-                        {tx('Not logged')}
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xl font-black text-slate-900 mt-1.5 font-mono tabular-nums flex items-baseline gap-1">
-                    <span>{summary?.spo2?.value1 ?? '—'}</span>
-                    {summary?.spo2?.value1 != null && <span className="text-xs font-normal text-slate-500 font-sans">%</span>}
-                  </div>
-                  <p className="text-xs text-slate-500 font-medium mt-1 truncate">
-                    {summary?.spo2?.recordedAt ? tx('Logged {date}', { date: fmtDate(summary.spo2.recordedAt) }) : tx('Click to log reading')}
-                  </p>
-                </button>
-              </div>
-            </section>
-          )}
-
-          {/* TIER 5: CARE CONTINUITY ROW — E-PRESCRIPTIONS & SPECIALIST RECOMMENDATIONS (Shown on 'all' overview) */}
-          {appointmentsSubTab === 'all' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {/* LEFT: ACTIVE E-PRESCRIPTIONS & PHARMACY DISPATCH */}
-              <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6 flex flex-col justify-between" aria-label={tx('Active prescriptions and dispensary')}>
-                <div>
-                  <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-[color:var(--t-100)]">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shadow-2xs">
-                        <Pill className="h-4 w-4" />
-                      </span>
-                      <div>
-                        <h3 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
-                          {tx('Active Doctor E-Prescriptions')}
-                        </h3>
-                        <p className="text-xs text-slate-500 font-medium mt-0.5">
-                          {tx('Digital prescriptions from your consultations ready for fulfillment')}
-                        </p>
-                      </div>
-                    </div>
-
-                    <span className="text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)]">
-                      {tx('{n} Active', { n: activePrescriptions.length })}
-                    </span>
-                  </div>
-
-                  {activePrescriptions.length === 0 ? (
-                    <div className="py-7 px-4 text-center bg-[color:var(--t-50)]/30 border border-dashed border-[color:var(--t-200)] my-2">
-                      <Pill className="h-7 w-7 text-slate-400 mx-auto mb-2" />
-                      <p className="text-sm font-bold text-[color:var(--ink)] mb-0.5">
-                        {tx('No Active Prescriptions Requiring Refill')}
-                      </p>
-                      <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
-                        {tx('Medications prescribed during your telehealth consultations appear here automatically for one-click pharmacy dispensing.')}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3 mb-3">
-                      {activePrescriptions.slice(0, 2).map((rx: any) => {
-                        const firstMed = Array.isArray(rx.items) && rx.items.length > 0 ? rx.items[0] : null;
-                        return (
-                          <div key={rx.id} className="p-3.5 border border-[color:var(--t-200)] bg-white hover:border-[color:var(--t-600)] transition-colors shadow-2xs">
-                            <div className="flex items-start justify-between gap-2 mb-2">
-                              <div>
-                                <span className="inline-block text-2xs font-mono font-black text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
-                                  {tx('RX CODE: {code}', { code: rx.code })}
-                                </span>
-                                <h4 className="font-display font-black text-sm text-[color:var(--ink)] mt-1">
-                                  {firstMed?.name || rx.diagnosis || tx('Prescribed Medication')}
-                                </h4>
-                                {firstMed?.instructions && (
-                                  <p className="text-xs text-slate-600 font-medium mt-0.5">
-                                    {tx(firstMed.instructions)} {firstMed?.quantity ? `· ${firstMed.quantity}` : ''}
-                                  </p>
-                                )}
-                              </div>
-
-                              <div className="text-right shrink-0">
-                                {rx.fillStatus === 'ready' ? (
-                                  <span className="inline-block text-2xs font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5">
-                                    {tx('Ready for Pickup')}
-                                  </span>
-                                ) : rx.fillStatus === 'preparing' ? (
-                                  <span className="inline-block text-2xs font-mono font-bold bg-[color:var(--t-50)] text-[color:var(--t-800)] border border-[color:var(--t-200)] px-2 py-0.5">
-                                    {tx('Being Prepared')}
-                                  </span>
-                                ) : rx.pharmacyName ? (
-                                  <span className="inline-block text-2xs font-mono font-bold bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 truncate max-w-[130px]">
-                                    {rx.pharmacyName}
-                                  </span>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setDispatchingRx(rx);
-                                      if (pharmacies.length > 0) setSelectedPharmacyId(pharmacies[0].id);
-                                    }}
-                                    className="inline-flex items-center gap-1 text-xs font-mono font-extrabold bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white px-2.5 py-1 shadow-2xs cursor-pointer transition-colors"
-                                  >
-                                    <Send className="h-3 w-3" /> {tx('Dispatch to Pharmacy')}
-                                  </button>
-                                )}
-                                <p className="text-xs font-mono text-slate-600 mt-1">
-                                  {tx('Valid until: {date}', { date: fmtDate(rx.validUntil) })}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between pt-2 border-t border-[color:var(--t-100)] text-xs">
-                              <span className="text-slate-500 font-medium">
-                                {tx('Doctor:')} <strong className="text-slate-700">{rx.doctor?.name || tx('Verified Physician')}</strong>
-                              </span>
-                              <button type="button" onClick={() => { setRxSubTab('active'); setActiveTab('prescriptions'); }} className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer">{tx('View Full Prescription →')}</button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {/* Daily Medication Dose Schedule (Pill Clock) */}
-                  <div className="p-3 bg-[color:var(--t-50)]/50 border border-[color:var(--t-200)] mb-3">
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="flex items-center gap-1.5 text-2xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)]">
-                        <Clock className="h-3 w-3 text-[color:var(--t-600)]" />
-                        {tx("Today's Dose Schedule · Pill Clock")}
-                      </span>
-                      <span className="text-2xs font-mono font-bold text-slate-500">
-                        {tx('2 of 3 Completed')}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                      <div className="p-2 bg-white border border-emerald-200 flex items-center justify-between">
-                        <div>
-                          <span className="text-2xs font-mono font-bold text-emerald-700 block">08:00 · {tx('Morning')}</span>
-                          <span className="font-bold text-slate-800 text-xs">Amlodipine 5mg</span>
-                        </div>
-                        <span className="text-2xs font-mono font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 border border-emerald-200">
-                          ✓ {tx('Taken')}
-                        </span>
-                      </div>
-                      <div className="p-2 bg-white border border-emerald-200 flex items-center justify-between">
-                        <div>
-                          <span className="text-2xs font-mono font-bold text-emerald-700 block">13:00 · {tx('Afternoon')}</span>
-                          <span className="font-bold text-slate-800 text-xs">Metformin 500mg</span>
-                        </div>
-                        <span className="text-2xs font-mono font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 border border-emerald-200">
-                          ✓ {tx('Taken')}
-                        </span>
-                      </div>
-                      <div className="p-2 bg-white border border-[color:var(--t-300)] flex items-center justify-between">
-                        <div>
-                          <span className="text-2xs font-mono font-bold text-[color:var(--t-700)] block">20:00 · {tx('Evening')}</span>
-                          <span className="font-bold text-slate-800 text-xs">Rosuvastatin 10mg</span>
-                        </div>
-                        <span className="text-2xs font-mono font-black text-[color:var(--t-700)] bg-[color:var(--t-50)] px-1.5 py-0.5 border border-[color:var(--t-200)]">
-                          ⏳ {tx('Due 8 PM')}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('prescriptions')}
-                    className="text-xs font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
-                  >
-                    {tx('Manage All Prescriptions →')}
-                  </button>
-                  {onOpenPharmacies && (
-                    <button
-                      type="button"
-                      onClick={onOpenPharmacies}
-                      className="text-xs font-bold text-slate-700 hover:text-[color:var(--t-600)] flex items-center gap-1 cursor-pointer"
-                    >
-                      <ExternalLink className="h-3 w-3" /> {tx('Pharmacies Directory')}
-                    </button>
-                  )}
-                </div>
-              </section>
-
-              {/* RIGHT: RECOMMENDED SPECIALISTS FOR FOLLOW-UP */}
-              <section className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-5 sm:p-6 flex flex-col justify-between" aria-label={tx('Personalized specialist care recommendations')}>
-                <div>
-                  <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-[color:var(--t-100)]">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shadow-2xs">
-                        <Stethoscope className="h-4 w-4" />
-                      </span>
-                      <div>
-                        <h3 className="font-display font-black text-base sm:text-lg text-[color:var(--ink)] leading-tight">
-                          {tx('Recommended Specialists for You')}
-                        </h3>
-                        <p className="text-xs text-slate-500 font-medium mt-0.5">
-                          {tx('Matched to {x}', { x: patientConditions.length > 0 ? patientConditions.map(c => tx(c)).join(', ') : tx('your clinical profile & vitals') })}
-                        </p>
-                      </div>
-                    </div>
-
-                    {onFindDoctors && (
-                      <button
-                        type="button"
-                        onClick={onFindDoctors}
-                        className="text-xs font-bold text-[color:var(--t-600)] hover:underline flex items-center gap-1 cursor-pointer"
-                      >
-                        <Search className="h-3.5 w-3.5" /> {tx('Full Directory')}
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="space-y-2.5">
-                    {recommendedSpecialists.map(prof => (
-                      <div
-                        key={prof.id}
-                        className="p-3 border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all bg-white flex items-center justify-between gap-3 shadow-2xs"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <UserAvatar
-                            src={prof.avatar}
-                            role={prof.role || 'doctor'}
-                            alt={prof.name}
-                            className="w-10 h-10 rounded-full object-cover border border-[color:var(--t-200)] shrink-0"
-                          />
-                          <div className="min-w-0">
-                            <button
-                              type="button"
-                              onClick={() => onSelectProfessional(prof.id)}
-                              className="font-display font-extrabold text-xs text-[color:var(--ink)] hover:text-[color:var(--t-600)] transition-colors text-left truncate block cursor-pointer"
-                            >
-                              {prof.name}
-                            </button>
-                            <p className="text-xs text-[color:var(--t-700)] font-bold truncate">
-                              {tx(prof.specialization)} · <span className="text-slate-500 font-medium">{prof.city || 'Kuala Lumpur'}</span>
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2.5 shrink-0">
-                          <span className="font-mono font-extrabold text-xs text-[color:var(--ink)] hidden sm:inline">
-                            {formatMoney(prof.fee || 80)}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => onSelectProfessional(prof.id)}
-                            className="min-h-[34px] px-3 bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] hover:text-white text-[color:var(--t-700)] text-xs font-black border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] transition-all cursor-pointer flex items-center gap-1"
-                          >
-                            <span>{tx('Book')}</span>
-                            <ArrowRight className="h-3 w-3" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="pt-3 border-t border-[color:var(--t-100)] mt-3 flex items-center justify-between text-xs">
-                  <span className="text-slate-500 font-medium">{tx('Need help choosing a specialist or verifying an MC?')}</span>
-                  {onOpenHelp && (
-                    <button
-                      type="button"
-                      onClick={onOpenHelp}
-                      className="font-bold text-[color:var(--t-600)] hover:underline cursor-pointer"
-                    >
-                      {tx('Ask Care Concierge →')}
-                    </button>
-                  )}
-                </div>
-              </section>
-            </div>
-          )}
-        </div>
+        <PatientAppointmentsTab
+          bookings={bookings}
+          upcoming={upcoming}
+          past={past}
+          professionals={professionals}
+          appointmentsSubTab={appointmentsSubTab}
+          setAppointmentsSubTab={setAppointmentsSubTab}
+          activeConsult={activeConsult}
+          cancelActiveConsult={cancelActiveConsult}
+          onCallStatus={onCallStatus}
+          summary={summary}
+          recordsData={recordsData}
+          patientAllergies={patientAllergies}
+          onSelectProfessional={onSelectProfessional}
+          onNavigateToMessages={onNavigateToMessages}
+          onConsultNow={() => { navigateToTab('consult'); setConsultSubTab('instant'); }}
+          onFindDoctors={() => navigateToTab('registry')}
+          onOpenTriage={() => { navigateToTab('consult'); setConsultSubTab('triage'); }}
+          onOpenPharmacies={() => navigateToTab('pharmacies')}
+          onOpenVitals={() => { setRecordsSubTab('vitals'); navigateToTab('records'); }}
+          onOpenRecordsOverview={() => { setRecordsSubTab('overview'); navigateToTab('records'); }}
+          onOpenLiveRoom={() => { navigateToTab('consult'); setConsultSubTab('instant'); }}
+          onOpenTriageTab={() => { navigateToTab('consult'); setConsultSubTab('triage'); }}
+          onOpenRxRecords={() => { setRecordsSubTab('rx'); navigateToTab('records'); }}
+          onPayBooking={setPaying}
+          onCancelBooking={cancelBooking}
+        />
       )}
 
       {/* 1. HEALTH RECORDS: CLINICAL PROFILE & VITALS */}
@@ -1592,7 +640,7 @@ export default function PatientDashboard({
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="px-3.5 min-h-[44px] bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                className="px-3.5 min-h-[44px] bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
               >
                 <FileText className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                 <span>{tx('Print this page')}</span>
@@ -1601,7 +649,7 @@ export default function PatientDashboard({
             tabs={[
               { id: 'overview', label: tx('Profile'), icon: ClipboardList },
               { id: 'vitals', label: tx('Readings'), icon: Activity },
-              { id: 'sharing', label: tx('Sharing & PIN'), icon: Share2 },
+              { id: 'sharing', label: tx('Record Sharing & Consent'), icon: Share2 },
             ]}
             activeTab={recordsSubTab}
             onTabChange={setRecordsSubTab}
@@ -1623,16 +671,14 @@ export default function PatientDashboard({
             title={tx('Prescriptions & medicines')}
             description={tx('Send a prescription to a partner pharmacy, follow its progress, and keep the past ones.')}
             aside={
-              onOpenPharmacies && (
-                <button
-                  type="button"
-                  onClick={onOpenPharmacies}
-                  className="px-3.5 min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <Store className="h-3.5 w-3.5" />
-                  <span>{tx('Find a pharmacy')}</span>
-                </button>
-              )
+              <button
+                type="button"
+                onClick={() => navigateToTab('pharmacies')}
+                className="px-3.5 min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <Store className="h-3.5 w-3.5" />
+                <span>{tx('Find a pharmacy')}</span>
+              </button>
             }
             tabs={[
               { id: 'active', label: tx('Active'), icon: Pill, count: activePrescriptions.length },
@@ -1644,7 +690,7 @@ export default function PatientDashboard({
           <PatientRecords
             activeSubTab={rxSubTab === 'history' ? 'rxhist' : 'rx'}
             onSubTabChange={t => setRxSubTab(t === 'rxhist' ? 'history' : 'active')}
-            onOpenPharmacies={onOpenPharmacies}
+            onOpenPharmacies={() => navigateToTab('pharmacies')}
             hideHeaderTabs={true}
           />
         </div>
@@ -1667,8 +713,8 @@ export default function PatientDashboard({
           />
           <PatientRecords
             activeSubTab={certsSubTab}
-            onFindDoctors={onFindDoctors}
-            onBookSpecialist={(id) => { if (id) onSelectProfessional(id); else onFindDoctors?.(); }}
+            onFindDoctors={() => navigateToTab('registry')}
+            onBookSpecialist={(id) => { if (id) onSelectProfessional(id); else navigateToTab('registry'); }}
             hideHeaderTabs={true}
           />
         </div>
@@ -1715,44 +761,32 @@ export default function PatientDashboard({
                 <span className="bg-amber-50 text-amber-900 border border-amber-300 text-2xs font-black uppercase px-2.5 py-0.5">{onCallLabel(onCall)}</span>
               )
             }
-            aside={
-              consultSubTab === 'instant' ? (
-                <button
-                  type="button"
-                  onClick={() => setConsultSubTab('triage')}
-                  className="px-3.5 min-h-[44px] bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <Sparkles className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                  <span>{tx('Not sure? Try AI symptom triage')}</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setConsultSubTab('instant')}
-                  className="px-3.5 min-h-[44px] bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <Video className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                  <span>{tx('Back to consultation')}</span>
-                </button>
-              )
-            }
+            tabs={[
+              { id: 'instant', label: tx('Instant Video / Chat'), icon: Video },
+              { id: 'triage', label: tx('AI Symptom Triage'), icon: Sparkles },
+            ]}
+            activeTab={consultSubTab}
+            onTabChange={(t) => setConsultSubTab(t as any)}
           />
           {consultSubTab === 'instant' ? (
             <ConsultNow 
               myUserId={currentUser?.id} 
               embedded={true} 
-              onNavigateToPrescriptions={() => setActiveTab('prescriptions')}
-              onBookAppointment={onFindDoctors}
+              onNavigateToPrescriptions={() => navigateToTab('prescriptions')}
+              onBookAppointment={() => navigateToTab('registry')}
             />
           ) : (
             <div className="space-y-4">
               <AISymptomMatcher
                 onSelectSpecialty={(spec) => {
-                  if (onFindDoctors) onFindDoctors();
+                  if (spec) setRegistrySpecialty(spec);
+                  navigateToTab('registry');
                 }}
                 onApplyTriage={(triage) => {
-                  if (onFindDoctors) onFindDoctors();
+                  if (triage?.specialty) setRegistrySpecialty(triage.specialty);
+                  navigateToTab('registry');
                 }}
+                onConsultNow={() => setConsultSubTab('instant')}
               />
             </div>
           )}
@@ -1768,16 +802,14 @@ export default function PatientDashboard({
             title={tx('Patient Care Mailbox & Direct Messaging')}
             description={tx('Private messages with the doctors and nurses you have booked or consulted. Replies can take time. Not for emergencies: call 999.')}
             aside={
-              onFindDoctors && (
-                <button
-                  type="button"
-                  onClick={onFindDoctors}
-                  className="px-3.5 py-2 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <Search className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                  <span>{tx('Find Doctor to Message')}</span>
-                </button>
-              )
+              <button
+                type="button"
+                onClick={() => navigateToTab('registry')}
+                className="px-3.5 py-2 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <Search className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                <span>{tx('Find Doctor to Message')}</span>
+              </button>
             }
           />
           <SecureMessenger
@@ -1797,16 +829,14 @@ export default function PatientDashboard({
             description={tx('The doctors and nurses you have seen, and others you saved to book later.')}
             badges={<BannerBadge tone="brand">{tx('{a} seen · {b} saved', { a: careTeam.length, b: savedIds.length })}</BannerBadge>}
             aside={
-              onFindDoctors && (
-                <button
-                  type="button"
-                  onClick={onFindDoctors}
-                  className="px-3.5 h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <Search className="h-3.5 w-3.5" />
-                  <span>{tx('Find a doctor or nurse')}</span>
-                </button>
-              )
+              <button
+                type="button"
+                onClick={() => navigateToTab('registry')}
+                className="px-3.5 h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <Search className="h-3.5 w-3.5" />
+                <span>{tx('Find a doctor or nurse')}</span>
+              </button>
             }
             tabs={[
               { id: 'all', label: tx('All Care Team'), count: careTeam.length + savedIds.length },
@@ -1828,7 +858,7 @@ export default function PatientDashboard({
               if (savedSubTab === 'nurses' && p.role !== UserRole.NURSE) return false;
               return true;
             })}
-            onFindProviders={onFindDoctors}
+            onFindProviders={() => navigateToTab('registry')}
             savedProfessionals={professionals.filter(p => {
               if (!savedIds.includes(p.id)) return false;
               if (savedSubTab === 'doctors' && p.role !== UserRole.DOCTOR) return false;
@@ -1888,14 +918,15 @@ export default function PatientDashboard({
         <div id="panel-assistance" role="tabpanel" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={HeartHandshake}
-            eyebrow={tx('Treatment quotes')}
-            title={tx('Treatment quotes and assistance')}
-            description={tx('Ask a hospital for an itemised quote, then accept it or ask for changes. Sending a request is free and does not commit you.')}
+            eyebrow={tx('Financial Transparency · Pro-Forma Estimates')}
+            title={tx('Itemized Treatment Quotes & Financial Aid')}
+            description={tx('Request an itemized hospital fee breakdown before admission, convert currencies, or apply insurance guarantee letters (GL). Free and non-binding.')}
+            badges={<BannerBadge tone="brand">{tx('Multi-Currency Estimate')}</BannerBadge>}
             tabs={[
-              { id: 'enquiry', label: tx('Request a quote') },
-              { id: 'cases', label: tx('My requests and quotes') },
-              { id: 'guide', label: tx('Travel guide') },
-              ...(currentUser ? [] : [{ id: 'track', label: tx('Track a request') }]),
+              { id: 'enquiry', label: tx('Request Cost Quote') },
+              { id: 'cases', label: tx('My Quotations & GLs') },
+              { id: 'guide', label: tx('Billing & Aid Guide') },
+              ...(currentUser ? [] : [{ id: 'track', label: tx('Track Quote Code') }]),
             ]}
             activeTab={assistanceSubTab}
             onTabChange={(t) => setAssistanceSubTab(t as any)}
@@ -1913,13 +944,14 @@ export default function PatientDashboard({
         <div id="panel-tourism" role="tabpanel" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={Plane}
-            eyebrow={tx('Hospitals and medical travel')}
-            title={tx('Global patient care')}
-            description={tx('Find licensed hospitals in Malaysia, ask one for an itemised quote, and follow your request. For patients in Malaysia and from abroad.')}
+            eyebrow={tx('MHTC Accredited · International Patient Concierge')}
+            title={tx('Medical Travel & Accredited Hospital Directory')}
+            description={tx('Explore JCI and MSQH accredited destination hospitals across Malaysia with airport transfer, medical visa support, and interpreter services.')}
+            badges={<BannerBadge tone="brand">{tx('JCI / MSQH Accredited')}</BannerBadge>}
             tabs={[
-              { id: 'find', label: tx('Find a hospital') },
-              { id: 'cases', label: tx('My requests') },
-              { id: 'info', label: tx('Travel information') },
+              { id: 'find', label: tx('Accredited Hospitals') },
+              { id: 'cases', label: tx('Travel Cases & Admissions') },
+              { id: 'info', label: tx('Visa & Arrival Checklist') },
             ]}
             activeTab={tourismSubTab}
             onTabChange={(t) => setTourismSubTab(t as any)}
@@ -1950,7 +982,7 @@ export default function PatientDashboard({
             activeTab={pharmaciesSubTab}
             onTabChange={setPharmaciesSubTab}
           />
-          <PharmacyFinder embedded={true} />
+          <PharmacyFinder embedded={true} filterTab={pharmaciesSubTab} />
         </div>
       )}
 
@@ -1964,24 +996,64 @@ export default function PatientDashboard({
             description={tx('Physician-authored, evidence-based medical articles, disease management guides, and clinical wellness advice.')}
             badges={<BannerBadge tone="brand">{tx('Doctor Reviewed')}</BannerBadge>}
             aside={
-              onFindDoctors && (
-                <button
-                  type="button"
-                  onClick={onFindDoctors}
-                  className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <Search className="h-3.5 w-3.5" />
-                  <span>{tx('Find Article Author')}</span>
-                </button>
-              )
+              <button
+                type="button"
+                onClick={() => navigateToTab('registry')}
+                className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <Search className="h-3.5 w-3.5" />
+                <span>{tx('Find Article Author')}</span>
+              </button>
             }
           />
+          {reading.length > 0 && (
+            <section
+              aria-label={tx('Prescribed reading from your doctor')}
+              className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] p-4 shadow-2xs space-y-3"
+            >
+              <div className="flex items-center justify-between gap-2 pb-2 border-b border-[color:var(--t-100)]">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-[color:var(--t-600)]" />
+                  <h3 className="font-display font-black text-xs uppercase tracking-wider text-[color:var(--ink)]">
+                    {tx('Prescribed Reading from Your Care Team')}
+                  </h3>
+                </div>
+                <span className="text-2xs font-mono font-bold px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
+                  {reading.length} {tx('Assigned')}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {reading.map(r => (
+                  <div
+                    key={r.id}
+                    className="p-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] flex items-start justify-between gap-3"
+                  >
+                    <div className="min-w-0 space-y-1">
+                      <p className="font-display font-bold text-xs text-[color:var(--ink)] truncate">{r.title}</p>
+                      <p className="text-2xs text-slate-600 font-medium">
+                        {tx('Recommended by {doctor}', { doctor: r.doctor })}
+                      </p>
+                      {r.note && <p className="text-xs text-slate-700 italic">“{r.note}”</p>}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => onOpenArticle(r.articleId)}
+                      className="shrink-0 h-8 px-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer transition-colors flex items-center gap-1"
+                    >
+                      <span>{tx('Read')}</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
           <MedicalLibrary
             embedded={true}
             articles={articles || INITIAL_ARTICLES}
             professionals={professionals}
             onFindDoctor={() => {
-              setActiveTab('registry');
+              navigateToTab('registry');
             }}
           />
         </div>
@@ -2025,16 +1097,14 @@ export default function PatientDashboard({
               description={tx('Directory of registered physicians verified directly against the Malaysian Medical Council (MMC) database with active Annual Practising Certificates (APC).')}
               badges={<BannerBadge tone="success"><CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" /> {tx('MMC Verified')}</BannerBadge>}
               aside={
-                onFindDoctors && (
-                  <button
-                    type="button"
-                    onClick={onFindDoctors}
-                    className="px-3.5 h-10 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
-                  >
-                    <Search className="h-3.5 w-3.5" />
-                    <span>{tx('Full Interactive Directory')}</span>
-                  </button>
-                )
+                <button
+                  type="button"
+                  onClick={() => navigateToTab('nurses')}
+                  className="px-3.5 h-10 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <UserCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                  <span>{tx('Browse Clinical Nurses')}</span>
+                </button>
               }
               tabs={[
                 { id: 'all', label: tx('All Specialists'), count: allDoctors.length },
@@ -2058,7 +1128,7 @@ export default function PatientDashboard({
                     placeholder={tx('Search by doctor name, specialty, hospital, city, or MMC number…')}
                     value={registryQuery}
                     onChange={e => setRegistryQuery(e.target.value)}
-                    className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
+                    className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
                   />
                   {registryQuery && (
                     <button
@@ -2172,11 +1242,26 @@ export default function PatientDashboard({
                             <button type="button" onClick={() => onSelectProfessional(prof.id)} className="font-display font-extrabold text-xs text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left truncate block cursor-pointer">
                               {prof.name}
                             </button>
-                            {prof.rating > 0 && (
-                              <span className="shrink-0 inline-flex items-center gap-0.5 text-2xs font-mono font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5">
-                                <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-500" /> {prof.rating.toFixed(1)}
-                              </span>
-                            )}
+                            <div className="shrink-0 flex items-center gap-1.5">
+                              {prof.rating > 0 && (
+                                <span className="inline-flex items-center gap-0.5 text-2xs font-mono font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5">
+                                  <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-500" /> {prof.rating.toFixed(1)}
+                                </span>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => (savedIds.includes(prof.id) ? removeSaved(prof.id) : restoreSaved(prof.id))}
+                                aria-label={savedIds.includes(prof.id) ? tx('Remove from My Care Team') : tx('Save to My Care Team')}
+                                title={savedIds.includes(prof.id) ? tx('Saved in My Care Team') : tx('Save to My Care Team')}
+                                className={`h-6 w-6 inline-flex items-center justify-center border transition-colors cursor-pointer ${
+                                  savedIds.includes(prof.id)
+                                    ? 'bg-rose-50 text-rose-600 border-rose-200'
+                                    : 'bg-white text-slate-400 border-[color:var(--t-200)] hover:text-rose-600 hover:border-rose-200'
+                                }`}
+                              >
+                                <Heart className={`h-3 w-3 ${savedIds.includes(prof.id) ? 'fill-rose-600 text-rose-600' : ''}`} />
+                              </button>
+                            </div>
                           </div>
                           <p className="text-xs text-[color:var(--t-700)] font-bold mt-0.5">{tx(prof.specialization)}</p>
                           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
@@ -2271,16 +1356,14 @@ export default function PatientDashboard({
               description={tx('Verified professional nurses registered with the Lembaga Jururawat Malaysia (LJM) for clinic care, home nursing, and wound dressing.')}
               badges={<BannerBadge tone="success"><CheckCircle2 className="h-3 w-3 inline mr-1 text-emerald-600" /> {tx('LJM Verified')}</BannerBadge>}
               aside={
-                onFindDoctors && (
-                  <button
-                    type="button"
-                    onClick={onFindDoctors}
-                    className="px-3.5 h-10 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
-                  >
-                    <Search className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                    <span>{tx('Search All Providers')}</span>
-                  </button>
-                )
+                <button
+                  type="button"
+                  onClick={() => navigateToTab('registry')}
+                  className="px-3.5 h-10 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold border border-[color:var(--t-200)] shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <Search className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                  <span>{tx('Browse Doctors & Specialists')}</span>
+                </button>
               }
               tabs={[
                 { id: 'all', label: tx('All Registered Nurses'), count: allNurses.length },
@@ -2304,7 +1387,7 @@ export default function PatientDashboard({
                     placeholder={tx('Search by nurse name, nursing specialty, city, or LJM number…')}
                     value={nursesQuery}
                     onChange={e => setNursesQuery(e.target.value)}
-                    className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
+                    className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
                   />
                   {nursesQuery && (
                     <button
@@ -2402,11 +1485,26 @@ export default function PatientDashboard({
                             <button type="button" onClick={() => onSelectProfessional(prof.id)} className="font-display font-extrabold text-xs text-[color:var(--ink)] hover:text-[color:var(--t-600)] text-left truncate block cursor-pointer">
                               {prof.name}
                             </button>
-                            {prof.rating > 0 && (
-                              <span className="shrink-0 inline-flex items-center gap-0.5 text-2xs font-mono font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5">
-                                <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-500" /> {prof.rating.toFixed(1)}
-                              </span>
-                            )}
+                            <div className="shrink-0 flex items-center gap-1.5">
+                              {prof.rating > 0 && (
+                                <span className="inline-flex items-center gap-0.5 text-2xs font-mono font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5">
+                                  <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-500" /> {prof.rating.toFixed(1)}
+                                </span>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => (savedIds.includes(prof.id) ? removeSaved(prof.id) : restoreSaved(prof.id))}
+                                aria-label={savedIds.includes(prof.id) ? tx('Remove from My Care Team') : tx('Save to My Care Team')}
+                                title={savedIds.includes(prof.id) ? tx('Saved in My Care Team') : tx('Save to My Care Team')}
+                                className={`h-6 w-6 inline-flex items-center justify-center border transition-colors cursor-pointer ${
+                                  savedIds.includes(prof.id)
+                                    ? 'bg-rose-50 text-rose-600 border-rose-200'
+                                    : 'bg-white text-slate-400 border-[color:var(--t-200)] hover:text-rose-600 hover:border-rose-200'
+                                }`}
+                              >
+                                <Heart className={`h-3 w-3 ${savedIds.includes(prof.id) ? 'fill-rose-600 text-rose-600' : ''}`} />
+                              </button>
+                            </div>
                           </div>
                           <p className="text-xs text-[color:var(--t-700)] font-bold mt-0.5">{tx(prof.specialization || 'Clinical Staff Nurse')}</p>
                           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
@@ -2522,7 +1620,7 @@ export default function PatientDashboard({
                     {pharmacies.map(p => (
                       <label
                         key={p.id}
-                        className={`block p-3 border cursor-pointer transition-all ${
+                        className={`block p-3 border cursor-pointer transition-colors ${
                           selectedPharmacyId === p.id 
                             ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)]/60' 
                             : 'border-[color:var(--t-200)] bg-white hover:border-[color:var(--t-300)]'
@@ -2683,6 +1781,7 @@ export default function PatientDashboard({
           </div>
         </div>
       )}
+      </Suspense>
       </div>
     </div>
   );

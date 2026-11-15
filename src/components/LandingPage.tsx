@@ -3,7 +3,7 @@ import { setLocale, useLocale, useT } from '../locale';
 import { HERO_TR } from '../locale/landing';
 import PatientAccess from './PatientAccess';
 import TouristAccess from './TouristAccess';
-import VerificationScopeBadge from './VerificationScopeBadge';
+import VerificationScopeBadge from '../domains/verification/VerificationScopeBadge';
 import ThemeSwitcher from './ThemeSwitcher';
 import LocaleSwitcher from './LocaleSwitcher';
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'motion/react';

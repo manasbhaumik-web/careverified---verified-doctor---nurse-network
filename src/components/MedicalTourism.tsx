@@ -1,6 +1,7 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Plane, Search, FolderOpen, Info, BadgeCheck, Languages, Utensils, Car, HeartHandshake, Building2, Download, Trash2, Copy, Printer, AlertCircle } from 'lucide-react';
-import DashboardHeader from './DashboardHeader';
+import { Plane, Search, FolderOpen, Info, BadgeCheck, Languages, Utensils, Car, HeartHandshake, Building2, Download, Trash2, Copy, Printer, AlertCircle, X } from 'lucide-react';
+import DashboardHeader, { FilterSelect } from '../shared/ui/DashboardHeader';
 import { formatMoney, formatDate, useTr } from '../locale';
 
 const jget = (url: string) => fetch(url).then(r => r.json());
@@ -25,7 +26,8 @@ const CATEGORY_LABEL: Record<string, string> = {
 const SERVICE_LABEL: Record<string, string> = { interpreter: 'Interpreter', airportPickup: 'Airport pickup', halalFood: 'Halal food', prayerRoom: 'Prayer room' };
 const COUNTRIES: [string, string][] = [['MY', 'Malaysia'], ['ID', 'Indonesia'], ['SG', 'Singapore'], ['CN', 'China'], ['IN', 'India'], ['AU', 'Australia'], ['GB', 'United Kingdom'], ['US', 'United States'], ['SA', 'Saudi Arabia'], ['AE', 'United Arab Emirates'], ['JP', 'Japan'], ['XX', 'Other']];
 
-const field = 'w-full border border-slate-300 bg-white px-3 min-h-[44px] text-xs text-slate-900 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]';
+const field = 'w-full border border-slate-300 bg-white px-3 h-11 min-h-[44px] text-xs text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]';
+const selectField = 'form-select w-full border border-slate-300 bg-white px-3 h-11 min-h-[44px] text-xs text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)]';
 const label = 'block text-xs font-bold text-slate-800';
 const primaryBtn = 'min-h-[44px] px-4 inline-flex items-center justify-center gap-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 disabled:text-slate-700 text-white text-xs font-bold cursor-pointer';
 const plainBtn = 'min-h-[44px] px-4 inline-flex items-center justify-center gap-2 border border-slate-300 bg-white hover:bg-slate-50 text-slate-900 text-xs font-bold cursor-pointer';
@@ -67,7 +69,7 @@ export default function MedicalTourism({
           onTabChange={t => setTab(t as MedicalTourismTab)}
         />
       )}
-      <div className={embedded ? "space-y-5 pt-2" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
+      <div className={embedded ? "space-y-5" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
         {tab === 'find' && <Facilities onSent={id => { setTab('cases'); setOpenCase(id); }} />}
         {tab === 'cases' && <MyCases openId={openCase} onOpen={setOpenCase} onOpenProfessional={onOpenProfessional} onFind={() => setTab('find')} />}
         {tab === 'info' && <TravelInfo />}
@@ -102,28 +104,94 @@ function Facilities({ onSent }: { onSent: (caseId: string) => void }) {
   return (
     <div className="space-y-4">
       {all.length > 0 && (
-        <div className="bg-white border border-[color:var(--t-200)] p-4 space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            <label className={label}>{tx('Name or city')}<input className={`${field} mt-1`} value={f.q} onChange={e => setF({ ...f, q: e.target.value })} placeholder={tx('e.g. Kuala Lumpur')} /></label>
-            <label className={label}>{tx('Specialty')}
-              <select className={`${field} mt-1`} value={f.specialty} onChange={e => setF({ ...f, specialty: e.target.value })}><option value="">{tx('Any specialty')}</option>{options.specialties.map(s => <option key={s} value={s}>{tx(s)}</option>)}</select>
-            </label>
-            <label className={label}>{tx('Language spoken')}
-              <select className={`${field} mt-1`} value={f.language} onChange={e => setF({ ...f, language: e.target.value })}><option value="">{tx('Any language')}</option>{options.languages.map(s => <option key={s} value={s}>{tx(s)}</option>)}</select>
-            </label>
-            <label className={label}>{tx('Accreditation')}
-              <select className={`${field} mt-1`} value={f.accreditation} onChange={e => setF({ ...f, accreditation: e.target.value })}><option value="">{tx('Any')}</option><option value="JCI">JCI</option><option value="MSQH">MSQH</option></select>
-            </label>
-            <label className={label}>{tx('Service')}
-              <select className={`${field} mt-1`} value={f.service} onChange={e => setF({ ...f, service: e.target.value })}><option value="">{tx('Any service')}</option>{Object.entries(SERVICE_LABEL).map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}</select>
-            </label>
-            <label className={label}>{tx('Patients from abroad')}
-              <select className={`${field} mt-1`} value={f.abroad} onChange={e => setF({ ...f, abroad: e.target.value })}><option value="">{tx('All hospitals')}</option><option value="1">{tx('Welcomes international patients')}</option></select>
-            </label>
+        <div className="bg-white border border-[color:var(--t-200)] p-3.5 space-y-2.5">
+          <div className="flex flex-col lg:flex-row gap-2.5 items-stretch lg:items-center">
+            <div className="relative flex-1 min-w-[220px]">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+              <input
+                type="text"
+                aria-label={tx('Name or city')}
+                className="form-input pl-10 pr-9 h-10 text-xs"
+                value={f.q}
+                onChange={e => setF({ ...f, q: e.target.value })}
+                placeholder={tx('Search hospital name, city, or state (e.g. Kuala Lumpur)...')}
+              />
+              {f.q && (
+                <button
+                  type="button"
+                  onClick={() => setF({ ...f, q: '' })}
+                  aria-label={tx('Clear search')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <FilterSelect
+                label={tx('Specialty')}
+                value={f.specialty || 'ALL'}
+                onChange={v => setF({ ...f, specialty: v === 'ALL' ? '' : v })}
+                options={[
+                  { value: 'ALL', label: tx('Any specialty') },
+                  ...options.specialties.map(s => ({ value: s, label: tx(s) })),
+                ]}
+              />
+              <FilterSelect
+                label={tx('Language')}
+                value={f.language || 'ALL'}
+                onChange={v => setF({ ...f, language: v === 'ALL' ? '' : v })}
+                options={[
+                  { value: 'ALL', label: tx('Any language') },
+                  ...options.languages.map(s => ({ value: s, label: tx(s) })),
+                ]}
+              />
+              <FilterSelect
+                label={tx('Accreditation')}
+                value={f.accreditation || 'ALL'}
+                onChange={v => setF({ ...f, accreditation: v === 'ALL' ? '' : v })}
+                options={[
+                  { value: 'ALL', label: tx('Any') },
+                  { value: 'JCI', label: 'JCI' },
+                  { value: 'MSQH', label: 'MSQH' },
+                ]}
+              />
+              <FilterSelect
+                label={tx('Service')}
+                value={f.service || 'ALL'}
+                onChange={v => setF({ ...f, service: v === 'ALL' ? '' : v })}
+                options={[
+                  { value: 'ALL', label: tx('Any service') },
+                  ...Object.entries(SERVICE_LABEL).map(([k, l]) => ({ value: k, label: tx(l) })),
+                ]}
+              />
+              <FilterSelect
+                label={tx('International')}
+                value={f.abroad || 'ALL'}
+                onChange={v => setF({ ...f, abroad: v === 'ALL' ? '' : v })}
+                options={[
+                  { value: 'ALL', label: tx('All hospitals') },
+                  { value: '1', label: tx('Welcomes international patients') },
+                ]}
+              />
+              {filtering && (
+                <button
+                  type="button"
+                  onClick={() => setF({ q: '', specialty: '', language: '', accreditation: '', service: '', abroad: '' })}
+                  className="h-10 px-3 text-xs font-bold text-rose-700 hover:bg-rose-50 border border-rose-200 transition-colors cursor-pointer"
+                >
+                  {tx('Clear filters')}
+                </button>
+              )}
+            </div>
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p role="status" className="text-xs font-bold text-slate-800">{tx(shown.length === 1 ? '{n} hospital' : '{n} hospitals', { n: shown.length })}</p>
-            {filtering && <button type="button" className="min-h-[44px] px-3 text-xs font-bold underline cursor-pointer" onClick={() => setF({ q: '', specialty: '', language: '', accreditation: '', service: '', abroad: '' })}>{tx('Clear filters')}</button>}
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs text-slate-600">
+            <p role="status" className="font-bold text-slate-800">
+              {tx(shown.length === 1 ? '{n} hospital' : '{n} hospitals', { n: shown.length })}
+            </p>
+            <span className="text-xs font-medium text-slate-500">
+              {tx('Licensed Malaysian hospitals with verified international patient desks')}
+            </span>
           </div>
         </div>
       )}
@@ -200,15 +268,15 @@ function EnquiryForm({ facility, onClose, onSent }: { facility: any; onClose: ()
           <p className="text-xs text-slate-700">{tx('Free, and it does not commit you. The hospital replies with an itemised quote.')}</p>
         </div>
         <label className={label}>{tx('What treatment are you looking for? *')}
-          <textarea className={`${field} mt-1 py-2`} rows={4} required minLength={20} maxLength={2000} autoFocus placeholder={tx('Your diagnosis, any previous treatment, and what you want to ask the hospital.')} value={v.summary} onChange={e => setV({ ...v, summary: e.target.value })} />
+          <textarea className="w-full border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] mt-1" rows={4} required minLength={20} maxLength={2000} placeholder={tx('Your diagnosis, any previous treatment, and what you want to ask the hospital.')} value={v.summary} onChange={e => setV({ ...v, summary: e.target.value })} />
           <span className="block text-xs font-normal text-slate-700 mt-1">{tx('At least 20 characters. Do not write passport, card or bank numbers here.')}</span>
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <label className={label}>{tx('Country you live in')}
-            <select className={`${field} mt-1`} value={v.homeCountry} onChange={e => setV({ ...v, homeCountry: e.target.value })}>
+            <CustomSelect className={`${selectField} mt-1`} value={v.homeCountry} onChange={e => setV({ ...v, homeCountry: e.target.value })}>
               <option value="">{tx('Choose a country')}</option>
               {COUNTRIES.map(([c, n]) => <option key={c} value={c}>{tx(n)}</option>)}
-            </select>
+            </CustomSelect>
           </label>
           <label className={label}>{tx('Earliest date you could start')}
             <input type="date" className={`${field} mt-1`} value={v.preferredFrom} min={new Date().toISOString().slice(0, 10)} onChange={e => setV({ ...v, preferredFrom: e.target.value })} />
@@ -220,10 +288,10 @@ function EnquiryForm({ facility, onClose, onSent }: { facility: any; onClose: ()
           <div className="space-y-3 pt-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <label className={label}>{tx('Specialty')}
-                <select className={`${field} mt-1`} value={v.specialty} onChange={e => setV({ ...v, specialty: e.target.value })}>
+                <CustomSelect className={`${selectField} mt-1`} value={v.specialty} onChange={e => setV({ ...v, specialty: e.target.value })}>
                   <option value="">{tx('Not sure yet')}</option>
                   {facility.specialties.map((s: string) => <option key={s} value={s}>{tx(s)}</option>)}
-                </select>
+                </CustomSelect>
               </label>
               <label className={label}>{tx('Leave by')}
                 <input type="date" className={`${field} mt-1`} value={v.preferredTo} min={v.preferredFrom || new Date().toISOString().slice(0, 10)} onChange={e => setV({ ...v, preferredTo: e.target.value })} />
@@ -231,10 +299,10 @@ function EnquiryForm({ facility, onClose, onSent }: { facility: any; onClose: ()
             </div>
             {facility.practitioners.length > 0 && (
               <label className={label}>{tx('Preferred doctor')}
-                <select className={`${field} mt-1`} value={v.practitionerId} onChange={e => setV({ ...v, practitionerId: e.target.value })}>
+                <CustomSelect className={`${selectField} mt-1`} value={v.practitionerId} onChange={e => setV({ ...v, practitionerId: e.target.value })}>
                   <option value="">{tx('No preference')}</option>
                   {facility.practitioners.map((p: any) => <option key={p.id} value={p.id}>{p.name} · {tx(p.specialization)}</option>)}
-                </select>
+                </CustomSelect>
               </label>
             )}
             <fieldset className="space-y-1">
@@ -402,7 +470,7 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
           )}
           {open && (
             <div className="flex flex-wrap items-center gap-2">
-              <select className={`${field} sm:w-64`} value={kind} onChange={e => setKind(e.target.value)} aria-label={tx('Document type')}><option value="passport">{tx('Passport copy')}</option><option value="medical_records">{tx('Medical records')}</option><option value="visa_letter">{tx('Visa / support letter')}</option><option value="other">{tx('Other')}</option></select>
+              <CustomSelect className={`${selectField} sm:w-64`} value={kind} onChange={e => setKind(e.target.value)} aria-label={tx('Document type')}><option value="passport">{tx('Passport copy')}</option><option value="medical_records">{tx('Medical records')}</option><option value="visa_letter">{tx('Visa / support letter')}</option><option value="other">{tx('Other')}</option></CustomSelect>
               <input type="file" accept="application/pdf,image/jpeg,image/png" aria-label={tx('Choose a file')} className="text-xs min-h-[44px]" onChange={e => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = ''; }} />
             </div>
           )}
@@ -432,7 +500,7 @@ function CaseDetail({ id, onBack, onOpenProfessional }: { id: string; onBack: ()
             <p className="font-bold text-slate-900">{tx('Share with your doctor at home')}</p>
             <form onSubmit={async e => { e.preventDefault(); const f = e.currentTarget; const d = await sh({ consent: true, days: Number((f.elements.namedItem('days') as HTMLSelectElement).value), recipientLabel: (f.elements.namedItem('who') as HTMLInputElement).value }); if (d.status === 'success') setShareLink(window.location.origin + d.data.path); say(d, 'Link created.'); }} className="flex flex-wrap gap-2 items-center">
               <input name="who" className={`${field} sm:w-64`} aria-label={tx('Doctor\'s name')} placeholder={tx("Doctor's name (optional)")} maxLength={80} />
-              <select name="days" aria-label={tx('Link lasts')} className={`${field} sm:w-32`} defaultValue="14"><option value="7">{tx('7 days')}</option><option value="14">{tx('14 days')}</option><option value="30">{tx('30 days')}</option></select>
+              <CustomSelect name="days" aria-label={tx('Link lasts')} className={`${selectField} sm:w-32`} defaultValue="14"><option value="7">{tx('7 days')}</option><option value="14">{tx('14 days')}</option><option value="30">{tx('30 days')}</option></CustomSelect>
               <label className="flex items-center gap-3 min-h-[44px]"><input type="checkbox" required className="h-5 w-5 accent-[color:var(--t-600)]" /> {tx('I agree to share this summary with whoever receives the link')}</label>
               <button className={primaryBtn}>{tx('Create link')}</button>
             </form>

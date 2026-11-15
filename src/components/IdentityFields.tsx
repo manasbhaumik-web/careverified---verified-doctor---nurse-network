@@ -1,3 +1,4 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useState } from 'react';
 import { useTr } from '../locale';
 import { Eye, EyeOff } from 'lucide-react';
@@ -62,10 +63,10 @@ export function IdFields({ value, onChange }: { value: IdState; onChange: (v: Id
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label className={label} htmlFor="id-nationality">{tx('Nationality *')}</label>
-            <select id="id-nationality" className="form-select" required value={value.nationality} onChange={e => set({ nationality: e.target.value })}>
+            <CustomSelect id="id-nationality" className="form-select" required value={value.nationality} onChange={e => set({ nationality: e.target.value })}>
               <option value="">{tx('Choose…')}</option>
               {NATIONALITIES.filter(n => n.code !== 'MY').map(n => <option key={n.code} value={n.code}>{n.name}</option>)}
-            </select>
+            </CustomSelect>
           </div>
           <div className="space-y-1.5">
             <label className={label} htmlFor="id-dob">{tx('Date of birth *')}</label>
@@ -89,9 +90,9 @@ export function PhoneField({ id, title, value, onChange, required = true }: { id
     <div className="space-y-1.5">
       <label className={label} htmlFor={id}>{tx(title)}{required ? ' *' : ''}</label>
       <div className="flex gap-2">
-        <select aria-label={tx('Country code')} className="form-select w-28 shrink-0" value={value.dial} onChange={e => onChange({ ...value, dial: e.target.value })}>
+        <CustomSelect aria-label={tx('Country code')} className="form-select w-28 shrink-0" value={value.dial} onChange={e => onChange({ ...value, dial: e.target.value })}>
           {DIAL_CODES.map(d => <option key={d.code} value={d.dial}>{d.code} {d.dial}</option>)}
-        </select>
+        </CustomSelect>
         <input id={id} type="tel" inputMode="tel" autoComplete="tel-national" className="form-input" required={required} placeholder={value.dial === '+60' ? '12-345 6789' : tx('Phone number')}
           value={value.number} onChange={e => onChange({ ...value, number: e.target.value })} />
       </div>
@@ -112,10 +113,10 @@ export function AddressFields({ value, onChange }: { value: Address; onChange: (
     <div className="space-y-3">
       <div className="space-y-1.5">
         <label className={label} htmlFor="addr-country">{tx('Country of residence *')}</label>
-        <select id="addr-country" className="form-select" value={value.country} onChange={e => onChange({ ...emptyAddress, country: e.target.value })}>
+        <CustomSelect id="addr-country" className="form-select" value={value.country} onChange={e => onChange({ ...emptyAddress, country: e.target.value })}>
           {NATIONALITIES.filter(n => n.code !== 'XX').map(n => <option key={n.code} value={n.code}>{n.name}</option>)}
           <option value="XX">{tx('Other')}</option>
-        </select>
+        </CustomSelect>
       </div>
       <input className="form-input" required placeholder={tx('Address line 1')} aria-label={tx('Address line 1')} maxLength={120} value={value.line1} onChange={e => set({ line1: e.target.value })} />
       <input className="form-input" placeholder={tx('Address line 2 (optional)')} aria-label={tx('Address line 2')} maxLength={120} value={value.line2 ?? ''} onChange={e => set({ line2: e.target.value })} />
@@ -124,10 +125,10 @@ export function AddressFields({ value, onChange }: { value: Address; onChange: (
           maxLength={my ? 5 : 12} value={value.postcode} onChange={e => set({ postcode: my ? e.target.value.replace(/\D/g, '') : e.target.value })} />
         <input className="form-input" required placeholder={tx('City')} aria-label={tx('City')} maxLength={60} value={value.city} onChange={e => set({ city: e.target.value })} />
         {my ? (
-          <select className="form-select" required aria-label={tx('State')} value={value.state ?? ''} onChange={e => set({ state: e.target.value })}>
+          <CustomSelect className="form-select" required aria-label={tx('State')} value={value.state ?? ''} onChange={e => set({ state: e.target.value })}>
             <option value="">{tx('State…')}</option>
             {MY_STATES.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
+          </CustomSelect>
         ) : (
           <input className="form-input" placeholder={tx('State / region')} aria-label={tx('State or region')} maxLength={60} value={value.state ?? ''} onChange={e => set({ state: e.target.value })} />
         )}

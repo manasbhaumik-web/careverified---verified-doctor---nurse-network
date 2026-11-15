@@ -1,0 +1,390 @@
+{
+  "version": 1,
+  "project": {
+    "name": "react-example",
+    "productType": null,
+    "stack": [
+      "react",
+      "tailwind-v4",
+      "vite"
+    ]
+  },
+  "sources": {
+    "tokens": [
+      "src/index.css"
+    ],
+    "components": [],
+    "assets": [
+      "public/assets",
+      "assets"
+    ],
+    "instructions": [
+      "DESIGN.md"
+    ]
+  },
+  "design": {
+    "colorMode": "light",
+    "colors": {
+      "--color-cross": {
+        "value": "var(--t-600)",
+        "source": "src/index.css"
+      },
+      "--color-cross-dark": {
+        "value": "var(--t-700)",
+        "source": "src/index.css"
+      },
+      "--color-cross-tint": {
+        "value": "var(--t-100)",
+        "source": "src/index.css"
+      },
+      "--color-emerald-primary": {
+        "value": "#059669",
+        "source": "src/index.css"
+      },
+      "--color-emerald-bright": {
+        "value": "#10b981",
+        "source": "src/index.css"
+      },
+      "--color-emerald-mint": {
+        "value": "#ecfdf5",
+        "source": "src/index.css"
+      },
+      "--color-emerald-border": {
+        "value": "#a7f3d0",
+        "source": "src/index.css"
+      },
+      "--color-ink": {
+        "value": "#1e293b",
+        "source": "src/index.css"
+      },
+      "--color-ink-body": {
+        "value": "#334155",
+        "source": "src/index.css"
+      },
+      "--sys-border-hairline": {
+        "value": "var(--t-200)",
+        "source": "src/index.css"
+      },
+      "--sys-text-primary": {
+        "value": "#1e293b",
+        "source": "src/index.css"
+      },
+      "--sys-border-emerald": {
+        "value": "#a7f3d0",
+        "source": "src/index.css"
+      },
+      "--color-brand-50": {
+        "value": "var(--t-50)",
+        "source": "src/index.css"
+      },
+      "--color-brand-100": {
+        "value": "var(--t-100)",
+        "source": "src/index.css"
+      },
+      "--color-brand-200": {
+        "value": "var(--t-200)",
+        "source": "src/index.css"
+      },
+      "--color-brand-300": {
+        "value": "var(--t-300)",
+        "source": "src/index.css"
+      },
+      "--color-brand-400": {
+        "value": "var(--t-400)",
+        "source": "src/index.css"
+      },
+      "--color-brand-500": {
+        "value": "var(--t-500)",
+        "source": "src/index.css"
+      },
+      "--color-brand-600": {
+        "value": "var(--t-600)",
+        "source": "src/index.css"
+      },
+      "--color-brand-700": {
+        "value": "var(--t-700)",
+        "source": "src/index.css"
+      },
+      "--color-brand-800": {
+        "value": "var(--t-800)",
+        "source": "src/index.css"
+      },
+      "--color-brand-900": {
+        "value": "var(--t-900)",
+        "source": "src/index.css"
+      },
+      "--color-sky-50": {
+        "value": "var(--t-50)",
+        "source": "src/index.css"
+      },
+      "--color-sky-100": {
+        "value": "var(--t-100)",
+        "source": "src/index.css"
+      },
+      "--color-sky-200": {
+        "value": "var(--t-200)",
+        "source": "src/index.css"
+      },
+      "--color-sky-300": {
+        "value": "var(--t-300)",
+        "source": "src/index.css"
+      },
+      "--color-sky-400": {
+        "value": "var(--t-400)",
+        "source": "src/index.css"
+      },
+      "--color-sky-500": {
+        "value": "var(--t-500)",
+        "source": "src/index.css"
+      },
+      "--color-sky-600": {
+        "value": "var(--t-600)",
+        "source": "src/index.css"
+      },
+      "--color-sky-700": {
+        "value": "var(--t-700)",
+        "source": "src/index.css"
+      },
+      "--color-sky-800": {
+        "value": "var(--t-800)",
+        "source": "src/index.css"
+      },
+      "--color-sky-900": {
+        "value": "var(--t-900)",
+        "source": "src/index.css"
+      },
+      "--color-rose-50": {
+        "value": "var(--t-50)",
+        "source": "src/index.css"
+      },
+      "--color-rose-100": {
+        "value": "var(--t-100)",
+        "source": "src/index.css"
+      },
+      "--color-rose-200": {
+        "value": "var(--t-200)",
+        "source": "src/index.css"
+      },
+      "--color-rose-300": {
+        "value": "var(--t-300)",
+        "source": "src/index.css"
+      },
+      "--color-rose-400": {
+        "value": "var(--t-400)",
+        "source": "src/index.css"
+      },
+      "--color-rose-500": {
+        "value": "var(--t-500)",
+        "source": "src/index.css"
+      },
+      "--color-rose-600": {
+        "value": "var(--t-600)",
+        "source": "src/index.css"
+      },
+      "--color-rose-700": {
+        "value": "var(--t-700)",
+        "source": "src/index.css"
+      },
+      "--color-rose-800": {
+        "value": "var(--t-800)",
+        "source": "src/index.css"
+      },
+      "--color-rose-900": {
+        "value": "var(--t-900)",
+        "source": "src/index.css"
+      },
+      "--color-slate-50": {
+        "value": "#F8FAFC",
+        "source": "src/index.css"
+      },
+      "--color-slate-100": {
+        "value": "#f1f5f9",
+        "source": "src/index.css"
+      },
+      "--color-slate-200": {
+        "value": "#e2e8f0",
+        "source": "src/index.css"
+      },
+      "--color-slate-300": {
+        "value": "#cbd5e1",
+        "source": "src/index.css"
+      },
+      "--color-slate-400": {
+        "value": "#94a3b8",
+        "source": "src/index.css"
+      },
+      "--color-slate-500": {
+        "value": "#64748b",
+        "source": "src/index.css"
+      },
+      "--color-slate-600": {
+        "value": "#475569",
+        "source": "src/index.css"
+      },
+      "--color-slate-700": {
+        "value": "#334155",
+        "source": "src/index.css"
+      },
+      "--color-slate-800": {
+        "value": "#1e293b",
+        "source": "src/index.css"
+      },
+      "--color-slate-900": {
+        "value": "#0f172a",
+        "source": "src/index.css"
+      },
+      "--color-slate-950": {
+        "value": "#020617",
+        "source": "src/index.css"
+      }
+    },
+    "typography": {
+      "--sys-text-body": {
+        "value": "#334155",
+        "source": "src/index.css"
+      },
+      "--font-display": {
+        "value": "\"Sora\", ui-sans-serif, system-ui, sans-serif",
+        "source": "src/index.css"
+      },
+      "--font-body": {
+        "value": "\"Inter\", ui-sans-serif, system-ui, sans-serif",
+        "source": "src/index.css"
+      },
+      "--font-sans": {
+        "value": "\"Inter\", ui-sans-serif, system-ui, sans-serif",
+        "source": "src/index.css"
+      },
+      "--text-2xs": {
+        "value": "0.625rem",
+        "source": "src/index.css"
+      },
+      "--text-2xs--line-height": {
+        "value": "0.875rem",
+        "source": "src/index.css"
+      },
+      "--text-xs": {
+        "value": "0.75rem",
+        "source": "src/index.css"
+      },
+      "--text-xs--line-height": {
+        "value": "1rem",
+        "source": "src/index.css"
+      },
+      "--text-sm": {
+        "value": "0.875rem",
+        "source": "src/index.css"
+      },
+      "--text-sm--line-height": {
+        "value": "1.25rem",
+        "source": "src/index.css"
+      },
+      "--text-base": {
+        "value": "1rem",
+        "source": "src/index.css"
+      },
+      "--text-base--line-height": {
+        "value": "1.5rem",
+        "source": "src/index.css"
+      },
+      "--text-lg": {
+        "value": "clamp(1.0625rem, 1.03rem + 0.15vw, 1.1875rem)",
+        "source": "src/index.css"
+      },
+      "--text-lg--line-height": {
+        "value": "1.45",
+        "source": "src/index.css"
+      },
+      "--text-xl": {
+        "value": "clamp(1.1875rem, 1.12rem + 0.28vw, 1.375rem)",
+        "source": "src/index.css"
+      },
+      "--text-xl--line-height": {
+        "value": "1.4",
+        "source": "src/index.css"
+      },
+      "--text-2xl": {
+        "value": "clamp(1.375rem, 1.25rem + 0.5vw, 1.625rem)",
+        "source": "src/index.css"
+      },
+      "--text-2xl--line-height": {
+        "value": "1.3",
+        "source": "src/index.css"
+      },
+      "--text-3xl": {
+        "value": "clamp(1.625rem, 1.4rem + 0.9vw, 2rem)",
+        "source": "src/index.css"
+      },
+      "--text-3xl--line-height": {
+        "value": "1.2",
+        "source": "src/index.css"
+      },
+      "--text-4xl": {
+        "value": "clamp(1.875rem, 1.55rem + 1.3vw, 2.5rem)",
+        "source": "src/index.css"
+      },
+      "--text-4xl--line-height": {
+        "value": "1.15",
+        "source": "src/index.css"
+      },
+      "--font-mono": {
+        "value": "\"Inter\", ui-sans-serif, system-ui, sans-serif",
+        "source": "src/index.css"
+      },
+      "--font-weight-extrabold": {
+        "value": "700",
+        "source": "src/index.css"
+      },
+      "--font-weight-black": {
+        "value": "700",
+        "source": "src/index.css"
+      },
+      "--t-text": {
+        "value": "var(--t-600)",
+        "source": "src/index.css"
+      }
+    },
+    "spacing": {},
+    "radius": {},
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [],
+    "avoid": []
+  },
+  "decisions": [],
+  "evidence": [
+    {
+      "fact": "design.colorMode:light",
+      "source": "src/index.css"
+    },
+    {
+      "fact": "design.tokens",
+      "source": "src/index.css"
+    },
+    {
+      "fact": "project.instructions",
+      "source": "DESIGN.md"
+    },
+    {
+      "fact": "project.stack:react",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:tailwind-v4",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:vite",
+      "source": "package.json"
+    }
+  ],
+  "generatedAt": "2026-11-14T16:22:51.325Z"
+}

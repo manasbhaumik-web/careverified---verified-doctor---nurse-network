@@ -48,7 +48,7 @@ export default function Footer({
           {/* Left: Brand Emblem, Act 586 Status & Copyright */}
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-slate-400 text-center md:text-left justify-center md:justify-start">
             <div className="flex items-center gap-2">
-              <span className="w-5 h-5 bg-[color:var(--t-600)] flex items-center justify-center text-white shrink-0 shadow-2xs">
+              <span className="w-5 h-5 rounded-full bg-[color:var(--t-600)] flex items-center justify-center text-white shrink-0 shadow-2xs">
                 <Cross className="h-3 w-3" />
               </span>
               <span className="font-display font-extrabold text-sm text-white tracking-tight">MediCred</span>

@@ -1,3 +1,4 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   CheckCircle2, FileText, Pill, Award, ArrowRight, Download, 
@@ -425,11 +426,11 @@ export default function DischargeSummaryDialog({
                       Matching verified partner pharmacies…
                     </div>
                   ) : (
-                    <select
+                    <CustomSelect
                       id="select-pharmacy"
                       value={selectedPharmacyId}
                       onChange={e => handleSelectPharmacy(e.target.value)}
-                      className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)]"
+                      className="form-select w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)]"
                     >
                       {pharmacies.map(p => (
                         <option key={p.id} value={p.id}>
@@ -438,7 +439,7 @@ export default function DischargeSummaryDialog({
                           {p.services.includes('24 hours') ? ' · 24 Hours' : ''}
                         </option>
                       ))}
-                    </select>
+                    </CustomSelect>
                   )}
                   {selectedPharmacy && (
                     <div className="text-xs text-slate-600 flex flex-wrap gap-x-4 gap-y-1 pt-0.5">
@@ -553,14 +554,14 @@ export default function DischargeSummaryDialog({
                       </div>
                       <div>
                         <label htmlFor="address-state" className="sr-only">State</label>
-                        <select
+                        <CustomSelect
                           id="address-state"
                           value={deliveryAddress.state}
                           onChange={e => setDeliveryAddress(a => ({ ...a, state: e.target.value }))}
-                          className="w-full h-9 border border-slate-300 bg-white px-2.5 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)]"
+                          className="form-select w-full h-9 border border-slate-300 bg-white px-2.5 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)]"
                         >
                           {MY_STATES.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
+                        </CustomSelect>
                       </div>
                       <div>
                         <label htmlFor="address-phone" className="sr-only">Rider Contact Phone</label>
@@ -604,11 +605,11 @@ export default function DischargeSummaryDialog({
                   {policies.length > 0 && (
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-black uppercase tracking-wider text-slate-700">Insurance Direct-Billing:</span>
-                      <select
+                      <CustomSelect
                         aria-label="Panel Insurance Policy"
                         value={selectedPolicyId}
                         onChange={e => setSelectedPolicyId(e.target.value)}
-                        className="h-8 border border-slate-300 bg-white px-2 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)]"
+                        className="form-select h-8 border border-slate-300 bg-white px-2 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)]"
                       >
                         <option value="">Cash / Direct Pay (No GL)</option>
                         {policies.map(p => (
@@ -616,7 +617,7 @@ export default function DischargeSummaryDialog({
                             {p.insurer} ({p.memberNo}){p.employer ? ` · ${p.employer}` : ''}
                           </option>
                         ))}
-                      </select>
+                      </CustomSelect>
                     </div>
                   )}
 

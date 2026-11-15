@@ -1,5 +1,6 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import PrescriptionList, { fmtDate } from './PrescriptionList';
+import PrescriptionList, { fmtDate } from '../domains/prescriptions/PrescriptionList';
 import CertificatesPanel from './CertificatesPanel';
 import TrendChart from './TrendChart';
 import { useTr } from '../locale';
@@ -8,7 +9,7 @@ import { Activity, AlertTriangle, ClipboardList, FileText, FlaskConical, Pill, S
 const jpost = (url: string, body?: unknown, method = 'POST') =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
 const fmt = fmtDate;
-const field = 'border border-[color:var(--t-200)] bg-white px-3.5 h-11 text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all';
+const field = 'border border-[color:var(--t-200)] bg-white px-3.5 h-11 text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-colors';
 
 /** A <input type="datetime-local"> value for "now", in the person's own time zone. */
 const localNow = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };
@@ -339,15 +340,15 @@ export default function PatientRecords({
           >
             <div className="w-full sm:w-36 shrink-0">
               <label className="sr-only">{tx('Entry Type')}</label>
-              <select 
+              <CustomSelect 
                 value={item.type} 
                 onChange={e => setItem({ ...item, type: e.target.value })}
-                className="w-full border border-[color:var(--t-200)] bg-white px-2.5 h-11 text-xs font-bold text-[color:var(--ink)] focus:outline-none focus:border-[color:var(--t-600)] transition-colors cursor-pointer"
+                className="form-select w-full border border-[color:var(--t-200)] bg-white px-2.5 h-11 text-xs font-bold text-[color:var(--ink)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors cursor-pointer"
               >
                 <option value="allergy">{tx('Allergy')}</option>
                 <option value="condition">{tx('Condition')}</option>
                 <option value="medication">{tx('Medicine')}</option>
-              </select>
+              </CustomSelect>
             </div>
 
             <div className="flex-1 min-w-[140px] w-full sm:w-auto">
@@ -359,7 +360,7 @@ export default function PatientRecords({
                 required 
                 maxLength={120} 
                 placeholder={tx(item.type === 'allergy' ? 'Allergy name (e.g. Penicillin)' : item.type === 'condition' ? 'Condition (e.g. Hypertension)' : 'Medicine name (e.g. Metformin)')}
-                className="w-full border border-[color:var(--t-200)] bg-white px-3 h-11 text-xs font-semibold text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus:border-[color:var(--t-600)] transition-colors"
+                className="w-full border border-[color:var(--t-200)] bg-white px-3 h-11 text-xs font-semibold text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors"
               />
             </div>
 
@@ -370,13 +371,13 @@ export default function PatientRecords({
                 onChange={e => setItem({ ...item, detail: e.target.value })} 
                 maxLength={300} 
                 placeholder={tx('Details (optional, e.g. severe rash, 5mg daily)')}
-                className="w-full border border-[color:var(--t-200)] bg-white px-3 h-11 text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus:border-[color:var(--t-600)] transition-colors"
+                className="w-full border border-[color:var(--t-200)] bg-white px-3 h-11 text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors"
               />
             </div>
 
             <button 
               type="submit"
-              className="w-full sm:w-auto shrink-0 h-11 px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black border border-[color:var(--t-700)] shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              className="w-full sm:w-auto shrink-0 h-11 px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black border border-[color:var(--t-700)] shadow-2xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
             >
               <Plus className="h-3.5 w-3.5" />
               <span>{tx('Add Entry')}</span>
@@ -397,7 +398,7 @@ export default function PatientRecords({
             const d = await act(() => jpost('/api/records/vitals', { kind: vital.kind, value1: Number(vital.value1), value2: vital.kind === 'bp' ? Number(vital.value2) : undefined, takenAt: vital.takenAt ? new Date(vital.takenAt).toISOString() : undefined }), 'Reading saved.');
             if (d.status === 'success') { setVital({ ...vital, value1: '', value2: '', takenAt: localNow() }); setTrendKind(vital.kind); setVitalFlag(d.data.flag ? d.data.flag.text : null); }
           }}>
-            <label className="text-xs font-bold text-slate-700 w-full sm:w-56 sm:flex-none">{tx('Reading')}<select className={`${field} block w-full mt-1.5`} value={vital.kind} onChange={e => setVital({ ...vital, kind: e.target.value, value1: '', value2: '' })}>{Object.entries(VITAL_LABEL).map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}</select><span className="block font-normal text-slate-700 mt-1">{tx('What you measured')}</span></label>
+            <label className="text-xs font-bold text-slate-700 w-full sm:w-56 sm:flex-none">{tx('Reading')}<CustomSelect className={`form-select ${field} block w-full mt-1.5`} value={vital.kind} onChange={e => setVital({ ...vital, kind: e.target.value, value1: '', value2: '' })}>{Object.entries(VITAL_LABEL).map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}</CustomSelect><span className="block font-normal text-slate-700 mt-1">{tx('What you measured')}</span></label>
             <label className="text-xs font-bold text-slate-700 flex-1 min-w-[200px]">{tx(vital.kind === 'bp' ? 'Top number (systolic)' : 'Value')}
               <span className="flex items-center gap-2 mt-1.5">
                 <input type="number" step="any" inputMode="decimal" className={`${field} block w-full min-w-0 flex-1`} value={vital.value1} onChange={e => setVital({ ...vital, value1: e.target.value })} min={vitalSpec?.min} max={vitalSpec?.max} required />
@@ -416,9 +417,9 @@ export default function PatientRecords({
               <input type="datetime-local" className={`${field} block w-full mt-1.5`} value={vital.takenAt} max={localNow()} onChange={e => setVital({ ...vital, takenAt: e.target.value })} required />
               <span className="block font-normal text-slate-700 mt-1">{tx('Now, unless you change it')}</span>
             </label>
-            <div>
-              <span className="block text-xs font-bold invisible" aria-hidden="true">{tx('Save')}</span>
-              <button className="mt-1.5 h-11 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer border border-[color:var(--t-700)] shadow-xs transition-all">{tx('Save Reading')}</button>
+            <div className="w-full sm:w-auto">
+              <span className="hidden sm:block text-xs font-bold invisible" aria-hidden="true">{tx('Save')}</span>
+              <button className="w-full sm:w-auto sm:mt-1.5 h-11 px-6 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold cursor-pointer border border-[color:var(--t-700)] shadow-xs transition-colors">{tx('Save Reading')}</button>
             </div>
           </form>
           {vitalFlag && <p role="alert" className="bg-rose-50 border-2 border-rose-300 text-rose-900 text-xs font-bold p-3 flex gap-2"><AlertTriangle className="h-5 w-5 shrink-0" />{vitalFlag}</p>}
@@ -428,9 +429,9 @@ export default function PatientRecords({
             <div className="flex flex-wrap items-end justify-between gap-3">
               <h3 id="trend-heading" className="font-display font-black text-sm text-[color:var(--ink)]">{tx('Trend')}</h3>
               <label className="text-xs font-bold text-slate-700 flex items-center gap-2">{tx('Show')}
-                <select className={`${field} text-xs`} value={trendKind} onChange={e => setTrendKind(e.target.value)}>
+                <CustomSelect className={`form-select ${field} text-xs`} value={trendKind} onChange={e => setTrendKind(e.target.value)}>
                   {Object.entries(VITAL_LABEL).map(([k, l]) => <option key={k} value={k}>{tx(l)}</option>)}
-                </select>
+                </CustomSelect>
               </label>
             </div>
             <TrendChart readings={data.vitals.filter((v: any) => v.kind === trendKind)} label={tx(VITAL_LABEL[trendKind])} unit={trendSpec?.unit ?? ''} twoValues={!!trendSpec?.two} />
@@ -509,58 +510,258 @@ export default function PatientRecords({
       )}
 
       {tab === 'labs' && (
-        <div className="space-y-3">
-          {data.labOrders.length === 0 && <p className="text-xs text-slate-600 bg-white border border-slate-200 p-4">{tx('No lab tests have been requested.')}</p>}
-          {data.labOrders.map((o: any) => (
-            <article key={o.id} className="bg-white border border-slate-200 p-4 text-xs space-y-1.5">
-              <p><b>{o.tests}</b> <span className="text-xs text-slate-600">{tx('requested by {doctor} · {date}', { doctor: o.doctor, date: fmt(o.orderedAt) })}</span></p>
-              {o.notes && <p className="text-xs">{o.notes}</p>}
-              {o.status === 'resulted'
-                ? <p className="text-xs font-bold text-emerald-800">{tx('Result uploaded {date} ·', { date: fmt(o.resultedAt) })} <a className="underline" href={`/api/documents/${o.resultDocumentId}/download`}>{tx('download')}</a></p>
-                : <label className="text-xs font-bold border border-dashed border-slate-300 px-3 py-2 inline-block cursor-pointer">
-                    {tx('Upload result (PDF, JPG or PNG)')}
-                    <input type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={async e => {
-                      const f = e.target.files?.[0]; if (!f) return;
-                      const form = new FormData(); form.append('file', f); form.append('kind', 'lab_result'); form.append('labOrderId', o.id);
-                      await act(() => fetch('/api/documents', { method: 'POST', body: form }).then(r => r.json()), 'Result uploaded.');
-                    }} />
-                  </label>}
-            </article>
-          ))}
+        <div className="space-y-3.5">
+          {data.labOrders.length === 0 ? (
+            <div className="bg-white border border-[color:var(--t-200)] p-10 text-center space-y-2.5 shadow-2xs">
+              <div className="w-11 h-11 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center mx-auto">
+                <FlaskConical className="h-5 w-5" />
+              </div>
+              <h3 className="font-display font-black text-sm text-[color:var(--ink)]">{tx('No Diagnostic Lab Orders Requested')}</h3>
+              <p className="text-xs text-slate-600 max-w-md mx-auto font-medium">
+                {tx('When a consulting physician orders blood pathology, urinalysis, or radiology imaging, the requisition and upload portal will appear here.')}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {data.labOrders.map((o: any) => {
+                const isResulted = o.status === 'resulted';
+                return (
+                  <article
+                    key={o.id}
+                    className={`bg-white border-t-2 ${
+                      isResulted ? 'border-t-emerald-600' : 'border-t-amber-500'
+                    } border-x border-b border-[color:var(--t-200)] p-5 shadow-xs flex flex-col justify-between gap-4`}
+                  >
+                    <div className="space-y-2.5">
+                      <div className="flex items-start justify-between gap-2 pb-2.5 border-b border-[color:var(--t-100)]">
+                        <div className="min-w-0">
+                          <span className="text-2xs font-mono font-bold uppercase tracking-wider text-slate-500 block">
+                            {tx('Pathology Requisition')}
+                          </span>
+                          <h3 className="font-display font-black text-sm text-[color:var(--ink)] mt-0.5">
+                            {o.tests}
+                          </h3>
+                        </div>
+                        <span
+                          className={`shrink-0 text-2xs font-mono font-bold uppercase px-2 py-0.5 border ${
+                            isResulted
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              : 'bg-amber-50 text-amber-800 border-amber-200'
+                          }`}
+                        >
+                          {isResulted ? tx('Result Uploaded') : tx('Awaiting Lab Report')}
+                        </span>
+                      </div>
+
+                      <div className="text-xs text-slate-600 space-y-1">
+                        <p className="font-medium">
+                          <strong className="text-[color:var(--ink)]">{tx('Ordering Physician:')}</strong> {o.doctor}
+                        </p>
+                        <p className="font-mono text-2xs text-slate-500">
+                          {tx('Ordered on {date}', { date: fmt(o.orderedAt) })}
+                        </p>
+                      </div>
+
+                      {o.notes && (
+                        <div className="p-2.5 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] text-xs text-slate-700">
+                          <span className="text-2xs font-mono font-bold uppercase text-slate-500 block mb-0.5">
+                            {tx('Clinical Instructions')}
+                          </span>
+                          {o.notes}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-3 border-t border-[color:var(--t-100)] flex items-center justify-between gap-3">
+                      {isResulted ? (
+                        <>
+                          <span className="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
+                            <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                            <span>{tx('Uploaded {date}', { date: fmt(o.resultedAt) })}</span>
+                          </span>
+                          <a
+                            className="h-9 px-3.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors"
+                            href={`/api/documents/${o.resultDocumentId}/download`}
+                          >
+                            <FileText className="h-3.5 w-3.5" />
+                            <span>{tx('Download Report')}</span>
+                          </a>
+                        </>
+                      ) : (
+                        <label className="w-full h-10 bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] border border-dashed border-[color:var(--t-400)] text-[color:var(--t-800)] text-xs font-extrabold px-4 inline-flex items-center justify-center gap-2 cursor-pointer transition-colors">
+                          <Plus className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                          <span>{tx('Upload Lab Result (PDF, JPG or PNG)')}</span>
+                          <input
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            className="hidden"
+                            onChange={async e => {
+                              const f = e.target.files?.[0];
+                              if (!f) return;
+                              const form = new FormData();
+                              form.append('file', f);
+                              form.append('kind', 'lab_result');
+                              form.append('labOrderId', o.id);
+                              await act(() => fetch('/api/documents', { method: 'POST', body: form }).then(r => r.json()), 'Result uploaded.');
+                            }}
+                          />
+                        </label>
+                      )}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
       {tab === 'notes' && (
-        <div className="space-y-3">
-          {data.encounters.length === 0 && <p className="text-xs text-slate-600 bg-white border border-slate-200 p-4">{tx('Your doctors\' consultation summaries will appear here.')}</p>}
-          {data.encounters.map((e: any) => (
-            <article key={e.id} className="bg-white border border-slate-200 p-4 text-xs space-y-1">
-              <p className="font-extrabold">{e.professionalName} · {fmt(e.signed_at)}</p>
-              {(['subjective', 'objective', 'assessment', 'plan'] as const).map(k => e[k] ? <p key={k}><span className="text-xs font-extrabold uppercase text-slate-600 mr-2">{tx(k)}</span>{e[k]}</p> : null)}
-            </article>
-          ))}
+        <div className="space-y-4">
+          {data.encounters.length === 0 ? (
+            <div className="bg-white border border-[color:var(--t-200)] p-10 text-center space-y-2.5 shadow-2xs">
+              <div className="w-11 h-11 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center mx-auto">
+                <FileText className="h-5 w-5" />
+              </div>
+              <h3 className="font-display font-black text-sm text-[color:var(--ink)]">{tx('No Signed Physician SOAP Notes Yet')}</h3>
+              <p className="text-xs text-slate-600 max-w-md mx-auto font-medium">
+                {tx('Your doctors\' signed consultation summaries (Subjective, Objective, Assessment & Plan) will appear here after your visit.')}
+              </p>
+            </div>
+          ) : (
+            data.encounters.map((e: any) => (
+              <article
+                key={e.id}
+                className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] p-5 shadow-xs space-y-3.5"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[color:var(--t-100)]">
+                  <div>
+                    <span className="text-2xs font-mono font-bold uppercase tracking-wider text-[color:var(--t-700)] block">
+                      {tx('Signed Clinical Consultation Summary (SOAP)')}
+                    </span>
+                    <h3 className="font-display font-black text-sm text-[color:var(--ink)] mt-0.5">
+                      {e.professionalName}
+                    </h3>
+                  </div>
+                  <span className="text-2xs font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 inline-flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                    {tx('Signed {date}', { date: fmt(e.signed_at) })}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  {([
+                    ['subjective', 'Subjective (Symptoms & History)'],
+                    ['objective', 'Objective (Examination & Vitals)'],
+                    ['assessment', 'Clinical Assessment / Diagnosis'],
+                    ['plan', 'Treatment & Follow-Up Plan'],
+                  ] as const).map(([k, title]) =>
+                    e[k] ? (
+                      <div key={k} className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3 space-y-1">
+                        <span className="text-2xs font-mono font-extrabold uppercase tracking-wider text-slate-600 block">
+                          {tx(title)}
+                        </span>
+                        <p className="text-xs text-[color:var(--ink)] font-medium leading-relaxed">{e[k]}</p>
+                      </div>
+                    ) : null
+                  )}
+                </div>
+              </article>
+            ))
+          )}
         </div>
       )}
 
       {tab === 'sharing' && (
         <div className="space-y-4">
-          <p className="text-xs text-slate-700 bg-white border border-slate-200 p-4">{tx('Doctors can read your allergies, conditions, medicines, readings and lab results only while you share them. You can stop sharing at any time. Every time a doctor opens your record it is logged.')}</p>
-          <section className="bg-white border border-slate-200 p-4 space-y-2">
-            <h3 className="text-sm font-extrabold">{tx('Currently sharing with')}</h3>
-            {data.grants.length === 0 ? <p className="text-xs text-slate-600">{tx('Nobody.')}</p> : data.grants.map((g: any) => (
-              <div key={g.id} className="flex items-center justify-between gap-3 text-xs border-t border-slate-100 pt-2">
-                <span><b>{g.professionalName}</b> <span className="text-xs text-slate-600">{tx('until {date}', { date: fmt(g.expires_at) })}</span></span>
-                <button onClick={() => act(() => jpost(`/api/records/grants/${g.id}`, undefined, 'DELETE'), 'Sharing stopped.')} className="text-xs font-bold text-rose-700 cursor-pointer">{tx('Stop sharing')}</button>
+          <div className="bg-[color:var(--t-50)]/60 border border-[color:var(--t-200)] p-4 flex items-start gap-3">
+            <Share2 className="h-4 w-4 text-[color:var(--t-600)] shrink-0 mt-0.5" />
+            <div className="text-xs text-slate-700 space-y-1">
+              <p className="font-bold text-[color:var(--ink)]">{tx('PDPA Patient-Controlled Record Consent (30-Day Statutory Window)')}</p>
+              <p className="leading-relaxed">
+                {tx('Doctors can read your allergies, conditions, medicines, readings and lab results only while you share them. You can stop sharing at any time. Every time a doctor opens your record it is logged.')}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+            <section className="lg:col-span-7 bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] p-5 shadow-xs space-y-3">
+              <div className="flex items-center justify-between pb-2.5 border-b border-[color:var(--t-100)]">
+                <h3 className="font-display font-black text-sm text-[color:var(--ink)]">{tx('Currently sharing with')}</h3>
+                <span className="text-2xs font-mono font-bold px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
+                  {data.grants.length} {tx('Active')}
+                </span>
               </div>
-            ))}
-          </section>
-          {data.sharableWith.length > 0 && (
-            <form className="bg-white border border-[color:var(--t-200)] p-4 flex flex-wrap gap-2 items-end" onSubmit={e => { e.preventDefault(); if (shareWith) act(() => jpost('/api/records/grants', { professionalId: shareWith, days: 30 }), 'Shared for 30 days.'); }}>
-              <label className="text-xs font-bold flex-1 min-w-[12rem]">{tx('Share with a doctor you have seen')}
-                <select className={`${field} block w-full mt-1`} value={shareWith} onChange={e => setShareWith(e.target.value)}><option value="">{tx('Choose…')}</option>{data.sharableWith.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
-              <button className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">{tx('Share for 30 days')}</button>
-            </form>
-          )}
+              {data.grants.length === 0 ? (
+                <div className="py-6 px-4 bg-[color:var(--t-50)]/30 border border-dashed border-[color:var(--t-200)] text-center">
+                  <p className="text-xs text-slate-600 font-medium">{tx('Nobody currently has active access to your clinical record.')}</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-[color:var(--t-100)]">
+                  {data.grants.map((g: any) => (
+                    <div key={g.id} className="py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+                      <div className="space-y-0.5">
+                        <p className="font-bold text-[color:var(--ink)]">{g.professionalName}</p>
+                        <p className="text-2xs font-mono text-slate-500">
+                          {tx('Valid until {date}', { date: fmt(g.expires_at) })}
+                          {g.source ? ` · ${tx('Granted via')} ${tx(g.source)}` : ''}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => act(() => jpost(`/api/records/grants/${g.id}`, undefined, 'DELETE'), 'Sharing stopped.')}
+                        className="h-9 px-3 bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold cursor-pointer transition-colors"
+                      >
+                        {tx('Stop sharing')}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            <section className="lg:col-span-5 bg-white border-t-2 border-t-emerald-600 border-x border-b border-[color:var(--t-200)] p-5 shadow-xs space-y-3">
+              <h3 className="font-display font-black text-sm text-[color:var(--ink)] pb-2.5 border-b border-[color:var(--t-100)]">
+                {tx('Grant 30-Day Record Access')}
+              </h3>
+              {data.sharableWith.length > 0 ? (
+                <form
+                  className="space-y-3"
+                  onSubmit={e => {
+                    e.preventDefault();
+                    if (shareWith) act(() => jpost('/api/records/grants', { professionalId: shareWith, days: 30 }), 'Shared for 30 days.');
+                  }}
+                >
+                  <label className="text-xs font-bold text-slate-700 block">
+                    {tx('Share with a doctor you have seen')}
+                    <CustomSelect
+                      className={`form-select ${field} block w-full mt-1.5`}
+                      value={shareWith}
+                      onChange={e => setShareWith(e.target.value)}
+                    >
+                      <option value="">{tx('Choose…')}</option>
+                      {data.sharableWith.map((p: any) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </CustomSelect>
+                  </label>
+                  <button
+                    type="submit"
+                    disabled={!shareWith}
+                    className="w-full h-11 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:opacity-50 text-white text-xs font-extrabold px-5 cursor-pointer transition-colors"
+                  >
+                    {tx('Share for 30 days')}
+                  </button>
+                </form>
+              ) : (
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {tx('Once you have booked or consulted a verified practitioner, you can grant them 30-day access to your health record from here.')}
+                </p>
+              )}
+            </section>
+          </div>
         </div>
       )}
     </div>

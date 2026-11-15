@@ -4,8 +4,8 @@ import {
   Plane, Globe, MapPin, AlertTriangle, Zap
 } from 'lucide-react';
 import { useTr } from '../../locale';
-import WorkspaceHeader from '../WorkspaceHeader';
-import { BannerBadge } from '../DashboardHeader';
+import WorkspaceHeader from '../../shared/ui/WorkspaceHeader';
+import { BannerBadge } from '../../shared/ui/DashboardHeader';
 import { PatientCase, ReferralLedgerData, ReferralLedgerCase } from './types';
 
 interface FacilityCasesTabProps {
@@ -63,10 +63,10 @@ export default function FacilityCasesTab({
                   key={st}
                   type="button"
                   onClick={() => setCaseStatusFilter(st)}
-                  className={`px-2.5 py-1 text-xs font-bold uppercase cursor-pointer ${
+                  className={`px-2.5 py-1 text-xs font-bold uppercase cursor-pointer rounded-none border transition-colors ${
                     caseStatusFilter === st
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]'
+                      : 'bg-[color:var(--t-bg)] text-slate-600 border-[color:var(--t-200)] hover:bg-[color:var(--t-50)]'
                   }`}
                 >
                   {st.replace('_', ' ')}
@@ -76,7 +76,7 @@ export default function FacilityCasesTab({
           </div>
 
           {filteredCases.length === 0 ? (
-            <div className="p-12 bg-slate-50 text-center text-xs text-slate-500 space-y-2 border border-dashed border-slate-200">
+            <div className="p-12 bg-[color:var(--t-bg)] text-center text-xs text-slate-500 space-y-2 border border-dashed border-[color:var(--t-200)]">
               <FileText className="h-8 w-8 text-slate-400 mx-auto" />
               <p className="text-sm font-bold text-slate-700">{tx('No active patient referral cases found.')}</p>
               <p className="text-xs text-slate-500">{tx('Inbound clinical referral inquiries and cross-border consultations will appear here automatically.')}</p>

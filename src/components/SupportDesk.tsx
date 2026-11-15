@@ -1,11 +1,12 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useCallback, useEffect, useState } from 'react';
 import { TestimonialForm } from './TestimonialPanels';
 import { AlertTriangle, LifeBuoy } from 'lucide-react';
 import { useTr } from '../locale';
-import DashboardHeader, { BannerBadge } from './DashboardHeader';
+import DashboardHeader, { BannerBadge } from '../shared/ui/DashboardHeader';
 import PractitionerHeroBanner from './PractitionerHeroBanner';
 import PatientHeroBanner from './PatientHeroBanner';
-import WorkspaceHeader from './WorkspaceHeader';
+import WorkspaceHeader from '../shared/ui/WorkspaceHeader';
 import { useLocale } from '../locale/store';
 
 const jpost = (url: string, body?: unknown) =>
@@ -130,10 +131,10 @@ export default function SupportDesk({
 
       <form onSubmit={create} className="bg-white border border-[color:var(--t-200)] p-6 space-y-4 shadow-xs">
         <h2 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)]">{tx('Open a Support Ticket')}</h2>
-        <select className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3 text-xs text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors cursor-pointer" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} required aria-label={tx('Category')}>
+        <CustomSelect className="form-select w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3 text-xs text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors cursor-pointer" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} required aria-label={tx('Category')}>
           <option value="">{tx('Select ticket category…')}</option>
           {cats.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-        </select>
+        </CustomSelect>
         {chosen && <p className="text-xs text-[color:var(--ink-2)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-2.5">{tx('Target resolution window:')} <b className="text-[color:var(--ink)]">{chosen.respondWithinHours} hour{chosen.respondWithinHours === 1 ? '' : 's'}</b>.</p>}
         {form.category === 'Report a user' && <input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 text-xs text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors" placeholder={tx('Who are you reporting? (Practitioner or Pharmacy name)')} value={form.target} onChange={e => setForm({ ...form, target: e.target.value })} maxLength={100} />}
         <input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] px-3.5 text-xs text-[color:var(--ink)] focus:bg-white focus:outline-none focus:border-[color:var(--t-600)] transition-colors" placeholder={tx('Ticket Subject (summary)')} value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} required minLength={3} maxLength={120} />

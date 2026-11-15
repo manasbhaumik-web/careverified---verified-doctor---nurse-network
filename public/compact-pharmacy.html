@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediCred — Compact Pharmacy Clinical Workstation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --t-900: #164e63;
+      --t-800: #155e75;
+      --t-700: #0e7490;
+      --t-600: #0891b2;
+      --t-500: #06b6d4;
+      --t-100: #cffafe;
+      --t-50: #f0fdfa;
+      --ink: #0f172a;
+      --canvas: #f8fafc;
+      --border: #e2e8f0;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--canvas);
+      color: var(--ink);
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Custom subtle scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900 antialiased selection:bg-cyan-100 selection:text-cyan-900">
+
+  <!-- 1. PRIMARY ELEVATED HEADER BAR (60px) -->
+  <header class="bg-[#0e7490] text-white border-b border-[#155e75] sticky top-0 z-40 shadow-sm">
+    <div class="max-w-[1720px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+      
+      <!-- Brand & Section Label -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 bg-white text-[#0e7490] font-black text-xl flex items-center justify-center rounded-none shadow-sm">
+            +
+          </div>
+          <div class="flex flex-col leading-none">
+            <span class="text-base font-extrabold tracking-tight">MediCred<span class="text-cyan-300">.</span></span>
+            <span class="text-[9px] font-bold uppercase tracking-widest text-cyan-200">Pharmacy Workspace</span>
+          </div>
+        </div>
+
+        <span class="hidden md:inline-block w-px h-6 bg-cyan-700 mx-2"></span>
+
+        <!-- Workspace Nav Pills -->
+        <nav class="hidden md:flex items-center gap-1">
+          <button class="flex items-center gap-1.5 px-3 py-1.5 bg-[#155e75] text-white text-xs font-bold rounded-none border border-cyan-500/30">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Rx Live Dispensing
+          </button>
+          <button class="px-3 py-1.5 text-cyan-100 hover:text-white hover:bg-white/10 text-xs font-semibold rounded-none transition-colors">
+            Operations &amp; Staff
+          </button>
+          <button class="px-3 py-1.5 text-cyan-100 hover:text-white hover:bg-white/10 text-xs font-semibold rounded-none transition-colors">
+            Poison Register
+          </button>
+        </nav>
+      </div>
+
+      <!-- Statutory Verification & Profile -->
+      <div class="flex items-center gap-3">
+        <div class="hidden lg:flex items-center gap-2 bg-[#155e75]/80 px-3 py-1 rounded-none border border-cyan-400/30 text-[11px] font-medium text-cyan-100">
+          <svg class="w-3.5 h-3.5 text-emerald-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v3a1 1 0 102 0V7z" clip-rule="evenodd"></path></svg>
+          <span>Act 586 Council-Verified Network</span>
+        </div>
+
+        <button class="px-2.5 py-1 text-xs font-bold bg-[#155e75] border border-cyan-600 text-cyan-100 hover:text-white rounded-none">
+          MY · EN
+        </button>
+
+        <div class="flex items-center gap-2 pl-2 border-l border-cyan-700">
+          <div class="w-7 h-7 rounded-full bg-cyan-200 border-2 border-white overflow-hidden flex items-center justify-center text-[#0e7490] font-black text-xs">
+            BP
+          </div>
+          <div class="hidden sm:flex flex-col text-left leading-tight">
+            <span class="text-xs font-bold">Bangsar Care</span>
+            <span class="text-[10px] text-cyan-200 font-mono">Lic: A-9921</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. STREAMLINED COMPACT IDENTITY BANNER (Collapsible) -->
+  <section id="identityBanner" class="bg-white border-b border-slate-200 transition-all duration-200">
+    <div class="max-w-[1720px] mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Facility Info + Statutory Badges -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-slate-100 border border-slate-300 rounded-none flex items-center justify-center text-slate-700 font-black text-sm shrink-0">
+          Rx
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-sm font-extrabold text-slate-900 tracking-tight">Bangsar Care Pharmacy</h1>
+            <span class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-extrabold bg-cyan-50 text-cyan-800 border border-cyan-200 uppercase tracking-wider">
+              Type A Poison Licence
+            </span>
+            <span class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200 uppercase tracking-wider">
+              LFM Accredited
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 truncate max-w-xl">
+            28 Jalan Telawi 3, Bangsar, Kuala Lumpur · Poison Premises #PH/WP/2026/0441
+          </p>
+        </div>
+      </div>
+
+      <!-- Interactive KPI Filter Pills -->
+      <div class="flex items-center gap-1.5 bg-slate-100 p-1 border border-slate-200 rounded-none">
+        <button onclick="setFilter('ALL')" id="filter-all" class="filter-chip px-2.5 py-1 text-xs font-bold rounded-none bg-white text-slate-900 shadow-2xs border border-slate-200 transition-all">
+          <span class="text-slate-500 font-normal mr-1">All</span>
+          <span class="font-mono" id="count-all">3</span>
+        </button>
+        <button onclick="setFilter('NEW')" id="filter-new" class="filter-chip px-2.5 py-1 text-xs font-bold rounded-none text-slate-600 hover:bg-white hover:text-slate-900 transition-all">
+          <span class="text-slate-500 font-normal mr-1">New</span>
+          <span class="font-mono text-cyan-600" id="count-new">1</span>
+        </button>
+        <button onclick="setFilter('IN_PROGRESS')" id="filter-progress" class="filter-chip px-2.5 py-1 text-xs font-bold rounded-none text-slate-600 hover:bg-white hover:text-slate-900 transition-all">
+          <span class="text-slate-500 font-normal mr-1">In Progress</span>
+          <span class="font-mono text-amber-600" id="count-progress">1</span>
+        </button>
+        <button onclick="setFilter('READY')" id="filter-ready" class="filter-chip px-2.5 py-1 text-xs font-bold rounded-none text-slate-600 hover:bg-white hover:text-slate-900 transition-all">
+          <span class="text-slate-500 font-normal mr-1">Ready</span>
+          <span class="font-mono text-emerald-600" id="count-ready">1</span>
+        </button>
+        <button onclick="setFilter('DISPENSED')" id="filter-dispensed" class="filter-chip px-2.5 py-1 text-xs font-bold rounded-none text-slate-600 hover:bg-white hover:text-slate-900 transition-all">
+          <span class="text-slate-500 font-normal mr-1">Dispensed</span>
+          <span class="font-mono text-slate-400" id="count-dispensed">0</span>
+        </button>
+
+        <button onclick="toggleBanner()" title="Toggle compact header" class="ml-1 p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 3. UNIFIED HIGH-DENSITY COMMAND BAR (44px) -->
+  <section class="bg-white border-b border-slate-200 sticky top-14 z-30 shadow-2xs">
+    <div class="max-w-[1720px] mx-auto px-4 sm:px-6 h-12 flex items-center justify-between gap-3">
+      
+      <!-- Left: Fast Live Search + Walk-in Code Trigger -->
+      <div class="flex items-center gap-2 flex-1 max-w-xl">
+        <div class="relative flex-1">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input 
+            type="text" 
+            id="searchInput"
+            oninput="handleSearch(this.value)"
+            placeholder="Search prescription code, patient IC, or drug name... (Ctrl + K)" 
+            class="w-full h-9 pl-9 pr-8 bg-slate-50 hover:bg-slate-100/80 focus:bg-white border border-slate-300 focus:border-cyan-600 focus:ring-1 focus:ring-cyan-600 text-xs font-medium text-slate-900 rounded-none placeholder:text-slate-400 transition-all"
+          >
+          <kbd class="hidden sm:inline-block absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-400 bg-slate-200/60 px-1 border border-slate-300">⌘K</kbd>
+        </div>
+
+        <button onclick="openWalkInModal()" class="h-9 px-3 bg-cyan-50 hover:bg-cyan-100 border border-cyan-300 text-cyan-900 text-xs font-bold flex items-center gap-1.5 rounded-none shrink-0 transition-colors">
+          <svg class="w-3.5 h-3.5 text-cyan-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Walk-in Code</span>
+        </button>
+      </div>
+
+      <!-- Right: Live Pulse + Audio/Desktop Alerts + Reporting Period -->
+      <div class="flex items-center gap-3">
+        <!-- Live status telemetry -->
+        <div class="hidden md:flex items-center gap-1.5 text-xs text-slate-600 border-r border-slate-200 pr-3 font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-emerald-700 font-bold">Live Rx stream</span>
+          <span class="text-slate-400 font-mono text-[11px]" id="clockTime">22:33:14</span>
+        </div>
+
+        <!-- Notification Toggles -->
+        <div class="hidden lg:flex items-center gap-1">
+          <button id="soundToggle" onclick="toggleSound()" class="h-8 px-2.5 text-xs font-semibold bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-700 flex items-center gap-1.5 rounded-none transition-colors">
+            <span id="soundIcon">🔊</span>
+            <span id="soundText" class="text-[11px]">Sound: ON</span>
+          </button>
+          <button id="desktopToggle" onclick="toggleDesktop()" class="h-8 px-2.5 text-xs font-semibold bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-700 flex items-center gap-1.5 rounded-none transition-colors">
+            <span id="desktopIcon">🔔</span>
+            <span id="desktopText" class="text-[11px]">Alerts: ON</span>
+          </button>
+        </div>
+
+        <!-- Standardized Headless Overlay FilterSelect -->
+        <div class="relative flex items-center bg-cyan-50/60 border border-cyan-200 pl-3 pr-2.5 h-9 min-w-[210px] focus-within:border-cyan-600 focus-within:bg-white focus-within:ring-1 focus-within:ring-cyan-600 transition-colors rounded-none">
+          <span class="text-[10px] font-black uppercase tracking-wider text-cyan-800 shrink-0 select-none mr-2 leading-none flex items-center h-full">PERIOD:</span>
+          <span id="filterLabel" class="flex-1 text-xs font-bold text-slate-800 truncate pr-2 select-none leading-none flex items-center h-full">Last 30 days</span>
+          <svg class="h-3.5 w-3.5 text-cyan-700 pointer-events-none shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          <select id="periodSelect" onchange="updatePeriod(this.value)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" aria-label="Reporting Period">
+            <option value="Last 7 days">Last 7 days</option>
+            <option value="Last 30 days" selected>Last 30 days</option>
+            <option value="Last 90 days">Last 90 days</option>
+          </select>
+        </div>
+
+        <button onclick="downloadCSV()" class="h-9 px-3 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-bold flex items-center gap-1.5 rounded-none transition-colors">
+          <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          <span class="hidden sm:inline">Audited CSV</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 4. MASTER-DETAIL CLINICAL BENTO WORKSTATION (Split-Pane) -->
+  <main class="flex-1 max-w-[1720px] w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+    
+    <!-- LEFT PANE: DENSE OPERATIONAL PRESCRIPTION QUEUE (5 cols / ~42%) -->
+    <div class="lg:col-span-5 flex flex-col bg-white border border-slate-200 shadow-2xs rounded-none overflow-hidden">
+      
+      <!-- Queue Header Bar -->
+      <div class="bg-slate-50 border-b border-slate-200 px-4 py-2.5 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <h2 class="text-xs font-black uppercase tracking-wider text-slate-700">Prescription Intake Queue</h2>
+          <span id="queueCount" class="text-[10px] font-mono font-bold bg-cyan-100 text-cyan-800 px-1.5 py-0.2 border border-cyan-200">3 ACTIVE</span>
+        </div>
+        <div class="text-[11px] text-slate-500 font-medium">
+          Sorted by Priority
+        </div>
+      </div>
+
+      <!-- Scrollable Queue Items -->
+      <div id="queueList" class="divide-y divide-slate-100 max-h-[calc(100vh-250px)] overflow-y-auto">
+        
+        <!-- Item 1 (Selected by default) -->
+        <div onclick="selectPrescription(1)" id="queue-item-1" class="queue-item p-3.5 hover:bg-slate-50/80 cursor-pointer transition-all bg-cyan-50/40 border-l-4 border-cyan-600">
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-black text-slate-900">RX-2026-2002</span>
+              <span class="px-1.5 py-0.2 text-[9px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">READY</span>
+            </div>
+            <span class="text-[11px] font-mono text-slate-400">11:20 AM (12m ago)</span>
+          </div>
+
+          <div class="flex items-baseline justify-between mb-1">
+            <span class="text-xs font-bold text-slate-800">Wong Mei Ling</span>
+            <span class="text-[11px] font-mono text-slate-500">IC: 880412-14-5542</span>
+          </div>
+
+          <div class="text-[11px] text-slate-600 line-clamp-1 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+            <span>Amoxicillin 500mg, Paracetamol 500mg</span>
+          </div>
+
+          <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
+            <span>Prescriber: <strong>Dr. Siti Aminah</strong> (MMC 48219)</span>
+            <span class="text-emerald-700 font-bold">✓ Allergy Clear</span>
+          </div>
+        </div>
+
+        <!-- Item 2 -->
+        <div onclick="selectPrescription(2)" id="queue-item-2" class="queue-item p-3.5 hover:bg-slate-50/80 cursor-pointer transition-all border-l-4 border-transparent">
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-black text-slate-900">RX-2026-2001</span>
+              <span class="px-1.5 py-0.2 text-[9px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300">IN PROGRESS</span>
+            </div>
+            <span class="text-[11px] font-mono text-slate-400">11:05 AM (27m ago)</span>
+          </div>
+
+          <div class="flex items-baseline justify-between mb-1">
+            <span class="text-xs font-bold text-slate-800">Ahmad Razak bin Osman</span>
+            <span class="text-[11px] font-mono text-slate-500">IC: 750920-10-5891</span>
+          </div>
+
+          <div class="text-[11px] text-slate-600 line-clamp-1 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            <span>Metformin 500mg, Atorvastatin 20mg</span>
+          </div>
+
+          <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
+            <span>Prescriber: <strong>Dr. Kevin Tan</strong> (MMC 39182)</span>
+            <span class="text-cyan-700 font-bold">Packaging in progress</span>
+          </div>
+        </div>
+
+        <!-- Item 3 -->
+        <div onclick="selectPrescription(3)" id="queue-item-3" class="queue-item p-3.5 hover:bg-slate-50/80 cursor-pointer transition-all border-l-4 border-transparent">
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-black text-slate-900">RX-2026-2003</span>
+              <span class="px-1.5 py-0.2 text-[9px] font-black uppercase tracking-wider bg-cyan-100 text-cyan-800 border border-cyan-300">NEW</span>
+            </div>
+            <span class="text-[11px] font-mono text-slate-400">11:31 AM (1m ago)</span>
+          </div>
+
+          <div class="flex items-baseline justify-between mb-1">
+            <span class="text-xs font-bold text-slate-800">Priya a/p Suresh</span>
+            <span class="text-[11px] font-mono text-slate-500">IC: 920315-08-6124</span>
+          </div>
+
+          <div class="text-[11px] text-slate-600 line-clamp-1 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span>Salbutamol 100mcg Inhaler, Cetirizine 10mg</span>
+          </div>
+
+          <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
+            <span>Prescriber: <strong>Dr. Lim Wei Hong</strong> (MMC 52914)</span>
+            <span class="text-amber-700 font-bold">⚡ Awaiting pharmacist review</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Queue Footer Status -->
+      <div class="bg-slate-50 border-t border-slate-200 px-4 py-2 flex items-center justify-between text-[11px] text-slate-500">
+        <span>Auto-synced with MoH MedVerify gateway</span>
+        <button onclick="refreshQueue()" class="text-cyan-700 font-bold hover:underline flex items-center gap-1">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          Sync Now
+        </button>
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANE: LIVE DETAIL INSPECTOR & DISPENSE WORKSTATION (7 cols / ~58%) -->
+    <div class="lg:col-span-7 bg-white border border-slate-200 shadow-2xs rounded-none flex flex-col">
+      
+      <!-- Detail Header & Compliance Banner -->
+      <div class="border-b border-slate-200 p-4 sm:p-5 bg-gradient-to-r from-slate-50 via-white to-cyan-50/30">
+        <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="text-lg font-black tracking-tight text-slate-900 font-mono" id="detailRxCode">RX-2026-2002</h3>
+              <span id="detailStatusBadge" class="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">
+                READY FOR DISPENSING
+              </span>
+              <span class="px-1.5 py-0.5 text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-300">
+                GROUP B POISON
+              </span>
+            </div>
+            <p class="text-xs text-slate-500">
+              Electronic Prescription under <strong class="text-slate-700">Digital Signature Act 1997</strong> &amp; <strong class="text-slate-700">Poisons Act 1952</strong>
+            </p>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="flex items-center gap-2">
+            <button onclick="printPoisonLabel()" class="px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-bold rounded-none flex items-center gap-1.5 shadow-2xs transition-colors">
+              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+              Print Poison Label
+            </button>
+            <button onclick="viewAuditLog()" class="px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-bold rounded-none flex items-center gap-1.5 shadow-2xs transition-colors">
+              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              Audit Trail
+            </button>
+          </div>
+        </div>
+
+        <!-- 2-Column Meta Matrix: Patient & Prescribing Physician -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-slate-200/80">
+          <!-- Patient Details -->
+          <div class="bg-white p-3 border border-slate-200">
+            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">PATIENT RECIPIENT</span>
+            <div class="text-sm font-black text-slate-900" id="detailPatientName">Wong Mei Ling</div>
+            <div class="text-xs font-mono text-slate-600 mt-0.5">NRIC: <span id="detailPatientIC">880412-14-5542</span> · 38 y/o (F)</div>
+            <div class="text-[11px] text-slate-500 mt-1">Tel: +60 12-389 4410</div>
+          </div>
+
+          <!-- Prescriber Details -->
+          <div class="bg-white p-3 border border-slate-200">
+            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">PRESCRIBING PRACTITIONER</span>
+            <div class="text-sm font-black text-slate-900 flex items-center gap-1.5">
+              <span id="detailDoctorName">Dr. Siti Aminah binti Yusof</span>
+              <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+            </div>
+            <div class="text-xs font-mono text-slate-600 mt-0.5">MMC Registration: <span id="detailDoctorMMC">48219</span> (Active APC)</div>
+            <div class="text-[11px] text-slate-500 mt-1">Klinik Bangsar Utama · Kuala Lumpur</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Critical Drug Safety & Allergy Clearance Alert -->
+      <div id="allergyBanner" class="bg-emerald-50 border-b border-emerald-200 px-4 py-2.5 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-emerald-700 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+          <span class="text-xs font-bold text-emerald-900">ALLERGY SAFETY CROSS-CHECK: PASSED</span>
+          <span class="text-[11px] text-emerald-700">(No known drug allergies reported or cross-reactive risks detected)</span>
+        </div>
+        <span class="text-[10px] font-mono text-emerald-800 bg-emerald-100/80 px-2 py-0.5 border border-emerald-300">MoH EHR VERIFIED</span>
+      </div>
+
+      <!-- Itemized Prescribed Medications Table -->
+      <div class="p-4 sm:p-5 flex-1">
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="text-xs font-black uppercase tracking-wider text-slate-700">Prescribed Pharmaceuticals (2 Items)</h4>
+          <span class="text-[11px] text-slate-500">Check off items to verify batch &amp; packaging</span>
+        </div>
+
+        <div class="border border-slate-200 divide-y divide-slate-200 overflow-hidden" id="medList">
+          
+          <!-- Medication 1 -->
+          <div class="p-3.5 bg-white hover:bg-slate-50/50 flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <input type="checkbox" checked id="chk-1" class="mt-1 w-4 h-4 text-cyan-600 rounded-none border-slate-300 focus:ring-cyan-600 cursor-pointer">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-extrabold text-slate-900">Amoxicillin Trihydrate 500mg</span>
+                  <span class="px-1.5 py-0.2 text-[9px] font-bold bg-amber-50 text-amber-800 border border-amber-200 font-mono">POISON B</span>
+                </div>
+                <p class="text-xs font-medium text-slate-700 mt-0.5">Take 1 capsule three times daily (TDS) after meals for 7 days.</p>
+                <div class="flex items-center gap-3 mt-1.5 text-[11px] text-slate-500 font-mono">
+                  <span>MAL19983941AZ</span>
+                  <span>·</span>
+                  <span>Batch: <strong class="text-slate-700">BX-2025-09A</strong></span>
+                  <span>·</span>
+                  <span>Exp: <strong class="text-slate-700">08/2027</strong></span>
+                </div>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="text-sm font-mono font-black text-slate-900 block">Qty: 21 Caps</span>
+              <span class="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 border border-emerald-200">IN STOCK (480)</span>
+            </div>
+          </div>
+
+          <!-- Medication 2 -->
+          <div class="p-3.5 bg-white hover:bg-slate-50/50 flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <input type="checkbox" checked id="chk-2" class="mt-1 w-4 h-4 text-cyan-600 rounded-none border-slate-300 focus:ring-cyan-600 cursor-pointer">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-extrabold text-slate-900">Paracetamol 500mg BP</span>
+                  <span class="px-1.5 py-0.2 text-[9px] font-bold bg-blue-50 text-blue-800 border border-blue-200 font-mono">POISON C</span>
+                </div>
+                <p class="text-xs font-medium text-slate-700 mt-0.5">Take 2 tablets four times daily as needed for fever or pain (PRN).</p>
+                <div class="flex items-center gap-3 mt-1.5 text-[11px] text-slate-500 font-mono">
+                  <span>MAL20011284XZ</span>
+                  <span>·</span>
+                  <span>Batch: <strong class="text-slate-700">PC-2026-01B</strong></span>
+                  <span>·</span>
+                  <span>Exp: <strong class="text-slate-700">12/2028</strong></span>
+                </div>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="text-sm font-mono font-black text-slate-900 block">Qty: 30 Tabs</span>
+              <span class="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 border border-emerald-200">IN STOCK (1,250)</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Clinical Dispenser Notes Box -->
+        <div class="mt-4">
+          <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">
+            DISPENSING PHARMACIST CLINICAL COUNSELING NOTES
+          </label>
+          <input 
+            type="text" 
+            value="Patient counseled to finish full antibiotic course even if symptoms subside. Advised on possible mild GI distress." 
+            class="w-full h-9 px-3 bg-slate-50 border border-slate-300 text-xs text-slate-800 rounded-none focus:bg-white focus:border-cyan-600 focus:ring-1 focus:ring-cyan-600"
+          >
+        </div>
+      </div>
+
+      <!-- Action Footer Bar -->
+      <div class="bg-slate-50 border-t border-slate-200 p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2 text-xs text-slate-500">
+          <svg class="w-4 h-4 text-cyan-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+          <span>Dispensing records are digitally signed &amp; timestamped per Regulation 23.</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="markIssue()" class="px-3.5 py-2 bg-white hover:bg-rose-50 border border-slate-300 hover:border-rose-300 text-slate-700 hover:text-rose-700 text-xs font-bold rounded-none transition-colors">
+            Decline / Stock Out
+          </button>
+          <button onclick="completeDispense()" id="dispenseBtn" class="px-5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-black uppercase tracking-wider rounded-none flex items-center gap-2 shadow-sm transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            Complete Dispense &amp; Log
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- WALK-IN CODE QUICK MODAL -->
+  <div id="walkInModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-2xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white border-2 border-cyan-600 max-w-md w-full p-6 shadow-xl rounded-none">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 bg-cyan-100 text-cyan-800 font-black text-sm flex items-center justify-center rounded-none">#</div>
+          <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-tight">Lookup Walk-in Prescription Code</h3>
+        </div>
+        <button onclick="closeWalkInModal()" class="text-slate-400 hover:text-slate-700 font-black text-lg">&times;</button>
+      </div>
+
+      <p class="text-xs text-slate-600 mb-4">
+        Enter the 10-character prescription code presented by the walk-in patient or scan the patient's secure QR pass.
+      </p>
+
+      <div class="mb-4">
+        <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">PRESCRIPTION PASSCODE / QR</label>
+        <input 
+          type="text" 
+          id="walkInInput"
+          placeholder="e.g. DCLHAS7GS3" 
+          class="w-full h-10 px-3 font-mono text-sm uppercase font-bold bg-slate-50 border border-slate-300 focus:bg-white focus:border-cyan-600 rounded-none focus:ring-1 focus:ring-cyan-600"
+        >
+      </div>
+
+      <div class="flex items-center justify-end gap-2">
+        <button onclick="closeWalkInModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-none">
+          Cancel
+        </button>
+        <button onclick="submitWalkInCode()" class="px-5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-none">
+          Verify &amp; Load Rx
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="hidden fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-3 border-l-4 border-emerald-400 shadow-lg text-xs font-medium z-50 flex items-center gap-3">
+    <span id="toastMsg">Action completed successfully.</span>
+    <button onclick="closeToast()" class="text-slate-400 hover:text-white">&times;</button>
+  </div>
+
+  <script>
+    // Live clock
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('clockTime').textContent = now.toTimeString().split(' ')[0];
+    }, 1000);
+
+    // Mock Prescription Data
+    const prescriptions = {
+      1: {
+        code: "RX-2026-2002",
+        status: "READY",
+        statusBadgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300",
+        patient: "Wong Mei Ling",
+        ic: "880412-14-5542",
+        ageGender: "38 y/o (F)",
+        phone: "+60 12-389 4410",
+        doctor: "Dr. Siti Aminah binti Yusof",
+        mmc: "48219",
+        clinic: "Klinik Bangsar Utama · Kuala Lumpur",
+        allergyCheck: "PASSED (No known drug allergies)",
+        items: [
+          { name: "Amoxicillin Trihydrate 500mg", type: "POISON B", sig: "Take 1 capsule three times daily (TDS) after meals for 7 days.", batch: "BX-2025-09A", exp: "08/2027", qty: "21 Caps", stock: "480" },
+          { name: "Paracetamol 500mg BP", type: "POISON C", sig: "Take 2 tablets four times daily as needed for fever or pain (PRN).", batch: "PC-2026-01B", exp: "12/2028", qty: "30 Tabs", stock: "1,250" }
+        ]
+      },
+      2: {
+        code: "RX-2026-2001",
+        status: "IN PROGRESS",
+        statusBadgeClass: "bg-amber-100 text-amber-800 border-amber-300",
+        patient: "Ahmad Razak bin Osman",
+        ic: "750920-10-5891",
+        ageGender: "51 y/o (M)",
+        phone: "+60 19-445 2819",
+        doctor: "Dr. Kevin Tan",
+        mmc: "39182",
+        clinic: "Pusat Perubatan Bangsar · KL",
+        allergyCheck: "PASSED (Clearance logged for Sulfa)",
+        items: [
+          { name: "Metformin HCl 500mg", type: "POISON B", sig: "Take 1 tablet twice daily with meals (BD).", batch: "MF-2025-11C", exp: "10/2027", qty: "60 Tabs", stock: "820" },
+          { name: "Atorvastatin Calcium 20mg", type: "POISON B", sig: "Take 1 tablet at night (ON).", batch: "AT-2026-03A", exp: "05/2028", qty: "30 Tabs", stock: "340" }
+        ]
+      },
+      3: {
+        code: "RX-2026-2003",
+        status: "NEW",
+        statusBadgeClass: "bg-cyan-100 text-cyan-800 border-cyan-300",
+        patient: "Priya a/p Suresh",
+        ic: "920315-08-6124",
+        ageGender: "34 y/o (F)",
+        phone: "+60 17-882 1934",
+        doctor: "Dr. Lim Wei Hong",
+        mmc: "52914",
+        clinic: "Bangsar Community Clinic · KL",
+        allergyCheck: "PASSED (Aspirin cautious review)",
+        items: [
+          { name: "Salbutamol 100mcg Inhaler", type: "POISON C", sig: "Inhale 2 puffs as needed for acute bronchospasm (PRN).", batch: "SB-2026-02D", exp: "01/2028", qty: "1 Inhaler", stock: "65" },
+          { name: "Cetirizine HCl 10mg", type: "POISON C", sig: "Take 1 tablet once daily at bedtime.", batch: "CT-2025-08B", exp: "11/2027", qty: "14 Tabs", stock: "510" }
+        ]
+      }
+    };
+
+    let activeRxId = 1;
+
+    function selectPrescription(id) {
+      activeRxId = id;
+      const data = prescriptions[id];
+      if (!data) return;
+
+      // Update queue visual selection
+      document.querySelectorAll('.queue-item').forEach(el => {
+        el.classList.remove('bg-cyan-50/40', 'border-cyan-600');
+        el.classList.add('border-transparent');
+      });
+      const activeEl = document.getElementById(`queue-item-${id}`);
+      if (activeEl) {
+        activeEl.classList.add('bg-cyan-50/40', 'border-cyan-600');
+        activeEl.classList.remove('border-transparent');
+      }
+
+      // Update inspector details
+      document.getElementById('detailRxCode').textContent = data.code;
+      document.getElementById('detailPatientName').textContent = data.patient;
+      document.getElementById('detailPatientIC').textContent = data.ic;
+      document.getElementById('detailDoctorName').textContent = data.doctor;
+      document.getElementById('detailDoctorMMC').textContent = data.mmc;
+
+      const badge = document.getElementById('detailStatusBadge');
+      badge.textContent = data.status === 'READY' ? 'READY FOR DISPENSING' : (data.status === 'IN PROGRESS' ? 'PREPARATION IN PROGRESS' : 'NEW PRESCRIPTION');
+      badge.className = `px-2 py-0.5 text-[10px] font-black uppercase tracking-wider border ${data.statusBadgeClass}`;
+
+      // Render items
+      const medList = document.getElementById('medList');
+      medList.innerHTML = data.items.map((item, idx) => `
+        <div class="p-3.5 bg-white hover:bg-slate-50/50 flex items-start justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <input type="checkbox" checked id="chk-${idx}" class="mt-1 w-4 h-4 text-cyan-600 rounded-none border-slate-300 focus:ring-cyan-600 cursor-pointer">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-extrabold text-slate-900">${item.name}</span>
+                <span class="px-1.5 py-0.2 text-[9px] font-bold bg-amber-50 text-amber-800 border border-amber-200 font-mono">${item.type}</span>
+              </div>
+              <p class="text-xs font-medium text-slate-700 mt-0.5">${item.sig}</p>
+              <div class="flex items-center gap-3 mt-1.5 text-[11px] text-slate-500 font-mono">
+                <span>Batch: <strong class="text-slate-700">${item.batch}</strong></span>
+                <span>·</span>
+                <span>Exp: <strong class="text-slate-700">${item.exp}</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="text-right shrink-0">
+            <span class="text-sm font-mono font-black text-slate-900 block">Qty: ${item.qty}</span>
+            <span class="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 border border-emerald-200">IN STOCK (${item.stock})</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setFilter(type) {
+      document.querySelectorAll('.filter-chip').forEach(el => {
+        el.classList.remove('bg-white', 'text-slate-900', 'shadow-2xs', 'border-slate-200');
+        el.classList.add('text-slate-600');
+      });
+
+      const map = {
+        'ALL': 'filter-all',
+        'NEW': 'filter-new',
+        'IN_PROGRESS': 'filter-progress',
+        'READY': 'filter-ready',
+        'DISPENSED': 'filter-dispensed'
+      };
+      const activeBtn = document.getElementById(map[type]);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-white', 'text-slate-900', 'shadow-2xs', 'border-slate-200');
+        activeBtn.classList.remove('text-slate-600');
+      }
+
+      // Filter list
+      document.querySelectorAll('.queue-item').forEach(el => {
+        if (type === 'ALL') {
+          el.style.display = 'block';
+        } else if (type === 'NEW') {
+          el.style.display = el.id === 'queue-item-3' ? 'block' : 'none';
+        } else if (type === 'IN_PROGRESS') {
+          el.style.display = el.id === 'queue-item-2' ? 'block' : 'none';
+        } else if (type === 'READY') {
+          el.style.display = el.id === 'queue-item-1' ? 'block' : 'none';
+        } else if (type === 'DISPENSED') {
+          el.style.display = 'none';
+        }
+      });
+      showToast(`Filter applied: ${type}`);
+    }
+
+    function handleSearch(val) {
+      const q = val.toLowerCase().trim();
+      document.querySelectorAll('.queue-item').forEach(el => {
+        const text = el.textContent.toLowerCase();
+        el.style.display = text.includes(q) ? 'block' : 'none';
+      });
+    }
+
+    function completeDispense() {
+      const data = prescriptions[activeRxId];
+      data.status = 'DISPENSED';
+      data.statusBadgeClass = 'bg-slate-100 text-slate-800 border-slate-300';
+      selectPrescription(activeRxId);
+
+      // update counts
+      const readyCount = document.getElementById('count-ready');
+      const dispensedCount = document.getElementById('count-dispensed');
+      readyCount.textContent = '0';
+      dispensedCount.textContent = '1';
+
+      showToast(`✓ Prescription ${data.code} dispensed & digitally signed to Poisons Register.`);
+    }
+
+    function printPoisonLabel() {
+      showToast("🖨️ Poison Act Regulation 12 label generated for batch printing.");
+    }
+
+    function viewAuditLog() {
+      showToast("📋 Act 586 statutory audit trail verified (SHA-256 integrity match).");
+    }
+
+    function markIssue() {
+      showToast("⚠️ Marked for Pharmacist-Doctor clarification callback.");
+    }
+
+    function updatePeriod(val) {
+      document.getElementById('filterLabel').textContent = val;
+      showToast(`Reporting window updated to: ${val}`);
+    }
+
+    let soundOn = true;
+    function toggleSound() {
+      soundOn = !soundOn;
+      document.getElementById('soundIcon').textContent = soundOn ? '🔊' : '🔇';
+      document.getElementById('soundText').textContent = soundOn ? 'Sound: ON' : 'Sound: OFF';
+      showToast(soundOn ? 'Audible dispensing alerts enabled' : 'Audible alerts muted');
+    }
+
+    let desktopOn = true;
+    function toggleDesktop() {
+      desktopOn = !desktopOn;
+      document.getElementById('desktopIcon').textContent = desktopOn ? '🔔' : '🔕';
+      document.getElementById('desktopText').textContent = desktopOn ? 'Alerts: ON' : 'Alerts: OFF';
+      showToast(desktopOn ? 'Desktop push notifications enabled' : 'Desktop notifications disabled');
+    }
+
+    let bannerCollapsed = false;
+    function toggleBanner() {
+      bannerCollapsed = !bannerCollapsed;
+      const b = document.getElementById('identityBanner');
+      if (bannerCollapsed) {
+        b.style.display = 'none';
+        showToast('Header collapsed to compact mode');
+      } else {
+        b.style.display = 'block';
+        showToast('Header expanded to full mode');
+      }
+    }
+
+    function openWalkInModal() {
+      document.getElementById('walkInModal').classList.remove('hidden');
+      document.getElementById('walkInInput').focus();
+    }
+
+    function closeWalkInModal() {
+      document.getElementById('walkInModal').classList.add('hidden');
+    }
+
+    function submitWalkInCode() {
+      const code = document.getElementById('walkInInput').value.trim();
+      if (!code) return;
+      closeWalkInModal();
+      showToast(`✓ Walk-in code ${code} validated. Queue loaded.`);
+    }
+
+    function downloadCSV() {
+      showToast("📥 Audited CSV report downloaded.");
+    }
+
+    function refreshQueue() {
+      showToast("🔄 Synced with Ministry of Health MedVerify API.");
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3500);
+    }
+
+    function closeToast() {
+      document.getElementById('toast').classList.add('hidden');
+    }
+
+    // Keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        document.getElementById('searchInput').focus();
+      }
+    });
+  </script>
+</body>
+</html>

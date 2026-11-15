@@ -78,7 +78,7 @@ export default function DashboardDesignPreview() {
             className="flex items-center gap-3.5 cursor-pointer group"
             onClick={() => navigate('/')}
           >
-            <div className="w-10 h-10 rounded-none bg-white text-[color:var(--t-600)] flex items-center justify-center shrink-0 group-hover:bg-[color:var(--t-50)] transition-colors">
+            <div className="w-10 h-10 rounded-full bg-white text-[color:var(--t-600)] flex items-center justify-center shrink-0 group-hover:bg-[color:var(--t-50)] transition-colors shadow-2xs">
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true">
                 <path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" />
               </svg>

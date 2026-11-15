@@ -1,3 +1,4 @@
+import { CustomSelect } from '../../shared/ui/CustomSelect';
 import React, { useState, useEffect } from 'react';
 import { Truck, CheckCircle2, AlertTriangle, Snowflake, X, ShieldCheck } from 'lucide-react';
 import { useTr } from '../../locale';
@@ -192,7 +193,7 @@ export default function DeliveryActionModal({
                   value={partnerRef}
                   onChange={e => setPartnerRef(e.target.value)}
                   placeholder={delivery.method === 'pharmacy_courier' ? 'e.g. RIDER-02-AFTERNOON' : 'e.g. GRAB-948102 or LLM-48192'}
-                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)] transition-colors"
+                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors"
                 />
               </div>
 
@@ -206,7 +207,7 @@ export default function DeliveryActionModal({
                   value={trackingUrl}
                   onChange={e => setTrackingUrl(e.target.value)}
                   placeholder="https://tracker.partner.com/track/..."
-                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)] transition-colors"
+                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors"
                 />
               </div>
 
@@ -230,7 +231,7 @@ export default function DeliveryActionModal({
                       value={temperature}
                       onChange={e => setTemperature(e.target.value)}
                       placeholder="e.g. 4.2"
-                      className="w-32 h-9 border border-sky-300 bg-white px-3 text-xs font-mono font-bold rounded-none outline-none focus:border-sky-600"
+                      className="w-32 h-9 border border-sky-300 bg-white px-3 text-xs font-mono font-bold rounded-none outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-sky-600"
                     />
                   </div>
                 </div>
@@ -252,7 +253,7 @@ export default function DeliveryActionModal({
                   value={recipientName}
                   onChange={e => setRecipientName(e.target.value)}
                   placeholder={tx('e.g. Ahmad bin Razak (Patient or authorized proxy)')}
-                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)] transition-colors"
+                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors"
                 />
               </div>
 
@@ -273,7 +274,7 @@ export default function DeliveryActionModal({
                       value={temperature}
                       onChange={e => setTemperature(e.target.value)}
                       placeholder="e.g. 5.1"
-                      className="w-32 h-9 border border-sky-300 bg-white px-3 text-xs font-mono font-bold rounded-none outline-none focus:border-sky-600"
+                      className="w-32 h-9 border border-sky-300 bg-white px-3 text-xs font-mono font-bold rounded-none outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-sky-600"
                     />
                   </div>
                 </div>
@@ -301,18 +302,18 @@ export default function DeliveryActionModal({
                 <label htmlFor="failure-reason" className={fieldLabel}>
                   Reason for Non-Delivery *
                 </label>
-                <select
+                <CustomSelect
                   id="failure-reason"
                   value={failureReason}
                   onChange={e => setFailureReason(e.target.value)}
-                  className="w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus:border-rose-600"
+                  className="form-select w-full h-10 border border-slate-300 bg-white px-3 text-xs font-semibold rounded-none outline-none focus-visible:ring-2 focus-visible:ring-rose-500/40 focus:border-rose-600"
                 >
                   {FAILURE_REASONS.map(r => (
                     <option key={r} value={r}>
                       {r}
                     </option>
                   ))}
-                </select>
+                </CustomSelect>
               </div>
 
               <div>
@@ -325,7 +326,7 @@ export default function DeliveryActionModal({
                   value={failureNotes}
                   onChange={e => setFailureNotes(e.target.value)}
                   placeholder={tx('e.g. Called patient 3 times; no answer at premises. Cold-chain medicine returned safely to dispensary refrigerator at 14:35.')}
-                  className="w-full border border-slate-300 bg-white p-3 text-xs font-semibold rounded-none outline-none focus:border-rose-600"
+                  className="w-full border border-slate-300 bg-white p-3 text-xs font-semibold rounded-none outline-none focus-visible:ring-2 focus-visible:ring-rose-500/40 focus:border-rose-600"
                 />
               </div>
 

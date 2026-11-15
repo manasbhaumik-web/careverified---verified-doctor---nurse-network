@@ -1,3 +1,4 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useEffect, useState } from 'react';
 import { BadgeCheck, Building2, Car, FileText, Languages, Plane, Search, Utensils, HeartHandshake, ShieldCheck, ArrowRight, Globe, Check } from 'lucide-react';
 import { useLocale } from '../locale/store';
@@ -545,13 +546,13 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
             <input className={field} placeholder={tx.browse.q} aria-label={tx.browse.q} value={f.q} onChange={e => setF({ ...f, q: e.target.value })} />
             <input className={field} placeholder={tx.browse.specialty} aria-label={tx.browse.specialty} value={f.specialty} onChange={e => setF({ ...f, specialty: e.target.value })} />
             <input className={field} placeholder={tx.browse.language} aria-label={tx.browse.language} value={f.language} onChange={e => setF({ ...f, language: e.target.value })} />
-            <select className={field} aria-label={tx.browse.anyAcc} value={f.accreditation} onChange={e => setF({ ...f, accreditation: e.target.value })}>
+            <CustomSelect className="form-select text-xs" aria-label={tx.browse.anyAcc} value={f.accreditation} onChange={e => setF({ ...f, accreditation: e.target.value })}>
               <option value="">{tx.browse.anyAcc}</option><option value="JCI">JCI</option><option value="MSQH">MSQH</option>
-            </select>
-            <select className={field} aria-label={tx.browse.anyService} value={f.service} onChange={e => setF({ ...f, service: e.target.value })}>
+            </CustomSelect>
+            <CustomSelect className="form-select text-xs" aria-label={tx.browse.anyService} value={f.service} onChange={e => setF({ ...f, service: e.target.value })}>
               <option value="">{tx.browse.anyService}</option>
               {Object.entries(tx.browse.services).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-            </select>
+            </CustomSelect>
           </div>
 
           <div className="mt-4" aria-live="polite">

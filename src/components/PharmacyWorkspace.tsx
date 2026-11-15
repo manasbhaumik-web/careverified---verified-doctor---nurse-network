@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Activity, AlertTriangle, BarChart3, CheckCircle2, Clock, Download, Inbox, KeyRound, LifeBuoy, Lock, Pill, Scale, Search, ShieldAlert, Snowflake, StickyNote, Store, Truck, UserRound, Users } from 'lucide-react';
 import { useTr } from '../locale';
-import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, FilterSelect, DashboardTab, bannerPrimaryBtn, bannerSecondaryBtn } from './DashboardHeader';
+import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, FilterSelect, DashboardTab, bannerPrimaryBtn, bannerSecondaryBtn } from '../shared/ui/DashboardHeader';
 import { btnDanger, btnPlain, btnPrimary, fmtDate, fmtTime, jfetch } from './pharmacy/shared';
 import { useLiveAlerts } from './pharmacy/useLiveAlerts';
 import SecurityCard from './pharmacy/SecurityCard';
 import TeamTab from './pharmacy/TeamTab';
 import DeliveryActionModal from './pharmacy/DeliveryActionModal';
-import WorkspaceHeader from './WorkspaceHeader';
+import WorkspaceHeader from '../shared/ui/WorkspaceHeader';
 
 export type PharmacyTab = 'inbox' | 'activity' | 'reports' | 'team' | 'profile';
 export type PharmacyTabGroup = 'dispensing' | 'operations';
@@ -18,20 +18,20 @@ export const PHARMACY_GROUPS: Record<PharmacyTabGroup, {
   tabs: { id: PharmacyTab; label: string; icon: any; count?: number }[];
 }> = {
   dispensing: {
-    name: 'Prescription Dispensing',
+    name: 'Dispensing',
     defaultTab: 'inbox',
     tabs: [
-      { id: 'inbox', label: 'Inbox', icon: Inbox },
-      { id: 'activity', label: 'Activity', icon: Activity },
+      { id: 'inbox', label: 'Rx Inbox', icon: Inbox },
+      { id: 'activity', label: 'Dispensing Log', icon: Activity },
     ],
   },
   operations: {
-    name: 'Operations & Management',
+    name: 'Operations & Team',
     defaultTab: 'reports',
     tabs: [
-      { id: 'reports', label: 'Reports', icon: BarChart3 },
-      { id: 'team', label: 'Team', icon: Users },
-      { id: 'profile', label: 'Pharmacy profile', icon: Store },
+      { id: 'reports', label: 'Reports & Analytics', icon: BarChart3 },
+      { id: 'team', label: 'Pharmacist Team', icon: Users },
+      { id: 'profile', label: 'Pharmacy Profile', icon: Store },
     ],
   },
 };
@@ -77,12 +77,12 @@ const SERVICES = ['24 hours', 'Home delivery', 'Drive-through', 'Vaccinations', 
 const ALL = 'all';
 const BUCKET_LABEL: Record<Bucket, string> = { new: 'New', in_progress: 'In progress', ready: 'Ready', cannot_fill: "Can't fill", dispensed: 'Dispensed', closed: 'Expired / cancelled' };
 const BUCKET_STYLE: Record<Bucket, string> = {
-  new: 'text-teal-800 bg-teal-50 border-teal-200 font-bold uppercase tracking-wider rounded-md',
-  in_progress: 'text-amber-850 bg-amber-50 border-amber-300 font-bold uppercase tracking-wider rounded-md',
-  ready: 'text-emerald-850 bg-emerald-50 border-emerald-300 font-bold uppercase tracking-wider rounded-md',
-  cannot_fill: 'text-rose-800 bg-rose-50 border-rose-300 font-bold uppercase tracking-wider rounded-md',
-  dispensed: 'text-slate-800 bg-slate-100 border-slate-300 font-bold uppercase tracking-wider rounded-md',
-  closed: 'text-slate-600 bg-slate-50 border-slate-200 font-bold uppercase tracking-wider rounded-md',
+  new: 'text-teal-800 bg-teal-50 border-teal-200 font-bold uppercase tracking-wider rounded-none',
+  in_progress: 'text-amber-850 bg-amber-50 border-amber-300 font-bold uppercase tracking-wider rounded-none',
+  ready: 'text-emerald-850 bg-emerald-50 border-emerald-300 font-bold uppercase tracking-wider rounded-none',
+  cannot_fill: 'text-rose-800 bg-rose-50 border-rose-300 font-bold uppercase tracking-wider rounded-none',
+  dispensed: 'text-slate-800 bg-slate-100 border-slate-300 font-bold uppercase tracking-wider rounded-none',
+  closed: 'text-slate-600 bg-slate-50 border-slate-200 font-bold uppercase tracking-wider rounded-none',
 };
 
 const fmtMin = (m: number | null) => (m === null ? '—' : m < 60 ? `${m} min` : m < 1440 ? `${(m / 60).toFixed(1)} h` : `${(m / 1440).toFixed(1)} d`);
@@ -183,9 +183,36 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
     <div className="w-full space-y-0">
       <DashboardHeader
         fullWidth={true}
-        tabs={displayedTabs}
-        activeTab={tab}
-        onTabChange={setTab}
+        tabs={[
+          { key: 'dispensing' as PharmacyTabGroup, viewId: 'pharmacy_dispensing', icon: Pill, count: counts?.new || undefined },
+          { key: 'operations' as PharmacyTabGroup, viewId: 'pharmacy_operations', icon: Store },
+        ].map(g => ({
+          id: g.key,
+          label: tx(PHARMACY_GROUPS[g.key].name),
+          icon: g.icon,
+          count: g.count,
+          activeSubTab: tab,
+          onSubTabChange: (subId: string) => {
+            window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: g.viewId }));
+            setTab(subId as Tab);
+          },
+          subItems: PHARMACY_GROUPS[g.key].tabs
+            .filter(t => t.id !== 'team' || me?.account.isOwner)
+            .map(t => ({
+              ...t,
+              label: tx(t.label),
+              count: t.id === 'inbox' && counts ? (counts.new || undefined) : undefined,
+            })),
+        }))}
+        activeTab={currentGroup}
+        onTabChange={(grp) => {
+          const viewMap: Record<PharmacyTabGroup, string> = {
+            dispensing: 'pharmacy_dispensing',
+            operations: 'pharmacy_operations',
+          };
+          window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: viewMap[grp] }));
+          setTab(PHARMACY_GROUPS[grp].defaultTab);
+        }}
         tabsLabel={tx('{name} sections', { name: tx(PHARMACY_GROUPS[currentGroup].name) })}
         tabsRight={pharmacyHelpTab}
       >
@@ -238,35 +265,9 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
           </div>
         )}
 
-        <div className="app-card rounded-none border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-x-5 gap-y-2 text-xs text-slate-600">
-          <span className="inline-flex items-center gap-2 font-medium">
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
-            <span>Live: new prescriptions appear automatically · updated {new Date(alerts.updatedAt).toLocaleTimeString()}</span>
-          </span>
-          <div className="flex items-center gap-4">
-            <label className="inline-flex items-center gap-1.5 cursor-pointer font-semibold text-slate-700">
-              <input type="checkbox" checked={alerts.sound} onChange={alerts.toggleSound} className="h-4 w-4 accent-[color:var(--t-600)] rounded" /> Sound alert
-            </label>
-            {alerts.desktopSupported && (
-              <label className="inline-flex items-center gap-1.5 cursor-pointer font-semibold text-slate-700">
-                <input type="checkbox" checked={alerts.desktop} onChange={alerts.toggleDesktop} className="h-4 w-4 accent-[color:var(--t-600)] rounded" /> Desktop alerts
-              </label>
-            )}
-          </div>
-        </div>
-
         <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
           {tab === 'inbox' && (
-            <div className="space-y-4">
-              <WorkspaceHeader
-                icon={Inbox}
-                eyebrow={tx('Electronic Prescription Dispensing · Poison Licence')}
-                title={tx('Prescription Dispensing Inbox & Live Orders')}
-                description={tx('Receive electronic prescriptions from MMC-verified physicians, review patient drug allergies, and prepare medication dispatches.')}
-                badges={<BannerBadge tone="brand">{tx('Type A Poison Licensed')}</BannerBadge>}
-              />
-              <InboxTab counts={counts} onChanged={loadMe} tick={alerts.tick} />
-            </div>
+            <InboxTab counts={counts} onChanged={loadMe} tick={alerts.tick} alerts={alerts} />
           )}
           {tab === 'activity' && (
             <div className="space-y-4">
@@ -324,7 +325,7 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
 
 /* ------------------------------------------------------------------ Inbox */
 
-function InboxTab({ counts, onChanged, tick }: { counts?: Counts; onChanged: () => void; tick: number }) {
+function InboxTab({ counts, onChanged, tick, alerts }: { counts?: Counts; onChanged: () => void; tick: number; alerts: ReturnType<typeof useLiveAlerts> }) {
   const tx = useTr();
   const [list, setList] = useState<Rx[] | null>(null);
   const [filter, setFilter] = useState<string>(ALL);
@@ -332,6 +333,7 @@ function InboxTab({ counts, onChanged, tick }: { counts?: Counts; onChanged: () 
   const [code, setCode] = useState('');
   const [found, setFound] = useState<Rx | null>(null);
   const [lookupMsg, setLookupMsg] = useState('');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const d = await jfetch('/api/pharmacy/prescriptions');
@@ -355,42 +357,69 @@ function InboxTab({ counts, onChanged, tick }: { counts?: Counts; onChanged: () 
       && (q === '' || r.code.toLowerCase().includes(q) || r.patientName.toLowerCase().includes(q) || r.items.some(i => i.name.toLowerCase().includes(q))));
   }, [list, filter, query]);
 
-  return (
-    <div className="space-y-5">
-      <section aria-label={tx('Find a prescription')} className="app-card rounded-none border-slate-200 p-5 space-y-3">
-        <form onSubmit={lookup} className="flex flex-wrap items-end gap-3">
-          <label className="flex-1 min-w-[240px]">
-            <span className="text-xs font-bold uppercase tracking-wide text-slate-700 block mb-1.5 flex items-center gap-1.5">
-              <span>{tx('Look up a code (walk-in patient)')}</span>
-              <span className="app-badge badge-neutral text-2xs font-bold font-mono">QR / Code</span>
-            </span>
-            <input 
-              value={code} 
-              onChange={e => setCode(e.target.value.toUpperCase())} 
-              placeholder={tx('e.g. DCLHAS7GS3')} 
-              maxLength={20} 
-              className="h-10 w-full border border-slate-300 rounded-none px-3.5 bg-slate-50 font-mono font-bold text-xs text-slate-900 outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-all" 
-            />
-          </label>
-          <button type="submit" className="btn btn-sm btn-primary">{tx('Look up code')}</button>
-        </form>
-        {lookupMsg && <p role="alert" className="text-xs font-bold text-rose-850 bg-rose-50 border border-rose-300 rounded-none p-3">{lookupMsg}</p>}
-        {found && <RxCard rx={found} onChanged={() => { setFound(null); setCode(''); changed(); }} />}
-      </section>
+  const activeRx = useMemo(() => {
+    if (found) return found;
+    if (selectedId) {
+      const match = shown.find(r => r.id === selectedId);
+      if (match) return match;
+    }
+    return shown[0] ?? null;
+  }, [found, selectedId, shown]);
 
-      <section aria-label={tx('Inbox filters')} className="app-card rounded-none border-slate-200 p-4 space-y-3">
-        <div className="flex items-center gap-3 border border-slate-200 rounded-none bg-slate-50 px-3.5 h-10 focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-all">
-          <Search className="h-4 w-4 text-slate-400 shrink-0" />
-          <label htmlFor="inbox-search" className="sr-only">{tx('Search the inbox')}</label>
-          <input id="inbox-search" value={query} onChange={e => setQuery(e.target.value)} placeholder={tx('Search by prescription code, patient name, or medicine...')}
-            className="flex-1 min-w-0 bg-transparent text-xs text-slate-900 outline-none placeholder-slate-400 font-medium" />
-        </div>
+  return (
+    <div className="space-y-4">
+      {/* Compact Consolidated Command Bar (Public Pages UI Style) */}
+      <section aria-label={tx('Inbox controls')} className="app-card rounded-none p-3.5 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
+          {/* Search + Inline Walk-in Code */}
+          <div className="flex flex-wrap items-center gap-2 flex-1 min-w-[280px]">
+            <div className="flex items-center gap-2 border border-[color:var(--t-200)] rounded-none bg-[color:var(--t-bg)] px-3 h-10 flex-1 min-w-[220px] focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors">
+              <Search className="h-4 w-4 text-slate-400 shrink-0" />
+              <label htmlFor="inbox-search" className="sr-only">{tx('Search the inbox')}</label>
+              <input id="inbox-search" value={query} onChange={e => setQuery(e.target.value)} placeholder={tx('Search by prescription code, patient name, or medicine...')}
+                className="flex-1 min-w-0 bg-transparent text-xs text-[color:var(--ink)] outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 placeholder-slate-400 font-medium" />
+            </div>
+
+            <form onSubmit={lookup} className="flex items-center gap-1.5 shrink-0">
+              <input
+                value={code}
+                onChange={e => setCode(e.target.value.toUpperCase())}
+                placeholder={tx('Code (e.g. DCLHAS7GS3)')}
+                maxLength={20}
+                aria-label={tx('Look up a code (walk-in patient)')}
+                className="h-10 w-48 sm:w-52 border border-[color:var(--t-200)] rounded-none px-3 bg-[color:var(--t-bg)] font-mono font-bold text-xs text-[color:var(--ink)] outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
+              />
+              <button type="submit" className="btn btn-sm btn-primary h-10 px-3.5">{tx('Look up code')}</button>
+            </form>
+          </div>
+
+          {/* Live Stream & Alerts */}
+          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600">
+            <span className="inline-flex items-center gap-1.5 font-medium bg-[#F4FDFF] border border-[color:var(--t-100)] px-2.5 h-9">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
+              <span className="font-semibold text-[color:var(--ink)]">Live</span>
+              <span className="text-slate-400 tabular-nums">· {new Date(alerts.updatedAt).toLocaleTimeString()}</span>
+            </span>
+            <label className="inline-flex items-center gap-1.5 cursor-pointer font-semibold text-slate-700">
+              <input type="checkbox" checked={alerts.sound} onChange={alerts.toggleSound} className="h-3.5 w-3.5 accent-[color:var(--t-600)]" /> Sound
+            </label>
+            {alerts.desktopSupported && (
+              <label className="inline-flex items-center gap-1.5 cursor-pointer font-semibold text-slate-700">
+                <input type="checkbox" checked={alerts.desktop} onChange={alerts.toggleDesktop} className="h-3.5 w-3.5 accent-[color:var(--t-600)]" /> Desktop
+              </label>
+            )}
+          </div>
+        </div>
+
+        {lookupMsg && <p role="alert" className="text-xs font-bold text-rose-800 bg-rose-50 border border-rose-300 rounded-none p-2.5">{lookupMsg}</p>}
+
+        {/* Filter Chips Strip */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[color:var(--t-100)]">
           <div className="flex flex-wrap items-center gap-1.5">
             <button
               type="button"
-              onClick={() => setFilter(ALL)}
-              className={`px-2.5 py-1 rounded-md text-xs font-semibold whitespace-nowrap shrink-0 transition-all ${filter === ALL ? 'bg-[color:var(--t-700)] text-white shadow-2xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+              onClick={() => { setFilter(ALL); setFound(null); }}
+              className={`px-2.5 py-1 rounded-none text-xs font-bold whitespace-nowrap shrink-0 border transition-colors ${filter === ALL && !found ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]' : 'bg-white text-slate-700 border-[color:var(--t-200)] hover:border-[color:var(--t-600)]'}`}
             >
               All ({list?.length ?? 0})
             </button>
@@ -398,31 +427,90 @@ function InboxTab({ counts, onChanged, tick }: { counts?: Counts; onChanged: () 
               <button
                 key={b}
                 type="button"
-                onClick={() => setFilter(b)}
-                className={`px-2.5 py-1 rounded-md text-xs font-semibold whitespace-nowrap shrink-0 transition-all ${filter === b ? 'bg-[color:var(--t-700)] text-white shadow-2xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+                onClick={() => { setFilter(b); setFound(null); }}
+                className={`px-2.5 py-1 rounded-none text-xs font-bold whitespace-nowrap shrink-0 border transition-colors ${filter === b && !found ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]' : 'bg-white text-slate-700 border-[color:var(--t-200)] hover:border-[color:var(--t-600)]'}`}
               >
                 {BUCKET_LABEL[b]}{counts ? ` (${counts[b]})` : ''}
               </button>
             ))}
           </div>
-          {(filter !== ALL || query) && (
-            <button type="button" onClick={() => { setFilter(ALL); setQuery(''); }} className="btn btn-sm btn-secondary text-2xs py-1 h-7">{tx('Clear filters')}</button>
-          )}
-          <span className="text-2xs font-mono font-bold text-slate-600 tabular-nums bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-md" aria-live="polite">{shown.length} result{shown.length === 1 ? '' : 's'}</span>
+          <div className="flex items-center gap-2">
+            {(filter !== ALL || query || found) && (
+              <button type="button" onClick={() => { setFilter(ALL); setQuery(''); setFound(null); setCode(''); }} className="btn btn-sm btn-secondary text-2xs py-1 h-7">{tx('Clear')}</button>
+            )}
+            <span className="text-2xs font-bold text-[color:var(--t-700)] tabular-nums bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-1 rounded-none" aria-live="polite">
+              {shown.length} result{shown.length === 1 ? '' : 's'}
+            </span>
+          </div>
         </div>
       </section>
 
+      {/* Split-Pane Master-Detail Clinical Workstation */}
       {list === null ? (
         <p className="text-xs text-slate-600 font-semibold">{tx('Loading your inbox…')}</p>
-      ) : shown.length === 0 ? (
-        <div className="app-card rounded-none border-slate-200 p-12 text-center space-y-3">
+      ) : shown.length === 0 && !found ? (
+        <div className="app-card rounded-none p-12 text-center space-y-3">
           <Inbox className="h-10 w-10 text-[color:var(--t-400)] mx-auto" />
-          <h2 className="text-sm font-bold text-slate-900 tracking-tight">{list.length === 0 ? tx('No prescriptions yet') : tx('Nothing matches your filters')}</h2>
+          <h2 className="text-sm font-bold text-[color:var(--ink)] tracking-tight">{list.length === 0 ? tx('No prescriptions yet') : tx('Nothing matches your filters')}</h2>
           <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">{list.length === 0 ? tx('When a patient sends you a prescription it will appear here and you will be notified.') : tx('Try a different status or search filter.')}</p>
         </div>
       ) : (
-        <section aria-label={tx('Prescriptions')} className="grid gap-5 lg:grid-cols-2">
-          {shown.map(r => <RxCard key={r.id} rx={r} onChanged={changed} />)}
+        <section aria-label={tx('Prescriptions')} className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+          {/* LEFT PANE: Compact Operational Queue */}
+          <div className="lg:col-span-5 app-card rounded-none p-0 overflow-hidden">
+            <div className="bg-[#F4FDFF] border-b border-[color:var(--t-100)] px-4 py-2.5 flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-[color:var(--t-700)]">{tx('Incoming Prescriptions')}</span>
+              <span className="app-badge badge-brand">{shown.length} {tx('Orders')}</span>
+            </div>
+            <div className="divide-y divide-[color:var(--t-100)] max-h-[calc(100vh-320px)] overflow-y-auto">
+              {shown.map(r => {
+                const isSelected = activeRx?.id === r.id && !found;
+                const hasAllergyAlert = r.safety.shared && r.safety.allergies.length > 0;
+                return (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => { setFound(null); setSelectedId(r.id); }}
+                    className={`w-full text-left p-3.5 transition-colors block border-l-4 ${isSelected ? 'bg-[color:var(--t-50)]/70 border-l-[color:var(--t-600)]' : 'bg-white hover:bg-[#F4FDFF] border-l-transparent'}`}
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-xs font-bold text-[color:var(--ink)] tabular-nums">{r.code}</span>
+                        <span className={`text-xs px-1.5 py-0.5 border ${BUCKET_STYLE[r.bucket]} rounded-none`}>{BUCKET_LABEL[r.bucket]}</span>
+                      </div>
+                      <span className="text-xs text-slate-400 tabular-nums shrink-0">{waiting(r.issuedAt)} ago</span>
+                    </div>
+                    <div className="text-sm font-bold text-[color:var(--ink)] truncate">{r.patientName}</div>
+                    <p className="text-xs text-slate-600 truncate mt-0.5 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--t-600)] shrink-0" />
+                      <span>{r.items.map(i => i.name).join(', ')}</span>
+                    </p>
+                    <div className="mt-2 pt-2 border-t border-[color:var(--t-100)] flex items-center justify-between text-xs text-slate-500">
+                      <span className="truncate">{r.prescriber ? (r.prescriber.name.startsWith('Dr.') ? r.prescriber.name : `Dr. ${r.prescriber.name}`) : tx('Walk-in / External')}</span>
+                      {hasAllergyAlert ? (
+                        <span className="text-rose-700 font-bold shrink-0">⚠ Allergy Alert</span>
+                      ) : r.safety.shared ? (
+                        <span className="text-[color:var(--e-600)] font-bold shrink-0">✓ Allergy Safe</span>
+                      ) : null}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* RIGHT PANE: Active Prescription Inspector */}
+          <div className="lg:col-span-7">
+            {found && (
+              <div className="mb-2 bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-3.5 py-2 flex items-center justify-between text-xs">
+                <span className="font-bold text-[color:var(--t-800)]">Walk-in Lookup Result: {found.code}</span>
+                <button type="button" onClick={() => { setFound(null); setCode(''); }} className="text-[color:var(--t-700)] font-bold hover:underline">Back to Queue</button>
+              </div>
+            )}
+            {activeRx && (
+              <RxCard key={activeRx.id} rx={activeRx} onChanged={() => { setFound(null); setCode(''); changed(); }} />
+            )}
+          </div>
         </section>
       )}
     </div>
@@ -482,7 +570,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
         <div className="p-4 bg-slate-50/80 border-b border-slate-200 flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-1.5 mb-1">
-              <span className="font-mono font-bold text-xs text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2 py-0.5 rounded border border-[color:var(--t-200)]">{rx.code}</span>
+              <span className="font-mono font-bold text-xs text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2 py-0.5 rounded-none border border-[color:var(--t-200)]">{rx.code}</span>
               <span className={`text-2xs font-bold px-2 py-0.5 border ${BUCKET_STYLE[rx.bucket]}`}>{BUCKET_LABEL[rx.bucket]}{rx.bucket === 'in_progress' && rx.fillStatus ? ` · ${rx.fillStatus === 'received' ? tx('Received') : tx('Preparing')}` : ''}</span>
               {rx.coldChainItems.length > 0 && <span className="app-badge badge-cyan text-2xs inline-flex items-center gap-1"><Snowflake className="h-3 w-3 shrink-0" /> Cold Chain Required (2°C–8°C)</span>}
             </div>
@@ -571,8 +659,8 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
               <p className="text-2xs text-slate-700"><b>{rx.insurance.insurer}</b> · Member No: <span className="font-mono font-bold">{rx.insurance.memberNo}</span>{rx.insurance.policyType === 'corporate' && rx.insurance.employer ? ` · Employer: ${rx.insurance.employer}` : ''}</p>
               {active && (
                 <div className="flex flex-wrap gap-2 items-center pt-1">
-                  <input value={glNumber} onChange={e => setGlNumber(e.target.value)} placeholder={tx('GL number')} aria-label={tx('Guarantee letter number')} className="h-8 border border-slate-300 rounded-none px-2 text-xs w-36 bg-white outline-none focus:border-[color:var(--t-600)]" />
-                  <input value={glNote} onChange={e => setGlNote(e.target.value)} placeholder={tx('Note (required to decline)')} aria-label={tx('Guarantee letter note')} className="h-8 border border-slate-300 rounded-none px-2 text-xs flex-1 min-w-[10rem] bg-white outline-none focus:border-[color:var(--t-600)]" />
+                  <input value={glNumber} onChange={e => setGlNumber(e.target.value)} placeholder={tx('GL number')} aria-label={tx('Guarantee letter number')} className="h-8 border border-slate-300 rounded-none px-2 text-xs w-36 bg-white outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]" />
+                  <input value={glNote} onChange={e => setGlNote(e.target.value)} placeholder={tx('Note (required to decline)')} aria-label={tx('Guarantee letter note')} className="h-8 border border-slate-300 rounded-none px-2 text-xs flex-1 min-w-[10rem] bg-white outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]" />
                   <button type="button" disabled={busy || !glNumber.trim()} onClick={() => decideGl('approved')} className="btn btn-sm btn-secondary text-2xs h-8 px-2.5">{tx('GL approved')}</button>
                   <button type="button" disabled={busy || glNote.trim().length < 3} onClick={() => decideGl('declined')} className="btn btn-sm btn-danger text-2xs h-8 px-2.5">{tx('GL declined')}</button>
                 </div>
@@ -598,10 +686,10 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
               
               {/* 4-step Stepper */}
               <div className="grid grid-cols-4 gap-1 text-center pt-1 text-2xs">
-                <div className={`p-1 rounded font-bold ${['requested', 'arranged', 'out_for_delivery', 'delivered'].includes(rx.delivery.status) ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-400'}`}>1. Placed ✓</div>
-                <div className={`p-1 rounded font-bold ${['arranged', 'out_for_delivery', 'delivered'].includes(rx.delivery.status) ? 'bg-teal-600 text-white' : rx.delivery.status === 'requested' ? 'bg-teal-100 text-teal-800 border border-teal-300' : 'bg-slate-100 text-slate-400'}`}>2. Arranged</div>
-                <div className={`p-1 rounded font-bold ${['out_for_delivery', 'delivered'].includes(rx.delivery.status) ? 'bg-teal-600 text-white' : rx.delivery.status === 'arranged' ? 'bg-teal-100 text-teal-800 border border-teal-300' : 'bg-slate-100 text-slate-400'}`}>3. On Route</div>
-                <div className={`p-1 rounded font-bold ${rx.delivery.status === 'delivered' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'}`}>4. Handover</div>
+                <div className={`p-1 rounded-none font-bold ${['requested', 'arranged', 'out_for_delivery', 'delivered'].includes(rx.delivery.status) ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-400'}`}>1. Placed ✓</div>
+                <div className={`p-1 rounded-none font-bold ${['arranged', 'out_for_delivery', 'delivered'].includes(rx.delivery.status) ? 'bg-teal-600 text-white' : rx.delivery.status === 'requested' ? 'bg-teal-100 text-teal-800 border border-teal-300' : 'bg-slate-100 text-slate-400'}`}>2. Arranged</div>
+                <div className={`p-1 rounded-none font-bold ${['out_for_delivery', 'delivered'].includes(rx.delivery.status) ? 'bg-teal-600 text-white' : rx.delivery.status === 'arranged' ? 'bg-teal-100 text-teal-800 border border-teal-300' : 'bg-slate-100 text-slate-400'}`}>3. On Route</div>
+                <div className={`p-1 rounded-none font-bold ${rx.delivery.status === 'delivered' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'}`}>4. Handover</div>
               </div>
 
               {['requested', 'arranged', 'out_for_delivery'].includes(rx.delivery.status) && (
@@ -642,18 +730,28 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
             <div className="grid sm:grid-cols-2 gap-2">
               <div>
                 <label className="text-2xs uppercase tracking-wider font-extrabold text-slate-600 block mb-1">Dispensing Pharmacist *</label>
-                <input value={pharmacist} onChange={e => setPharmacist(e.target.value)} placeholder={tx('e.g. Rph. Sarah Nurhaliza')} aria-label={tx('Dispensing pharmacist')} maxLength={100} className="w-full border border-slate-300 rounded-none px-2.5 py-1.5 text-xs bg-white outline-none focus:border-[color:var(--t-600)] font-semibold" />
+                <input value={pharmacist} onChange={e => setPharmacist(e.target.value)} placeholder={tx('e.g. Rph. Sarah Nurhaliza')} aria-label={tx('Dispensing pharmacist')} maxLength={100} className="w-full border border-slate-300 rounded-none px-2.5 py-1.5 text-xs bg-white outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] font-semibold" />
               </div>
               <div>
                 <label className="text-2xs uppercase tracking-wider font-extrabold text-slate-600 block mb-1">Poisons Book Entry Serial No. *</label>
-                <input value={poisonsNo} onChange={e => setPoisonsNo(e.target.value)} placeholder={tx('e.g. PB-2026-0841')} aria-label={tx('Poisons book entry number')} maxLength={40} className="w-full border border-slate-300 rounded-none px-2.5 py-1.5 text-xs bg-white outline-none focus:border-[color:var(--t-600)] font-mono font-bold" />
+                <input value={poisonsNo} onChange={e => setPoisonsNo(e.target.value)} placeholder={tx('e.g. PB-2026-0841')} aria-label={tx('Poisons book entry number')} maxLength={40} className="w-full border border-slate-300 rounded-none px-2.5 py-1.5 text-xs bg-white outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] font-mono font-bold" />
               </div>
             </div>
             {!rx.safety.shared && <p className="text-2xs font-bold text-amber-900 bg-amber-100 border border-amber-300 p-2 rounded-none flex items-center gap-1.5"><AlertTriangle className="h-3.5 w-3.5 shrink-0" /> {tx('Allergies were not shared digitally. Confirm verbal patient verification.')}</p>}
             {rx.prescriber && !rx.prescriber.stillVerified && <p className="text-2xs font-bold text-rose-800 bg-rose-100 border border-rose-300 p-2 rounded-none">{tx('Warning: The prescribing doctor is not currently verified by the medical board.')}</p>}
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              <button type="button" disabled={busy} onClick={dispense} className="btn btn-sm btn-primary inline-flex items-center gap-1.5"><Lock className="h-3.5 w-3.5 shrink-0" /> {tx('Sign & Mark Dispensed')}</button>
+              <button
+                type="button"
+                disabled={busy || !pharmacist.trim() || !poisonsNo.trim()}
+                onClick={dispense}
+                className="btn btn-sm btn-primary inline-flex items-center gap-1.5"
+              >
+                <Lock className="h-3.5 w-3.5 shrink-0" /> {tx('Sign & Mark Dispensed')}
+              </button>
               <button type="button" onClick={() => setConfirming(false)} className="btn btn-sm btn-secondary">{tx('Cancel')}</button>
+              {(!pharmacist.trim() || !poisonsNo.trim()) && (
+                <span className="text-2xs font-semibold text-slate-500">{tx('Enter pharmacist name & Poisons Book serial to sign.')}</span>
+              )}
             </div>
           </div>
         </div>
@@ -664,7 +762,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
         <div className="p-4 bg-slate-50 border-t border-slate-200">
           <div className="space-y-2.5 bg-white border border-slate-200 p-3.5 rounded-none">
             <label className="text-xs font-bold uppercase tracking-wide text-slate-700 block" htmlFor={`reason-${rx.id}`}>{tx('Reason for inability to fill (sent to patient)')}</label>
-            <input id={`reason-${rx.id}`} value={reason} onChange={e => setReason(e.target.value)} maxLength={200} placeholder={tx('e.g. Out of stock until Tuesday, recommended alternative clinic')} className="h-10 w-full border border-slate-300 rounded-none px-3 bg-white text-xs font-semibold outline-none focus:border-[color:var(--t-600)]" />
+            <input id={`reason-${rx.id}`} value={reason} onChange={e => setReason(e.target.value)} maxLength={200} placeholder={tx('e.g. Out of stock until Tuesday, recommended alternative clinic')} className="h-10 w-full border border-slate-300 rounded-none px-3 bg-white text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]" />
             <div className="flex gap-2">
               <button type="button" disabled={busy || reason.trim().length < 3} onClick={() => setStatus('cannot_fill')} className="btn btn-sm btn-danger">{tx('Send to patient')}</button>
               <button type="button" onClick={() => setDeclining(false)} className="btn btn-sm btn-secondary">{tx('Cancel')}</button>
@@ -678,7 +776,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
         <div className="p-4 bg-slate-50 border-t border-slate-200">
           <div className="space-y-2 bg-white border border-slate-200 p-3.5 rounded-none">
             <label className="text-xs font-bold uppercase tracking-wide text-slate-700 block" htmlFor={`note-${rx.id}`}>{tx('Internal Pharmacist Note (Private to this pharmacy)')}</label>
-            <textarea id={`note-${rx.id}`} value={note} onChange={e => setNote(e.target.value)} rows={3} maxLength={500} className="w-full border border-slate-300 rounded-none p-3 bg-white text-xs font-semibold outline-none focus:border-[color:var(--t-600)]" />
+            <textarea id={`note-${rx.id}`} value={note} onChange={e => setNote(e.target.value)} rows={3} maxLength={500} className="w-full border border-slate-300 rounded-none p-3 bg-white text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]" />
             <div className="flex gap-2">
               <button type="button" disabled={busy} onClick={saveNote} className="btn btn-sm btn-primary">{tx('Save note')}</button>
               <button type="button" onClick={() => { setNoting(false); setNote(rx.note); }} className="btn btn-sm btn-secondary">{tx('Cancel')}</button>
@@ -757,6 +855,7 @@ function ActivityTab() {
   const [items, setItems] = useState<EventRow[] | null>(null);
   const [next, setNext] = useState<number | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [eventFilter, setEventFilter] = useState<'all' | 'dispensed' | 'status' | 'lookup' | 'admin'>('all');
 
   useEffect(() => {
     jfetch('/api/pharmacy/activity?limit=30').then(d => { setItems(d.status === 'success' ? d.data.items : []); setNext(d.status === 'success' ? d.data.next : null); });
@@ -769,10 +868,19 @@ function ActivityTab() {
     setLoadingMore(false);
   };
 
+  const filteredItems = useMemo(() => {
+    if (!items) return [];
+    if (eventFilter === 'all') return items;
+    if (eventFilter === 'dispensed') return items.filter(e => e.type === 'dispensed');
+    if (eventFilter === 'status') return items.filter(e => ['sent', 'received', 'preparing', 'ready', 'cannot_fill', 'cancelled', 'redirected', 'note'].includes(e.type));
+    if (eventFilter === 'lookup') return items.filter(e => e.type === 'lookup');
+    return items.filter(e => ['profile_update', 'staff_added', 'staff_status', 'two_factor'].includes(e.type));
+  }, [items, eventFilter]);
+
   if (items === null) return <p className="text-xs text-slate-600">{tx('Loading activity…')}</p>;
   if (items.length === 0) {
     return (
-      <div className="app-card rounded-none border-slate-200 p-10 text-center space-y-2">
+      <div className="app-card rounded-none border-[color:var(--t-200)] p-10 text-center space-y-2">
         <Activity className="h-10 w-10 text-[color:var(--t-300)] mx-auto" />
         <h2 className="text-sm font-bold text-slate-900">{tx('No activity yet')}</h2>
         <p className="text-xs text-slate-600">{tx('Everything your pharmacy does here is recorded in this timeline.')}</p>
@@ -780,28 +888,53 @@ function ActivityTab() {
     );
   }
   return (
-    <section aria-label={tx('Activity log')} className="app-card rounded-none border-slate-200 overflow-hidden">
-      <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+    <section aria-label={tx('Activity log')} className="app-card rounded-none border-[color:var(--t-200)] overflow-hidden">
+      <div className="p-4 border-b border-[color:var(--t-200)] bg-[color:var(--t-bg)] flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
           <Activity className="h-4 w-4 text-[color:var(--t-600)]" />
-          <span>Operational Audit Trail ({items.length})</span>
-          <span className="app-badge badge-brand text-2xs">Act 366 Compliant</span>
+          <span>{tx('Operational Audit Trail ({n})', { n: filteredItems.length })}</span>
+          <span className="app-badge badge-brand text-2xs">{tx('Act 366 Compliant')}</span>
         </h3>
-        <span className="text-xs font-semibold text-slate-500">{tx('Attributable Dispensing Logs')}</span>
+        <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={tx('Filter audit events')}>
+          {([
+            ['all', tx('All')],
+            ['dispensed', tx('Dispensed')],
+            ['status', tx('Rx Status')],
+            ['lookup', tx('Lookups')],
+            ['admin', tx('Team & Profile')],
+          ] as const).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setEventFilter(id)}
+              className={`px-2.5 py-1 rounded-none text-xs font-bold border cursor-pointer transition-colors ${
+                eventFilter === id
+                  ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]'
+                  : 'bg-white text-slate-700 border-[color:var(--t-200)] hover:border-[color:var(--t-600)]'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
-      <ol className="divide-y divide-slate-200">
-        {items.map(e => (
-          <li key={e.id} className="p-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 hover:bg-slate-50 transition-colors">
-            <div className="flex items-center gap-3 min-w-0">
-              <span className="h-2 w-2 rounded-full bg-teal-500 shrink-0" />
-              <span className="text-xs font-semibold text-slate-800 min-w-0 [overflow-wrap:anywhere]">{(EVENT_TEXT[e.type] ?? (() => e.type))(e)}</span>
-            </div>
-            <time dateTime={e.ts} className="text-2xs font-mono font-bold text-slate-500 tabular-nums shrink-0">{fmtTime(e.ts)}</time>
-          </li>
-        ))}
-      </ol>
+      {filteredItems.length === 0 ? (
+        <p className="p-8 text-center text-xs text-slate-500">{tx('No audit entries match this filter.')}</p>
+      ) : (
+        <ol className="divide-y divide-[color:var(--t-100)]">
+          {filteredItems.map(e => (
+            <li key={e.id} className="p-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 hover:bg-[#F4FDFF] transition-colors">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="h-2 w-2 rounded-full bg-teal-500 shrink-0" />
+                <span className="text-xs font-semibold text-slate-800 min-w-0 [overflow-wrap:anywhere]">{(EVENT_TEXT[e.type] ?? (() => e.type))(e)}</span>
+              </div>
+              <time dateTime={e.ts} className="text-2xs font-mono font-bold text-slate-500 tabular-nums shrink-0">{fmtTime(e.ts)}</time>
+            </li>
+          ))}
+        </ol>
+      )}
       {next !== null && (
-        <div className="p-4 border-t border-slate-200 text-center bg-slate-50">
+        <div className="p-4 border-t border-[color:var(--t-200)] text-center bg-[color:var(--t-bg)]">
           <button type="button" onClick={more} disabled={loadingMore} className={btnPlain}>{loadingMore ? tx('Loading older entries…') : tx('Load older activity')}</button>
         </div>
       )}
@@ -856,29 +989,29 @@ function ReportsTab() {
               <div className="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
                 <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800">{tx('Daily Prescription Volume')}</h2>
                 <p className="text-xs font-semibold text-slate-600 flex items-center gap-4">
-                  <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[color:var(--t-200)]" /> {tx('Received')}</span>
-                  <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[color:var(--t-600)]" /> {tx('Dispensed')}</span>
+                  <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-none bg-[color:var(--t-200)]" /> {tx('Received')}</span>
+                  <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-none bg-[color:var(--t-600)]" /> {tx('Dispensed')}</span>
                 </p>
               </div>
-              <div className="flex items-end gap-px h-44 bg-slate-50 border border-slate-200 rounded-none p-2" role="img" aria-label={`Bar chart of prescriptions received and dispensed per day over the last ${r.days} days`}>
+              <div className="flex items-end gap-px h-44 bg-slate-50 border border-[color:var(--t-200)] rounded-none p-2" role="img" aria-label={`Bar chart of prescriptions received and dispensed per day over the last ${r.days} days`}>
                 {r.perDay.map(d => (
                   <div key={d.date} title={`${d.date}: ${d.received} received, ${d.dispensed} dispensed`} className="flex-1 min-w-0 h-full flex items-end gap-px">
-                    <div className="flex-1 bg-[color:var(--t-200)] rounded-t-xs" style={{ height: `${(d.received / max) * 100}%`, minHeight: d.received ? 3 : 0 }} />
-                    <div className="flex-1 bg-[color:var(--t-600)] rounded-t-xs" style={{ height: `${(d.dispensed / max) * 100}%`, minHeight: d.dispensed ? 3 : 0 }} />
+                    <div className="flex-1 bg-[color:var(--t-200)] rounded-none" style={{ height: `${(d.received / max) * 100}%`, minHeight: d.received ? 3 : 0 }} />
+                    <div className="flex-1 bg-[color:var(--t-600)] rounded-none" style={{ height: `${(d.dispensed / max) * 100}%`, minHeight: d.dispensed ? 3 : 0 }} />
                   </div>
                 ))}
               </div>
               <div className="flex justify-between text-2xs font-mono font-bold text-slate-500 mt-2"><span>{r.perDay[0]?.date}</span><span>{r.perDay[r.perDay.length - 1]?.date}</span></div>
             </section>
 
-            <section aria-label={tx('Most prescribed medicines')} className="app-card rounded-none border-slate-200 p-5 min-w-0">
+            <section aria-label={tx('Most prescribed medicines')} className="app-card rounded-none border-[color:var(--t-200)] p-5 min-w-0">
               <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 mb-4 border-b border-slate-100 pb-3">{tx('Top Formulations Dispensed')}</h2>
               {r.topMedicines.length === 0 ? <p className="text-xs text-slate-600 font-semibold">{tx('Nothing in this period yet.')}</p> : (
                 <ol className="divide-y divide-slate-100">
                   {r.topMedicines.map(m => (
                     <li key={m.name} className="py-2.5 flex items-center justify-between gap-3 text-xs">
                       <span className="min-w-0 [overflow-wrap:anywhere] font-bold text-slate-800 capitalize">{m.name}</span>
-                      <span className="font-mono font-bold tabular-nums text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 rounded-md text-2xs">{m.count} units</span>
+                      <span className="font-mono font-bold tabular-nums text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 rounded-none text-2xs">{m.count} units</span>
                     </li>
                   ))}
                 </ol>

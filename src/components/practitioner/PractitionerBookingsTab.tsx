@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import { CustomSelect } from '../../shared/ui/CustomSelect';
+import React, { useMemo, useState } from 'react';
 import {
   FileSignature, X, ShieldCheck, Loader, Ambulance, MapPin, CheckCircle2, Calendar, Clock, Check,
-  ClipboardList, HeartPulse, Activity, Bandage, Stethoscope
+  ClipboardList, Search
 } from 'lucide-react';
 import { formatMoney, useTr } from '../../locale';
 import { DoctorProfile, NurseProfile, Booking, OnCallDispatch } from '../../types';
+import ClinicalWorkspace from '../ClinicalWorkspace';
 
 interface PractitionerBookingsTabProps {
   matchedProfile: DoctorProfile | NurseProfile;
@@ -45,6 +47,26 @@ export default function PractitionerBookingsTab({
 }: PractitionerBookingsTabProps) {
   const tx = useTr();
   const activeDispatches = dispatches.filter(d => d.dispatchStatus !== 'Completed');
+  const [query, setQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'Upcoming' | 'Completed'>('all');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const filteredBookings = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return myBookings.filter(b =>
+      (statusFilter === 'all' || b.status === statusFilter) &&
+      (q === '' || b.patientName.toLowerCase().includes(q) || b.patientId.toLowerCase().includes(q) || (b.symptoms || '').toLowerCase().includes(q))
+    );
+  }, [myBookings, statusFilter, query]);
+
+  const activeBooking = useMemo(() => {
+    if (selectedBookingForPrescribe) return selectedBookingForPrescribe;
+    if (selectedId) {
+      const m = filteredBookings.find(b => b.id === selectedId);
+      if (m) return m;
+    }
+    return filteredBookings[0] ?? null;
+  }, [selectedBookingForPrescribe, selectedId, filteredBookings]);
 
   // Nurse Care Log Form States
   const [nursingProcedure, setNursingProcedure] = useState('Sterile Wound Dressing (Stage II)');
@@ -79,358 +101,75 @@ export default function PractitionerBookingsTab({
   };
 
   return (
-    <div id="panel-bookings" role="tabpanel" aria-labelledby="tab-bookings" tabIndex={0} className="space-y-6 animate-fade-in">
-      {/* Dynamic Modal: Doctor E-Prescription VS Nurse Procedure & Care Log */}
-      {selectedBookingForPrescribe && (
-        <div className="bg-[color:var(--t-50)]/70 border-2 border-[color:var(--t-200)] rounded-none p-6 space-y-4 shadow-sm max-w-2xl mx-auto">
-          <div className="flex justify-between items-center border-b border-[color:var(--t-200)] pb-3">
-            <div className="flex items-center gap-2">
-              {isDoc ? (
-                <>
-                  <FileSignature className="h-5 w-5 text-[color:var(--t-600)]" />
-                  <div>
-                    <h4 className="text-sm font-black text-slate-900">{tx('Issue Doctor-Signed E-Prescription')}</h4>
-                    <p className="text-xs text-slate-500 font-medium">Medical Act 1971 &bull; Poisons Act 1952 Compliant</p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <ClipboardList className="h-5 w-5 text-emerald-600" />
-                  <div>
-                    <h4 className="text-sm font-black text-slate-900">{tx('Official Clinical Nursing Care & Procedure Log')}</h4>
-                    <p className="text-xs text-slate-500 font-medium">Lembaga Jururawat Malaysia (LJM) &bull; Nurses Act 1950</p>
-                  </div>
-                </>
-              )}
-            </div>
-            <button
-              type="button"
-              onClick={onCancelPrescription}
-              className="p-1 hover:bg-[color:var(--t-100)] rounded-none cursor-pointer text-[color:var(--t-600)]"
-            >
-              <X className="h-4 w-4" />
-            </button>
+    <div id="panel-bookings" role="tabpanel" aria-labelledby="tab-bookings" tabIndex={0} className="space-y-4 animate-fade-in">
+      {/* Compact Emergency Dispatch Strip / Active Urgent Board */}
+      {activeDispatches.length === 0 ? (
+        <div className="app-card rounded-none px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2 text-slate-600">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <Ambulance className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
+            <span className="font-bold text-[color:var(--ink)]">{tx('On-Call Emergency Radar')}</span>
+            <span className="text-slate-400">·</span>
+            <span className="text-slate-500">{tx('No urgent dispatches pending nearby')}</span>
           </div>
-
-          {/* DOCTOR WORKFLOW: E-PRESCRIPTION */}
-          {isDoc ? (
-            <form onSubmit={onSubmitPrescription} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
-                  <span className="text-xs text-slate-400 font-bold block uppercase">{tx('Patient Identity')}</span>
-                  <strong className="text-slate-800 text-xs font-extrabold">{selectedBookingForPrescribe.patientName}</strong>
-                  <p className="text-slate-500 font-semibold mt-0.5">ID Ref: {selectedBookingForPrescribe.patientId}</p>
-                </div>
-                <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
-                  <span className="text-xs text-slate-400 font-bold block uppercase">{tx('Consultation Mode')}</span>
-                  <strong className="text-slate-800 font-extrabold">{selectedBookingForPrescribe.mode}</strong>
-                  <p className="text-slate-500 font-semibold mt-0.5">Date: {selectedBookingForPrescribe.date} &bull; {selectedBookingForPrescribe.timeSlot}</p>
-                </div>
-              </div>
-
-              {selectedBookingForPrescribe.symptoms && (
-                <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]/50 text-xs text-slate-600">
-                  <span className="text-xs text-slate-400 font-bold block uppercase mb-1">{tx('Stated Symptoms at Booking')}</span>
-                  "{selectedBookingForPrescribe.symptoms}"
-                </div>
-              )}
-
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">{tx('Clinical Diagnosis & Findings')}</label>
-                  <input
-                    type="text"
-                    placeholder={tx('e.g. Acute Upper Respiratory Tract Infection (URTI)')}
-                    value={prescribeDiagnosis}
-                    onChange={(e) => setPrescribeDiagnosis(e.target.value)}
-                    className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">{tx('Prescribed Pharmacotherapy (Medicines & Dosage)')}</label>
-                  <textarea
-                    rows={3}
-                    placeholder={tx('e.g. 1. Tab Paracetamol 500mg - 2 tabs QDS (PRN Fever)\n2. Syrup Diphenhydramine 10ml - TDS (Cough)')}
-                    value={prescribeMeds}
-                    onChange={(e) => setPrescribeMeds(e.target.value)}
-                    className="w-full text-xs border border-[color:var(--t-200)] rounded-none p-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">{tx('Specific Care & Lifestyle Instructions')}</label>
-                  <input
-                    type="text"
-                    placeholder={tx('e.g. Plenty of oral fluids. Avoid cold food items. Strict rest for 3 days.')}
-                    value={prescribeInstructions}
-                    onChange={(e) => setPrescribeInstructions(e.target.value)}
-                    className="w-full text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-800 bg-white"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="bg-slate-100 p-3 rounded-none border border-[color:var(--t-200)] flex gap-2.5 items-start">
-                <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <div className="text-xs text-slate-500 leading-relaxed font-semibold">
-                  {tx('By signing this e-prescription, you certify that you have reviewed the patient\'s record, performed clinical validation, and your digital MMC registration credentials will be embedded into the PDF slip.')}
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2.5 pt-2">
-                <button
-                  type="button"
-                  onClick={onCancelPrescription}
-                  className="border border-[color:var(--t-200)] text-slate-600 text-xs font-bold px-5 py-2 rounded-none hover:bg-slate-50 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={issuingPrescription}
-                  className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-black px-6 py-2 rounded-none transition-all flex items-center gap-1.5 cursor-pointer shadow-3xs"
-                >
-                  {issuingPrescription ? (
-                    <>
-                      <Loader className="h-3.5 w-3.5 animate-spin" />
-                      <span>{tx('Generating Encrypted Prescription...')}</span>
-                    </>
-                  ) : (
-                    <>
-                      <FileSignature className="h-3.5 w-3.5" />
-                      <span>{tx('Generate & Sign E-Prescription')}</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          ) : (
-            /* NURSE WORKFLOW: CLINICAL NURSING PROCEDURE & CARE LOG */
-            <form onSubmit={handleNurseCareLogSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
-                  <span className="text-xs text-slate-400 font-bold block uppercase">{tx('Patient Identity')}</span>
-                  <strong className="text-slate-800 text-xs font-extrabold">{selectedBookingForPrescribe.patientName}</strong>
-                  <p className="text-slate-500 font-semibold mt-0.5">ID Ref: {selectedBookingForPrescribe.patientId}</p>
-                </div>
-                <div className="bg-white p-3 rounded-none border border-[color:var(--t-200)]">
-                  <span className="text-xs text-slate-400 font-bold block uppercase">{tx('Nursing Duty Mode')}</span>
-                  <strong className="text-slate-800 font-extrabold">{selectedBookingForPrescribe.mode}</strong>
-                  <p className="text-slate-500 font-semibold mt-0.5">Date: {selectedBookingForPrescribe.date} &bull; {selectedBookingForPrescribe.timeSlot}</p>
-                </div>
-              </div>
-
-              {/* Procedure Performed */}
-              <div className="space-y-1">
-                <label className="form-label">{tx('Clinical Nursing Procedure Performed')}</label>
-                <select
-                  value={nursingProcedure}
-                  onChange={(e) => setNursingProcedure(e.target.value)}
-                  className="form-select text-xs font-semibold"
-                >
-                  <option value="Sterile Wound Dressing (Stage II / Post-Op)">{tx('Sterile Wound Dressing (Stage II / Post-Op)')}</option>
-                  <option value="Intramuscular / Subcutaneous Medication Administration">{tx('Intramuscular / Subcutaneous Medication Administration')}</option>
-                  <option value="Foley Catheter Maintenance & Replacement">{tx('Foley Catheter Maintenance & Replacement')}</option>
-                  <option value="Post-Surgical Vital Signs Telemetry & Monitoring">{tx('Post-Surgical Vital Signs Telemetry & Monitoring')}</option>
-                  <option value="Ostomy / Stoma Care & Cleansing">{tx('Ostomy / Stoma Care & Cleansing')}</option>
-                  <option value="General Bedside Care & Elder Hygiene Assistance">{tx('General Bedside Care & Elder Hygiene Assistance')}</option>
-                </select>
-              </div>
-
-              {/* Vitals Telemetry Grid */}
-              <div className="space-y-1">
-                <label className="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                  <HeartPulse className="h-3.5 w-3.5 text-rose-500" />
-                  <span>{tx('Vital Signs Recorded on Duty')}</span>
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  <div className="bg-white p-2 border border-slate-200">
-                    <span className="text-xs font-mono text-slate-400 uppercase block font-bold">{tx('Blood Pressure')}</span>
-                    <input
-                      type="text"
-                      value={nursingBp}
-                      onChange={(e) => setNursingBp(e.target.value)}
-                      placeholder="e.g. 120/80"
-                      className="w-full text-xs font-bold text-slate-800 outline-none mt-0.5"
-                    />
-                  </div>
-                  <div className="bg-white p-2 border border-slate-200">
-                    <span className="text-xs font-mono text-slate-400 uppercase block font-bold">{tx('Heart Rate (bpm)')}</span>
-                    <input
-                      type="text"
-                      value={nursingHr}
-                      onChange={(e) => setNursingHr(e.target.value)}
-                      placeholder="e.g. 76"
-                      className="w-full text-xs font-bold text-slate-800 outline-none mt-0.5"
-                    />
-                  </div>
-                  <div className="bg-white p-2 border border-slate-200">
-                    <span className="text-xs font-mono text-slate-400 uppercase block font-bold">{tx('SpO2 Oxygen (%)')}</span>
-                    <input
-                      type="text"
-                      value={nursingSpo2}
-                      onChange={(e) => setNursingSpo2(e.target.value)}
-                      placeholder="e.g. 98"
-                      className="w-full text-xs font-bold text-slate-800 outline-none mt-0.5"
-                    />
-                  </div>
-                  <div className="bg-white p-2 border border-slate-200">
-                    <span className="text-xs font-mono text-slate-400 uppercase block font-bold">{tx('Temperature (°C)')}</span>
-                    <input
-                      type="text"
-                      value={nursingTemp}
-                      onChange={(e) => setNursingTemp(e.target.value)}
-                      placeholder="e.g. 36.8"
-                      className="w-full text-xs font-bold text-slate-800 outline-none mt-0.5"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Nursing Observations */}
-              <div>
-                <label className="form-label">{tx('Nursing Observations & Recovery Notes')}</label>
-                <textarea
-                  rows={3}
-                  value={nursingNotes}
-                  onChange={(e) => setNursingNotes(e.target.value)}
-                  className="form-textarea text-xs"
-                  required
-                />
-              </div>
-
-              <div className="bg-emerald-50/60 p-3 rounded-none border border-emerald-200 flex gap-2.5 items-start">
-                <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <div className="text-xs text-emerald-900 leading-relaxed font-semibold">
-                  By certifying this nursing care log, you verify under the <strong>{tx('Nurses Act 1950')}</strong> that all recorded vital signs and procedures were conducted in adherence with Malaysian Nursing Board (LJM) clinical standards.
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2.5 pt-2">
-                <button
-                  type="button"
-                  onClick={onCancelPrescription}
-                  className="border border-[color:var(--t-200)] text-slate-600 text-xs font-bold px-5 py-2 rounded-none hover:bg-slate-50 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={savingNurseLog}
-                  className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-black px-6 py-2 rounded-none transition-all flex items-center gap-1.5 cursor-pointer shadow-3xs"
-                >
-                  {savingNurseLog ? (
-                    <>
-                      <Loader className="h-3.5 w-3.5 animate-spin" />
-                      <span>{tx('Recording Nursing Log...')}</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      <span>{tx('Certify & Sign Nursing Log')}</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          )}
+          <span className="app-badge badge-success">{tx('Live Radar Active')}</span>
         </div>
-      )}
-
-      {/* Emergency Ambulance Dispatch Board */}
-      <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-3xs space-y-4">
-        <div className="border-b border-[color:var(--t-200)] pb-3 flex items-center justify-between">
-          <div>
-            <h3 className="text-sm font-black text-rose-600 uppercase tracking-widest flex items-center gap-1.5">
-              <Ambulance className="h-4.5 w-4.5 text-rose-500" />
-              {tx('Urgent On-Call Emergency Center')}
+      ) : (
+        <div className="app-card rounded-none border-rose-300 p-4 space-y-3">
+          <div className="border-b border-rose-200 pb-2.5 flex items-center justify-between">
+            <h3 className="text-xs font-black text-rose-700 uppercase tracking-wider flex items-center gap-1.5">
+              <Ambulance className="h-4 w-4 text-rose-600" />
+              {tx('Urgent On-Call Emergency Center')} ({activeDispatches.length})
             </h3>
-            <p className="text-xs text-slate-500 font-medium mt-0.5">{tx('Claim active emergency dispatch tickets requested by high-risk patients nearby.')}</p>
+            <span className="bg-rose-50 text-rose-700 border border-rose-200 text-2xs font-bold px-2 py-0.5 rounded-none uppercase tracking-wider animate-pulse">{tx('Live Radar Active')}</span>
           </div>
-          <span className="bg-rose-50 text-rose-700 border border-rose-100 text-2xs font-bold px-2 py-0.5 rounded-none uppercase tracking-wider animate-pulse">{tx('Live Radar Active')}</span>
-        </div>
-
-        {activeDispatches.length === 0 ? (
-          <div className="text-center py-8 bg-slate-50 border border-dashed border-[color:var(--t-200)] rounded-none text-xs text-slate-500 space-y-2">
-            <ShieldCheck className="h-8 w-8 text-slate-300 mx-auto" />
-            <p className="text-sm font-bold text-slate-700">{tx('No Urgent Emergency Dispatches Pending')}</p>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">{tx('Standard municipal emergency channels are quiet. If an emergency is triggered by a nearby patient, it will instantly blink here.')}</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {activeDispatches.map(dispatch => {
               const isClaimedByMe = dispatch.doctorId === matchedProfile.id;
               const isClaimedByOthers = dispatch.doctorId !== 'auto' && !isClaimedByMe;
 
               return (
-                <div key={dispatch.id} className={`border p-4.5 rounded-none space-y-3.5 transition-all relative ${
-                  isClaimedByMe
-                    ? 'border-[color:var(--t-200)] bg-[color:var(--t-50)]/50'
-                    : 'border-[color:var(--t-200)] bg-white hover:border-slate-350'
+                <div key={dispatch.id} className={`border p-4 rounded-none space-y-3 transition-colors ${
+                  isClaimedByMe ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)]/50' : 'border-rose-200 bg-white'
                 }`}>
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-0.5">
-                      <span className="bg-red-50 text-red-700 border border-red-100 text-2xs font-black px-1.5 py-0.5 rounded-none uppercase tracking-wider">{tx('CRITICAL ALERT')}</span>
-                      <h4 className="text-sm font-black text-slate-900">{dispatch.patientName}</h4>
-                      <p className="text-xs text-slate-400 font-semibold">{(dispatch as any).timestamp}</p>
+                  <div className="flex justify-between items-start gap-2">
+                    <div>
+                      <span className="bg-red-50 text-red-700 border border-red-200 text-2xs font-black px-1.5 py-0.5 rounded-none uppercase tracking-wider">{tx('CRITICAL ALERT')}</span>
+                      <h4 className="text-sm font-bold text-slate-900 mt-1">{dispatch.patientName}</h4>
+                      <p className="text-xs text-slate-400">{(dispatch as any).timestamp}</p>
                     </div>
                     <span className={`text-2xs font-bold px-2 py-0.5 rounded-none ${
-                      dispatch.dispatchStatus === 'Pending Dispatch'
-                        ? 'bg-amber-100 text-amber-800'
-                        : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'
+                      dispatch.dispatchStatus === 'Pending Dispatch' ? 'bg-amber-100 text-amber-800' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'
                     }`}>
                       {dispatch.dispatchStatus}
                     </span>
                   </div>
-
-                  <div className="text-xs font-semibold text-slate-600 bg-slate-50 p-2.5 rounded-none border border-[color:var(--t-200)] space-y-1">
-                    <p><strong className="text-slate-800 font-bold">{tx('Urgent Complaint:')}</strong> {(dispatch as any).reason}</p>
-                    <p><strong className="text-slate-800 font-bold">{tx('Dispatch Location:')}</strong> {(dispatch as any).address}</p>
+                  <div className="text-xs text-slate-600 bg-slate-50 p-2.5 border border-[color:var(--t-100)] space-y-1">
+                    <p><strong className="text-slate-800">{tx('Urgent Complaint:')}</strong> {(dispatch as any).reason}</p>
+                    <p><strong className="text-slate-800">{tx('Dispatch Location:')}</strong> {(dispatch as any).address}</p>
                   </div>
-
                   <div className="flex justify-between items-center text-xs">
-                    <span className="font-black text-rose-600">
+                    <span className="font-bold text-rose-600">
                       {(dispatch as any).fee != null ? `${tx('Compensation:')} ${formatMoney((dispatch as any).fee)}` : tx('Standard Emergency Tariff')}
                     </span>
-                    {dispatch.etaMinutes ? (
-                      <span className="text-xs text-slate-400 font-mono font-bold">ETA: {dispatch.etaMinutes} mins</span>
-                    ) : null}
+                    {dispatch.etaMinutes ? <span className="text-xs text-slate-400 tabular-nums font-bold">ETA: {dispatch.etaMinutes} mins</span> : null}
                   </div>
-
-                  <div className="pt-2 border-t border-[color:var(--t-200)]">
+                  <div className="pt-2 border-t border-[color:var(--t-100)]">
                     {dispatch.dispatchStatus === 'Pending Dispatch' && (
-                      <button
-                        onClick={() => onUpdateDispatchStatus(dispatch.id, 'En-Route')}
-                        className="btn btn-sm btn-danger whitespace-nowrap w-full"
-                      >
-                        <Ambulance className="h-4 w-4" />
-                        <span>{tx('CLAIM EMERGENCY TRANSIT')}</span>
+                      <button onClick={() => onUpdateDispatchStatus(dispatch.id, 'En-Route')} className="btn btn-sm btn-danger whitespace-nowrap w-full">
+                        <Ambulance className="h-4 w-4" /><span>{tx('CLAIM EMERGENCY TRANSIT')}</span>
                       </button>
                     )}
-
                     {dispatch.dispatchStatus === 'En-Route' && isClaimedByMe && (
-                      <button
-                        onClick={() => onUpdateDispatchStatus(dispatch.id, 'Arrived')}
-                        className="btn btn-sm btn-primary whitespace-nowrap w-full"
-                      >
-                        <MapPin className="h-4 w-4" />
-                        <span>{tx('MARK ARRIVED AT PATIENT')}</span>
+                      <button onClick={() => onUpdateDispatchStatus(dispatch.id, 'Arrived')} className="btn btn-sm btn-primary whitespace-nowrap w-full">
+                        <MapPin className="h-4 w-4" /><span>{tx('MARK ARRIVED AT PATIENT')}</span>
                       </button>
                     )}
-
                     {dispatch.dispatchStatus === 'Arrived' && isClaimedByMe && (
-                      <button
-                        onClick={() => onUpdateDispatchStatus(dispatch.id, 'Completed')}
-                        className="w-full bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black py-2 rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                      >
-                        <CheckCircle2 className="h-4 w-4" />
-                        <span>{tx('COMPLETE CRITICAL CARE DISPATCH')}</span>
+                      <button onClick={() => onUpdateDispatchStatus(dispatch.id, 'Completed')} className="btn btn-sm btn-primary whitespace-nowrap w-full">
+                        <CheckCircle2 className="h-4 w-4" /><span>{tx('COMPLETE CRITICAL CARE DISPATCH')}</span>
                       </button>
                     )}
-
                     {isClaimedByOthers && (
                       <span className="text-xs text-slate-400 font-bold block text-center italic py-1">{tx('Claimed by another nearby professional')}</span>
                     )}
@@ -439,143 +178,292 @@ export default function PractitionerBookingsTab({
               );
             })}
           </div>
-        )}
+        </div>
+      )}
+
+      {/* Compact Command Bar for Consultations */}
+      <div className="app-card rounded-none p-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2 border border-[color:var(--t-200)] rounded-none bg-[color:var(--t-bg)] px-3 h-10 flex-1 min-w-[220px] max-w-md focus-within:border-[color:var(--t-600)] focus-within:bg-white transition-colors">
+          <Search className="h-4 w-4 text-slate-400 shrink-0" />
+          <input
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder={tx('Search patient name, ID, or symptoms...')}
+            className="flex-1 min-w-0 bg-transparent text-xs text-[color:var(--ink)] outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 placeholder-slate-400 font-medium"
+          />
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {(['all', 'Upcoming', 'Completed'] as const).map(st => {
+            const count = st === 'all' ? myBookings.length : myBookings.filter(b => b.status === st).length;
+            return (
+              <button
+                key={st}
+                type="button"
+                onClick={() => setStatusFilter(st)}
+                className={`px-2.5 py-1 rounded-none text-xs font-bold border transition-colors ${
+                  statusFilter === st
+                    ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]'
+                    : 'bg-white text-slate-700 border-[color:var(--t-200)] hover:border-[color:var(--t-600)]'
+                }`}
+              >
+                {st === 'all' ? tx('All') : tx(st)} ({count})
+              </button>
+            );
+          })}
+          <span className="text-2xs font-bold text-[color:var(--t-700)] tabular-nums bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-1 rounded-none ml-1">
+            {filteredBookings.length} {filteredBookings.length === 1 ? tx('patient') : tx('patients')}
+          </span>
+        </div>
       </div>
 
-      {/* Scheduled Clinical Consultations / Nursing Visits List */}
-      <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-3xs space-y-4">
-        <div className="border-b border-[color:var(--t-200)] pb-3">
-          <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-            <Calendar className="h-4.5 w-4.5 text-[color:var(--t-600)]" />
-            {isDoc ? tx('Scheduled Doctor Consultations ({n})', { n: myBookings.length }) : tx('Scheduled Home Nursing Duties ({n})', { n: myBookings.length })}
-          </h3>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
-            {isDoc
-              ? tx('Review appointments booked by patients and generate doctor-signed e-prescriptions upon consultation completion.')
-              : tx('Review patient home nursing bookings, post-op visits, and record certified clinical nursing care logs.')}
+      {/* Master-Detail Split-Pane Consultation Workstation */}
+      {filteredBookings.length === 0 ? (
+        <div className="app-card rounded-none p-12 text-center space-y-2">
+          <Clock className="h-10 w-10 text-slate-300 mx-auto" />
+          <h4 className="text-sm font-bold text-slate-700">{myBookings.length === 0 ? tx('No Appointments Booked Yet') : tx('No matching consultations')}</h4>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+            {myBookings.length === 0
+              ? tx('When patients register on your public clinical page, their details, symptoms, and scheduling block will compile here.')
+              : tx('Try adjusting your search query or status filter.')}
           </p>
         </div>
-
-        {myBookings.length === 0 ? (
-          <div className="text-center py-12 space-y-2">
-            <Clock className="h-10 w-10 text-slate-300 mx-auto" />
-            <h4 className="text-sm font-bold text-slate-700">{tx('No Appointments Booked Yet')}</h4>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
-              {tx('When patients register on your public clinical page, their details, symptoms, and scheduling block will compile here.')}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {myBookings.map((booking) => {
-              const isUpcoming = booking.status === 'Upcoming';
-
-              return (
-                <div key={booking.id} className="app-card-interactive app-card-equal p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all">
-                  <div className="space-y-2.5">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 bg-slate-100 rounded-none flex items-center justify-center font-bold text-slate-700 text-xs">
-                        {booking.patientName[0]}
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-black text-slate-800">{booking.patientName}</h4>
-                        <p className="text-xs text-slate-400 font-semibold font-mono">ID Ref: {booking.patientId}</p>
-                      </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+          {/* LEFT PANE: Compact Patient Schedule Queue */}
+          <div className="lg:col-span-5 app-card rounded-none p-0 overflow-hidden">
+            <div className="bg-[#F4FDFF] border-b border-[color:var(--t-100)] px-4 py-2.5 flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-[color:var(--t-700)] flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5" />
+                {isDoc ? tx('Patient Consultation Queue') : tx('Home Nursing Schedule')}
+              </span>
+              <span className="app-badge badge-brand">{filteredBookings.length}</span>
+            </div>
+            <div className="divide-y divide-[color:var(--t-100)] max-h-[calc(100vh-300px)] overflow-y-auto">
+              {filteredBookings.map(booking => {
+                const isSelected = activeBooking?.id === booking.id;
+                const isUpcoming = booking.status === 'Upcoming';
+                return (
+                  <button
+                    key={booking.id}
+                    type="button"
+                    onClick={() => {
+                      if (selectedBookingForPrescribe && selectedBookingForPrescribe.id !== booking.id) onCancelPrescription();
+                      setSelectedId(booking.id);
+                    }}
+                    className={`w-full text-left p-3.5 transition-colors block border-l-4 ${
+                      isSelected ? 'bg-[color:var(--t-50)]/70 border-l-[color:var(--t-600)]' : 'bg-white hover:bg-[#F4FDFF] border-l-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="text-xs font-bold text-slate-500 tabular-nums">{booking.date} · {booking.timeSlot}</span>
+                      <span className={`app-badge ${isUpcoming ? 'badge-brand' : 'badge-success'}`}>{booking.status}</span>
                     </div>
-
-                    <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-slate-600 max-w-md bg-slate-50/50 p-2.5 rounded-none border border-[color:var(--t-200)]/50">
-                      <div>
-                        <span className="text-xs text-slate-400 font-bold block uppercase">{tx('Date & Slot')}</span>
-                        <span className="text-slate-800 font-extrabold">{booking.date}</span> &bull; <span className="font-mono text-slate-700 font-bold">{booking.timeSlot}</span>
-                      </div>
-                      <div>
-                        <span className="text-xs text-slate-400 font-bold block uppercase">{tx('Consultation Mode')}</span>
-                        <span className="text-slate-800 font-extrabold">{booking.mode}</span>
-                      </div>
-                    </div>
-
+                    <div className="text-sm font-bold text-[color:var(--ink)] truncate">{booking.patientName}</div>
                     {booking.symptoms && (
-                      <p className="text-xs text-slate-600">
-                        <strong className="text-slate-800 font-bold">{tx('Patient Complaint:')}</strong> "{booking.symptoms}"
-                      </p>
+                      <p className="text-xs text-slate-600 truncate mt-0.5">"{booking.symptoms}"</p>
+                    )}
+                    <div className="mt-2 pt-2 border-t border-[color:var(--t-100)] flex items-center justify-between text-xs text-slate-500">
+                      <span>{booking.mode}</span>
+                      <span className="font-bold text-[color:var(--ink)] tabular-nums">RM {booking.fee}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* RIGHT PANE: Live Consultation Inspector & Inline Prescribing */}
+          <div className="lg:col-span-7">
+            {activeBooking && (
+              selectedBookingForPrescribe && selectedBookingForPrescribe.id === activeBooking.id ? (
+                <div className="app-card rounded-none p-5 space-y-4">
+                  <div className="flex justify-between items-center border-b border-[color:var(--t-200)] pb-3">
+                    <div className="flex items-center gap-2">
+                      {isDoc ? (
+                        <>
+                          <FileSignature className="h-5 w-5 text-[color:var(--t-600)]" />
+                          <div>
+                            <h4 className="text-sm font-bold text-slate-900">{tx('Issue Doctor-Signed E-Prescription')}</h4>
+                            <p className="text-xs text-slate-500">{tx('Clinical consultation sign-off & digital prescription')}</p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <ClipboardList className="h-5 w-5 text-emerald-600" />
+                          <div>
+                            <h4 className="text-sm font-bold text-slate-900">{tx('Clinical Nursing Care & Procedure Log')}</h4>
+                            <p className="text-xs text-slate-500">{tx('Record patient vitals and nursing procedure')}</p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    <button type="button" onClick={onCancelPrescription} className="p-1 hover:bg-[color:var(--t-100)] rounded-none cursor-pointer text-[color:var(--t-600)]">
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  {isDoc ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div className="bg-[#F4FDFF] p-3 border border-[color:var(--t-200)]">
+                          <span className="text-xs text-slate-400 font-bold block uppercase">{tx('Patient')}</span>
+                          <strong className="text-slate-900 text-xs font-bold">{selectedBookingForPrescribe.patientName}</strong>
+                          <p className="text-slate-500 tabular-nums mt-0.5">ID: {selectedBookingForPrescribe.patientId}</p>
+                        </div>
+                        <div className="bg-[#F4FDFF] p-3 border border-[color:var(--t-200)]">
+                          <span className="text-xs text-slate-400 font-bold block uppercase">{tx('Consultation Mode')}</span>
+                          <strong className="text-slate-900 font-bold">{selectedBookingForPrescribe.mode}</strong>
+                          <p className="text-slate-500 tabular-nums mt-0.5">{selectedBookingForPrescribe.date} · {selectedBookingForPrescribe.timeSlot}</p>
+                        </div>
+                      </div>
+                      {selectedBookingForPrescribe.symptoms && (
+                        <div className="app-info-box text-xs">
+                          <span className="font-bold text-slate-700">{tx('Stated Symptoms:')}</span> "{selectedBookingForPrescribe.symptoms}"
+                        </div>
+                      )}
+                      <ClinicalWorkspace kind="booking" refId={selectedBookingForPrescribe.id} />
+                    </div>
+                  ) : (
+                    <form onSubmit={handleNurseCareLogSubmit} className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div className="bg-[#F4FDFF] p-3 border border-[color:var(--t-200)]">
+                          <span className="text-xs text-slate-400 font-bold block uppercase">{tx('Patient')}</span>
+                          <strong className="text-slate-900 text-xs font-bold">{selectedBookingForPrescribe.patientName}</strong>
+                        </div>
+                        <div className="bg-[#F4FDFF] p-3 border border-[color:var(--t-200)]">
+                          <span className="text-xs text-slate-400 font-bold block uppercase">{tx('Nursing Duty Mode')}</span>
+                          <strong className="text-slate-900 font-bold">{selectedBookingForPrescribe.mode}</strong>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="form-label">{tx('Clinical Nursing Procedure Performed')}</label>
+                        <CustomSelect value={nursingProcedure} onChange={(e) => setNursingProcedure(e.target.value)} className="form-select text-xs">
+                          <option value="Sterile Wound Dressing (Stage II)">Sterile Wound Dressing (Stage II)</option>
+                          <option value="Post-Operative Suture & Drain Care">Post-Operative Suture &amp; Drain Care</option>
+                          <option value="IV Cannulation & Infusion Therapy">IV Cannulation &amp; Infusion Therapy</option>
+                          <option value="Foley Catheterization & Maintenance">Foley Catheterization &amp; Maintenance</option>
+                          <option value="Geriatric Mobility & Fall Prevention Care">Geriatric Mobility &amp; Fall Prevention Care</option>
+                        </CustomSelect>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <div>
+                          <label className="text-2xs font-bold text-slate-600 block mb-1">BP (mmHg)</label>
+                          <input type="text" value={nursingBp} onChange={e => setNursingBp(e.target.value)} className="form-input text-xs tabular-nums" />
+                        </div>
+                        <div>
+                          <label className="text-2xs font-bold text-slate-600 block mb-1">HR (bpm)</label>
+                          <input type="text" value={nursingHr} onChange={e => setNursingHr(e.target.value)} className="form-input text-xs tabular-nums" />
+                        </div>
+                        <div>
+                          <label className="text-2xs font-bold text-slate-600 block mb-1">SpO2 (%)</label>
+                          <input type="text" value={nursingSpo2} onChange={e => setNursingSpo2(e.target.value)} className="form-input text-xs tabular-nums" />
+                        </div>
+                        <div>
+                          <label className="text-2xs font-bold text-slate-600 block mb-1">Temp (°C)</label>
+                          <input type="text" value={nursingTemp} onChange={e => setNursingTemp(e.target.value)} className="form-input text-xs tabular-nums" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="form-label">{tx('Clinical Nursing Notes')}</label>
+                        <textarea rows={3} value={nursingNotes} onChange={e => setNursingNotes(e.target.value)} className="form-textarea text-xs" required />
+                      </div>
+                      <div className="flex justify-end gap-2.5 pt-2 border-t border-[color:var(--t-100)]">
+                        <button type="button" onClick={onCancelPrescription} className="btn btn-sm btn-secondary">{tx('Cancel')}</button>
+                        <button type="submit" disabled={savingNurseLog} className="btn btn-sm btn-primary">
+                          {savingNurseLog ? <><Loader className="h-3.5 w-3.5 animate-spin" /><span>{tx('Saving...')}</span></> : <><CheckCircle2 className="h-3.5 w-3.5" /><span>{tx('Certify & Sign Nursing Log')}</span></>}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              ) : (
+                <div className="app-card rounded-none p-0 overflow-hidden">
+                  <div className="p-5 border-b border-[color:var(--t-200)] bg-[#F4FDFF] flex flex-wrap items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white border border-[color:var(--t-200)] flex items-center justify-center font-bold text-[color:var(--t-700)] text-sm">
+                        {activeBooking.patientName[0]}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-base font-bold text-[color:var(--ink)]">{activeBooking.patientName}</h3>
+                          <span className={`app-badge ${activeBooking.status === 'Upcoming' ? 'badge-brand' : 'badge-success'}`}>{activeBooking.status}</span>
+                        </div>
+                        <p className="text-xs text-slate-500 tabular-nums mt-0.5">Ref: {activeBooking.patientId}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">{isDoc ? tx('Consultation Fee') : tx('Nursing Fee')}</span>
+                      <span className="text-base font-bold text-[color:var(--ink)] tabular-nums">RM {activeBooking.fee}</span>
+                    </div>
+                  </div>
+
+                  <div className="p-5 space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div className="bg-[color:var(--t-bg)] p-3 border border-[color:var(--t-200)]">
+                        <span className="text-xs text-slate-400 font-bold block uppercase">{tx('Date & Slot')}</span>
+                        <span className="text-[color:var(--ink)] font-bold tabular-nums">{activeBooking.date} · {activeBooking.timeSlot}</span>
+                      </div>
+                      <div className="bg-[color:var(--t-bg)] p-3 border border-[color:var(--t-200)]">
+                        <span className="text-xs text-slate-400 font-bold block uppercase">{tx('Consultation Mode')}</span>
+                        <span className="text-[color:var(--ink)] font-bold">{activeBooking.mode}</span>
+                      </div>
+                    </div>
+
+                    {activeBooking.symptoms && (
+                      <div className="app-info-box text-xs">
+                        <strong className="text-[color:var(--ink)]">{tx('Patient Complaint:')}</strong> "{activeBooking.symptoms}"
+                      </div>
                     )}
 
-                    {booking.prescription && (
-                      <div className="bg-emerald-50/30 border border-emerald-150 p-3 rounded-none text-xs space-y-1.5 max-w-xl">
-                        <div className="flex items-center gap-1.5 text-emerald-800 font-black text-xs uppercase tracking-wider">
-                          <Check className="h-4 w-4 text-emerald-600" />
+                    {activeBooking.prescription && (
+                      <div className="bg-[#ECFDF5] border border-[#A7F3D0] p-4 text-xs space-y-1.5">
+                        <div className="flex items-center gap-1.5 text-[#065F46] font-bold uppercase tracking-wider">
+                          <Check className="h-4 w-4" />
                           {tx('Issued Doctor E-Prescription')}
                         </div>
-                        <p><strong className="text-slate-800 font-bold">{tx('Diagnosis:')}</strong> {booking.prescription.diagnosis}</p>
-                        <p><strong className="text-slate-800 font-bold">{tx('Medicines:')}</strong> {booking.prescription.medicines}</p>
-                        <p><strong className="text-slate-800 font-bold">{tx('Instructions:')}</strong> {booking.prescription.instructions}</p>
+                        <p><strong className="text-slate-800">{tx('Diagnosis:')}</strong> {activeBooking.prescription.diagnosis}</p>
+                        <p><strong className="text-slate-800">{tx('Medicines:')}</strong> {activeBooking.prescription.medicines}</p>
+                        <p><strong className="text-slate-800">{tx('Instructions:')}</strong> {activeBooking.prescription.instructions}</p>
                       </div>
                     )}
 
-                    {booking.nursingCareLog && (
-                      <div className="bg-emerald-50/40 border border-emerald-200 p-3 rounded-none text-xs space-y-2 max-w-xl">
-                        <div className="flex items-center justify-between text-emerald-900 font-black text-xs uppercase tracking-wider">
-                          <span className="flex items-center gap-1.5">
-                            <Check className="h-4 w-4 text-emerald-600" />
-                            {tx('Completed Nursing Care Log')}
-                          </span>
-                          <span className="font-mono text-2xs bg-emerald-100 text-emerald-800 px-1.5 py-0.5 border border-emerald-300">
-                            {tx('LJM Certified')}
-                          </span>
+                    {activeBooking.nursingCareLog && (
+                      <div className="bg-[#ECFDF5] border border-[#A7F3D0] p-4 text-xs space-y-2">
+                        <div className="flex items-center justify-between text-[#065F46] font-bold uppercase tracking-wider">
+                          <span className="flex items-center gap-1.5"><Check className="h-4 w-4" />{tx('Completed Nursing Care Log')}</span>
+                          <span className="app-badge badge-success">{tx('LJM Certified')}</span>
                         </div>
-                        <p><strong className="text-slate-800 font-bold">{tx('Procedure:')}</strong> {booking.nursingCareLog.procedurePerformed}</p>
-                        {booking.nursingCareLog.vitals && (
-                          <div className="flex flex-wrap gap-2 text-xs font-mono">
-                            <span className="bg-white px-2 py-0.5 border border-emerald-200 text-slate-700 font-bold">BP: {booking.nursingCareLog.vitals.bloodPressure || 'N/A'}</span>
-                            <span className="bg-white px-2 py-0.5 border border-emerald-200 text-slate-700 font-bold">HR: {booking.nursingCareLog.vitals.heartRate ? `${booking.nursingCareLog.vitals.heartRate} bpm` : 'N/A'}</span>
-                            <span className="bg-white px-2 py-0.5 border border-emerald-200 text-slate-700 font-bold">SpO2: {booking.nursingCareLog.vitals.spO2 ? `${booking.nursingCareLog.vitals.spO2}%` : 'N/A'}</span>
-                            <span className="bg-white px-2 py-0.5 border border-emerald-200 text-slate-700 font-bold">Temp: {booking.nursingCareLog.vitals.temperature ? `${booking.nursingCareLog.vitals.temperature} °C` : 'N/A'}</span>
+                        <p><strong className="text-slate-800">{tx('Procedure:')}</strong> {activeBooking.nursingCareLog.procedurePerformed}</p>
+                        {activeBooking.nursingCareLog.vitals && (
+                          <div className="flex flex-wrap gap-2 text-xs tabular-nums">
+                            <span className="bg-white px-2 py-0.5 border border-[#A7F3D0] font-bold">BP: {activeBooking.nursingCareLog.vitals.bloodPressure || 'N/A'}</span>
+                            <span className="bg-white px-2 py-0.5 border border-[#A7F3D0] font-bold">HR: {activeBooking.nursingCareLog.vitals.heartRate ? `${activeBooking.nursingCareLog.vitals.heartRate} bpm` : 'N/A'}</span>
+                            <span className="bg-white px-2 py-0.5 border border-[#A7F3D0] font-bold">SpO2: {activeBooking.nursingCareLog.vitals.spO2 ? `${activeBooking.nursingCareLog.vitals.spO2}%` : 'N/A'}</span>
+                            <span className="bg-white px-2 py-0.5 border border-[#A7F3D0] font-bold">Temp: {activeBooking.nursingCareLog.vitals.temperature ? `${activeBooking.nursingCareLog.vitals.temperature} °C` : 'N/A'}</span>
                           </div>
                         )}
-                        <p className="text-slate-600"><strong className="text-slate-800 font-bold">{tx('Notes:')}</strong> {booking.nursingCareLog.clinicalNotes}</p>
+                        <p className="text-slate-600"><strong className="text-slate-800">{tx('Notes:')}</strong> {activeBooking.nursingCareLog.clinicalNotes}</p>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex flex-col items-start sm:items-end justify-between shrink-0 gap-3">
-                    <div className="space-y-1 sm:text-right">
-                      <span className="text-xs text-slate-400 font-bold block uppercase">
-                        {isDoc ? tx('Consultation Fee') : tx('Nursing Fee')}
-                      </span>
-                      <span className="text-xs font-black text-slate-900">RM {booking.fee}</span>
-                      <span className={`block text-2xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-none text-center border mt-1 ${
-                        isUpcoming
-                          ? 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border-[color:var(--t-200)]'
-                          : 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                      }`}>
-                        {booking.status}
-                      </span>
-                    </div>
-
-                    {isUpcoming && (
-                      <button
-                        onClick={() => onStartPrescription(booking)}
-                        className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
-                      >
+                  {activeBooking.status === 'Upcoming' && (
+                    <div className="p-4 bg-[#F4FDFF] border-t border-[color:var(--t-200)] flex justify-end">
+                      <button onClick={() => onStartPrescription(activeBooking)} className="btn btn-sm btn-primary">
                         {isDoc ? (
-                          <>
-                            <FileSignature className="h-3.5 w-3.5" />
-                            <span>{tx('Diagnose & Prescribe')}</span>
-                          </>
+                          <><FileSignature className="h-3.5 w-3.5" /><span>{tx('Diagnose & Prescribe')}</span></>
                         ) : (
-                          <>
-                            <ClipboardList className="h-3.5 w-3.5" />
-                            <span>{tx('Record Nursing Care Log')}</span>
-                          </>
+                          <><ClipboardList className="h-3.5 w-3.5" /><span>{tx('Record Nursing Care Log')}</span></>
                         )}
                       </button>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
-              );
-            })}
+              )
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

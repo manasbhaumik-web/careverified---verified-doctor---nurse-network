@@ -1,7 +1,8 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useCallback, useEffect, useState } from 'react';
-import { AlertTriangle, Ban, FilePlus2, Lock, Pill, Plus, Stethoscope, Trash2 } from 'lucide-react';
+import { AlertTriangle, Ban, CheckCircle2, FilePlus2, Lock, Pill, Plus, ShieldCheck, Stethoscope, Trash2, X } from 'lucide-react';
 import { useTr } from '../locale';
-import PrescriptionCancelModal from './clinical/PrescriptionCancelModal';
+import PrescriptionCancelModal from '../domains/prescriptions/PrescriptionCancelModal';
 
 type Kind = 'booking' | 'consult';
 interface Props { kind: Kind; refId: string }
@@ -359,7 +360,7 @@ export default function ClinicalWorkspace({ kind, refId }: Props) {
             <h4 className={label}>{tx('Referral')}</h4>
             <input className={field} placeholder={tx('Specialty (e.g. Cardiologist)')} value={ref.toSpecialty} onChange={e => setRef({ ...ref, toSpecialty: e.target.value })} maxLength={100} />
             <textarea className={textareaField} rows={3} placeholder={tx('Reason for referral')} value={ref.reason} onChange={e => setRef({ ...ref, reason: e.target.value })} maxLength={1000} />
-            <select className={selectField} value={ref.urgency} onChange={e => setRef({ ...ref, urgency: e.target.value })}><option value="routine">{tx('Routine')}</option><option value="soon">{tx('Soon')}</option><option value="urgent">{tx('Urgent')}</option></select>
+            <CustomSelect className={selectField} value={ref.urgency} onChange={e => setRef({ ...ref, urgency: e.target.value })}><option value="routine">{tx('Routine')}</option><option value="soon">{tx('Soon')}</option><option value="urgent">{tx('Urgent')}</option></CustomSelect>
             <button onClick={() => submit('/api/referrals', ref, () => setRef({ toSpecialty: '', reason: '', urgency: 'routine' }))} className="bg-[color:var(--t-600)] text-white text-xs font-extrabold px-5 py-2.5 cursor-pointer">{tx('Issue referral')}</button>
             {ctx.referrals.length > 0 && <ul className="text-xs space-y-1 pt-2 border-t border-slate-200">{ctx.referrals.map((r: any) => <li key={r.id}>{r.toSpecialty} · {r.urgency}</li>)}</ul>}
           </div>

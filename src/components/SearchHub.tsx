@@ -1,5 +1,6 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useState } from 'react';
-import VerificationScopeBadge from './VerificationScopeBadge';
+import VerificationScopeBadge from '../domains/verification/VerificationScopeBadge';
 import {
   Search, MapPin, Stethoscope, Clock,
   HeartPulse, UserCheck, Star, LayoutGrid, List, X, Globe, Activity,
@@ -96,7 +97,7 @@ export default function SearchHub({
   };
 
   const labelCls = 'text-xs font-bold uppercase tracking-wider text-[color:var(--ink-2)]';
-  const selectCls = 'w-full min-h-[46px] border border-[color:var(--t-200)] bg-white px-3 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] cursor-pointer';
+  const selectCls = 'form-select w-full h-11 border border-[color:var(--t-200)] bg-white px-3 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] cursor-pointer';
 
   const renderCard = (prof: DoctorProfile | NurseProfile) => {
     const isDoc = prof.role === UserRole.DOCTOR;
@@ -183,16 +184,16 @@ export default function SearchHub({
           />
         </div>
         <label htmlFor="directory-sort" className="sr-only">Sort by</label>
-        <select
+        <CustomSelect
           id="directory-sort"
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as any)}
-          className="flex-[1_1_200px] min-h-[48px] border border-[color:var(--t-200)] bg-white px-3 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] cursor-pointer"
+          className="form-select flex-[1_1_200px] h-12 border border-[color:var(--t-200)] bg-white px-3 text-xs font-semibold text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] cursor-pointer"
         >
           <option value="rating">Sort: Highest rated</option>
           <option value="fee">Sort: Lowest fee</option>
           <option value="experience">Sort: Most experience</option>
-        </select>
+        </CustomSelect>
       </section>
 
       <div className="flex flex-wrap gap-6 items-start">
@@ -232,7 +233,7 @@ export default function SearchHub({
 
           <div className="space-y-2">
             <label htmlFor="directory-specialty" className={labelCls}>Specialty</label>
-            <select
+            <CustomSelect
               id="directory-specialty"
               value={specialties.find(sp => sp.toLowerCase() === selectedSpecialtyFilter.toLowerCase()) || ''}
               onChange={(e) => (e.target.value ? onSelectSpecialtyFilter(e.target.value) : onClearSpecialtyFilter())}
@@ -240,15 +241,15 @@ export default function SearchHub({
             >
               <option value="">All specialties</option>
               {specialties.map(sp => <option key={sp} value={sp}>{sp}</option>)}
-            </select>
+            </CustomSelect>
           </div>
 
           <div className="space-y-2">
             <label htmlFor="directory-city" className={labelCls}>City</label>
-            <select id="directory-city" value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)} className={selectCls}>
+            <CustomSelect id="directory-city" value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)} className={selectCls}>
               <option value="all">All cities</option>
               {cities.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
+            </CustomSelect>
           </div>
 
           <fieldset className="space-y-1">

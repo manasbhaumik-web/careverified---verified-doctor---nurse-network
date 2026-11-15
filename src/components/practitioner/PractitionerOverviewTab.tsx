@@ -111,7 +111,7 @@ export default function PractitionerOverviewTab({
 
           <button
             type="button"
-            onClick={onViewAnalytics || onViewBookings}
+            onClick={onViewBookings}
             className="p-4 bg-white hover:bg-slate-50 border border-[color:var(--t-200)] text-slate-900 text-left transition-colors cursor-pointer flex flex-col justify-between gap-3 rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
           >
             <span className="font-black text-sm">

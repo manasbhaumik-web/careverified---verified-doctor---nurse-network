@@ -31,7 +31,7 @@ export default defineConfig(() => {
             }
 
             // 2. Feature Workspaces & Large Suites
-            if (id.includes('src/components/AdminDashboard') || id.includes('src/components/SEODashboard')) {
+            if (id.includes('src/workspaces/admin/') || id.includes('src/components/SEODashboard')) {
               return 'admin-suite';
             }
 
@@ -49,22 +49,6 @@ export default defineConfig(() => {
 
             if (id.includes('src/components/VerificationTerminal') || id.includes('src/components/practitioner/')) {
               return 'practitioner-suite';
-            }
-
-            if (id.includes('src/components/LandingPage')) {
-              return 'landing-page';
-            }
-
-            if (id.includes('src/components/MedicalLibrary')) {
-              return 'medical-library';
-            }
-
-            if (
-              id.includes('src/components/MalaysiaPatientsPage') ||
-              id.includes('src/components/InternationalPatientsPage') ||
-              id.includes('src/components/MedicalTourism')
-            ) {
-              return 'patient-guides-suite';
             }
 
             if (

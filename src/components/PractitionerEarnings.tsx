@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Download, Landmark, Wallet } from 'lucide-react';
-import DashboardHeader from './DashboardHeader';
+import DashboardHeader from '../shared/ui/DashboardHeader';
 import { formatDate, formatMoney, useTr } from '../locale';
 
 const jget = (url: string) => fetch(url).then(r => r.json());
@@ -131,7 +131,13 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
                 {d.upcoming.map(u => (
                   <tr key={u.paymentId} className="border-t border-slate-100">
                     <td className="py-2 pr-3">{u.description}{u.testMode ? ` (${tx('test payment')})` : ''}</td>
-                    <td className="pr-3">{u.state === 'ready' ? <span className="font-bold text-emerald-800">{tx('Ready')}</span> : <span className="text-slate-700">{u.note ? tx(u.note) : tx('Waiting')}</span>}</td>
+                    <td className="pr-3">
+                      {u.state === 'ready' ? (
+                        <span className="app-badge badge-success">{tx('Ready')}</span>
+                      ) : (
+                        <span className="app-badge badge-neutral">{u.note ? tx(u.note) : tx('Waiting')}</span>
+                      )}
+                    </td>
                     <td className="text-right tabular-nums font-bold">{formatMoney(u.net)}</td>
                   </tr>
                 ))}
@@ -160,7 +166,16 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
                 {d.payouts.map(p => (
                   <tr key={p.id} className="border-t border-slate-100">
                     <td className="py-2 pr-3 font-mono">{p.id}<span className="block text-xs text-slate-600 font-sans">{formatDate(p.paidOn ?? p.createdAt)}</span></td>
-                    <td className="pr-3 font-bold">{p.status === 'pending' ? tx('Being prepared') : p.status === 'paid' ? tx('Paid') : p.status === 'failed' ? tx('Could not be sent') : p.status}{p.failureReason ? <span className="block font-normal text-slate-700">{p.failureReason}</span> : null}</td>
+                    <td className="pr-3">
+                      <span className={`app-badge ${
+                        p.status === 'paid' ? 'badge-success' :
+                        p.status === 'pending' ? 'badge-brand' :
+                        p.status === 'failed' ? 'bg-rose-50 text-rose-800 border-rose-200' : 'badge-neutral'
+                      }`}>
+                        {p.status === 'pending' ? tx('Being prepared') : p.status === 'paid' ? tx('Paid') : p.status === 'failed' ? tx('Could not be sent') : p.status}
+                      </span>
+                      {p.failureReason ? <span className="block font-normal text-rose-700 mt-1">{p.failureReason}</span> : null}
+                    </td>
                     <td className="pr-3">{p.bank}</td>
                     <td className="pr-3 font-mono">{p.reference ?? ''}</td>
                     <td className="pr-3 text-right tabular-nums font-bold">{formatMoney(p.amount)}</td>

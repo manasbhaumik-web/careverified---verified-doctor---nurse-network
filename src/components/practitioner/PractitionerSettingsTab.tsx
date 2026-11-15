@@ -1,3 +1,4 @@
+import { CustomSelect } from '../../shared/ui/CustomSelect';
 import React from 'react';
 import {
   Edit, Bold, Italic, List, Quote, X, Plus, Calendar, CheckCircle2, Loader, Save,
@@ -139,7 +140,8 @@ export default function PractitionerSettingsTab({
                 <button
                   type="button"
                   onClick={() => {
-                    setEditBio(prev => prev + "\n- Pediatric Primary Care\n- Child Development Milestones");
+                    const spec = matchedProfile.specialization || tx('Clinical Care');
+                    setEditBio(prev => prev + `\n- ${spec} Assessment & Diagnostics\n- Evidence-Based Treatment Plans`);
                     showToast(tx('Added Bullet List template'));
                   }}
                   className="p-1 hover:bg-white text-slate-600 hover:text-slate-900 rounded-none text-xs font-bold transition-colors flex items-center gap-0.5 cursor-pointer"
@@ -152,7 +154,8 @@ export default function PractitionerSettingsTab({
                 <button
                   type="button"
                   onClick={() => {
-                    setEditBio(prev => prev + '\n> "My clinical philosophy is pediatric wellness."');
+                    const spec = matchedProfile.specialization || tx('patient care');
+                    setEditBio(prev => prev + `\n> "My clinical philosophy is evidence-based ${spec.toLowerCase()} with clear patient communication."`);
                     showToast(tx('Added Quote template'));
                   }}
                   className="p-1 hover:bg-white text-slate-600 hover:text-slate-900 rounded-none text-xs font-bold transition-colors flex items-center gap-0.5 cursor-pointer"
@@ -179,7 +182,7 @@ export default function PractitionerSettingsTab({
               rows={5}
               value={editBio}
               onChange={(e) => setEditBio(e.target.value)}
-              className="w-full text-xs border border-[color:var(--t-200)] rounded-none p-3.5 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 leading-relaxed bg-white"
+              className="w-full text-xs border border-[color:var(--t-200)] rounded-none p-3.5 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 leading-relaxed bg-white"
               placeholder={tx('Explain your approach to care, clinical experience, and focus areas...')}
               required
             />
@@ -228,7 +231,7 @@ export default function PractitionerSettingsTab({
               <button
                 type="button"
                 onClick={addCertification}
-                className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-4 py-2 rounded-none transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap"
+                className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-4 py-2 rounded-none transition-colors cursor-pointer flex items-center gap-1 whitespace-nowrap"
               >
                 <Plus className="h-3.5 w-3.5" />
                 {tx('Add Tag')}
@@ -257,7 +260,7 @@ export default function PractitionerSettingsTab({
 
             <div>
               <label className="form-label">{tx('Registered Practice City')}</label>
-              <select
+              <CustomSelect
                 value={editCity}
                 onChange={(e) => setEditCity(e.target.value)}
                 className="form-select text-xs font-bold"
@@ -266,7 +269,7 @@ export default function PractitionerSettingsTab({
                 <option value="Petaling Jaya">{tx('Petaling Jaya')}</option>
                 <option value="Penang">{tx('Penang')}</option>
                 <option value="Johor Bahru">{tx('Johor Bahru')}</option>
-              </select>
+              </CustomSelect>
             </div>
           </div>
 
@@ -308,7 +311,7 @@ export default function PractitionerSettingsTab({
                           setEditDays([...editDays, day]);
                         }
                       }}
-                      className={`text-xs font-bold py-1.5 px-3 rounded-none border transition-all cursor-pointer ${
+                      className={`text-xs font-bold py-1.5 px-3 rounded-none border transition-colors cursor-pointer ${
                         isActive
                           ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-600)] shadow-3xs'
                           : 'bg-white text-slate-600 border-[color:var(--t-200)] hover:bg-slate-50'
@@ -329,12 +332,12 @@ export default function PractitionerSettingsTab({
                   placeholder={tx('e.g. 10:00 AM')}
                   value={newTimeSlot}
                   onChange={(e) => setNewTimeSlot(e.target.value)}
-                  className="text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-700 flex-1 min-w-0 bg-white"
+                  className="text-xs border border-[color:var(--t-200)] rounded-none py-2 px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-700 flex-1 min-w-0 bg-white"
                 />
                 <button
                   type="button"
                   onClick={addTimeSlot}
-                  className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-bold px-4 py-2 rounded-none transition-all cursor-pointer flex items-center gap-1 shrink-0"
+                  className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] text-white text-xs font-bold px-4 py-2 rounded-none transition-colors cursor-pointer flex items-center gap-1 shrink-0"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   {tx('Add Slot')}
@@ -392,7 +395,7 @@ export default function PractitionerSettingsTab({
             <button
               type="submit"
               disabled={savingSettings}
-              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-black py-2.5 px-6 rounded-none transition-all flex items-center gap-2 shadow-xs cursor-pointer"
+              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-black py-2.5 px-6 rounded-none transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
             >
               {savingSettings ? (
                 <>

@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import { Shield, Check, Eye, Send, CheckCircle2, X, LifeBuoy } from 'lucide-react';
+import {
+  Shield, Check, Eye, Send, CheckCircle2, X, LifeBuoy,
+  Stethoscope, Briefcase, ShieldCheck, Wallet, BookOpen,
+  LayoutGrid, Calendar, Radio, MessageSquare, Globe,
+  Users, Award, TrendingUp, Star, SlidersHorizontal, BadgeCheck, Bookmark
+} from 'lucide-react';
 import { useTr, useLocale, dateLocaleOf } from '../locale';
 import { Professional, Review, Booking, UserRole, VerificationStatus, ConsultationMode } from '../types';
 import DashboardHeader, {
@@ -10,7 +15,7 @@ import DashboardHeader, {
   bannerOnBrandPrimaryBtn,
   bannerOnBrandSecondaryBtn,
   type DashboardTab,
-} from './DashboardHeader';
+} from '../shared/ui/DashboardHeader';
 
 export interface PractitionerHeroBannerProps<T extends string = string> {
   currentUser?: {
@@ -28,6 +33,8 @@ export interface PractitionerHeroBannerProps<T extends string = string> {
   tabs?: DashboardTab<T>[];
   activeTab?: T;
   onTabChange?: (tab: T) => void;
+  activeSubTab?: string;
+  onSubTabChange?: (subId: string) => void;
   tabsLabel?: string;
   onOpenHelp?: () => void;
   isHelpActive?: boolean;
@@ -46,6 +53,8 @@ export default function PractitionerHeroBanner<T extends string = string>({
   tabs,
   activeTab,
   onTabChange,
+  activeSubTab,
+  onSubTabChange,
   tabsLabel,
   onOpenHelp,
   isHelpActive,
@@ -98,7 +107,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
     (currentUser?.profileId && p.id === currentUser.profileId)
   );
 
-  const fallbackProfile: Professional = {
+  const fallbackProfile = {
     id: currentUser?.profileId || currentUser?.id || '—',
     name: currentUser?.name || 'Practitioner Account',
     avatar: currentUser?.avatarUrl || (currentUser?.role === 'nurse' ? '/assets/malaysian_female_nurse.jpg' : '/assets/malaysian_female_doctor.jpg'),
@@ -138,19 +147,123 @@ export default function PractitionerHeroBanner<T extends string = string>({
     ? (myReviews.reduce((sum, r) => sum + r.rating, 0) / myReviews.length).toFixed(1)
     : (profile.rating > 0 ? profile.rating.toFixed(1) : null);
 
+  const navigatePractitionerGroup = (groupKey: string, subId?: string) => {
+    const viewMap: Record<string, string> = {
+      clinical: 'onboard',
+      recruitment: 'recruitment',
+      practice: 'practice_compliance',
+      performance: 'performance_profile',
+      articles: 'articles',
+    };
+    try {
+      if (subId) {
+        if (groupKey === 'recruitment') sessionStorage.setItem('medcred_shifts_subtab', subId);
+        else if (groupKey === 'articles') sessionStorage.setItem('medcred_library_subtab', subId);
+        else sessionStorage.setItem('medcred_practitioner_subtab', subId);
+      }
+    } catch { /* ignore */ }
+    if (activeTab === groupKey && subId && onSubTabChange) {
+      onSubTabChange(subId);
+      return;
+    }
+    if (onTabChange && !subId) {
+      onTabChange(groupKey as T);
+      return;
+    }
+    const targetView = viewMap[groupKey] || groupKey;
+    window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: targetView }));
+  };
+
+  const defaultPractitionerTabs: DashboardTab<any>[] = [
+    {
+      id: 'clinical',
+      label: tx('Patient Care'),
+      icon: Stethoscope,
+      count: upcomingBookingsCount || undefined,
+      activeSubTab: activeTab === 'clinical' ? activeSubTab : undefined,
+      onSubTabChange: (subId) => navigatePractitionerGroup('clinical', subId),
+      subItems: [
+        { id: 'home', label: tx('Overview'), icon: LayoutGrid },
+        { id: 'bookings', label: tx('Appointments'), icon: Calendar, count: upcomingBookingsCount || undefined },
+        { id: 'oncall', label: tx('On-Call Dispatch'), icon: Radio },
+        { id: 'messages', label: tx('Messages'), icon: MessageSquare },
+        { id: 'global', label: tx('Global Patients'), icon: Globe },
+      ],
+    },
+    {
+      id: 'recruitment',
+      label: tx('Shifts & Locums'),
+      icon: Briefcase,
+      activeSubTab: activeTab === 'recruitment' ? activeSubTab : undefined,
+      onSubTabChange: (subId) => navigatePractitionerGroup('recruitment', subId),
+      subItems: [
+        { id: 'open', label: tx('Open Shifts'), icon: Briefcase },
+        { id: 'applied', label: tx('My Applications'), icon: CheckCircle2 },
+        { id: 'locums', label: tx('Locum Roster'), icon: Users },
+        { id: 'eligibility', label: tx('Work Eligibility'), icon: ShieldCheck },
+      ],
+    },
+    {
+      id: 'practice',
+      label: tx('Licensing & CPD'),
+      icon: ShieldCheck,
+      activeSubTab: activeTab === 'practice' ? activeSubTab : undefined,
+      onSubTabChange: (subId) => navigatePractitionerGroup('practice', subId),
+      subItems: [
+        { id: 'accreditation', label: tx('Licensing & APC'), icon: ShieldCheck },
+        { id: 'quality', label: tx('CPD & Quality'), icon: Award },
+      ],
+    },
+    {
+      id: 'performance',
+      label: tx('Earnings & Profile'),
+      icon: Wallet,
+      activeSubTab: activeTab === 'performance' ? activeSubTab : undefined,
+      onSubTabChange: (subId) => navigatePractitionerGroup('performance', subId),
+      subItems: [
+        { id: 'earnings', label: tx('Earnings & Payouts'), icon: Wallet },
+        { id: 'analytics', label: tx('Practice Analytics'), icon: TrendingUp },
+        { id: 'reviews', label: tx('Patient Reviews'), icon: Star },
+        { id: 'settings', label: tx('Profile & Settings'), icon: SlidersHorizontal },
+      ],
+    },
+    {
+      id: 'articles',
+      label: tx('Medical Library'),
+      icon: BookOpen,
+      activeSubTab: activeTab === 'articles' ? activeSubTab : undefined,
+      onSubTabChange: (subId) => navigatePractitionerGroup('articles', subId),
+      subItems: [
+        { id: 'all', label: tx('All Articles'), icon: BookOpen },
+        { id: 'practitioner', label: tx('Clinical Guides'), icon: ShieldCheck },
+        { id: 'research', label: tx('Research Papers'), icon: BadgeCheck },
+        { id: 'saved', label: tx('Saved Articles'), icon: Bookmark },
+      ],
+    },
+  ];
+
+  const resolvedTabs = tabs ?? (defaultPractitionerTabs as DashboardTab<T>[]);
+  const handleDefaultTabChange = (grp: T) => {
+    if (onTabChange) {
+      onTabChange(grp);
+      return;
+    }
+    navigatePractitionerGroup(String(grp));
+  };
+
   return (
     <>
       {toastMessage && (
-        <div role="status" aria-live="polite" className="fixed bottom-6 right-6 bg-[color:var(--dark)] text-white text-xs font-semibold px-4 py-3 rounded-none shadow-lg border border-slate-800 flex items-center gap-2 z-50 transition-all duration-200">
+        <div role="status" aria-live="polite" className="fixed bottom-6 right-6 bg-[color:var(--dark)] text-white text-xs font-semibold px-4 py-3 rounded-none shadow-lg border border-slate-800 flex items-center gap-2 z-50 transition-colors duration-200">
           <CheckCircle2 className="h-4 w-4 text-emerald-400 animate-pulse" />
           <span>{toastMessage}</span>
         </div>
       )}
 
       <DashboardHeader
-        tabs={tabs}
+        tabs={resolvedTabs}
         activeTab={activeTab}
-        onTabChange={onTabChange}
+        onTabChange={handleDefaultTabChange}
         tabsLabel={tabsLabel || `${groupName} sections`}
         tabsRight={helpRightNode}
       >
@@ -297,7 +410,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
               <button
                 type="button"
                 onClick={() => setShowPublicProfilePreview(false)}
-                className="w-full py-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black rounded-none transition-all shadow-md cursor-pointer"
+                className="w-full py-3 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black rounded-none transition-colors shadow-md cursor-pointer"
               >
                 {tx('Close Public Profile Preview')}
               </button>

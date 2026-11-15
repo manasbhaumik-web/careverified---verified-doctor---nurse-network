@@ -1,3 +1,4 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useCallback, useEffect, useState } from 'react';
 import { formatDateTime, formatDate, useTr } from '../locale';
 
@@ -75,10 +76,10 @@ export default function PrivacyAdmin({ onMessage }: { onMessage: (m: string) => 
           <input className={input} placeholder={tx('Name (e.g. hosting provider)')} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
           <input className={input} placeholder={tx('Purpose')} value={form.purpose} onChange={e => setForm({ ...form, purpose: e.target.value })} required />
           <input className={input} placeholder={tx('Country code (MY, SG…)')} maxLength={2} value={form.country} onChange={e => setForm({ ...form, country: e.target.value.toUpperCase() })} required />
-          <select className={input} value={form.basis} onChange={e => setForm({ ...form, basis: e.target.value })}>
+          <CustomSelect className={`form-select ${input}`} value={form.basis} onChange={e => setForm({ ...form, basis: e.target.value })}>
             <option value="">{tx('Transfer basis…')}</option>
             {proc?.bases.map((b: string) => <option key={b} value={b}>{BASIS_LABEL[b] ?? b}</option>)}
-          </select>
+          </CustomSelect>
           <label className="text-xs col-span-2 flex items-center gap-2">{tx('TIA date (if applicable)')} <input type="date" className={input} value={form.tiaDate} onChange={e => setForm({ ...form, tiaDate: e.target.value })} /></label>
           <button className="col-span-2 bg-[color:var(--t-600)] text-white text-xs font-bold py-2 cursor-pointer">{tx('Add to register')}</button>
         </form>
@@ -103,9 +104,9 @@ export default function PrivacyAdmin({ onMessage }: { onMessage: (m: string) => 
           <textarea className={`${input} col-span-2`} rows={2} placeholder={tx('What happened, and when did we learn of it?')} value={breach.summary} onChange={e => setBreach({ ...breach, summary: e.target.value })} required minLength={10} />
           <input className={input} placeholder={tx('Data involved (e.g. IC numbers, health records)')} value={breach.dataTypes} onChange={e => setBreach({ ...breach, dataTypes: e.target.value })} />
           <input className={input} placeholder={tx('People affected (number)')} type="number" min={0} value={breach.affectedCount} onChange={e => setBreach({ ...breach, affectedCount: e.target.value })} />
-          <select className={input} value={breach.severity} onChange={e => setBreach({ ...breach, severity: e.target.value })}>
+          <CustomSelect className={`form-select ${input}`} value={breach.severity} onChange={e => setBreach({ ...breach, severity: e.target.value })}>
             {['unknown', 'low', 'medium', 'high'].map(s => <option key={s} value={s}>Severity: {s}</option>)}
-          </select>
+          </CustomSelect>
           <button className="bg-rose-700 text-white text-xs font-bold py-2 cursor-pointer">{tx('Log incident (starts the clock)')}</button>
         </form>
         <ul className="space-y-1.5">

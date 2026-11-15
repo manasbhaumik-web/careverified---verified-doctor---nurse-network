@@ -1,3 +1,4 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   PackagePlus, Search, Tag, Building2, Check, Clock, ShieldCheck,
@@ -6,7 +7,7 @@ import {
   BadgeCheck, HeartPulse, CreditCard, Lock, Receipt, Download, Printer
 } from 'lucide-react';
 import { useTr } from '../locale';
-import DashboardHeader, { bannerPrimaryBtn } from './DashboardHeader';
+import DashboardHeader, { bannerPrimaryBtn, FilterSelect } from '../shared/ui/DashboardHeader';
 
 export interface MedicalPackage {
   id: string;
@@ -338,7 +339,7 @@ export default function MedicalPackagesModule({
         />
       )}
 
-      <div className={embedded ? "space-y-6 pt-2" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
+      <div className={embedded ? "space-y-6" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
 
         {/* ------------------------------------------------------------------- */}
         {/* ACTIVE PROMOTIONS MARQUEE STRIP (Shown on packages tab) */}
@@ -411,7 +412,7 @@ export default function MedicalPackagesModule({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={tx('Search packages by procedure, health test, hospital, or city...')}
-                    className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] text-xs text-[color:var(--ink)] font-medium focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white rounded-none transition-colors"
+                    className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] text-xs text-[color:var(--ink)] font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] focus:bg-white rounded-none transition-colors"
                   />
                   {searchQuery && (
                     <button
@@ -426,27 +427,19 @@ export default function MedicalPackagesModule({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2.5 flex-auto max-w-full">
-                  {/* 2. Category Dropdown List (h-11) */}
-                  <label className="flex items-center h-11 border border-[color:var(--t-200)] bg-white px-3 gap-2 flex-auto max-w-full min-w-0 focus-within:border-[color:var(--t-600)]">
-                    <span className="text-2xs font-mono font-black uppercase tracking-wider text-slate-500 shrink-0">
-                      {tx('Category:')}
-                    </span>
-                    <select
-                      aria-label={tx('Category')}
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="flex-1 min-w-0 max-w-full h-full bg-transparent text-xs font-bold text-[color:var(--ink)] pr-2 cursor-pointer focus:outline-none"
-                    >
-                      {CATEGORIES.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat === 'All' ? tx('All Specialties') : tx(cat)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                  {/* 2. Category Dropdown List */}
+                  <FilterSelect
+                    label={tx('Category')}
+                    value={selectedCategory}
+                    onChange={(v) => setSelectedCategory(v)}
+                    options={CATEGORIES.map((cat) => ({
+                      value: cat,
+                      label: cat === 'All' ? tx('All Specialties') : tx(cat),
+                    }))}
+                  />
 
-                  {/* 3. Target Audience Segmented Toggle (Exact h-11 outer height to match Search & Dropdowns) */}
-                  <div className="flex items-center h-11 border border-[color:var(--t-200)] bg-[color:var(--t-50)]/40 p-1 gap-1 flex-auto max-w-full overflow-x-auto">
+                  {/* 3. Target Audience Segmented Toggle */}
+                  <div className="flex items-center h-10 border border-[color:var(--t-200)] bg-[color:var(--t-50)]/40 p-1 gap-1 flex-auto max-w-full overflow-x-auto">
                     <span className="text-2xs font-mono font-black uppercase tracking-wider text-slate-500 px-2 flex items-center gap-1 shrink-0">
                       <Filter className="h-3 w-3 text-[color:var(--t-600)]" />
                       {tx('Audience:')}
@@ -460,7 +453,7 @@ export default function MedicalPackagesModule({
                         key={aud.id}
                         type="button"
                         onClick={() => setSelectedAudience(aud.id as any)}
-                        className={`flex-1 h-full text-xs font-bold px-3 transition-all cursor-pointer rounded-none flex items-center justify-center whitespace-nowrap ${
+                        className={`flex-1 h-full text-xs font-bold px-3 transition-colors cursor-pointer rounded-none flex items-center justify-center whitespace-nowrap ${
                           selectedAudience === aud.id
                             ? 'bg-[color:var(--t-600)] text-white shadow-2xs'
                             : 'text-slate-600 hover:text-[color:var(--ink)] hover:bg-white'
@@ -471,23 +464,18 @@ export default function MedicalPackagesModule({
                     ))}
                   </div>
 
-                  {/* 4. Sort By Dropdown (h-11) */}
-                  <label className="flex items-center h-11 border border-[color:var(--t-200)] bg-white px-3 gap-2 flex-auto max-w-full min-w-0 focus-within:border-[color:var(--t-600)]">
-                    <span className="text-2xs font-mono font-black uppercase tracking-wider text-slate-500 shrink-0">
-                      {tx('Sort by:')}
-                    </span>
-                    <select
-                      aria-label={tx('Sort by')}
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value as PackageSort)}
-                      className="flex-1 min-w-0 max-w-full h-full bg-transparent text-xs font-bold text-[color:var(--ink)] pr-2 cursor-pointer focus:outline-none"
-                    >
-                      <option value="featured">{tx('Recommended')}</option>
-                      <option value="price-asc">{tx('Price: Low to High')}</option>
-                      <option value="price-desc">{tx('Price: High to Low')}</option>
-                      <option value="saving">{tx('Biggest Saving')}</option>
-                    </select>
-                  </label>
+                  {/* 4. Sort By Dropdown */}
+                  <FilterSelect
+                    label={tx('Sort by')}
+                    value={sortBy}
+                    onChange={(v) => setSortBy(v as PackageSort)}
+                    options={[
+                      { value: 'featured', label: tx('Recommended') },
+                      { value: 'price-asc', label: tx('Price: Low to High') },
+                      { value: 'price-desc', label: tx('Price: High to Low') },
+                      { value: 'saving', label: tx('Biggest Saving') },
+                    ]}
+                  />
                 </div>
               </div>
 
@@ -975,7 +963,7 @@ export default function MedicalPackagesModule({
                       value={promoCodeInput}
                       onChange={(e) => setPromoCodeInput(e.target.value)}
                       placeholder={tx('e.g. CAREMERDEKA')}
-                      className="px-3 py-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-800 uppercase flex-1 focus:outline-none focus:border-[color:var(--t-600)]"
+                      className="px-3 py-2 bg-white border border-slate-300 text-xs font-mono font-bold text-slate-800 uppercase flex-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]"
                     />
                     <button
                       type="button"
@@ -1157,24 +1145,24 @@ export default function MedicalPackagesModule({
 
                   <div className="space-y-1">
                     <label htmlFor="pkg-name" className="text-xs font-bold text-slate-800 block">{tx('Full name (as in passport or NRIC) *')}</label>
-                    <input id="pkg-name" type="text" required value={bookName} onChange={(e) => setBookName(e.target.value)} placeholder={tx('e.g. Siti Sarah binti Ahmad')} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
+                    <input id="pkg-name" type="text" required value={bookName} onChange={(e) => setBookName(e.target.value)} placeholder={tx('e.g. Siti Sarah binti Ahmad')} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]" />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <label htmlFor="pkg-phone" className="text-xs font-bold text-slate-800 block">{tx('Mobile phone (WhatsApp) *')}</label>
-                      <input id="pkg-phone" type="tel" required value={bookPhone} onChange={(e) => setBookPhone(e.target.value)} placeholder="+60 12-345 6789" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
+                      <input id="pkg-phone" type="tel" required value={bookPhone} onChange={(e) => setBookPhone(e.target.value)} placeholder="+60 12-345 6789" className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]" />
                     </div>
                     <div className="space-y-1">
                       <label htmlFor="pkg-email" className="text-xs font-bold text-slate-800 block">{tx('Email *')}</label>
-                      <input id="pkg-email" type="email" required value={bookEmail} onChange={(e) => setBookEmail(e.target.value)} placeholder={tx('you@example.com')} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
+                      <input id="pkg-email" type="email" required value={bookEmail} onChange={(e) => setBookEmail(e.target.value)} placeholder={tx('you@example.com')} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <label htmlFor="pkg-country" className="text-xs font-bold text-slate-800 block">{tx('Country of residence')}</label>
-                      <select id="pkg-country" value={bookCountry} onChange={(e) => setBookCountry(e.target.value)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]">
+                      <CustomSelect id="pkg-country" value={bookCountry} onChange={(e) => setBookCountry(e.target.value)} className="form-select w-full px-3 h-11 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]">
                         <option value="Malaysia">{tx('Malaysia')}</option>
                         <option value="Indonesia">{tx('Indonesia')}</option>
                         <option value="Singapore">{tx('Singapore')}</option>
@@ -1182,17 +1170,17 @@ export default function MedicalPackagesModule({
                         <option value="Australia">{tx('Australia')}</option>
                         <option value="United Kingdom">{tx('United Kingdom')}</option>
                         <option value="Other">{tx('Other')}</option>
-                      </select>
+                      </CustomSelect>
                     </div>
                     <div className="space-y-1">
                       <label htmlFor="pkg-date" className="text-xs font-bold text-slate-800 block">{tx('Preferred date')}</label>
-                      <input id="pkg-date" type="date" value={bookDate} onChange={(e) => setBookDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
+                      <input id="pkg-date" type="date" value={bookDate} onChange={(e) => setBookDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} className="w-full px-3 min-h-[44px] border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]" />
                     </div>
                   </div>
 
                   <div className="space-y-1">
                     <label htmlFor="pkg-notes" className="text-xs font-bold text-slate-800 block">{tx('Anything the hospital should know (optional)')}</label>
-                    <textarea id="pkg-notes" rows={2} value={bookNotes} onChange={(e) => setBookNotes(e.target.value)} placeholder={tx('Health conditions, mobility needs, dietary needs…')} className="w-full px-3 py-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus:border-[color:var(--t-600)]" />
+                    <textarea id="pkg-notes" rows={2} value={bookNotes} onChange={(e) => setBookNotes(e.target.value)} placeholder={tx('Health conditions, mobility needs, dietary needs…')} className="w-full px-3 py-2 border border-slate-300 text-xs bg-white rounded-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]" />
                   </div>
 
                   <p className="p-3 bg-slate-50 border border-slate-200 text-xs text-slate-700">

@@ -15,8 +15,8 @@ import {
   FileText,
 } from 'lucide-react';
 import { useTr } from '../../locale';
-import WorkspaceHeader from '../WorkspaceHeader';
-import { BannerBadge } from '../DashboardHeader';
+import WorkspaceHeader from '../../shared/ui/WorkspaceHeader';
+import { BannerBadge } from '../../shared/ui/DashboardHeader';
 import { FacilityProfile } from './types';
 
 export interface FacilityProfileTabProps {
@@ -96,11 +96,11 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                     </div>
                     <div>
                       <span className="text-xs text-slate-400 uppercase font-bold block">{tx('Statutory Licence No.')}</span>
-                      <strong className="font-mono text-slate-900">{facility?.licenceNo || 'KKM/JKA/586-90412'}</strong>
+                      <strong className="font-mono text-slate-900">{facility?.licenceNo || tx('Pending Verification')}</strong>
                     </div>
                     <div>
                       <span className="text-xs text-slate-400 uppercase font-bold block">{tx('Licence Expiry')}</span>
-                      <strong className="text-slate-900">{facility?.licenceExpiry || '2029-12-31'}</strong>
+                      <strong className="text-slate-900">{facility?.licenceExpiry || tx('Not Specified')}</strong>
                     </div>
                   </div>
 
@@ -116,15 +116,29 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                     {tx('Accreditation Credentials')}
                   </span>
                   <div className="space-y-2">
-                    <div className="p-3 bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                      <div>
-                        <strong className="text-slate-900 block">{tx('MSQH 6th Edition Hospital Accreditation')}</strong>
-                        <span className="text-slate-500 text-xs">{tx('Malaysian Society for Quality in Health')}</span>
+                    {facility?.accreditations && facility.accreditations.length > 0 ? (
+                      facility.accreditations.map((acc, idx) => (
+                        <div key={idx} className="p-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] flex items-center justify-between text-xs">
+                          <div>
+                            <strong className="text-slate-900 block">{acc.body}</strong>
+                            <span className="text-slate-500 text-xs">
+                              {acc.level ? `${acc.level} · ` : ''}{tx('Verified Institutional Credential')}
+                            </span>
+                          </div>
+                          <span className={`px-2 py-0.5 text-2xs font-black uppercase border ${
+                            acc.status === 'Expired'
+                              ? 'bg-rose-100 text-rose-800 border-rose-300'
+                              : 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                          }`}>
+                            {acc.status || tx('Valid')}
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-3 bg-[color:var(--t-bg)] border border-dashed border-[color:var(--t-200)] text-xs text-slate-500">
+                        {tx('No hospital accreditation records uploaded yet.')}
                       </div>
-                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-2xs font-black uppercase border border-emerald-300">
-                        Valid
-                      </span>
-                    </div>
+                    )}
                     {facility?.mhtcMember && (
                       <div className="p-3 bg-blue-50/50 border border-blue-200 flex items-center justify-between text-xs">
                         <div>
@@ -132,7 +146,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                           <span className="text-blue-700 text-xs">{tx('Malaysia Healthcare Travel Council')}</span>
                         </div>
                         <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-2xs font-black uppercase border border-blue-300">
-                          Certified
+                          {tx('Certified')}
                         </span>
                       </div>
                     )}
@@ -176,15 +190,15 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                   <div className="space-y-2">
                     <div className="flex items-start gap-2">
                       <MapPin className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
-                      <span>{facility?.address || '1, Jalan Bukit Pantai, Bangsar, 59100 Kuala Lumpur'}</span>
+                      <span>{facility?.address || tx('Address not yet provided')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Phone className="h-4 w-4 text-slate-400 shrink-0" />
-                      <span>{facility?.phone || '+60 3-2296 0888'}</span>
+                      <span>{facility?.phone || tx('Contact number not yet provided')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4 text-slate-400 shrink-0" />
-                      <span>{facility?.email || 'hr.locum@pantai.com.my'}</span>
+                      <span>{facility?.email || tx('Contact email not yet provided')}</span>
                     </div>
                     {facility?.website && (
                       <div className="flex items-center gap-2">
@@ -263,7 +277,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                     value={newEquipmentInput}
                     onChange={e => setNewEquipmentInput(e.target.value)}
                     placeholder={tx('e.g. 3T High-Field MRI Scanner')}
-                    className="p-2 border border-slate-300 text-xs flex-1 bg-slate-50 focus:bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="p-2 border border-slate-300 text-xs flex-1 bg-slate-50 focus:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]"
                   />
                   <button
                     type="button"
@@ -314,7 +328,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                     value={newAmenityInput}
                     onChange={e => setNewAmenityInput(e.target.value)}
                     placeholder={tx('e.g. JAKIM Halal-Certified Dietary Kitchen')}
-                    className="p-2 border border-slate-300 text-xs flex-1 bg-slate-50 focus:bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="p-2 border border-slate-300 text-xs flex-1 bg-slate-50 focus:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]"
                   />
                   <button
                     type="button"
@@ -366,7 +380,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                   
                   <div
                     onClick={() => setBillingPref('escrow')}
-                    className={`p-4 border cursor-pointer transition-all ${
+                    className={`p-4 border cursor-pointer transition-colors ${
                       billingPref === 'escrow'
                         ? 'border-blue-600 bg-blue-50/50 ring-1 ring-blue-600'
                         : 'border-slate-200 hover:border-slate-300 bg-white'
@@ -401,7 +415,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                         });
                       }
                     }}
-                    className={`p-4 border cursor-pointer transition-all ${
+                    className={`p-4 border cursor-pointer transition-colors ${
                       billingPref === 'invoice'
                         ? 'border-purple-600 bg-purple-50/50 ring-1 ring-purple-600'
                         : 'border-slate-200 hover:border-slate-300 bg-white'
@@ -448,7 +462,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                       value={billingEmail}
                       onChange={e => setBillingEmail(e.target.value)}
                       placeholder={tx('finance.locum@hospital.com.my')}
-                      className="w-full p-2 border border-slate-300 text-xs focus:outline-none focus:border-[color:var(--t-600)]"
+                      className="w-full p-2 border border-slate-300 text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]"
                     />
                   </div>
 
@@ -459,7 +473,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                       value={sstNo}
                       onChange={e => setSstNo(e.target.value)}
                       placeholder="W10-2401-32000042"
-                      className="w-full p-2 border border-slate-300 text-xs focus:outline-none focus:border-[color:var(--t-600)]"
+                      className="w-full p-2 border border-slate-300 text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]"
                     />
                   </div>
 

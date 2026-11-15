@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediCred — Clinical Color System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --t-50: #ECFEFF; --t-100: #CFFAFE; --t-200: #A5F3FC; --t-300: #67E8F9; --t-400: #22D3EE;
+      --t-500: #06B6D4; --t-600: #0891B2; --t-700: #0E7490; --t-800: #155E75; --t-900: #164E63;
+      --t-bg: color-mix(in srgb, var(--t-50) 35%, #EEF3F7);
+    }
+    body {
+      font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+      background-color: var(--t-bg);
+      color: #1E293B;
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased">
+  <!-- Main Header -->
+  <header class="bg-[color:var(--t-600)] text-white px-6 py-3.5 shadow-[0_2px_6px_-1px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.06)] sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-white text-[color:var(--t-600)] flex items-center justify-center font-bold text-xl">+</div>
+        <div>
+          <div class="font-bold text-base leading-tight">MediCred.</div>
+          <div class="text-[11px] uppercase tracking-wider text-white/80 font-bold">Clinical Design System · Color Tokens</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-white/80 mr-1">Preview Theme:</span>
+        <button onclick="setTheme('cyan')" id="btn-cyan" class="px-3 py-1.5 text-xs font-bold bg-white text-[#0891B2] border border-white cursor-pointer">Clinical Cyan</button>
+        <button onclick="setTheme('green')" id="btn-green" class="px-3 py-1.5 text-xs font-bold bg-white/15 text-white border border-white/30 hover:bg-white/25 cursor-pointer">Clinical Light Green</button>
+        <button onclick="setTheme('sky')" id="btn-sky" class="px-3 py-1.5 text-xs font-bold bg-white/15 text-white border border-white/30 hover:bg-white/25 cursor-pointer">Clinical Sky</button>
+        <button onclick="setTheme('rose')" id="btn-rose" class="px-3 py-1.5 text-xs font-bold bg-white/15 text-white border border-white/30 hover:bg-white/25 cursor-pointer">Clinical Crimson</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Header Banner with matching bottom shadow -->
+  <div class="bg-white border-b border-[color:var(--t-200)] shadow-[0_2px_6px_-1px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.06)] relative z-20">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <div class="text-xs font-bold uppercase tracking-wider text-[color:var(--t-700)]">Layer 1 & 2 Tokens · src/index.css</div>
+        <h1 class="text-2xl font-bold text-[#1E293B] mt-0.5">Clinical Color Palette & Semantic Surfaces</h1>
+        <p class="text-xs text-[#64748B] mt-1">Click any swatch to copy its hex value. All tokens follow strict 0px sharp clinical geometry.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="px-3 py-1.5 text-xs font-bold bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0]">WCAG AA Verified</span>
+        <span class="px-3 py-1.5 text-xs font-bold bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]" id="active-theme-label">Active: Clinical Cyan (188deg)</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-6xl mx-auto px-6 py-8 space-y-8">
+    <!-- 1. Primary Clinical Scale -->
+    <section class="bg-white border border-[color:var(--t-200)] p-6">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-[color:var(--t-100)]">
+        <div>
+          <h2 class="text-base font-bold text-[#1E293B]">1. Primary Clinical Theme Scale (<code class="text-xs text-[color:var(--t-700)]">--t-50</code> → <code class="text-xs text-[color:var(--t-700)]">--t-900</code>)</h2>
+          <p class="text-xs text-[#64748B] mt-0.5">Drives headers, primary CTAs, hairline borders, active queue highlights, and canvas tint.</p>
+        </div>
+      </div>
+      <div id="primary-grid" class="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-3"></div>
+    </section>
+
+    <!-- 2. Emerald Verification & Slate Ink -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <section class="bg-white border border-[color:var(--t-200)] p-6">
+        <h2 class="text-base font-bold text-[#1E293B] mb-1">2. Verification & Clinical Success (Emerald)</h2>
+        <p class="text-xs text-[#64748B] mb-4 pb-3 border-b border-[color:var(--t-100)]">Used for MMC/LJM verified badges, APC active status, and issued e-prescriptions.</p>
+        <div id="emerald-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+      </section>
+
+      <section class="bg-white border border-[color:var(--t-200)] p-6">
+        <h2 class="text-base font-bold text-[#1E293B] mb-1">3. Slate Ink & Neutral Surfaces</h2>
+        <p class="text-xs text-[#64748B] mb-4 pb-3 border-b border-[color:var(--t-100)]">High-contrast clinical typography and neutral card dividers.</p>
+        <div id="slate-grid" class="grid grid-cols-2 sm:grid-cols-5 gap-3"></div>
+      </section>
+    </div>
+
+    <!-- 3. Live Component Preview -->
+    <section class="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] p-6">
+      <h2 class="text-base font-bold text-[#1E293B] mb-4">4. Live Component Token Pairing Preview</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-4">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-[color:var(--t-700)]">Active Queue Selection</div>
+          <div class="text-sm font-bold text-[#1E293B] mt-1">Dr. Arjun Menon</div>
+          <p class="text-xs text-[#334155] mt-1">Uses <code class="font-bold">--t-50</code> fill + <code class="font-bold">--t-200</code> border + <code class="font-bold">--t-600</code> left accent.</p>
+          <button class="mt-3 px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer">Primary Action (--t-600)</button>
+        </div>
+
+        <div class="bg-[#ECFDF5] border border-[#A7F3D0] p-4">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-[#059669] flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#10B981]"></span> Verified Clinical State
+          </div>
+          <div class="text-sm font-bold text-[#1E293B] mt-1">APC & MMC Verified</div>
+          <p class="text-xs text-[#334155] mt-1">Uses <code class="font-bold">#ECFDF5</code> mint surface + <code class="font-bold">#A7F3D0</code> border + <code class="font-bold">#059669</code> ink.</p>
+          <button class="mt-3 px-3.5 py-2 bg-[#059669] text-white text-xs font-bold cursor-pointer">Confirm & Sign</button>
+        </div>
+
+        <div class="bg-white border border-[#E2E8F0] p-4">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-[#64748B]">Neutral Secondary Surface</div>
+          <div class="text-sm font-bold text-[#1E293B] mt-1">Consultation Metadata</div>
+          <p class="text-xs text-[#334155] mt-1">Uses <code class="font-bold">#FFFFFF</code> surface + <code class="font-bold">#E2E8F0</code> divider + <code class="font-bold">#1E293B</code> ink.</p>
+          <button class="mt-3 px-3.5 py-2 bg-white border border-[color:var(--t-200)] text-[#1E293B] text-xs font-bold cursor-pointer">Secondary Action</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="fixed bottom-5 right-5 bg-[#1E293B] text-white text-xs font-bold px-4 py-2.5 hidden shadow-md">Copied</div>
+
+  <script>
+    const THEMES = {
+      cyan: {
+        label: 'Active: Clinical Cyan (188deg)',
+        tokens: {
+          '50': '#ECFEFF', '100': '#CFFAFE', '200': '#A5F3FC', '300': '#67E8F9', '400': '#22D3EE',
+          '500': '#06B6D4', '600': '#0891B2', '700': '#0E7490', '800': '#155E75', '900': '#164E63'
+        }
+      },
+      green: {
+        label: 'Active: Clinical Light Green (158deg)',
+        tokens: {
+          '50': '#ECFDF5', '100': '#D1FAE5', '200': '#A7F3D0', '300': '#6EE7B7', '400': '#34D399',
+          '500': '#10B981', '600': '#059669', '700': '#047857', '800': '#065F46', '900': '#064E3B'
+        }
+      },
+      sky: {
+        label: 'Active: Clinical Sky (205deg)',
+        tokens: {
+          '50': '#F0F9FF', '100': '#E0F2FE', '200': '#BAE6FD', '300': '#7DD3FC', '400': '#38BDF8',
+          '500': '#0EA5E9', '600': '#0270A9', '700': '#0369A1', '800': '#075985', '900': '#0C4A6E'
+        }
+      },
+      rose: {
+        label: 'Active: Clinical Crimson (0deg)',
+        tokens: {
+          '50': '#FFF0F2', '100': '#FFE4E6', '200': '#FECDD3', '300': '#FDA4AF', '400': '#FF8A98',
+          '500': '#E0243F', '600': '#C81E1E', '700': '#B91C1C', '800': '#86102A', '900': '#6B0F24'
+        }
+      }
+    };
+
+    const EMERALD = [
+      { name: 'Mint BG', hex: '#ECFDF5', token: '--color-emerald-mint' },
+      { name: 'Border', hex: '#A7F3D0', token: '--color-emerald-border' },
+      { name: 'Bright Dot', hex: '#10B981', token: '--color-emerald-bright' },
+      { name: 'Primary', hex: '#059669', token: '--color-emerald-primary' }
+    ];
+
+    const SLATES = [
+      { name: 'Surface', hex: '#F8FAFC', token: 'slate-50' },
+      { name: 'Border', hex: '#E2E8F0', token: 'slate-200' },
+      { name: 'Muted', hex: '#64748B', token: 'slate-500' },
+      { name: 'Body', hex: '#334155', token: '--color-ink-body' },
+      { name: 'Ink', hex: '#1E293B', token: '--color-ink' }
+    ];
+
+    function copyHex(hex) {
+      navigator.clipboard?.writeText(hex);
+      const t = document.getElementById('toast');
+      t.textContent = `Copied ${hex}`;
+      t.classList.remove('hidden');
+      clearTimeout(window._t);
+      window._t = setTimeout(() => t.classList.add('hidden'), 1500);
+    }
+
+    function swatchCard(label, hex, sub) {
+      return `
+        <button onclick="copyHex('${hex}')" class="text-left border border-slate-200 hover:border-[color:var(--t-600)] transition-colors cursor-pointer bg-white">
+          <div class="h-14 w-full border-b border-slate-200" style="background:${hex}"></div>
+          <div class="p-2">
+            <div class="text-xs font-bold text-[#1E293B]">${label}</div>
+            <div class="text-[11px] font-mono text-[#64748B]">${hex}</div>
+            ${sub ? `<div class="text-[10px] text-[#94A3B8] truncate">${sub}</div>` : ''}
+          </div>
+        </button>
+      `;
+    }
+
+    function setTheme(key) {
+      const theme = THEMES[key];
+      const root = document.documentElement;
+      Object.entries(theme.tokens).forEach(([step, hex]) => {
+        root.style.setProperty(`--t-${step}`, hex);
+      });
+      document.getElementById('active-theme-label').textContent = theme.label;
+      document.getElementById('primary-grid').innerHTML = Object.entries(theme.tokens)
+        .map(([step, hex]) => swatchCard(`--t-${step}`, hex, step === '600' ? 'Primary' : ''))
+        .join('');
+
+      ['cyan', 'green', 'sky', 'rose'].forEach(k => {
+        const b = document.getElementById(`btn-${k}`);
+        if (k === key) {
+          b.className = 'px-3 py-1.5 text-xs font-bold bg-white text-[color:var(--t-600)] border border-white cursor-pointer';
+        } else {
+          b.className = 'px-3 py-1.5 text-xs font-bold bg-white/15 text-white border border-white/30 hover:bg-white/25 cursor-pointer';
+        }
+      });
+    }
+
+    document.getElementById('emerald-grid').innerHTML = EMERALD.map(c => swatchCard(c.name, c.hex, c.token)).join('');
+    document.getElementById('slate-grid').innerHTML = SLATES.map(c => swatchCard(c.name, c.hex, c.token)).join('');
+    setTheme('cyan');
+  </script>
+</body>
+</html>

@@ -1,3 +1,4 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import { expiryLabel } from '../registries';
 import ClinicalWorkspace from './ClinicalWorkspace';
 import React, { useState, useEffect } from 'react';
@@ -5,7 +6,7 @@ import {
   Award, FileText, Loader, 
   CheckCircle2, AlertCircle, Edit, Shield, ShieldCheck, MessageSquare, 
   X, Send, Check, Calendar, TrendingUp, Eye, LayoutGrid, Wallet, Radio,
-  Star, SlidersHorizontal, Globe, ArrowRight
+  Star, SlidersHorizontal, Globe, ArrowRight, Stethoscope, BookOpen
 } from 'lucide-react';
 import { useTr, useLocale, dateLocaleOf } from '../locale';
 import { UserRole, DoctorProfile, NurseProfile, Review, VerificationStatus, Booking, OnCallDispatch } from '../types';
@@ -18,13 +19,13 @@ import PractitionerSettingsTab from './practitioner/PractitionerSettingsTab';
 import PractitionerEarnings from './PractitionerEarnings';
 import PractitionerOnCall from './PractitionerOnCall';
 import PractitionerQuality from './PractitionerQuality';
-import SecureMessenger from './SecureMessenger';
+import SecureMessenger from '../domains/telemedicine/SecureMessenger';
 import TourismDesk from './TourismDesk';
 import PractitionerHeroBanner from './PractitionerHeroBanner';
-import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from './DashboardHeader';
-import PageBanner from './PageBanner';
+import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, bannerOnBrandPrimaryBtn, bannerOnBrandSecondaryBtn } from '../shared/ui/DashboardHeader';
+import PageBanner from '../shared/ui/PageBanner';
 import { UserAvatar } from '../avatars';
-import WorkspaceHeader from './WorkspaceHeader';
+import WorkspaceHeader from '../shared/ui/WorkspaceHeader';
 
 export type PractitionerDashboardTab = 'home' | 'bookings' | 'oncall' | 'messages' | 'global' | 'earnings' | 'quality' | 'accreditation' | 'reviews' | 'analytics' | 'settings';
 export type PractitionerTabGroup = 'clinical' | 'practice' | 'performance';
@@ -35,32 +36,32 @@ export const PRACTITIONER_GROUPS: Record<PractitionerTabGroup, {
   tabs: { id: PractitionerDashboardTab; label: string; icon: any }[];
 }> = {
   clinical: {
-    name: 'Clinical Care',
+    name: 'Patient Care',
     defaultTab: 'home',
     tabs: [
       { id: 'home', label: 'Overview', icon: LayoutGrid },
-      { id: 'bookings', label: 'Bookings', icon: Calendar },
-      { id: 'oncall', label: 'On Call', icon: Radio },
-      { id: 'messages', label: 'Mailbox', icon: MessageSquare },
+      { id: 'bookings', label: 'Appointments', icon: Calendar },
+      { id: 'oncall', label: 'On-Call Dispatch', icon: Radio },
+      { id: 'messages', label: 'Messages', icon: MessageSquare },
       { id: 'global', label: 'Global Patients', icon: Globe },
     ],
   },
   practice: {
-    name: 'Practice & Compliance',
-    defaultTab: 'earnings',
+    name: 'Licensing & CPD',
+    defaultTab: 'accreditation',
     tabs: [
-      { id: 'earnings', label: 'Earnings', icon: Wallet },
-      { id: 'quality', label: 'Quality & CPD', icon: Award },
-      { id: 'accreditation', label: 'Accreditation', icon: ShieldCheck },
+      { id: 'accreditation', label: 'Licensing & APC', icon: ShieldCheck },
+      { id: 'quality', label: 'CPD & Quality', icon: Award },
     ],
   },
   performance: {
-    name: 'Performance & Profile',
-    defaultTab: 'reviews',
+    name: 'Earnings & Profile',
+    defaultTab: 'earnings',
     tabs: [
-      { id: 'reviews', label: 'Feedback', icon: Star },
-      { id: 'analytics', label: 'Analytics', icon: TrendingUp },
-      { id: 'settings', label: 'Settings', icon: SlidersHorizontal },
+      { id: 'earnings', label: 'Earnings & Payouts', icon: Wallet },
+      { id: 'analytics', label: 'Practice Analytics', icon: TrendingUp },
+      { id: 'reviews', label: 'Patient Reviews', icon: Star },
+      { id: 'settings', label: 'Profile & Settings', icon: SlidersHorizontal },
     ],
   },
 };
@@ -96,17 +97,32 @@ export default function VerificationTerminal({
   // Track currently active group and ensure the active tab belongs to the active group
   const currentGroup: PractitionerTabGroup = activeGroup || (
     initialTab ? (
-      (['earnings', 'quality', 'accreditation'].includes(initialTab)) ? 'practice' :
-      (['reviews', 'analytics', 'settings'].includes(initialTab)) ? 'performance' : 'clinical'
+      (['quality', 'accreditation'].includes(initialTab)) ? 'practice' :
+      (['earnings', 'reviews', 'analytics', 'settings'].includes(initialTab)) ? 'performance' : 'clinical'
     ) : 'clinical'
   );
 
   // Dashboard state variables (for registered practitioner)
-  const [activeDashboardTab, setActiveDashboardTab] = useState<PractitionerDashboardTab>(
-    initialTab || PRACTITIONER_GROUPS[currentGroup].defaultTab
-  );
+  const [activeDashboardTab, setActiveDashboardTab] = useState<PractitionerDashboardTab>(() => {
+    try {
+      const pending = sessionStorage.getItem('medcred_practitioner_subtab') as PractitionerDashboardTab | null;
+      if (pending) {
+        sessionStorage.removeItem('medcred_practitioner_subtab');
+        return pending;
+      }
+    } catch { /* ignore */ }
+    return initialTab || PRACTITIONER_GROUPS[currentGroup].defaultTab;
+  });
 
   useEffect(() => {
+    try {
+      const pending = sessionStorage.getItem('medcred_practitioner_subtab') as PractitionerDashboardTab | null;
+      if (pending) {
+        sessionStorage.removeItem('medcred_practitioner_subtab');
+        setActiveDashboardTab(pending);
+        return;
+      }
+    } catch { /* ignore */ }
     if (activeGroup) {
       const allowed = PRACTITIONER_GROUPS[activeGroup].tabs.map(t => t.id);
       if (!allowed.includes(activeDashboardTab)) {
@@ -123,7 +139,7 @@ export default function VerificationTerminal({
   const [editCity, setEditCity] = useState('');
 
   // Profile Hub Custom States
-  const [certifications, setCertifications] = useState<string[]>(['Neonatal Care', 'Immunization']);
+  const [certifications, setCertifications] = useState<string[]>([]);
   const [newCert, setNewCert] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showPublicProfilePreview, setShowPublicProfilePreview] = useState(false);
@@ -209,6 +225,7 @@ export default function VerificationTerminal({
       setEditCity(matchedProfile.city);
       setEditDays(matchedProfile.availability?.days || []);
       setEditSlots(matchedProfile.availability?.slots || []);
+      setCertifications((matchedProfile as any).certifications || matchedProfile.education || []);
     }
   }, [matchedProfile?.id]);
 
@@ -303,6 +320,7 @@ export default function VerificationTerminal({
           fee: Number(editFee),
           practiceAddress: editAddress,
           city: editCity,
+          certifications,
           availability: {
             days: editDays,
             slots: editSlots
@@ -436,7 +454,7 @@ export default function VerificationTerminal({
       <div className="w-full space-y-0" id="practitioner-dashboard-root">
         {/* Absolute Toast Alert */}
         {toastMessage && (
-          <div role="status" aria-live="polite" className="fixed bottom-6 right-6 bg-[color:var(--dark)] text-white text-xs font-semibold px-4 py-3 rounded-none shadow-lg border border-slate-850 flex items-center gap-2 z-50 transition-all duration-200">
+          <div role="status" aria-live="polite" className="fixed bottom-6 right-6 bg-[color:var(--dark)] text-white text-xs font-semibold px-4 py-3 rounded-none shadow-lg border border-slate-850 flex items-center gap-2 z-50 transition-colors duration-200">
             <CheckCircle2 className="h-4 w-4 text-emerald-400 animate-pulse" />
             <span>{toastMessage}</span>
           </div>
@@ -448,9 +466,23 @@ export default function VerificationTerminal({
           reviews={reviews}
           bookings={bookings}
           groupName={tx(PRACTITIONER_GROUPS[currentGroup].name)}
-          tabs={currentGroupTabs}
-          activeTab={activeDashboardTab}
-          onTabChange={setActiveDashboardTab}
+          activeTab={currentGroup}
+          activeSubTab={activeDashboardTab}
+          onSubTabChange={(subId) => setActiveDashboardTab(subId as PractitionerDashboardTab)}
+          onTabChange={(grp) => {
+            if ((grp as string) === 'recruitment' || (grp as string) === 'articles') {
+              window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: grp }));
+              return;
+            }
+            const viewMap: Record<PractitionerTabGroup, string> = {
+              clinical: 'onboard',
+              practice: 'practice_compliance',
+              performance: 'performance_profile',
+            };
+            const g = grp as PractitionerTabGroup;
+            window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: viewMap[g] }));
+            setActiveDashboardTab(PRACTITIONER_GROUPS[g].defaultTab);
+          }}
           tabsLabel={tx('{name} sections', { name: tx(PRACTITIONER_GROUPS[currentGroup].name) })}
           onOpenHelp={onOpenHelp}
         />
@@ -856,7 +888,7 @@ export default function VerificationTerminal({
         <div className="flex items-center justify-between relative">
           {/* Step 1 */}
           <div className="flex items-center gap-2 z-10">
-            <div className={`w-7 h-7 rounded-none flex items-center justify-center transition-all ${
+            <div className={`w-7 h-7 rounded-none flex items-center justify-center transition-colors ${
               step > 1 
                 ? 'bg-[color:var(--t-600)] border border-[color:var(--t-600)] text-white shadow-3xs' 
                 : step === 1 
@@ -868,11 +900,11 @@ export default function VerificationTerminal({
             <span className={`text-xs font-black uppercase hidden sm:inline ${step === 1 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>{tx('Professional Info')}</span>
           </div>
 
-          <div className={`flex-1 h-0.5 mx-3 transition-all ${step > 1 ? 'bg-[color:var(--t-600)]' : 'bg-slate-200'}`}></div>
+          <div className={`flex-1 h-0.5 mx-3 transition-colors ${step > 1 ? 'bg-[color:var(--t-600)]' : 'bg-slate-200'}`}></div>
 
           {/* Step 2 */}
           <div className="flex items-center gap-2 z-10">
-            <div className={`w-7 h-7 rounded-none flex items-center justify-center transition-all ${
+            <div className={`w-7 h-7 rounded-none flex items-center justify-center transition-colors ${
               step > 2 
                 ? 'bg-[color:var(--t-600)] border border-[color:var(--t-600)] text-white shadow-3xs' 
                 : step === 2 
@@ -884,11 +916,11 @@ export default function VerificationTerminal({
             <span className={`text-xs font-black uppercase hidden sm:inline ${step === 2 ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`}>{tx('Licensing Credentials')}</span>
           </div>
 
-          <div className={`flex-1 h-0.5 mx-3 transition-all ${step > 2 ? 'bg-[color:var(--t-600)]' : 'bg-slate-200'}`}></div>
+          <div className={`flex-1 h-0.5 mx-3 transition-colors ${step > 2 ? 'bg-[color:var(--t-600)]' : 'bg-slate-200'}`}></div>
 
           {/* Step 3 */}
           <div className="flex items-center gap-2 z-10">
-            <div className={`w-7 h-7 rounded-none flex items-center justify-center transition-all ${
+            <div className={`w-7 h-7 rounded-none flex items-center justify-center transition-colors ${
               step > 3
                 ? 'bg-[color:var(--t-600)] border border-[color:var(--t-600)] text-white shadow-3xs'
                 : step === 3 
@@ -913,14 +945,14 @@ export default function VerificationTerminal({
                 placeholder={tx('Dr. Ahmad Ridzuan / Sister Nurul Ain')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-750"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-750"
                 required
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1">{tx('Medical Category')}</label>
-              <select
+              <CustomSelect
                 value={role}
                 onChange={(e) => {
                   setRole(e.target.value as any);
@@ -929,37 +961,37 @@ export default function VerificationTerminal({
                   setRegistryId(e.target.value === UserRole.DOCTOR ? 'MMC' : 'LJM');
                   setRegistrationType('full');
                 }}
-                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-extrabold text-slate-700"
+                className="form-select w-full h-11 text-xs border border-slate-250 rounded-none px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-extrabold text-slate-700"
               >
                 <option value={UserRole.DOCTOR}>{tx('Doctor (MD / MBBS)')}</option>
                 <option value={UserRole.NURSE}>{tx('Registered Nurse (RN)')}</option>
-              </select>
+              </CustomSelect>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1">{tx('Specialization / Department Focus')}</label>
               {role === UserRole.DOCTOR ? (
-                <select
+                <CustomSelect
                   value={specialization}
                   onChange={(e) => setSpecialization(e.target.value)}
-                  className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
+                  className="form-select w-full h-11 text-xs border border-slate-250 rounded-none px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
                 >
                   <option value="Cardiologist">{tx('Cardiologist')}</option>
                   <option value="Pediatrician">{tx('Pediatrician')}</option>
                   <option value="Neurologist">{tx('Neurologist')}</option>
                   <option value="Dermatologist">{tx('Dermatologist')}</option>
                   <option value="General Physician">{tx('General Physician')}</option>
-                </select>
+                </CustomSelect>
               ) : (
-                <select
+                <CustomSelect
                   value={specialization}
                   onChange={(e) => setSpecialization(e.target.value)}
-                  className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
+                  className="form-select w-full h-11 text-xs border border-slate-250 rounded-none px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
                 >
                   <option value="ICU & Critical Care">{tx('ICU & Critical Care')}</option>
                   <option value="Geriatric & Eldercare">{tx('Geriatric & Eldercare')}</option>
                   <option value="Pediatric & Neonatal Care">{tx('Pediatric & Neonatal Care')}</option>
-                </select>
+                </CustomSelect>
               )}
             </div>
 
@@ -970,7 +1002,7 @@ export default function VerificationTerminal({
                 placeholder="e.g. 10"
                 value={experienceYears}
                 onChange={(e) => setExperienceYears(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
                 required
               />
             </div>
@@ -983,7 +1015,7 @@ export default function VerificationTerminal({
               rows={3}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              className="w-full text-xs border border-slate-250 rounded-none p-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 placeholder-slate-400"
+              className="w-full text-xs border border-slate-250 rounded-none p-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-700 placeholder-slate-400"
             />
           </div>
 
@@ -991,7 +1023,7 @@ export default function VerificationTerminal({
             <button
               onClick={() => setStep(2)}
               disabled={!name || !experienceYears}
-              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-bold px-6 py-2.5 rounded-none transition-all shadow-xs cursor-pointer rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
+              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-bold px-6 py-2.5 rounded-none transition-colors shadow-xs cursor-pointer rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
             >
               {tx('Continue to Credentials')}
             </button>
@@ -1007,7 +1039,7 @@ export default function VerificationTerminal({
               <label className="block text-xs font-bold text-slate-600 mb-1">
                 {role === UserRole.DOCTOR ? tx('Medical Council Registry') : tx('Nursing Council Registry')}
               </label>
-              <select
+              <CustomSelect
                 value={registryId}
                 onChange={(e) => {
                   setRegistryId(e.target.value);
@@ -1016,22 +1048,22 @@ export default function VerificationTerminal({
                   else setMedicalCouncil("");
                   if (e.target.value === "LJM") setRegistrationType("full");
                 }}
-                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
+                className="form-select w-full h-11 text-xs border border-slate-250 rounded-none px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
               >
                 {role === UserRole.DOCTOR ? <option value="MMC">{tx('Malaysian Medical Council (MMC)')}</option> : <option value="LJM">{tx('Malaysian Nursing Board (LJM)')}</option>}
                 <option value="OTHER">{tx('Another country\'s regulator (international)')}</option>
-              </select>
+              </CustomSelect>
               {registryId === "OTHER" && (
-                <input type="text" required maxLength={100} placeholder={tx('Regulator name and country, e.g. General Medical Council (UK)')} value={medicalCouncil} onChange={(e) => setMedicalCouncil(e.target.value)} className="mt-2 w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-800" />
+                <input type="text" required maxLength={100} placeholder={tx('Regulator name and country, e.g. General Medical Council (UK)')} value={medicalCouncil} onChange={(e) => setMedicalCouncil(e.target.value)} className="mt-2 w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-800" />
               )}
               <label className="block text-xs font-bold text-slate-600 mt-3 mb-1">{tx('Registration type')}</label>
-              <select value={registrationType} onChange={(e) => setRegistrationType(e.target.value)} className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705">
+              <CustomSelect value={registrationType} onChange={(e) => setRegistrationType(e.target.value)} className="form-select w-full h-11 text-xs border border-slate-250 rounded-none px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705">
                 <option value="full">{tx('Full registration')}</option>
                 <option value="provisional">{tx('Provisional registration')}</option>
                 {registryId !== "LJM" && <option value="specialist">{tx('Specialist register')}</option>}
-              </select>
+              </CustomSelect>
               {registrationType === "specialist" && (
-                <input type="text" required maxLength={50} placeholder={tx('Specialist register number')} value={specialistRegNo} onChange={(e) => setSpecialistRegNo(e.target.value)} className="mt-2 w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-mono font-bold text-slate-800" />
+                <input type="text" required maxLength={50} placeholder={tx('Specialist register number')} value={specialistRegNo} onChange={(e) => setSpecialistRegNo(e.target.value)} className="mt-2 w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-mono font-bold text-slate-800" />
               )}
             </div>
 
@@ -1042,7 +1074,7 @@ export default function VerificationTerminal({
                 placeholder={role === UserRole.DOCTOR ? tx('MMC-REG-XXXXX') : tx('LJM-REG-XXXXX')}
                 value={licenseNumber}
                 onChange={(e) => setLicenseNumber(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-black font-mono text-slate-850"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-black font-mono text-slate-850"
                 required
               />
             </div>
@@ -1054,7 +1086,7 @@ export default function VerificationTerminal({
                 min={new Date(Date.now() + 86400_000).toISOString().slice(0, 10)}
                 value={licenseExpiry}
                 onChange={(e) => setLicenseExpiry(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-705"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-705"
                 required
               />
             </div>
@@ -1066,7 +1098,7 @@ export default function VerificationTerminal({
                 placeholder={tx('e.g. MBBS (Malaya), M.Med (UKM) / Diploma in Nursing')}
                 value={education}
                 onChange={(e) => setEducation(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-705"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-705"
                 required
               />
             </div>
@@ -1078,23 +1110,23 @@ export default function VerificationTerminal({
                 placeholder="e.g. 150"
                 value={fee}
                 onChange={(e) => setFee(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-bold text-slate-705"
                 required
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1">{tx('Active Practice City')}</label>
-              <select
+              <CustomSelect
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-extrabold text-slate-700"
+                className="form-select w-full h-11 text-xs border border-slate-250 rounded-none px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-extrabold text-slate-700"
               >
                 <option value="Kuala Lumpur">{tx('Kuala Lumpur')}</option>
                 <option value="Petaling Jaya">{tx('Petaling Jaya')}</option>
                 <option value="Penang">{tx('Penang')}</option>
                 <option value="Johor Bahru">{tx('Johor Bahru')}</option>
-              </select>
+              </CustomSelect>
             </div>
 
             <div>
@@ -1104,7 +1136,7 @@ export default function VerificationTerminal({
                 placeholder={tx('Jalan Kiara, Mont Kiara')}
                 value={practiceAddress}
                 onChange={(e) => setPracticeAddress(e.target.value)}
-                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-705"
+                className="w-full text-xs border border-slate-250 rounded-none py-2.5 px-3 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:ring-1 focus:ring-[color:var(--t-600)] font-semibold text-slate-705"
                 required
               />
             </div>
@@ -1174,7 +1206,7 @@ export default function VerificationTerminal({
             <button
               type="submit"
               disabled={loading || !fileAttached}
-              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-bold px-8 py-2.5 rounded-none transition-all flex items-center gap-1.5 shadow-md cursor-pointer rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
+              className="bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] disabled:bg-slate-300 text-white text-xs font-bold px-8 py-2.5 rounded-none transition-colors flex items-center gap-1.5 shadow-md cursor-pointer rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
             >
               {loading ? (
                 <>

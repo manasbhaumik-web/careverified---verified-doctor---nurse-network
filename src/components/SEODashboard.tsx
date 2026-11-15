@@ -1,5 +1,5 @@
-import DashboardHeader, { BannerBadge } from './DashboardHeader';
-import WorkspaceHeader from './WorkspaceHeader';
+import DashboardHeader, { BannerBadge } from '../shared/ui/DashboardHeader';
+import WorkspaceHeader from '../shared/ui/WorkspaceHeader';
 import React, { useState } from 'react';
 import { Search, Code, Zap, FileSpreadsheet, Eye, Copy, CheckCircle, List, LayoutGrid, X, Globe } from 'lucide-react';
 import { useTr } from '../locale';

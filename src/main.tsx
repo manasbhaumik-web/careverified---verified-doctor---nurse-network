@@ -2,7 +2,7 @@ import {StrictMode} from 'react';
 import SharedSummary from './components/SharedSummary.tsx';
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
-import VerifyDocument from './components/VerifyDocument.tsx';
+import VerifyDocument from './domains/verification/VerifyDocument';
 import PrivacyCentre from './components/PrivacyCentre.tsx';
 import './index.css';
 import { getLocale, loadCatalog } from './locale';

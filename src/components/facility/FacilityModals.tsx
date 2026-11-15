@@ -1,3 +1,4 @@
+import { CustomSelect } from '../../shared/ui/CustomSelect';
 import React from 'react';
 import {
   FileText,
@@ -25,8 +26,8 @@ export interface FacilityModalsProps {
   jobs: FacilityJob[];
 
   // 1. Decision Modal
-  decisionModal: { app: Application; action: 'shortlist' | 'accept' | 'decline' } | null;
-  setDecisionModal: React.Dispatch<React.SetStateAction<{ app: Application; action: 'shortlist' | 'accept' | 'decline' } | null>>;
+  decisionModal: { jobId: string; applicant: Application; action: 'accepted' | 'declined' } | null;
+  setDecisionModal: React.Dispatch<React.SetStateAction<{ jobId: string; applicant: Application; action: 'accepted' | 'declined' } | null>>;
   decisionNotes: string;
   setDecisionNotes: React.Dispatch<React.SetStateAction<string>>;
   actionSubmitting: boolean;
@@ -37,8 +38,8 @@ export interface FacilityModalsProps {
   setShowNewJobModal: React.Dispatch<React.SetStateAction<boolean>>;
   newJobTitle: string;
   setNewJobTitle: React.Dispatch<React.SetStateAction<string>>;
-  newJobRole: 'Doctor' | 'Nurse';
-  setNewJobRole: React.Dispatch<React.SetStateAction<'Doctor' | 'Nurse'>>;
+  newJobRole: 'doctor' | 'nurse' | 'any';
+  setNewJobRole: React.Dispatch<React.SetStateAction<'doctor' | 'nurse' | 'any'>>;
   newJobType: string;
   setNewJobType: React.Dispatch<React.SetStateAction<string>>;
   newJobSpecialty: string;
@@ -53,6 +54,10 @@ export interface FacilityModalsProps {
   setNewJobLocation: React.Dispatch<React.SetStateAction<string>>;
   newJobDesc: string;
   setNewJobDesc: React.Dispatch<React.SetStateAction<string>>;
+  newJobAcceptsForeign: boolean;
+  setNewJobAcceptsForeign: React.Dispatch<React.SetStateAction<boolean>>;
+  newJobVisaSupport: boolean;
+  setNewJobVisaSupport: React.Dispatch<React.SetStateAction<boolean>>;
   newJobSubmitting: boolean;
   handleCreateJob: (e: React.FormEvent) => void;
 
@@ -68,9 +73,21 @@ export interface FacilityModalsProps {
   handleInviteSubmit: (e: React.FormEvent) => void;
 
   // 4. Chat Modal
-  chatModal: Application | null;
-  setChatModal: React.Dispatch<React.SetStateAction<Application | null>>;
-  chatMessages: Array<{ id: string; sender: string; text: string; time: string }>;
+  chatModal: {
+    jobId: string;
+    jobTitle: string;
+    applicantUserId: string;
+    applicantName: string;
+    applicantRole: string;
+  } | null;
+  setChatModal: React.Dispatch<React.SetStateAction<{
+    jobId: string;
+    jobTitle: string;
+    applicantUserId: string;
+    applicantName: string;
+    applicantRole: string;
+  } | null>>;
+  chatMessages: Array<{ id: string; senderName: string; message: string; createdAt: string; mine?: boolean }>;
   chatInput: string;
   setChatInput: React.Dispatch<React.SetStateAction<string>>;
   chatLoading: boolean;
@@ -186,6 +203,10 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
   setNewJobLocation,
   newJobDesc,
   setNewJobDesc,
+  newJobAcceptsForeign,
+  setNewJobAcceptsForeign,
+  newJobVisaSupport,
+  setNewJobVisaSupport,
   newJobSubmitting,
   handleCreateJob,
   inviteModal,
@@ -278,13 +299,58 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
   setSelectedInvoice,
 }) => {
   const tx = useTr();
+
+  React.useEffect(() => {
+    const anyOpen = Boolean(
+      decisionModal ||
+        showNewJobModal ||
+        inviteModal ||
+        chatModal ||
+        quoteModal ||
+        packageModalOpen ||
+        promoModalOpen ||
+        selectedInvoice
+    );
+    if (!anyOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (chatModal) setChatModal(null);
+      else if (decisionModal) setDecisionModal(null);
+      else if (showNewJobModal) setShowNewJobModal(false);
+      else if (inviteModal) setInviteModal(null);
+      else if (quoteModal) setQuoteModal(null);
+      else if (packageModalOpen) setPackageModalOpen(false);
+      else if (promoModalOpen) setPromoModalOpen(false);
+      else if (selectedInvoice) setSelectedInvoice(null);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [
+    decisionModal,
+    showNewJobModal,
+    inviteModal,
+    chatModal,
+    quoteModal,
+    packageModalOpen,
+    promoModalOpen,
+    selectedInvoice,
+    setChatModal,
+    setDecisionModal,
+    setShowNewJobModal,
+    setInviteModal,
+    setQuoteModal,
+    setPackageModalOpen,
+    setPromoModalOpen,
+    setSelectedInvoice,
+  ]);
+
   return (
     <>
       {/* ========================================================================= */}
       {/* DECISION MODAL (ACCEPT / DECLINE JOB APPLICATION) */}
       {/* ========================================================================= */}
       {decisionModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-slate-300 max-w-lg w-full p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h3 className="text-base font-black text-slate-900">
@@ -397,7 +463,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
       {/* POST NEW JOB MODAL */}
       {/* ========================================================================= */}
       {showNewJobModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-slate-300 max-w-xl w-full p-6 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
@@ -437,7 +503,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   <label className="form-label">
                     Target Role *
                   </label>
-                  <select
+                  <CustomSelect
                     value={newJobRole}
                     onChange={e => setNewJobRole(e.target.value as any)}
                     className="form-select text-xs"
@@ -445,14 +511,14 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     <option value="doctor">{tx('Doctor / Medical Officer')}</option>
                     <option value="nurse">{tx('Nurse / Staff Nurse')}</option>
                     <option value="any">{tx('Specialist / Clinical Consultant')}</option>
-                  </select>
+                  </CustomSelect>
                 </div>
 
                 <div className="space-y-1">
                   <label className="form-label">
                     Engagement Type *
                   </label>
-                  <select
+                  <CustomSelect
                     value={newJobType}
                     onChange={e => setNewJobType(e.target.value)}
                     className="form-select text-xs"
@@ -460,7 +526,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     <option value="Locum">{tx('Locum (Shift Cover)')}</option>
                     <option value="Sessional">{tx('Sessional / Part-Time')}</option>
                     <option value="Permanent">{tx('Permanent Position')}</option>
-                  </select>
+                  </CustomSelect>
                 </div>
               </div>
 
@@ -524,7 +590,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   <label className="form-label">
                     Period
                   </label>
-                  <select
+                  <CustomSelect
                     value={newJobSalaryPeriod}
                     onChange={e => setNewJobSalaryPeriod(e.target.value)}
                     className="form-select text-xs"
@@ -532,7 +598,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     <option value="hour">{tx('Per Hour')}</option>
                     <option value="shift">{tx('Per Shift')}</option>
                     <option value="month">{tx('Per Month')}</option>
-                  </select>
+                  </CustomSelect>
                 </div>
               </div>
 
@@ -547,6 +613,27 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   onChange={e => setNewJobDesc(e.target.value)}
                   className="form-input text-xs"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)]">
+                <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={newJobAcceptsForeign}
+                    onChange={e => setNewJobAcceptsForeign(e.target.checked)}
+                    className="h-4 w-4 accent-[color:var(--t-600)]"
+                  />
+                  {tx('Open to Foreign / Expat Practitioners')}
+                </label>
+                <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={newJobVisaSupport}
+                    onChange={e => setNewJobVisaSupport(e.target.checked)}
+                    className="h-4 w-4 accent-[color:var(--t-600)]"
+                  />
+                  {tx('Provides Work Permit / Visa Sponsorship')}
+                </label>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
@@ -574,7 +661,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
       {/* DIRECT INVITATION MODAL */}
       {/* ========================================================================= */}
       {inviteModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-slate-300 max-w-lg w-full p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h3 className="text-base font-black text-slate-900">
@@ -606,7 +693,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 <label className="form-label">
                   {tx('Select Shift / Vacancy (Optional)')}
                 </label>
-                <select
+                <CustomSelect
                   value={inviteJobId}
                   onChange={e => setInviteJobId(e.target.value)}
                   className="form-select text-xs"
@@ -617,7 +704,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                       {j.title} ({j.specialtyRequired} - {j.salaryRange})
                     </option>
                   ))}
-                </select>
+                </CustomSelect>
               </div>
 
               <div className="space-y-1">
@@ -658,7 +745,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
       {/* DIRECT COORDINATION CHAT MODAL */}
       {/* ========================================================================= */}
       {chatModal && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white border border-slate-300 max-w-2xl w-full p-6 shadow-2xl rounded-none space-y-4 flex flex-col max-h-[90vh]">
             <div className="flex items-start justify-between border-b border-slate-200 pb-3">
               <div className="space-y-1">
@@ -727,7 +814,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 value={chatInput}
                 onChange={e => setChatInput(e.target.value)}
                 placeholder={tx('Type your message to practitioner…')}
-                className="flex-1 border border-[color:var(--t-200)] px-3 py-2 text-xs rounded-none bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                className="flex-1 border border-[color:var(--t-200)] px-3 py-2 text-xs rounded-none bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]"
               />
               <button
                 type="submit"
@@ -917,7 +1004,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   <label className="form-label">
                     Category *
                   </label>
-                  <select
+                  <CustomSelect
                     value={pkgCategory}
                     onChange={e => setPkgCategory(e.target.value)}
                     className="form-select text-xs"
@@ -925,7 +1012,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     {['Health Screening', 'Cardiology', 'Orthopaedics', 'Maternity', 'Fertility', 'Oncology', 'Ophthalmology', 'Dental', 'Surgery', 'Aesthetics'].map(c => (
                       <option key={c} value={c}>{c}</option>
                     ))}
-                  </select>
+                  </CustomSelect>
                 </div>
 
                 <div className="space-y-1">
@@ -945,7 +1032,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   <label className="form-label">
                     {tx('Target Audience')}
                   </label>
-                  <select
+                  <CustomSelect
                     value={pkgAudience}
                     onChange={e => setPkgAudience(e.target.value as any)}
                     className="form-select text-xs"
@@ -953,7 +1040,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                     <option value="all">{tx('All Patients')}</option>
                     <option value="local">{tx('Malaysian Residents Only')}</option>
                     <option value="international">{tx('Medical Tourism (MHTC)')}</option>
-                  </select>
+                  </CustomSelect>
                 </div>
               </div>
 
@@ -991,14 +1078,14 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   <label className="form-label">
                     {tx('Publishing Status')}
                   </label>
-                  <select
+                  <CustomSelect
                     value={pkgStatus}
                     onChange={e => setPkgStatus(e.target.value as any)}
                     className="form-select text-xs"
                   >
                     <option value="published">{tx('Published (Live to public)')}</option>
                     <option value="draft">{tx('Draft (Private)')}</option>
-                  </select>
+                  </CustomSelect>
                 </div>
               </div>
 
@@ -1070,7 +1157,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                       }
                     }}
                     placeholder={tx('e.g. Ultrasound Abdomen & Pelvis')}
-                    className="p-2 border border-slate-300 text-xs flex-1 bg-white focus:outline-none focus:border-[color:var(--t-600)]"
+                    className="p-2 border border-slate-300 text-xs flex-1 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]"
                   />
                   <button
                     type="button"
@@ -1194,14 +1281,14 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                   <label className="form-label">
                     Discount Type *
                   </label>
-                  <select
+                  <CustomSelect
                     value={promoType}
                     onChange={e => setPromoType(e.target.value as any)}
                     className="form-select text-xs"
                   >
                     <option value="percentage">{tx('Percentage (%) Discount')}</option>
                     <option value="fixed">{tx('Fixed Amount (RM) Rebate')}</option>
-                  </select>
+                  </CustomSelect>
                 </div>
 
                 <div className="space-y-1">
@@ -1224,7 +1311,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                 <label className="form-label">
                   {tx('Applicable Package')}
                 </label>
-                <select
+                <CustomSelect
                   value={promoPkgId}
                   onChange={e => setPromoPkgId(e.target.value)}
                   className="form-select text-xs"
@@ -1235,7 +1322,7 @@ export const FacilityModals: React.FC<FacilityModalsProps> = ({
                       {p.code} - {p.title}
                     </option>
                   ))}
-                </select>
+                </CustomSelect>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

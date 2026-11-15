@@ -5,8 +5,8 @@ import {
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, UserRole, VerificationStatus } from '../../types';
 import { formatMoney, useTr } from '../../locale';
-import { requestConversationWith } from '../SecureMessenger';
-import { FilterSelect } from '../DashboardHeader';
+import { requestConversationWith } from '../../domains/telemedicine/SecureMessenger';
+import { FilterSelect } from '../../shared/ui/DashboardHeader';
 import { UserAvatar } from '../../avatars';
 
 type Pro = DoctorProfile | NurseProfile;
@@ -161,7 +161,7 @@ export default function SavedTab({
               placeholder={tx('Search your care team or recommended specialists by name, specialty, or city…')}
               value={query}
               onChange={e => setQuery(e.target.value)}
-              className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
+              className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
             />
             {query && (
               <button
@@ -335,7 +335,7 @@ export default function SavedTab({
                 <button
                   type="button"
                   onClick={onFindProviders}
-                  className="inline-flex items-center gap-2 h-10 px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-2xs transition-all cursor-pointer"
+                  className="inline-flex items-center gap-2 h-10 px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-2xs transition-colors cursor-pointer"
                 >
                   <Search className="h-3.5 w-3.5" aria-hidden="true" />
                   <span>Browse Full Practitioner Directory</span>
@@ -351,7 +351,7 @@ export default function SavedTab({
                 <motion.article
                   variants={itemVariants}
                   key={p.id}
-                  className="group relative app-card-interactive app-card-equal p-5 transition-all"
+                  className="group relative app-card-interactive app-card-equal p-5 transition-colors"
                 >
                   <div className="space-y-3">
                     <div className="flex gap-3 items-start justify-between">
@@ -366,7 +366,7 @@ export default function SavedTab({
                       <button
                         type="button"
                         onClick={() => remove(p)}
-                        className="h-8 w-8 flex items-center justify-center hover:bg-rose-50 text-slate-500 hover:text-rose-700 border border-transparent hover:border-rose-200 transition-all cursor-pointer bg-white shrink-0"
+                        className="h-8 w-8 flex items-center justify-center hover:bg-rose-50 text-slate-500 hover:text-rose-700 border border-transparent hover:border-rose-200 transition-colors cursor-pointer bg-white shrink-0"
                         title={tx('Remove from saved')}
                         aria-label={tx('Remove {name} from saved', { name: p.name })}
                       >
@@ -396,7 +396,7 @@ export default function SavedTab({
                         <button
                           type="button"
                           onClick={() => message(p.id)}
-                          className="h-9 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold px-2.5 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                          className="h-9 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] text-[color:var(--ink)] text-xs font-bold px-2.5 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                         >
                           <MessageSquare className="h-3.5 w-3.5 text-[color:var(--t-600)]" aria-hidden="true" />
                           <span>{tx('Message')}</span>
@@ -414,7 +414,7 @@ export default function SavedTab({
                       <button
                         type="button"
                         onClick={() => onSelectProfessional(p.id)}
-                        className="h-9 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-2.5 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-[color:var(--t-700)]"
+                        className="h-9 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold px-2.5 transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-[color:var(--t-700)]"
                       >
                         <CalendarRange className="h-3.5 w-3.5" aria-hidden="true" />
                         <span>{tx('Book Visit')}</span>

@@ -9,26 +9,26 @@ export const FACILITY_GROUPS: Record<FacilityTabGroup, {
   tabs: { id: FacilityTab; label: string; icon: any; count?: number }[];
 }> = {
   staffing: {
-    name: 'Clinical Staffing & Shifts',
+    name: 'Staffing & Shifts',
     defaultTab: 'shifts',
     tabs: [
-      { id: 'shifts', label: 'Job Postings & Vacancies', icon: Calendar },
-      { id: 'locums', label: 'Practitioner Network', icon: Users },
+      { id: 'shifts', label: 'Shift Vacancies', icon: Calendar },
+      { id: 'locums', label: 'Locum Directory', icon: Users },
     ],
   },
   care: {
-    name: 'Patient Referrals & Packages',
+    name: 'Referrals & Packages',
     defaultTab: 'cases',
     tabs: [
-      { id: 'cases', label: 'Patient Referrals & Quotes', icon: FileText },
-      { id: 'packages', label: 'Packages & Promotions', icon: Tag },
+      { id: 'cases', label: 'Patient Referrals', icon: FileText },
+      { id: 'packages', label: 'Health Packages', icon: Tag },
     ],
   },
   profile: {
-    name: 'Facility & Infrastructure',
+    name: 'Facility Profile',
     defaultTab: 'profile',
     tabs: [
-      { id: 'profile', label: 'Facility Profile & Infrastructure', icon: Building2 },
+      { id: 'profile', label: 'Facility Profile', icon: Building2 },
     ],
   },
 };

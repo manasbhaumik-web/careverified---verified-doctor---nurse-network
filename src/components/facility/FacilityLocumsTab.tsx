@@ -1,8 +1,8 @@
 import React from 'react';
 import { Users, Search, Send } from 'lucide-react';
 import { useTr } from '../../locale';
-import WorkspaceHeader from '../WorkspaceHeader';
-import { BannerBadge, DashboardTab } from '../DashboardHeader';
+import WorkspaceHeader from '../../shared/ui/WorkspaceHeader';
+import { BannerBadge, DashboardTab } from '../../shared/ui/DashboardHeader';
 import { LocumProfile } from './types';
 
 interface FacilityLocumsTabProps {
@@ -51,7 +51,7 @@ export default function FacilityLocumsTab({
             placeholder={tx('Search practitioners by doctor name, specialty, state, or city…')}
             value={locumSearch}
             onChange={e => setLocumSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-[color:var(--t-200)] text-xs rounded-none focus:outline-none focus:border-[color:var(--t-600)]"
+            className="w-full pl-9 pr-4 py-2 border border-[color:var(--t-200)] text-xs rounded-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]"
           />
         </div>
 
@@ -102,7 +102,7 @@ export default function FacilityLocumsTab({
           {filteredLocums.map(loc => (
             <div
               key={loc.profileId}
-              className="bg-white border border-[color:var(--t-200)] p-4 flex flex-col justify-between space-y-4 hover:border-[color:var(--t-400)] transition-all"
+              className="bg-white border border-[color:var(--t-200)] p-4 flex flex-col justify-between space-y-4 hover:border-[color:var(--t-400)] transition-colors"
             >
               <div className="space-y-3">
                 <div className="flex items-start justify-between gap-3">
@@ -117,9 +117,30 @@ export default function FacilityLocumsTab({
                       {loc.specialization}
                     </span>
                   </div>
-                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-2xs font-black uppercase tracking-wider border border-emerald-300 shrink-0">
-                    {tx('APC Active')}
-                  </span>
+                  {(() => {
+                    const st = loc.apcStatus || 'valid';
+                    const badgeStyle =
+                      st === 'valid'
+                        ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                        : st === 'expiring'
+                        ? 'bg-amber-100 text-amber-900 border-amber-300'
+                        : st === 'expired'
+                        ? 'bg-rose-100 text-rose-800 border-rose-300'
+                        : 'bg-slate-100 text-slate-600 border-slate-300';
+                    const badgeLabel =
+                      st === 'valid'
+                        ? tx('APC Active')
+                        : st === 'expiring'
+                        ? tx('APC Expiring')
+                        : st === 'expired'
+                        ? tx('APC Expired')
+                        : tx('APC Unverified');
+                    return (
+                      <span className={`px-2 py-0.5 text-2xs font-black uppercase tracking-wider border shrink-0 ${badgeStyle}`}>
+                        {badgeLabel}
+                      </span>
+                    );
+                  })()}
                 </div>
 
                 <div className="text-xs space-y-1 text-slate-600">

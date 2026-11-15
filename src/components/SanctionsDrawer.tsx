@@ -1,3 +1,4 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useState, useEffect } from 'react';
 import { 
   ShieldAlert, AlertTriangle, CheckCircle2, Clock, 
@@ -265,15 +266,15 @@ export default function SanctionsDrawer({
             <label className="text-xs font-black uppercase text-slate-700 tracking-wider block mb-1">
               Statutory Basis &amp; Legal Framework *
             </label>
-            <select
+            <CustomSelect
               value={statutoryBasis}
               onChange={(e) => setStatutoryBasis(e.target.value)}
-              className="w-full border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-800 bg-white focus:outline-none focus:border-rose-600"
+              className="form-select h-11 w-full border border-slate-300 px-3 text-xs font-semibold text-slate-800 bg-white focus:outline-none focus:border-rose-600"
             >
               {STATUTORY_BASES.map(b => (
                 <option key={b.id} value={b.label}>{tx(b.label)}</option>
               ))}
-            </select>
+            </CustomSelect>
           </div>
 
           {/* Reference Number */}
@@ -294,15 +295,15 @@ export default function SanctionsDrawer({
               <label className="text-xs font-black uppercase text-slate-700 tracking-wider block mb-1">
                 {tx('Sanction Action Category')}
               </label>
-              <select
+              <CustomSelect
                 value={sanctionType}
                 onChange={(e) => setSanctionType(e.target.value)}
-                className="w-full border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-800 bg-white focus:outline-none focus:border-rose-600"
+                className="form-select h-11 w-full border border-slate-300 px-3 text-xs font-semibold text-slate-800 bg-white focus:outline-none focus:border-rose-600"
               >
                 <option value="disciplinary_suspension">{tx('Disciplinary Practice Suspension (Full)')}</option>
                 <option value="apc_revocation">{tx('Annual Practicing Certificate Revocation')}</option>
                 <option value="conditional_restriction">{tx('Conditional Practice Restriction')}</option>
-              </select>
+              </CustomSelect>
             </div>
           </div>
 

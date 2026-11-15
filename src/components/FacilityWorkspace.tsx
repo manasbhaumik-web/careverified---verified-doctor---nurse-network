@@ -10,47 +10,22 @@ import {
 import { useTr } from '../locale';
 import DashboardHeader, {
   BannerRow, BannerIdentity, BannerBadge, BannerKpis, DashboardTab, bannerPrimaryBtn
-} from './DashboardHeader';
-import WorkspaceHeader from './WorkspaceHeader';
+} from '../shared/ui/DashboardHeader';
+import WorkspaceHeader from '../shared/ui/WorkspaceHeader';
 import FacilityShiftsTab from './facility/FacilityShiftsTab';
 import FacilityLocumsTab from './facility/FacilityLocumsTab';
 import FacilityCasesTab from './facility/FacilityCasesTab';
 import { FacilityPackagesTab } from './facility/FacilityPackagesTab';
 import { FacilityProfileTab } from './facility/FacilityProfileTab';
 import { FacilityModals } from './facility/FacilityModals';
+import { useFacilityWorkspace } from './facility/hooks/useFacilityWorkspace';
+import {
+  FACILITY_GROUPS,
+  type FacilityTab,
+  type FacilityTabGroup,
+} from './facility/types';
 
-export type FacilityTab = 'shifts' | 'locums' | 'cases' | 'packages' | 'profile';
-export type FacilityTabGroup = 'staffing' | 'care' | 'profile';
-
-export const FACILITY_GROUPS: Record<FacilityTabGroup, {
-  name: string;
-  defaultTab: FacilityTab;
-  tabs: { id: FacilityTab; label: string; icon: any; count?: number }[];
-}> = {
-  staffing: {
-    name: 'Clinical Staffing & Shifts',
-    defaultTab: 'shifts',
-    tabs: [
-      { id: 'shifts', label: 'Job Postings & Vacancies', icon: Calendar },
-      { id: 'locums', label: 'Practitioner Network', icon: Users },
-    ],
-  },
-  care: {
-    name: 'Patient Referrals & Packages',
-    defaultTab: 'cases',
-    tabs: [
-      { id: 'cases', label: 'Patient Referrals & Quotes', icon: FileText },
-      { id: 'packages', label: 'Packages & Promotions', icon: Tag },
-    ],
-  },
-  profile: {
-    name: 'Facility & Infrastructure',
-    defaultTab: 'profile',
-    tabs: [
-      { id: 'profile', label: 'Facility Profile & Infrastructure', icon: Building2 },
-    ],
-  },
-};
+export { FACILITY_GROUPS, type FacilityTab, type FacilityTabGroup };
 
 type Tab = FacilityTab;
 
@@ -334,769 +309,44 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
       setTab(initialTab);
     }
   }, [activeGroup, initialTab]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [facility, setFacility] = useState<FacilityProfile | null>(null);
-  const [stats, setStats] = useState<FacilityStats>({
-    activeVacancies: 0, pendingApplicants: 0, acceptedLocums: 0, patientCases: 0,
-  });
-
-  // Shifts / Jobs state
-  const [jobs, setJobs] = useState<FacilityJob[]>([]);
-  const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
-  const [jobFilter, setJobFilter] = useState<'all' | 'doctor' | 'nurse'>('all');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'Active' | 'Closed'>('all');
-  const [jobSearch, setJobSearch] = useState('');
-
-  // Decision Modal state (Accept / Decline)
-  const [decisionModal, setDecisionModal] = useState<{
-    jobId: string;
-    applicant: Application;
-    action: 'accepted' | 'declined';
-  } | null>(null);
-  const [decisionNotes, setDecisionNotes] = useState('');
-  const [actionSubmitting, setActionSubmitting] = useState(false);
-
-  // New Job Modal state
-  const [showNewJobModal, setShowNewJobModal] = useState(false);
-  const [newJobTitle, setNewJobTitle] = useState('');
-  const [newJobRole, setNewJobRole] = useState<'doctor' | 'nurse' | 'any'>('doctor');
-  const [newJobType, setNewJobType] = useState('Locum');
-  const [newJobSpecialty, setNewJobSpecialty] = useState('');
-  const [newJobSalaryMin, setNewJobSalaryMin] = useState('80');
-  const [newJobSalaryMax, setNewJobSalaryMax] = useState('120');
-  const [newJobSalaryPeriod, setNewJobSalaryPeriod] = useState('hour');
-  const [newJobLocation, setNewJobLocation] = useState('Emergency Department / Main Wing');
-  const [newJobDesc, setNewJobDesc] = useState('');
-  const [newJobSubmitting, setNewJobSubmitting] = useState(false);
-
-  // Locums / Practitioner Directory state
-  const [locums, setLocums] = useState<LocumProfile[]>([]);
-  const [locumSearch, setLocumSearch] = useState('');
-  const [locumRoleFilter, setLocumRoleFilter] = useState<'all' | 'doctor' | 'nurse'>('all');
-  const [inviteModal, setInviteModal] = useState<LocumProfile | null>(null);
-  const [inviteMessage, setInviteMessage] = useState('Greetings. Our medical facility would like to invite you for upcoming clinical locum coverage.');
-  const [inviteJobId, setInviteJobId] = useState('');
-  const [inviteSubmitting, setInviteSubmitting] = useState(false);
-  const [inviteSuccess, setInviteSuccess] = useState('');
-
-  // Coordination Chat Modal state
-  const [chatModal, setChatModal] = useState<{
-    jobId: string;
-    jobTitle: string;
-    applicantUserId: string;
-    applicantName: string;
-    applicantRole: string;
-  } | null>(null);
-  const [chatMessages, setChatMessages] = useState<FacilityMessage[]>([]);
-  const [chatInput, setChatInput] = useState('');
-  const [chatLoading, setChatLoading] = useState(false);
-  const [chatSending, setChatSending] = useState(false);
-
-  // Patient Referral Cases & Commission Ledger state
-  const [cases, setCases] = useState<PatientCase[]>([]);
-  const [casesSubTab, setCasesSubTab] = useState<'referrals' | 'ledger'>('referrals');
-  const [caseStatusFilter, setCaseStatusFilter] = useState<string>('all');
-  const [referralLedger, setReferralLedger] = useState<ReferralLedgerData | null>(null);
-  const [ledgerLoading, setLedgerLoading] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState<ReferralLedgerCase | null>(null);
-  const [quoteModal, setQuoteModal] = useState<PatientCase | null>(null);
-  const [quoteProcedure, setQuoteProcedure] = useState('');
-  const [quoteAmount, setQuoteAmount] = useState('');
-  const [quoteDays, setQuoteDays] = useState('2');
-  const [quoteInclusions, setQuoteInclusions] = useState('');
-  const [quoteExclusions, setQuoteExclusions] = useState('Excludes extra ICU days, complications, international flights.');
-  const [quoteSubmitting, setQuoteSubmitting] = useState(false);
-
-  // Medical Packages, Promotions & Orders state
-  const [packages, setPackages] = useState<MedicalPackage[]>([]);
-  const [promotions, setPromotions] = useState<MedicalPromotion[]>([]);
-  const [packageOrders, setPackageOrders] = useState<PackageOrder[]>([]);
-  const [packageSubTab, setPackageSubTab] = useState<'packages' | 'promotions' | 'orders'>('packages');
-  const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | 'pending' | 'confirmed' | 'completed'>('all');
-  const [packageCategoryFilter, setPackageCategoryFilter] = useState('All');
-  const [packageStatusFilter, setPackageStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
-  const [packageSearch, setPackageSearch] = useState('');
-
-  // Package Modal State (Publish / Edit)
-  const [packageModalOpen, setPackageModalOpen] = useState(false);
-  const [editingPackageId, setEditingPackageId] = useState<string | null>(null);
-  const [pkgCode, setPkgCode] = useState('');
-  const [pkgTitle, setPkgTitle] = useState('');
-  const [pkgCategory, setPkgCategory] = useState('Health Screening');
-  const [pkgDescription, setPkgDescription] = useState('');
-  const [pkgDuration, setPkgDuration] = useState('1 Day Outpatient');
-  const [pkgPrice, setPkgPrice] = useState('');
-  const [pkgOriginalPrice, setPkgOriginalPrice] = useState('');
-  const [pkgAudience, setPkgAudience] = useState<'all' | 'local' | 'international'>('all');
-  const [pkgFasting, setPkgFasting] = useState(false);
-  const [pkgInclusions, setPkgInclusions] = useState<string[]>([]);
-  const [pkgInclusionInput, setPkgInclusionInput] = useState('');
-  const [pkgExclusions, setPkgExclusions] = useState('');
-  const [pkgPreparation, setPkgPreparation] = useState('');
-  const [pkgImageUrl, setPkgImageUrl] = useState('/assets/clean_light_doctor_suite_full.jpg');
-  const [pkgStatus, setPkgStatus] = useState<'published' | 'draft'>('published');
-  const [pkgSubmitting, setPkgSubmitting] = useState(false);
-
-  // Promotion Modal State (Create / Edit)
-  const [promoModalOpen, setPromoModalOpen] = useState(false);
-  const [editingPromoId, setEditingPromoId] = useState<string | null>(null);
-  const [promoCode, setPromoCode] = useState('');
-  const [promoTitle, setPromoTitle] = useState('');
-  const [promoDesc, setPromoDesc] = useState('');
-  const [promoType, setPromoType] = useState<'percentage' | 'fixed'>('percentage');
-  const [promoValue, setPromoValue] = useState('');
-  const [promoPkgId, setPromoPkgId] = useState('');
-  const [promoBadge, setPromoBadge] = useState('');
-  const [promoValidFrom, setPromoValidFrom] = useState('');
-  const [promoValidUntil, setPromoValidUntil] = useState('');
-  const [promoTerms, setPromoTerms] = useState('');
-  const [promoSubmitting, setPromoSubmitting] = useState(false);
-
-  // Facility Infrastructure State
-  const [equipmentList, setEquipmentList] = useState<string[]>([]);
-  const [amenitiesList, setAmenitiesList] = useState<string[]>([]);
-  const [newEquipmentInput, setNewEquipmentInput] = useState('');
-  const [newAmenityInput, setNewAmenityInput] = useState('');
-  const [infraSaving, setInfraSaving] = useState(false);
-
-  // Facility Billing Preference & Escrow State
-  const [billingPref, setBillingPref] = useState<'escrow' | 'invoice'>('escrow');
-  const [billingEmail, setBillingEmail] = useState('');
-  const [sstNo, setSstNo] = useState('');
-  const [billingSaving, setBillingSaving] = useState(false);
-
-  // Notification feedback
-  const [notificationMsg, setNotificationMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
-  const loadFacilityData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/facility/me');
-      const data = await res.json();
-      if (data.status === 'success') {
-        setFacility(data.data.facility);
-        setStats(data.data.stats);
-        if (data.data.facility?.billingPreference) {
-          setBillingPref(data.data.facility.billingPreference);
-        }
-        if (data.data.facility?.billingContactEmail) {
-          setBillingEmail(data.data.facility.billingContactEmail);
-        }
-        if (data.data.facility?.sstRegistrationNo) {
-          setSstNo(data.data.facility.sstRegistrationNo);
-        }
-      } else {
-        setError(data.message || tx('Unable to load facility profile'));
-      }
-
-      const jobsRes = await fetch('/api/facility/jobs');
-      const jobsData = await jobsRes.json();
-      if (jobsData.status === 'success') {
-        setJobs(jobsData.data);
-        if (jobsData.data.length > 0 && !expandedJobId) {
-          setExpandedJobId(jobsData.data[0].id);
-        }
-      }
-
-      // Fetch verified locum practitioners
-      const locRes = await fetch('/api/locums');
-      const locData = await locRes.json();
-      if (locData.status === 'success') {
-        setLocums(locData.data);
-      }
-
-      // Fetch facility referral cases & commission ledger
-      const casesRes = await fetch('/api/facility/cases');
-      const casesData = await casesRes.json();
-      if (casesData.status === 'success') {
-        setCases(casesData.data);
-      }
-
-      const ledgerRes = await fetch('/api/facility/referral-ledger');
-      const ledgerData = await ledgerRes.json();
-      if (ledgerData.status === 'success') {
-        setReferralLedger(ledgerData.data);
-      }
-
-      // Fetch facility package orders
-      const ordersRes = await fetch('/api/facility/package-orders');
-      const ordersData = await ordersRes.json();
-      if (ordersData.status === 'success') {
-        setPackageOrders(ordersData.data);
-      }
-
-      // Fetch facility packages
-      const pkgRes = await fetch('/api/packages?status=all');
-      const pkgData = await pkgRes.json();
-      if (pkgData.status === 'success') {
-        setPackages(pkgData.data);
-      }
-
-      // Fetch facility promotions
-      const promoRes = await fetch('/api/promotions');
-      const promoData = await promoRes.json();
-      if (promoData.status === 'success') {
-        setPromotions(promoData.data);
-      }
-
-      // Fetch facility infrastructure
-      const infraRes = await fetch('/api/facility/infrastructure');
-      const infraData = await infraRes.json();
-      if (infraData.status === 'success') {
-        setEquipmentList(infraData.data.equipment || []);
-        setAmenitiesList(infraData.data.amenities || []);
-      }
-    } catch {
-      setError(tx('Server communication error. Please try again.'));
-    } finally {
-      setLoading(false);
-    }
-  }, [expandedJobId]);
-
-  useEffect(() => {
-    loadFacilityData();
-  }, [loadFacilityData]);
-
-  // Handle Accept or Decline Application
-  const handleDecisionSubmit = async () => {
-    if (!decisionModal) return;
-    setActionSubmitting(true);
-    try {
-      const res = await fetch(`/api/facility/jobs/${decisionModal.jobId}/applicants/${decisionModal.applicant.userId}/decision`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          decision: decisionModal.action,
-          notes: decisionNotes.trim() || undefined,
-        }),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({
-          type: 'success',
-          text: decisionModal.action === 'accepted'
-            ? `Application accepted! ${decisionModal.applicant.applicantName} confirmed for shift.`
-            : `Application from ${decisionModal.applicant.applicantName} declined.`,
-        });
-        setDecisionModal(null);
-        setDecisionNotes('');
-        loadFacilityData();
-      } else {
-        setNotificationMsg({ type: 'error', text: data.message || tx('Could not process decision.') });
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error. Please try again.') });
-    } finally {
-      setActionSubmitting(false);
-    }
-  };
-
-  // Handle Update Job Status (Active / Closed)
-  const handleUpdateJobStatus = async (jobId: string, nextStatus: 'Active' | 'Closed') => {
-    try {
-      const res = await fetch(`/api/facility/jobs/${jobId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: nextStatus }),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: `Job listing status updated to "${nextStatus}".` });
-        loadFacilityData();
-      } else {
-        setNotificationMsg({ type: 'error', text: data.message || tx('Could not update job status.') });
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error. Please try again.') });
-    }
-  };
-
-  // Handle Post New Job Vacancy
-  const handleCreateJob = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newJobTitle.trim() || !newJobSpecialty.trim()) {
-      setNotificationMsg({ type: 'error', text: tx('Please fill in all mandatory job fields.') });
-      return;
-    }
-    setNewJobSubmitting(true);
-    try {
-      const res = await fetch('/api/jobs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          hospitalName: facility?.name || tx('Medical Centre'),
-          title: newJobTitle.trim(),
-          type: newJobType,
-          sector: 'private',
-          roleRequired: newJobRole,
-          specialtyRequired: newJobSpecialty.trim(),
-          salaryMin: Number(newJobSalaryMin) || null,
-          salaryMax: Number(newJobSalaryMax) || null,
-          salaryPeriod: newJobSalaryPeriod,
-          location: newJobLocation.trim(),
-          city: facility?.city || tx('Kuala Lumpur'),
-          state: facility?.state || tx('Kuala Lumpur'),
-          description: newJobDesc.trim() || `Licensed clinical facility seeking credentialed ${newJobRole} for medical coverage.`,
-          facilityId: facility?.id,
-          acceptsForeign: false,
-          visaSupport: false,
-        }),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: `Job vacancy "${newJobTitle}" published successfully!` });
-        setShowNewJobModal(false);
-        setNewJobTitle('');
-        setNewJobSpecialty('');
-        setNewJobDesc('');
-        loadFacilityData();
-      } else {
-        setNotificationMsg({ type: 'error', text: data.message || tx('Could not publish job opening.') });
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error. Please try again.') });
-    } finally {
-      setNewJobSubmitting(false);
-    }
-  };
-
-  // Handle Invite Locum Practitioner to Job
-  const handleInviteSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inviteModal) return;
-    setInviteSubmitting(true);
-    try {
-      const res = await fetch(`/api/locums/${inviteModal.profileId}/invite`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: inviteMessage.trim(),
-          jobId: inviteJobId || undefined,
-        }),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setInviteSuccess(`Invitation sent to ${inviteModal.name}.`);
-        setTimeout(() => {
-          setInviteSuccess('');
-          setInviteModal(null);
-        }, 1800);
-      } else {
-        setNotificationMsg({ type: 'error', text: data.message || tx('Could not send invitation.') });
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error.') });
-    } finally {
-      setInviteSubmitting(false);
-    }
-  };
-
-  // Handle Coordination Chat with Applicant
-  const handleOpenChat = async (jobId: string, jobTitle: string, app: Application) => {
-    setChatModal({
-      jobId,
-      jobTitle,
-      applicantUserId: app.userId,
-      applicantName: app.applicantName,
-      applicantRole: app.applicantRole,
-    });
-    setChatLoading(true);
-    try {
-      const res = await fetch(`/api/facility/jobs/${jobId}/applicants/${app.userId}/messages`);
-      const data = await res.json();
-      if (data.status === 'success') {
-        setChatMessages(data.data);
-      }
-    } catch {
-      console.error('Failed to load coordination messages');
-    } finally {
-      setChatLoading(false);
-    }
-  };
-
-  const handleSendChatMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatModal || !chatInput.trim()) return;
-    setChatSending(true);
-    try {
-      const res = await fetch(`/api/facility/jobs/${chatModal.jobId}/applicants/${chatModal.applicantUserId}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: chatInput.trim() }),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setChatMessages(prev => [...prev, data.data]);
-        setChatInput('');
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Failed to send message.') });
-    } finally {
-      setChatSending(false);
-    }
-  };
-
-  // Handle Treatment Quotation for Patient Referral Case
-  const handleQuoteSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!quoteModal || !quoteProcedure.trim() || !quoteAmount) return;
-    setQuoteSubmitting(true);
-    try {
-      const res = await fetch(`/api/facility/cases/${quoteModal.id}/quote`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          procedureName: quoteProcedure.trim(),
-          totalAmountMyr: Number(quoteAmount),
-          estimatedStayDays: Number(quoteDays) || 1,
-          inclusions: quoteInclusions.trim() || undefined,
-          exclusions: quoteExclusions.trim() || undefined,
-        }),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: data.message });
-        setQuoteModal(null);
-        setQuoteProcedure('');
-        setQuoteAmount('');
-        loadFacilityData();
-      } else {
-        setNotificationMsg({ type: 'error', text: data.message || tx('Could not issue quote.') });
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error.') });
-    } finally {
-      setQuoteSubmitting(false);
-    }
-  };
-
-  const handleUpdateCaseStatus = async (caseId: string, status: string) => {
-    try {
-      const res = await fetch(`/api/facility/cases/${caseId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: data.message });
-        loadFacilityData();
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error.') });
-    }
-  };
-
-  // Handle Confirm Package Order / Deposit Reservation
-  const handleConfirmPackageOrder = async (orderId: string, status = 'confirmed') => {
-    try {
-      const res = await fetch(`/api/facility/package-orders/${orderId}/confirm`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: data.message || `Package reservation updated to ${status}.` });
-        loadFacilityData();
-      } else {
-        setNotificationMsg({ type: 'error', text: data.message || tx('Could not update package reservation.') });
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error updating package order.') });
-    }
-  };
-
-  // Handle Create or Update Package
-  const handleSavePackage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!pkgTitle.trim() || !pkgPrice) return;
-    setPkgSubmitting(true);
-    try {
-      const payload = {
-        code: pkgCode.trim() || undefined,
-        title: pkgTitle.trim(),
-        category: pkgCategory,
-        description: pkgDescription.trim(),
-        duration: pkgDuration.trim(),
-        priceMyr: Number(pkgPrice),
-        originalPriceMyr: pkgOriginalPrice ? Number(pkgOriginalPrice) : null,
-        targetAudience: pkgAudience,
-        fastingRequired: pkgFasting,
-        inclusions: pkgInclusions,
-        exclusions: pkgExclusions.trim() || undefined,
-        preparationInstructions: pkgPreparation.trim() || undefined,
-        imageUrl: pkgImageUrl.trim() || undefined,
-        status: pkgStatus,
-      };
-
-      const url = editingPackageId ? `/api/packages/${editingPackageId}` : '/api/packages';
-      const method = editingPackageId ? 'PUT' : 'POST';
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: data.message });
-        setPackageModalOpen(false);
-        setEditingPackageId(null);
-        resetPackageForm();
-        loadFacilityData();
-      } else {
-        setNotificationMsg({ type: 'error', text: data.message || tx('Error saving package.') });
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error.') });
-    } finally {
-      setPkgSubmitting(false);
-    }
-  };
-
-  const resetPackageForm = () => {
-    setPkgCode('');
-    setPkgTitle('');
-    setPkgCategory('Health Screening');
-    setPkgDescription('');
-    setPkgDuration('1 Day Outpatient');
-    setPkgPrice('');
-    setPkgOriginalPrice('');
-    setPkgAudience('all');
-    setPkgFasting(false);
-    setPkgInclusions([]);
-    setPkgInclusionInput('');
-    setPkgExclusions('');
-    setPkgPreparation('');
-    setPkgImageUrl('/assets/clean_light_doctor_suite_full.jpg');
-    setPkgStatus('published');
-  };
-
-  const handleEditPackage = (pkg: MedicalPackage) => {
-    setEditingPackageId(pkg.id);
-    setPkgCode(pkg.code);
-    setPkgTitle(pkg.title);
-    setPkgCategory(pkg.category);
-    setPkgDescription(pkg.description);
-    setPkgDuration(pkg.duration);
-    setPkgPrice(String(pkg.priceMyr));
-    setPkgOriginalPrice(pkg.originalPriceMyr ? String(pkg.originalPriceMyr) : '');
-    setPkgAudience(pkg.target_audience);
-    setPkgFasting(pkg.fastingRequired);
-    setPkgInclusions(pkg.inclusions || []);
-    setPkgExclusions(pkg.exclusions || '');
-    setPkgPreparation(pkg.preparation_instructions || '');
-    setPkgImageUrl(pkg.image_url || '/assets/clean_light_doctor_suite_full.jpg');
-    setPkgStatus(pkg.status === 'published' ? 'published' : 'draft');
-    setPackageModalOpen(true);
-  };
-
-  const handleTogglePackageStatus = async (pkg: MedicalPackage) => {
-    const nextStatus = pkg.status === 'published' ? 'draft' : 'published';
-    try {
-      const res = await fetch(`/api/packages/${pkg.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: nextStatus }),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: `Package marked as ${nextStatus}.` });
-        loadFacilityData();
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error.') });
-    }
-  };
-
-  const handleDeletePackage = async (id: string) => {
-    if (!confirm(tx('Are you sure you want to delete this medical package?'))) return;
-    try {
-      const res = await fetch(`/api/packages/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: data.message });
-        loadFacilityData();
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error.') });
-    }
-  };
-
-  // Handle Create or Update Promotion
-  const handleSavePromo = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!promoCode.trim() || !promoTitle.trim() || !promoValue) return;
-    setPromoSubmitting(true);
-    try {
-      const payload = {
-        code: promoCode.trim().toUpperCase(),
-        title: promoTitle.trim(),
-        description: promoDesc.trim(),
-        discountType: promoType,
-        discountValue: Number(promoValue),
-        packageId: promoPkgId || null,
-        badgeText: promoBadge.trim() || undefined,
-        validFrom: promoValidFrom || undefined,
-        validUntil: promoValidUntil || undefined,
-        terms: promoTerms.trim() || undefined,
-      };
-
-      const url = editingPromoId ? `/api/promotions/${editingPromoId}` : '/api/promotions';
-      const method = editingPromoId ? 'PUT' : 'POST';
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: data.message });
-        setPromoModalOpen(false);
-        setEditingPromoId(null);
-        resetPromoForm();
-        loadFacilityData();
-      } else {
-        setNotificationMsg({ type: 'error', text: data.message || tx('Error saving promotion.') });
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error.') });
-    } finally {
-      setPromoSubmitting(false);
-    }
-  };
-
-  const resetPromoForm = () => {
-    setPromoCode('');
-    setPromoTitle('');
-    setPromoDesc('');
-    setPromoType('percentage');
-    setPromoValue('');
-    setPromoPkgId('');
-    setPromoBadge('');
-    setPromoValidFrom('');
-    setPromoValidUntil('');
-    setPromoTerms('');
-  };
-
-  const handleEditPromo = (pr: MedicalPromotion) => {
-    setEditingPromoId(pr.id);
-    setPromoCode(pr.code);
-    setPromoTitle(pr.title);
-    setPromoDesc(pr.description);
-    setPromoType(pr.discount_type);
-    setPromoValue(String(pr.discount_type === 'fixed' ? (pr.discountValueMyr || pr.discount_value / 100) : pr.discount_value));
-    setPromoPkgId(pr.package_id || '');
-    setPromoBadge(pr.badge_text || '');
-    setPromoValidFrom(pr.valid_from);
-    setPromoValidUntil(pr.valid_until);
-    setPromoTerms(pr.terms || '');
-    setPromoModalOpen(true);
-  };
-
-  const handleTogglePromoStatus = async (pr: MedicalPromotion) => {
-    const nextStatus = pr.status === 'active' ? 'paused' : 'active';
-    try {
-      const res = await fetch(`/api/promotions/${pr.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: nextStatus }),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: `Promotion marked as ${nextStatus}.` });
-        loadFacilityData();
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error.') });
-    }
-  };
-
-  const handleDeletePromo = async (id: string) => {
-    if (!confirm(tx('Are you sure you want to delete this promotion?'))) return;
-    try {
-      const res = await fetch(`/api/promotions/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: data.message });
-        loadFacilityData();
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error.') });
-    }
-  };
-
-  // Handle Save Facility Infrastructure
-  const handleSaveInfrastructure = async () => {
-    setInfraSaving(true);
-    try {
-      const res = await fetch('/api/facility/infrastructure', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          equipment: equipmentList,
-          amenities: amenitiesList,
-        }),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: data.message });
-        loadFacilityData();
-      } else {
-        setNotificationMsg({ type: 'error', text: data.message || tx('Could not save infrastructure.') });
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error.') });
-    } finally {
-      setInfraSaving(false);
-    }
-  };
-
-  // Handle Save Facility Billing & Settlement Settings
-  const handleSaveBillingSettings = async () => {
-    setBillingSaving(true);
-    try {
-      const res = await fetch('/api/facility/billing-settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          billingPreference: billingPref,
-          billingContactEmail: billingEmail.trim() || undefined,
-          sstRegistrationNo: sstNo.trim() || undefined,
-        }),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: data.message });
-        loadFacilityData();
-      } else {
-        setNotificationMsg({ type: 'error', text: data.message || tx('Could not update billing settings.') });
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Network error. Please try again.') });
-    } finally {
-      setBillingSaving(false);
-    }
-  };
-
-  // Approve locum timesheet
-  const handleApproveTimesheet = async (jobId: string, app: Application) => {
-    try {
-      const res = await fetch(`/api/facility/jobs/${jobId}/applications/${app.id}/approve-timesheet`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hours: app.actualHours }),
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        setNotificationMsg({ type: 'success', text: data.message || tx('Timesheet approved.') });
-        loadFacilityData();
-      }
-    } catch {
-      setNotificationMsg({ type: 'error', text: tx('Failed to approve timesheet.') });
-    }
-  };
+  const {
+    loading, error, facility, stats, jobs, locums, cases, packages, promotions, packageOrders, referralLedger,
+    expandedJobId, setExpandedJobId, jobFilter, setJobFilter, statusFilter, setStatusFilter, jobSearch, setJobSearch,
+    locumSearch, setLocumSearch, locumRoleFilter, setLocumRoleFilter,
+    casesSubTab, setCasesSubTab, caseStatusFilter, setCaseStatusFilter,
+    decisionModal, setDecisionModal, decisionNotes, setDecisionNotes, actionSubmitting,
+    showNewJobModal, setShowNewJobModal, newJobTitle, setNewJobTitle, newJobRole, setNewJobRole,
+    newJobType, setNewJobType, newJobSpecialty, setNewJobSpecialty, newJobSalaryMin, setNewJobSalaryMin,
+    newJobSalaryMax, setNewJobSalaryMax, newJobSalaryPeriod, setNewJobSalaryPeriod,
+    newJobLocation, setNewJobLocation, newJobDesc, setNewJobDesc,
+    newJobAcceptsForeign, setNewJobAcceptsForeign, newJobVisaSupport, setNewJobVisaSupport, newJobSubmitting,
+    inviteModal, setInviteModal, inviteMessage, setInviteMessage, inviteJobId, setInviteJobId,
+    inviteSubmitting, inviteSuccess, setInviteSuccess,
+    chatModal, setChatModal, chatMessages, chatInput, setChatInput, chatLoading, chatSending,
+    selectedInvoice, setSelectedInvoice, quoteModal, setQuoteModal, quoteProcedure, setQuoteProcedure,
+    quoteAmount, setQuoteAmount, quoteDays, setQuoteDays, quoteInclusions, setQuoteInclusions,
+    quoteExclusions, setQuoteExclusions, quoteSubmitting,
+    packageModalOpen, setPackageModalOpen, editingPackageId, setEditingPackageId, pkgCode, setPkgCode,
+    pkgTitle, setPkgTitle, pkgCategory, setPkgCategory, pkgDescription, setPkgDescription,
+    pkgDuration, setPkgDuration, pkgPrice, setPkgPrice, pkgOriginalPrice, setPkgOriginalPrice,
+    pkgAudience, setPkgAudience, pkgFasting, setPkgFasting, pkgInclusions, setPkgInclusions,
+    pkgInclusionInput, setPkgInclusionInput, pkgPreparation, setPkgPreparation,
+    pkgStatus, setPkgStatus, pkgSubmitting,
+    promoModalOpen, setPromoModalOpen, editingPromoId, setEditingPromoId, promoCode, setPromoCode,
+    promoTitle, setPromoTitle, promoDesc, setPromoDesc, promoType, setPromoType, promoValue, setPromoValue,
+    promoPkgId, setPromoPkgId, promoBadge, setPromoBadge, promoValidFrom, setPromoValidFrom,
+    promoValidUntil, setPromoValidUntil, promoSubmitting,
+    equipmentList, setEquipmentList, amenitiesList, setAmenitiesList,
+    newEquipmentInput, setNewEquipmentInput, newAmenityInput, setNewAmenityInput, infraSaving,
+    billingPref, setBillingPref, billingEmail, setBillingEmail, sstNo, setSstNo, billingSaving,
+    notificationMsg, setNotificationMsg, filteredJobs, filteredLocums, filteredCases,
+    loadFacilityData, handleDecisionSubmit, handleUpdateJobStatus, handleCreateJob, handleInviteSubmit,
+    handleOpenChat, handleSendChatMessage, handleQuoteSubmit, handleUpdateCaseStatus,
+    handleConfirmPackageOrder, resetPackageForm, handleSavePackage, handleEditPackage,
+    handleTogglePackageStatus, handleDeletePackage, resetPromoForm, handleSavePromo,
+    handleEditPromo, handleTogglePromoStatus, handleDeletePromo,
+    handleSaveInfrastructure, handleSaveBillingSettings, handleApproveTimesheet,
+  } = useFacilityWorkspace(activeGroup);
 
   const displayedTabs: DashboardTab<Tab>[] = FACILITY_GROUPS[currentGroup].tabs.map(t => ({ ...t, label: tx(t.label) })).map(t => {
     if (t.id === 'shifts') return { ...t, count: stats.activeVacancies };
@@ -1104,40 +354,6 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
     if (t.id === 'cases') return { ...t, count: stats.patientCases };
     if (t.id === 'packages') return { ...t, count: packages.length };
     return t;
-  });
-
-  const filteredJobs = jobs.filter(j => {
-    if (jobFilter === 'doctor' && j.roleRequired !== 'doctor') return false;
-    if (jobFilter === 'nurse' && j.roleRequired !== 'nurse') return false;
-    if (statusFilter !== 'all' && j.status !== statusFilter) return false;
-    if (jobSearch.trim()) {
-      const q = jobSearch.toLowerCase();
-      return (
-        j.title.toLowerCase().includes(q) ||
-        j.specialtyRequired.toLowerCase().includes(q) ||
-        j.location.toLowerCase().includes(q)
-      );
-    }
-    return true;
-  });
-
-  const filteredLocums = locums.filter(l => {
-    if (locumRoleFilter !== 'all' && l.role !== locumRoleFilter) return false;
-    if (locumSearch.trim()) {
-      const q = locumSearch.toLowerCase();
-      return (
-        l.name.toLowerCase().includes(q) ||
-        l.specialization.toLowerCase().includes(q) ||
-        l.city?.toLowerCase().includes(q) ||
-        l.states?.some(s => s.toLowerCase().includes(q))
-      );
-    }
-    return true;
-  });
-
-  const filteredCases = cases.filter(c => {
-    if (caseStatusFilter === 'all') return true;
-    return c.status === caseStatusFilter;
   });
 
   const facilityHelpTab = (
@@ -1150,7 +366,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         onClick={() => {
           window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: 'help' }));
         }}
-        className="shrink-0 min-h-[48px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer border-b border-transparent transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
+        className="shrink-0 min-h-[40px] px-3.5 sm:px-4 text-xs flex items-center gap-2 cursor-pointer transition-colors font-medium text-[color:var(--ink-2)] hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]"
         title={tx('Facility Help & Support Desk')}
       >
         <LifeBuoy className="h-4 w-4 text-slate-500" />
@@ -1165,9 +381,36 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
       {!embedded && (
         <DashboardHeader
           fullWidth={true}
-          tabs={displayedTabs}
-          activeTab={tab}
-          onTabChange={setTab}
+          tabs={[
+            { key: 'staffing' as FacilityTabGroup, viewId: 'facility_staffing', icon: Calendar, count: stats.pendingApplicants || undefined },
+            { key: 'care' as FacilityTabGroup, viewId: 'facility_care', icon: PackagePlus, count: stats.patientCases || undefined },
+            { key: 'profile' as FacilityTabGroup, viewId: 'facility_profile', icon: Building2 },
+          ].map(g => ({
+            id: g.key,
+            label: tx(FACILITY_GROUPS[g.key].name),
+            icon: g.icon,
+            count: g.count,
+            activeSubTab: tab,
+            onSubTabChange: (subId: string) => {
+              window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: g.viewId }));
+              setTab(subId as Tab);
+            },
+            subItems: FACILITY_GROUPS[g.key].tabs.map(t => ({
+              ...t,
+              label: tx(t.label),
+              count: t.id === 'shifts' ? (stats.pendingApplicants || undefined) : t.id === 'cases' ? (stats.patientCases || undefined) : undefined,
+            })),
+          }))}
+          activeTab={currentGroup}
+          onTabChange={(grp) => {
+            const viewMap: Record<FacilityTabGroup, string> = {
+              staffing: 'facility_staffing',
+              care: 'facility_care',
+              profile: 'facility_profile',
+            };
+            window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: viewMap[grp] }));
+            setTab(FACILITY_GROUPS[grp].defaultTab);
+          }}
           tabsLabel={tx('{name} sections', { name: tx(FACILITY_GROUPS[currentGroup].name) })}
           tabsRight={facilityHelpTab}
         >
@@ -1217,7 +460,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
                     type="button"
                     onClick={loadFacilityData}
                     disabled={loading}
-                    className="p-2 text-slate-600 hover:text-slate-900 border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer disabled:opacity-50 h-9 w-9 flex items-center justify-center rounded-none"
+                    className="p-2 text-slate-600 hover:text-[color:var(--ink)] border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-50)] cursor-pointer disabled:opacity-50 h-9 w-9 flex items-center justify-center rounded-none"
                     title={tx('Refresh Data')}
                     aria-label={tx('Refresh Data')}
                   >
@@ -1261,9 +504,9 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
             <button
               type="button"
               onClick={() => setNotificationMsg(null)}
-              className="text-xs font-bold px-3 py-1 bg-white border border-slate-200 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer shrink-0 ml-4"
+              className="text-xs font-bold px-3 py-1 bg-white border border-[color:var(--t-200)] shadow-2xs hover:bg-[color:var(--t-50)] transition-colors cursor-pointer shrink-0 ml-4 rounded-none"
             >
-              Dismiss
+              {tx('Dismiss')}
             </button>
           </div>
         )}
@@ -1306,7 +549,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
               onUpdateJobStatus={handleUpdateJobStatus}
               onOpenDecision={(jobId, app, action) => {
                 setDecisionNotes('');
-                setDecisionModal({ app, action });
+                setDecisionModal({ jobId, applicant: app, action });
               }}
               onApproveTimesheet={handleApproveTimesheet}
               onOpenChat={handleOpenChat}
@@ -1435,6 +678,10 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         setNewJobLocation={setNewJobLocation}
         newJobDesc={newJobDesc}
         setNewJobDesc={setNewJobDesc}
+        newJobAcceptsForeign={newJobAcceptsForeign}
+        setNewJobAcceptsForeign={setNewJobAcceptsForeign}
+        newJobVisaSupport={newJobVisaSupport}
+        setNewJobVisaSupport={setNewJobVisaSupport}
         newJobSubmitting={newJobSubmitting}
         handleCreateJob={handleCreateJob}
         inviteModal={inviteModal}
@@ -1446,10 +693,8 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
         inviteSubmitting={inviteSubmitting}
         inviteSuccess={inviteSuccess ? true : false}
         handleInviteSubmit={handleInviteSubmit}
-        chatModal={chatModal ? chatModal.applicant : null}
-        setChatModal={(val) => {
-          if (!val) setChatModal(null);
-        }}
+        chatModal={chatModal}
+        setChatModal={setChatModal}
         chatMessages={chatMessages}
         chatInput={chatInput}
         setChatInput={setChatInput}

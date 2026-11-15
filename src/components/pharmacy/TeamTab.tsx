@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ShieldCheck, Users } from 'lucide-react';
 import { useTr } from '../../locale';
-import { bannerPrimaryBtn } from '../DashboardHeader';
+import { bannerPrimaryBtn } from '../../shared/ui/DashboardHeader';
 import { btnDanger, btnPlain, fieldLabel, fmtDate, jfetch } from './shared';
 
 interface Member { id: string; name: string; email: string; active: boolean; isOwner: boolean; twoFactor: boolean; mustChangePassword: boolean; createdAt: string }
@@ -14,6 +14,7 @@ export default function TeamTab() {
   const [email, setEmail] = useState('');
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [issued, setIssued] = useState<{ who: string; email: string; password: string } | null>(null);
+  const [confirmResetId, setConfirmResetId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const d = await jfetch('/api/pharmacy/staff');
@@ -33,8 +34,8 @@ export default function TeamTab() {
     if (d.status === 'success') load(); else setMsg({ ok: false, text: d.message || tx('Could not update the login.') });
   };
   const reset = async (m: Member) => {
-    if (!window.confirm(`Reset the password for ${m.name}? They will be signed out and need to set up two-factor sign-in again.`)) return;
     const d = await jfetch(`/api/pharmacy/staff/${m.id}/reset`, 'POST');
+    setConfirmResetId(null);
     if (d.status === 'success') { setIssued({ who: m.name, ...d.data }); load(); } else setMsg({ ok: false, text: d.message || tx('Could not reset the password.') });
   };
 
@@ -52,8 +53,8 @@ export default function TeamTab() {
                 <div className="min-w-0">
                   <p className="text-xs font-black text-slate-900 [overflow-wrap:anywhere] flex items-center gap-2">
                     {m.name}
-                    {m.isOwner && <span className="text-2xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 rounded-md">{tx('Owner')}</span>}
-                    {!m.active && <span className="text-2xs font-black uppercase tracking-wider text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">{tx('Disabled')}</span>}
+                    {m.isOwner && <span className="text-2xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 rounded-none">{tx('Owner')}</span>}
+                    {!m.active && <span className="text-2xs font-black uppercase tracking-wider text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-none">{tx('Disabled')}</span>}
                   </p>
                   <p className="text-xs font-semibold text-slate-600 [overflow-wrap:anywhere] mt-0.5">{m.email} · added {fmtDate(m.createdAt)}</p>
                   <p className="text-xs mt-1 flex flex-wrap gap-x-3">
@@ -62,9 +63,19 @@ export default function TeamTab() {
                   </p>
                 </div>
                 {!m.isOwner && (
-                  <div className="flex flex-wrap gap-2">
-                    <button type="button" onClick={() => reset(m)} className={btnPlain}>{tx('Reset password')}</button>
-                    {m.active ? <button type="button" onClick={() => setActive(m, false)} className={btnDanger}>{tx('Disable')}</button> : <button type="button" onClick={() => setActive(m, true)} className={btnPlain}>{tx('Enable')}</button>}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {confirmResetId === m.id ? (
+                      <>
+                        <span className="text-2xs font-bold text-rose-800">{tx('Reset password & 2FA?')}</span>
+                        <button type="button" onClick={() => reset(m)} className={btnDanger}>{tx('Confirm Reset')}</button>
+                        <button type="button" onClick={() => setConfirmResetId(null)} className={btnPlain}>{tx('Cancel')}</button>
+                      </>
+                    ) : (
+                      <>
+                        <button type="button" onClick={() => setConfirmResetId(m.id)} className={btnPlain}>{tx('Reset password')}</button>
+                        {m.active ? <button type="button" onClick={() => setActive(m, false)} className={btnDanger}>{tx('Disable')}</button> : <button type="button" onClick={() => setActive(m, true)} className={btnPlain}>{tx('Enable')}</button>}
+                      </>
+                    )}
                   </div>
                 )}
               </li>
@@ -78,12 +89,12 @@ export default function TeamTab() {
           <h2 className="text-sm font-black uppercase tracking-wider text-slate-800">{tx('Provision Staff Account')}</h2>
           <p className="text-xs text-slate-500 font-semibold mt-1">{tx('Issue a secure sign-in for a licensed pharmacist or dispensary assistant.')}</p>
         </div>
-        <label className="block"><span className={fieldLabel}>{tx('Staff Full Name')}</span><input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="h-10 w-full border border-slate-300 rounded-none px-3 bg-white text-xs font-semibold text-slate-900 outline-none focus:border-[color:var(--t-600)] transition-colors" /></label>
-        <label className="block"><span className={fieldLabel}>{tx('Staff Email Address')}</span><input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="h-10 w-full border border-slate-300 rounded-none px-3 bg-white text-xs font-semibold text-slate-900 outline-none focus:border-[color:var(--t-600)] transition-colors" /></label>
+        <label className="block"><span className={fieldLabel}>{tx('Staff Full Name')}</span><input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="h-10 w-full border border-slate-300 rounded-none px-3 bg-white text-xs font-semibold text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors" /></label>
+        <label className="block"><span className={fieldLabel}>{tx('Staff Email Address')}</span><input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="h-10 w-full border border-slate-300 rounded-none px-3 bg-white text-xs font-semibold text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors" /></label>
         <button type="submit" className={bannerPrimaryBtn}>{tx('Issue Staff Credentials')}</button>
-        {msg && <p role="status" className={`text-xs font-bold p-3 border rounded-md ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-300' : 'text-rose-900 bg-rose-50 border-rose-300'}`}>{msg.text}</p>}
+        {msg && <p role="status" className={`text-xs font-bold p-3 border rounded-none ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-300' : 'text-rose-900 bg-rose-50 border-rose-300'}`}>{msg.text}</p>}
         {issued && (
-          <div role="status" className="text-xs bg-amber-50 border border-amber-300 rounded-md p-4 font-semibold [overflow-wrap:anywhere] space-y-2">
+          <div role="status" className="text-xs bg-amber-50 border border-amber-300 rounded-none p-4 font-semibold [overflow-wrap:anywhere] space-y-2">
             <p className="font-black uppercase tracking-wider text-amber-900">One-Time Temporary Credentials for {issued.who}</p>
             <p className="text-slate-700">{tx('Share these details immediately. The generated password cannot be retrieved again.')}</p>
             <div className="bg-white border border-amber-200 p-2.5 font-mono text-xs space-y-1">

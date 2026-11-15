@@ -2,7 +2,7 @@ import React from 'react';
 import { Award, CheckCircle2, Loader, AlertCircle, MapPin, DollarSign, ShieldOff, Clock, ShieldCheck } from 'lucide-react';
 import { DoctorProfile, NurseProfile, VerificationStatus } from '../../types';
 import { formatMoney, useTr } from '../../locale';
-import VerificationStatusCard from '../VerificationStatusCard';
+import VerificationStatusCard from '../../domains/verification/VerificationStatusCard';
 
 interface PractitionerAccreditationTabProps {
   matchedProfile: DoctorProfile | NurseProfile;
@@ -148,26 +148,38 @@ export default function PractitionerAccreditationTab({
             </div>
           )}
 
-          {/* Verified Checklist Cards */}
+          {/* Statutory Checklist Cards */}
           <div className="space-y-3">
-            <h4 className="text-2xs font-black uppercase tracking-wider text-slate-500">{tx('Completed Quality Checkmarks')}</h4>
+            <h4 className="text-2xs font-black uppercase tracking-wider text-slate-500">{tx('Statutory Compliance Checklist')}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-              <div className="flex items-center gap-2.5 p-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                <span className="font-semibold text-slate-700">{tx('Identity Document check completed')}</span>
-              </div>
-              <div className="flex items-center gap-2.5 p-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                <span className="font-semibold text-slate-700">{tx('Clinical Diploma authenticated')}</span>
-              </div>
-              <div className="flex items-center gap-2.5 p-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                <span className="font-semibold text-slate-700">{tx('Malpractice Liability clearing active')}</span>
-              </div>
-              <div className="flex items-center gap-2.5 p-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                <span className="font-semibold text-slate-700">{tx('Professional Ethics code accepted')}</span>
-              </div>
+              {[
+                { label: tx('Identity Document Verification'), done: isVerified || isPending },
+                { label: tx('Clinical Diploma Authentication'), done: isVerified || isPending },
+                { label: tx('Board & APC Standing Check'), done: isVerified },
+                { label: tx('Professional Ethics & Indemnity'), done: isVerified },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center justify-between gap-2.5 p-3 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    {item.done ? (
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                    ) : isPending ? (
+                      <Clock className="h-4 w-4 text-amber-600 shrink-0" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" />
+                    )}
+                    <span className="font-semibold text-slate-700 truncate">{item.label}</span>
+                  </div>
+                  <span className={`text-2xs font-mono font-bold uppercase px-1.5 py-0.5 border shrink-0 ${
+                    item.done
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                      : isPending
+                      ? 'bg-amber-50 text-amber-800 border-amber-200'
+                      : 'bg-rose-50 text-rose-800 border-rose-200'
+                  }`}>
+                    {item.done ? tx('Verified') : isPending ? tx('In Review') : tx('Action Needed')}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

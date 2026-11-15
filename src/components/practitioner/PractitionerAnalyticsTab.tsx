@@ -1,9 +1,9 @@
-import React from 'react';
-import { TrendingUp, Star, AlertTriangle } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { TrendingUp, Star, AlertTriangle, Info } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking, OnCallDispatch, ConsultationMode } from '../../types';
 import { formatMoney, useTr } from '../../locale';
-import WorkspaceHeader from '../WorkspaceHeader';
-import { BannerBadge } from '../DashboardHeader';
+import WorkspaceHeader from '../../shared/ui/WorkspaceHeader';
+import { BannerBadge } from '../../shared/ui/DashboardHeader';
 
 interface PractitionerAnalyticsTabProps {
   matchedProfile: DoctorProfile | NurseProfile;
@@ -21,14 +21,25 @@ export default function PractitionerAnalyticsTab({
   reviewCount
 }: PractitionerAnalyticsTabProps) {
   const tx = useTr();
-  const completedBookings = myBookings.filter(b => b.status === 'Completed');
-  const completedDispatches = dispatches.filter(d => d.doctorId === matchedProfile.id && d.dispatchStatus === 'Completed');
+  const [period, setPeriod] = useState<'30d' | '90d' | 'all'>('all');
+
+  const inPeriod = (dateStr?: string) => {
+    if (period === 'all' || !dateStr) return true;
+    const t = Date.parse(dateStr);
+    if (Number.isNaN(t)) return true;
+    const days = period === '30d' ? 30 : 90;
+    return Date.now() - t <= days * 86_400_000;
+  };
+
+  const scopedBookings = useMemo(() => myBookings.filter(b => inPeriod(b.date)), [myBookings, period]);
+  const completedBookings = scopedBookings.filter(b => b.status === 'Completed');
+  const completedDispatches = dispatches.filter(d => d.doctorId === matchedProfile.id && d.dispatchStatus === 'Completed' && inPeriod(((d as any).timestamp || '').split(' ')[0]));
 
   const totalBookingsEarned = completedBookings.reduce((sum, b) => sum + b.fee, 0);
   const totalDispatchesEarned = completedDispatches.reduce((sum, d) => sum + ((d as any).fee ?? 0), 0);
   const totalEarnings = totalBookingsEarned + totalDispatchesEarned;
   const totalAttendedCount = completedBookings.length + completedDispatches.length;
-  const completionRatePct = myBookings.length > 0 ? Math.round((completedBookings.length / myBookings.length) * 100) : null;
+  const completionRatePct = scopedBookings.length > 0 ? Math.round((completedBookings.length / scopedBookings.length) * 100) : null;
 
   const videoEarned = completedBookings.filter(b => b.mode === ConsultationMode.VIDEO).reduce((sum, b) => sum + b.fee, 0);
   const inPersonEarned = completedBookings.filter(b => b.mode === ConsultationMode.IN_PERSON).reduce((sum, b) => sum + b.fee, 0);
@@ -46,7 +57,31 @@ export default function PractitionerAnalyticsTab({
             <BannerBadge tone="success">{tx('Live Ledger')}</BannerBadge>
           </>
         }
+        aside={
+          <div className="inline-flex border border-[color:var(--t-200)] bg-white" role="group" aria-label={tx('Analytics time period')}>
+            {([['30d', tx('30 Days')], ['90d', tx('90 Days')], ['all', tx('All Time')]] as const).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setPeriod(id)}
+                className={`px-3 py-1.5 text-xs font-bold cursor-pointer transition-colors ${
+                  period === id
+                    ? 'bg-[color:var(--t-600)] text-white'
+                    : 'text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        }
       />
+      {totalAttendedCount === 0 && (
+        <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-4 text-xs text-[color:var(--t-700)] flex items-start gap-2.5">
+          <Info className="h-4 w-4 shrink-0 mt-0.5" />
+          <span>{tx('No completed consultations or dispatches in this period yet. Metrics will populate automatically as you finalize patient encounters in Appointments or On-Call Dispatch.')}</span>
+        </div>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
           <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Generated Income')}</span>
@@ -74,7 +109,7 @@ export default function PractitionerAnalyticsTab({
         <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
           <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Completion Rate')}</span>
           <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--e-700)] tabular-nums">{completionRatePct != null ? `${completionRatePct}%` : '—'}</span>
-          <p className="text-xs text-slate-500 font-semibold">{tx('{a} of {b} bookings completed', { a: completedBookings.length, b: myBookings.length })}</p>
+          <p className="text-xs text-slate-500 font-semibold">{tx('{a} of {b} bookings completed', { a: completedBookings.length, b: scopedBookings.length })}</p>
         </div>
       </div>
 
@@ -92,7 +127,7 @@ export default function PractitionerAnalyticsTab({
               <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((videoEarned / totalEarnings) * 100) : 0}%</span>
             </div>
             <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
-              <div className="bg-[color:var(--t-600)] h-full rounded-none transition-all duration-500" style={{ width: `${totalEarnings > 0 ? (videoEarned / totalEarnings) * 100 : 0}%` }}></div>
+              <div className="bg-[color:var(--t-600)] h-full rounded-none transition-colors duration-500" style={{ width: `${totalEarnings > 0 ? (videoEarned / totalEarnings) * 100 : 0}%` }}></div>
             </div>
           </div>
 
@@ -102,7 +137,7 @@ export default function PractitionerAnalyticsTab({
               <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((inPersonEarned / totalEarnings) * 100) : 0}%</span>
             </div>
             <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
-              <div className="bg-[color:var(--t-600)] h-full rounded-none transition-all duration-500" style={{ width: `${totalEarnings > 0 ? (inPersonEarned / totalEarnings) * 100 : 0}%` }}></div>
+              <div className="bg-[color:var(--t-600)] h-full rounded-none transition-colors duration-500" style={{ width: `${totalEarnings > 0 ? (inPersonEarned / totalEarnings) * 100 : 0}%` }}></div>
             </div>
           </div>
 
@@ -112,7 +147,7 @@ export default function PractitionerAnalyticsTab({
               <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((totalDispatchesEarned / totalEarnings) * 100) : 0}%</span>
             </div>
             <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
-              <div className="bg-rose-600 h-full rounded-none transition-all duration-500" style={{ width: `${totalEarnings > 0 ? (totalDispatchesEarned / totalEarnings) * 100 : 0}%` }}></div>
+              <div className="bg-rose-600 h-full rounded-none transition-colors duration-500" style={{ width: `${totalEarnings > 0 ? (totalDispatchesEarned / totalEarnings) * 100 : 0}%` }}></div>
             </div>
           </div>
         </div>

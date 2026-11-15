@@ -149,6 +149,49 @@ let bookings: any[] = [
       issuedAt: "2026-07-05T11:45:00.000Z",
       digitalSignature: "Digitally Signed & Certified by Dr. Rajesh K. Sharma (MMC-32109)"
     }
+  },
+  {
+    id: "bkg-demo-101",
+    professionalId: "doc-demo-1",
+    professionalName: "Dr. Arjun Menon",
+    professionalRole: UserRole.DOCTOR,
+    patientId: "pat-99912",
+    patientName: "Aisyah Rahman",
+    patientPhone: "+60-12-884-2190",
+    patientEmail: "aisyah.r@example.com",
+    date: "2026-11-15",
+    timeSlot: "10:30 AM",
+    mode: ConsultationMode.VIDEO,
+    fee: 95,
+    paymentStatus: "Paid",
+    status: "Upcoming",
+    symptoms: "Persistent dry cough and mild evening fever for 4 days; requesting tele-consult.",
+    createdAt: "2026-11-12T09:15:00.000Z"
+  },
+  {
+    id: "bkg-demo-102",
+    professionalId: "doc-demo-1",
+    professionalName: "Dr. Arjun Menon",
+    professionalRole: UserRole.DOCTOR,
+    patientId: "pat-99913",
+    patientName: "Daniel Tan",
+    patientPhone: "+60-16-441-7720",
+    patientEmail: "daniel.tan@example.com",
+    date: "2026-11-11",
+    timeSlot: "03:00 PM",
+    mode: ConsultationMode.IN_PERSON,
+    fee: 110,
+    paymentStatus: "Paid",
+    status: "Completed",
+    symptoms: "Elevated BP reading (148/92) at home monitor with occasional morning headache.",
+    createdAt: "2026-11-10T14:00:00.000Z",
+    prescription: {
+      diagnosis: "Stage 1 Essential Hypertension — Follow-up & Lifestyle Review",
+      medicines: "1. Tab Amlodipine 5mg - 1 tablet once daily every morning\n2. Tab Paracetamol 500mg - 1 tablet PRN for headache",
+      instructions: "Reduce dietary sodium (<2g/day). Log morning and evening BP for 14 days and bring readings to follow-up.",
+      issuedAt: "2026-11-11T15:35:00.000Z",
+      digitalSignature: "Digitally Signed & Certified by Dr. Arjun Menon (DEMO-MMC-0001)"
+    }
   }
 ];
 let chats: any[] = [];
@@ -569,6 +612,55 @@ function ensureDemoData() {
         nurseProf.licenseNumber ?? "DEMO-LJM-RN-41223", (nurseProf as any).licenseExpiry ?? "2029-12-31", 45, "pending", now, null, null, null
       );
     }
+  }
+
+  // Ensure Demo Doctor has sample bookings so the Practitioner Consultations queue is populated
+  if (docProfile && !bookings.some(b => b.id === "bkg-demo-101")) {
+    bookings.push(
+      {
+        id: "bkg-demo-101",
+        professionalId: docProfile.id,
+        professionalName: docProfile.name,
+        professionalRole: UserRole.DOCTOR,
+        patientId: "pat-99912",
+        patientName: "Aisyah Rahman",
+        patientPhone: "+60-12-884-2190",
+        patientEmail: "aisyah.r@example.com",
+        date: "2026-11-15",
+        timeSlot: "10:30 AM",
+        mode: ConsultationMode.VIDEO,
+        fee: 95,
+        paymentStatus: "Paid",
+        status: "Upcoming",
+        symptoms: "Persistent dry cough and mild evening fever for 4 days; requesting tele-consult.",
+        createdAt: "2026-11-12T09:15:00.000Z"
+      },
+      {
+        id: "bkg-demo-102",
+        professionalId: docProfile.id,
+        professionalName: docProfile.name,
+        professionalRole: UserRole.DOCTOR,
+        patientId: "pat-99913",
+        patientName: "Daniel Tan",
+        patientPhone: "+60-16-441-7720",
+        patientEmail: "daniel.tan@example.com",
+        date: "2026-11-11",
+        timeSlot: "03:00 PM",
+        mode: ConsultationMode.IN_PERSON,
+        fee: 110,
+        paymentStatus: "Paid",
+        status: "Completed",
+        symptoms: "Elevated BP reading (148/92) at home monitor with occasional morning headache.",
+        createdAt: "2026-11-10T14:00:00.000Z",
+        prescription: {
+          diagnosis: "Stage 1 Essential Hypertension — Follow-up & Lifestyle Review",
+          medicines: "1. Tab Amlodipine 5mg - 1 tablet once daily every morning\n2. Tab Paracetamol 500mg - 1 tablet PRN for headache",
+          instructions: "Reduce dietary sodium (<2g/day). Log morning and evening BP for 14 days and bring readings to follow-up.",
+          issuedAt: "2026-11-11T15:35:00.000Z",
+          digitalSignature: `Digitally Signed & Certified by ${docProfile.name} (${docProfile.licenseNumber})`
+        }
+      }
+    );
   }
 }
 
@@ -1185,7 +1277,7 @@ app.post("/api/register", requireRole("practitioner"), (req, res) => {
 
 app.post("/api/professionals/:id/edit", requireRole("practitioner", "admin"), (req, res) => {
   const { id } = req.params;
-  const { bio, fee, practiceAddress, city, availability } = req.body;
+  const { bio, fee, practiceAddress, city, availability, certifications } = req.body;
 
   const prof: any = findProfessional(id);
   if (!prof) {
@@ -1200,6 +1292,9 @@ app.post("/api/professionals/:id/edit", requireRole("practitioner", "admin"), (r
   if (fee !== undefined && Number(fee) >= 0) prof.fee = Number(fee);
   if (practiceAddress !== undefined) prof.practiceAddress = str(practiceAddress, 250);
   if (city !== undefined) prof.city = str(city, 80);
+  if (Array.isArray(certifications)) {
+    prof.certifications = certifications.slice(0, 12).map((c: unknown) => str(c, 80)).filter(Boolean);
+  }
   if (availability !== undefined && Array.isArray(availability?.days) && Array.isArray(availability?.slots)) {
     prof.availability = { days: availability.days.map((d: unknown) => str(d, 20)), slots: availability.slots.map((s: unknown) => str(s, 30)) };
   }

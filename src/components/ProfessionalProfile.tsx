@@ -1,6 +1,7 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import ReportPractitioner from './ReportPractitioner';
-import TelemedicineQuestions, { defaultTeleAnswers, teleToPayload, type TeleAnswers } from './TelemedicineQuestions';
-import VerificationScopeBadge from './VerificationScopeBadge';
+import TelemedicineQuestions, { defaultTeleAnswers, teleToPayload, type TeleAnswers } from '../domains/telemedicine/TelemedicineQuestions';
+import VerificationScopeBadge from '../domains/verification/VerificationScopeBadge';
 import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, BadgeCheck, Stethoscope, Award, GraduationCap, MapPin, 
@@ -497,23 +498,23 @@ export default function ProfessionalProfile({
                     <div className="grid grid-cols-2 gap-3 text-xs">
                       <div>
                         <label className="block font-semibold text-slate-600 mb-1">{tx('Punctuality (1-5)')}</label>
-                        <select 
+                        <CustomSelect 
                           value={reviewPunctuality} 
                           onChange={(e) => setReviewPunctuality(Number(e.target.value))}
-                          className="w-full border border-slate-200 rounded-none p-1 outline-none"
+                          className="form-select w-full border border-slate-200 rounded-none px-3 h-10 outline-none"
                         >
                           {[5,4,3,2,1].map(n => <option key={n} value={n}>⭐ {n}</option>)}
-                        </select>
+                        </CustomSelect>
                       </div>
                       <div>
                         <label className="block font-semibold text-slate-600 mb-1">{tx('Communication (1-5)')}</label>
-                        <select 
+                        <CustomSelect 
                           value={reviewCommunication} 
                           onChange={(e) => setReviewCommunication(Number(e.target.value))}
-                          className="w-full border border-slate-200 rounded-none p-1 outline-none"
+                          className="form-select w-full border border-slate-200 rounded-none px-3 h-10 outline-none"
                         >
                           {[5,4,3,2,1].map(n => <option key={n} value={n}>⭐ {n}</option>)}
-                        </select>
+                        </CustomSelect>
                       </div>
                     </div>
                   </div>

@@ -1,3 +1,4 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useState } from 'react';
 import { AlertCircle, CheckCircle2, RefreshCw, Send } from 'lucide-react';
 import { MY_STATES, toE164 } from '../identity';
@@ -106,10 +107,10 @@ export default function PartnerEnquiryForm({ kind }: { kind: 'clinic' | 'pharmac
         </div>
         <div>
           <label htmlFor={id('state')} className={label}>{tx.state} *</label>
-          <select id={id('state')} className={inputCls} value={f.state} onChange={e => set({ state: e.target.value })} required>
+          <CustomSelect id={id('state')} className={`form-select ${inputCls}`} value={f.state} onChange={e => set({ state: e.target.value })} required>
             <option value="">{tx.stateChoose}</option>
             {MY_STATES.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
+          </CustomSelect>
         </div>
         <div>
           <label htmlFor={id('licence')} className={label}>{tx.licence}</label>

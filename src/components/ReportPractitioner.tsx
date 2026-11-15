@@ -1,3 +1,4 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useEffect, useState } from 'react';
 import { Flag } from 'lucide-react';
 import { useTr } from '../locale';
@@ -43,10 +44,10 @@ export default function ReportPractitioner({ professionalId }: { professionalId:
       {open && (
         <form onSubmit={submit} className="mt-3 bg-white border border-slate-200 rounded-none p-4 space-y-3 max-w-md">
           <p className="text-xs text-slate-600">{tx('Reports go to the medical board, not to the practitioner. You can only report someone you have booked.')}</p>
-          <select className={field} value={category} onChange={e => setCategory(e.target.value)} required>
+          <CustomSelect className="form-select text-xs" value={category} onChange={e => setCategory(e.target.value)} required>
             <option value="">{tx('Choose a category…')}</option>
             {categories.map(c => <option key={c} value={c}>{tx(c)}</option>)}
-          </select>
+          </CustomSelect>
           <textarea className={field} rows={4} value={description} onChange={e => setDescription(e.target.value)}
             placeholder={tx('What happened? (at least 20 characters)')} minLength={20} maxLength={2000} required />
           {msg && <p className={`text-xs font-bold ${msg.ok ? 'text-emerald-700' : 'text-rose-700'}`}>{msg.text}</p>}

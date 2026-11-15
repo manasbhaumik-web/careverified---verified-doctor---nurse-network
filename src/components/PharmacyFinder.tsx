@@ -1,6 +1,7 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Clock, MapPin, Phone, Pill, Search, Send, ShieldCheck, X, Thermometer, Truck, CheckCircle2 } from 'lucide-react';
-import DashboardHeader, { BannerKpis, FilterSelect } from './DashboardHeader';
+import DashboardHeader, { BannerKpis, FilterSelect } from '../shared/ui/DashboardHeader';
 import { useTr } from '../locale';
 
 interface Pharmacy { id: string; name: string; address: string; city: string | null; phone: string | null; hours: string | null; services: string[]; deliveryMethods?: string[]; coldChain?: boolean; panelInsurers?: string[]; licenceVerified?: boolean; licenceExpiresOn?: string | null }
@@ -14,7 +15,7 @@ const jpost = (url: string, body?: unknown) =>
   fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
 
 /** Patient: browse partner pharmacies and send an active prescription to one. */
-export default function PharmacyFinder({ embedded = false }: { embedded?: boolean } = {}) {
+export default function PharmacyFinder({ embedded = false, filterTab = 'all' }: { embedded?: boolean; filterTab?: 'all' | 'delivery' | 'open24' } = {}) {
   const tx = useTr();
   const [pharmacies, setPharmacies] = useState<Pharmacy[] | null>(null);
   const [rx, setRx] = useState<Rx[]>([]);
@@ -43,9 +44,14 @@ export default function PharmacyFinder({ embedded = false }: { embedded?: boolea
 
   const shown = list.filter(p => {
     const q = query.trim().toLowerCase();
+    const matchesTab =
+      filterTab === 'all' ||
+      (filterTab === 'delivery' && ((p.deliveryMethods && p.deliveryMethods.length > 0) || p.services.some(s => /delivery|courier/i.test(s)))) ||
+      (filterTab === 'open24' && (p.services.some(s => /24/i.test(s)) || /24/.test(p.hours || '')));
     return (q === '' || `${p.name} ${p.address} ${p.city ?? ''}`.toLowerCase().includes(q))
       && (city === ALL || p.city === city)
-      && (service === ALL || p.services.includes(service));
+      && (service === ALL || p.services.includes(service))
+      && matchesTab;
   });
   const filtersOn = query.trim() !== '' || city !== ALL || service !== ALL;
 
@@ -76,7 +82,7 @@ export default function PharmacyFinder({ embedded = false }: { embedded?: boolea
         />
       )}
 
-      <div className={embedded ? "space-y-5 pt-2" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
+      <div className={embedded ? "space-y-5" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5"}>
         {/* Unified Single-Row Filter Control Bar */}
         <section aria-label={tx('Find pharmacies')} className="bg-white border border-[color:var(--t-200)] rounded-none p-4 shadow-2xs space-y-3">
           <div className="flex flex-wrap items-center gap-3">
@@ -90,7 +96,7 @@ export default function PharmacyFinder({ embedded = false }: { embedded?: boolea
                 placeholder={tx('Search by pharmacy name, street, or city (e.g. Bangsar, Georgetown, Johor Bahru)…')}
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
+                className="w-full pl-10 pr-9 h-11 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] rounded-none text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] focus:bg-white transition-colors"
               />
               {query && (
                 <button
@@ -262,12 +268,12 @@ export default function PharmacyFinder({ embedded = false }: { embedded?: boolea
                     {isOpen ? (
                       <div className="w-full space-y-2.5 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3 rounded-none">
                         <label htmlFor={`rx-${p.id}`} className="text-xs font-black uppercase tracking-wider text-slate-700 block">{tx('Select active prescription to route')}</label>
-                        <select id={`rx-${p.id}`} value={chosen} onChange={e => setChosen(e.target.value)} className="w-full border border-[color:var(--t-200)] bg-white px-3 h-9 text-xs font-semibold rounded-none outline-none focus:border-[color:var(--t-600)]">
+                        <CustomSelect id={`rx-${p.id}`} value={chosen} onChange={e => setChosen(e.target.value)} className="form-select w-full border border-[color:var(--t-200)] bg-white px-3 h-10 text-xs font-semibold rounded-none outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]">
                           <option value="">{tx('Select prescription…')}</option>
                           {activeRx.map(r => (
                             <option key={r.id} value={r.id}>{r.code} · {r.items[0]?.name ?? tx('Prescription')}{r.items.length > 1 ? ` +${r.items.length - 1}` : ''} · {tx('valid until {date}', { date: fmt(r.validUntil) })}</option>
                           ))}
-                        </select>
+                        </CustomSelect>
                         <label className="flex items-start gap-2 text-xs text-slate-700 cursor-pointer font-medium">
                           <input type="checkbox" checked={share} onChange={e => setShare(e.target.checked)} className="mt-0.5 h-4 w-4 rounded-none accent-[color:var(--t-600)]" />
                           <span>{tx('Share my registered allergies and medication list with this pharmacy for contraindication checks')} <b>{tx('(recommended)')}</b>.</span>

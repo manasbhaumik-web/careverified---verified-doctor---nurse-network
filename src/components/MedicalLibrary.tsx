@@ -1,10 +1,11 @@
+import { CustomSelect } from '../shared/ui/CustomSelect';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocale, useTr } from '../locale';
 import { ArrowRight, BadgeCheck, Bookmark, BookOpen, ExternalLink, Flag, Printer, Search, Send, ShieldCheck, X } from 'lucide-react';
 import { Article, DoctorProfile, NurseProfile, Review, Booking } from '../types';
-import DashboardHeader, { BannerBadge, BannerKpis, FilterSelect } from './DashboardHeader';
+import DashboardHeader, { BannerBadge, BannerKpis, FilterSelect } from '../shared/ui/DashboardHeader';
 import PractitionerHeroBanner from './PractitionerHeroBanner';
-import WorkspaceHeader from './WorkspaceHeader';
+import WorkspaceHeader from '../shared/ui/WorkspaceHeader';
 import { UserAvatar } from '../avatars';
 
 interface MedicalLibraryProps {
@@ -294,6 +295,16 @@ export default function MedicalLibrary({
     }
   };
 
+  useEffect(() => {
+    try {
+      const pending = sessionStorage.getItem('medcred_library_subtab') as LibraryTabId | null;
+      if (pending) {
+        sessionStorage.removeItem('medcred_library_subtab');
+        handleLibraryTabChange(pending);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
   const libraryTabMeta: Record<LibraryTabId, {
     icon: any;
     eyebrow: string;
@@ -351,14 +362,9 @@ export default function MedicalLibrary({
             reviews={reviews}
             bookings={bookings}
             groupName={tx('Medical Library')}
-            tabs={[
-              { id: 'all' as const, label: tx('All Articles'), icon: BookOpen, count: articles.length },
-              { id: 'practitioner' as const, label: tx('Clinical Articles'), icon: ShieldCheck, count: articles.filter(a => !a.source).length },
-              { id: 'research' as const, label: tx('Research Papers'), icon: BadgeCheck, count: articles.filter(a => !!a.source).length },
-              { id: 'saved' as const, label: tx('Saved Articles'), icon: Bookmark, count: savedIds.length },
-            ]}
-            activeTab={activeLibraryTab}
-            onTabChange={handleLibraryTabChange}
+            activeTab="articles"
+            activeSubTab={activeLibraryTab}
+            onSubTabChange={(subId) => handleLibraryTabChange(subId as LibraryTabId)}
             tabsLabel={tx('Medical Library sections')}
             onOpenHelp={onOpenHelp}
           />
@@ -379,7 +385,7 @@ export default function MedicalLibrary({
         )
       )}
 
-      <div className={embedded ? "space-y-6 pt-2" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
+      <div className={embedded ? "space-y-6" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
         {!embedded && (
           <WorkspaceHeader
             icon={libraryTabMeta[activeLibraryTab].icon}
@@ -402,7 +408,7 @@ export default function MedicalLibrary({
                 placeholder={tx('Search medical topics, symptoms, or clinical terms (e.g. hypertension, diabetes, pediatrics)…')}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="flex-1 min-w-0 bg-transparent text-xs font-medium text-[color:var(--ink)] outline-none placeholder-slate-400"
+                className="flex-1 min-w-0 bg-transparent text-xs font-medium text-[color:var(--ink)] outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 placeholder-slate-400"
               />
             </div>
 
@@ -489,7 +495,7 @@ export default function MedicalLibrary({
           ) : (
             <>
               {/* Featured article */}
-              <article className="bg-white border border-[color:var(--t-200)] shadow-xs hover:shadow-md hover:border-[color:var(--t-300)] transition-all flex flex-wrap">
+              <article className="bg-white border border-[color:var(--t-200)] shadow-xs hover:shadow-md hover:border-[color:var(--t-300)] transition-colors flex flex-wrap">
                 <div className="flex-[1_1_240px] min-w-0 min-h-[200px] bg-[color:var(--t-50)] border-b md:border-b-0 md:border-r border-[color:var(--t-200)] flex items-center justify-center">
                   <div className="h-[72px] w-[72px] bg-[color:var(--t-600)] text-white flex items-center justify-center">
                     <BookOpen className="h-8 w-8" />
@@ -525,7 +531,7 @@ export default function MedicalLibrary({
 
               <section aria-label={tx('Articles')} className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {rest.map(art => (
-                  <article key={art.id} className="bg-white border border-[color:var(--t-200)] shadow-xs hover:shadow-md hover:border-[color:var(--t-300)] transition-all p-5 flex flex-col gap-3">
+                  <article key={art.id} className="bg-white border border-[color:var(--t-200)] shadow-xs hover:shadow-md hover:border-[color:var(--t-300)] transition-colors p-5 flex flex-col gap-3">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-2xs font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-0.5">{tx(art.category)}</span>
                       <span className="text-xs text-slate-600">{art.date}</span>
@@ -711,10 +717,10 @@ export default function MedicalLibrary({
                   <p className="text-xs text-slate-500">{tx('You have no patients yet. You can recommend articles to people you have treated.')}</p>
                 ) : (
                   <div className="grid gap-2 sm:grid-cols-[220px_1fr_auto] items-start">
-                    <select value={recPatient} onChange={e => setRecPatient(e.target.value)} aria-label={tx('Patient')} className="border border-slate-200 bg-white px-3 py-2 text-xs">
+                    <CustomSelect value={recPatient} onChange={e => setRecPatient(e.target.value)} aria-label={tx('Patient')} className="form-select h-11 border border-slate-200 bg-white px-3 text-xs">
                       <option value="">{tx('Choose a patient…')}</option>
                       {patients.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                    </select>
+                    </CustomSelect>
                     <input value={recNote} onChange={e => setRecNote(e.target.value)} maxLength={300} placeholder={tx('Optional note, e.g. “Read this before our follow-up”')} aria-label={tx('Note')} className="border border-slate-200 px-3 py-2 text-xs" />
                     <button type="button" onClick={sendRecommendation} disabled={!recPatient} className="bg-[color:var(--t-600)] disabled:bg-slate-300 text-white text-xs font-extrabold px-4 py-2.5 cursor-pointer">{tx('Send')}</button>
                   </div>

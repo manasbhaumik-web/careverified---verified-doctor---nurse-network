@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediCred — Modern Eye-Pleasant Healthcare Workspace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Soft ambient card elevation */
+    .glass-card {
+      background: #ffffff;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+    }
+    .glass-card-hover:hover {
+      box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.03);
+      transform: translateY(-1px);
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f8fafc;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50/70 text-slate-800 antialiased selection:bg-teal-100 selection:text-teal-900">
+
+  <!-- TOP ROLE SWITCHER PILL (Playground Switcher) -->
+  <div class="bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-50 px-4 py-2 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
+    <div class="flex items-center gap-2.5">
+      <div class="w-2.5 h-2.5 rounded-full bg-teal-500 animate-pulse"></div>
+      <span class="text-xs font-bold text-slate-700 tracking-tight">Eye-Pleasant Modern Workspaces:</span>
+    </div>
+
+    <!-- Soft Pill Segmented Control -->
+    <div class="flex items-center gap-1 bg-slate-100/80 p-1 rounded-full border border-slate-200/60 shadow-inner">
+      <button onclick="switchRole('pharmacy')" id="role-btn-pharmacy" class="role-btn px-3.5 py-1 text-xs font-bold rounded-full bg-white text-teal-700 shadow-xs transition-all flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+        <span>Pharmacy</span>
+      </button>
+      <button onclick="switchRole('practitioner')" id="role-btn-practitioner" class="role-btn px-3.5 py-1 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-full transition-all flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+        <span>Doctor (Practitioner)</span>
+      </button>
+      <button onclick="switchRole('facility')" id="role-btn-facility" class="role-btn px-3.5 py-1 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-full transition-all flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+        <span>Clinic / Hospital</span>
+      </button>
+      <button onclick="switchRole('patient')" id="role-btn-patient" class="role-btn px-3.5 py-1 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-full transition-all flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+        <span>Patient Portal</span>
+      </button>
+    </div>
+
+    <div class="hidden sm:flex items-center gap-2 text-xs font-medium text-slate-500">
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-teal-50 text-teal-700 border border-teal-200/60">
+        ✨ Human-Centered UX
+      </span>
+      <span>Soft Aesthetic</span>
+    </div>
+  </div>
+
+  <!-- 1. WARM, CALM PRIMARY HEADER (58px) -->
+  <header class="bg-gradient-to-r from-teal-700 via-teal-800 to-cyan-800 text-white shadow-sm">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 h-15 flex items-center justify-between gap-4 py-2.5">
+      
+      <!-- Brand & Soft Tag -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 bg-white/10 backdrop-blur-md text-white font-extrabold text-lg flex items-center justify-center rounded-xl border border-white/20 shadow-xs">
+            <svg class="w-5 h-5 text-teal-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v12m6-6H6"></path></svg>
+          </div>
+          <div class="flex flex-col leading-none">
+            <div class="flex items-center gap-1.5">
+              <span class="text-base font-extrabold tracking-tight">MediCred</span>
+              <span class="w-1.5 h-1.5 rounded-full bg-teal-300"></span>
+            </div>
+            <span class="text-[10px] font-semibold text-teal-200/90 mt-0.5" id="headerRoleSubtitle">Pharmacy Workspace</span>
+          </div>
+        </div>
+
+        <span class="hidden md:inline-block w-px h-6 bg-white/20 mx-2"></span>
+
+        <!-- Nav Tabs with Soft Organic Pills -->
+        <nav class="hidden md:flex items-center gap-1.5" id="roleNavPills">
+          <!-- Injected dynamically -->
+        </nav>
+      </div>
+
+      <!-- User Profile & Verified Badge -->
+      <div class="flex items-center gap-3">
+        <div class="hidden lg:flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/15 text-xs font-medium text-teal-100">
+          <svg class="w-3.5 h-3.5 text-teal-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+          <span id="statutoryBadgeText">Verified Care Network</span>
+        </div>
+
+        <!-- Language Pill -->
+        <button class="px-3 py-1 text-xs font-semibold bg-white/10 hover:bg-white/20 border border-white/15 text-white rounded-full transition-colors">
+          MY · EN
+        </button>
+
+        <!-- Profile Avatar Pill -->
+        <div class="flex items-center gap-2.5 pl-2">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-teal-200 to-cyan-100 text-teal-900 font-extrabold text-xs flex items-center justify-center shadow-xs border-2 border-white/30" id="headerAvatar">
+            BP
+          </div>
+          <div class="hidden sm:flex flex-col text-left leading-tight">
+            <span class="text-xs font-bold text-white" id="headerProfileName">Bangsar Care</span>
+            <span class="text-[11px] text-teal-200/90" id="headerProfileLic">Lic: A-9921</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. MODERN EYE-PLEASANT HERO BANNER (Warm, Human, Approachable) -->
+  <section class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 pt-5 pb-3">
+    <div class="glass-card rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Entity Identity & Warm Greeting -->
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-50 to-teal-100/80 border border-teal-200/60 flex items-center justify-center text-teal-700 shadow-xs shrink-0" id="bannerIcon">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <h1 class="text-lg font-bold text-slate-900 tracking-tight" id="bannerTitle">Bangsar Care Pharmacy</h1>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-800 border border-teal-200/60" id="bannerBadge1">
+              Type A Licence
+            </span>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/60" id="bannerBadge2">
+              LFM Accredited
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1 max-w-xl flex items-center gap-1.5" id="bannerSubtitle">
+            <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+            <span>28 Jalan Telawi 3, Bangsar, Kuala Lumpur</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- KPI Status Pills (Eye-Pleasant Rounded Pills) -->
+      <div class="flex items-center gap-2 flex-wrap" id="kpiStrip">
+        <!-- Injected dynamically per role -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 3. FLOATING COHESIVE COMMAND BAR (48px - Rounded-2xl, Gentle Shadow) -->
+  <section class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-2">
+    <div class="glass-card rounded-2xl px-4 py-2 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Search Input with Soft Pill & Friendly Action -->
+      <div class="flex items-center gap-2.5 flex-1 max-w-xl">
+        <div class="relative flex-1">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input 
+            type="text" 
+            id="searchInput"
+            oninput="handleSearch(this.value)"
+            placeholder="Search by code, patient name, or medicine... (Ctrl + K)" 
+            class="w-full h-10 pl-10 pr-10 bg-slate-50/80 hover:bg-slate-100/70 focus:bg-white border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 text-xs font-medium text-slate-900 rounded-xl placeholder:text-slate-400 transition-all"
+          >
+          <kbd class="hidden sm:inline-block absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-400 bg-white px-1.5 py-0.5 rounded border border-slate-200">⌘K</kbd>
+        </div>
+
+        <button onclick="handlePrimaryAction()" id="primaryActionBtn" class="h-10 px-4 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white text-xs font-bold flex items-center gap-1.5 rounded-xl shadow-xs shadow-teal-600/20 hover:shadow-sm transition-all shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span id="primaryActionLabel">+ Quick Action</span>
+        </button>
+      </div>
+
+      <!-- Telemetry, Period Filter, and Export -->
+      <div class="flex items-center gap-3">
+        <!-- Subtle Live Status Indicator -->
+        <div class="hidden md:flex items-center gap-2 text-xs text-slate-600 px-3 py-1.5 bg-slate-50/80 rounded-xl border border-slate-200/60">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="font-semibold text-slate-700" id="telemetryLabel">Live stream</span>
+          <span class="text-slate-400 font-mono text-[11px]" id="clockTime">22:45:00</span>
+        </div>
+
+        <!-- Friendly Dropdown Filter -->
+        <div class="relative flex items-center bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200/80 pl-3.5 pr-3 h-10 min-w-[180px] rounded-xl transition-colors focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/20">
+          <span class="text-[11px] font-bold text-slate-500 mr-2 uppercase tracking-wide">Period:</span>
+          <span id="filterLabel" class="flex-1 text-xs font-bold text-slate-800 truncate pr-2">Last 30 days</span>
+          <svg class="w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          <select id="periodSelect" onchange="updatePeriod(this.value)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" aria-label="Reporting Period">
+            <option value="Last 7 days">Last 7 days</option>
+            <option value="Last 30 days" selected>Last 30 days</option>
+            <option value="Last 90 days">Last 90 days</option>
+          </select>
+        </div>
+
+        <button onclick="downloadReport()" class="h-10 px-3.5 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 text-xs font-semibold flex items-center gap-1.5 rounded-xl shadow-2xs transition-colors">
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          <span class="hidden sm:inline">Export</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 4. MASTER-DETAIL EYE-PLEASANT BENTO WORKSTATION -->
+  <main class="flex-1 max-w-[1600px] w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+    
+    <!-- LEFT PANE: SOFT & CLEAR QUEUE (5 cols / ~42%) -->
+    <div class="lg:col-span-5 flex flex-col glass-card rounded-2xl overflow-hidden">
+      
+      <!-- Queue Header Bar -->
+      <div class="bg-slate-50/70 border-b border-slate-100 px-5 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-600" id="queueHeaderTitle">Active Queue</h2>
+          <span id="queueCountBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200/60">3 Orders</span>
+        </div>
+        <div class="text-[11px] text-slate-400 font-medium">
+          Auto-updated
+        </div>
+      </div>
+
+      <!-- Scrollable Queue Items -->
+      <div id="queueListContainer" class="divide-y divide-slate-100/80 max-h-[calc(100vh-320px)] overflow-y-auto">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Queue Footer Status -->
+      <div class="bg-slate-50/50 border-t border-slate-100 px-5 py-2.5 flex items-center justify-between text-xs text-slate-400">
+        <span class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+          <span id="queueSyncLabel">Cloud sync connected</span>
+        </span>
+        <button onclick="refreshData()" class="text-teal-600 hover:text-teal-700 font-semibold text-xs flex items-center gap-1">
+          Refresh
+        </button>
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANE: LIVE DETAIL INSPECTOR (7 cols / ~58%) -->
+    <div class="lg:col-span-7 glass-card rounded-2xl overflow-hidden flex flex-col" id="detailInspectorContainer">
+      <!-- Rendered dynamically -->
+    </div>
+
+  </main>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="hidden fixed bottom-6 right-6 bg-slate-900/90 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-xl text-xs font-medium z-50 flex items-center gap-3 border border-slate-700">
+    <span class="w-2 h-2 rounded-full bg-teal-400"></span>
+    <span id="toastMsg">Action completed successfully.</span>
+    <button onclick="closeToast()" class="text-slate-400 hover:text-white">&times;</button>
+  </div>
+
+  <script>
+    // Live clock
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('clockTime').textContent = now.toTimeString().split(' ')[0];
+    }, 1000);
+
+    // Friendly Human-Centered Datasets
+    const ROLE_DATA = {
+      pharmacy: {
+        subtitle: "Pharmacy Dispensing Hub",
+        statutoryText: "Verified Care Network",
+        profileName: "Bangsar Care",
+        profileLic: "Lic: A-9921",
+        avatar: "BP",
+        bannerIconSvg: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>`,
+        bannerTitle: "Bangsar Care Pharmacy",
+        bannerBadge1: "Type A Poison Licence",
+        bannerBadge2: "Accredited Dispenser",
+        bannerSubtitle: "28 Jalan Telawi 3, Bangsar, Kuala Lumpur",
+        primaryActionLabel: "+ Walk-in Code",
+        telemetryLabel: "Live Rx stream",
+        queueTitle: "Incoming Prescriptions",
+        queueCount: "3 Orders",
+        navPills: [
+          { label: "Prescription Dispensing", active: true, pulse: true },
+          { label: "Medication Inventory", active: false },
+          { label: "Dispensing History", active: false }
+        ],
+        kpis: [
+          { id: "all", label: "All Orders", count: "3", active: true },
+          { id: "ready", label: "Ready to Dispense", count: "1", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+          { id: "progress", label: "Preparing", count: "1", color: "bg-amber-50 text-amber-700 border-amber-200" },
+          { id: "new", label: "New Incoming", count: "1", color: "bg-teal-50 text-teal-700 border-teal-200" }
+        ],
+        queue: [
+          {
+            id: 1,
+            code: "RX-2026-2002",
+            status: "Ready for Pickup",
+            statusClass: "bg-emerald-50 text-emerald-700 border-emerald-200/80",
+            time: "12 mins ago",
+            title: "Wong Mei Ling",
+            meta: "38 y/o · IC: 880412-14-5542",
+            summary: "Amoxicillin 500mg, Paracetamol 500mg",
+            subtext: "Prescribed by Dr. Siti Aminah",
+            badge: "Allergy Safe"
+          },
+          {
+            id: 2,
+            code: "RX-2026-2001",
+            status: "In Preparation",
+            statusClass: "bg-amber-50 text-amber-700 border-amber-200/80",
+            time: "27 mins ago",
+            title: "Ahmad Razak bin Osman",
+            meta: "51 y/o · IC: 750920-10-5891",
+            summary: "Metformin 500mg, Atorvastatin 20mg",
+            subtext: "Prescribed by Dr. Kevin Tan",
+            badge: "Packaging"
+          },
+          {
+            id: 3,
+            code: "RX-2026-2003",
+            status: "New Intake",
+            statusClass: "bg-teal-50 text-teal-700 border-teal-200/80",
+            time: "1 min ago",
+            title: "Priya a/p Suresh",
+            meta: "34 y/o · IC: 920315-08-6124",
+            summary: "Salbutamol Inhaler, Cetirizine 10mg",
+            subtext: "Prescribed by Dr. Lim Wei Hong",
+            badge: "Review Required"
+          }
+        ]
+      },
+
+      practitioner: {
+        subtitle: "Doctor Clinical Care Hub",
+        statutoryText: "Verified Medical Doctor",
+        profileName: "Dr. Siti Aminah",
+        profileLic: "MMC: 48219",
+        avatar: "SA",
+        bannerIconSvg: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>`,
+        bannerTitle: "Dr. Siti Aminah binti Yusof",
+        bannerBadge1: "Internal Medicine",
+        bannerBadge2: "Active Practice License",
+        bannerSubtitle: "Klinik Bangsar Utama · MMC Registered #48219",
+        primaryActionLabel: "+ New Consultation",
+        telemetryLabel: "Consult Queue",
+        queueTitle: "Today's Patient Schedule",
+        queueCount: "3 Patients",
+        navPills: [
+          { label: "Patient Care", active: true, pulse: true },
+          { label: "My Appointments", active: false },
+          { label: "Clinical Notes & Library", active: false }
+        ],
+        kpis: [
+          { id: "all", label: "Today's Consults", count: "8", active: true },
+          { id: "waiting", label: "In Waiting Room", count: "2", color: "bg-amber-50 text-amber-700 border-amber-200" },
+          { id: "active", label: "In Consultation", count: "1", color: "bg-teal-50 text-teal-700 border-teal-200" },
+          { id: "completed", label: "Completed", count: "5", color: "bg-emerald-50 text-emerald-700 border-emerald-200" }
+        ],
+        queue: [
+          {
+            id: 1,
+            code: "CONS-0811",
+            status: "In Consultation",
+            statusClass: "bg-teal-50 text-teal-700 border-teal-200/80",
+            time: "Started 8m ago",
+            title: "Tan Sri Razali Ismail",
+            meta: "72 y/o (M) · Regular Checkup",
+            summary: "Hypertension review, mild persistent cough",
+            subtext: "BP: 142/88 mmHg · SpO2: 98%",
+            badge: "Room 2 Active"
+          },
+          {
+            id: 2,
+            code: "CONS-0812",
+            status: "Up Next",
+            statusClass: "bg-amber-50 text-amber-700 border-amber-200/80",
+            time: "Waiting 14m",
+            title: "Nurul Huda binti Halim",
+            meta: "30 y/o (F) · Walk-in",
+            summary: "Migraine headache with visual aura",
+            subtext: "Vitals: BP 118/74 · Afebrile",
+            badge: "Waiting Room"
+          },
+          {
+            id: 3,
+            code: "CONS-0813",
+            status: "Video Teleconsult",
+            statusClass: "bg-purple-50 text-purple-700 border-purple-200/80",
+            time: "11:45 AM",
+            title: "David Chong Wei Lun",
+            meta: "45 y/o (M) · Teleconsult",
+            summary: "Follow-up review for lipid panel results",
+            subtext: "Encrypted HD Video Call",
+            badge: "Ready to Connect"
+          }
+        ]
+      },
+
+      facility: {
+        subtitle: "Clinic & Hospital Overview",
+        statutoryText: "Licensed Healthcare Facility",
+        profileName: "Pantai Medical Bangsar",
+        profileLic: "Accredited",
+        avatar: "PM",
+        bannerIconSvg: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>`,
+        bannerTitle: "Pantai Medical Centre Bangsar",
+        bannerBadge1: "Private Hospital",
+        bannerBadge2: "24/7 Emergency Care",
+        bannerSubtitle: "8 Jalan Bukit Pantai, Kuala Lumpur · 120 Inpatient Beds",
+        primaryActionLabel: "+ Schedule Staff",
+        telemetryLabel: "Facility Live Pulse",
+        queueTitle: "Clinical Departments",
+        queueCount: "3 Units",
+        navPills: [
+          { label: "Department Overview", active: true, pulse: true },
+          { label: "Doctor & Nurse Roster", active: false },
+          { label: "Operating Theatres", active: false }
+        ],
+        kpis: [
+          { id: "all", label: "Bed Occupancy", count: "82%", active: true },
+          { id: "doctors", label: "Doctors On-Duty", count: "14", color: "bg-teal-50 text-teal-700 border-teal-200" },
+          { id: "nurses", label: "Nurses On-Duty", count: "38", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+          { id: "ot", label: "Active Surgery Suites", count: "4 / 5", color: "bg-slate-100 text-slate-700 border-slate-200" }
+        ],
+        queue: [
+          {
+            id: 1,
+            code: "A&E DEPT",
+            status: "Busy / Active",
+            statusClass: "bg-amber-50 text-amber-700 border-amber-200/80",
+            time: "Updated 2m ago",
+            title: "Accident & Emergency (A&E)",
+            meta: "Lead: Dr. Farhan Azman",
+            summary: "12 beds occupied · 4 triage incoming",
+            subtext: "3 Doctors & 8 Nurses on duty",
+            badge: "Staffing Optimal"
+          },
+          {
+            id: 2,
+            code: "ICU WARD",
+            status: "Stable",
+            statusClass: "bg-emerald-50 text-emerald-700 border-emerald-200/80",
+            time: "Updated 5m ago",
+            title: "Intensive Care Unit (ICU)",
+            meta: "Lead: Dr. Lim Siew Ling",
+            summary: "8 / 10 ventilator beds occupied",
+            subtext: "2 Intensivists & 10 Nurses on duty",
+            badge: "All Systems Normal"
+          },
+          {
+            id: 3,
+            code: "SURGERY OT-2",
+            status: "Surgery In Progress",
+            statusClass: "bg-teal-50 text-teal-700 border-teal-200/80",
+            time: "Started 10:30 AM",
+            title: "Operating Suite 2",
+            meta: "Surgeon: Dr. Kevin Tan",
+            summary: "Laparoscopic Procedure",
+            subtext: "Anesthetist: Dr. Arumugam",
+            badge: "In Progress"
+          }
+        ]
+      },
+
+      patient: {
+        subtitle: "My Health & Prescriptions",
+        statutoryText: "Private & Encrypted",
+        profileName: "Wong Mei Ling",
+        profileLic: "Verified Patient",
+        avatar: "WM",
+        bannerIconSvg: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>`,
+        bannerTitle: "Welcome back, Mei Ling",
+        bannerBadge1: "Active Patient Profile",
+        bannerBadge2: "Blood Type: O+",
+        bannerSubtitle: "Bangsar, Kuala Lumpur · No known drug allergies",
+        primaryActionLabel: "+ Book Doctor Visit",
+        telemetryLabel: "Health Hub",
+        queueTitle: "My Prescriptions & Visits",
+        queueCount: "2 Active",
+        navPills: [
+          { label: "My Prescriptions", active: true, pulse: true },
+          { label: "Upcoming Appointments", active: false },
+          { label: "Lab Test Reports", active: false }
+        ],
+        kpis: [
+          { id: "all", label: "Prescription Ready", count: "1", active: true },
+          { id: "apt", label: "Upcoming Visits", count: "1", color: "bg-teal-50 text-teal-700 border-teal-200" },
+          { id: "docs", label: "Health Documents", count: "4", color: "bg-slate-100 text-slate-700 border-slate-200" }
+        ],
+        queue: [
+          {
+            id: 1,
+            code: "RX-2026-2002",
+            status: "Ready for Pickup",
+            statusClass: "bg-emerald-50 text-emerald-700 border-emerald-200/80",
+            time: "Ready today",
+            title: "Bangsar Care Pharmacy",
+            meta: "Dr. Siti Aminah · 2 items",
+            summary: "Amoxicillin 500mg, Paracetamol 500mg",
+            subtext: "Show Digital Pass code at counter",
+            badge: "Available Now"
+          },
+          {
+            id: 2,
+            code: "APT-4410",
+            status: "Upcoming Appointment",
+            statusClass: "bg-teal-50 text-teal-700 border-teal-200/80",
+            time: "Tomorrow, 2:30 PM",
+            title: "Dr. Siti Aminah (Follow-up)",
+            meta: "Klinik Bangsar Utama",
+            summary: "Post-treatment checkup & consultation",
+            subtext: "SMS reminder scheduled",
+            badge: "Confirmed"
+          }
+        ]
+      }
+    };
+
+    let currentRole = 'pharmacy';
+    let selectedItemId = 1;
+
+    function switchRole(roleKey) {
+      currentRole = roleKey;
+      selectedItemId = 1;
+
+      // Update switcher buttons
+      document.querySelectorAll('.role-btn').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-teal-700', 'shadow-xs');
+        btn.classList.add('text-slate-600');
+      });
+      const activeBtn = document.getElementById(`role-btn-${roleKey}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-white', 'text-teal-700', 'shadow-xs');
+        activeBtn.classList.remove('text-slate-600');
+      }
+
+      const d = ROLE_DATA[roleKey];
+      if (!d) return;
+
+      // Header updates
+      document.getElementById('headerRoleSubtitle').textContent = d.subtitle;
+      document.getElementById('statutoryBadgeText').textContent = d.statutoryText;
+      document.getElementById('headerProfileName').textContent = d.profileName;
+      document.getElementById('headerProfileLic').textContent = d.profileLic;
+      document.getElementById('headerAvatar').textContent = d.avatar;
+
+      // Nav pills
+      const navContainer = document.getElementById('roleNavPills');
+      navContainer.innerHTML = d.navPills.map(p => `
+        <button class="px-3.5 py-1.5 ${p.active ? 'bg-white/15 text-white font-bold border border-white/20' : 'text-teal-100 hover:text-white hover:bg-white/10 font-medium'} text-xs rounded-full flex items-center gap-1.5 transition-colors">
+          ${p.pulse ? '<span class="w-2 h-2 rounded-full bg-teal-300 animate-pulse"></span>' : ''}
+          ${p.label}
+        </button>
+      `).join('');
+
+      // Banner updates
+      document.getElementById('bannerIcon').innerHTML = d.bannerIconSvg;
+      document.getElementById('bannerTitle').textContent = d.bannerTitle;
+      document.getElementById('bannerBadge1').textContent = d.bannerBadge1;
+      document.getElementById('bannerBadge2').textContent = d.bannerBadge2;
+      document.getElementById('bannerSubtitle').querySelector('span').textContent = d.bannerSubtitle;
+
+      // KPI strip
+      const kpiStrip = document.getElementById('kpiStrip');
+      kpiStrip.innerHTML = d.kpis.map(k => `
+        <button class="px-3 py-1 rounded-full text-xs font-semibold ${k.active ? 'bg-teal-600 text-white shadow-xs' : 'bg-slate-100/90 hover:bg-slate-200/80 text-slate-700'} border border-slate-200/50 flex items-center gap-1.5 transition-all">
+          <span>${k.label}:</span>
+          <span class="font-bold">${k.count}</span>
+        </button>
+      `).join('');
+
+      // Command Bar
+      document.getElementById('primaryActionLabel').textContent = d.primaryActionLabel;
+      document.getElementById('telemetryLabel').textContent = d.telemetryLabel;
+
+      // Queue container
+      document.getElementById('queueHeaderTitle').textContent = d.queueTitle;
+      document.getElementById('queueCountBadge').textContent = d.queueCount;
+
+      renderQueueList();
+      renderDetailInspector();
+      showToast(`Switched view to ${d.subtitle}`);
+    }
+
+    function renderQueueList() {
+      const d = ROLE_DATA[currentRole];
+      const container = document.getElementById('queueListContainer');
+      container.innerHTML = d.queue.map(item => `
+        <div onclick="selectItem(${item.id})" class="p-4 hover:bg-teal-50/30 cursor-pointer transition-all ${item.id === selectedItemId ? 'bg-teal-50/50 border-l-4 border-teal-600' : 'border-l-4 border-transparent'}">
+          <div class="flex items-center justify-between mb-1.5">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-900">${item.code}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${item.statusClass}">${item.status}</span>
+            </div>
+            <span class="text-[11px] text-slate-400 font-medium">${item.time}</span>
+          </div>
+
+          <div class="flex items-baseline justify-between mb-1">
+            <span class="text-sm font-bold text-slate-800">${item.title}</span>
+            <span class="text-xs text-slate-500">${item.meta}</span>
+          </div>
+
+          <p class="text-xs text-slate-600 line-clamp-1 flex items-center gap-1.5 mt-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
+            <span>${item.summary}</span>
+          </p>
+
+          <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span>${item.subtext}</span>
+            <span class="text-teal-700 font-bold text-[11px]">${item.badge}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function selectItem(id) {
+      selectedItemId = id;
+      renderQueueList();
+      renderDetailInspector();
+    }
+
+    function renderDetailInspector() {
+      const container = document.getElementById('detailInspectorContainer');
+      const d = ROLE_DATA[currentRole];
+      const item = d.queue.find(q => q.id === selectedItemId) || d.queue[0];
+
+      if (currentRole === 'pharmacy') {
+        container.innerHTML = `
+          <!-- Inspector Header -->
+          <div class="p-6 border-b border-slate-100 bg-gradient-to-br from-teal-50/30 via-white to-slate-50/50">
+            <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+              <div>
+                <div class="flex items-center gap-2 mb-1.5">
+                  <h3 class="text-xl font-extrabold text-slate-900 font-mono">${item.code}</h3>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border ${item.statusClass}">${item.status}</span>
+                </div>
+                <p class="text-xs text-slate-500">Verified Electronic Prescription · Ready for Patient Fulfillment</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="showToast('🖨️ Dispensing label ready to print')" class="px-3.5 py-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl shadow-2xs transition-colors flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                  Print Label
+                </button>
+              </div>
+            </div>
+
+            <!-- Patient & Prescriber Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="bg-white/80 p-3.5 rounded-xl border border-slate-200/70 shadow-2xs">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Patient Recipient</span>
+                <div class="text-sm font-bold text-slate-900">${item.title}</div>
+                <div class="text-xs text-slate-500 mt-0.5">${item.meta}</div>
+              </div>
+              <div class="bg-white/80 p-3.5 rounded-xl border border-slate-200/70 shadow-2xs">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Prescribing Doctor</span>
+                <div class="text-sm font-bold text-slate-900 flex items-center gap-1">
+                  <span>Dr. Siti Aminah binti Yusof</span>
+                  <svg class="w-3.5 h-3.5 text-teal-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                </div>
+                <div class="text-xs text-slate-500 mt-0.5">MMC 48219 · Klinik Bangsar Utama</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Allergy Safety Badge (Friendly Pastel Banner) -->
+          <div class="mx-6 mt-4 p-3 bg-emerald-50/80 border border-emerald-200/60 rounded-xl flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2 text-emerald-800 font-semibold">
+              <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+              <span>Drug Allergy Check: Safe to Dispense</span>
+            </div>
+            <span class="text-[11px] font-medium text-emerald-700 bg-white/70 px-2 py-0.5 rounded-full border border-emerald-200/50">Verified</span>
+          </div>
+
+          <!-- Medication Checklist -->
+          <div class="p-6 flex-1 space-y-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Prescribed Pharmaceuticals</h4>
+            <div class="border border-slate-200/80 rounded-xl divide-y divide-slate-100 overflow-hidden bg-white">
+              
+              <div class="p-3.5 flex items-start justify-between gap-3 hover:bg-slate-50/50 transition-colors">
+                <div class="flex items-start gap-3">
+                  <input type="checkbox" checked class="mt-1 w-4 h-4 text-teal-600 rounded-md border-slate-300 focus:ring-teal-500 cursor-pointer">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-sm font-bold text-slate-900">Amoxicillin 500mg</span>
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200/60">Poison B</span>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-0.5">Take 1 capsule 3 times daily after meals for 7 days.</p>
+                    <span class="text-[11px] text-slate-400 mt-1 block">Batch: BX-2025-09A · Expiry: Aug 2027</span>
+                  </div>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-xs font-bold text-slate-800 block">21 Capsules</span>
+                  <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">In Stock</span>
+                </div>
+              </div>
+
+              <div class="p-3.5 flex items-start justify-between gap-3 hover:bg-slate-50/50 transition-colors">
+                <div class="flex items-start gap-3">
+                  <input type="checkbox" checked class="mt-1 w-4 h-4 text-teal-600 rounded-md border-slate-300 focus:ring-teal-500 cursor-pointer">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-sm font-bold text-slate-900">Paracetamol 500mg</span>
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-800 border border-blue-200/60">Poison C</span>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-0.5">Take 2 tablets every 6 hours as needed for fever or headache.</p>
+                    <span class="text-[11px] text-slate-400 mt-1 block">Batch: PC-2026-01B · Expiry: Dec 2028</span>
+                  </div>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-xs font-bold text-slate-800 block">30 Tablets</span>
+                  <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">In Stock</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Bottom Action Bar -->
+          <div class="p-5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between gap-3">
+            <span class="text-xs text-slate-400">All checks completed &amp; recorded</span>
+            <div class="flex items-center gap-2">
+              <button onclick="showToast('Review requested from prescriber')" class="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors">
+                Flag Issue
+              </button>
+              <button onclick="showToast('✓ Order marked dispensed & patient notified')" class="px-5 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white text-xs font-bold rounded-xl shadow-xs shadow-teal-600/20 hover:shadow-sm transition-all flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Dispense &amp; Notify Patient
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (currentRole === 'practitioner') {
+        container.innerHTML = `
+          <!-- Inspector Header -->
+          <div class="p-6 border-b border-slate-100 bg-gradient-to-br from-teal-50/30 via-white to-slate-50/50">
+            <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="text-xl font-extrabold text-slate-900">${item.title}</h3>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border ${item.statusClass}">${item.status}</span>
+                </div>
+                <p class="text-xs text-slate-500">${item.meta} · Active Consultation Session</p>
+              </div>
+              <button onclick="showToast('📹 Video Room Started')" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-xs transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                Connect Video Call
+              </button>
+            </div>
+
+            <!-- Triage Summary Pill -->
+            <div class="p-3 bg-white/80 rounded-xl border border-slate-200/70 flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-700">Triage Vitals:</span>
+              <span class="text-slate-600 font-medium">BP: 142/88 mmHg · Heart Rate: 76 bpm · SpO2: 98% · Temp: 36.8°C</span>
+              <span class="text-[11px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full">Normal Range</span>
+            </div>
+          </div>
+
+          <!-- Doctor's Consultation Notes -->
+          <div class="p-6 flex-1 space-y-4">
+            <div>
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1.5">Consultation Notes &amp; Findings</label>
+              <textarea rows="3" class="w-full p-3.5 bg-slate-50/80 hover:bg-slate-100/50 focus:bg-white border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 text-xs text-slate-800 rounded-xl leading-relaxed transition-all">Patient reports mild persistent dry cough for the past 2 weeks without fever. Chest auscultation clear bilaterally. Vitals stable. Advised to start symptomatic syrup and maintain hydration.</textarea>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Prescribed Treatments</label>
+                <button onclick="showToast('+ Medicine added to prescription')" class="text-xs text-teal-600 hover:text-teal-700 font-bold">+ Add Item</button>
+              </div>
+              <div class="border border-slate-200/80 rounded-xl p-3.5 bg-white space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-bold text-slate-900">1. Dextromethorphan HBr 15mg</span>
+                  <span class="text-slate-500">1 tablet 3 times daily as needed</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-bold text-slate-900">2. Amlodipine 5mg</span>
+                  <span class="text-slate-500">1 tablet daily in the morning</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action Bar -->
+          <div class="p-5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between gap-3">
+            <span class="text-xs text-slate-400">Dr. Siti Aminah · MMC #48219</span>
+            <button onclick="showToast('✓ Consultation signed & saved to patient record')" class="px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              Complete &amp; Sign Consult
+            </button>
+          </div>
+        `;
+      } else if (currentRole === 'facility') {
+        container.innerHTML = `
+          <!-- Inspector Header -->
+          <div class="p-6 border-b border-slate-100 bg-gradient-to-br from-teal-50/30 via-white to-slate-50/50">
+            <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="text-xl font-extrabold text-slate-900">${item.title}</h3>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border ${item.statusClass}">${item.status}</span>
+                </div>
+                <p class="text-xs text-slate-500">${item.meta} · Active Department Floor</p>
+              </div>
+              <button onclick="showToast('Staff schedule opened')" class="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl shadow-2xs transition-colors">
+                Manage Roster
+              </button>
+            </div>
+
+            <!-- Department Metric Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="p-3 bg-white/80 rounded-xl border border-slate-200/70 shadow-2xs">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Bed Occupancy</span>
+                <div class="text-base font-extrabold text-slate-900">12 / 14 Beds (86%)</div>
+              </div>
+              <div class="p-3 bg-white/80 rounded-xl border border-slate-200/70 shadow-2xs">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Avg Wait Time</span>
+                <div class="text-base font-extrabold text-teal-700">8 mins</div>
+              </div>
+              <div class="p-3 bg-white/80 rounded-xl border border-slate-200/70 shadow-2xs">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Staff Coverage</span>
+                <div class="text-base font-extrabold text-emerald-700">100% Rostered</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Staffing on Duty List -->
+          <div class="p-6 flex-1 space-y-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Personnel Currently On Duty</h4>
+            <div class="border border-slate-200/80 rounded-xl divide-y divide-slate-100 overflow-hidden bg-white">
+              <div class="p-3.5 flex items-center justify-between text-xs">
+                <div>
+                  <span class="font-bold text-slate-900">Dr. Farhan Azman</span>
+                  <span class="text-slate-500 block text-[11px]">Emergency Medicine Consultant · MMC 41092</span>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">On Duty</span>
+              </div>
+              <div class="p-3.5 flex items-center justify-between text-xs">
+                <div>
+                  <span class="font-bold text-slate-900">Sister Cheryl Lim</span>
+                  <span class="text-slate-500 block text-[11px]">Clinical Nurse Specialist · LJM 18921</span>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">On Duty</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action Bar -->
+          <div class="p-5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between gap-3">
+            <span class="text-xs text-slate-400">All shifts verified &amp; signed</span>
+            <button onclick="showToast('Shift report downloaded')" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all">
+              Export Roster
+            </button>
+          </div>
+        `;
+      } else if (currentRole === 'patient') {
+        container.innerHTML = `
+          <!-- Inspector Header -->
+          <div class="p-6 border-b border-slate-100 bg-gradient-to-br from-teal-50/30 via-white to-slate-50/50">
+            <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="text-xl font-extrabold text-slate-900">${item.title}</h3>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border ${item.statusClass}">${item.status}</span>
+                </div>
+                <p class="text-xs text-slate-500">${item.meta} · Ready for collection</p>
+              </div>
+            </div>
+
+            <!-- Eye-Pleasant Digital Pass Card -->
+            <div class="p-4 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-2xl text-white shadow-sm flex items-center justify-between gap-4">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-teal-100 block mb-0.5">Counter Pickup Passcode</span>
+                <div class="text-2xl font-black font-mono tracking-wider">DCLHAS7GS3</div>
+                <p class="text-xs text-teal-100 mt-1">Show this code or tap below to present your digital QR pass at Bangsar Care Pharmacy.</p>
+              </div>
+              <div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center font-mono text-xs font-bold border border-white/30 shrink-0">
+                [ QR ]
+              </div>
+            </div>
+          </div>
+
+          <!-- Prescribed Medication Summary -->
+          <div class="p-6 flex-1 space-y-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Your Prescribed Medications</h4>
+            <div class="border border-slate-200/80 rounded-xl divide-y divide-slate-100 overflow-hidden bg-white">
+              <div class="p-3.5 text-xs">
+                <span class="font-bold text-slate-900 text-sm">Amoxicillin 500mg</span>
+                <p class="text-slate-600 mt-0.5">Take 1 capsule 3 times daily after food for 7 days. Please complete full course.</p>
+              </div>
+              <div class="p-3.5 text-xs">
+                <span class="font-bold text-slate-900 text-sm">Paracetamol 500mg</span>
+                <p class="text-slate-600 mt-0.5">Take 2 tablets as needed for pain or fever. Maximum 8 tablets in 24 hours.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action Bar -->
+          <div class="p-5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between gap-3">
+            <span class="text-xs text-slate-400">Prescription valid for 30 days</span>
+            <button onclick="showToast('📍 Opened Google Maps to Pharmacy')" class="px-5 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all">
+              Get Directions to Pharmacy
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    function handlePrimaryAction() {
+      const d = ROLE_DATA[currentRole];
+      showToast(`Action clicked: ${d.primaryActionLabel}`);
+    }
+
+    function handleSearch(val) {
+      const q = val.toLowerCase().trim();
+      document.querySelectorAll('#queueListContainer > div').forEach(el => {
+        const text = el.textContent.toLowerCase();
+        el.style.display = text.includes(q) ? 'block' : 'none';
+      });
+    }
+
+    function updatePeriod(val) {
+      document.getElementById('filterLabel').textContent = val;
+      showToast(`Period changed to: ${val}`);
+    }
+
+    function downloadReport() {
+      showToast("📥 Exported summary report.");
+    }
+
+    function refreshData() {
+      showToast("🔄 Synced with live health network.");
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3500);
+    }
+
+    function closeToast() {
+      document.getElementById('toast').classList.add('hidden');
+    }
+
+    // Keyboard shortcut
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        document.getElementById('searchInput').focus();
+      }
+    });
+
+    // Start on pharmacy
+    switchRole('pharmacy');
+  </script>
+</body>
+</html>
