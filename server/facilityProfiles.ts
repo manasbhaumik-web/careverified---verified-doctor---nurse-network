@@ -9,6 +9,7 @@ import { requireRole, createUser, createSession, passwordProblem, emailTaken, ty
 import { notifyAdmins, notify } from "./verification";
 import { recordConsent, CONSENT_VERSION } from "./privacy";
 import { decryptFile } from "./fileCrypto";
+import { str, fail, parse, row, rows, newId, today, isDate } from "./util";
 
 /**
  * Facility self-service: registration, admin approval, profile (departments, services, accreditation claims, photos) and staff with roles.
@@ -25,14 +26,6 @@ const KINDS = ["hospital", "clinic"];
 const MAX_PHOTOS = 8;
 const MAX_DEPARTMENTS = 30;
 
-const str = (v: unknown, max = 200) => (typeof v === "string" ? v.trim().slice(0, max) : "");
-const fail = (res: Response, code: number, message: string) => res.status(code).json({ status: "error", message });
-const parse = <T,>(v: unknown, fallback: T): T => { try { return v ? (JSON.parse(String(v)) as T) : fallback; } catch { return fallback; } };
-const row = (sql: string, ...p: any[]) => db.prepare(sql).get(...p) as any;
-const rows = (sql: string, ...p: any[]) => db.prepare(sql).all(...p) as any[];
-const newId = (p: string) => `${p}-${crypto.randomBytes(5).toString("hex")}`;
-const today = () => new Date().toISOString().slice(0, 10);
-const isDate = (v: string) => /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v));
 
 const uploadsRoot = path.join(dataDir, "uploads");
 
@@ -133,7 +126,10 @@ export function registerFacilityProfiles(app: Application) {
     const decision = req.body.decision, note = str(req.body.note, 500);
     if (decision !== "approve" && decision !== "reject") return fail(res, 400, "Decision must be approve or reject.");
     if (decision === "reject" && !note) return fail(res, 400, "Give a reason for rejecting.");
-    if (decision === "approve" && !f.licence_no) return fail(res, 400, "Cannot approve a facility with no licence number.");
+    // The public lists only look at the licence expiry date, so approval must not rely on a licence nobody has checked.
+    if (decision === "approve" && (!f.licence_no || !f.licence_checked_at || !f.licence_expiry || f.licence_expiry <= today())) {
+      return fail(res, 400, "Record the licence check first (licence number, a future expiry date and how you checked it) before approving.");
+    }
     db.prepare("UPDATE tourism_facilities SET approval_status = ?, approval_note = ?, active = ? WHERE id = ?")
       .run(decision === "approve" ? "approved" : "rejected", note || null, decision === "approve" ? 1 : 0, f.id);
     for (const u of rows("SELECT id FROM users WHERE facility_id = ?", f.id)) {
@@ -160,13 +156,22 @@ export function registerFacilityProfiles(app: Application) {
     const id = requireFacilityAccess(req, res, true);
     if (!id) return;
     const b = req.body ?? {};
-    const departments = (Array.isArray(b.departments) ? b.departments : []).slice(0, MAX_DEPARTMENTS)
-      .map((d: any) => ({ name: str(d?.name, 80), description: str(d?.description, 300) || undefined })).filter((d: any) => d.name);
-    const website = str(b.website, 200);
-    if (website && !/^https:\/\/\S+$/.test(website)) return fail(res, 400, "The website must start with https://");
-    db.prepare("UPDATE tourism_facilities SET description=?, phone=?, email=?, website=?, address=?, city=?, state=?, departments=?, service_list=? WHERE id=?")
-      .run(str(b.description, 1500) || null, str(b.phone, 30) || null, str(b.email, 120) || null, website || null, str(b.address, 250) || null,
-        str(b.city, 60) || null, str(b.state, 60) || null, JSON.stringify(departments), JSON.stringify(cleanList(b.services, 40)), id);
+    // Only the fields that were sent are changed: leaving a field out keeps it, sending "" or [] clears it.
+    const sets: string[] = [], vals: any[] = [];
+    const text: [string, string, number][] = [["description", "description", 1500], ["phone", "phone", 30], ["email", "email", 120], ["address", "address", 250], ["city", "city", 60], ["state", "state", 60]];
+    for (const [key, col, max] of text) if (b[key] !== undefined) { sets.push(`${col}=?`); vals.push(str(b[key], max) || null); }
+    if (b.website !== undefined) {
+      const website = str(b.website, 200);
+      if (website && !/^https:\/\/\S+$/.test(website)) return fail(res, 400, "The website must start with https://");
+      sets.push("website=?"); vals.push(website || null);
+    }
+    if (b.departments !== undefined) {
+      const departments = (Array.isArray(b.departments) ? b.departments : []).slice(0, MAX_DEPARTMENTS)
+        .map((d: any) => ({ name: str(d?.name, 80), description: str(d?.description, 300) || undefined })).filter((d: any) => d.name);
+      sets.push("departments=?"); vals.push(JSON.stringify(departments));
+    }
+    if (b.services !== undefined) { sets.push("service_list=?"); vals.push(JSON.stringify(cleanList(b.services, 40))); }
+    if (sets.length) db.prepare(`UPDATE tourism_facilities SET ${sets.join(", ")} WHERE id=?`).run(...vals, id);
     audit(req, "facility.profile.update", { target: ["facility", id] });
     res.json({ status: "success", data: profileView(row("SELECT * FROM tourism_facilities WHERE id = ?", id)) });
   });

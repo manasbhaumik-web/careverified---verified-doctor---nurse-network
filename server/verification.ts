@@ -382,6 +382,8 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
       licenseNumber: prof.licenseNumber, medicalCouncil: prof.medicalCouncil ?? prof.nursingCouncil,
       degreeName: prof.education?.[0] ?? "", fileUrl: "", submittedAt: new Date().toISOString(),
       status: VerificationStatus.PENDING, kind: "renewal",
+      // A caregiver's identity and references were checked at the first application: carry them over so the renewal only needs the new certificate.
+      ...(prof.role === CAREGIVER_ROLE ? { caregiverChecks: [...ctx.requests()].reverse().find(r => r.userId === prof.id && r.caregiverChecks)?.caregiverChecks } : {}),
     };
     ctx.requests().push(request);
     logEvent(request.id, prof.id, req.user!.id, "renewal_submitted", str(req.body.note, 1000), true);

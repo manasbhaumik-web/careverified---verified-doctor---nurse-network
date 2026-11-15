@@ -13,13 +13,22 @@ import { deriveState, isPublicState, type CredentialState } from "./credentialSt
 db.exec("CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)");
 
 /** Secret for badge links, kept in the database so QR codes keep working across restarts. BADGE_SECRET overrides it. */
+let storedSecret: string | null = null; // read from the database once, not for every token
+
 function badgeSecret(): string {
   if (process.env.BADGE_SECRET) return process.env.BADGE_SECRET;
+  if (storedSecret) return storedSecret;
   const found = db.prepare("SELECT value FROM settings WHERE key = 'badge_secret'").get() as { value: string } | undefined;
-  if (found) return found.value;
+  if (found) return (storedSecret = found.value);
   const fresh = crypto.randomBytes(32).toString("hex");
   db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('badge_secret', ?)").run(fresh);
-  return (db.prepare("SELECT value FROM settings WHERE key = 'badge_secret'").get() as { value: string }).value;
+  return (storedSecret = (db.prepare("SELECT value FROM settings WHERE key = 'badge_secret'").get() as { value: string }).value);
+}
+
+// The database copy lives and dies with the instance's data folder (on Vercel it is a temporary folder per instance), so printed QR codes only
+// last if the secret comes from the environment.
+if (process.env.NODE_ENV === "production" && !process.env.BADGE_SECRET) {
+  console.warn("[badge] BADGE_SECRET is not set. QR badges stop working when this instance's data folder is reset or when a second instance serves a request. Set BADGE_SECRET.");
 }
 
 /** Stable, unguessable token for a profile. It is the only identifier the public ever sees. */

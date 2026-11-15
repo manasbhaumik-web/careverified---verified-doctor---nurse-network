@@ -94,6 +94,37 @@ test('caregiver tier end to end: register, incomplete approval refused, then ver
   assert.match(found[0].registrationNumber, /^CG-/);
 });
 
+test('expiry sweep over HTTP: flags an expiring caregiver, audits it and tells them; the renewal can then be approved', async () => {
+  const inDays = (n: number) => new Date(Date.now() + n * 86_400_000).toISOString().slice(0, 10);
+  const c = await registerAccount('caregiver3@example.com');
+  const reg = await c.call('POST', '/api/register', body({ name: 'Nora Salleh', idNumber: '900101-14-5559', certificateExpiry: inDays(10) }));
+  assert.equal(reg.status, 201);
+  const requestId = reg.data.data.verificationRequestId;
+  assert.equal(await upload(c, requestId), 201);
+  assert.equal((await admin.call('POST', `/api/verification-requests/${requestId}/decision`, { decision: 'approve' })).status, 200);
+
+  const sweep = await admin.call('POST', '/api/admin/verification/run-expiry-sweep');
+  assert.equal(sweep.status, 200);
+  const mine = (sweep.data.data.changes as any[]).filter(x => x.name === 'Nora Salleh (demo)' || x.name === 'Nora Salleh');
+  assert.equal(mine.length, 1, JSON.stringify(sweep.data.data));
+  assert.deepEqual([mine[0].from, mine[0].to], ['verified', 'expiring']);
+  assert.equal((await admin.call('POST', '/api/admin/verification/run-expiry-sweep')).data.data.changed, 0, 'a second run changes nothing');
+
+  const logs = (await admin.call('GET', '/api/admin/audit-logs?action=auto_expiring')).data.data.logs as any[];
+  assert.ok(logs.some(l => l.target_id === mine[0].id && l.actor_role === 'system'), 'the change is in the audit log');
+  const notes = (await c.call('GET', '/api/notifications')).data.data as any[];
+  assert.ok(notes.some(n => /expiring/i.test(n.title)), 'the caregiver was told');
+
+  // renewal: identity and references carry over, so the new certificate is all that is needed
+  const renew = await c.call('POST', '/api/my-verification/renew', { licenseExpiry: inDays(400) });
+  assert.equal(renew.status, 201);
+  const renewId = renew.data.data.verificationRequestId;
+  assert.equal((await admin.call('POST', `/api/verification-requests/${renewId}/decision`, { decision: 'approve' })).status, 400, 'no new certificate yet');
+  assert.equal(await upload(c, renewId), 201);
+  const ok = await admin.call('POST', `/api/verification-requests/${renewId}/decision`, { decision: 'approve' });
+  assert.equal(ok.status, 200, JSON.stringify(ok.data));
+});
+
 test('caregiver whose identity check fails cannot be approved', async () => {
   const c = await registerAccount('caregiver2@example.com');
   const reg = await c.call('POST', '/api/register', body({ name: 'Lee Mei Ling', idNumber: '900101-14-5550' }));

@@ -74,6 +74,11 @@ test('a pending facility can complete its profile, claim accreditation and attac
   const mine = pending.find(f => f.name === 'Lotus Specialist Clinic');
   assert.ok(mine);
   assert.equal((await admin.call('POST', `/api/admin/facilities/${mine.id}/approval`, { decision: 'reject' })).status, 400, 'a reason is needed to reject');
+  const early = await admin.call('POST', `/api/admin/facilities/${mine.id}/approval`, { decision: 'approve' });
+  assert.equal(early.status, 400, 'cannot approve a licence nobody has checked');
+  assert.match(early.data.message, /licence check/i);
+  assert.equal((await admin.call('POST', `/api/admin/tourism/facilities/${mine.id}/licence`, { licenceNo: 'PHFSA-TEST-001', licenceExpiry: '2020-01-01', reference: 'test', confirmed: true })).status, 400, 'an expired licence cannot be recorded');
+  assert.equal((await admin.call('POST', `/api/admin/tourism/facilities/${mine.id}/licence`, { licenceNo: 'PHFSA-TEST-001', licenceExpiry: '2031-01-01', reference: 'checked on the regulator site', confirmed: true })).status, 200);
   assert.equal((await admin.call('POST', `/api/admin/facilities/${mine.id}/approval`, { decision: 'approve' })).status, 200);
   assert.equal((await admin.call('POST', `/api/admin/facilities/${mine.id}/approval`, { decision: 'approve' })).status, 409, 'already decided');
 
@@ -82,6 +87,34 @@ test('a pending facility can complete its profile, claim accreditation and attac
   assert.deepEqual(pub.departments.map((d: any) => d.name), ['Paediatrics', 'Women health']);
   assert.equal((await fetch(srv.base + url)).status, 200, 'photo is public once approved');
   assert.equal((await fetch(`${srv.base}/api/public/facilities/${mine.id}/photos/not-a-photo`)).status, 404);
+});
+
+test('a partial profile update keeps the fields that were not sent', async () => {
+  const owner = srv.client();
+  await owner.login('lotus@example.com', 'Passw0rd!ok', 'facility');
+  const before = (await owner.call('GET', '/api/facility/profile')).data.data;
+  assert.equal(before.departments.length, 2);
+  const r = await owner.call('PUT', '/api/facility/profile', { description: 'Updated text only' });
+  assert.equal(r.status, 200);
+  const after = r.data.data;
+  assert.equal(after.description, 'Updated text only');
+  assert.equal(after.phone, before.phone, 'phone kept');
+  assert.equal(after.website, before.website, 'website kept');
+  assert.deepEqual(after.departments, before.departments, 'departments kept');
+  assert.deepEqual(after.services, before.services, 'services kept');
+  const cleared = (await owner.call('PUT', '/api/facility/profile', { phone: '', services: [] })).data.data;
+  assert.equal(cleared.phone, null, 'an empty value clears it on purpose');
+  assert.deepEqual(cleared.services, []);
+  assert.equal(cleared.description, 'Updated text only');
+  assert.equal((await owner.call('PUT', '/api/facility/profile', { phone: '05-5550100', services: ['Health screening'] })).status, 200);
+});
+
+test('a facility account can keep only a limited number of uploaded files', async () => {
+  const c = srv.client();
+  assert.equal((await c.call('POST', '/api/auth/register-facility', reg({ facilityName: 'Uploader Clinic', email: 'uploader@example.com', licenceNo: 'PHFSA-TEST-009' }))).status, 201);
+  let last = 0;
+  for (let i = 0; i < 26; i++) last = (await uploadDoc(c, png())).status;
+  assert.equal(last, 400, 'the 26th upload is refused');
 });
 
 test('staff roles: admin manages staff and profile, staff cannot, and a facility keeps at least one admin', async () => {

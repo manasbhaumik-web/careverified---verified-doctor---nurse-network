@@ -54,7 +54,7 @@ What it covers is in [docs/phase-1.md](docs/phase-1.md): the public credential l
 | `FILE_ENCRYPTION_KEY` | 64 hex characters. Encrypts uploaded documents, patient files and facility photos at rest. Production refuses uploads without it. |
 | `PAYOUT_ENCRYPTION_KEY` | Same format. Encrypts payout bank account numbers. |
 | `SESSION_SECRET` | Signs session tokens. |
-| `BADGE_SECRET` | Signs the QR and badge links of the public lookup. If unset, a random one is kept in the database. |
+| `BADGE_SECRET` | Signs the QR and badge links of the public lookup. Set it in production: if unset, a random one is kept in the instance's database and printed QR codes break when that data is reset. |
 | `MEDCRED_WEBHOOK_SECRET` | Signs webhooks sent to hospital systems. Without it no webhook is sent. |
 | `REGISTRY_ADAPTER` | `mock` uses a fake regulator register in development. Unset means manual review only. |
 | `API_RATE_LIMIT` | API calls per minute per IP (default 300). |

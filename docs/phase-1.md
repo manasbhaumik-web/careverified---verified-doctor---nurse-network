@@ -25,6 +25,7 @@ Legal and regulatory wording in the screens is placeholder text for legal review
 - **`Expired` is a new stored status.** Adding a value is safe for existing rows, and every existing "is verified" check excludes it automatically.
 - **A verified profile with no expiry date stays verified.** This is legacy and seed data; approval already requires a future expiry. The admin overview flags it.
 - **Facility roles are `admin` and `staff`.** The account that registered the facility is always an admin. Staff can work with jobs, shifts and applicants but cannot change the profile, staff or billing. A facility keeps at least one admin.
+- **Approval needs a recorded licence check.** The board must first record the facility licence (number, future expiry, how it was checked) through the existing admin route; approving without it is refused. A facility account can keep at most 25 uploaded files, because anyone can register one.
 - **A pending facility can sign in** (to finish its profile) but is hidden from every public list until approved.
 - **Accreditations entered by a facility are claims.** They are shown publicly only after the board records a checked accreditation through the existing admin route.
 - **Photos reuse the document upload** (private storage, access controlled) and are served publicly only while the facility is approved and the photo is attached to it.

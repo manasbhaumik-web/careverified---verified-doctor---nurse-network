@@ -13,6 +13,7 @@ const root = path.join(dataDir, "uploads");
 try { fs.mkdirSync(root, { recursive: true }); } catch { /* serverless read-only fallback */ }
 
 const MAX_BYTES = 5 * 1024 * 1024;
+const MAX_FACILITY_FILES = 25;
 const KINDS = ["license", "degree", "identity", "lab_result", "cpd", "certificate", "other"];
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_BYTES, files: 1 } });
 
@@ -59,6 +60,10 @@ documentsRouter.post("/", requireAuth, (req, res) => {
     const labOrderId = req.body.labOrderId ? String(req.body.labOrderId) : null;
     if (kind === "lab_result" && (!labOrderId || clinical?.labOrderOwner(labOrderId) !== req.user!.id)) {
       return res.status(403).json({ status: "error", message: "That lab order is not yours." });
+    }
+    // A facility can register itself without review, so its storage is capped until the board has dealt with it.
+    if (req.user!.role === "facility" && (db.prepare("SELECT COUNT(*) AS n FROM documents WHERE owner_id = ?").get(req.user!.id) as any).n >= MAX_FACILITY_FILES) {
+      return res.status(400).json({ status: "error", message: `A facility account can keep up to ${MAX_FACILITY_FILES} uploaded files.` });
     }
     const id = "doc-" + crypto.randomBytes(8).toString("hex");
     const storedName = `${crypto.randomBytes(16).toString("hex")}.${type.ext}`;
