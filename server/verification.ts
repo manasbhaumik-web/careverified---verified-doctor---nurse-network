@@ -98,20 +98,10 @@ for (const col of ["webhook_id TEXT", "endpoint_url TEXT", "next_retry_at TEXT",
   try { db.exec(`ALTER TABLE webhook_dispatch_logs ADD COLUMN ${col}`); } catch { /* column exists */ }
 }
 
-// Seed default hospital HR integration webhooks
+// Earlier builds seeded webhooks pointing at real hospital domains. Never send practitioner data to third parties by default: switch those rows off.
 try {
-  if (!db.prepare("SELECT 1 FROM hospital_webhooks LIMIT 1").get()) {
-    const seedHooks = [
-      { id: "whk-pantai-kl", name: "Pantai Hospital Kuala Lumpur (IHH Healthcare HR)", url: "https://api.pantai.com.my/v1/hr/credential-sync", events: "practitioner.verified,practitioner.suspended" },
-      { id: "whk-kpj-corp", name: "KPJ Healthcare Berhad (Medical Affairs & Staffing)", url: "https://api.kpjhealth.com.my/integration/practitioners", events: "practitioner.verified,practitioner.suspended" },
-      { id: "whk-gleneagles-kl", name: "Gleneagles Hospital KL (Clinical Locum Operations)", url: "https://api.gleneagles.com.my/webhooks/staffing", events: "practitioner.verified" },
-    ];
-    const now = new Date().toISOString();
-    for (const h of seedHooks) {
-      db.prepare("INSERT INTO hospital_webhooks (id, facility_name, endpoint_url, event_types, active, created_at) VALUES (?, ?, ?, ?, 1, ?)").run(h.id, h.name, h.url, h.events, now);
-    }
-  }
-} catch { /* tables already seeded */ }
+  db.prepare("UPDATE hospital_webhooks SET active = 0 WHERE id IN ('whk-pantai-kl','whk-kpj-corp','whk-gleneagles-kl')").run();
+} catch { /* nothing to switch off */ }
 
 export const INFO_REQUESTED = "Info Requested";
 const REVERIFY_MONTHS = 12;
@@ -149,7 +139,11 @@ export async function executeWebhookDelivery(
   attempt = 1,
   maxRetries = 3
 ) {
-  const secretKey = process.env.MEDCRED_WEBHOOK_SECRET || "whsec_medcred_statutory_kpj_pantai_live_2026";
+  const secretKey = process.env.MEDCRED_WEBHOOK_SECRET;
+  if (!secretKey) {
+    db.prepare("UPDATE webhook_dispatch_logs SET status = 'skipped', last_error = ? WHERE id = ?").run("MEDCRED_WEBHOOK_SECRET is not set; nothing was sent.", logId);
+    return { success: false, status: 0, error: "MEDCRED_WEBHOOK_SECRET is not set" };
+  }
   const signature = crypto.createHmac("sha256", secretKey).update(payloadString).digest("hex");
   const now = new Date().toISOString();
 

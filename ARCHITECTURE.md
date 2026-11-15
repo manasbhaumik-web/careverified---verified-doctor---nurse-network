@@ -258,7 +258,7 @@ CREATE TABLE IF NOT EXISTS hospital_webhooks (
   facility_name TEXT NOT NULL,
   endpoint_url TEXT NOT NULL,
   event_types TEXT NOT NULL,
-  secret_key TEXT NOT NULL DEFAULT 'whsec_medcred_statutory_kpj_pantai_live_2026',
+  secret_key TEXT NOT NULL -- set per hook; never commit a real secret,
   active INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL
 );
