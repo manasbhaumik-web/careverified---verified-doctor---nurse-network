@@ -1678,7 +1678,9 @@ app.post("/api/jobs", requireRole("practitioner", "admin", "facility"), (req, re
   if (f.facilityId) {
     const fac = db.prepare("SELECT id, name, active FROM tourism_facilities WHERE id = ?").get(f.facilityId) as any;
     if (!fac || !fac.active) return fail(res, 404, "Employer not found in the facility register.");
-    const allowed = req.user!.role === "admin" || req.user!.role === "facility" || !!db.prepare("SELECT 1 AS x FROM tourism_facility_staff WHERE facility_id = ? AND user_id = ?").get(fac.id, req.user!.id);
+    // A facility account may post only for its own facility.
+    const ownFacility = req.user!.role === "facility" && (req.user!.facilityId || req.user!.profileId) === fac.id;
+    const allowed = req.user!.role === "admin" || ownFacility || !!db.prepare("SELECT 1 AS x FROM tourism_facility_staff WHERE facility_id = ? AND user_id = ?").get(fac.id, req.user!.id);
     if (!allowed) return fail(res, 403, "You can only post for a facility you are assigned to.");
   }
   if (f.sector === "private") {
