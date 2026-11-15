@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   email TEXT NOT NULL UNIQUE COLLATE NOCASE,
   password_hash TEXT NOT NULL,
-  role TEXT NOT NULL CHECK (role IN ('patient','practitioner','admin','pharmacy','facility')),
+  role TEXT NOT NULL CHECK (role IN ('patient','practitioner','admin','pharmacy','facility','nurse')),
   name TEXT NOT NULL,
   avatar_url TEXT,
   profile_id TEXT,
@@ -198,16 +198,16 @@ CREATE TABLE IF NOT EXISTS facility_messages (
 CREATE INDEX IF NOT EXISTS idx_fac_msg_thread ON facility_messages(job_id, applicant_user_id);
 `);
 
-// ---- Migration: allow the 'pharmacy' and 'facility' roles. ----
+// ---- Migration: allow the 'pharmacy', 'facility', and 'nurse' roles. ----
 {
   const def = (db.prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'users'").get() as { sql?: string } | undefined)?.sql ?? "";
-  if (def && (!def.includes("'pharmacy'") || !def.includes("'facility'"))) {
+  if (def && (!def.includes("'pharmacy'") || !def.includes("'facility'") || !def.includes("'nurse'"))) {
     let next = def
       .replace(/^CREATE TABLE\s+(IF NOT EXISTS\s+)?["`]?users["`]?/i, "CREATE TABLE users_fac_new");
     // Append a role to the CHECK (role IN (...)) list wherever it ends: the list may already carry other roles (e.g. 'org').
     const addRole = (sql: string, role: string) => sql.includes(`'${role}'`) ? sql : sql.replace(/(role\s+TEXT[^)]*?IN\s*\([^)]*)\)/i, `$1,'${role}')`);
-    next = addRole(addRole(next, "pharmacy"), "facility");
-    if (!next.startsWith("CREATE TABLE users_fac_new") || !next.includes("'facility'")) throw new Error("Could not migrate the users table for the facility role.");
+    next = addRole(addRole(addRole(next, "pharmacy"), "facility"), "nurse");
+    if (!next.startsWith("CREATE TABLE users_fac_new") || !next.includes("'nurse'")) throw new Error("Could not migrate the users table for the nurse role.");
     try { db.exec("PRAGMA wal_checkpoint(TRUNCATE)"); } catch { /* not in WAL mode */ }
     fs.copyFileSync(path.join(dataDir, "careverified.db"), path.join(dataDir, `careverified.before-facility-role-${Date.now()}.db`));
     db.exec("PRAGMA foreign_keys = OFF");

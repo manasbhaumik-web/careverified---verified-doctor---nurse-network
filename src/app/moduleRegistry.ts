@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { ADMIN_SUB_ROLES, AdminSubRole, AppPackage } from '../types';
 
-export type SessionRole = 'patient' | 'practitioner' | 'admin' | 'pharmacy' | 'facility';
+export type SessionRole = 'patient' | 'practitioner' | 'nurse' | 'admin' | 'pharmacy' | 'facility';
 
 export interface NavItemDef {
   id: string;
@@ -45,7 +45,7 @@ export const ROLE_MODULES: Record<SessionRole, RoleModuleDef[]> = {
       name: 'My Care',
       shortLabel: 'My Care',
       icon: Heart,
-      aliases: ['patient_care', 'patient_dashboard', 'appointments', 'consult', 'messages', 'saved'],
+      aliases: ['patient_care', 'patient_dashboard', 'overview', 'appointments', 'consult', 'messages', 'saved'],
     },
     {
       id: 'patient_records',
@@ -184,11 +184,35 @@ export const ROLE_MODULES: Record<SessionRole, RoleModuleDef[]> = {
       adminGroup: 'growth',
     },
   ],
+  nurse: [
+    {
+      id: 'nurse_care',
+      name: 'Care Visits & Roster',
+      shortLabel: 'Care Visits',
+      icon: Heart,
+      aliases: ['nurse_care', 'nurse_workspace'],
+    },
+    {
+      id: 'nurse_shifts',
+      name: 'Shifts & Locums',
+      shortLabel: 'Shifts',
+      icon: Calendar,
+      aliases: ['nurse_shifts'],
+    },
+    {
+      id: 'nurse_credentials',
+      name: 'LJM & Credentials',
+      shortLabel: 'Credentials',
+      icon: ShieldCheck,
+      aliases: ['nurse_credentials'],
+    },
+  ],
 };
 
 export const MOBILE_PRIORITY: Record<SessionRole, string[]> = {
   patient: ['patient_care', 'patient_records', 'patient_services', 'patient_discovery'],
   practitioner: ['onboard', 'recruitment', 'practice_compliance', 'performance_profile'],
+  nurse: ['nurse_care', 'nurse_shifts', 'nurse_credentials'],
   pharmacy: ['pharmacy_dispensing', 'pharmacy_operations'],
   facility: ['facility_staffing', 'facility_care', 'facility_profile'],
   admin: ['admin_registry', 'admin_ops', 'admin_facilities', 'admin_growth'],
@@ -230,6 +254,9 @@ export const SHORT_LABEL: Record<string, string> = {
   admin_ops: 'Operations',
   admin_facilities: 'Facilities',
   admin_growth: 'Growth',
+  nurse_care: 'Care Visits',
+  nurse_shifts: 'Shifts',
+  nurse_credentials: 'Credentials',
 };
 
 export const STANDARD_MODULE_IDS = new Set([
@@ -238,6 +265,7 @@ export const STANDARD_MODULE_IDS = new Set([
   'performance_profile', 'messages', 'seo', 'admin', 'admin_registry', 'admin_ops',
   'admin_facilities', 'admin_growth', 'consult', 'oncall', 'earnings', 'quality', 'help',
   'facility_workspace', 'facility_staffing', 'facility_care', 'facility_profile',
+  'nurse_workspace', 'nurse_care', 'nurse_shifts', 'nurse_credentials',
   'pharmacy_workspace', 'pharmacy_dispensing', 'pharmacy_operations',
   'records', 'prescriptions', 'certs', 'labs', 'saved', 'pharmacies',
   'packages', 'assistance', 'tourism', 'tourism_desk', 'profile',
@@ -312,7 +340,7 @@ export function getPatientGroup(view: string): 'care' | 'records' | 'services' |
 export function getPatientTab(view: string): any {
   if (
     [
-      'appointments', 'consult', 'messages', 'saved', 'records', 'prescriptions',
+      'overview', 'appointments', 'consult', 'messages', 'saved', 'records', 'prescriptions',
       'certs', 'labs', 'packages', 'assistance', 'tourism', 'registry',
       'nurses', 'pharmacies', 'articles',
     ].includes(view)

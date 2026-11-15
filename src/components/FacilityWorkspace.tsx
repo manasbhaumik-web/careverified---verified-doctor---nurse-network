@@ -388,6 +388,19 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
           ].map(g => ({
             id: g.key,
             label: tx(FACILITY_GROUPS[g.key].name),
+            summary: tx(FACILITY_GROUPS[g.key].summary),
+            cta: {
+              label:
+                g.key === 'staffing'
+                  ? tx('Manage Shift Vacancies')
+                  : g.key === 'care'
+                  ? tx('Review Patient Referrals')
+                  : tx('Edit Facility Profile'),
+              onClick: () => {
+                window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: g.viewId }));
+                setTab(FACILITY_GROUPS[g.key].defaultTab);
+              },
+            },
             icon: g.icon,
             count: g.count,
             activeSubTab: tab,
@@ -398,6 +411,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
             subItems: FACILITY_GROUPS[g.key].tabs.map(t => ({
               ...t,
               label: tx(t.label),
+              description: tx(t.description),
               count: t.id === 'shifts' ? (stats.pendingApplicants || undefined) : t.id === 'cases' ? (stats.patientCases || undefined) : undefined,
             })),
           }))}

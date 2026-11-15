@@ -6,6 +6,7 @@ import TouristAccess from './TouristAccess';
 import VerificationScopeBadge from '../domains/verification/VerificationScopeBadge';
 import ThemeSwitcher from './ThemeSwitcher';
 import LocaleSwitcher from './LocaleSwitcher';
+import BrandLogo from '../shared/ui/BrandLogo';
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'motion/react';
 import {
   ShieldCheck, Search, PackagePlus, CheckCircle2, RefreshCw,
@@ -668,18 +669,12 @@ export default function LandingPage({ professionals }: LandingPageProps) {
       {/* ═══════════ NAVBAR (LIGHT TONE PRIMARY BACKGROUND) ═══════════ */}
       <nav className="sticky top-0 z-50 bg-[color:var(--t-50)]/95 backdrop-blur-md border-b border-[color:var(--t-200)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-2.5 sm:py-3.5 flex flex-nowrap sm:flex-wrap justify-between items-center gap-2 sm:gap-4">
-          <a href="#top" className="flex items-center gap-2.5 sm:gap-3.5 group min-w-0">
-            <span className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-none bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-700)] group-hover:bg-[color:var(--t-700)] transition-colors">
-              <Cross className="h-5 w-5" />
-            </span>
-            <span className="flex flex-col leading-none">
-              <span className="font-display font-black text-xl sm:text-2xl tracking-tight text-[color:var(--ink)]">
-                MediCred<span className="text-[color:var(--t-600)]">.</span>
-              </span>
-              <span className="hidden sm:block text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--t-600)] mt-1">
-                {t('nav.tagline')}
-              </span>
-            </span>
+          <a href="#top" className="group min-w-0">
+            <BrandLogo
+              tone="light"
+              size="lg"
+              subtitle={<span className="hidden sm:block">{t('nav.tagline')}</span>}
+            />
           </a>
 
           <div className="flex items-center gap-2 sm:gap-3 sm:flex-wrap shrink-0">

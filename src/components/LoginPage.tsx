@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { AlertCircle, ArrowLeft, ArrowRight, Building, Building2, Heart, PlusCircle, Pill, RefreshCw, Zap, ShieldCheck, Globe } from 'lucide-react';
+import { AlertCircle, ArrowLeft, ArrowRight, Building, Building2, Heart, HeartPulse, PlusCircle, Pill, RefreshCw, Zap, ShieldCheck, Globe } from 'lucide-react';
 import ThemeSwitcher from './ThemeSwitcher';
 import LocaleSwitcher from './LocaleSwitcher';
+import BrandLogo from '../shared/ui/BrandLogo';
 import Footer from './Footer';
 import PatientRegistrationForm from './PatientRegistrationForm';
 import PractitionerSignUp from './PractitionerSignUp';
@@ -18,6 +19,7 @@ const pick = (l: LangCode): Lang => (l === 'ms' || l === 'zh' ? l : 'en');
 const ROLE_ICONS: Record<PortalRole, React.ComponentType<{ className?: string }>> = {
   patient: Heart,
   practitioner: PlusCircle,
+  nurse: HeartPulse,
   pharmacy: Pill,
   facility: Building2,
   admin: Building,
@@ -58,6 +60,7 @@ const COPY: Record<Lang, {
     roles: {
       patient: { label: 'Patient / Member', desc: 'MyKad & Passport intake, consults & e-Rx', portal: 'Member Portal', who: 'a Patient / Member' },
       practitioner: { label: 'Practitioner', desc: 'MMC / LJM verification & clinical shifts', portal: 'Practitioner Hub', who: 'a Practitioner' },
+      nurse: { label: 'Nurse / Caring Attendant', desc: 'Home care visits, ADLs, LJM & shifts', portal: 'Nursing & Care Hub', who: 'a Nurse or Caring Attendant' },
       pharmacy: { label: 'Pharmacy', desc: 'QR e-prescription inbox & dispensing logs', portal: 'Pharmacy Workspace', who: 'a Pharmacy' },
       facility: { label: 'Clinic / Hospital', desc: 'Act 586 facility, shifts, locums & quotes', portal: 'Facility Workspace', who: 'a Clinic or Hospital Staff' },
       admin: { label: 'Board Admin', desc: 'Licence audit & platform governance', portal: 'Board Admin Console', who: 'a Board Admin' },
@@ -89,6 +92,7 @@ const COPY: Record<Lang, {
     roles: {
       patient: { label: 'Pesakit / Ahli', desc: 'Pendaftaran MyKad & Pasport, konsultasi & e-Rx', portal: 'Portal Ahli', who: 'Pesakit / Ahli' },
       practitioner: { label: 'Pengamal Perubatan', desc: 'Pengesahan MMC / LJM & syif klinikal', portal: 'Hab Pengamal', who: 'Pengamal Perubatan' },
+      nurse: { label: 'Jururawat / Penjaga', desc: 'Lawatan rumah, ADL, LJM & syif jagaan', portal: 'Hab Kejururawatan & Jagaan', who: 'Jururawat atau Penjaga' },
       pharmacy: { label: 'Farmasi', desc: 'Peti masuk e-preskripsi QR & rekod dispens', portal: 'Ruang Kerja Farmasi', who: 'Farmasi' },
       facility: { label: 'Klinik / Hospital', desc: 'Fasiliti Akta 586, syif, lokum & sebut harga', portal: 'Ruang Kerja Fasiliti', who: 'Staf Klinik / Hospital' },
       admin: { label: 'Pentadbir Lembaga', desc: 'Audit lesen & tadbir urus platform', portal: 'Konsol Pentadbir', who: 'Pentadbir Lembaga' },
@@ -120,6 +124,7 @@ const COPY: Record<Lang, {
     roles: {
       patient: { label: '患者 / 会员', desc: '支持 MyKad 与国际护照、问诊及电子处方', portal: '患者会员中心', who: '患者 / 会员' },
       practitioner: { label: '执业医护人员', desc: 'MMC / LJM 执照核验与临床排班', portal: '医护工作台', who: '执业医护人员' },
+      nurse: { label: '护士 / 护理人员', desc: '居家护理、日常照护、LJM 执照与班次', portal: '护理与照护工作台', who: '护士或护理人员' },
       pharmacy: { label: '社区药房', desc: '二维码电子处方核验与调配记录', portal: '药房工作台', who: '认证药房' },
       facility: { label: '诊所 / 医院机构', desc: '586法令合规、班次排班、临时医护与报价', portal: '医疗机构工作台', who: '诊所或医院管理人员' },
       admin: { label: '委员会管理员', desc: '法定执照审核与平台合规管理', portal: '管理控制台', who: '委员会管理员' },
@@ -143,8 +148,8 @@ const COPY: Record<Lang, {
   },
 };
 
-const ROLE_KEYS: PortalRole[] = ['patient', 'practitioner', 'pharmacy', 'facility', 'admin'];
-const isRole = (v: string | null): v is PortalRole => v === 'patient' || v === 'practitioner' || v === 'pharmacy' || v === 'facility' || v === 'admin';
+const ROLE_KEYS: PortalRole[] = ['patient', 'practitioner', 'nurse', 'pharmacy', 'facility', 'admin'];
+const isRole = (v: string | null): v is PortalRole => v === 'patient' || v === 'practitioner' || v === 'nurse' || v === 'pharmacy' || v === 'facility' || v === 'admin';
 
 const inputCls = 'w-full bg-white border border-[color:var(--t-200)] rounded-none px-4 h-12 text-sm font-medium text-[color:var(--ink)] placeholder-slate-500 focus:outline-none focus:border-[color:var(--t-600)] focus:ring-1 focus:ring-[color:var(--t-600)] transition-all';
 
@@ -237,11 +242,8 @@ export default function LoginPage({ onLoginSuccess }: { onLoginSuccess: (user: S
 
       <header className="sticky top-0 z-40 bg-[color:var(--t-50)]/95 backdrop-blur-md border-b border-[color:var(--t-200)]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
-          <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="flex items-center gap-2.5 min-w-0" aria-label="MediCred home">
-            <span className="w-9 h-9 shrink-0 bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-700)]">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
-            </span>
-            <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">MediCred<span className="text-[color:var(--t-600)]">.</span></span>
+          <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="group min-w-0" aria-label="MediCred home">
+            <BrandLogo tone="light" size="md" />
           </a>
           <div className="flex items-center gap-2">
             <LocaleSwitcher />

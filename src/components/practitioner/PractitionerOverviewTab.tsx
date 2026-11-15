@@ -34,75 +34,99 @@ export default function PractitionerOverviewTab({
 }: PractitionerOverviewTabProps) {
   const tx = useTr();
   return (
-    <div id="panel-home" role="tabpanel" aria-labelledby="tab-home" tabIndex={0} className="space-y-6 animate-fade-in font-sans">
+    <div id="panel-home" role="tabpanel" aria-labelledby="tab-home" tabIndex={0} className="space-y-4 animate-fade-in font-sans">
 
-      {/* 2. LIVE CLINICAL OPERATIONS SUMMARY (NON-DUPLICATED) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="app-card-interactive app-card-equal p-5 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-[color:var(--ink-2)]">
+      {/* 2. COMPACT 4-CELL OPERATIONS RIBBON */}
+      <section className="grid grid-cols-2 lg:grid-cols-4 bg-white border border-[color:var(--t-200)]">
+        <div className="p-3.5 sm:p-4 border-r border-b lg:border-b-0 border-[color:var(--t-100)] min-w-0">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)]">
               {tx('Board Verification')}
             </span>
-            <ShieldCheck className="h-4 w-4 text-[color:var(--t-600)]" />
+            <ShieldCheck className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
           </div>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] block">
+          <span className="text-lg font-bold tracking-tight text-[color:var(--ink)] block mt-1 truncate">
             {isVerified ? tx('Verified Active') : isPending ? tx('Pending Review') : tx('Unverified')}
           </span>
-          <p className="text-xs text-slate-600 font-mono">
+          <p className="text-xs text-[color:var(--ink-2)] truncate">
             {matchedProfile.licenseNumber} · {tx(matchedProfile.city)}
           </p>
         </div>
 
-        <div className="app-card-interactive app-card-equal p-5 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-[color:var(--ink-2)]">
-              {tx('Active Clinical Queue')}
+        <button
+          type="button"
+          onClick={onViewBookings}
+          className="text-left p-3.5 sm:p-4 lg:border-r border-b lg:border-b-0 border-[color:var(--t-100)] hover:bg-[color:var(--t-50)] transition-colors cursor-pointer min-w-0"
+        >
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)]">
+              {tx('Upcoming Consults')}
             </span>
-            <Clock className="h-4 w-4 text-emerald-600" />
+            <Clock className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
           </div>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">
-            {upcomingBookingsCount + pendingDispatchesCount}
+          <span className="text-lg font-bold tracking-tight text-[color:var(--ink)] tabular-nums block mt-1">
+            {upcomingBookingsCount}
           </span>
-          <p className="text-xs text-slate-600 tabular-nums">
-            {tx('{a} upcoming consults · {b} pending dispatches', { a: upcomingBookingsCount, b: pendingDispatchesCount })}
+          <p className="text-xs text-[color:var(--ink-2)] truncate">
+            {tx('Scheduled patient visits')}
           </p>
-        </div>
+        </button>
 
-        <div className="app-card-interactive app-card-equal p-5 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-[color:var(--ink-2)]">
-              {tx('Completed Dispatches')}
+        <button
+          type="button"
+          onClick={onViewOnCall || onViewBookings}
+          className="text-left p-3.5 sm:p-4 border-r border-[color:var(--t-100)] hover:bg-[color:var(--t-50)] transition-colors cursor-pointer min-w-0"
+        >
+          <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">
+            {tx('Pending Dispatches')}
+          </span>
+          <span className={`text-lg font-bold tracking-tight tabular-nums block mt-1 ${pendingDispatchesCount > 0 ? 'text-amber-700' : 'text-[color:var(--ink)]'}`}>
+            {pendingDispatchesCount}
+          </span>
+          <p className="text-xs text-[color:var(--ink-2)] truncate">
+            {tx('On-call queue items')}
+          </p>
+        </button>
+
+        <button
+          type="button"
+          onClick={onViewAnalytics || onViewBookings}
+          className="text-left p-3.5 sm:p-4 hover:bg-[color:var(--t-50)] transition-colors cursor-pointer min-w-0"
+        >
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)]">
+              {tx('Completed')}
             </span>
-            <FileText className="h-4 w-4 text-[color:var(--t-600)]" />
+            <FileText className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
           </div>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">
+          <span className="text-lg font-bold tracking-tight text-[color:var(--ink)] tabular-nums block mt-1">
             {completedDispatchesCount}
           </span>
-          <p className="text-xs text-slate-600 tabular-nums">
+          <p className="text-xs text-[color:var(--ink-2)] tabular-nums truncate">
             {avgOverall
-              ? tx('Patient rating: {rating} / 5.0', { rating: avgOverall })
-              : tx('No patient ratings recorded yet.')}
+              ? tx('Rating: {rating} / 5.0', { rating: avgOverall })
+              : tx('No ratings yet')}
           </p>
-        </div>
-      </div>
+        </button>
+      </section>
 
       {/* 3. CLINICAL WORKFLOW ACTIONS GRID */}
-      <div className="app-card p-5 space-y-4">
-        <h4 className="text-base font-bold text-[color:var(--ink)] border-b border-[color:var(--t-200)] pb-3 flex items-center gap-2">
+      <div className="bg-white border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] p-4 sm:p-5 space-y-3.5">
+        <h4 className="text-base font-bold text-[color:var(--ink)] border-b border-[color:var(--t-100)] pb-2.5 flex items-center gap-2">
           <Zap className="h-4 w-4 text-[color:var(--t-600)]" />
           {isDoc ? tx('Doctor Clinical Operations Shortcuts') : tx('Nursing Operations & Care Shortcuts')}
         </h4>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-bold">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
           <button
             type="button"
             onClick={onViewBookings}
-            className="p-4 bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] border border-[color:var(--t-200)] text-[color:var(--t-600)] text-left transition-colors cursor-pointer flex flex-col justify-between gap-3 rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
+            className="p-3.5 bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] border border-[color:var(--t-200)] text-[color:var(--t-800)] text-left transition-colors cursor-pointer flex flex-col justify-between gap-2 rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
           >
-            <span className="font-black text-sm">
+            <span className="font-bold text-sm">
               {isDoc ? tx('Issue E-Prescription') : tx('Complete Nursing Care Log')}
             </span>
-            <span className="text-xs font-semibold text-slate-600">
+            <span className="text-xs text-[color:var(--ink-2)] leading-snug">
               {isDoc
                 ? tx('Draft & sign digital prescriptions for active consultations.')
                 : tx('Log sterile wound dressing, vitals telemetry & clinical care notes.')}
@@ -112,12 +136,12 @@ export default function PractitionerOverviewTab({
           <button
             type="button"
             onClick={onViewBookings}
-            className="p-4 bg-white hover:bg-slate-50 border border-[color:var(--t-200)] text-slate-900 text-left transition-colors cursor-pointer flex flex-col justify-between gap-3 rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
+            className="p-3.5 bg-white hover:bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--ink)] text-left transition-colors cursor-pointer flex flex-col justify-between gap-2 rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
           >
-            <span className="font-black text-sm">
+            <span className="font-bold text-sm">
               {isDoc ? tx('Review Patient Records') : tx('Patient Vitals & Care History')}
             </span>
-            <span className="text-xs font-semibold text-slate-600">
+            <span className="text-xs text-[color:var(--ink-2)] leading-snug">
               {isDoc
                 ? tx('Access verified lab reports, X-rays, and medical history.')
                 : tx('Review patient baseline BP, blood glucose, and recovery trend.')}
@@ -127,7 +151,7 @@ export default function PractitionerOverviewTab({
           <button
             type="button"
             onClick={onViewOnCall || onViewBookings}
-            className="p-4 bg-white hover:bg-slate-50 border border-[color:var(--t-200)] text-slate-900 text-left transition-colors cursor-pointer flex flex-col justify-between gap-3 rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
+            className="p-3.5 bg-white hover:bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--ink)] text-left transition-colors cursor-pointer flex flex-col justify-between gap-2 rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-600)] focus-visible:outline-none"
           >
             <span className="font-black text-sm">
               {isDoc ? tx('Emergency Dispatch Log') : tx('Home Nursing Transit Radar')}

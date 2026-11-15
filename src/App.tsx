@@ -7,6 +7,8 @@ import {
 
 // Shared UI, Registry & Lazy-Loaded Modules
 import DashboardHeader from './shared/ui/DashboardHeader';
+import BrandLogo from './shared/ui/BrandLogo';
+const CaregiverWorkspace = React.lazy(() => import('./components/CaregiverWorkspace'));
 import NotificationBell from './components/NotificationBell';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import OnCallChip from './components/OnCallChip';
@@ -85,7 +87,7 @@ export default function App() {
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
 
   // User Session State (server-side session cookie; nothing sensitive is kept in localStorage)
-  type SessionUser = { id: string; role: 'patient' | 'practitioner' | 'admin' | 'pharmacy' | 'facility'; name: string; email: string; avatarUrl?: string; profileId?: string | null };
+  type SessionUser = { id: string; role: 'patient' | 'practitioner' | 'nurse' | 'admin' | 'pharmacy' | 'facility'; name: string; email: string; avatarUrl?: string; profileId?: string | null };
   const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
   const route = useLocation();
   // Emails to a signed-in person are sent in the language they use in the app
@@ -126,6 +128,8 @@ export default function App() {
         ? 'patient_care'
         : role === 'practitioner'
         ? 'onboard'
+        : role === 'nurse'
+        ? 'nurse_care'
         : role === 'pharmacy'
         ? 'pharmacy_dispensing'
         : role === 'facility'
@@ -371,9 +375,7 @@ export default function App() {
         <div className="relative mb-4 flex items-center justify-center">
           <LoadingImage size={80} />
         </div>
-        <div className="font-display font-extrabold text-lg text-slate-900 tracking-tight">
-          MediCred<span className="text-[color:var(--t-600)]">.</span>
-        </div>
+        <BrandLogo tone="light" size="md" />
         <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">
           Verifying secure medical session…
         </p>
@@ -481,29 +483,37 @@ export default function App() {
         <div className="max-w-[1440px] mx-auto flex items-center justify-between h-16">
 
           {/* Brand Logo */}
-          <div
-            className="flex items-center gap-3.5 cursor-pointer group"
+          <button
+            type="button"
+            className="flex items-center cursor-pointer group text-left bg-transparent border-0 p-0"
             onClick={() => {
               if (currentUser.role === 'patient') setActiveView('patient_care');
               else if (currentUser.role === 'practitioner') setActiveView('onboard');
+              else if (currentUser.role === 'nurse') setActiveView('nurse_care');
               else if (currentUser.role === 'pharmacy') setActiveView('pharmacy_dispensing');
               else if (currentUser.role === 'facility') setActiveView('facility_staffing');
               else if (currentUser.role === 'admin') setActiveView('admin_registry');
               setSelectedProfId(null);
             }}
           >
-            <div className="w-10 h-10 rounded-full bg-white text-[color:var(--t-600)] flex items-center justify-center shrink-0 group-hover:bg-[color:var(--t-50)] transition-colors shadow-2xs">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
-            </div>
-            <div className="leading-none">
-              <span className="font-display font-black text-xl sm:text-2xl text-white tracking-tight block">
-                MediCred<span className="text-white/80">.</span>
-              </span>
-              <span className="text-2xs font-extrabold text-white/90 uppercase tracking-[0.16em] block mt-0.5">
-                {currentUser.role === 'admin' ? tt('Board Console') : currentUser.role === 'practitioner' ? tt('Practitioner Hub') : currentUser.role === 'pharmacy' ? tt('Pharmacy Workspace') : tt('Member Portal')}
-              </span>
-            </div>
-          </div>
+            <BrandLogo
+              tone="onColor"
+              size="lg"
+              subtitle={
+                currentUser.role === 'admin'
+                  ? tt('Board Console')
+                  : currentUser.role === 'practitioner'
+                  ? tt('Practitioner Hub')
+                  : currentUser.role === 'nurse'
+                  ? tt('Nursing & Care Hub')
+                  : currentUser.role === 'pharmacy'
+                  ? tt('Pharmacy Workspace')
+                  : currentUser.role === 'facility'
+                  ? tt('Facility Portal')
+                  : tt('Member Portal')
+              }
+            />
+          </button>
 
           {/* Right-Side Desktop Actions & User Session Details - Standardized Gaps & Round Outlines */}
           <div className="hidden lg:flex items-center gap-2.5 sm:gap-3">
@@ -870,6 +880,22 @@ export default function App() {
               <FacilityWorkspace activeGroup={getFacilityGroup(activeView)} currentUser={currentUser} />
             )}
 
+            {/* VIEW: NURSE & CARING ATTENDANT WORKSPACE */}
+            {currentUser.role === 'nurse' && [
+              'nurse_workspace', 'nurse_care', 'nurse_shifts', 'nurse_credentials'
+            ].includes(activeView) && (
+              <CaregiverWorkspace
+                currentUser={currentUser}
+                professionals={professionals}
+                bookings={bookings}
+                jobs={jobs}
+                reviews={reviews}
+                onNewJobCreated={handleNewJobCreated}
+                onApplyJob={handleApplyJob}
+                onOpenHelp={() => setActiveView('help')}
+              />
+            )}
+
             {/* VIEW: PHARMACY WORKSPACE (Handles all pharmacy groups) */}
             {currentUser.role === 'pharmacy' && [
               'pharmacy_workspace', 'pharmacy_dispensing', 'pharmacy_operations'
@@ -1006,7 +1032,7 @@ export default function App() {
             {/* VIEW 9: PATIENT PORTAL DASHBOARD (Unified PatientHeroBanner & 4 parent groups for all patient views) */}
             {currentUser.role === 'patient' && [
               'patient_dashboard', 'patient_care', 'patient_records', 'patient_services', 'patient_discovery',
-              'appointments', 'consult', 'packages', 'assistance', 'tourism', 'pharmacies', 'messages', 'articles', 'registry', 'nurses', 'records', 'prescriptions', 'certs', 'labs', 'saved'
+              'overview', 'appointments', 'consult', 'packages', 'assistance', 'tourism', 'pharmacies', 'messages', 'articles', 'registry', 'nurses', 'records', 'prescriptions', 'certs', 'labs', 'saved'
             ].includes(activeView) && !selectedProfId && (
               <PatientDashboard
                 bookings={bookings}

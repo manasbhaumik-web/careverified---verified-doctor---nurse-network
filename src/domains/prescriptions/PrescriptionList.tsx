@@ -1,7 +1,7 @@
 import { CustomSelect } from '../../shared/ui/CustomSelect';
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { AlertTriangle, CheckCircle2, Clock, Pill, Printer, Send, Store, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Clock, Printer, QrCode, Search, Send, Store, X, XCircle } from 'lucide-react';
 import PrescriptionExtras from './PrescriptionExtras';
 import { useTr, tr, getLocale } from '../../locale';
 /** Translate outside a component (these helpers run during render, so they follow the current language). */
@@ -113,6 +113,9 @@ interface Props {
 export default function PrescriptionList({ prescriptions, pharmacies, scope, onChange, onSend, onOpenPharmacies, onShowArchive }: Props) {
   const tx = useTr();
   const [changing, setChanging] = useState<string | null>(null);
+  const [openQrId, setOpenQrId] = useState<string | null>(null);
+  const [filterMode, setFilterMode] = useState<'all' | 'action' | 'ready'>('all');
+  const [query, setQuery] = useState('');
   const isActive = (p: any) => p.status === 'active';
   const list = prescriptions.filter(p => (scope === 'active' ? isActive(p) : !isActive(p)));
   // Newest first from the server; a stable sort keeps that inside each group
@@ -120,6 +123,9 @@ export default function PrescriptionList({ prescriptions, pharmacies, scope, onC
 
   // The same medicine on more than one active prescription: worth a second look before taking both
   const activeRx = prescriptions.filter(isActive);
+  const actionCount = activeRx.filter(p => !p.pharmacyId || p.fillStatus === 'cannot_fill').length;
+  const readyCount = activeRx.filter(p => p.fillStatus === 'ready').length;
+
   const seenOn = new Map<string, { codes: string[]; label: string }>();
   for (const p of activeRx) for (const i of p.items ?? []) {
     const e = seenOn.get(medKey(i)) ?? { codes: [], label: `${i.name}${i.strength ? ` ${i.strength}` : ''}` };
@@ -134,6 +140,23 @@ export default function PrescriptionList({ prescriptions, pharmacies, scope, onC
   // One line per medicine across the active prescriptions
   const meds = activeRx.flatMap(p => (p.items ?? []).map((i: any) => ({ key: `${medKey(i)}|${i.dose}|${i.frequency}`.toLowerCase(), name: `${i.name}${i.strength ? ` ${i.strength}` : ''}`, how: [i.dose, i.frequency].filter(Boolean).join(', ') })))
     .filter((m: any, k: number, all: any[]) => all.findIndex(o => o.key === m.key) === k);
+
+  const visible = ordered.filter((p: any) => {
+    if (scope === 'active') {
+      if (filterMode === 'action' && !(!p.pharmacyId || p.fillStatus === 'cannot_fill')) return false;
+      if (filterMode === 'ready' && p.fillStatus !== 'ready') return false;
+    }
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    const hay = [
+      p.code,
+      p.diagnosis,
+      p.doctor?.name,
+      p.pharmacyName,
+      ...(p.items ?? []).map((i: any) => `${i.name} ${i.strength ?? ''}`),
+    ].filter(Boolean).join(' ').toLowerCase();
+    return hay.includes(q);
+  });
 
   if (list.length === 0) {
     return (
@@ -156,27 +179,119 @@ export default function PrescriptionList({ prescriptions, pharmacies, scope, onC
 
   return (
     <div className="space-y-3">
-      {scope === 'active' && meds.length > 0 && (
-        <section aria-labelledby="meds-now" className="bg-white border border-[color:var(--t-200)] p-4">
-          <h3 id="meds-now" className="text-sm font-extrabold text-[color:var(--ink)] flex items-center gap-2"><Pill className="h-4 w-4 text-[color:var(--t-600)]" aria-hidden="true" /> {tx('Medicines on your active prescriptions')}</h3>
-          <ul className="mt-2 grid gap-x-6 gap-y-1 sm:grid-cols-2 text-xs text-slate-800">
-            {meds.map((m: any) => <li key={m.key}><b>{m.name}</b>{m.how ? <span className="text-slate-700"> · {m.how}</span> : null}</li>)}
-          </ul>
+      {scope === 'active' && (
+        <section
+          aria-label={tx('Prescriptions summary')}
+          className="grid grid-cols-2 lg:grid-cols-4 bg-white border border-[color:var(--t-200)]"
+        >
+          <button
+            type="button"
+            onClick={() => setFilterMode('all')}
+            className={`text-left p-3.5 border-r border-b lg:border-b-0 border-[color:var(--t-100)] hover:bg-[color:var(--t-50)] transition-colors cursor-pointer min-w-0 ${filterMode === 'all' ? 'bg-[color:var(--t-50)]/60' : ''}`}
+          >
+            <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Active Rx')}</span>
+            <span className="text-lg font-bold text-[color:var(--ink)] tabular-nums block mt-0.5">{activeRx.length}</span>
+            <span className="text-xs text-[color:var(--ink-2)] truncate block">{tx('Tap to show all')}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setFilterMode(filterMode === 'action' ? 'all' : 'action')}
+            className={`text-left p-3.5 lg:border-r border-b lg:border-b-0 border-[color:var(--t-100)] hover:bg-[color:var(--t-50)] transition-colors cursor-pointer min-w-0 ${filterMode === 'action' ? 'bg-rose-50/70' : ''}`}
+          >
+            <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Action Needed')}</span>
+            <span className={`text-lg font-bold tabular-nums block mt-0.5 ${actionCount > 0 ? 'text-rose-700' : 'text-[color:var(--ink)]'}`}>{actionCount}</span>
+            <span className="text-xs text-[color:var(--ink-2)] truncate block">{actionCount > 0 ? tx('Choose a pharmacy') : tx('All sent')}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setFilterMode(filterMode === 'ready' ? 'all' : 'ready')}
+            className={`text-left p-3.5 border-r border-[color:var(--t-100)] hover:bg-[color:var(--t-50)] transition-colors cursor-pointer min-w-0 ${filterMode === 'ready' ? 'bg-emerald-50/70' : ''}`}
+          >
+            <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Ready for Pickup')}</span>
+            <span className={`text-lg font-bold tabular-nums block mt-0.5 ${readyCount > 0 ? 'text-emerald-700' : 'text-[color:var(--ink)]'}`}>{readyCount}</span>
+            <span className="text-xs text-[color:var(--ink-2)] truncate block">{readyCount > 0 ? tx('Show QR at counter') : tx('None ready yet')}</span>
+          </button>
+
+          <div className="p-3.5 min-w-0">
+            <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Active Medicines')} ({meds.length})</span>
+            <span className="text-xs font-semibold text-[color:var(--ink)] line-clamp-2 mt-1 block">
+              {meds.length > 0 ? meds.map((m: any) => m.name).join(' · ') : tx('None')}
+            </span>
+          </div>
         </section>
       )}
 
-      {ordered.map((p: any) => {
+      {/* Compact Search & Filter Bar */}
+      <div className="bg-white border border-[color:var(--t-200)] px-3 py-2 flex flex-wrap items-center justify-between gap-2.5">
+        <div className="relative flex-1 min-w-[220px] max-w-md">
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder={tx('Search medicine, RX code, doctor, or pharmacy...')}
+            aria-label={tx('Search prescriptions')}
+            className="w-full h-9 pl-9 pr-8 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:border-[color:var(--t-600)] focus:bg-white focus:outline-none text-xs font-medium text-[color:var(--ink)]"
+          />
+          {query && (
+            <button type="button" onClick={() => setQuery('')} aria-label={tx('Clear search')} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+        {scope === 'active' && (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {([
+              ['all', tx('All')],
+              ['action', tx('Needs Action')],
+              ['ready', tx('Ready')],
+            ] as const).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setFilterMode(id)}
+                className={`px-2.5 py-1.5 text-2xs font-bold border cursor-pointer transition-colors ${
+                  filterMode === id
+                    ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]'
+                    : 'bg-white text-[color:var(--ink-2)] border-[color:var(--t-200)] hover:bg-[color:var(--t-50)]'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {visible.length === 0 ? (
+        <div className="py-6 px-4 bg-white border border-[color:var(--t-200)] text-center space-y-2">
+          <p className="text-xs font-bold text-[color:var(--ink)]">{tx('No prescriptions match your filter.')}</p>
+          <button type="button" onClick={() => { setFilterMode('all'); setQuery(''); }} className="text-xs font-bold text-[color:var(--t-700)] underline cursor-pointer">
+            {tx('Reset filters')}
+          </button>
+        </div>
+      ) : visible.map((p: any) => {
         const st = statusOf(p);
         const Icon = ICON[st.tone];
         const dupes = scope === 'active' ? duplicatesOf(p) : [];
         const cardId = `rx-card-${p.id}`;
         const needsSend = isActive(p) && (!p.pharmacyId || p.fillStatus === 'cannot_fill');
+        const qrExpanded = openQrId === p.id || p.fillStatus === 'ready';
+        const metaParts = [
+          p.diagnosis,
+          p.doctor?.name ? `${p.doctor.name}${p.doctor.licenseNumber ? ` (${p.doctor.licenseNumber})` : ''}` : null,
+          `${tx('Issued')} ${fmtDate(p.issuedAt)}`,
+          p.validUntil ? `${tx('Valid until')} ${fmtDate(p.validUntil)}` : null,
+        ].filter(Boolean);
+
         return (
-          <article key={p.id} id={cardId} className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs grid grid-cols-1 lg:grid-cols-[1.55fr_1fr]">
-            {/* Left: Clinical Details & Safety */}
-            <div className="p-4 sm:p-5 space-y-3.5 min-w-0">
+          <article key={p.id} id={cardId} className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs grid grid-cols-1 lg:grid-cols-[1.6fr_1fr]">
+            {/* Left: Medicine Details & Safety */}
+            <div className="p-3.5 sm:p-4 space-y-2.5 min-w-0">
               <div className="flex flex-wrap items-start justify-between gap-2">
-                <div className={`border px-3 py-2 flex-1 min-w-[220px] ${TONE[st.tone]}`} role={st.tone === 'alert' ? 'alert' : undefined}>
+                <div className={`border px-3 py-1.5 flex-1 min-w-[220px] ${TONE[st.tone]}`} role={st.tone === 'alert' ? 'alert' : undefined}>
                   <p className="text-xs font-extrabold flex items-center gap-2"><Icon className="h-4 w-4 shrink-0" aria-hidden="true" /> {st.label}</p>
                   {st.detail && <p className="text-xs mt-0.5 [overflow-wrap:anywhere]">{st.detail}</p>}
                 </div>
@@ -185,9 +300,9 @@ export default function PrescriptionList({ prescriptions, pharmacies, scope, onC
                 </span>
               </div>
 
-              <ul className="space-y-2">
+              <ul className="space-y-1.5">
                 {p.items.map((i: any, k: number) => (
-                  <li key={k} className="text-base text-[color:var(--ink)]">
+                  <li key={k} className="text-sm text-[color:var(--ink)]">
                     <b className="font-extrabold">{i.name} {i.strength}</b> <span className="text-xs text-slate-600 font-semibold">{i.form}</span>
                     <p className="text-xs text-slate-700 mt-0.5">{tx('{dose}, {freq} for {days} days · qty {qty}', { dose: i.dose, freq: i.frequency, days: i.durationDays, qty: i.quantity })}{i.instructions ? ` · ${i.instructions}` : ''}</p>
                   </li>
@@ -195,62 +310,69 @@ export default function PrescriptionList({ prescriptions, pharmacies, scope, onC
               </ul>
 
               {dupes.map((d: { label: string; others: string[] }) => (
-                <p key={d.label} className="text-xs text-amber-900 bg-amber-50 border border-amber-300 px-3 py-2 flex gap-2">
+                <p key={d.label} className="text-xs text-amber-900 bg-amber-50 border border-amber-300 px-3 py-1.5 flex gap-2">
                   <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
                   <span><b>{d.label}</b> {tx('is also on another active prescription ({codes}). Ask your doctor or pharmacist before taking both.', { codes: d.others.join(', ') })}</span>
                 </p>
               ))}
 
-              <div className="flex flex-wrap gap-1.5 pt-0.5">
-                {p.diagnosis && (
-                  <span className="text-2xs bg-slate-50 border border-slate-200 px-2.5 py-1 text-slate-700">
-                    <b className="text-[color:var(--ink)]">{tx('Diagnosis:')}</b> {p.diagnosis}
-                  </span>
-                )}
-                {p.doctor?.name && (
-                  <span className="text-2xs bg-slate-50 border border-slate-200 px-2.5 py-1 text-slate-700">
-                    <b className="text-[color:var(--ink)]">{p.doctor.name}</b>{p.doctor.licenseNumber ? ` (${p.doctor.licenseNumber})` : ''}
-                  </span>
-                )}
-                <span className="text-2xs bg-slate-50 border border-slate-200 px-2.5 py-1 text-slate-700">
-                  <b className="text-[color:var(--ink)]">{tx('Issued:')}</b> {fmtDate(p.issuedAt)} · <b className="text-[color:var(--ink)]">{tx('Valid until:')}</b> {fmtDate(p.validUntil)}
-                </span>
-              </div>
+              {metaParts.length > 0 && (
+                <p className="text-2xs text-slate-600 border-t border-[color:var(--t-100)] pt-2">
+                  {metaParts.join(' · ')}
+                </p>
+              )}
 
               <div className="no-print"><PrescriptionExtras rx={p} pharmacies={pharmacies} onChange={onChange} /></div>
             </div>
 
-            {/* Right: Fulfilment & Verification Rail */}
-            <div className="bg-[color:var(--t-50)]/70 border-t lg:border-t-0 lg:border-l border-[color:var(--t-100)] p-4 sm:p-5 flex flex-col justify-between gap-4">
+            {/* Right: Fulfilment & Collapsible Verification Rail */}
+            <div className="bg-[color:var(--t-50)]/70 border-t lg:border-t-0 lg:border-l border-[color:var(--t-100)] p-3.5 sm:p-4 flex flex-col justify-between gap-3">
               {isActive(p) && pharmacies.length > 0 && (
                 <div className="space-y-2 no-print">
                   {needsSend
                     ? <SendBox p={p} pharmacies={pharmacies} onSend={onSend} lead={p.pharmacyId ? 'Send it to another pharmacy' : 'Send it to a pharmacy'} />
                     : changing === p.id
                       ? <SendBox p={p} pharmacies={pharmacies} onSend={async (...a) => { await onSend(...a); setChanging(null); }} lead="Send it to a different pharmacy" />
-                      : <button type="button" onClick={() => setChanging(p.id)} className="w-full min-h-[44px] px-3 inline-flex items-center justify-center gap-2 text-xs font-bold text-[color:var(--t-700)] border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-50)] cursor-pointer transition-colors"><Store className="h-4 w-4" aria-hidden="true" /> {tx('Send to a different pharmacy')}</button>}
+                      : <button type="button" onClick={() => setChanging(p.id)} className="w-full min-h-[40px] px-3 inline-flex items-center justify-center gap-2 text-xs font-bold text-[color:var(--t-700)] border border-[color:var(--t-200)] bg-white hover:bg-[color:var(--t-50)] cursor-pointer transition-colors"><Store className="h-4 w-4" aria-hidden="true" /> {tx('Send to a different pharmacy')}</button>}
 
                   {needsSend && p.fillStatus === 'cannot_fill' && onOpenPharmacies && (
-                    <button type="button" onClick={onOpenPharmacies} className="min-h-[44px] text-xs font-bold underline text-[color:var(--t-700)] cursor-pointer block">{tx('Find a pharmacy that has it')}</button>
+                    <button type="button" onClick={onOpenPharmacies} className="text-xs font-bold underline text-[color:var(--t-700)] cursor-pointer block">{tx('Find a pharmacy that has it')}</button>
                   )}
                 </div>
               )}
 
-              <div className="bg-white border border-[color:var(--t-200)] p-3 flex items-center gap-3 mt-auto">
-                <div className="shrink-0">
-                  <Qr text={`${window.location.origin}/rx/${p.code}`} size={80} />
-                </div>
-                <div className="min-w-0 flex-1 space-y-2">
-                  <div>
-                    <p className="text-xs font-extrabold text-[color:var(--ink)]">{tx('Pharmacist QR')}</p>
-                    <p className="text-2xs text-slate-600">{tx('Scan to verify')}</p>
-                  </div>
-                  {isActive(p) && (
-                    <div className="no-print">
-                      <PrintOne cardId={cardId} />
-                    </div>
+              <div className="bg-white border border-[color:var(--t-200)] p-2.5 mt-auto">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-extrabold text-[color:var(--ink)] flex items-center gap-1.5">
+                    <QrCode className="h-3.5 w-3.5 text-[color:var(--t-600)]" aria-hidden="true" />
+                    {tx('Pharmacist QR')}
+                  </span>
+                  {p.fillStatus !== 'ready' && (
+                    <button
+                      type="button"
+                      onClick={() => setOpenQrId(openQrId === p.id ? null : p.id)}
+                      className="text-2xs font-bold text-[color:var(--t-700)] hover:underline cursor-pointer no-print"
+                    >
+                      {qrExpanded ? tx('Hide QR') : tx('Show QR')}
+                    </button>
                   )}
                 </div>
+
+                {qrExpanded && (
+                  <div className="mt-2.5 pt-2.5 border-t border-[color:var(--t-100)] flex items-center gap-3">
+                    <div className="shrink-0">
+                      <Qr text={`${window.location.origin}/rx/${p.code}`} size={72} />
+                    </div>
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <p className="text-2xs text-slate-600">{tx('Scan to verify')}</p>
+                      {isActive(p) && (
+                        <div className="no-print">
+                          <PrintOne cardId={cardId} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </article>

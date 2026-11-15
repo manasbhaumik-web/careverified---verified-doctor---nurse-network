@@ -14,24 +14,27 @@ export type PharmacyTabGroup = 'dispensing' | 'operations';
 
 export const PHARMACY_GROUPS: Record<PharmacyTabGroup, {
   name: string;
+  summary: string;
   defaultTab: PharmacyTab;
-  tabs: { id: PharmacyTab; label: string; icon: any; count?: number }[];
+  tabs: { id: PharmacyTab; label: string; description: string; icon: any; count?: number }[];
 }> = {
   dispensing: {
     name: 'Dispensing',
+    summary: 'Process incoming e-prescriptions, verify fills, and track dispensing history.',
     defaultTab: 'inbox',
     tabs: [
-      { id: 'inbox', label: 'Rx Inbox', icon: Inbox },
-      { id: 'activity', label: 'Dispensing Log', icon: Activity },
+      { id: 'inbox', label: 'Rx Inbox', description: 'New e-prescriptions, preparation queue & pickup', icon: Inbox },
+      { id: 'activity', label: 'Dispensing Log', description: 'Completed fills, cold-chain dispatches & audit trail', icon: Activity },
     ],
   },
   operations: {
     name: 'Operations & Team',
+    summary: 'Dispensing analytics, pharmacist staff access, and store profile settings.',
     defaultTab: 'reports',
     tabs: [
-      { id: 'reports', label: 'Reports & Analytics', icon: BarChart3 },
-      { id: 'team', label: 'Pharmacist Team', icon: Users },
-      { id: 'profile', label: 'Pharmacy Profile', icon: Store },
+      { id: 'reports', label: 'Reports & Analytics', description: 'Fill turnaround times, volume & panel insurer mix', icon: BarChart3 },
+      { id: 'team', label: 'Pharmacist Team', description: 'Manage registered pharmacists & staff accounts', icon: Users },
+      { id: 'profile', label: 'Pharmacy Profile', description: 'Operating hours, delivery modes & cold-chain setup', icon: Store },
     ],
   },
 };
@@ -189,6 +192,14 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
         ].map(g => ({
           id: g.key,
           label: tx(PHARMACY_GROUPS[g.key].name),
+          summary: tx(PHARMACY_GROUPS[g.key].summary),
+          cta: {
+            label: g.key === 'dispensing' ? tx('Open Rx Inbox') : tx('View Reports & Analytics'),
+            onClick: () => {
+              window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: g.viewId }));
+              setTab(PHARMACY_GROUPS[g.key].defaultTab);
+            },
+          },
           icon: g.icon,
           count: g.count,
           activeSubTab: tab,
@@ -201,6 +212,7 @@ export default function PharmacyWorkspace({ activeGroup, initialTab, currentUser
             .map(t => ({
               ...t,
               label: tx(t.label),
+              description: tx(t.description),
               count: t.id === 'inbox' && counts ? (counts.new || undefined) : undefined,
             })),
         }))}

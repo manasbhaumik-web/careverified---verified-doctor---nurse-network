@@ -28,7 +28,7 @@ export function useLocation() {
   return { path, params: new URLSearchParams(q < 0 ? '' : full.slice(q)) };
 }
 
-export type PortalRole = 'patient' | 'practitioner' | 'admin' | 'pharmacy' | 'facility';
+export type PortalRole = 'patient' | 'practitioner' | 'nurse' | 'admin' | 'pharmacy' | 'facility';
 
 /** URL of the sign-in page for a role. */
 export const loginUrl = (role: PortalRole = 'patient', register = false) =>

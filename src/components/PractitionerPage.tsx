@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import BrandLogo from '../shared/ui/BrandLogo';
 import {
   ArrowRight, BadgeCheck, Building2, ClipboardList, FileSignature, Hourglass, MessageSquare, Pill, Stethoscope, Video, Plane,
   ShieldCheck, CheckCircle2, Shield, UserCheck, Search, Scale, Lock, FileText, Sparkles, Check, Zap, Clock, Award,
@@ -733,19 +734,12 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
               e.preventDefault();
               navigate('/');
             }}
-            className="flex items-center gap-2.5 min-w-0"
+            className="flex items-center gap-2.5 min-w-0 group"
             aria-label="MediCred home"
           >
-            <span className="w-9 h-9 shrink-0 bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-700)]">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true">
-                <path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" />
-              </svg>
-            </span>
-            <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">
-              MediCred<span className="text-[color:var(--t-600)]">.</span>
-              <span className="ml-2 text-xs font-mono font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
-                Practitioner Network
-              </span>
+            <BrandLogo tone="light" size="md" />
+            <span className="hidden sm:inline-block text-xs font-mono font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
+              Practitioner Network
             </span>
           </a>
 

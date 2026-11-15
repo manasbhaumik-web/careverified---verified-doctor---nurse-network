@@ -507,23 +507,12 @@ export default function VerificationTerminal({
               </div>
 
         {activeDashboardTab === 'home' && (
-          <div id="panel-home" role="tabpanel" aria-labelledby="tab-home" tabIndex={0} className="space-y-6 animate-fade-in">
+          <div id="panel-home" role="tabpanel" aria-labelledby="tab-home" tabIndex={0} className="space-y-4 animate-fade-in">
             <WorkspaceHeader
               icon={LayoutGrid}
-              eyebrow={tx('Clinical Practice Command · Active Roster')}
-              title={tx('Practitioner Clinical Command & Consultation Summary')}
-              description={tx('Real-time clinical queue overview, upcoming patient consultations, emergency dispatches, and key practice metrics.')}
-              badges={
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <BannerBadge tone={isVerified ? "success" : "brand"}>
-                    <ShieldCheck className="h-3 w-3 inline mr-1 text-emerald-600" />
-                    {isVerified ? tx('MMC / LJM Active') : tx('Pending Verification')}
-                  </BannerBadge>
-                  <BannerBadge tone="brand">
-                    APC {matchedProfile.licenseExpiry ? tx('Valid to {date}', { date: matchedProfile.licenseExpiry }) : '2026/2027'}
-                  </BannerBadge>
-                </div>
-              }
+              eyebrow={tx('Clinical Practice · Overview')}
+              title={tx('Practice Overview & Today')}
+              description={tx('Upcoming consultations, pending dispatches, and quick clinical shortcuts.')}
               aside={
                 <button
                   type="button"
@@ -531,46 +520,34 @@ export default function VerificationTerminal({
                   className="btn btn-sm btn-primary whitespace-nowrap shrink-0"
                 >
                   <Calendar className="h-3.5 w-3.5" />
-                  <span>{tx('Manage Consultation Schedule ({n})', { n: upcomingBookingsCount })}</span>
+                  <span>{tx('Manage Schedule ({n})', { n: upcomingBookingsCount })}</span>
                   <ArrowRight className="h-3.5 w-3.5 ml-0.5" />
                 </button>
               }
             >
-              {/* Merged Next Patient Queue & Live Telehealth Status Strip */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[color:var(--t-50)]/70 border border-[color:var(--t-200)] px-4 py-3">
-                <div className="flex items-start sm:items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-none bg-white border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shrink-0">
-                    <Calendar className="h-4.5 w-4.5" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                      <span className="text-2xs font-black uppercase tracking-widest text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)]">
-                        {tx('Next Patient Queue')}
-                      </span>
-                      <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 text-2xs font-extrabold flex items-center gap-1.5">
-                        <span className="w-2 h-2 bg-emerald-500 rounded-full inline-block animate-pulse shrink-0 shadow-xs" />
-                        {tx('Live Telehealth Ready')}
-                      </span>
-                    </div>
-                    {nextUpcomingBooking ? (
-                      <p className="text-xs font-bold text-[color:var(--ink)] truncate">
-                        <span>{nextUpcomingBooking.patientName}</span>
-                        <span className="text-slate-400 mx-1.5">&bull;</span>
-                        <span className="font-mono text-slate-600">{nextUpcomingBooking.date} {nextUpcomingBooking.timeSlot}</span>
-                        <span className="text-slate-400 mx-1.5">&bull;</span>
-                        <span className="text-[color:var(--t-600)] font-semibold">{nextUpcomingBooking.mode}</span>
-                      </p>
-                    ) : (
-                      <p className="text-xs text-slate-600 font-medium">{tx('No immediate patient consultations queued for today.')}</p>
-                    )}
-                  </div>
+              {/* Compact Next Patient Strip */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-[color:var(--t-50)]/60 border border-[color:var(--t-200)] px-3.5 py-2.5">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Calendar className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
+                  <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] shrink-0">
+                    {tx('Next Patient')}:
+                  </span>
+                  {nextUpcomingBooking ? (
+                    <p className="text-xs font-bold text-[color:var(--ink)] truncate">
+                      <span>{nextUpcomingBooking.patientName}</span>
+                      <span className="text-slate-400 mx-1.5">&bull;</span>
+                      <span className="tabular-nums text-[color:var(--ink-2)]">{nextUpcomingBooking.date} {nextUpcomingBooking.timeSlot}</span>
+                      <span className="text-slate-400 mx-1.5">&bull;</span>
+                      <span className="text-[color:var(--t-700)]">{nextUpcomingBooking.mode}</span>
+                    </p>
+                  ) : (
+                    <p className="text-xs text-[color:var(--ink-2)]">{tx('No upcoming patient consultations queued for today.')}</p>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                  <span className="text-xs font-bold text-slate-500 font-mono">
-                    {tx('{n} Scheduled', { n: upcomingBookingsCount })}
-                  </span>
-                </div>
+                <span className="text-xs font-bold text-[color:var(--t-700)] tabular-nums shrink-0">
+                  {tx('{n} Scheduled', { n: upcomingBookingsCount })}
+                </span>
               </div>
             </WorkspaceHeader>
             <PractitionerOverviewTab

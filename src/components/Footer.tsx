@@ -3,6 +3,7 @@ import React from 'react';
 import { openLegal } from '../legal';
 import { navigate } from '../nav';
 import { Globe, ChevronRight, LogOut } from 'lucide-react';
+import BrandLogo from '../shared/ui/BrandLogo';
 
 export interface NavItem {
   id: string;
@@ -47,12 +48,7 @@ export default function Footer({
           
           {/* Left: Brand Emblem, Act 586 Status & Copyright */}
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-slate-400 text-center md:text-left justify-center md:justify-start">
-            <div className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-[color:var(--t-600)] flex items-center justify-center text-white shrink-0 shadow-2xs">
-                <Cross className="h-3 w-3" />
-              </span>
-              <span className="font-display font-extrabold text-sm text-white tracking-tight">MediCred</span>
-            </div>
+            <BrandLogo tone="dark" size="sm" />
             <span className="text-slate-600 hidden sm:inline">&bull;</span>
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 bg-emerald-400 animate-pulse shrink-0" />
@@ -109,10 +105,7 @@ export default function Footer({
           {/* Column 1: Ecosystem Identity & Live Status Telemetry (3 Cols) */}
           <div className="lg:col-span-3 space-y-4">
             <div className="flex items-center gap-2.5">
-              <span className="w-8 h-8 bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-800)] shadow-xs">
-                <Cross className="h-4 w-4" />
-              </span>
-              <span className="font-display font-black text-xl text-white tracking-tight">MediCred</span>
+              <BrandLogo tone="dark" size="md" />
               <span className="text-xs font-black uppercase tracking-widest bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 px-2 py-0.5">
                 Registry v2.4
               </span>

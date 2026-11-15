@@ -31,21 +31,21 @@ export default function PractitionerAccreditationTab({
     : matchedProfile.city;
 
   return (
-    <div id="panel-accreditation" role="tabpanel" aria-labelledby="tab-accreditation" tabIndex={0} className="space-y-6 animate-fade-in">
+    <div id="panel-accreditation" role="tabpanel" aria-labelledby="tab-accreditation" tabIndex={0} className="space-y-4 animate-fade-in">
       <VerificationStatusCard onChanged={onRefreshData} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
         {/* Certificate of Accreditation Widget */}
-        <div className="lg:col-span-2 bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-2xs space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[color:var(--t-200)] pb-3">
+        <div className="lg:col-span-2 bg-white border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] rounded-none p-4 sm:p-5 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[color:var(--t-100)] pb-3">
             <div>
-              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <h3 className="text-sm font-bold text-[color:var(--ink)] flex items-center gap-2">
                 <Award className="h-4 w-4 text-[color:var(--t-600)]" />
                 {tx('National Network Accreditation')}
               </h3>
-              <p className="text-xs text-slate-500 font-medium mt-0.5">{tx('Official credential status verified with governmental boards.')}</p>
+              <p className="text-xs text-[color:var(--ink-2)] mt-0.5">{tx('Official credential status verified with governmental boards.')}</p>
             </div>
-            <span className={`text-2xs font-mono font-black uppercase tracking-wider px-2.5 py-0.5 border ${
+            <span className={`text-2xs font-bold uppercase tracking-wider px-2 py-0.5 border ${
               isVerified
                 ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                 : isSuspended
@@ -59,43 +59,43 @@ export default function PractitionerAccreditationTab({
           </div>
 
           {isVerified ? (
-            <div className="border border-emerald-200 rounded-none p-5 bg-emerald-50/30 space-y-4">
-              <div className="flex gap-3.5 items-start">
-                <div className="p-2.5 bg-emerald-50 rounded-none border border-emerald-200 text-emerald-600 shrink-0">
-                  <CheckCircle2 className="h-5 w-5" />
+            <div className="border border-emerald-200 rounded-none p-4 bg-emerald-50/30 space-y-3.5">
+              <div className="flex gap-3 items-start">
+                <div className="p-2 bg-emerald-50 rounded-none border border-emerald-200 text-emerald-600 shrink-0">
+                  <CheckCircle2 className="h-4 w-4" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="text-sm font-extrabold text-slate-900">{tx('MMC/LJM Status: Active & In Good Standing')}</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  <h4 className="text-sm font-bold text-[color:var(--ink)]">{tx('MMC/LJM Status: Active & In Good Standing')}</h4>
+                  <p className="text-xs text-[color:var(--ink-2)] leading-relaxed">
                     {tx('Your professional practice certificate matches active licensing records inside the state database. No compliance alerts are pending on your record.')}
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3.5 border-t border-emerald-200/60 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-emerald-200/60 text-xs">
                 <div>
-                  <span className="text-2xs text-slate-400 font-black uppercase tracking-wider block">{tx('Registry Authority')}</span>
-                  <span className="font-extrabold text-slate-800 mt-0.5 block">{tx(councilName)}</span>
+                  <span className="text-2xs text-[color:var(--t-700)] font-bold uppercase tracking-widest block">{tx('Registry Authority')}</span>
+                  <span className="font-bold text-[color:var(--ink)] mt-0.5 block">{tx(councilName)}</span>
                 </div>
                 <div>
-                  <span className="text-2xs text-slate-400 font-black uppercase tracking-wider block">{tx('License Key Number')}</span>
+                  <span className="text-2xs text-[color:var(--t-700)] font-bold uppercase tracking-widest block">{tx('License Key Number')}</span>
                   <code className="font-mono font-bold text-[color:var(--t-700)] bg-white border border-[color:var(--t-200)] px-2 py-0.5 rounded-none text-2xs mt-0.5 inline-block">{matchedProfile.licenseNumber}</code>
                 </div>
                 <div>
-                  <span className="text-2xs text-slate-400 font-black uppercase tracking-wider block">{tx('APC Valid Until')}</span>
-                  <span className="font-mono font-extrabold text-emerald-800 mt-0.5 block">{matchedProfile.licenseExpiry || '2029-12-31'}</span>
+                  <span className="text-2xs text-[color:var(--t-700)] font-bold uppercase tracking-widest block">{tx('APC Valid Until')}</span>
+                  <span className="font-bold tabular-nums text-emerald-800 mt-0.5 block">{matchedProfile.licenseExpiry || '2029-12-31'}</span>
                 </div>
               </div>
             </div>
           ) : isSuspended ? (
-            <div className="border border-rose-200 rounded-none p-5 bg-rose-50/30 space-y-4">
-              <div className="flex gap-3.5 items-start">
-                <div className="p-2.5 bg-rose-50 rounded-none border border-rose-200 text-rose-600 shrink-0">
-                  <ShieldOff className="h-5 w-5" />
+            <div className="border border-rose-200 rounded-none p-4 bg-rose-50/30 space-y-3.5">
+              <div className="flex gap-3 items-start">
+                <div className="p-2 bg-rose-50 rounded-none border border-rose-200 text-rose-600 shrink-0">
+                  <ShieldOff className="h-4 w-4" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="text-sm font-extrabold text-slate-900">{tx('Statutory Suspension Active — Public Listing Hidden')}</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  <h4 className="text-sm font-bold text-[color:var(--ink)]">{tx('Statutory Suspension Active — Public Listing Hidden')}</h4>
+                  <p className="text-xs text-[color:var(--ink-2)] leading-relaxed">
                     {matchedProfile.suspensionReason
                       ? `${tx('Board sanction notice: ')}${matchedProfile.suspensionReason} ${tx('Submit your renewed APC or compliance documentation above for reinstatement review.')}`
                       : tx('Your practising profile is currently suspended pending medical board compliance review. Submit your renewal documentation above.')}
@@ -103,18 +103,18 @@ export default function PractitionerAccreditationTab({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3.5 border-t border-rose-200/60 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-rose-200/60 text-xs">
                 <div>
-                  <span className="text-2xs text-slate-400 font-black uppercase tracking-wider block">{tx('Registry Authority')}</span>
-                  <span className="font-extrabold text-slate-800 mt-0.5 block">{tx(councilName)}</span>
+                  <span className="text-2xs text-rose-700 font-bold uppercase tracking-widest block">{tx('Registry Authority')}</span>
+                  <span className="font-bold text-[color:var(--ink)] mt-0.5 block">{tx(councilName)}</span>
                 </div>
                 <div>
-                  <span className="text-2xs text-slate-400 font-black uppercase tracking-wider block">{tx('License Key Number')}</span>
+                  <span className="text-2xs text-rose-700 font-bold uppercase tracking-widest block">{tx('License Key Number')}</span>
                   <code className="font-mono font-bold text-rose-800 bg-white border border-rose-200 px-2 py-0.5 rounded-none text-2xs mt-0.5 inline-block">{matchedProfile.licenseNumber}</code>
                 </div>
                 <div>
-                  <span className="text-2xs text-slate-400 font-black uppercase tracking-wider block">{tx('Recorded APC Expiry')}</span>
-                  <span className="font-mono font-extrabold text-slate-800 mt-0.5 block">{matchedProfile.licenseExpiry || '—'}</span>
+                  <span className="text-2xs text-rose-700 font-bold uppercase tracking-widest block">{tx('Recorded APC Expiry')}</span>
+                  <span className="font-bold tabular-nums text-[color:var(--ink)] mt-0.5 block">{matchedProfile.licenseExpiry || '—'}</span>
                 </div>
               </div>
             </div>

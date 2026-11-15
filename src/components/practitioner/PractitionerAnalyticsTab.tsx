@@ -45,18 +45,12 @@ export default function PractitionerAnalyticsTab({
   const inPersonEarned = completedBookings.filter(b => b.mode === ConsultationMode.IN_PERSON).reduce((sum, b) => sum + b.fee, 0);
 
   return (
-    <div id="panel-analytics" role="tabpanel" aria-labelledby="tab-analytics" tabIndex={0} className="space-y-6 animate-fade-in">
+    <div id="panel-analytics" role="tabpanel" aria-labelledby="tab-analytics" tabIndex={0} className="space-y-4 animate-fade-in">
       <WorkspaceHeader
         icon={TrendingUp}
-        eyebrow={tx('Practice Intelligence & Clinical Metrics · Analytics')}
-        title={tx('Consultation Analytics, Patient Volume & Clinical Performance')}
-        description={tx('Comprehensive clinical workload insights, completed consultation trends, revenue distribution, and patient satisfaction ratings.')}
-        badges={
-          <>
-            <BannerBadge tone="brand">{tx('Practice Intelligence')}</BannerBadge>
-            <BannerBadge tone="success">{tx('Live Ledger')}</BannerBadge>
-          </>
-        }
+        eyebrow={tx('Practice Intelligence · Analytics')}
+        title={tx('Consultation Analytics & Performance')}
+        description={tx('Completed consultations, revenue distribution, and patient satisfaction ratings.')}
         aside={
           <div className="inline-flex border border-[color:var(--t-200)] bg-white" role="group" aria-label={tx('Analytics time period')}>
             {([['30d', tx('30 Days')], ['90d', tx('90 Days')], ['all', tx('All Time')]] as const).map(([id, label]) => (
@@ -77,56 +71,56 @@ export default function PractitionerAnalyticsTab({
         }
       />
       {totalAttendedCount === 0 && (
-        <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-4 text-xs text-[color:var(--t-700)] flex items-start gap-2.5">
+        <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-3.5 text-xs text-[color:var(--t-700)] flex items-start gap-2.5">
           <Info className="h-4 w-4 shrink-0 mt-0.5" />
           <span>{tx('No completed consultations or dispatches in this period yet. Metrics will populate automatically as you finalize patient encounters in Appointments or On-Call Dispatch.')}</span>
         </div>
       )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Generated Income')}</span>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{formatMoney(totalEarnings)}</span>
-          <p className="text-xs text-slate-600 font-semibold">
+      <section className="grid grid-cols-2 lg:grid-cols-4 bg-white border border-[color:var(--t-200)]">
+        <div className="p-3.5 sm:p-4 border-r border-b lg:border-b-0 border-[color:var(--t-100)] space-y-0.5 min-w-0">
+          <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Generated Income')}</span>
+          <span className="text-lg font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">{formatMoney(totalEarnings)}</span>
+          <p className="text-xs text-[color:var(--ink-2)] truncate">
             {tx('{n} finalized items', { n: totalAttendedCount })}
           </p>
         </div>
 
-        <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Patients Attended')}</span>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{tx('{n} Patients', { n: totalAttendedCount })}</span>
-          <p className="text-xs text-slate-500 font-semibold">{tx('{a} consults • {b} dispatches', { a: completedBookings.length, b: completedDispatches.length })}</p>
+        <div className="p-3.5 sm:p-4 lg:border-r border-b lg:border-b-0 border-[color:var(--t-100)] space-y-0.5 min-w-0">
+          <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Patients Attended')}</span>
+          <span className="text-lg font-bold tracking-tight text-[color:var(--ink)] tabular-nums block">{tx('{n} Patients', { n: totalAttendedCount })}</span>
+          <p className="text-xs text-[color:var(--ink-2)] truncate">{tx('{a} consults • {b} dispatches', { a: completedBookings.length, b: completedDispatches.length })}</p>
         </div>
 
-        <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Practice Rating')}</span>
+        <div className="p-3.5 sm:p-4 border-r border-[color:var(--t-100)] space-y-0.5 min-w-0">
+          <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Practice Rating')}</span>
           <div className="flex items-center gap-1.5">
-            <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{avgOverall ?? "—"}</span>
-            <Star className="h-4.5 w-4.5 text-amber-500 fill-amber-500" />
+            <span className="text-lg font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{avgOverall ?? "—"}</span>
+            <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
           </div>
-          <p className="text-xs text-slate-500 font-semibold">{tx('Based on {n} clinical ratings', { n: reviewCount })}</p>
+          <p className="text-xs text-[color:var(--ink-2)] truncate">{tx('Based on {n} clinical ratings', { n: reviewCount })}</p>
         </div>
 
-        <div className="bg-white border border-[color:var(--t-200)] p-5 rounded-none shadow-xs space-y-1">
-          <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Completion Rate')}</span>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--e-700)] tabular-nums">{completionRatePct != null ? `${completionRatePct}%` : '—'}</span>
-          <p className="text-xs text-slate-500 font-semibold">{tx('{a} of {b} bookings completed', { a: completedBookings.length, b: scopedBookings.length })}</p>
+        <div className="p-3.5 sm:p-4 space-y-0.5 min-w-0">
+          <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Completion Rate')}</span>
+          <span className="text-lg font-bold tracking-tight text-[color:var(--e-700)] tabular-nums block">{completionRatePct != null ? `${completionRatePct}%` : '—'}</span>
+          <p className="text-xs text-[color:var(--ink-2)] truncate">{tx('{a} of {b} bookings completed', { a: completedBookings.length, b: scopedBookings.length })}</p>
         </div>
-      </div>
+      </section>
 
       {/* Earnings Visualizer Chart */}
-      <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-xs space-y-5">
+      <div className="bg-white border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] rounded-none p-4 sm:p-5 space-y-4">
         <div>
           <h4 className="text-base font-bold text-[color:var(--ink)]">{tx('Revenue Stream Distribution')}</h4>
-          <p className="text-xs text-[color:var(--ink-2)]">{tx('Visualizing contribution proportions across clinical channels')}</p>
+          <p className="text-xs text-[color:var(--ink-2)]">{tx('Contribution proportions across clinical channels')}</p>
         </div>
 
         <div className="space-y-3 max-w-xl text-xs font-bold text-slate-700">
           <div>
             <div className="flex justify-between mb-1">
               <span>{tx('Video Telehealth Booking ({amount})', { amount: formatMoney(videoEarned) })}</span>
-              <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((videoEarned / totalEarnings) * 100) : 0}%</span>
+              <span className="tabular-nums">{totalEarnings > 0 ? Math.round((videoEarned / totalEarnings) * 100) : 0}%</span>
             </div>
-            <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
+            <div className="h-2 bg-slate-100 rounded-none overflow-hidden">
               <div className="bg-[color:var(--t-600)] h-full rounded-none transition-colors duration-500" style={{ width: `${totalEarnings > 0 ? (videoEarned / totalEarnings) * 100 : 0}%` }}></div>
             </div>
           </div>
@@ -134,9 +128,9 @@ export default function PractitionerAnalyticsTab({
           <div>
             <div className="flex justify-between mb-1">
               <span>{tx('In-Person Clinic consultations ({amount})', { amount: formatMoney(inPersonEarned) })}</span>
-              <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((inPersonEarned / totalEarnings) * 100) : 0}%</span>
+              <span className="tabular-nums">{totalEarnings > 0 ? Math.round((inPersonEarned / totalEarnings) * 100) : 0}%</span>
             </div>
-            <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
+            <div className="h-2 bg-slate-100 rounded-none overflow-hidden">
               <div className="bg-[color:var(--t-600)] h-full rounded-none transition-colors duration-500" style={{ width: `${totalEarnings > 0 ? (inPersonEarned / totalEarnings) * 100 : 0}%` }}></div>
             </div>
           </div>
@@ -144,9 +138,9 @@ export default function PractitionerAnalyticsTab({
           <div>
             <div className="flex justify-between mb-1">
               <span>{tx('Urgent On-Call Ambulance Dispatches ({amount})', { amount: formatMoney(totalDispatchesEarned) })}</span>
-              <span className="font-mono tabular-nums">{totalEarnings > 0 ? Math.round((totalDispatchesEarned / totalEarnings) * 100) : 0}%</span>
+              <span className="tabular-nums">{totalEarnings > 0 ? Math.round((totalDispatchesEarned / totalEarnings) * 100) : 0}%</span>
             </div>
-            <div className="h-2.5 bg-slate-100 rounded-none overflow-hidden">
+            <div className="h-2 bg-slate-100 rounded-none overflow-hidden">
               <div className="bg-rose-600 h-full rounded-none transition-colors duration-500" style={{ width: `${totalEarnings > 0 ? (totalDispatchesEarned / totalEarnings) * 100 : 0}%` }}></div>
             </div>
           </div>
@@ -154,7 +148,7 @@ export default function PractitionerAnalyticsTab({
       </div>
 
       {/* Patient History Logs */}
-      <div className="bg-white border border-[color:var(--t-200)] rounded-none p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] rounded-none p-4 sm:p-5 space-y-3.5">
         <div>
           <h4 className="text-base font-bold text-[color:var(--ink)]">{tx('Clinical Attended Ledger')}</h4>
           <p className="text-xs text-[color:var(--ink-2)]">{tx('Chronological history log of all patients evaluated and treatments finalized')}</p>

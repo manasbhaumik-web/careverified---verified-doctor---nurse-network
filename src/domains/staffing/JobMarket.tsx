@@ -432,6 +432,49 @@ export default function JobMarket({
       )}
 
       <div className={embedded ? "space-y-6" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
+        {!embedded && role === 'practitioner' && (() => {
+          const shiftTabMeta: Record<'open' | 'applied' | 'locums' | 'eligibility', {
+            icon: React.ComponentType<{ className?: string }>;
+            eyebrow: string;
+            title: string;
+            description: string;
+          }> = {
+            open: {
+              icon: Briefcase,
+              eyebrow: tx('Clinical Human Capital · Act 586 Staffing'),
+              title: tx('Shifts & Locum Marketplace'),
+              description: tx('Browse verified hospital shifts, clinics, and temporary clinical cover roles with transparent rates and instant eligibility checks.'),
+            },
+            applied: {
+              icon: CheckCircle2,
+              eyebrow: tx('Application Tracker · Active Bids'),
+              title: tx('My Shift Applications'),
+              description: tx('Monitor submitted locum applications, hospital shortlists, and confirmed shift offers.'),
+            },
+            locums: {
+              icon: Users,
+              eyebrow: tx('Locum Roster · Verified Coverage'),
+              title: tx('Locum Directory & Roster'),
+              description: tx('View confirmed locum assignments, facility rosters, and peer coverage schedules.'),
+            },
+            eligibility: {
+              icon: ShieldCheck,
+              eyebrow: tx('Credential Readiness · Compliance'),
+              title: tx('Work Eligibility & Privileges'),
+              description: tx('Verify your APC standing, hospital privileging status, and mandatory clinical compliance requirements.'),
+            },
+          };
+          const meta = shiftTabMeta[activeTab] || shiftTabMeta.open;
+          return (
+            <WorkspaceHeader
+              icon={meta.icon}
+              eyebrow={meta.eyebrow}
+              title={meta.title}
+              description={meta.description}
+              badges={<BannerBadge tone="brand">{tx('National Shift Registry')}</BannerBadge>}
+            />
+          );
+        })()}
         {/* Compact Summary Metrics Bar */}
         <section
           aria-label={tx('Marketplace summary')}

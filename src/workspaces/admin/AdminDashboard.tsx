@@ -46,42 +46,47 @@ export type AdminTabGroup = 'registry' | 'ops' | 'facilities' | 'growth';
 
 export const ADMIN_GROUPS: Record<AdminTabGroup, {
   name: string;
+  summary: string;
   defaultTab: AdminDashboardTab;
-  tabs: { id: AdminDashboardTab; label: string; icon: any; count?: number }[];
+  tabs: { id: AdminDashboardTab; label: string; description: string; icon: any; count?: number }[];
 }> = {
   registry: {
     name: 'Licensing & Registry',
+    summary: 'Review clinician applications, compliance watchlists, and the verified registry.',
     defaultTab: 'approvals',
     tabs: [
-      { id: 'approvals', label: 'Pending Approvals', icon: ShieldCheck },
-      { id: 'trust', label: 'Trust & Watchlist', icon: ShieldAlert },
-      { id: 'registry', label: 'Verified Directory', icon: UserCheck },
+      { id: 'approvals', label: 'Pending Approvals', description: 'Verify MMC/LJM credentials & approve new clinicians', icon: ShieldCheck },
+      { id: 'trust', label: 'Trust & Watchlist', description: 'Sanctions, flagged accounts & compliance reviews', icon: ShieldAlert },
+      { id: 'registry', label: 'Verified Directory', description: 'Search and manage active verified professionals', icon: UserCheck },
     ],
   },
   ops: {
     name: 'Operations & Quality',
+    summary: 'Platform settlements, support tickets, quality audits, and feature modules.',
     defaultTab: 'ops',
     tabs: [
-      { id: 'ops', label: 'Payments & Roster', icon: CreditCard },
-      { id: 'quality', label: 'Support & Quality', icon: CheckCircle2 },
-      { id: 'packages', label: 'Platform Modules', icon: Puzzle },
+      { id: 'ops', label: 'Payments & Roster', description: 'Payout settlements, ledger & active shift roster', icon: CreditCard },
+      { id: 'quality', label: 'Support & Quality', description: 'Patient/clinician escalations & service audits', icon: CheckCircle2 },
+      { id: 'packages', label: 'Platform Modules', description: 'Configure health packages & platform offerings', icon: Puzzle },
     ],
   },
   facilities: {
     name: 'Facilities & Shifts',
+    summary: 'Manage partner hospitals, clinics, and the locum shift marketplace.',
     defaultTab: 'facilities',
     tabs: [
-      { id: 'facilities', label: 'Registered Facilities', icon: Building2 },
-      { id: 'shifts', label: 'Shift Marketplace', icon: Calendar },
+      { id: 'facilities', label: 'Registered Facilities', description: 'Onboard and audit partner hospitals & clinics', icon: Building2 },
+      { id: 'shifts', label: 'Shift Marketplace', description: 'Monitor posted locum shifts & fill rates', icon: Calendar },
     ],
   },
   growth: {
     name: 'Global Care & Content',
+    summary: 'MHTC medical travel desk, clinical library publishing, and search SEO.',
     defaultTab: 'tourism',
     tabs: [
-      { id: 'tourism', label: 'International Desk', icon: Plane },
-      { id: 'literature', label: 'Medical Library', icon: BookOpen },
-      { id: 'seo', label: 'Search & SEO', icon: Globe },
+      { id: 'tourism', label: 'International Desk', description: 'Cross-border patient inquiries & MHTC coordination', icon: Plane },
+      { id: 'literature', label: 'Medical Library', description: 'Publish & moderate clinician-reviewed articles', icon: BookOpen },
+      { id: 'seo', label: 'Search & SEO', description: 'Directory indexing, metadata & growth controls', icon: Globe },
     ],
   },
 };
@@ -985,6 +990,21 @@ export default function AdminDashboard({
         ]).filter(g => currentSubRoleConfig.allowedGroups.includes(g.key)).map(g => ({
           id: g.key,
           label: tx(ADMIN_GROUPS[g.key].name),
+          summary: tx(ADMIN_GROUPS[g.key].summary),
+          cta: {
+            label:
+              g.key === 'registry'
+                ? tx('Review Pending Approvals')
+                : g.key === 'ops'
+                ? tx('Open Payments & Roster')
+                : g.key === 'facilities'
+                ? tx('Manage Facilities')
+                : tx('Open International Desk'),
+            onClick: () => {
+              window.dispatchEvent(new CustomEvent('medcred-navigate', { detail: g.viewId }));
+              setActiveTab(ADMIN_GROUPS[g.key].defaultTab);
+            },
+          },
           icon: g.icon,
           count: g.count,
           activeSubTab: activeTab,
@@ -995,6 +1015,7 @@ export default function AdminDashboard({
           subItems: ADMIN_GROUPS[g.key].tabs.map(t => ({
             ...t,
             label: tx(t.label),
+            description: tx(t.description),
             count: t.id === 'approvals'
               ? (pendingRequests.length || undefined)
               : t.id === 'trust'

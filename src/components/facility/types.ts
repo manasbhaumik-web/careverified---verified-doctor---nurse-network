@@ -5,30 +5,34 @@ export type FacilityTabGroup = 'staffing' | 'care' | 'profile';
 
 export const FACILITY_GROUPS: Record<FacilityTabGroup, {
   name: string;
+  summary: string;
   defaultTab: FacilityTab;
-  tabs: { id: FacilityTab; label: string; icon: any; count?: number }[];
+  tabs: { id: FacilityTab; label: string; description: string; icon: any; count?: number }[];
 }> = {
   staffing: {
     name: 'Staffing & Shifts',
+    summary: 'Post shift vacancies, review applicants, and manage verified locum clinicians.',
     defaultTab: 'shifts',
     tabs: [
-      { id: 'shifts', label: 'Shift Vacancies', icon: Calendar },
-      { id: 'locums', label: 'Locum Directory', icon: Users },
+      { id: 'shifts', label: 'Shift Vacancies', description: 'Post open shifts & review clinician applications', icon: Calendar },
+      { id: 'locums', label: 'Locum Directory', description: 'Search verified MMC/LJM clinicians for coverage', icon: Users },
     ],
   },
   care: {
     name: 'Referrals & Packages',
+    summary: 'Coordinate incoming patient referrals and publish screening health packages.',
     defaultTab: 'cases',
     tabs: [
-      { id: 'cases', label: 'Patient Referrals', icon: FileText },
-      { id: 'packages', label: 'Health Packages', icon: Tag },
+      { id: 'cases', label: 'Patient Referrals', description: 'Manage incoming specialist & hospital referrals', icon: FileText },
+      { id: 'packages', label: 'Health Packages', description: 'Publish screening, maternity & corporate checkups', icon: Tag },
     ],
   },
   profile: {
     name: 'Facility Profile',
+    summary: 'Facility accreditation, operating hours, departments, and contact details.',
     defaultTab: 'profile',
     tabs: [
-      { id: 'profile', label: 'Facility Profile', icon: Building2 },
+      { id: 'profile', label: 'Facility Profile', description: 'Hospital accreditation, services & contact info', icon: Building2 },
     ],
   },
 };

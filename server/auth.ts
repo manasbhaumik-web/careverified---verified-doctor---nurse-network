@@ -4,7 +4,7 @@ import { db } from "./db";
 import { audit } from "./audit";
 import { verifyTotp } from "./totp";
 
-export type Role = "patient" | "practitioner" | "admin" | "pharmacy" | "facility";
+export type Role = "patient" | "practitioner" | "admin" | "pharmacy" | "facility" | "nurse";
 export interface AuthUser {
   id: string;
   email: string;

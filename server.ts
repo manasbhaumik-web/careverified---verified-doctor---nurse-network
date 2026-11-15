@@ -553,6 +553,67 @@ function ensureDemoData() {
     demoFac = db.prepare("SELECT * FROM tourism_facilities WHERE id = 'fac-demo-1'").get();
   }
 
+  // Ensure Demo Nurse / Caring Attendant user exists (linked to nurses[0])
+  const nurseProfile = nurses[0];
+  let demoNurseUser = db.prepare("SELECT * FROM users WHERE email = ?").get("demo.nurse@careverified.test") as any;
+  if (!demoNurseUser) {
+    demoNurseUser = createUser({
+      id: "usr-demo-nurse",
+      email: "demo.nurse@careverified.test",
+      password: DEMO_PASSWORD,
+      role: "nurse",
+      name: nurseProfile?.name || "Maya Lim (RN)",
+      profileId: nurseProfile?.id || null,
+      avatarUrl: nurseProfile?.avatarUrl || "/assets/nurse_female_malay.jpg",
+    });
+  } else if (nurseProfile) {
+    db.prepare("UPDATE users SET profile_id = ?, avatar_url = ? WHERE id = ?").run(
+      nurseProfile.id,
+      nurseProfile.avatarUrl || "/assets/nurse_female_malay.jpg",
+      demoNurseUser.id
+    );
+  }
+  if (nurseProfile && !bookings.some(b => b.professionalId === nurseProfile.id)) {
+    bookings.push(
+      {
+        id: "bkg-nurse-201",
+        professionalId: nurseProfile.id,
+        professionalName: nurseProfile.name,
+        professionalRole: UserRole.NURSE,
+        patientId: "pat-99912",
+        patientName: "Aisyah Rahman",
+        patientPhone: "+60-12-884-2190",
+        patientEmail: "demo.patient@careverified.test",
+        date: "2026-11-15",
+        timeSlot: "09:00 AM",
+        mode: ConsultationMode.HOME_CARE,
+        fee: nurseProfile.hourlyRate || 85,
+        paymentStatus: "Paid",
+        status: "Upcoming",
+        symptoms: "Post-operative wound dressing change & morning vitals monitoring at Bangsar residence.",
+        createdAt: "2026-11-13T08:00:00.000Z",
+      },
+      {
+        id: "bkg-nurse-202",
+        professionalId: nurseProfile.id,
+        professionalName: nurseProfile.name,
+        professionalRole: UserRole.NURSE,
+        patientId: "pat-88410",
+        patientName: "Tan Wei Ming",
+        patientPhone: "+60-16-412-9088",
+        patientEmail: "tan.wm@example.com",
+        date: "2026-11-15",
+        timeSlot: "02:30 PM",
+        mode: ConsultationMode.HOME_CARE,
+        fee: nurseProfile.hourlyRate || 85,
+        paymentStatus: "Paid",
+        status: "Upcoming",
+        symptoms: "Elderly mobility assistance, blood pressure check, and evening medication reconciliation.",
+        createdAt: "2026-11-13T10:30:00.000Z",
+      }
+    );
+  }
+
   let facUser = db.prepare("SELECT * FROM users WHERE email = ?").get("demo.facility@careverified.test") as any;
   if (!facUser) {
     facUser = createUser({
@@ -750,6 +811,7 @@ app.get("/api/auth/options", (_req, res) => {
         practitioner: { label: "Dr. Arjun Menon (Physician)", email: "demo.doctor@careverified.test", password: DEMO_PASSWORD },
         pharmacy: { label: "Bangsar Care Pharmacy", email: "demo.pharmacy@careverified.test", password: DEMO_PASSWORD },
         facility: { label: "Pantai Medical Centre Bangsar", email: "demo.facility@careverified.test", password: DEMO_PASSWORD },
+        nurse: { label: "Maya Lim (RN / Caregiver)", email: "demo.nurse@careverified.test", password: DEMO_PASSWORD },
       } : undefined,
     },
   });
@@ -766,6 +828,7 @@ app.post("/api/auth/demo", (req, res) => {
     practitioner: "demo.doctor@careverified.test",
     pharmacy: "demo.pharmacy@careverified.test",
     facility: "demo.facility@careverified.test",
+    nurse: "demo.nurse@careverified.test",
   };
   const row = db.prepare("SELECT * FROM users WHERE email = ?").get(demoEmails[role]) as any;
   if (!row) return fail(res, 404, "Demo account not available.");

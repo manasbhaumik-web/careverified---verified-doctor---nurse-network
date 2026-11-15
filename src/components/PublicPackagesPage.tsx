@@ -1,4 +1,5 @@
 import { CustomSelect } from '../shared/ui/CustomSelect';
+import BrandLogo from '../shared/ui/BrandLogo';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
@@ -1444,11 +1445,8 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
       <header className="sticky top-0 z-40">
         <div className="bg-[color:var(--t-50)]/95 backdrop-blur-md border-b border-[color:var(--t-200)]">
           <div className={`${wrap} min-h-[64px] flex items-center justify-between gap-3`}>
-            <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="flex items-center gap-2.5" aria-label="MediCred home">
-              <span className="w-9 h-9 bg-[color:var(--t-600)] flex items-center justify-center text-white border border-[color:var(--t-700)]">
-                <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" /></svg>
-              </span>
-              <span className="font-display font-black text-xl tracking-tight">MediCred<span className="text-[color:var(--t-600)]">.</span></span>
+            <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="group" aria-label="MediCred home">
+              <BrandLogo tone="light" size="md" />
             </a>
             <nav aria-label="Marketplace sections" className="hidden lg:flex self-stretch items-stretch gap-2 text-sm font-semibold">
               <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="relative min-h-[44px] px-3 inline-flex items-center whitespace-nowrap text-slate-700 hover:text-[color:var(--t-700)]">Home</a>

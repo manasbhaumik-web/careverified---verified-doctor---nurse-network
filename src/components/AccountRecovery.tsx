@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AlertCircle, ArrowLeft, CheckCircle2, RefreshCw } from 'lucide-react';
 import ThemeSwitcher from './ThemeSwitcher';
 import LocaleSwitcher from './LocaleSwitcher';
+import BrandLogo from '../shared/ui/BrandLogo';
 import { loginUrl, navigate, useLocation } from '../nav';
 import { getLocale } from '../locale/store';
 import { useLocale } from '../locale/store';
@@ -99,7 +100,9 @@ export default function AccountRecovery({ mode }: { mode: 'forgot' | 'reset' }) 
     <div className="min-h-dvh bg-[color:var(--t-bg)] text-[color:var(--ink)] font-body flex flex-col antialiased">
       <header className="bg-[color:var(--t-50)] border-b border-[color:var(--t-200)]">
         <div className="max-w-xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
-          <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="font-display font-black text-xl tracking-tight" aria-label="MediCred home">MediCred<span className="text-[color:var(--t-600)]">.</span></a>
+          <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="group min-w-0" aria-label="MediCred home">
+            <BrandLogo tone="light" size="md" />
+          </a>
           <div className="flex items-center gap-2"><LocaleSwitcher /><ThemeSwitcher /></div>
         </div>
       </header>

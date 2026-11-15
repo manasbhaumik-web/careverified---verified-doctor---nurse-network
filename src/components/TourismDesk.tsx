@@ -97,6 +97,15 @@ export default function TourismDesk({
         />
       )}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {isPractitioner && (
+          <WorkspaceHeader
+            icon={Briefcase}
+            eyebrow={tx('Cross-Border Care & Referrals')}
+            title={tx('Global Patient Services Desk')}
+            description={tx('Manage international enquiries, review cross-border medical files, issue itemised hospital quotes, and author discharge summaries.')}
+            badges={<BannerBadge tone="brand">{tx('MHTC Desk')}</BannerBadge>}
+          />
+        )}
         {tab === 'cases' && (me && me.facilities.length === 0
           ? <p className="text-xs bg-white border border-dashed border-slate-300 p-6 text-center text-slate-600">{tx('You are not assigned to a facility yet. An admin adds you from Global Patient Services > Facilities.')}</p>
           : open ? <StaffCase id={open} onBack={() => setOpen(null)} /> : <CaseQueue onOpen={setOpen} />)}

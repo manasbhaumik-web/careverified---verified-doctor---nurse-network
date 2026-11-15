@@ -3,7 +3,7 @@ import { useTr } from '../locale';
 import {
   CheckCircle2, LifeBuoy, Video, Sparkles, FolderHeart,
   Heart, Calendar, MessageSquare, Pill, FlaskConical, FileText,
-  Search, UserCheck, Store, BookOpen, PackagePlus, HeartHandshake, Plane
+  Search, UserCheck, Store, BookOpen, PackagePlus, HeartHandshake, Plane, LayoutDashboard
 } from 'lucide-react';
 import DashboardHeader, {
   BannerRow,
@@ -130,6 +130,7 @@ export default function PatientHeroBanner<T extends string = string>({
       cta: { label: tx('Start Instant Consult'), onClick: () => navigatePatientGroup('care', 'consult') },
       onSubTabChange: (subId) => navigatePatientGroup('care', subId),
       subItems: [
+        { id: 'overview', label: tx('Overview'), description: tx('Today at a glance: visits, medicines, vitals & care team'), icon: LayoutDashboard },
         { id: 'appointments', label: tx('Appointments'), description: tx('Manage upcoming visits, reschedules & history'), icon: Calendar, count: upcomingCount || undefined },
         { id: 'consult', label: tx('Instant Consult'), description: tx('24/7 video consults & AI symptom triage'), icon: Video },
         { id: 'messages', label: tx('Messages'), description: tx('Encrypted chat with your doctors & clinics'), icon: MessageSquare },

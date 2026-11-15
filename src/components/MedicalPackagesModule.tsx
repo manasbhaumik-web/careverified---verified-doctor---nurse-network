@@ -339,59 +339,51 @@ export default function MedicalPackagesModule({
         />
       )}
 
-      <div className={embedded ? "space-y-6" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
+      <div className={embedded ? "space-y-4" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-4"}>
 
         {/* ------------------------------------------------------------------- */}
-        {/* ACTIVE PROMOTIONS MARQUEE STRIP (Shown on packages tab) */}
+        {/* COMPACT PARTNER PROMOTIONS BAR (Shown on packages tab) */}
         {/* ------------------------------------------------------------------- */}
         {activeTab === 'packages' && promotions.length > 0 && (
-          <div className="bg-white border border-[color:var(--t-200)] border-l-4 border-l-[color:var(--t-600)] p-3.5 sm:p-4 rounded-none shadow-2xs">
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <span className="w-9 h-9 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center shrink-0">
-                  <Sparkles className="h-4 w-4" />
-                </span>
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h4 className="text-sm font-black uppercase tracking-wider text-[color:var(--ink)]">
-                      {tx('Offers from Partner Hospitals')}
-                    </h4>
-                    <span className="text-2xs font-mono font-bold bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-2 py-0.5">
-                      {tx('{n} Available', { n: promotions.length })}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    {tx('Tap a promo code to copy it, then apply it under Package Details to calculate your discounted rate.')}
-                  </p>
-                </div>
-              </div>
+          <div className="bg-white border border-[color:var(--t-200)] border-l-4 border-l-[color:var(--t-600)] px-3 py-2 rounded-none shadow-2xs flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <Sparkles className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
+              <span className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--ink)] whitespace-nowrap">
+                {tx('Partner Offers')}
+              </span>
+              <span className="text-2xs font-mono font-bold bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-1.5 py-0.5 whitespace-nowrap">
+                {promotions.length}
+              </span>
+              <span className="hidden md:inline text-2xs text-slate-500 truncate">
+                · {tx('Tap a code to copy & apply in Package Details')}
+              </span>
+            </div>
 
-              {/* Promo chips carousel */}
-              <div className="flex flex-wrap items-center gap-2 shrink-0">
-                {promotions.map((pr) => (
-                  <button
-                    key={pr.id}
-                    type="button"
-                    onClick={() => {
-                      copyPromoCode(pr.code);
-                      setPromoCodeInput(pr.code);
-                    }}
-                    className="inline-flex items-center gap-2 px-3 h-9 bg-[color:var(--t-50)]/40 hover:bg-[color:var(--t-50)] border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] text-[color:var(--ink)] text-xs font-bold cursor-pointer transition-colors shadow-2xs"
-                    title={tx('Click to copy promo code')}
-                  >
-                    <Tag className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
-                    <span className="font-mono font-extrabold text-[color:var(--t-700)]">{pr.code}</span>
-                    <span className="text-2xs text-emerald-800 font-extrabold uppercase px-1.5 py-0.5 bg-emerald-50 border border-emerald-200">
-                      {pr.badge_text || (pr.discount_type === 'percentage' ? tx('{pct}% OFF', { pct: pr.discount_value }) : tx('RM {amt} OFF', { amt: pr.discountValueMyr }))}
-                    </span>
-                    {copiedCode === pr.code ? (
-                      <span className="flex items-center gap-1 text-emerald-700 text-2xs font-bold"><CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> {tx('Copied')}</span>
-                    ) : (
-                      <Copy className="h-3.5 w-3.5 text-slate-400 hover:text-[color:var(--t-600)]" aria-label={tx('Copy code')} />
-                    )}
-                  </button>
-                ))}
-              </div>
+            {/* Compact promo chips */}
+            <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+              {promotions.map((pr) => (
+                <button
+                  key={pr.id}
+                  type="button"
+                  onClick={() => {
+                    copyPromoCode(pr.code);
+                    setPromoCodeInput(pr.code);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-2 h-7 bg-[color:var(--t-50)]/40 hover:bg-[color:var(--t-50)] border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] text-[color:var(--ink)] text-2xs font-bold cursor-pointer transition-colors"
+                  title={tx('Click to copy promo code')}
+                >
+                  <Tag className="h-3 w-3 text-[color:var(--t-600)] shrink-0" />
+                  <span className="font-mono font-extrabold text-[color:var(--t-700)]">{pr.code}</span>
+                  <span className="text-2xs text-emerald-800 font-extrabold uppercase px-1 py-0.2 bg-emerald-50 border border-emerald-200">
+                    {pr.badge_text || (pr.discount_type === 'percentage' ? tx('{pct}% OFF', { pct: pr.discount_value }) : tx('RM {amt} OFF', { amt: pr.discountValueMyr }))}
+                  </span>
+                  {copiedCode === pr.code ? (
+                    <span className="flex items-center gap-0.5 text-emerald-700 text-2xs font-bold"><CheckCircle2 className="h-3 w-3" aria-hidden="true" /> {tx('Copied')}</span>
+                  ) : (
+                    <Copy className="h-3 w-3 text-slate-400 hover:text-[color:var(--t-600)]" aria-label={tx('Copy code')} />
+                  )}
+                </button>
+              ))}
             </div>
           </div>
         )}

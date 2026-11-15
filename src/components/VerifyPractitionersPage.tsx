@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import BrandLogo from '../shared/ui/BrandLogo';
 import { 
   ShieldCheck, CheckCircle2, Search, Stethoscope, UserCheck, Users, 
   Award, Clock, ArrowRight, ArrowLeft, Heart, Lock, AlertCircle, 
@@ -116,14 +117,10 @@ export default function VerifyPractitionersPage({
             <a 
               href="/" 
               onClick={(e) => { e.preventDefault(); navigate('/'); }}
-              className="flex items-center gap-2 group cursor-pointer"
+              className="group cursor-pointer"
+              aria-label="MediCred home"
             >
-              <span className="w-9 h-9 bg-[color:var(--t-600)] text-white flex items-center justify-center font-black text-lg shadow-2xs group-hover:bg-[color:var(--t-700)] transition-colors">
-                M
-              </span>
-              <span className="font-display font-black text-xl tracking-tight text-[color:var(--ink)]">
-                MediCred<span className="text-[color:var(--t-600)]">.</span>
-              </span>
+              <BrandLogo tone="light" size="md" />
             </a>
 
             <div className="hidden md:flex items-center gap-1.5 text-xs font-bold text-slate-500 border-l border-slate-200 pl-4">

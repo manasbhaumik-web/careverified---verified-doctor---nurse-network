@@ -143,11 +143,11 @@ export default function PatientAppointmentsTab({
     <div id="panel-appointments" role="tabpanel" aria-labelledby="tab-appointments" tabIndex={0} className="space-y-4">
       {/* 1. COMPACT WORKSPACE HEADER */}
       <WorkspaceHeader
+        variant="overview"
         icon={Calendar}
-        eyebrow={tx('My Care · Clinical Encounters')}
-        title={tx('Appointments & Consultation Visits')}
-        description={tx('Manage upcoming visits, instant video consult rooms, vitals, and your clinical consultation archive.')}
-        badges={<BannerBadge tone="brand">{tx('MOH Protocol')}</BannerBadge>}
+        eyebrow={tx('My Care · Visits')}
+        title={tx('Your Appointments')}
+        description={tx('Join video visits, check upcoming bookings, and review past doctor summaries.')}
         aside={
           <div className="flex flex-wrap items-center gap-2">
             {onFindDoctors && (
@@ -157,15 +157,15 @@ export default function PatientAppointmentsTab({
                 className="px-3.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5 rounded-none"
               >
                 <Calendar className="h-3.5 w-3.5" />
-                <span>{tx('Schedule Doctor Visit')}</span>
+                <span>{tx('Book a Doctor')}</span>
               </button>
             )}
           </div>
         }
         tabs={[
-          { id: 'all', label: tx('All Encounters'), count: bookings.length },
-          { id: 'upcoming', label: tx('Upcoming Visits'), count: upcoming.length },
-          { id: 'past', label: tx('Consultation Archive'), count: past.length },
+          { id: 'all', label: tx('All Visits'), count: bookings.length },
+          { id: 'upcoming', label: tx('Upcoming'), count: upcoming.length },
+          { id: 'past', label: tx('Past Visits'), count: past.length },
         ]}
         activeTab={appointmentsSubTab}
         onTabChange={setAppointmentsSubTab}
@@ -224,166 +224,83 @@ export default function PatientAppointmentsTab({
         </section>
       )}
 
-      {/* 3. COMPACT CARE CHANNELS & VITALS STRIP (Single-row Bento Ribbon) */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-3.5 animate-panel-in">
-        {/* Immediate Care Quick Actions + Next Visit Spotlight (5 cols) */}
-        <section
-          aria-label={tx('Immediate medical assistance channels')}
-          className="xl:col-span-5 panel-elevated border-t-2 border-t-[color:var(--t-600)] p-3.5 flex flex-col justify-between gap-3 rounded-none"
+      {/* 3. COMPACT 4-CELL OVERVIEW RIBBON (Next Visit · Latest Vitals · Online Care · Quick Tools) */}
+      <section
+        aria-label={tx('Visit summary and quick actions')}
+        className="grid grid-cols-2 lg:grid-cols-4 bg-white border border-[color:var(--t-200)] rounded-none"
+      >
+        <button
+          type="button"
+          onClick={() => upcoming[0] && setSelectedId(upcoming[0].id)}
+          className="text-left p-3.5 border-r border-b lg:border-b-0 border-[color:var(--t-100)] hover:bg-[color:var(--t-50)] transition-colors cursor-pointer min-w-0"
         >
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-700">
-                {tx('Immediate Care Channels')}
-              </span>
-            </div>
-            <span className="text-xs font-mono font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
-              {onCallStatus && onCallStatus.onlineDoctors > 0
-                ? tx('{n} Doctors Online', { n: onCallStatus.onlineDoctors })
-                : tx('24/7 Care Triage')}
-            </span>
-          </div>
+          <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Next Visit')}</span>
+          <span className="text-sm font-bold text-[color:var(--ink)] tabular-nums truncate block mt-0.5">
+            {upcoming[0] ? `${upcoming[0].date} · ${upcoming[0].timeSlot}` : tx('None scheduled')}
+          </span>
+          <span className="text-xs text-[color:var(--ink-2)] truncate block">
+            {upcoming[0] ? upcoming[0].professionalName : tx('Book a doctor anytime')}
+          </span>
+        </button>
 
-          {upcoming[0] && (
-            <button
-              type="button"
-              onClick={() => setSelectedId(upcoming[0].id)}
-              className="w-full text-left bg-[color:var(--t-50)]/80 hover:bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-3 py-2 flex items-center justify-between gap-2 transition-colors cursor-pointer"
-            >
-              <div className="min-w-0">
-                <span className="text-2xs font-mono font-bold uppercase tracking-wider text-[color:var(--t-700)] block">
-                  {tx('Next Scheduled Visit')}
-                </span>
-                <span className="text-xs font-bold text-[color:var(--ink)] truncate block">
-                  {upcoming[0].professionalName} · {upcoming[0].date} ({upcoming[0].timeSlot})
-                </span>
-              </div>
-              <ChevronRight className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
-            </button>
-          )}
+        <button
+          type="button"
+          onClick={onOpenVitals}
+          className="text-left p-3.5 lg:border-r border-b lg:border-b-0 border-[color:var(--t-100)] hover:bg-[color:var(--t-50)] transition-colors cursor-pointer min-w-0"
+        >
+          <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Latest Vitals')}</span>
+          <span className="text-sm font-bold text-[color:var(--ink)] tabular-nums truncate block mt-0.5">
+            {summary?.bp ? `BP ${summary.bp.value1}/${summary.bp.value2}` : tx('BP not logged')}
+            {summary?.pulse?.value1 != null ? ` · ${summary.pulse.value1} bpm` : ''}
+          </span>
+          <span className={`text-xs truncate block ${patientAllergies.length > 0 ? 'text-rose-700 font-semibold' : 'text-[color:var(--ink-2)]'}`}>
+            {patientAllergies.length > 0
+              ? tx('Allergies: {list}', { list: patientAllergies.map((a) => tx(a)).join(', ') })
+              : recordsData?.allergyStatement?.kind === 'none_known'
+              ? tx('No known allergies')
+              : tx('Tap to update vitals')}
+          </span>
+        </button>
 
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              onClick={onConsultNow}
-              className="px-2.5 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-[colors,transform,box-shadow] hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-1.5 rounded-none shadow-2xs"
-            >
-              <Video className="h-3.5 w-3.5 shrink-0" />
-              <span className="truncate">{tx('Video Doctor')}</span>
-            </button>
+        <button
+          type="button"
+          onClick={onConsultNow}
+          className="text-left p-3.5 border-r border-[color:var(--t-100)] hover:bg-[color:var(--t-50)] transition-colors cursor-pointer min-w-0"
+        >
+          <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Instant Video Visit')}</span>
+          <span className="text-sm font-bold text-[color:var(--t-700)] truncate flex items-center gap-1.5 mt-0.5">
+            <Video className="h-3.5 w-3.5 shrink-0" />
+            <span>{tx('See a Doctor Now')}</span>
+          </span>
+          <span className="text-xs text-[color:var(--ink-2)] truncate block">
+            {onCallStatus && onCallStatus.onlineDoctors > 0
+              ? tx('{n} doctors online', { n: onCallStatus.onlineDoctors })
+              : tx('24/7 care available')}
+          </span>
+        </button>
+
+        <div className="p-3.5 flex flex-col justify-between gap-1.5 min-w-0">
+          <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Quick Tools')}</span>
+          <div className="flex flex-wrap gap-1.5">
             <button
               type="button"
               onClick={onOpenTriageTab}
-              className="px-2.5 py-2 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5 rounded-none"
+              className="px-2.5 py-1.5 bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] text-[color:var(--t-800)] border border-[color:var(--t-200)] text-2xs font-bold cursor-pointer rounded-none inline-flex items-center gap-1"
             >
-              <Stethoscope className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
-              <span className="truncate">{tx('AI Triage')}</span>
+              <Stethoscope className="h-3 w-3" />
+              <span>{tx('Symptom Check')}</span>
             </button>
             <button
               type="button"
               onClick={onOpenPharmacies ? onOpenPharmacies : onOpenRxRecords}
-              className="px-2.5 py-2 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5 rounded-none"
+              className="px-2.5 py-1.5 bg-white hover:bg-[color:var(--t-50)] text-[color:var(--ink)] border border-[color:var(--t-200)] text-2xs font-bold cursor-pointer rounded-none inline-flex items-center gap-1"
             >
-              <Pill className="h-3.5 w-3.5 text-cyan-600 shrink-0" />
-              <span className="truncate">{tx('Rx Refill')}</span>
+              <Pill className="h-3 w-3 text-[color:var(--t-600)]" />
+              <span>{tx('Refill Rx')}</span>
             </button>
           </div>
-        </section>
-
-        {/* Compact Vitals & Allergy Ribbon (7 cols) */}
-        <section
-          aria-label={tx('Clinical vitals and safety snapshot')}
-          className="xl:col-span-7 panel-elevated p-3.5 flex flex-col justify-between gap-2.5 rounded-none"
-        >
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <HeartPulse className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-700">
-                {tx('Pre-Consultation Vitals')}
-              </span>
-              <span
-                className={`text-xs font-mono font-semibold px-2 py-0.5 border ${
-                  patientAllergies.length > 0
-                    ? 'bg-rose-50 text-rose-800 border-rose-200'
-                    : recordsData?.allergyStatement?.kind === 'none_known'
-                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                    : 'bg-slate-100 text-slate-700 border-slate-200'
-                }`}
-              >
-                {patientAllergies.length > 0
-                  ? tx('Allergies: {list}', { list: patientAllergies.map((a) => tx(a)).join(', ') })
-                  : recordsData?.allergyStatement?.kind === 'none_known'
-                  ? tx('No Known Allergies')
-                  : tx('Allergies Unrecorded')}
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={onOpenVitals}
-              className="text-xs font-semibold text-[color:var(--t-600)] hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              <span>{tx('Update Vitals')}</span>
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <button
-              type="button"
-              onClick={onOpenVitals}
-              className={`text-left px-3 py-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] border-l-2 ${
-                summary?.bp?.flag?.level === 'high' || summary?.bp?.flag?.level === 'critical'
-                  ? 'border-l-rose-500'
-                  : summary?.bp
-                  ? 'border-l-emerald-500'
-                  : 'border-l-slate-300'
-              } hover:border-[color:var(--t-600)] hover:bg-white transition-colors cursor-pointer rounded-none`}
-            >
-              <span className="text-xs font-mono font-semibold uppercase text-slate-500 block">{tx('BP')}</span>
-              <span className="text-sm font-bold font-mono tabular-nums text-[color:var(--ink)]">
-                {summary?.bp ? `${summary.bp.value1}/${summary.bp.value2}` : '—'}
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={onOpenVitals}
-              className={`text-left px-3 py-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] border-l-2 ${
-                summary?.pulse ? 'border-l-emerald-500' : 'border-l-slate-300'
-              } hover:border-[color:var(--t-600)] hover:bg-white transition-colors cursor-pointer rounded-none`}
-            >
-              <span className="text-xs font-mono font-semibold uppercase text-slate-500 block">{tx('Heart Rate')}</span>
-              <span className="text-sm font-bold font-mono tabular-nums text-[color:var(--ink)]">
-                {summary?.pulse?.value1 != null ? `${summary.pulse.value1} bpm` : '—'}
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={onOpenVitals}
-              className={`text-left px-3 py-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] border-l-2 ${
-                summary?.glucose ? 'border-l-emerald-500' : 'border-l-slate-300'
-              } hover:border-[color:var(--t-600)] hover:bg-white transition-colors cursor-pointer rounded-none`}
-            >
-              <span className="text-xs font-mono font-semibold uppercase text-slate-500 block">{tx('Glucose')}</span>
-              <span className="text-sm font-bold font-mono tabular-nums text-[color:var(--ink)]">
-                {summary?.glucose?.value1 != null ? `${summary.glucose.value1}` : '—'}
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={onOpenVitals}
-              className={`text-left px-3 py-2 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] border-l-2 ${
-                summary?.spo2 ? 'border-l-emerald-500' : 'border-l-slate-300'
-              } hover:border-[color:var(--t-600)] hover:bg-white transition-colors cursor-pointer rounded-none`}
-            >
-              <span className="text-xs font-mono font-semibold uppercase text-slate-500 block">{tx('SpO₂')}</span>
-              <span className="text-sm font-bold font-mono tabular-nums text-[color:var(--ink)]">
-                {summary?.spo2?.value1 != null ? `${summary.spo2.value1}%` : '—'}
-              </span>
-            </button>
-          </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
       {/* 4. COMMAND BAR */}
       <div className="bg-white border border-[color:var(--t-200)] px-3.5 py-2.5 flex flex-wrap items-center justify-between gap-3 rounded-none shadow-2xs">
@@ -393,7 +310,7 @@ export default function PatientAppointmentsTab({
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={tx('Search by doctor name, specialty, symptoms, or encounter ID...')}
+            placeholder={tx('Search by doctor, specialty, or reason for visit...')}
             aria-label={tx('Search appointments')}
             className="w-full h-9 pl-9 pr-8 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] focus:border-[color:var(--t-600)] focus:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 text-xs font-medium text-[color:var(--ink)] rounded-none transition-colors"
           />
@@ -654,7 +571,7 @@ export default function PatientAppointmentsTab({
                       <span className="truncate">{tx(String(selectedBooking.mode))}</span>
                     </span>
                     <span className="text-xs text-slate-500">
-                      {isVideo ? tx('Encrypted WebRTC') : isHomeVisit ? tx('Home Visit') : tx('In-Clinic')}
+                      {isVideo ? tx('Video Call') : isHomeVisit ? tx('Home Visit') : tx('In-Clinic')}
                     </span>
                   </div>
                   <div className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3">
@@ -671,11 +588,11 @@ export default function PatientAppointmentsTab({
                     </span>
                   </div>
                   <div className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3">
-                    <span className="text-xs font-mono font-bold uppercase text-slate-500 block">{tx('Encounter ID')}</span>
+                    <span className="text-xs font-mono font-bold uppercase text-slate-500 block">{tx('Booking ID')}</span>
                     <span className="text-xs font-bold font-mono text-slate-700 mt-1 block truncate">
                       {selectedBooking.id}
                     </span>
-                    <span className="text-xs text-slate-500">{tx('MOH SLA')}</span>
+                    <span className="text-xs text-slate-500">{tx('Verified Care')}</span>
                   </div>
                 </div>
 
@@ -683,7 +600,7 @@ export default function PatientAppointmentsTab({
                 {selectedBooking.symptoms && (
                   <div className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3.5">
                     <span className="text-xs font-mono font-bold uppercase text-slate-500 block mb-1">
-                      {tx('Stated Symptoms / Reason for Visit')}
+                      {tx('What You Shared')}
                     </span>
                     <p className="text-xs text-slate-700 font-medium leading-relaxed">
                       “{selectedBooking.symptoms}”

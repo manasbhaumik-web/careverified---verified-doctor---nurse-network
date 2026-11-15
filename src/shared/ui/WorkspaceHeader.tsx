@@ -21,6 +21,8 @@ export interface WorkspaceHeaderProps<T extends string = string> {
   onTabChange?: (tabId: T) => void;
   tabsLabel?: string;
   className?: string;
+  /** 'overview' = flat editorial strip + square tab bar (Patient Overview style) */
+  variant?: 'default' | 'overview';
   children?: React.ReactNode;
 }
 
@@ -41,9 +43,82 @@ export default function WorkspaceHeader<T extends string = string>({
   onTabChange,
   tabsLabel,
   className = '',
+  variant = 'overview',
   children,
 }: WorkspaceHeaderProps<T>) {
   const tx = useTr();
+
+  // "overview" variant: flat editorial title strip + square tab bar (matches the Patient Overview page)
+  if (variant === 'overview') {
+    return (
+      <div className={`space-y-4 ${className}`}>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className="min-w-0">
+            {eyebrow && (
+              <div className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)]">{eyebrow}</div>
+            )}
+            <div className="mt-1 flex flex-wrap items-center gap-2.5">
+              <h2 className="text-2xl font-bold tracking-tight text-[color:var(--ink)] leading-tight">{title}</h2>
+              {badges}
+            </div>
+            {description && (
+              <p className="mt-1 text-xs text-[color:var(--ink-2)] leading-relaxed max-w-3xl">{description}</p>
+            )}
+          </div>
+          {aside && <div className="flex items-center gap-2 flex-wrap shrink-0">{aside}</div>}
+        </div>
+
+        {children && (
+          <div className="bg-white border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] p-3.5">{children}</div>
+        )}
+
+        {tabs && tabs.length > 0 && (
+          <div
+            role="tablist"
+            aria-label={tabsLabel || tx('Workspace section tabs')}
+            className="flex items-stretch gap-0.5 bg-white border border-[color:var(--t-200)] overflow-x-auto"
+          >
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              const TabIcon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => onTabChange?.(tab.id)}
+                  className={`px-3.5 py-3 text-xs flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 border-b-[3px] transition-colors focus:outline-none focus-visible:bg-[color:var(--t-50)] ${
+                    isActive
+                      ? 'bg-[color:var(--t-50)] border-b-[color:var(--t-600)] text-[color:var(--t-800)] font-bold'
+                      : 'border-b-transparent text-[color:var(--ink-2)] font-semibold hover:bg-[color:var(--t-50)] hover:text-[color:var(--t-800)]'
+                  }`}
+                >
+                  {TabIcon && <TabIcon className={`h-3.5 w-3.5 ${isActive ? 'text-[color:var(--t-700)]' : 'text-slate-400'}`} />}
+                  <span>{tab.label}</span>
+                  {tab.count !== undefined && (
+                    <span
+                      className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[11px] font-bold leading-none tabular-nums border ${
+                        isActive
+                          ? 'bg-[color:var(--t-100)] text-[color:var(--t-900)] border-[color:var(--t-300)]'
+                          : 'bg-slate-50 text-slate-600 border-slate-200'
+                      }`}
+                    >
+                      {tab.count}
+                    </span>
+                  )}
+                  {tab.badge && (
+                    <span className="text-2xs font-bold uppercase tracking-wider px-1.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">{tab.badge}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div
       className={`bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] p-3.5 sm:p-4 shadow-2xs ${className}`}
@@ -124,10 +199,10 @@ export default function WorkspaceHeader<T extends string = string>({
                   <span>{tab.label}</span>
                   {tab.count !== undefined && (
                     <span
-                      className={`text-2xs font-mono font-bold px-1.5 py-0.2 leading-none ${
+                      className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[11px] font-bold leading-none tabular-nums border ${
                         isActive
-                          ? 'bg-[color:var(--t-600)] text-white'
-                          : 'bg-white text-slate-700 border border-[color:var(--t-200)]'
+                          ? 'bg-[color:var(--t-100)] text-[color:var(--t-900)] border-[color:var(--t-300)]'
+                          : 'bg-white text-slate-600 border-[color:var(--t-200)]'
                       }`}
                     >
                       {tab.count}

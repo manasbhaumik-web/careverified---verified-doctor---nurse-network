@@ -7,7 +7,7 @@ import {
   AlertTriangle, Stethoscope, Sparkles, Pill, Activity, PhoneCall,
   HeartPulse, ShieldAlert, ChevronRight, ExternalLink, LifeBuoy,
   Send, X, Star, MapPin, Radio, AlertCircle, FileText, PackagePlus,
-  HeartHandshake, Plane, Store, UserCheck, Tag, FlaskConical, ClipboardList, Share2
+  HeartHandshake, Plane, Store, UserCheck, Tag, FlaskConical, ClipboardList, Share2, LayoutDashboard
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile, Booking, PatientProfile, UserRole, Article, ConsultationMode } from '../types';
 import { INITIAL_ARTICLES } from '../data';
@@ -15,13 +15,19 @@ import DashboardHeader, { BannerRow, BannerIdentity, BannerBadge, BannerKpis, Fi
 import type { RecordSubTab } from './PatientRecords';
 import SavedTab from './patient/SavedTab';
 import PatientAppointmentsTab from './patient/PatientAppointmentsTab';
+import PatientOverviewTab from './patient/PatientOverviewTab';
 import PaymentDialog from './PaymentDialog';
 import { formatMoney, useTr } from '../locale';
 import PatientHeroBanner from './PatientHeroBanner';
 import { useOnCallStatus, onCallLabel } from '../useOnCallStatus';
 import { useSavedProviders } from '../savedProviders';
 import { UserAvatar } from '../avatars';
-import WorkspaceHeader from '../shared/ui/WorkspaceHeader';
+import BaseWorkspaceHeader, { WorkspaceHeaderProps } from '../shared/ui/WorkspaceHeader';
+
+// Patient workspace pages share the Overview page's editorial header + square tab bar
+const WorkspaceHeader = <T extends string = string>(props: WorkspaceHeaderProps<T>) => (
+  <BaseWorkspaceHeader<T> variant="overview" {...props} />
+);
 import { patientApi } from './patient/api';
 import { classifyBp, fmtPatientDate as fmtDate, matchRecommendedSpecialists } from './patient/clinicalHelpers';
 
@@ -36,6 +42,7 @@ const MedicalLibrary = lazy(() => import('./MedicalLibrary'));
 const AISymptomMatcher = lazy(() => import('../domains/telemedicine/AISymptomMatcher'));
 
 export type PatientDashboardTab = 
+  | 'overview'
   | 'appointments' 
   | 'consult' 
   | 'messages' 
@@ -61,8 +68,9 @@ export const PATIENT_GROUPS: Record<PatientTabGroup, {
 }> = {
   care: {
     name: 'My Care',
-    defaultTab: 'appointments',
+    defaultTab: 'overview',
     tabs: [
+      { id: 'overview', label: 'Overview', description: 'Today at a glance: visits, medicines, vitals & care team', icon: LayoutDashboard },
       { id: 'appointments', label: 'Appointments', description: 'Manage upcoming visits, reschedules & history', icon: Calendar },
       { id: 'consult', label: 'Instant Consult', description: '24/7 video consults & AI symptom triage', icon: Video },
       { id: 'messages', label: 'Messages', description: 'Encrypted chat with your doctors & clinics', icon: MessageSquare },
@@ -431,6 +439,7 @@ export default function PatientDashboard({
 
   const navigateToTab = (tab: PatientDashboardTab) => {
     const tabToGroup: Record<PatientDashboardTab, PatientTabGroup> = {
+      overview: 'care',
       appointments: 'care',
       consult: 'care',
       messages: 'care',
@@ -598,6 +607,31 @@ export default function PatientDashboard({
       )}
 
       {/* 4. MAIN WORKSPACE VIEW */}
+      {activeTab === 'overview' && (
+        <PatientOverviewTab
+          userName={userName}
+          greeting={greeting}
+          upcoming={upcoming}
+          activeConsult={activeConsult}
+          summary={summary}
+          recordsData={recordsData}
+          activePrescriptions={activePrescriptions}
+          careTeam={careTeam}
+          patientAllergies={patientAllergies}
+          patientConditions={patientConditions}
+          onCallStatus={onCallStatus}
+          onOpenAppointments={() => navigateToTab('appointments')}
+          onConsultNow={() => { navigateToTab('consult'); setConsultSubTab('instant'); }}
+          onOpenTriage={() => { navigateToTab('consult'); setConsultSubTab('triage'); }}
+          onOpenMessages={() => navigateToTab('messages')}
+          onOpenPrescriptions={() => { setRxSubTab('active'); navigateToTab('prescriptions'); }}
+          onOpenVitals={() => { setRecordsSubTab('vitals'); navigateToTab('records'); }}
+          onOpenCareTeam={() => navigateToTab('saved')}
+          onFindPharmacy={() => navigateToTab('pharmacies')}
+          onSelectProfessional={onSelectProfessional}
+        />
+      )}
+
       {activeTab === 'appointments' && (
         <PatientAppointmentsTab
           bookings={bookings}
@@ -701,9 +735,9 @@ export default function PatientDashboard({
         <div id="panel-certs" role="tabpanel" aria-labelledby="tab-certs" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={FileText}
-            eyebrow={tx('Certificates and referrals')}
-            title={tx('Medical certificates & referrals')}
-            description={tx('Each certificate has a code and QR that your employer can check online. The check shows the doctor\'s registration number and whether the certificate has been changed since it was signed.')}
+            eyebrow={tx('Health Records · Certificates')}
+            title={tx('Medical Certificates & Referrals')}
+            description={tx('Download your MC or specialist referral letters. Each has a QR code your employer can verify.')}
             tabs={[
               { id: 'mc', label: tx('Medical Certificates (MC)'), icon: FileText },
               { id: 'referrals', label: tx('Referral Letters'), icon: HeartHandshake },
@@ -725,13 +759,12 @@ export default function PatientDashboard({
         <div id="panel-labs" role="tabpanel" aria-labelledby="tab-labs" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={FlaskConical}
-            eyebrow={tx('Clinical Diagnostics · Diagnostic Reports')}
-            title={tx('Diagnostic Lab Reports & Doctor Clinical Notes')}
-            description={tx('Pathology test results, blood analysis, radiology reports, and physician consultation summaries.')}
-            badges={<BannerBadge tone="brand">{tx('Accredited Pathology')}</BannerBadge>}
+            eyebrow={tx('Health Records · Tests')}
+            title={tx('Lab Results & Doctor Notes')}
+            description={tx('View your blood tests, scan reports, and visit notes from your doctors.')}
             tabs={[
-              { id: 'labs', label: tx('Lab Test Reports'), icon: FlaskConical },
-              { id: 'notes', label: tx('Doctor Clinical Notes'), icon: FileText },
+              { id: 'labs', label: tx('Lab Results'), icon: FlaskConical },
+              { id: 'notes', label: tx('Doctor Notes'), icon: FileText },
             ]}
             activeTab={labsSubTab}
             onTabChange={setLabsSubTab}
@@ -749,9 +782,9 @@ export default function PatientDashboard({
         <div id="panel-consult" role="tabpanel" tabIndex={0} className="space-y-4">
           <WorkspaceHeader
             icon={Video}
-            eyebrow={tx('Telehealth network')}
-            title={tx('Consult a doctor now')}
-            description={tx('Chat or video with a doctor. If no doctor joins within 10 minutes you are refunded automatically.')}
+            eyebrow={tx('My Care · 24/7 Video')}
+            title={tx('See a Doctor Now')}
+            description={tx('Chat or video call with a doctor. Automatic refund if no doctor joins within 10 minutes.')}
             badges={
               onCall && onCall.onlineDoctors > 0 ? (
                 <BannerBadge tone="success">
@@ -762,8 +795,8 @@ export default function PatientDashboard({
               )
             }
             tabs={[
-              { id: 'instant', label: tx('Instant Video / Chat'), icon: Video },
-              { id: 'triage', label: tx('AI Symptom Triage'), icon: Sparkles },
+              { id: 'instant', label: tx('Video or Chat'), icon: Video },
+              { id: 'triage', label: tx('AI Symptom Check'), icon: Sparkles },
             ]}
             activeTab={consultSubTab}
             onTabChange={(t) => setConsultSubTab(t as any)}
