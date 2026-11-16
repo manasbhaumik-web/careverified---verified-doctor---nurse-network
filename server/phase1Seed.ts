@@ -1,6 +1,7 @@
 import { db } from "./db";
 import { VerificationStatus } from "../src/types";
 import { createUser } from "./auth";
+import { CONSENT_VERSION } from "./privacy";
 
 /**
  * Phase 1 demo data: facilities in every approval state, 26 invented practitioners and caregivers covering every verification state,
@@ -145,8 +146,10 @@ export function seedPhase1Demo(ctx: Ctx) {
 export function seedHomecareDemo() {
   const CG_EMAIL = "demo.caregiver@careverified.test";
   if (!db.prepare("SELECT 1 FROM users WHERE email = ?").get(CG_EMAIL)) {
-    createUser({ email: CG_EMAIL, password: "DemoPass123", role: "practitioner", name: "Aminah Yusof (demo)", profileId: "p1-cg-22" });
+    createUser({ email: CG_EMAIL, password: "DemoPass123", role: "practitioner", name: "Aminah Yusof (demo)", profileId: "p1-cg-22", consentVersion: CONSENT_VERSION });
   }
+  // Like the other demo accounts, the demo caregiver has already accepted the current notice (else the privacy dialog covers the screen).
+  db.prepare("UPDATE users SET consent_version = COALESCE(consent_version, ?), consent_at = COALESCE(consent_at, ?) WHERE email = ?").run(CONSENT_VERSION, iso(), CG_EMAIL);
   const patient = db.prepare("SELECT id FROM users WHERE email = ?").get("demo.patient@careverified.test") as { id: string } | undefined;
   if (patient && !db.prepare("SELECT 1 FROM care_recipients WHERE owner_user_id = ?").get(patient.id)) {
     const add = db.prepare("INSERT INTO care_recipients (id,owner_user_id,name,relationship,birth_year,address,city,state,needs,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)");
