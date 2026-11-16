@@ -8,6 +8,7 @@ import { audit } from "./audit";
 import { requireRole, verifyPassword } from "./auth";
 import { notify, notifyAdmins } from "./verification";
 import { email } from "./mail";
+import { careVisitForPayout } from "./homecare";
 
 /**
  * Practitioner payouts.
@@ -148,6 +149,10 @@ export function earningsFor(getBooking: (id: string) => any, professionalId?: st
       const b = getBooking(p.ref_id);
       done = !!b && b.status === "Completed";
       serviceDate = b?.date ?? null;
+    } else if (p.kind === "care") {
+      const c = careVisitForPayout(p.ref_id);
+      done = c.done;
+      serviceDate = c.date;
     } else {
       const c = row("SELECT status, ended_at FROM consults WHERE id = ?", p.ref_id);
       done = !!c && c.status === "completed";
