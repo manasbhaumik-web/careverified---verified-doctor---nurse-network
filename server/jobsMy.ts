@@ -27,7 +27,7 @@ const parse = <T,>(s: string | null | undefined, fallback: T): T => { try { retu
 
 export const SECTORS = ["public", "private", "other"] as const;
 export const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Shift-based", "Locum"] as const;
-export const ROLES_REQUIRED = ["doctor", "nurse", "any"] as const;
+export const ROLES_REQUIRED = ["doctor", "nurse", "caregiver", "any"] as const;
 export const PAY_PERIODS = ["month", "day", "hour", "shift"] as const;
 const PAY_CAP: Record<string, number> = { month: 100_000, day: 20_000, hour: 2_000, shift: 20_000 };
 
@@ -100,10 +100,12 @@ export function applyProblem(job: any, prof: any): string | null {
   if (!prof || prof.verificationStatus !== VerificationStatus.VERIFIED) return "Only verified practitioners can apply to positions.";
   if (job.roleRequired === "doctor" && prof.role !== "doctor") return "This position is for doctors.";
   if (job.roleRequired === "nurse" && prof.role !== "nurse") return "This position is for nurses.";
+  if (job.roleRequired === "caregiver" && prof.role !== "caregiver") return "This position is for caregivers.";
   const lastDay = (job.shifts as Shift[] | undefined)?.length ? job.shifts[job.shifts.length - 1].date : today();
   if (!prof.licenseExpiry) return "Add your annual practising certificate expiry date to your profile first.";
   if (prof.licenseExpiry < lastDay) return `Your annual practising certificate expires on ${prof.licenseExpiry}, before ${(job.shifts as Shift[] | undefined)?.length ? "the last shift" : "today"} (${lastDay}). Renew it first.`;
-  if (!isMalaysianRegistered(prof) && !job.acceptsForeign) {
+  // Caregivers are verified by our own tier, not a foreign or Malaysian regulator, so the registration-country rule does not apply to them.
+  if (prof.role !== "caregiver" && !isMalaysianRegistered(prof) && !job.acceptsForeign) {
     return "This employer only considers practitioners registered in Malaysia. Practitioners registered abroad need Malaysian registration first, usually arranged through a sponsoring employer.";
   }
   return null;
@@ -119,6 +121,21 @@ CREATE TABLE IF NOT EXISTS locum_profiles (
 
 export function registerJobsMy(app: Application, ctx: { findProfessional: (id: string) => any | undefined; allProfessionals: () => any[]; jobs: () => any[] }) {
   // Licensed employers a practitioner may post for: facilities they are staff of (admins: all active)
+  // The signed-in practitioner's confirmed upcoming shifts (applications a facility has accepted), soonest first.
+  app.get("/api/practitioner/shifts", requireRole("practitioner"), (req, res) => {
+    const t = today();
+    const out: any[] = [];
+    for (const a of rows("SELECT * FROM job_applications WHERE applicant_user_id = ? AND status = 'accepted'", req.user!.id)) {
+      const job = ctx.jobs().find(j => j.id === a.job_id);
+      if (!job) continue;
+      for (const s of ((job.shifts as Shift[] | undefined) ?? []).filter(x => x.date >= t)) {
+        out.push({ jobId: job.id, title: job.title, facility: job.hospitalName, city: job.city, location: job.location, date: s.date, start: s.start, end: s.end, clockedIn: !!a.clock_in_at });
+      }
+    }
+    out.sort((x, y) => `${x.date} ${x.start}`.localeCompare(`${y.date} ${y.start}`));
+    res.json({ status: "success", data: out });
+  });
+
   app.get("/api/jobs/employers", requireRole("practitioner", "admin", "facility"), (req, res) => {
     const list = req.user!.role === "admin"
       ? rows("SELECT id, name, city, state, licence_expiry, licence_checked_at FROM tourism_facilities WHERE active = 1 ORDER BY name")

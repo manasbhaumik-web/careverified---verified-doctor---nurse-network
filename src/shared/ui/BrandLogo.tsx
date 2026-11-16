@@ -1,4 +1,5 @@
 import React from 'react';
+import { ShieldCheck } from 'lucide-react';
 
 export interface BrandMarkProps {
   tone?: 'onColor' | 'light' | 'dark';
@@ -6,43 +7,46 @@ export interface BrandMarkProps {
   className?: string;
 }
 
-const MARK_SIZE: Record<'sm' | 'md' | 'lg', { box: string; svg: string }> = {
-  sm: { box: 'w-6 h-6 rounded-[6px]', svg: 'h-6 w-6' },
-  md: { box: 'w-9 h-9 rounded-[8px]', svg: 'h-9 w-9' },
-  lg: { box: 'w-10 h-10 rounded-[9px]', svg: 'h-10 w-10' },
+const MARK_SIZE: Record<'sm' | 'md' | 'lg', string> = {
+  sm: 'h-6 w-6',
+  md: 'h-9 w-9',
+  lg: 'h-10 w-10',
 };
 
 /**
- * MediCred "Connected Care Pulse" emblem:
- * A sculpted clinical waveform forming an abstract "M" bridge with an emerald verified node.
- * Uses CSS theme tokens (--t-*) so it automatically syncs with every workspace theme.
+ * MediCred "Verified Pulse" emblem:
+ * A shield (trust) holding a heartbeat that reads as an "M", with an emerald verified-check badge.
+ * Theme-aware via CSS tokens (--t-*), so it syncs with every workspace theme.
  */
 export function BrandMark({ tone = 'light', size = 'md', className = '' }: BrandMarkProps) {
-  const dims = MARK_SIZE[size];
-
-  const boxClasses =
-    tone === 'onColor'
-      ? 'bg-white/15 text-white group-hover:bg-white/25'
-      : tone === 'dark'
-      ? 'bg-[color:var(--t-600)] text-white'
-      : 'bg-[color:var(--t-600)] text-white group-hover:bg-[color:var(--t-700)]';
+  const shield = tone === 'light' ? 'var(--t-600)' : '#FFFFFF';
+  const pulse = tone === 'light' ? '#FFFFFF' : 'var(--t-700)';
+  const ring = tone === 'light' ? '#FFFFFF' : tone === 'dark' ? '#0F172A' : 'var(--t-700)';
 
   return (
-    <span
-      className={`relative inline-flex items-center justify-center shrink-0 transition-colors ${dims.box} ${boxClasses} ${className}`}
+    <svg
+      viewBox="0 0 48 48"
+      fill="none"
+      className={`shrink-0 ${MARK_SIZE[size]} ${className}`}
       aria-hidden="true"
     >
-      <svg viewBox="0 0 42 42" fill="none" className={dims.svg}>
-        <path
-          d="M8 25h4.5l3.5-11 4.5 15 4-11 3 7H34"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <circle cx="33" cy="11" r="3.5" fill="#34D399" />
-      </svg>
-    </span>
+      <path d="M24 3 40 9v13c0 10-7 18-16 23C15 40 8 32 8 22V9z" fill={shield} />
+      <path
+        d="M13 26h5.5l3-9.5 5 15.5 3.5-10 1.5 4H35"
+        stroke={pulse}
+        strokeWidth="2.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="36" cy="38" r="8" fill="#10B981" stroke={ring} strokeWidth="2.5" />
+      <path
+        d="m32.5 38 2.5 2.5 4.5-5"
+        stroke="#FFFFFF"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
@@ -50,6 +54,8 @@ export interface BrandLogoProps {
   tone?: 'onColor' | 'light' | 'dark';
   size?: 'sm' | 'md' | 'lg';
   subtitle?: React.ReactNode;
+  /** 'stacked' (default) puts the subtitle under the wordmark; 'badge' puts it in a bordered badge beside it, on one line. */
+  layout?: 'stacked' | 'badge';
   className?: string;
 }
 
@@ -60,6 +66,7 @@ export function BrandLogo({
   tone = 'light',
   size = 'md',
   subtitle,
+  layout = 'stacked',
   className = '',
 }: BrandLogoProps) {
   const wordmarkSize =
@@ -85,6 +92,24 @@ export function BrandLogo({
       : tone === 'dark'
       ? 'text-slate-400'
       : 'text-[color:var(--t-700)]';
+
+  if (layout === 'badge' && subtitle) {
+    return (
+      <span className={`inline-flex items-center gap-3 sm:gap-4 min-w-0 ${className}`}>
+        <span className="inline-flex items-center gap-3 min-w-0">
+          <BrandMark tone={tone} size={size} />
+          <span className={`font-display font-black tracking-tight leading-none ${wordmarkSize} ${mediColor}`}>
+            Medi<span className={credColor}>Cred</span>
+          </span>
+        </span>
+        <span className="hidden sm:block w-px h-8 bg-white/40" aria-hidden="true" />
+        <span className="hidden sm:inline-flex items-center gap-2 h-8 px-3 bg-white/15 border border-white/40 text-white text-2xs font-extrabold uppercase tracking-[0.14em] whitespace-nowrap rounded-none">
+          <ShieldCheck className="h-3.5 w-3.5 text-emerald-300 shrink-0" aria-hidden="true" />
+          {subtitle}
+        </span>
+      </span>
+    );
+  }
 
   return (
     <span className={`inline-flex items-center gap-3 min-w-0 ${className}`}>

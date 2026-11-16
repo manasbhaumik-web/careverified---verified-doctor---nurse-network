@@ -87,7 +87,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
 
   if (me && !me.canGoOnline) {
     return (
-      <div className={embedded ? "space-y-6 w-full" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
+      <div className={embedded ? "space-y-6 w-full" : "page-w mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
         <WorkspaceHeader
           icon={Radio}
           eyebrow={tx('On-Call Telehealth · Real-Time Radar')}
@@ -107,7 +107,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
   const fmtRM = (v?: number) => formatMoney(v ?? 0);
 
   return (
-    <div className={embedded ? "space-y-6 w-full" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
+    <div className={embedded ? "space-y-6 w-full" : "page-w mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full"}>
       {/* Unified Institutional Inner Workspace Header with Telemetry Sub-bar */}
       <WorkspaceHeader
         icon={Radio}

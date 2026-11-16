@@ -98,7 +98,7 @@ export default function WorkspaceHeader<T extends string = string>({
                   <span>{tab.label}</span>
                   {tab.count !== undefined && (
                     <span
-                      className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[11px] font-bold leading-none tabular-nums border ${
+                      className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold leading-none tabular-nums border ${
                         isActive
                           ? 'bg-[color:var(--t-100)] text-[color:var(--t-900)] border-[color:var(--t-300)]'
                           : 'bg-slate-50 text-slate-600 border-slate-200'
@@ -199,7 +199,7 @@ export default function WorkspaceHeader<T extends string = string>({
                   <span>{tab.label}</span>
                   {tab.count !== undefined && (
                     <span
-                      className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[11px] font-bold leading-none tabular-nums border ${
+                      className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold leading-none tabular-nums border ${
                         isActive
                           ? 'bg-[color:var(--t-100)] text-[color:var(--t-900)] border-[color:var(--t-300)]'
                           : 'bg-white text-slate-600 border-[color:var(--t-200)]'

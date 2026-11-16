@@ -431,7 +431,7 @@ export default function JobMarket({
         />
       )}
 
-      <div className={embedded ? "space-y-6" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
+      <div className={embedded ? "space-y-6" : "page-w mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
         {!embedded && role === 'practitioner' && (() => {
           const shiftTabMeta: Record<'open' | 'applied' | 'locums' | 'eligibility', {
             icon: React.ComponentType<{ className?: string }>;

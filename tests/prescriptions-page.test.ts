@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const dash = fs.readFileSync('src/components/PatientDashboard.tsx', 'utf8');
-const list = fs.readFileSync('src/components/PrescriptionList.tsx', 'utf8');
+const list = fs.readFileSync('src/domains/prescriptions/PrescriptionList.tsx', 'utf8');
 
 test('the Past prescriptions tab opens past prescriptions, not certificates', () => {
   assert.match(dash, /rxSubTab === 'history' \? 'rxhist' : 'rx'/);

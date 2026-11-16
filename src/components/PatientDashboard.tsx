@@ -563,7 +563,7 @@ export default function PatientDashboard({
       />
 
       {/* 3. MAIN WORKSPACE CONTENT CONTAINER */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className="page-w mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <Suspense
         fallback={
           <div className="space-y-4 animate-pulse" aria-busy="true" aria-label={tx('Loading workspace section')}>

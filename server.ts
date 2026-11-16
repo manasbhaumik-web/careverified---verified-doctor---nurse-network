@@ -37,6 +37,9 @@ import { registerPayouts } from "./server/payouts";
 import { registerMail, email as sendMail } from "./server/mail";
 import { registerRecovery } from "./server/accountRecovery";
 import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
+import { registerFacilityProfiles, migrateFacilitySchema } from "./server/facilityProfiles";
+import { seedPhase1Demo } from "./server/phase1Seed";
+import { CAREGIVER_ROLE, MIN_REFERENCES, cleanReferences, ekycAdapter, type CaregiverChecks } from "./server/caregiverTier";
 
 // Load environment variables
 dotenv.config();
@@ -93,7 +96,7 @@ app.use("/api/auth/login", rateLimit({ windowMs: 15 * 60_000, limit: 30, standar
   message: { status: "error", message: "Too many attempts. Please wait and try again." } }));
 app.use("/api/auth/register-practitioner", rateLimit({ windowMs: 60 * 60_000, limit: 20, standardHeaders: true, legacyHeaders: false }));
 app.use("/api/register-patient", rateLimit({ windowMs: 60 * 60_000, limit: 20, standardHeaders: true, legacyHeaders: false }));
-app.use("/api/", rateLimit({ windowMs: 60_000, limit: 300, standardHeaders: true, legacyHeaders: false }));
+app.use("/api/", rateLimit({ windowMs: 60_000, limit: Number(process.env.API_RATE_LIMIT) || 300, standardHeaders: true, legacyHeaders: false }));
 
 app.use(loadSession);
 
@@ -336,8 +339,8 @@ function ensureDemoData() {
     }
   }
   for (const r of reviews) {
-    if (r.professionalId === docProfile.id && r.professionalName === "Dr Demo Physician") {
-      r.professionalName = "Dr. Arjun Menon";
+    if (r.professionalId === docProfile.id && (r as any).professionalName === "Dr Demo Physician") {
+      (r as any).professionalName = "Dr. Arjun Menon";
     }
   }
 
@@ -564,12 +567,12 @@ function ensureDemoData() {
       role: "nurse",
       name: nurseProfile?.name || "Maya Lim (RN)",
       profileId: nurseProfile?.id || null,
-      avatarUrl: nurseProfile?.avatarUrl || "/assets/nurse_female_malay.jpg",
+      avatarUrl: (nurseProfile as any)?.avatarUrl || "/assets/nurse_female_malay.jpg",
     });
   } else if (nurseProfile) {
     db.prepare("UPDATE users SET profile_id = ?, avatar_url = ? WHERE id = ?").run(
       nurseProfile.id,
-      nurseProfile.avatarUrl || "/assets/nurse_female_malay.jpg",
+      (nurseProfile as any).avatarUrl || "/assets/nurse_female_malay.jpg",
       demoNurseUser.id
     );
   }
@@ -586,8 +589,8 @@ function ensureDemoData() {
         patientEmail: "demo.patient@careverified.test",
         date: "2026-11-15",
         timeSlot: "09:00 AM",
-        mode: ConsultationMode.HOME_CARE,
-        fee: nurseProfile.hourlyRate || 85,
+        mode: ConsultationMode.HOME_VISIT,
+        fee: (nurseProfile as any).hourlyRate || 85,
         paymentStatus: "Paid",
         status: "Upcoming",
         symptoms: "Post-operative wound dressing change & morning vitals monitoring at Bangsar residence.",
@@ -604,8 +607,8 @@ function ensureDemoData() {
         patientEmail: "tan.wm@example.com",
         date: "2026-11-15",
         timeSlot: "02:30 PM",
-        mode: ConsultationMode.HOME_CARE,
-        fee: nurseProfile.hourlyRate || 85,
+        mode: ConsultationMode.HOME_VISIT,
+        fee: (nurseProfile as any).hourlyRate || 85,
         paymentStatus: "Paid",
         status: "Upcoming",
         symptoms: "Elderly mobility assistance, blood pressure check, and evening medication reconciliation.",
@@ -726,6 +729,10 @@ function ensureDemoData() {
 }
 
 if (demoEnabled()) ensureDemoData();
+if (demoEnabled()) {
+  migrateFacilitySchema(); // the Phase 1 columns must exist before the demo facilities are written
+  seedPhase1Demo({ doctors, nurses, jobs, verificationRequests });
+}
 
 // Seed data added after a database was created: add what is missing, and rename the original demo registration numbers
 // (which looked like real MMC / Nursing Board numbers) so a demo profile can never be mistaken for a real practitioner.
@@ -994,6 +1001,7 @@ registerPharmacyMy(app);
 registerTestimonials(app);
 registerJobsMy(app, { findProfessional, allProfessionals, jobs: () => jobs });
 registerTourism(app, { findProfessional, allProfessionals });
+registerFacilityProfiles(app);
 registerAssistanceRoutes(app, { findProfessional, allProfessionals });
 registerPackagesRoutes(app);
 registerFacilityRoutes(app, { jobs: () => jobs, findProfessional });
@@ -1208,10 +1216,61 @@ app.get("/api/admin/registry-integrations", requireRole("admin"), (_req, res) =>
 
 app.get("/api/registries", (_req, res) => res.json({ status: "success", data: { registries: REGISTRIES, registrationTypes: REGISTRATION_TYPES } }));
 
+// Caregiver registration: our own verification tier (identity, certificate, references) instead of a council licence.
+// A caregiver is a practitioner-account profile with role "caregiver"; it is stored with the nurse profiles.
+async function registerCaregiver(req: express.Request, res: express.Response) {
+  const user = req.user!;
+  const name = str(req.body.name, 100);
+  const specialization = str(req.body.specialization, 100) || "Home care";
+  const city = str(req.body.city, 80);
+  const idNumber = str(req.body.idNumber, 40);
+  const certificateExpiry = typeof req.body.certificateExpiry === "string" ? req.body.certificateExpiry : "";
+  if (!name || !city || !idNumber) return fail(res, 400, "Name, city and ID number are required.");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(certificateExpiry) || certificateExpiry <= new Date().toISOString().slice(0, 10)) {
+    return fail(res, 400, "Enter the expiry date of your main certificate (it must be in the future).");
+  }
+  const references = cleanReferences(req.body.references);
+  if (references.length < MIN_REFERENCES) return fail(res, 400, `Give at least ${MIN_REFERENCES} references (name, relationship, contact).`);
+
+  const ekyc = await ekycAdapter().verify({ fullName: name, idNumber });
+  const newId = generateId("cg");
+  const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  // The full ID number is used for the e-KYC check only and is never stored; we keep the last four digits.
+  const checks: CaregiverChecks = { idNumberLast4: idNumber.replace(/\W/g, "").slice(-4), ekyc, references };
+
+  (nurses as any[]).push({
+    id: newId, name, avatar: "/assets/malaysian_female_nurse.jpg", role: CAREGIVER_ROLE, specialization,
+    licenseNumber: `CG-${newId.slice(3)}`, licenseExpiry: certificateExpiry, nursingCouncil: "CareVerified caregiver tier",
+    registeringBody: "CareVerified caregiver tier", registryId: "CAREGIVER_TIER", registrationType: "full",
+    experienceYears: Number(req.body.experienceYears) || 1, education: [], bio: str(req.body.bio, 1000) || "Verified caregiver.",
+    languages: Array.isArray(req.body.languages) ? req.body.languages.map((l: unknown) => str(l, 40)) : ["English"],
+    consultationModes: ["Home Visit"], fee: Math.max(0, Number(req.body.fee) || 0), rating: 0, reviewCount: 0,
+    verificationStatus: VerificationStatus.PENDING, practiceAddress: str(req.body.practiceAddress, 250), city,
+    availability: { days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], slots: ["09:00 AM - 05:00 PM"] },
+    seoSlug: `${slug(name)}-${slug(specialization)}-${slug(city)}`, shiftTypes: Array.isArray(req.body.shiftTypes) ? req.body.shiftTypes : ["Day Shift"],
+  });
+  db.prepare("UPDATE users SET profile_id = ? WHERE id = ?").run(newId, user.id);
+
+  const vReq = {
+    id: generateId("ver"), userId: newId, accountId: user.id, userName: name, userType: CAREGIVER_ROLE as any,
+    licenseNumber: `CG-${newId.slice(3)}`, medicalCouncil: "CareVerified caregiver tier", degreeName: "", fileUrl: "",
+    submittedAt: new Date().toISOString(), status: VerificationStatus.PENDING, kind: "caregiver", caregiverChecks: checks,
+  };
+  verificationRequests.push(vReq);
+  audit(req, "caregiver.submit", { target: ["verification", vReq.id], details: { profileId: newId, ekyc: ekyc.status } });
+  notifyAdmins("New caregiver verification request", `${name} submitted identity, certificate and references for review.`);
+  res.status(201).json({
+    status: "success",
+    message: ekyc.status === "passed" ? "Registration submitted. Upload your certificate so the board can review it." : "Registration submitted, but the identity check did not pass. The board will contact you.",
+    data: { id: newId, seoSlug: `${slug(name)}-${slug(specialization)}-${slug(city)}`, verificationRequestId: vReq.id, ekyc: ekyc.status },
+  });
+}
+
 // Submit practitioner profile + licence details for verification (one profile per account)
 app.post("/api/register", requireRole("practitioner"), (req, res) => {
   const user = req.user!;
   if (user.profileId) return fail(res, 409, "A professional profile already exists for this account.");
+  if (req.body.role === CAREGIVER_ROLE) return void registerCaregiver(req, res).catch(() => fail(res, 500, "Could not register."));
 
   const role = req.body.role === UserRole.NURSE ? UserRole.NURSE : UserRole.DOCTOR;
   const name = str(req.body.name, 100);
@@ -1624,7 +1683,9 @@ app.post("/api/jobs", requireRole("practitioner", "admin", "facility"), (req, re
   if (f.facilityId) {
     const fac = db.prepare("SELECT id, name, active FROM tourism_facilities WHERE id = ?").get(f.facilityId) as any;
     if (!fac || !fac.active) return fail(res, 404, "Employer not found in the facility register.");
-    const allowed = req.user!.role === "admin" || req.user!.role === "facility" || !!db.prepare("SELECT 1 AS x FROM tourism_facility_staff WHERE facility_id = ? AND user_id = ?").get(fac.id, req.user!.id);
+    // A facility account may post only for its own facility.
+    const ownFacility = req.user!.role === "facility" && (req.user!.facilityId || req.user!.profileId) === fac.id;
+    const allowed = req.user!.role === "admin" || ownFacility || !!db.prepare("SELECT 1 AS x FROM tourism_facility_staff WHERE facility_id = ? AND user_id = ?").get(fac.id, req.user!.id);
     if (!allowed) return fail(res, 403, "You can only post for a facility you are assigned to.");
   }
   if (f.sector === "private") {

@@ -44,7 +44,7 @@ export default function Footer({
   if (variant === 'app') {
     return (
       <footer className="app-dark-footer bg-[color:var(--dark)] text-slate-400 border-t border-[color:var(--t-800)]/60 shrink-0 mt-auto py-3.5 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+        <div className="page-w mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
           
           {/* Left: Brand Emblem, Act 586 Status & Copyright */}
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-slate-400 text-center md:text-left justify-center md:justify-start">
@@ -97,7 +97,7 @@ export default function Footer({
 
   return (
     <footer className="app-dark-footer bg-[color:var(--dark)] text-slate-300 border-t border-[color:var(--t-800)] shrink-0 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-8 pb-8 md:pt-12 md:pb-10 space-y-5 md:space-y-6">
+      <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 pt-8 pb-8 md:pt-12 md:pb-10 space-y-5 md:space-y-6">
         
         {/* ─── TIER 1: 5-COLUMN STRUCTURED NAVIGATION & TELEMETRY HUB ─── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-6 md:pb-8 border-b border-[color:var(--t-800)]">

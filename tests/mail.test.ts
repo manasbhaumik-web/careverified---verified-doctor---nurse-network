@@ -32,9 +32,9 @@ test('a new practitioner is welcomed in the language they were using', async () 
   assert.equal((await registerPractitioner(srv.client(), zh, { lang: 'zh' })).status, 201);
   const [a, b, c] = [outbox(en)[0], outbox(ms)[0], outbox(zh)[0]];
   assert.equal(a.template, 'practitioner_welcome');
-  assert.equal(a.subject, 'Welcome to MedCred');
-  assert.equal(b.subject, 'Selamat datang ke MedCred');
-  assert.equal(c.subject, '欢迎加入 MedCred');
+  assert.equal(a.subject, 'Welcome to MediCred');
+  assert.equal(b.subject, 'Selamat datang ke MediCred');
+  assert.equal(c.subject, '欢迎加入 MediCred');
   assert.equal(a.status, 'logged');
   assert.match(a.body_text, /Dr Test Person/);
   assert.match(a.body_text, /http:\/\/localhost:\d+\/login\?role=practitioner/);
@@ -195,7 +195,7 @@ test('the board can see email status and send itself a test; others cannot', asy
 // ---------- real SMTP ----------
 test('over SMTP: the message arrives complete, with text and HTML, sensible headers, and no body kept in the outbox', async () => {
   const smtp = await startFakeSmtp();
-  const s2 = await startTestServer({ MAIL_TRANSPORT: 'smtp', SMTP_HOST: '127.0.0.1', SMTP_PORT: String(smtp.port), SMTP_REQUIRE_TLS: 'false', SMTP_USER: 'mailer', SMTP_PASS: 'secret', MAIL_FROM: 'MedCred <no-reply@mail.example.org>', MAIL_REPLY_TO: 'help@example.org', MAIL_RETRY_MS: '50,50' }, { seed: false });
+  const s2 = await startTestServer({ MAIL_TRANSPORT: 'smtp', SMTP_HOST: '127.0.0.1', SMTP_PORT: String(smtp.port), SMTP_REQUIRE_TLS: 'false', SMTP_USER: 'mailer', SMTP_PASS: 'secret', MAIL_FROM: 'MediCred <no-reply@mail.example.org>', MAIL_REPLY_TO: 'help@example.org', MAIL_RETRY_MS: '50,50' }, { seed: false });
   try {
     const to = `zh${Date.now() % 100000}@example.org`;
     assert.equal((await registerPractitioner(s2.client(), to, { lang: 'zh' })).status, 201);
@@ -205,8 +205,8 @@ test('over SMTP: the message arrives complete, with text and HTML, sensible head
     assert.equal(m.auth, true, 'it logged in');
     assert.equal(m.from, 'no-reply@mail.example.org');
     assert.deepEqual(m.to, [to]);
-    assert.equal(decodeWords(header(m.data, 'Subject')!), '欢迎加入 MedCred');
-    assert.match(header(m.data, 'From')!, /MedCred/);
+    assert.equal(decodeWords(header(m.data, 'Subject')!), '欢迎加入 MediCred');
+    assert.match(header(m.data, 'From')!, /MediCred/);
     assert.equal(header(m.data, 'Reply-To'), 'help@example.org');
     assert.equal(header(m.data, 'Auto-Submitted'), 'auto-generated');
     assert.match(m.data, /Content-Type: multipart\/alternative/i);
@@ -230,7 +230,7 @@ test('over SMTP: the message arrives complete, with text and HTML, sensible head
 
 test('over SMTP: a refused mailbox is retried, then recorded as failed with the reason', async () => {
   const smtp = await startFakeSmtp(); smtp.rejectRecipients = true;
-  const s2 = await startTestServer({ MAIL_TRANSPORT: 'smtp', SMTP_HOST: '127.0.0.1', SMTP_PORT: String(smtp.port), SMTP_REQUIRE_TLS: 'false', MAIL_FROM: 'MedCred <no-reply@mail.example.org>', MAIL_RETRY_MS: '50,50' }, { seed: false });
+  const s2 = await startTestServer({ MAIL_TRANSPORT: 'smtp', SMTP_HOST: '127.0.0.1', SMTP_PORT: String(smtp.port), SMTP_REQUIRE_TLS: 'false', MAIL_FROM: 'MediCred <no-reply@mail.example.org>', MAIL_RETRY_MS: '50,50' }, { seed: false });
   try {
     const to = `bounce${Date.now() % 100000}@example.org`;
     const c = s2.client();

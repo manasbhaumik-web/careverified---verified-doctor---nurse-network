@@ -10,7 +10,8 @@ export enum VerificationStatus {
   PENDING = 'Pending',
   VERIFIED = 'Verified ✅',
   REJECTED = 'Rejected',
-  SUSPENDED = 'Suspended'
+  SUSPENDED = 'Suspended',
+  EXPIRED = 'Expired'
 }
 
 export enum ConsultationMode {

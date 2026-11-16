@@ -10,6 +10,7 @@ import { requireAuth, requireRole } from "./auth";
 import { notify, notifyAdmins } from "./verification";
 import { recordConsent } from "./privacy";
 import { computeTax } from "./paymentPolicy";
+import { encryptFile, decryptFile, fileEncryptionAvailable } from "./fileCrypto";
 import { VerificationStatus } from "../src/types";
 
 /**
@@ -155,6 +156,9 @@ export function registerTourism(app: Application, ctx: { findProfessional: (id: 
       accreditations: liveAccreditations(f).map(a => ({ body: a.body, number: a.number, validUntil: a.validUntil })),
       licenceChecked: !!f.licence_checked_at && licenceOk(f), licenceExpiry: f.licence_expiry ?? null,
       practitioners,
+      departments: parse<{ name: string; description?: string }[]>(f.departments, []),
+      serviceList: parse<string[]>(f.service_list, []),
+      photos: parse<string[]>(f.photos, []).map(pid => `/api/public/facilities/${f.id}/photos/${pid}`),
     };
   };
   // One rule for "listed": the hospital is switched on and its licence has not expired. Whether it welcomes international patients is
@@ -320,7 +324,8 @@ export function registerTourism(app: Application, ctx: { findProfessional: (id: 
       const type = detectType(file.buffer);
       if (!type) return fail(res, 400, "Only PDF, JPG or PNG files are accepted.");
       const id = newId("tfl"), stored = `${crypto.randomBytes(16).toString("hex")}.${type.ext}`;
-      fs.writeFileSync(path.join(root, stored), file.buffer, { mode: 0o600 });
+      if (!fileEncryptionAvailable()) return fail(res, 503, "Uploads are not available yet: the server has no file encryption key. Ask the board.");
+      fs.writeFileSync(path.join(root, stored), encryptFile(file.buffer), { mode: 0o600 });
       db.prepare("INSERT INTO tourism_files (id,case_id,owner_user_id,kind,original_name,mime,size,stored_name,created_at) VALUES (?,?,?,?,?,?,?,?,?)")
         .run(id, c.id, req.user!.id, kind, path.basename(file.originalname).slice(0, 120), type.mime, file.size, stored, iso());
       touch(c.id);
@@ -338,7 +343,8 @@ export function registerTourism(app: Application, ctx: { findProfessional: (id: 
     res.setHeader("Content-Type", f.mime);
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("Content-Disposition", `attachment; filename="${f.original_name.replace(/[^\w.\- ]/g, "_")}"`);
-    res.sendFile(path.join(root, f.stored_name));
+    try { res.send(decryptFile(fs.readFileSync(path.join(root, f.stored_name)))); }
+    catch { fail(res, 404, "File not found."); }
   });
 
   app.delete("/api/tourism/cases/:id/files/:fileId", requireRole("patient"), (req, res) => {

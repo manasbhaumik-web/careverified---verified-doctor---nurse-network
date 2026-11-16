@@ -50,7 +50,7 @@ export default function MalaysiaPatientsPage({ onSignUp }: MalaysiaPatientsPageP
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* ─── TOP GLOBAL NAVIGATION BAR ─── */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[color:var(--t-200)] shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between gap-4">
+        <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-6">
             <a 
               href="/" 
@@ -99,7 +99,7 @@ export default function MalaysiaPatientsPage({ onSignUp }: MalaysiaPatientsPageP
 
       {/* ─── FULL-WIDTH APPLICATION HERO BANNER ─── */}
       <section className="w-full bg-[color:var(--t-50)] text-slate-900 border-b border-[color:var(--t-200)] shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-10 sm:py-14">
+        <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 py-10 sm:py-14">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="max-w-3xl space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-2xs">
@@ -160,7 +160,7 @@ export default function MalaysiaPatientsPage({ onSignUp }: MalaysiaPatientsPageP
       </section>
 
       {/* ─── DETAILED SECTIONS ─── */}
-      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-10 w-full space-y-12">
+      <main className="flex-grow page-w mx-auto px-4 sm:px-6 lg:px-12 py-10 w-full space-y-12">
         
         {/* Section 1: Detailed Clinical Services Breakdown */}
         <section className="space-y-6">

@@ -17,6 +17,7 @@ import FacilityLocumsTab from './facility/FacilityLocumsTab';
 import FacilityCasesTab from './facility/FacilityCasesTab';
 import { FacilityPackagesTab } from './facility/FacilityPackagesTab';
 import { FacilityProfileTab } from './facility/FacilityProfileTab';
+import FacilityPublicProfile from './facility/FacilityPublicProfile';
 import { FacilityModals } from './facility/FacilityModals';
 import { useFacilityWorkspace } from './facility/hooks/useFacilityWorkspace';
 import {
@@ -496,7 +497,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
       )}
 
       {/* Main Inner Workspace Content Container */}
-      <div className={embedded ? "space-y-6" : "max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
+      <div className={embedded ? "space-y-6" : "page-w mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"}>
         {/* Toast / Status Notification */}
         {notificationMsg && (
           <div
@@ -660,6 +661,7 @@ export default function FacilityWorkspace({ activeGroup, initialTab, currentUser
               setNotificationMsg={setNotificationMsg}
             />
           )}
+          {tab === 'profile' && <FacilityPublicProfile />}
         </div>
       </div>
 

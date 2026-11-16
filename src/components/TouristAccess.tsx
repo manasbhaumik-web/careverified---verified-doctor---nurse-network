@@ -328,7 +328,7 @@ export default function TouristAccess({ onSignUp }: { onSignUp: () => void }) {
 
   return (
     <section id="tourist-section" aria-labelledby="tourist-heading" className="bg-white border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+      <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="section-index-badge">04B</span>

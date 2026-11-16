@@ -149,7 +149,10 @@ async function main() {
   }
 
   // ---- pharmacy workspace login (email + password) and a few prescriptions in its inbox
-  const demoPharmacy = (must("pharmacies", await admin.call("GET", "/api/admin/pharmacies")).data as any[]).find(p => p.name === "Demo Pharmacy");
+  // The server's own demo data may already own the demo pharmacy login (under a different pharmacy name): use that pharmacy, so the account is not created twice.
+  const allPharmacies = must("pharmacies", await admin.call("GET", "/api/admin/pharmacies")).data as any[];
+  const pharmacyAccounts = must("pharmacy accounts", await admin.call("GET", "/api/admin/pharmacies/summary")).data as Record<string, any>;
+  const demoPharmacy = allPharmacies.find(p => pharmacyAccounts[p.id]?.account?.email === PHARMACY_EMAIL) ?? allPharmacies.find(p => p.name === "Demo Pharmacy");
   const phc = new Client();
   let workspaceLine = "Pharmacy workspace login is not set up (Demo Pharmacy was not found).";
   if (demoPharmacy) {

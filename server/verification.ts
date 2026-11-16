@@ -6,6 +6,10 @@ import { audit } from "./audit";
 import { requireAuth, requireRole } from "./auth";
 import { VerificationStatus } from "../src/types";
 import { findRegistry, inferRegistryId, scopeFor } from "./registries";
+import { sweepExpiry } from "./credentialState";
+import { CAREGIVER_ROLE, missingForApproval } from "./caregiverTier";
+import { adapterFor } from "./registryProviders";
+import { registerPublicLookup, presentCredential, badgeTokenFor } from "./publicLookup";
 
 /**
  * Practitioner trust pipeline: review decisions with history, licence expiry and
@@ -98,20 +102,10 @@ for (const col of ["webhook_id TEXT", "endpoint_url TEXT", "next_retry_at TEXT",
   try { db.exec(`ALTER TABLE webhook_dispatch_logs ADD COLUMN ${col}`); } catch { /* column exists */ }
 }
 
-// Seed default hospital HR integration webhooks
+// Earlier builds seeded webhooks pointing at real hospital domains. Never send practitioner data to third parties by default: switch those rows off.
 try {
-  if (!db.prepare("SELECT 1 FROM hospital_webhooks LIMIT 1").get()) {
-    const seedHooks = [
-      { id: "whk-pantai-kl", name: "Pantai Hospital Kuala Lumpur (IHH Healthcare HR)", url: "https://api.pantai.com.my/v1/hr/credential-sync", events: "practitioner.verified,practitioner.suspended" },
-      { id: "whk-kpj-corp", name: "KPJ Healthcare Berhad (Medical Affairs & Staffing)", url: "https://api.kpjhealth.com.my/integration/practitioners", events: "practitioner.verified,practitioner.suspended" },
-      { id: "whk-gleneagles-kl", name: "Gleneagles Hospital KL (Clinical Locum Operations)", url: "https://api.gleneagles.com.my/webhooks/staffing", events: "practitioner.verified" },
-    ];
-    const now = new Date().toISOString();
-    for (const h of seedHooks) {
-      db.prepare("INSERT INTO hospital_webhooks (id, facility_name, endpoint_url, event_types, active, created_at) VALUES (?, ?, ?, ?, 1, ?)").run(h.id, h.name, h.url, h.events, now);
-    }
-  }
-} catch { /* tables already seeded */ }
+  db.prepare("UPDATE hospital_webhooks SET active = 0 WHERE id IN ('whk-pantai-kl','whk-kpj-corp','whk-gleneagles-kl')").run();
+} catch { /* nothing to switch off */ }
 
 export const INFO_REQUESTED = "Info Requested";
 const REVERIFY_MONTHS = 12;
@@ -149,7 +143,11 @@ export async function executeWebhookDelivery(
   attempt = 1,
   maxRetries = 3
 ) {
-  const secretKey = process.env.MEDCRED_WEBHOOK_SECRET || "whsec_medcred_statutory_kpj_pantai_live_2026";
+  const secretKey = process.env.MEDCRED_WEBHOOK_SECRET;
+  if (!secretKey) {
+    db.prepare("UPDATE webhook_dispatch_logs SET status = 'skipped', last_error = ? WHERE id = ?").run("MEDCRED_WEBHOOK_SECRET is not set; nothing was sent.", logId);
+    return { success: false, status: 0, error: "MEDCRED_WEBHOOK_SECRET is not set" };
+  }
   const signature = crypto.createHmac("sha256", secretKey).update(payloadString).digest("hex");
   const now = new Date().toISOString();
 
@@ -273,6 +271,46 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
   const latestRequestFor = (profileId: string) =>
     [...ctx.requests()].reverse().find(r => r.userId === profileId);
 
+  registerPublicLookup(app, ctx);
+
+  /** Daily expiry sweep: flags credentials that are about to lapse and expires the ones that have. Every change is audited and the practitioner is told. */
+  const runExpirySweep = (now: Date = new Date()) => {
+    const changes = sweepExpiry(ctx.allProfessionals(), now);
+    if (!changes.length) return changes;
+    ctx.persist();
+    for (const c of changes) {
+      logEvent(null, c.id, null, `credential_${c.to}`, `Automatic: ${c.from} to ${c.to}`, true);
+      audit(null, `verification.auto_${c.to}`, { actor: { id: "system", role: "system" }, target: ["professional", c.id], details: { from: c.from, to: c.to } });
+      const target = accountOfProfile(c.id);
+      if (c.to === "expiring") notify(target, "Your licence is expiring soon", "Submit your renewed licence from Verification so your profile stays visible.");
+      if (c.to === "expired") notify(target, "Your licence has expired", "Your profile is hidden until you submit a renewal and the board approves it.");
+    }
+    return changes;
+  };
+  setTimeout(() => { try { runExpirySweep(); } catch (e) { console.error("expiry sweep", e); } }, 5_000).unref();
+  setInterval(() => { try { runExpirySweep(); } catch (e) { console.error("expiry sweep", e); } }, 24 * 3600_000).unref();
+  // Registry check adapter with manual fallback: returns the register's answer when an adapter can be used, else tells the reviewer to check by hand.
+  app.get("/api/admin/registry-check/:registryId/:registrationNumber", requireRole("admin"), async (req, res) => {
+    const registry = findRegistry(req.params.registryId);
+    if (!registry) return fail(res, 404, "Unknown registry.");
+    const adapter = adapterFor(registry.id);
+    const reason = adapter?.unavailableReason() ?? "No automatic adapter for this register.";
+    if (!adapter || reason) return res.json({ status: "success", data: { mode: "manual", reason, lookup: registry.lookup } });
+    try {
+      const result = await adapter.lookup(str(req.params.registrationNumber, 50));
+      audit(req, "verification.registry_check", { target: ["registry", registry.id], details: { mode: adapter.mode, found: result.found } });
+      res.json({ status: "success", data: { mode: adapter.mode, result } });
+    } catch (e: any) {
+      res.json({ status: "success", data: { mode: "manual", reason: String(e?.message || e), lookup: registry.lookup } });
+    }
+  });
+
+  app.post("/api/admin/verification/run-expiry-sweep", requireRole("admin"), (req, res) => {
+    const changes = runExpirySweep();
+    audit(req, "verification.expiry_sweep_manual", { details: { changed: changes.length } });
+    res.json({ status: "success", data: { changed: changes.length, changes } });
+  });
+
   // ---------- Practitioner: own verification status ----------
   app.get("/api/my-verification", requireRole("practitioner"), (req, res) => {
     const profileId = req.user!.profileId;
@@ -289,6 +327,7 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
       status: "success",
       data: {
         profileId,
+        badge: badgeTokenFor(profileId),
         verificationStatus: prof?.verificationStatus,
         requestId: request?.id,
         requestStatus: request?.status,
@@ -329,8 +368,8 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
     const profileId = req.user!.profileId;
     const prof = profileId ? findProf(profileId) : null;
     if (!prof) return fail(res, 404, "No professional profile found.");
-    if (prof.verificationStatus !== VerificationStatus.VERIFIED && prof.verificationStatus !== VerificationStatus.SUSPENDED) {
-      return fail(res, 409, "Renewal applies to verified or suspended profiles only.");
+    if (prof.verificationStatus !== VerificationStatus.VERIFIED && prof.verificationStatus !== VerificationStatus.SUSPENDED && prof.verificationStatus !== VerificationStatus.EXPIRED) {
+      return fail(res, 409, "Renewal applies to verified, expired or suspended profiles only.");
     }
     const open = ctx.requests().find(r => r.userId === prof.id && (r.status === VerificationStatus.PENDING || r.status === INFO_REQUESTED));
     if (open) return fail(res, 409, "You already have a review in progress.");
@@ -343,6 +382,8 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
       licenseNumber: prof.licenseNumber, medicalCouncil: prof.medicalCouncil ?? prof.nursingCouncil,
       degreeName: prof.education?.[0] ?? "", fileUrl: "", submittedAt: new Date().toISOString(),
       status: VerificationStatus.PENDING, kind: "renewal",
+      // A caregiver's identity and references were checked at the first application: carry them over so the renewal only needs the new certificate.
+      ...(prof.role === CAREGIVER_ROLE ? { caregiverChecks: [...ctx.requests()].reverse().find(r => r.userId === prof.id && r.caregiverChecks)?.caregiverChecks } : {}),
     };
     ctx.requests().push(request);
     logEvent(request.id, prof.id, req.user!.id, "renewal_submitted", str(req.body.note, 1000), true);
@@ -458,8 +499,14 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
       if (!expiry || expiry <= new Date().toISOString().slice(0, 10)) {
         return fail(res, 400, "Cannot approve: the licence expiry date is missing or already past.");
       }
-      const registryReference = str(req.body.registryReference, 200);
-      if (!registryReference) {
+      const isCaregiver = request.userType === CAREGIVER_ROLE;
+      let registryReference = str(req.body.registryReference, 200);
+      if (isCaregiver) {
+        // No statutory register for caregivers: our own tier (identity, certificate, references) must be complete.
+        const missing = missingForApproval(request.caregiverChecks, docCount);
+        if (missing.length) return fail(res, 400, `Cannot approve: ${missing.join("; ")}.`);
+        registryReference = "caregiver-tier: identity, certificate and references checked";
+      } else if (!registryReference) {
         return fail(res, 400, "Record how the licence was checked with the council register (reference or URL) before approving.");
       }
       const now = new Date();
@@ -467,9 +514,15 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
       request.reviewedBy = actor.id;
       request.registryCheck = { reference: registryReference, checkedAt: now.toISOString(), checkedBy: actor.id };
       prof.verificationStatus = VerificationStatus.VERIFIED;
+      prof.credentialState = "verified";
+      delete prof.expiredAt;
       prof.verifiedAt = now.toISOString();
-      prof.registryId = findRegistry(prof.registryId)?.id ?? inferRegistryId(prof.medicalCouncil ?? prof.nursingCouncil);
-      prof.verificationScope = scopeFor(prof.registryId);
+      if (isCaregiver) {
+        prof.verificationScope = "platform-tier";
+      } else {
+        prof.registryId = findRegistry(prof.registryId)?.id ?? inferRegistryId(prof.medicalCouncil ?? prof.nursingCouncil);
+        prof.verificationScope = scopeFor(prof.registryId);
+      }
       request.registryCheck.scope = prof.verificationScope;
       prof.verifiedUntil = addMonths(now, REVERIFY_MONTHS).toISOString().slice(0, 10);
       delete prof.suspensionReason;
@@ -751,16 +804,19 @@ export function registerVerificationRoutes(app: Application, ctx: Ctx) {
   // ---------- Public licence lookup (minimal, verified-only) ----------
   app.get("/api/verify-license/:licenseNumber", (req, res) => {
     const lic = str(req.params.licenseNumber, 50).toLowerCase();
-    const p = ctx.allProfessionals().find(x => x.licenseNumber.toLowerCase() === lic);
-    if (!p || p.verificationStatus !== VerificationStatus.VERIFIED) {
-      // Same answer for unknown, pending, rejected and suspended so status is not leaked.
+    const p = ctx.allProfessionals().find(x => String(x.licenseNumber ?? "").toLowerCase() === lic);
+    const c = p ? presentCredential(p) : null;
+    if (!p || !c) {
+      // Same answer for unknown, pending and rejected so status is not leaked.
       return res.json({ status: "success", data: { verified: false } });
     }
     res.json({
       status: "success",
       data: {
-        verified: true, name: p.name, verificationScope: p.verificationScope ?? scopeFor(p.registryId ?? inferRegistryId(p.medicalCouncil ?? p.nursingCouncil)), registrationType: p.registrationType ?? "full", registryId: p.registryId ?? null, role: p.role, specialization: p.specialization,
-        council: p.medicalCouncil ?? p.nursingCouncil, verifiedUntil: p.verifiedUntil ?? null,
+        // `verified` stays true only while the registration is current (verified or expiring); `state` tells expired and suspended apart.
+        verified: c.status === "verified" || c.status === "expiring", state: c.status,
+        name: p.name, verificationScope: p.verificationScope ?? scopeFor(p.registryId ?? inferRegistryId(p.medicalCouncil ?? p.nursingCouncil)), registrationType: p.registrationType ?? "full", registryId: p.registryId ?? null, role: p.role, specialization: p.specialization,
+        council: p.medicalCouncil ?? p.nursingCouncil, verifiedUntil: c.validUntil, facility: c.facility, badge: c.badge,
       },
     });
   });

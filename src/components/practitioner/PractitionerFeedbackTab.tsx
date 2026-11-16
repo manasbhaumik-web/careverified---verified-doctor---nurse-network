@@ -36,13 +36,13 @@ export default function PractitionerFeedbackTab({
 }: PractitionerFeedbackTabProps) {
   const tx = useTr();
   return (
-    <div id="panel-reviews" role="tabpanel" aria-labelledby="tab-reviews" tabIndex={0} className="space-y-6 animate-fade-in">
+    <div id="panel-reviews" role="tabpanel" aria-labelledby="tab-reviews" tabIndex={0} className="space-y-4 animate-fade-in">
       {/* Reviews Metric Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="app-card space-y-1">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[color:var(--t-200)] border border-[color:var(--t-200)]">
+        <div className="bg-white px-4 py-3 space-y-0.5">
           <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Overall Clinical Rating')}</span>
           <div className="flex items-center gap-2">
-            <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{avgOverall ?? "—"}</span>
+            <span className="text-xl font-bold leading-tight tracking-tight text-[color:var(--ink)] tabular-nums">{avgOverall ?? "—"}</span>
             <div className="flex text-amber-400 shrink-0">
               <Star className="h-4.5 w-4.5 fill-current" />
             </div>
@@ -52,43 +52,45 @@ export default function PractitionerFeedbackTab({
           </p>
         </div>
 
-        <div className="app-card space-y-1">
+        <div className="bg-white px-4 py-3 space-y-0.5">
           <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Bedside Manners')}</span>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgComm} / 5.0` : '—'}</span>
-          <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
+          <span className="text-xl font-bold leading-tight tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgComm} / 5.0` : '—'}</span>
+          <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1">
             <div className="bg-[color:var(--t-600)] h-full rounded-none" style={{ width: `${hasReviews ? (Number(avgComm)/5)*100 : 0}%` }}></div>
           </div>
         </div>
 
-        <div className="app-card space-y-1">
+        <div className="bg-white px-4 py-3 space-y-0.5">
           <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Clinic Punctuality')}</span>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgPunct} / 5.0` : '—'}</span>
-          <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
+          <span className="text-xl font-bold leading-tight tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgPunct} / 5.0` : '—'}</span>
+          <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1">
             <div className="bg-[color:var(--t-600)] h-full rounded-none" style={{ width: `${hasReviews ? (Number(avgPunct)/5)*100 : 0}%` }}></div>
           </div>
         </div>
 
-        <div className="app-card space-y-1">
+        <div className="bg-white px-4 py-3 space-y-0.5">
           <span className="text-xs font-semibold text-[color:var(--ink-2)] block">{tx('Care Satisfaction')}</span>
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgSatis} / 5.0` : '—'}</span>
-          <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1.5">
+          <span className="text-xl font-bold leading-tight tracking-tight text-[color:var(--ink)] tabular-nums">{hasReviews ? `${avgSatis} / 5.0` : '—'}</span>
+          <div className="h-1 bg-slate-100 rounded-none overflow-hidden mt-1">
             <div className="bg-[color:var(--t-600)] h-full rounded-none" style={{ width: `${hasReviews ? (Number(avgSatis)/5)*100 : 0}%` }}></div>
           </div>
         </div>
       </div>
 
       {/* List of Patient Feedback */}
-      <div className="app-card space-y-5">
-        <div className="border-b border-[color:var(--t-200)] pb-3">
+      <div className="app-card space-y-3">
+        <div className="border-b border-[color:var(--t-200)] pb-2">
           <h3 className="text-base font-bold text-[color:var(--ink)]">{tx('Patient Care Logbook')}</h3>
           <p className="text-xs text-slate-500 font-medium mt-0.5">{tx('Below are verified experiences left by patients post-treatment.')}</p>
         </div>
 
         {myReviews.length === 0 ? (
-          <div className="text-center py-12 space-y-2">
-            <MessageSquare className="h-10 w-10 text-slate-300 mx-auto" />
-            <h4 className="text-sm font-bold text-slate-700">{tx('No Patient Reviews Logged Yet')}</h4>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">{tx('Reviews left on your public practitioner specialty page will compile here for clinical moderation.')}</p>
+          <div className="flex items-center gap-3 py-4">
+            <MessageSquare className="h-8 w-8 text-slate-300 shrink-0" aria-hidden="true" />
+            <div>
+              <h4 className="text-sm font-bold text-slate-700">{tx('No Patient Reviews Logged Yet')}</h4>
+              <p className="text-xs text-slate-500 leading-relaxed">{tx('Reviews left on your public practitioner specialty page will compile here for clinical moderation.')}</p>
+            </div>
           </div>
         ) : (
           <div className="space-y-6 divide-y divide-slate-100">

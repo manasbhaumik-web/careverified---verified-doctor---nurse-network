@@ -8,7 +8,7 @@ const read = (f: string) => fs.readFileSync(f, 'utf8');
 const dash = read('src/components/PatientDashboard.tsx');
 const records = read('src/components/PatientRecords.tsx');
 const panel = read('src/components/CertificatesPanel.tsx');
-const verify = read('src/components/VerifyDocument.tsx');
+const verify = read('src/domains/verification/VerifyDocument.tsx');
 const discharge = read('src/components/DischargeSummaryDialog.tsx');
 
 test('the MC and Referral Letters tabs each show only their own list', () => {

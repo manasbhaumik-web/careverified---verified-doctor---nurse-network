@@ -668,7 +668,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
       {/* ═══════════ NAVBAR (LIGHT TONE PRIMARY BACKGROUND) ═══════════ */}
       <nav className="sticky top-0 z-50 bg-[color:var(--t-50)]/95 backdrop-blur-md border-b border-[color:var(--t-200)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-2.5 sm:py-3.5 flex flex-nowrap sm:flex-wrap justify-between items-center gap-2 sm:gap-4">
+        <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 py-2.5 sm:py-3.5 flex flex-nowrap sm:flex-wrap justify-between items-center gap-2 sm:gap-4">
           <a href="#top" className="group min-w-0">
             <BrandLogo
               tone="light"
@@ -1018,7 +1018,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
           />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full z-10 py-4 sm:py-6">
+        <div className="relative page-w mx-auto px-4 sm:px-6 lg:px-12 w-full z-10 py-4 sm:py-6">
           {/* All slides share one grid cell, so the hero is as tall as the tallest slide on every slide. Screen readers hear slide changes only once autoplay has stopped. */}
           <div className="grid" aria-live={autoplay ? 'off' : 'polite'}>
             {HERO_SLIDES.map((s, i) => {
@@ -1225,7 +1225,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
       {/* ═══════════ LIVE TELEMETRY STRIP (ATTACHED JUST UNDER HERO — HORIZONTALLY ATTACHED GRID) ═══════════ */}
       <section aria-label="How MediCred works" className="relative z-20 bg-white border-b border-[color:var(--t-200)] shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+        <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
           {/* Continuous Horizontally-Attached Cards (Separated by hairline 1px borders) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-x border-[color:var(--t-200)] divide-y sm:divide-y-0 sm:divide-x divide-[color:var(--t-200)]">
             {QUANTIFIED_METRICS.map((qm) => {
@@ -1263,7 +1263,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
       {/* ═══════════ "FIND CARE IN 1 CLICK" QUICK-SEARCH BAR WITH LIVE AUTOCOMPLETE ═══════════ */}
       <section aria-label="Quick Care Intake Search" className="relative z-30 bg-white border-b border-[color:var(--t-200)] py-4 sm:py-4.5 shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+        <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
           <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 sm:gap-4">
 
             {/* Left: Search Input with Live Autocomplete Dropdown */}
@@ -1432,7 +1432,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
       {/* ═══════════ COMPACT CLINICAL EMERGENCY ADVISORY BAR ═══════════ */}
       <section aria-label="Emergency Hotline Protocol" className="relative bg-rose-50/80 border-b border-rose-200 py-3.5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-start sm:items-center gap-3 min-w-0">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-600 text-white text-xs font-mono font-extrabold uppercase tracking-wider shrink-0">
               <AlertCircle className="h-3.5 w-3.5 animate-pulse" />
@@ -1457,7 +1457,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
         {/* ─── SECTION 01: STATUTORY GOVERNANCE & LIVE PRACTITIONER LICENCE VERIFICATION ─── */}
         <section id="verify-section" aria-label="Statutory governance and licence verification" className="relative overflow-hidden bg-white border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10 space-y-12">
+          <div className="relative page-w mx-auto px-4 sm:px-6 lg:px-12 z-10 space-y-12">
             <div>
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 pb-6 border-b border-[color:var(--t-200)]">
                 <div>
@@ -1610,7 +1610,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
         {/* ─── SECTION 02: GENTLE CARE FOR PATIENTS IN MALAYSIA (MYKAD) ─── */}
         <section id="services-section" aria-label="Gentle care for patients in Malaysia" className="relative overflow-hidden bg-[color:var(--t-50)]/30 border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10 space-y-10">
+          <div className="relative page-w mx-auto px-4 sm:px-6 lg:px-12 z-10 space-y-10">
             <AnimatedSection className="max-w-3xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -1927,7 +1927,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
         {/* ─── SECTION 03: WELCOMING YOU TO MALAYSIA · INTERNATIONAL PATIENTS & MEDICAL TRAVELLERS ─── */}
         <section id="tourism-section" aria-label="International patients and medical travel" className="relative overflow-hidden bg-white border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10 space-y-10">
+          <div className="relative page-w mx-auto px-4 sm:px-6 lg:px-12 z-10 space-y-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[color:var(--t-200)]">
               <div className="max-w-3xl space-y-2">
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs">
@@ -2173,7 +2173,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
         {/* ─── SECTION 04: 3-STEP CARE PATHWAY ("HOW IT WORKS") ─── */}
         <div id="pathway-section" className="relative overflow-hidden bg-white border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10">
+          <div className="relative page-w mx-auto px-4 sm:px-6 lg:px-12 z-10">
             <section aria-label="Get started">
               <AnimatedSection>
                 <div className="bg-white text-[color:var(--ink)] panel-edge corner-bracket">
@@ -2288,7 +2288,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
         {/* ─── SECTION 05: PARTNER & PRACTITIONER NETWORK ECOSYSTEM ─── */}
         <section id="ecosystem-section" aria-label="Practitioner and partner network" className="relative overflow-hidden bg-[color:var(--t-50)]/60 border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+          <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
             <AnimatedSection className="max-w-3xl mb-10">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -2394,7 +2394,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
         {/* ─── SECTION 06: PATIENT TESTIMONIALS (only real, approved ones are shown) ─── */}
         {testimonials.length > 0 && (
           <section id="feedback-section" aria-label="Patient testimonials" className="relative overflow-hidden bg-white border-b border-[color:var(--t-200)] py-14 sm:py-18 scroll-mt-28">
-            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 z-10">
+            <div className="relative page-w mx-auto px-4 sm:px-6 lg:px-12 z-10">
               <AnimatedSection className="max-w-3xl mb-10">
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs mb-3">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />

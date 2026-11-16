@@ -50,7 +50,7 @@ export default function InternationalPatientsPage({ onSignUp }: InternationalPat
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* ─── TOP GLOBAL NAVIGATION BAR ─── */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[color:var(--t-200)] shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between gap-4">
+        <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-6">
             <a 
               href="/" 
@@ -99,7 +99,7 @@ export default function InternationalPatientsPage({ onSignUp }: InternationalPat
 
       {/* ─── FULL-WIDTH APPLICATION HERO BANNER ─── */}
       <section className="w-full bg-[color:var(--t-50)] text-slate-900 border-b border-[color:var(--t-200)] shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-10 sm:py-14">
+        <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 py-10 sm:py-14">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="max-w-3xl space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-2xs">
@@ -164,7 +164,7 @@ export default function InternationalPatientsPage({ onSignUp }: InternationalPat
         <TouristAccess onSignUp={goMemberSignup} />
 
         {/* Section: International Travel FAQs */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pb-12">
+        <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 pb-12">
           <section className="bg-white border border-[color:var(--t-200)] p-6 sm:p-8 shadow-xs space-y-6">
             <div className="flex items-center gap-2">
               <HelpCircle className="h-5 w-5 text-[color:var(--t-600)]" />

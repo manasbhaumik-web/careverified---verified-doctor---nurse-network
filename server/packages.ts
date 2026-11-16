@@ -313,8 +313,8 @@ export function initPackagesSchema() {
 
     const stmt = db.prepare(`
       INSERT INTO medical_promotions (
-        id, facility_id, code, title, description, discount_type, discount_value, package_id, badge_text, valid_from, valid_until, terms, status, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        id, facility_id, code, title, description, discount_type, discount_value, package_id, badge_text, valid_from, valid_until, terms, status, image_url, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const now = iso();

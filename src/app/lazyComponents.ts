@@ -9,6 +9,7 @@ export const ClinicHospitalPage = lazy(() => import('../components/ClinicHospita
 export const PharmacyPage = lazy(() => import('../components/PharmacyPage'));
 export const PublicPackagesPage = lazy(() => import('../components/PublicPackagesPage'));
 export const VerifyPractitionersPage = lazy(() => import('../components/VerifyPractitionersPage'));
+export const FacilitySignUp = lazy(() => import('../components/FacilitySignUp'));
 export const MalaysiaPatientsPage = lazy(() => import('../components/MalaysiaPatientsPage'));
 export const InternationalPatientsPage = lazy(() => import('../components/InternationalPatientsPage'));
 export const DashboardDesignPreview = lazy(() => import('../components/DashboardDesignPreview'));

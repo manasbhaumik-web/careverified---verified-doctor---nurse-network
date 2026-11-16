@@ -46,7 +46,7 @@ export default function JoinNetwork() {
   const tx = T[pick(lang)];
   return (
     <section id="join-network" aria-labelledby="join-h" className="bg-white border-b border-[color:var(--t-200)] py-12 sm:py-14 scroll-mt-28">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+      <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
         <div className="eyebrow mb-3">
           <Users className="h-3 w-3 text-[color:var(--t-600)]" />
           {tx.eyebrow}
