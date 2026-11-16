@@ -405,13 +405,11 @@ footer button.bg-slate-800:hover,
 :root[data-theme="light-cyan"],
 :root[data-theme="cyan"] {
   --ink: #1E293B; --ink-2: #334155; --t-bright: 1; --page: #F8FAFC;
-  --e-50: #ECFDF5; --e-200: #A7F3D0; --e-600: #047857; --e-700: #047857; --e-800: #065F46;
+  --e-50: #ECFDF5; --e-200: #A7F3D0; --e-600: #059669; --e-700: #047857; --e-800: #065F46;
   --dark: #0F172A;
-  /* Neutral surface: slate-200 borders and a cool off-white page, so cards and chips stand apart from the page. */
-  /* Action shades start at cyan-700 (white on it is 5.4:1; on cyan-600 it was 3.7:1). */
-  --t-50: #ECFEFF; --t-100: #CFFAFE; --t-200: #E2E8F0; --t-300: #67E8F9; --t-400: #22D3EE;
-  --t-500: #06B6D4; --t-600: #0E7490; --t-700: #155E75; --t-800: #164E63; --t-900: #083344;
-  --t-bg: #F4F7FA; --t-hue: 188deg;
+  --t-50: #ECFEFF; --t-100: #CFFAFE; --t-200: #A5F3FC; --t-300: #67E8F9; --t-400: #22D3EE;
+  --t-500: #06B6D4; --t-600: #0891B2; --t-700: #0E7490; --t-800: #155E75; --t-900: #164E63;
+  --t-bg: color-mix(in srgb, var(--t-50) 35%, #EEF3F7); --t-hue: 188deg;
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
   --t-text: var(--t-600);
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
@@ -1167,7 +1165,7 @@ a, button, [role="button"], summary, label, select, input { touch-action: manipu
 }
 
 /* Sub-tab strip under a workspace header: white row, teal underline on the active tab. */
-.subtab-strip { background-color: #fff; border-top: 1px solid var(--t-200); }
+.subtab-strip { background-color: var(--t-50); border-top: 1px solid var(--t-200); }
 
 /* Patient workspace: calmer, larger type (16px body, 13px labels) - same scale steps, just one notch up inside this area. */
 #patient-dashboard-root .text-sm { font-size: 1rem; line-height: 1.5rem; }
