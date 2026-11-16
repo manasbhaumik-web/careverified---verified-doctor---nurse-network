@@ -1,7 +1,7 @@
 import React, { Suspense, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
-  ShieldCheck, Menu, X, UserCheck, Settings, Activity
+  ShieldCheck, Menu, X, UserCheck, Settings, Activity, Home as HomeIcon, CalendarDays, MessageSquare, FileText
 } from 'lucide-react';
 
 
@@ -85,6 +85,13 @@ export default function App() {
   const [prefilledSymptoms, setPrefilledSymptoms] = useState<string>('');
   const [registryTab, setRegistryTab] = useState<'directory' | 'triage'>('directory');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Which patient page is showing (the patient workspace reports it), so the phone bar can highlight it
+  const [patientTab, setPatientTab] = useState<string>('overview');
+  useEffect(() => {
+    const onTab = (e: Event) => { const d = (e as CustomEvent<string>).detail; if (d) setPatientTab(d); };
+    window.addEventListener('medcred-patient-tab', onTab);
+    return () => window.removeEventListener('medcred-patient-tab', onTab);
+  }, []);
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
 
   // User Session State (server-side session cookie; nothing sensitive is kept in localStorage)
@@ -445,6 +452,20 @@ export default function App() {
     return [...wanted, ...rest].slice(0, 4);
   })();
 
+  // Phone bottom bar. Patients get Home, Visits, Messages, Records and More; other roles keep their top places.
+  const onPatientPage = currentUser.role === 'patient' && !selectedProfId && ['patient_dashboard', 'patient_care', 'patient_records', 'patient_services', 'patient_discovery', 'overview', 'appointments', 'consult', 'messages', 'records', 'prescriptions', 'certs', 'labs', 'saved'].includes(activeView);
+  const barItems: { id: string; label: string; icon: React.ComponentType<{ className?: string }>; view: string; active: boolean }[] = currentUser.role === 'patient'
+    ? [
+        { id: 'bar-home', label: 'Home', icon: HomeIcon, view: 'overview', active: onPatientPage && patientTab === 'overview' },
+        { id: 'bar-visits', label: 'Visits', icon: CalendarDays, view: 'appointments', active: onPatientPage && patientTab === 'appointments' },
+        { id: 'bar-messages', label: 'Messages', icon: MessageSquare, view: 'messages', active: onPatientPage && patientTab === 'messages' },
+        { id: 'bar-records', label: 'Records', icon: FileText, view: 'records', active: onPatientPage && ['records', 'prescriptions', 'labs', 'certs'].includes(patientTab) },
+      ]
+    : mobileTabs.map(item => ({ id: item.id, label: SHORT_LABEL[item.id] ?? item.name, icon: item.icon, view: item.id, active: activeView === item.id }));
+
+  // "More" takes the highlight while its menu is open, and on any page that is not one of the bar's own tabs
+  const moreActive = mobileMenuOpen || !barItems.some(i => i.active);
+
   const handleNavKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, currentId: string) => {
     const ids = navItems.map(n => n.id);
     const currentIndex = ids.indexOf(currentId);
@@ -481,7 +502,7 @@ export default function App() {
       )}
 
       {/* MediCred Elevated Primary Header */}
-      <header className="bg-[color:var(--t-600)]/95 backdrop-blur-md text-white border-0 sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-[0_2px_6px_-1px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.06)]">
+      <header className="bg-[color:var(--t-600)]/95 lg:backdrop-blur-md text-white border-0 sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-[0_2px_6px_-1px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.06)]">
         <div className="page-w mx-auto flex items-center justify-between h-16">
 
           {/* Brand Logo */}
@@ -521,10 +542,9 @@ export default function App() {
           {/* Right-Side Desktop Actions & User Session Details - Standardized Gaps & Round Outlines */}
           <div className="hidden lg:flex items-center gap-2.5 sm:gap-3">
             <OnCallChip />
-            <div className="flex items-center gap-2 bg-white/15 border-0 shadow-none px-3 py-1.5 rounded-none text-2xs font-extrabold uppercase tracking-wider text-white">
-              <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true"></span>
+            <div className="hidden 2xl:flex items-center gap-2 bg-white/15 border-0 shadow-none px-3 py-1.5 rounded-none text-xs font-bold text-white whitespace-nowrap" title={tt('Council-Verified Network (Act 586)')}>
               <ShieldCheck className="h-3.5 w-3.5 text-white" aria-hidden="true" />
-              <span>{tt('Council-Verified Network (Act 586)')}</span>
+              <span>{tt('Council-verified doctors')}</span>
             </div>
 
             <div className="h-5 w-px bg-white/20 mx-0.5" aria-hidden="true" />
@@ -607,21 +627,6 @@ export default function App() {
                         <span>{tt(item.name)}</span>
                       </div>
 
-                      {item.id === 'patient_care' && (
-                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          {tt('Live Care')}
-                        </span>
-                      )}
-                      {item.id === 'patient_records' && (
-                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          {tt('EHR')}
-                        </span>
-                      )}
-                      {item.id === 'patient_services' && (
-                        <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
-                          {tt('Packages')}
-                        </span>
-                      )}
                       {item.id === 'facility_staffing' && (
                         <span className={`text-2xs px-2 py-0.5 rounded-none font-mono font-extrabold ${isActive ? 'bg-white text-[color:var(--t-600)]' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] border border-[color:var(--t-200)]'}`}>
                           {tt('Shifts')}
@@ -1149,20 +1154,20 @@ export default function App() {
 
       {/* Mobile bottom tab bar: the few places used most, plus a menu for the rest */}
       <nav aria-label={tt('Primary')} className="bottom-nav lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-[color:var(--t-200)] shadow-[0_-2px_10px_rgba(15,23,42,0.08)]">
-        <ul className="grid" style={{ gridTemplateColumns: `repeat(${mobileTabs.length + 1}, minmax(0, 1fr))` }}>
-          {mobileTabs.map((item) => {
+        <ul className="grid" style={{ gridTemplateColumns: `repeat(${barItems.length + 1}, minmax(0, 1fr))` }}>
+          {barItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeView === item.id && !mobileMenuOpen;
+            const isActive = item.active && !mobileMenuOpen;
             return (
               <li key={item.id}>
                 <button
                   type="button"
-                  onClick={() => { setActiveView(item.id); setSelectedProfId(null); setMobileMenuOpen(false); window.scrollTo({ top: 0 }); }}
+                  onClick={() => { setActiveView(item.view); setSelectedProfId(null); setMobileMenuOpen(false); window.scrollTo({ top: 0 }); }}
                   aria-current={isActive ? 'page' : undefined}
                   className={`w-full h-16 flex flex-col items-center justify-center gap-1 text-xs font-bold cursor-pointer ${isActive ? 'text-[color:var(--t-700)]' : 'text-slate-500'}`}
                 >
                   <span className={`h-7 w-12 rounded-full flex items-center justify-center transition-colors ${isActive ? 'bg-[color:var(--t-100)]' : ''}`}><Icon className="h-5 w-5" /></span>
-                  <span className="max-w-full truncate px-1">{tt(SHORT_LABEL[item.id] ?? item.name)}</span>
+                  <span className="max-w-full truncate px-1">{tt(item.label)}</span>
                 </button>
               </li>
             );
@@ -1172,9 +1177,10 @@ export default function App() {
               type="button"
               onClick={() => setMobileMenuOpen(o => !o)}
               aria-expanded={mobileMenuOpen}
-              className={`w-full h-16 flex flex-col items-center justify-center gap-1 text-xs font-bold cursor-pointer ${mobileMenuOpen ? 'text-[color:var(--t-700)]' : 'text-slate-500'}`}
+              aria-current={moreActive ? 'page' : undefined}
+              className={`w-full h-16 flex flex-col items-center justify-center gap-1 text-xs font-bold cursor-pointer ${moreActive ? 'text-[color:var(--t-700)]' : 'text-slate-500'}`}
             >
-              <span className={`h-7 w-12 rounded-full flex items-center justify-center ${mobileMenuOpen ? 'bg-[color:var(--t-100)]' : ''}`}>{mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</span>
+              <span className={`h-7 w-12 rounded-full flex items-center justify-center ${moreActive ? 'bg-[color:var(--t-100)]' : ''}`}>{mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</span>
               <span>{mobileMenuOpen ? tt('Close') : tt('More')}</span>
             </button>
           </li>

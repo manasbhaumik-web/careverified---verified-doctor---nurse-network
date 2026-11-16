@@ -58,15 +58,15 @@ const INTL_PACKAGES = [
   },
   {
     id: 'cardio-workup',
-    myr: 3200,
+    myr: 2950,
     hub: 'Kuala Lumpur · Penang',
     code: 'PKG-CARD-02',
     image: hospitalHeroBg,
     accreditation: 'JCI Cardiac Specialty',
     badgeClass: 'bg-rose-700/90 text-white border-rose-500/50',
-    title: 'Comprehensive Cardiac CT Angiogram & Echo Suite',
-    duration: '1–2 Days Outpatient',
-    highlights: ['Coronary CT Angiogram', '2D Echocardiogram', 'Senior Cardiologist Review']
+    title: 'Comprehensive Cardiac CT Angiogram & Calcium Score',
+    duration: '1 Day Outpatient',
+    highlights: ['Coronary CT Angiogram', 'Coronary Calcium Score', 'Senior Cardiologist Review']
   },
   {
     id: 'ortho-knee',
@@ -851,7 +851,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
               className="inline-flex items-center gap-1.5 min-h-[44px] px-3 sm:px-3.5 text-xs sm:text-sm font-extrabold text-[color:var(--t-700)] bg-[color:var(--t-50)] hover:bg-[color:var(--t-100)] border border-[color:var(--t-300)] shadow-2xs transition-all cursor-pointer whitespace-nowrap"
             >
               <PackagePlus className="h-4 w-4 text-[color:var(--t-600)]" />
-              <span>Packages &amp; Promos</span>
+              <span>Packages &amp; Directory</span>
             </a>
 
             {/* 2. Join Us Navmenu Dropdown */}
@@ -1744,7 +1744,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                         03 · PHARMACY
                       </div>
                       <div className="absolute top-2.5 right-2.5 bg-white/95 text-amber-800 text-xs font-mono font-extrabold px-2 py-0.5 border border-slate-200 shadow-2xs">
-                        0% Commission
+                        Nearby pickup
                       </div>
                     </div>
                     <div className="p-4 space-y-2">
@@ -1996,7 +1996,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     }}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer transition-colors shadow-2xs"
                   >
-                    <span>Browse All Packages & Promos</span>
+                    <span>Browse all packages</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </a>
                 </div>
@@ -2059,10 +2059,10 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                         </div>
                         <button
                           type="button"
-                          onClick={() => goLogin('patient', true)}
+                          onClick={() => navigate('/packages')}
                           className="w-full py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1"
                         >
-                          <span>Inquire as Member</span>
+                          <span>View package</span>
                           <ArrowRight className="h-3 w-3" />
                         </button>
                       </div>

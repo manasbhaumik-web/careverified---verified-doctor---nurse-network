@@ -202,6 +202,11 @@ export default function PatientDashboard({
     }
   }, [activeGroup, initialTab]);
 
+  // Tell the app which patient page is open, so the phone bottom bar can highlight it
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('medcred-patient-tab', { detail: activeTab }));
+  }, [activeTab]);
+
   // Inner Workspace Subtabs State
   const [appointmentsSubTab, setAppointmentsSubTab] = useState<'all' | 'upcoming' | 'past'>('all');
   const [recordsSubTab, setRecordsSubTab] = useState<RecordSubTab>('overview');
@@ -479,7 +484,7 @@ export default function PatientDashboard({
         greeting={greeting}
         groupName={PATIENT_GROUPS[currentGroup].name}
         upcomingCount={upcoming.length}
-        nextVisitText={upcoming[0] ? tx('Next Visit: {name}, {date}', { name: upcoming[0].professionalName, date: upcoming[0].date }) : tx('No upcoming consultations')}
+        nextVisitText={upcoming[0] ? tx('Next Visit: {name}, {date}', { name: upcoming[0].professionalName, date: fmtDate(upcoming[0].date) }) : tx('No upcoming consultations')}
         activeRxCount={summary?.activeRx ?? '–'}
         careTeamCount={careTeam.length}
         bpSummary={summary?.bp}
@@ -621,6 +626,9 @@ export default function PatientDashboard({
           patientConditions={patientConditions}
           onCallStatus={onCallStatus}
           onOpenAppointments={() => navigateToTab('appointments')}
+          onOpenLiveRoom={() => { navigateToTab('consult'); setConsultSubTab('instant'); }}
+          onFindDoctor={onFindDoctors}
+          onOpenRecords={() => navigateToTab('records')}
           onConsultNow={() => { navigateToTab('consult'); setConsultSubTab('instant'); }}
           onOpenTriage={() => { navigateToTab('consult'); setConsultSubTab('triage'); }}
           onOpenMessages={() => navigateToTab('messages')}

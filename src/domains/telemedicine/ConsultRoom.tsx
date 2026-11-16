@@ -476,7 +476,7 @@ export default function ConsultRoom({ consultId, myUserId, isDoctor, onEnded, on
                   <span className="flex items-center gap-2">
                     <MessageSquare className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                     <span>{tx('In-Call Patient Chat')}</span>
-                    <span className="px-1.5 py-0.2 bg-slate-100 text-slate-700 text-2xs font-mono font-bold">
+                    <span className="count-badge bg-slate-100 text-slate-700">
                       {messages.length}
                     </span>
                   </span>

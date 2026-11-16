@@ -165,11 +165,11 @@ export default function WorkspaceHeader<T extends string = string>({
 
       {/* Attached Inner Workspace Subtab Strip */}
       {tabs && tabs.length > 0 && (
-        <div className="border-t border-[color:var(--t-200)] bg-[color:var(--t-50)] p-2.5 -mx-3.5 -mb-3.5 sm:-mx-4 sm:-mb-4 mt-3.5">
+        <div className="subtab-strip px-2.5 -mx-3.5 -mb-3.5 sm:-mx-4 sm:-mb-4 mt-3.5">
           <div
             role="tablist"
             aria-label={tabsLabel || tx('Workspace section tabs')}
-            className="flex flex-wrap items-center gap-1.5"
+            className="flex flex-wrap items-center gap-1"
           >
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
@@ -183,33 +183,27 @@ export default function WorkspaceHeader<T extends string = string>({
                   onClick={() => onTabChange?.(tab.id)}
                   className={`h-9 px-3.5 text-xs transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 bg-transparent focus:outline-none focus-visible:underline focus-visible:underline-offset-4 ${
                     isActive
-                      ? 'text-[color:var(--t-900)] font-black'
-                      : 'text-slate-600 font-semibold hover:text-[color:var(--t-800)]'
+                      ? 'text-[color:var(--t-700)] font-black shadow-[inset_0_-3px_0_var(--t-600)]'
+                      : 'text-slate-700 font-semibold hover:text-[color:var(--t-700)] hover:bg-[color:var(--t-50)]'
                   }`}
                 >
-                  {isActive && (
-                    <span
-                      className="w-1.5 h-1.5 rounded-full bg-[color:var(--t-600)] shadow-[0_0_6px_rgba(13,148,136,0.65)] shrink-0"
-                      aria-hidden="true"
-                    />
-                  )}
                   {TabIcon && (
-                    <TabIcon className={`h-3.5 w-3.5 transition-colors ${isActive ? 'text-[color:var(--t-700)]' : 'text-slate-400'}`} />
+                    <TabIcon className={`h-3.5 w-3.5 transition-colors ${isActive ? 'text-[color:var(--t-700)]' : 'text-slate-500'}`} />
                   )}
                   <span>{tab.label}</span>
                   {tab.count !== undefined && (
                     <span
-                      className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold leading-none tabular-nums border ${
+                      className={`count-badge ${
                         isActive
-                          ? 'bg-[color:var(--t-100)] text-[color:var(--t-900)] border-[color:var(--t-300)]'
-                          : 'bg-white text-slate-600 border-[color:var(--t-200)]'
+                          ? 'bg-[color:var(--t-600)] text-white'
+                          : 'bg-slate-100 text-slate-700'
                       }`}
                     >
                       {tab.count}
                     </span>
                   )}
                   {tab.badge && (
-                    <span className="text-2xs font-mono font-bold uppercase tracking-wider px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span className="text-2xs font-mono font-bold uppercase tracking-wider px-1.5 py-0.2 bg-slate-100 text-slate-700">
                       {tab.badge}
                     </span>
                   )}

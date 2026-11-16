@@ -307,7 +307,7 @@ export default function PractitionerHeroBanner<T extends string = string>({
                   <span className="text-slate-400">&bull;</span>
                   <span className="font-mono text-[color:var(--ink-2)]">{tx('{n} Years Exp.', { n: profile.experienceYears })}</span>
                   <span className="text-slate-400">&bull;</span>
-                  <span className="font-mono font-bold text-[color:var(--t-700)] bg-white px-2 py-0.5 border border-[color:var(--t-200)] text-2xs rounded-none shadow-2xs">
+                  <span className="font-mono font-bold text-[color:var(--ink-2)] text-xs">
                     {profile.licenseNumber}
                   </span>
                   {((profile as any).apcExpiry || (profile as any).licenseExpiry) && (

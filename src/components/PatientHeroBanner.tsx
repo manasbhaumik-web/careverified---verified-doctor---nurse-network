@@ -94,7 +94,7 @@ export default function PatientHeroBanner<T extends string = string>({
         <LifeBuoy className={`h-4 w-4 ${helpActive ? 'text-[color:var(--t-600)]' : 'text-slate-500'}`} />
         <span className="whitespace-nowrap font-medium sm:font-semibold">{tx('Help & Support')}</span>
         {openTicketsCount > 0 && (
-          <span className="tabular-nums text-2xs min-w-[18px] text-center px-1.5 py-0.5 rounded-full font-semibold bg-[color:var(--t-600)] text-white leading-none">
+          <span className="count-badge bg-[color:var(--t-600)] text-white">
             {openTicketsCount}
           </span>
         )}
@@ -208,7 +208,7 @@ export default function PatientHeroBanner<T extends string = string>({
             badges={
               <>
                 <BannerBadge tone="success">
-                  <CheckCircle2 className="h-3 w-3 text-emerald-600 stroke-[3]" /> {tx('EHR Verified Patient')}
+                  <CheckCircle2 className="h-3 w-3 text-emerald-600 stroke-[3]" /> {tx('Verified health record')}
                 </BannerBadge>
               </>
             }

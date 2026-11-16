@@ -238,7 +238,7 @@ export default function PatientRecords({
                       {tx('Chronic Conditions')}
                     </h3>
                   </div>
-                  <span className="text-2xs font-mono font-bold px-1.5 py-0.2 border bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]">
+                  <span className="count-badge border bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]">
                     {data.items.filter((i: any) => i.type === 'condition').length}
                   </span>
                 </div>
@@ -280,7 +280,7 @@ export default function PatientRecords({
                       {tx('Active Medications')}
                     </h3>
                   </div>
-                  <span className="text-2xs font-mono font-bold px-1.5 py-0.2 border bg-cyan-50 text-cyan-800 border-cyan-200">
+                  <span className="count-badge border bg-cyan-50 text-cyan-800 border-cyan-200">
                     {data.items.filter((i: any) => i.type === 'medication').length + prescribed.length}
                   </span>
                 </div>

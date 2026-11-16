@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShieldCheck, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
 import { UserAvatar } from '../../avatars';
 
 export interface DashboardSubTab<S extends string = string> {
@@ -107,6 +107,8 @@ export default function DashboardHeader<T extends string>({
 
   const [openMenuId, setOpenMenuId] = React.useState<T | null>(null);
   const [megaLeft, setMegaLeft] = React.useState(0);
+  // Tallest the open panel may be: the room left below the menu strip (minus the phone's bottom bar), so it scrolls inside instead of running off screen
+  const [megaMax, setMegaMax] = React.useState(520);
   const closeMenuTimer = React.useRef<number | null>(null);
   const navRef = React.useRef<HTMLElement | null>(null);
   const tablistRef = React.useRef<HTMLDivElement | null>(null);
@@ -116,13 +118,18 @@ export default function DashboardHeader<T extends string>({
     const tabEl = tabRefs.current[String(menuId)];
     const listEl = tablistRef.current;
     if (!tabEl || !listEl) return;
-    const maxOffset = Math.max(0, listEl.clientWidth - 470);
+    const maxOffset = Math.max(0, listEl.clientWidth - 520);
     setMegaLeft(Math.max(0, Math.min(tabEl.offsetLeft, maxOffset)));
   };
 
   const openMenu = (menuId: T) => {
     if (closeMenuTimer.current) window.clearTimeout(closeMenuTimer.current);
-    if (menuStyle === 'mega') updateMegaAnchor(menuId);
+    if (menuStyle === 'mega') {
+      updateMegaAnchor(menuId);
+      const navBottom = navRef.current?.getBoundingClientRect().bottom ?? 0;
+      const reserve = window.innerWidth < 1024 ? 84 : 16;
+      setMegaMax(Math.max(240, window.innerHeight - navBottom - reserve));
+    }
     setOpenMenuId(menuId);
   };
   const scheduleCloseMenu = () => {
@@ -436,7 +443,7 @@ export default function DashboardHeader<T extends string>({
                 {isCollapsed ? (
                   <>
                     <ChevronDown className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                    <span className="text-[color:var(--t-700)] font-black">Expand Banner</span>
+                    <span className="hidden xl:inline text-[color:var(--t-700)] font-black">Expand</span>
                   </>
                 ) : (
                   <>
@@ -456,85 +463,52 @@ export default function DashboardHeader<T extends string>({
                   aria-label={`${megaTab.label} mega menu`}
                   onMouseEnter={() => openMenu(megaTab.id)}
                   onMouseLeave={scheduleCloseMenu}
-                  style={{ '--mega-left': `${megaLeft}px` } as React.CSSProperties}
-                  className="pointer-events-auto w-full sm:w-[680px] sm:ml-[var(--mega-left)] -mt-px bg-white border border-[color:var(--t-200)] grid grid-cols-1 sm:grid-cols-[1.85fr_1fr] rounded-none animate-fade-in"
+                  style={{ '--mega-left': `${megaLeft}px`, maxHeight: megaMax } as React.CSSProperties}
+                  className="pointer-events-auto w-full sm:w-[520px] sm:ml-[var(--mega-left)] overflow-y-auto bg-white border border-[color:var(--t-300)] border-t-[3px] border-t-[color:var(--t-600)] shadow-[0_24px_48px_-12px_rgba(8,51,68,0.28)] animate-fade-in"
                 >
-                  {/* Left: flat section list, hairline-divided like the stat strips on the page */}
-                  <div className="flex flex-col min-w-0">
-                    <div className="px-4 py-2.5 flex items-center justify-between bg-[color:var(--t-50)] border-b border-[color:var(--t-200)]">
-                      <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)]">
-                        {megaTab.label}
-                      </span>
-                      <span className="text-xs font-semibold text-slate-600 tabular-nums">
-                        {megaTab.subItems.length} sections
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2">
-                    {megaTab.subItems.map((sub, i, all) => {
+                  <div className="px-4 py-2.5 flex items-center justify-between gap-3 bg-[color:var(--t-50)] border-b border-[color:var(--t-200)]">
+                    <span className="text-xs font-extrabold text-[color:var(--t-700)]">{megaTab.label}</span>
+                    <span className="hidden sm:inline-block border border-[color:var(--t-200)] bg-white px-1.5 py-0.5 text-xs font-bold text-[color:var(--t-700)]">Esc</span>
+                  </div>
+                  <ul>
+                    {megaTab.subItems.map(sub => {
                       const SubIcon = sub.icon;
                       const subActive = activeTab === megaTab.id && megaTab.activeSubTab === sub.id;
-                      const lastRowStart = all.length - (all.length % 2 === 0 ? 2 : 1);
-                      const dividers = `${i % 2 === 0 && i !== all.length - 1 ? 'sm:border-r' : ''} ${i < all.length - 1 ? 'border-b' : ''} ${i >= lastRowStart ? 'sm:border-b-0' : ''}`;
                       return (
-                        <button
-                          key={sub.id}
-                          type="button"
-                          role="menuitem"
-                          onClick={() => {
-                            if (activeTab !== megaTab.id) onTabChange?.(megaTab.id);
-                            megaTab.onSubTabChange?.(sub.id);
-                            setOpenMenuId(null);
-                          }}
-                          className={`group w-full text-left px-4 py-3.5 border-[color:var(--t-100)] transition-colors cursor-pointer flex items-start gap-3 rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[color:var(--t-500)]/40 ${dividers} ${
-                            subActive ? 'bg-[color:var(--t-50)]' : 'bg-white hover:bg-[color:var(--t-50)]'
-                          }`}
-                        >
-                          {SubIcon && <SubIcon className="h-[18px] w-[18px] shrink-0 mt-px text-[color:var(--t-600)]" />}
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className={`text-sm font-bold truncate ${subActive ? 'text-[color:var(--t-900)]' : 'text-[color:var(--ink)]'}`}>
-                                {sub.label}
+                        <li key={sub.id} className="border-b border-[color:var(--t-100)]">
+                          <button
+                            type="button"
+                            role="menuitem"
+                            aria-current={subActive ? 'page' : undefined}
+                            onClick={() => {
+                              if (activeTab !== megaTab.id) onTabChange?.(megaTab.id);
+                              megaTab.onSubTabChange?.(sub.id);
+                              setOpenMenuId(null);
+                            }}
+                            className={`group w-full text-left px-4 py-2.5 flex items-start gap-3 cursor-pointer transition-colors rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[color:var(--t-500)]/40 ${subActive ? 'bg-[color:var(--t-50)]' : 'bg-white hover:bg-[color:var(--t-50)]'}`}
+                          >
+                            <span className={`shrink-0 h-8 w-8 flex items-center justify-center ${subActive ? 'bg-[color:var(--t-600)] text-white' : 'bg-[color:var(--t-50)] text-[color:var(--t-600)] group-hover:bg-white'}`}>
+                              {SubIcon && <SubIcon className="h-4 w-4" />}
+                            </span>
+                            <span className="min-w-0 flex-1 block">
+                              <span className="flex items-center gap-2">
+                                <span className="text-xs font-bold leading-snug text-[color:var(--t-900)]">{sub.label}</span>
+                                {sub.count !== undefined && sub.count > 0 && (
+                                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold leading-none tabular-nums bg-[color:var(--t-100)] text-[color:var(--t-900)] border border-[color:var(--t-300)] shrink-0">{sub.count}</span>
+                                )}
                               </span>
-                              {sub.count !== undefined && sub.count > 0 && (
-                                <span
-                                  className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold leading-none tabular-nums border shrink-0 ${
-                                    subActive
-                                      ? 'bg-[color:var(--t-100)] text-[color:var(--t-900)] border-[color:var(--t-300)]'
-                                      : 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]'
-                                  }`}
-                                >
-                                  {sub.count}
-                                </span>
+                              {sub.description && (
+                                <span className="block mt-0.5 text-xs text-slate-600 leading-snug">{sub.description}</span>
                               )}
-                            </div>
-                            {sub.description && (
-                              <p className="text-xs text-slate-600 mt-0.5 leading-snug line-clamp-2">
-                                {sub.description}
-                              </p>
-                            )}
-                          </div>
-                        </button>
+                            </span>
+                            <ChevronRight className="h-4 w-4 shrink-0 mt-2 text-slate-500" aria-hidden="true" />
+                          </button>
+                        </li>
                       );
                     })}
-                    </div>
-                  </div>
-
-                  {/* Right: flat quick-action panel */}
-                  <div className="bg-[color:var(--t-50)] p-4 flex flex-col justify-between gap-4 border-t sm:border-t-0 sm:border-l border-[color:var(--t-200)]">
-                    <div>
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)]">
-                          Quick action
-                        </span>
-                        <span className="hidden sm:inline-block border border-[color:var(--t-200)] bg-white px-1.5 py-0.5 text-2xs font-bold text-[color:var(--t-700)]">Esc</span>
-                      </div>
-                      <h4 className="text-sm font-bold text-[color:var(--ink)] mt-2.5">
-                        {megaTab.label}
-                      </h4>
-                      <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
-                        {megaTab.summary || `${megaTab.subItems.length} sections available in ${megaTab.label}.`}
-                      </p>
-                    </div>
+                  </ul>
+                  <div className="px-4 py-2.5 bg-[color:var(--t-bg)] flex flex-wrap items-center justify-between gap-3">
+                    <span className="min-w-0 text-xs text-slate-700">{megaTab.summary}</span>
                     {(megaTab.cta || megaTab.subItems[0]) && (
                       <button
                         type="button"
@@ -547,9 +521,9 @@ export default function DashboardHeader<T extends string>({
                           }
                           setOpenMenuId(null);
                         }}
-                        className="w-full h-10 bg-[color:var(--t-700)] hover:bg-[color:var(--t-800)] text-white border border-[color:var(--t-800)] text-sm font-bold px-3 cursor-pointer transition-colors flex items-center justify-center gap-2 rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40"
+                        className="min-h-[40px] px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer transition-colors inline-flex items-center gap-2 rounded-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40"
                       >
-                        {megaTab.cta ? megaTab.cta.label : `Open ${megaTab.subItems[0].label}`} →
+                        {megaTab.cta ? megaTab.cta.label : megaTab.subItems[0].label} →
                       </button>
                     )}
                   </div>

@@ -234,7 +234,7 @@ export default function PatientAppointmentsTab({
           onClick={() => upcoming[0] && setSelectedId(upcoming[0].id)}
           className="text-left p-3.5 border-r border-b lg:border-b-0 border-[color:var(--t-100)] hover:bg-[color:var(--t-50)] transition-colors cursor-pointer min-w-0"
         >
-          <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Next Visit')}</span>
+          <span className="text-xs font-semibold text-[color:var(--t-700)] block">{tx('Next Visit')}</span>
           <span className="text-sm font-bold text-[color:var(--ink)] tabular-nums truncate block mt-0.5">
             {upcoming[0] ? `${upcoming[0].date} · ${upcoming[0].timeSlot}` : tx('None scheduled')}
           </span>
@@ -248,7 +248,7 @@ export default function PatientAppointmentsTab({
           onClick={onOpenVitals}
           className="text-left p-3.5 lg:border-r border-b lg:border-b-0 border-[color:var(--t-100)] hover:bg-[color:var(--t-50)] transition-colors cursor-pointer min-w-0"
         >
-          <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Latest Vitals')}</span>
+          <span className="text-xs font-semibold text-[color:var(--t-700)] block">{tx('Latest Vitals')}</span>
           <span className="text-sm font-bold text-[color:var(--ink)] tabular-nums truncate block mt-0.5">
             {summary?.bp ? `BP ${summary.bp.value1}/${summary.bp.value2}` : tx('BP not logged')}
             {summary?.pulse?.value1 != null ? ` · ${summary.pulse.value1} bpm` : ''}
@@ -267,7 +267,7 @@ export default function PatientAppointmentsTab({
           onClick={onConsultNow}
           className="text-left p-3.5 border-r border-[color:var(--t-100)] hover:bg-[color:var(--t-50)] transition-colors cursor-pointer min-w-0"
         >
-          <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Instant Video Visit')}</span>
+          <span className="text-xs font-semibold text-[color:var(--t-700)] block">{tx('Instant Video Visit')}</span>
           <span className="text-sm font-bold text-[color:var(--t-700)] truncate flex items-center gap-1.5 mt-0.5">
             <Video className="h-3.5 w-3.5 shrink-0" />
             <span>{tx('See a Doctor Now')}</span>
@@ -280,7 +280,7 @@ export default function PatientAppointmentsTab({
         </button>
 
         <div className="p-3.5 flex flex-col justify-between gap-1.5 min-w-0">
-          <span className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)] block">{tx('Quick Tools')}</span>
+          <span className="text-xs font-semibold text-[color:var(--t-700)] block">{tx('Quick Tools')}</span>
           <div className="flex flex-wrap gap-1.5">
             <button
               type="button"
@@ -336,7 +336,7 @@ export default function PatientAppointmentsTab({
             </button>
           )}
           <span className="text-xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-1.5 rounded-none tabular-nums">
-            {tx('Showing')} {filteredBookings.length} {tx('of')} {baseList.length} {tx('encounters')}
+            {tx('Showing')} {filteredBookings.length} {tx('of')} {baseList.length} {tx('visits')}
           </span>
         </div>
       </div>
@@ -348,7 +348,7 @@ export default function PatientAppointmentsTab({
             <Calendar className="h-5 w-5" />
           </div>
           <h3 className="font-display font-black text-base text-[color:var(--ink)] mb-1">
-            {query ? tx('No matching encounters found') : tx('No Consultations Currently Scheduled')}
+            {query ? tx('No matching visits found') : tx('No Consultations Currently Scheduled')}
           </h3>
           <p className="text-xs text-slate-600 max-w-md mx-auto font-medium leading-relaxed mb-5">
             {query
@@ -393,7 +393,7 @@ export default function PatientAppointmentsTab({
             <div className="px-4 py-3 bg-[color:var(--t-bg)] border-b border-[color:var(--t-200)] flex items-center justify-between">
               <span className="text-xs font-mono font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
                 <Calendar className="w-3.5 h-3.5 text-[color:var(--t-600)]" />
-                {tx('Consultation Encounters')}
+                {tx('Your visits')}
               </span>
               <span className="text-xs font-mono font-bold text-slate-600 bg-white border border-[color:var(--t-200)] px-2 py-0.5">
                 {filteredBookings.length}
@@ -554,14 +554,14 @@ export default function PatientAppointmentsTab({
                 {/* Metadata Bento Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3">
-                    <span className="text-xs font-mono font-bold uppercase text-slate-500 block">{tx('Date & Slot')}</span>
+                    <span className="text-xs font-semibold text-slate-600 block">{tx('Date and time')}</span>
                     <span className="text-xs font-black text-[color:var(--ink)] font-mono mt-1 block">
                       {selectedBooking.date}
                     </span>
                     <span className="text-xs font-mono text-slate-600">{selectedBooking.timeSlot}</span>
                   </div>
                   <div className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3">
-                    <span className="text-xs font-mono font-bold uppercase text-slate-500 block">{tx('Channel')}</span>
+                    <span className="text-xs font-semibold text-slate-600 block">{tx('Channel')}</span>
                     <span className="text-xs font-black text-[color:var(--ink)] mt-1 flex items-center gap-1">
                       {isVideo ? (
                         <Video className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
@@ -575,7 +575,7 @@ export default function PatientAppointmentsTab({
                     </span>
                   </div>
                   <div className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3">
-                    <span className="text-xs font-mono font-bold uppercase text-slate-500 block">{tx('Fee & Billing')}</span>
+                    <span className="text-xs font-semibold text-slate-600 block">{tx('Fee')}</span>
                     <span className="text-xs font-black font-mono tabular-nums text-[color:var(--ink)] mt-1 block">
                       {formatMoney(selectedBooking.fee)}
                     </span>
@@ -588,18 +588,18 @@ export default function PatientAppointmentsTab({
                     </span>
                   </div>
                   <div className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3">
-                    <span className="text-xs font-mono font-bold uppercase text-slate-500 block">{tx('Booking ID')}</span>
-                    <span className="text-xs font-bold font-mono text-slate-700 mt-1 block truncate">
-                      {selectedBooking.id}
+                    <span className="text-xs font-semibold text-slate-600 block">{tx('Your doctor')}</span>
+                    <span className="text-xs font-bold text-slate-700 mt-1 block truncate" title={selectedBooking.id}>
+                      {selectedBooking.professionalName}
                     </span>
-                    <span className="text-xs text-slate-500">{tx('Verified Care')}</span>
+                    <span className="text-xs text-slate-500">{tx('Council-verified')}</span>
                   </div>
                 </div>
 
                 {/* Stated Symptoms */}
                 {selectedBooking.symptoms && (
                   <div className="bg-[color:var(--t-bg)] border border-[color:var(--t-200)] p-3.5">
-                    <span className="text-xs font-mono font-bold uppercase text-slate-500 block mb-1">
+                    <span className="text-xs font-semibold text-slate-600 block mb-1">
                       {tx('What You Shared')}
                     </span>
                     <p className="text-xs text-slate-700 font-medium leading-relaxed">

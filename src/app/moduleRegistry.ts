@@ -57,14 +57,14 @@ export const ROLE_MODULES: Record<SessionRole, RoleModuleDef[]> = {
     {
       id: 'patient_discovery',
       name: 'Find Care',
-      shortLabel: 'Directory',
+      shortLabel: 'Find Care',
       icon: Search,
       aliases: ['patient_discovery', 'registry', 'nurses', 'pharmacies', 'articles'],
     },
     {
       id: 'patient_services',
       name: 'Packages & Quotes',
-      shortLabel: 'Services',
+      shortLabel: 'Packages',
       icon: PackagePlus,
       aliases: ['patient_services', 'packages', 'assistance', 'tourism'],
     },
@@ -221,8 +221,8 @@ export const MOBILE_PRIORITY: Record<SessionRole, string[]> = {
 export const SHORT_LABEL: Record<string, string> = {
   patient_care: 'My Care',
   patient_records: 'Records',
-  patient_services: 'Services',
-  patient_discovery: 'Directory',
+  patient_services: 'Packages',
+  patient_discovery: 'Find Care',
   patient_dashboard: 'Home',
   consult: 'Consult',
   packages: 'Packages',
