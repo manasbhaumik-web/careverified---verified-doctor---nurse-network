@@ -272,7 +272,7 @@ export default function LoginPage({ onLoginSuccess }: { onLoginSuccess: (user: S
           <BrandLogo tone="onColor" size="lg" />
         </a>
         <div className="max-w-md space-y-6">
-          <p className="font-display font-black text-3xl sm:text-4xl lg:text-5xl leading-[1.08] tracking-tight">{tx.panelHeadline}</p>
+          <p className="font-display font-black text-3xl sm:text-4xl lg:text-4xl leading-[1.08] tracking-tight">{tx.panelHeadline}</p>
           <p className="text-base sm:text-lg leading-relaxed text-[color:var(--t-50)]">{tx.panelLead}</p>
           <ul className="space-y-4">
             {tx.panelPoints.map((pt, i) => {

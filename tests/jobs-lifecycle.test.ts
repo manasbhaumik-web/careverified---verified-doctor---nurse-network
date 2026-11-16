@@ -40,7 +40,7 @@ test('Job lifecycle: posting, credential eligibility, escrow booking, timesheet,
     salaryMax: 120,
     salaryPeriod: 'hour',
     shifts: [
-      { date: '2026-11-15', start: '08:00', end: '16:00' }
+      { date: new Date(Date.now() + 10 * 86_400_000).toISOString().slice(0, 10), start: '08:00', end: '16:00' } // always in the future
     ],
     description: 'Provide acute clinical triage and emergency care coverage for weekend day shift.',
     requirements: ['MMC Registered Medical Practitioner', 'Valid 2026 APC', 'ACLS Certified']
@@ -117,8 +117,8 @@ test('Locum availability directory and direct invitation', async () => {
     specialties: ['Emergency Medicine', 'General Practice'],
     minRate: 100,
     ratePeriod: 'hour',
-    availableFrom: '2026-11-01',
-    availableTo: '2026-12-31',
+    availableFrom: new Date().toISOString().slice(0, 10),
+    availableTo: new Date(Date.now() + 60 * 86_400_000).toISOString().slice(0, 10),
     note: 'Available for weekend and evening coverage.'
   });
   assert.equal(setProfileRes.status, 200);
