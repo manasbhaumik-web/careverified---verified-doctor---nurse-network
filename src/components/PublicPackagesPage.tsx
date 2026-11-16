@@ -44,6 +44,12 @@ import LocaleSwitcher from './LocaleSwitcher';
 import Footer from './Footer';
 import { loginUrl, navigate, useLocation } from '../nav';
 
+/** Offers store YYYY-MM-DD; show "31 Dec 2026". */
+const niceDate = (s: string) => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || '');
+  return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : s;
+};
+
 /**
  * Public Marketplace for Healthcare Packages, Verified Hospitals, Specialist Clinics,
  * Specialized Nurses, Doctors, and Licensed Pharmacies.
@@ -405,7 +411,7 @@ function PackageCard({ p, onEnquire }: { p: Pkg; onEnquire?: (pkg: Pkg) => void 
             }}
             className="text-xs font-bold px-3 py-1.5 bg-[color:var(--t-50)] hover:bg-[color:var(--t-600)] text-[color:var(--t-700)] hover:text-white border border-[color:var(--t-200)] transition-colors cursor-pointer"
           >
-            Details
+            View package
           </button>
         </div>
       </div>
@@ -537,7 +543,7 @@ function Detail({ p, signedIn, onEnquire, more, facilityOffers }: { p: Pkg; sign
                       <li key={o.id} className="border border-[color:var(--t-200)] bg-[color:var(--t-50)]/40 p-2.5 flex items-center justify-between gap-3">
                         <div className="min-w-0 flex-1">
                           <div className="font-bold text-sm text-[color:var(--t-700)] truncate">{o.badge_text || o.title}</div>
-                          <div className="text-xs text-slate-600">{o.valid_until ? `Valid until ${o.valid_until}` : o.title}</div>
+                          <div className="text-xs text-slate-600">{o.valid_until ? `Valid until ${niceDate(o.valid_until)}` : o.title}</div>
                         </div>
                         <button type="button" onClick={() => copyCode(o.code)} className="min-h-[36px] px-3 bg-[color:var(--t-900)] text-white font-mono font-bold text-xs cursor-pointer shrink-0">
                           {copiedCode === o.code ? 'Copied!' : o.code}
@@ -590,7 +596,7 @@ interface Slide {
 const SLIDE_MS = 5000;
 
 /** Hero Slider: dual-tone text (Black + Application color), clean natural background image without color overlay */
-function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; offers: Offer[]; copied: string; onCopy: (code: string) => void }) {
+function HeroSlider({ packages, offers, copied, onCopy, overlay }: { packages: Pkg[]; offers: Offer[]; copied: string; onCopy: (code: string) => void; overlay?: React.ReactNode }) {
   const slides = useMemo<Slide[]>(() => {
     const promoted = [...packages].sort((a, b) => Number(b.featured) - Number(a.featured) || savingPct(b) - savingPct(a)).slice(0, 3);
     const pk: Slide[] = promoted.map(p => ({
@@ -643,12 +649,12 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
               <>
                 <span className="text-slate-300">•</span>
                 <span className="text-slate-600 font-medium">Valid until</span>
-                <span className="font-bold text-[color:var(--t-600)]">{o.valid_until}</span>
+                <span className="font-bold text-[color:var(--t-600)]">{niceDate(o.valid_until)}</span>
               </>
             )}
           </div>
         ),
-        cta: linked ? 'View package' : 'Browse marketplace',
+        cta: linked ? 'View package' : 'View all packages',
         onGo: () => (linked ? navigate(`/packages?pkg=${linked.id}`) : document.getElementById('pp-sections')?.scrollIntoView({ behavior: 'smooth', block: 'start' })),
         href: linked ? `/packages?pkg=${linked.id}` : '#pp-sections',
         code: o.code,
@@ -694,7 +700,7 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
-      className="pp-hero relative h-[360px] sm:h-[310px] overflow-hidden bg-white border-b border-[color:var(--t-200)]"
+      className={`pp-hero relative overflow-hidden bg-white border-b border-[color:var(--t-200)] ${overlay ? 'h-[560px] sm:h-[420px]' : 'h-[360px] sm:h-[310px]'}`}
     >
       <h1 className="sr-only">Hospital and clinic packages</h1>
       {slides.map((s, k) => {
@@ -719,7 +725,7 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
             {/* Readability fade: natural white scrim on the left so Black & Brand text stays crisp with NO color overlay tint */}
             <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-white/10 sm:from-white/95 sm:via-white/70 sm:to-transparent pointer-events-none" />
 
-            <div className={`relative ${wrap} h-full flex items-center py-6`}>
+            <div className={`relative ${wrap} h-full flex items-center ${overlay ? 'pt-6 pb-56 sm:pb-36' : 'py-6'}`}>
               <div className="w-full max-w-2xl flex flex-col gap-2.5 z-10">
                 <span className={`self-start text-xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 border ${s.kind === 'offer' ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)]' : 'bg-white text-[color:var(--t-700)] border-[color:var(--t-200)] shadow-2xs'}`}>
                   {s.badge}
@@ -758,7 +764,7 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
 
       {/* Floating Carousel Controls */}
       {n > 1 && (
-        <div className="absolute inset-x-0 bottom-4 sm:bottom-6 z-20 pointer-events-none">
+        <div className={`absolute inset-x-0 z-20 pointer-events-none ${overlay ? 'bottom-60 sm:bottom-40' : 'bottom-4 sm:bottom-6'}`}>
           <div className={`${wrap} flex items-center justify-end gap-3`}>
             {/* Progress indicators */}
             <div className="pointer-events-auto hidden sm:flex items-center h-8 gap-1.5">
@@ -810,6 +816,11 @@ function HeroSlider({ packages, offers, copied, onCopy }: { packages: Pkg[]; off
               </button>
             </div>
           </div>
+        </div>
+      )}
+      {overlay && (
+        <div className="absolute inset-x-0 bottom-0 z-30 bg-white/95 backdrop-blur-sm border-t border-[color:var(--t-200)]">
+          <div className={`${wrap} py-3 sm:py-4`}>{overlay}</div>
         </div>
       )}
     </section>
@@ -1245,52 +1256,50 @@ function SectionHeader({
   );
 }
 
-// --------------------------------------------------------------------------
-// DEDICATED PAGE HEADER FOR INDIVIDUAL SECTION VIEW
-// --------------------------------------------------------------------------
-function DedicatedPageHeader({
+/** One banner per directory page: photo + short intro, with the title, count and search/filters overlaid on its lower edge. */
+function DirectoryBanner({
   title,
   subtitle,
-  totalCount,
+  image,
+  statusText,
   icon: Icon,
   onBack,
+  children,
 }: {
   title: string;
   subtitle: string;
-  totalCount: number;
+  image: string;
+  statusText: React.ReactNode;
   icon: React.ComponentType<{ className?: string }>;
   onBack: () => void;
+  children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white border-b border-[color:var(--t-200)] py-8 shadow-xs">
-      <div className={wrap}>
-        <button
-          type="button"
-          onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-sm font-bold text-[color:var(--t-700)] hover:underline mb-4 cursor-pointer"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Packages Marketplace Overview
-        </button>
-
-        <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <div>
-            <span className="inline-block text-xs font-extrabold uppercase tracking-wide text-white bg-[color:var(--t-700)] px-2.5 py-1 mb-2">
-              Dedicated Directory
-            </span>
-            <h1 className="font-display font-black text-3xl sm:text-4xl text-slate-900 flex items-center gap-3">
-              <Icon className="h-8 w-8 text-[color:var(--t-600)] shrink-0" aria-hidden="true" />
-              <TwoTone text={title} />
-            </h1>
-            <p className="text-base text-slate-600 max-w-3xl mt-2 leading-relaxed">{subtitle}</p>
+    <section className="relative overflow-hidden bg-white border-b border-[color:var(--t-200)]">
+      <img src={image} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover" />
+      <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-white/10 pointer-events-none" />
+      <div className={`relative ${wrap} pt-10 pb-8 sm:pb-12`}>
+        <p className="max-w-2xl text-sm sm:text-base text-slate-800 font-medium leading-relaxed line-clamp-3">{subtitle}</p>
+      </div>
+      <div className="relative z-10 bg-white/95 backdrop-blur-sm border-t border-[color:var(--t-200)]">
+        <div className={`${wrap} py-3 sm:py-4 space-y-3`}>
+          <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
+            <div className="min-w-0">
+              <button type="button" onClick={onBack} className="inline-flex items-center gap-1.5 text-xs font-bold text-[color:var(--t-700)] hover:underline cursor-pointer">
+                <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+                All packages and directory
+              </button>
+              <h1 className="font-display font-black text-xl sm:text-2xl text-slate-900 flex items-center gap-2">
+                <Icon className="h-5 w-5 text-[color:var(--t-600)] shrink-0" aria-hidden="true" />
+                <TwoTone text={title} />
+              </h1>
+            </div>
+            <p className="text-sm text-slate-700" role="status">{statusText}</p>
           </div>
-          <div className="text-right">
-            <span className="block text-3xl font-display font-black text-[color:var(--t-700)]">{totalCount}</span>
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Verified Providers</span>
-          </div>
+          <div className="grid gap-2.5 sm:grid-cols-2">{children}</div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -1491,7 +1500,58 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
           <>
             {/* Top Hero Banner - only on Overview or Packages page */}
             {(activeView === 'overview' || activeView === 'packages') && (
-              <HeroSlider packages={list} offers={offers} copied={copied} onCopy={copy} />
+              <HeroSlider
+                packages={list}
+                offers={offers}
+                copied={copied}
+                onCopy={copy}
+                overlay={activeView === 'packages' ? (
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
+                      <div className="min-w-0">
+                        <button type="button" onClick={() => goToView('overview')} className="inline-flex items-center gap-1.5 text-xs font-bold text-[color:var(--t-700)] hover:underline cursor-pointer">
+                          <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+                          All packages and directory
+                        </button>
+                        <h2 className="font-display font-black text-xl sm:text-2xl text-slate-900 flex items-center gap-2">
+                          <PackagePlus className="h-5 w-5 text-[color:var(--t-600)] shrink-0" aria-hidden="true" />
+                          <TwoTone text="Medical & Surgical Packages" />
+                        </h2>
+                      </div>
+                      <p className="text-sm text-slate-700" role="status">
+                        Showing <b>{shownPackages.length}</b> of {list.length} packages
+                      </p>
+                    </div>
+                    <div className="grid gap-2.5 sm:grid-cols-3">
+                      <div className="relative">
+                        <Search className="h-4 w-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+                        <input
+                          type="search"
+                          value={q}
+                          onChange={e => setQ(e.target.value)}
+                          aria-label="Search packages by procedure or hospital"
+                          placeholder="Search by procedure or hospital"
+                          style={{ paddingLeft: 36 }}
+                          className={`${control} w-full`}
+                        />
+                      </div>
+                      <div>
+                        <CustomSelect value={category} onChange={e => setCategory(e.target.value)} className={`form-select ${control} w-full`}>
+                          {categories.map(c => <option key={c} value={c}>{c === 'All' ? 'All specialties' : c}</option>)}
+                        </CustomSelect>
+                      </div>
+                      <div>
+                        <CustomSelect value={sort} onChange={e => setSort(e.target.value as typeof sort)} className={`form-select ${control} w-full`}>
+                          <option value="featured">Featured first</option>
+                          <option value="price-asc">Price, low to high</option>
+                          <option value="price-desc">Price, high to low</option>
+                          <option value="saving">Biggest saving</option>
+                        </CustomSelect>
+                      </div>
+                    </div>
+                  </div>
+                ) : undefined}
+              />
             )}
 
             
@@ -1762,45 +1822,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
             {/* ====================================================================== */}
             {activeView === 'packages' && (
               <>
-                <DedicatedPageHeader
-                  title="Medical & Surgical Packages"
-                  subtitle="Browse Malaysia's complete directory of licence-verified hospital and clinic healthcare packages with fixed upfront pricing, inclusions, and preparation instructions."
-                  totalCount={list.length}
-                  icon={PackagePlus}
-                  onBack={() => goToView('overview')}
-                />
                 <div className={`${wrap} py-8 space-y-6`}>
-                  {/* Search and filters */}
-                  <div className="bg-white border border-[color:var(--t-200)] p-4 grid gap-3 sm:grid-cols-3 shadow-xs">
-                    <div className="relative">
-                      <Search className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="search"
-                        value={q}
-                        onChange={e => setQ(e.target.value)}
-                        placeholder="Filter packages by procedure or hospital..."
-                        className={`${control} w-full pl-9`}
-                      />
-                    </div>
-                    <div>
-                      <CustomSelect value={category} onChange={e => setCategory(e.target.value)} className={`form-select ${control} w-full`}>
-                        {categories.map(c => <option key={c} value={c}>{c === 'All' ? 'All specialties' : c}</option>)}
-                      </CustomSelect>
-                    </div>
-                    <div>
-                      <CustomSelect value={sort} onChange={e => setSort(e.target.value as typeof sort)} className={`form-select ${control} w-full`}>
-                        <option value="featured">Featured first</option>
-                        <option value="price-asc">Price, low to high</option>
-                        <option value="price-desc">Price, high to low</option>
-                        <option value="saving">Biggest saving</option>
-                      </CustomSelect>
-                    </div>
-                  </div>
-
-                  <p className="text-sm text-slate-600" role="status">
-                    Showing <b>{shownPackages.length}</b> of {list.length} packages
-                  </p>
-
                   <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {shownPackages.map(p => (
                       <li key={p.id} className="min-w-0">
@@ -1820,24 +1842,23 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
             {/* ====================================================================== */}
             {activeView === 'clinics' && (
               <>
-                <DedicatedPageHeader
+                <DirectoryBanner
                   title="Verified Specialist & Wellness Clinics"
                   subtitle="Official Ministry of Health (MOH) checked private clinics offering family medicine, pediatrics, well-woman care, non-surgical orthopedics, and clinical dermatology."
-                  totalCount={clinics.length}
+                  image="/assets/clinics_hospital_hero_bg.jpg"
                   icon={Stethoscope}
+                  statusText={<>Showing <b>{filteredClinics.length}</b> verified clinics</>}
                   onBack={() => goToView('overview')}
-                />
-                <div className={`${wrap} py-8 space-y-6`}>
-                  {/* Search and filters */}
-                  <div className="bg-white border border-[color:var(--t-200)] p-4 grid gap-3 sm:grid-cols-2 shadow-xs">
+                >
                     <div className="relative">
-                      <Search className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <Search className="h-4 w-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
                       <input
                         type="search"
                         value={q}
                         onChange={e => setQ(e.target.value)}
                         placeholder="Search clinic by name or services..."
-                        className={`${control} w-full pl-9`}
+                        style={{ paddingLeft: 36 }}
+                        className={`${control} w-full`}
                       />
                     </div>
                     <div>
@@ -1849,12 +1870,8 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                         <option value="Johor Bahru">Johor Bahru (Johor)</option>
                       </CustomSelect>
                     </div>
-                  </div>
-
-                  <p className="text-sm text-slate-600" role="status">
-                    Showing <b>{filteredClinics.length}</b> verified clinics
-                  </p>
-
+                </DirectoryBanner>
+                <div className={`${wrap} py-8 space-y-6`}>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredClinics.map(c => (
                       <ClinicCard key={c.id} c={c} onPickClinic={handlePickFacility} onEnquire={setEnquiry} />
@@ -1869,24 +1886,23 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
             {/* ====================================================================== */}
             {activeView === 'hospitals' && (
               <>
-                <DedicatedPageHeader
+                <DirectoryBanner
                   title="Accredited Partner Hospitals"
                   subtitle="Tertiary medical centers benchmarked by Joint Commission International (JCI) and Malaysian Society for Quality in Health (MSQH) with multi-disciplinary clinical departments."
-                  totalCount={hospitals.length}
+                  image="/assets/clinics_hospital_hero_bg.jpg"
                   icon={Building2}
+                  statusText={<>Showing <b>{filteredHospitals.length}</b> tertiary medical centers</>}
                   onBack={() => goToView('overview')}
-                />
-                <div className={`${wrap} py-8 space-y-6`}>
-                  {/* Search and filters */}
-                  <div className="bg-white border border-[color:var(--t-200)] p-4 grid gap-3 sm:grid-cols-2 shadow-xs">
+                >
                     <div className="relative">
-                      <Search className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <Search className="h-4 w-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
                       <input
                         type="search"
                         value={q}
                         onChange={e => setQ(e.target.value)}
                         placeholder="Search hospital by name or city..."
-                        className={`${control} w-full pl-9`}
+                        style={{ paddingLeft: 36 }}
+                        className={`${control} w-full`}
                       />
                     </div>
                     <div>
@@ -1898,12 +1914,8 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                         <option value="Johor Bahru">Johor Bahru (Johor)</option>
                       </CustomSelect>
                     </div>
-                  </div>
-
-                  <p className="text-sm text-slate-600" role="status">
-                    Showing <b>{filteredHospitals.length}</b> tertiary medical centers
-                  </p>
-
+                </DirectoryBanner>
+                <div className={`${wrap} py-8 space-y-6`}>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredHospitals.map(h => (
                       <HospitalCard key={h.id} h={h} onPickHospital={handlePickFacility} onEnquire={setEnquiry} />
@@ -1918,24 +1930,23 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
             {/* ====================================================================== */}
             {activeView === 'nurses' && (
               <>
-                <DedicatedPageHeader
+                <DirectoryBanner
                   title="Specialized Registered Nurses & Home Care"
                   subtitle="Lembaga Jururawat Malaysia (LJM) verified nursing sisters and staff nurses specializing in critical care, stoma & wound healing, palliative hospice, orthopaedic rehabilitation, and postnatal lactation."
-                  totalCount={nurses.length}
+                  image="/assets/practitioners_hero_bg.jpg"
                   icon={HeartPulse}
+                  statusText={<>Showing <b>{filteredNurses.length}</b> LJM verified nurses</>}
                   onBack={() => goToView('overview')}
-                />
-                <div className={`${wrap} py-8 space-y-6`}>
-                  {/* Search and filters */}
-                  <div className="bg-white border border-[color:var(--t-200)] p-4 grid gap-3 sm:grid-cols-2 shadow-xs">
+                >
                     <div className="relative">
-                      <Search className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <Search className="h-4 w-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
                       <input
                         type="search"
                         value={q}
                         onChange={e => setQ(e.target.value)}
                         placeholder="Search nurse by name or clinical specialty..."
-                        className={`${control} w-full pl-9`}
+                        style={{ paddingLeft: 36 }}
+                        className={`${control} w-full`}
                       />
                     </div>
                     <div>
@@ -1949,12 +1960,8 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                         <option value="Johor Bahru">Johor Bahru</option>
                       </CustomSelect>
                     </div>
-                  </div>
-
-                  <p className="text-sm text-slate-600" role="status">
-                    Showing <b>{filteredNurses.length}</b> LJM verified nurses
-                  </p>
-
+                </DirectoryBanner>
+                <div className={`${wrap} py-8 space-y-6`}>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredNurses.map(n => (
                       <NurseCard key={n.id} n={n} signedIn={signedIn} onEnquire={setEnquiry} />
@@ -1969,24 +1976,23 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
             {/* ====================================================================== */}
             {activeView === 'doctors' && (
               <>
-                <DedicatedPageHeader
+                <DirectoryBanner
                   title="Specialist Doctors & Medical Consultants"
                   subtitle="Malaysian Medical Council (MMC) registered consultants across Cardiology, Medical Oncology, Orthopaedic Surgery, Gastroenterology, Obstetrics & Gynaecology, Paediatrics, and Endocrinology."
-                  totalCount={doctors.length}
+                  image="/assets/practitioners_hero_bg.jpg"
                   icon={UserCheck}
+                  statusText={<>Showing <b>{filteredDoctors.length}</b> MMC verified specialists</>}
                   onBack={() => goToView('overview')}
-                />
-                <div className={`${wrap} py-8 space-y-6`}>
-                  {/* Search and filters */}
-                  <div className="bg-white border border-[color:var(--t-200)] p-4 grid gap-3 sm:grid-cols-2 shadow-xs">
+                >
                     <div className="relative">
-                      <Search className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <Search className="h-4 w-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
                       <input
                         type="search"
                         value={q}
                         onChange={e => setQ(e.target.value)}
                         placeholder="Search doctor by name or medical specialty..."
-                        className={`${control} w-full pl-9`}
+                        style={{ paddingLeft: 36 }}
+                        className={`${control} w-full`}
                       />
                     </div>
                     <div>
@@ -1998,12 +2004,8 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                         <option value="Johor Bahru">Johor Bahru</option>
                       </CustomSelect>
                     </div>
-                  </div>
-
-                  <p className="text-sm text-slate-600" role="status">
-                    Showing <b>{filteredDoctors.length}</b> MMC verified specialists
-                  </p>
-
+                </DirectoryBanner>
+                <div className={`${wrap} py-8 space-y-6`}>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredDoctors.map(d => (
                       <DoctorCard key={d.id} d={d} signedIn={signedIn} onEnquire={setEnquiry} />
@@ -2018,13 +2020,35 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
             {/* ====================================================================== */}
             {activeView === 'pharmacies' && (
               <>
-                <DedicatedPageHeader
+                <DirectoryBanner
                   title="Licensed Community Pharmacies & Active Offers"
                   subtitle="NPRA certified dispensaries with temperature-controlled cold-chain logistics, diabetic testing, home stroke care, prescription delivery, and active promotional vouchers."
-                  totalCount={pharmacies.length}
+                  image="/assets/pharmacies_hero_bg.jpg"
                   icon={Pill}
+                  statusText={<>Showing <b>{filteredPharmacies.length}</b> licensed community pharmacies</>}
                   onBack={() => goToView('overview')}
-                />
+                >
+                    <div className="relative">
+                      <Search className="h-4 w-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+                      <input
+                        type="search"
+                        value={q}
+                        onChange={e => setQ(e.target.value)}
+                        placeholder="Search pharmacy by name or service..."
+                        style={{ paddingLeft: 36 }}
+                        className={`${control} w-full`}
+                      />
+                    </div>
+                    <div>
+                      <CustomSelect value={cityFilter} onChange={e => setCityFilter(e.target.value)} className={`form-select ${control} w-full`}>
+                        <option value="All">All Cities</option>
+                        <option value="Kuala Lumpur">Kuala Lumpur</option>
+                        <option value="Petaling Jaya">Petaling Jaya (Selangor)</option>
+                        <option value="George Town">George Town (Penang)</option>
+                        <option value="Johor Bahru">Johor Bahru (Johor)</option>
+                      </CustomSelect>
+                    </div>
+                </DirectoryBanner>
                 <div className={`${wrap} py-8 space-y-8`}>
                   {/* Active Voucher Offers Section */}
                   {offers.length > 0 && (
@@ -2044,7 +2068,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                                 {o.badge_text || 'Active Promo'}
                               </span>
                               <div className="font-bold text-sm text-slate-900 line-clamp-2 leading-snug">{o.title}</div>
-                              {o.valid_until && <div className="text-xs text-slate-500 mt-1">Valid until {o.valid_until}</div>}
+                              {o.valid_until && <div className="text-xs text-slate-500 mt-1">Valid until {niceDate(o.valid_until)}</div>}
                             </div>
                             <div className="mt-3 pt-2.5 border-t border-[color:var(--t-200)] flex items-center justify-between gap-2">
                               <span className="font-mono text-xs font-bold text-[color:var(--t-800)]">{o.code}</span>
@@ -2061,33 +2085,6 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                       </div>
                     </div>
                   )}
-
-                  {/* Search and filters */}
-                  <div className="bg-white border border-[color:var(--t-200)] p-4 grid gap-3 sm:grid-cols-2 shadow-xs">
-                    <div className="relative">
-                      <Search className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="search"
-                        value={q}
-                        onChange={e => setQ(e.target.value)}
-                        placeholder="Search pharmacy by name or service..."
-                        className={`${control} w-full pl-9`}
-                      />
-                    </div>
-                    <div>
-                      <CustomSelect value={cityFilter} onChange={e => setCityFilter(e.target.value)} className={`form-select ${control} w-full`}>
-                        <option value="All">All Cities</option>
-                        <option value="Kuala Lumpur">Kuala Lumpur</option>
-                        <option value="Petaling Jaya">Petaling Jaya (Selangor)</option>
-                        <option value="George Town">George Town (Penang)</option>
-                        <option value="Johor Bahru">Johor Bahru (Johor)</option>
-                      </CustomSelect>
-                    </div>
-                  </div>
-
-                  <p className="text-sm text-slate-600" role="status">
-                    Showing <b>{filteredPharmacies.length}</b> licensed community pharmacies
-                  </p>
 
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
                     {filteredPharmacies.map(ph => (

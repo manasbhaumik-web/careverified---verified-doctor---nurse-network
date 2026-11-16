@@ -111,7 +111,7 @@ const T: Record<Lang, {
     fxDisclaimer: 'Indicative reference rates only. Final itemised quotes and inpatient settlement are conducted directly with your chosen hospital in MYR (via Visa, Mastercard, Amex, or international telegraphic transfer).',
     packages: [
       { title: 'Executive Full-Body & Tumour Marker Screening', duration: '1 Day Outpatient', includes: '60+ blood panels, ECG, ultrasound, chest X-ray & specialist review' },
-      { title: 'Comprehensive Cardiac CT Angiogram & Echo Suite', duration: '1–2 Days Outpatient', includes: 'Coronary CT angiogram, 2D echocardiogram, stress test & cardiologist consult' },
+      { title: 'Comprehensive Cardiac CT Angiogram & Calcium Score', duration: '1 Day Outpatient', includes: 'Coronary CT angiogram, coronary calcium score & cardiologist review' },
       { title: 'Robotic / Total Knee Replacement Package', duration: '4–5 Days Inpatient', includes: 'Surgeon & anaesthetist fees, implant, private room & initial physiotherapy' },
       { title: 'IVF & Fertility Assessment + Cycle Package', duration: '2–3 Weeks Outpatient', includes: 'Hormonal profile, stimulation monitoring, oocyte retrieval & embryo transfer' },
     ],

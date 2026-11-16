@@ -45,7 +45,7 @@
    *   text-3xl  30px  hero headings (phones)
    *   text-4xl  36px  hero headings (desktop)
    * One line height per step, set here so every use of a step looks the same. */
-  --text-2xs: 0.625rem; --text-2xs--line-height: 0.875rem;
+  --text-2xs: 0.75rem; --text-2xs--line-height: 1rem;
   --text-xs: 0.75rem;   --text-xs--line-height: 1rem;
   --text-sm: 0.875rem;  --text-sm--line-height: 1.25rem;
   --text-base: 1rem;    --text-base--line-height: 1.5rem;
@@ -258,7 +258,7 @@ input:not(.rounded-full):not([class*="rounded-full"]),
 select,
 textarea,
 div:not(.animate-ping):not(.animate-pulse):not(.status-dot):not(.live-dot):not(.pulse-dot):not(.notification-icon):not(.active-signal):not(.rounded-full):not([class*="rounded-full"]),
-span:not(.animate-ping):not(.animate-pulse):not(.status-dot):not(.live-dot):not(.pulse-dot):not(.notification-icon):not(.active-signal):not(.rounded-full):not([class*="rounded-full"]),
+span:not(.count-badge):not(.animate-ping):not(.animate-pulse):not(.status-dot):not(.live-dot):not(.pulse-dot):not(.notification-icon):not(.active-signal):not(.rounded-full):not([class*="rounded-full"]),
 header,
 nav,
 aside,
@@ -405,11 +405,13 @@ footer button.bg-slate-800:hover,
 :root[data-theme="light-cyan"],
 :root[data-theme="cyan"] {
   --ink: #1E293B; --ink-2: #334155; --t-bright: 1; --page: #F8FAFC;
-  --e-50: #ECFDF5; --e-200: #A7F3D0; --e-600: #059669; --e-700: #047857; --e-800: #065F46;
+  --e-50: #ECFDF5; --e-200: #A7F3D0; --e-600: #047857; --e-700: #047857; --e-800: #065F46;
   --dark: #0F172A;
-  --t-50: #ECFEFF; --t-100: #CFFAFE; --t-200: #A5F3FC; --t-300: #67E8F9; --t-400: #22D3EE;
-  --t-500: #06B6D4; --t-600: #0891B2; --t-700: #0E7490; --t-800: #155E75; --t-900: #164E63;
-  --t-bg: color-mix(in srgb, var(--t-50) 35%, #EEF3F7); --t-hue: 188deg;
+  /* Neutral surface: slate-200 borders and a cool off-white page, so cards and chips stand apart from the page. */
+  /* Action shades start at cyan-700 (white on it is 5.4:1; on cyan-600 it was 3.7:1). */
+  --t-50: #ECFEFF; --t-100: #CFFAFE; --t-200: #E2E8F0; --t-300: #67E8F9; --t-400: #22D3EE;
+  --t-500: #06B6D4; --t-600: #0E7490; --t-700: #155E75; --t-800: #164E63; --t-900: #083344;
+  --t-bg: #F4F7FA; --t-hue: 188deg;
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
   --t-text: var(--t-600);
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
@@ -1147,3 +1149,28 @@ a, button, [role="button"], summary, label, select, input { touch-action: manipu
     url('/assets/clinics_hospital_hero_bg.jpg') center / cover no-repeat,
     var(--t-700);
 }
+/* Count badge: a number in a filled circle (grows to a pill for 3+ digits). Add a colour with utilities. */
+.count-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 1.25rem; height: 1.25rem; padding: 0 0.375rem; border-radius: 9999px !important; font-size: 0.75rem; line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; font-family: inherit; }
+
+/* Workspace icons and quiet text: slate-500 (4.8:1) instead of slate-400 (2.6:1). */
+#main-content .text-slate-400 { color: #64748B; }
+
+/* Filled status chip: any icon inside takes the chip's white text colour. */
+.badge-success svg { color: inherit !important; }
+
+/* Touch screens: controls in the workspace are at least 44px tall (WCAG 2.5.5). */
+@media (pointer: coarse) {
+  #main-content button:not(.count-badge):not([aria-hidden="true"]),
+  #main-content [role="tab"],
+  #main-content select,
+  #main-content input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) { min-height: 44px; }
+}
+
+/* Sub-tab strip under a workspace header: white row, teal underline on the active tab. */
+.subtab-strip { background-color: #fff; border-top: 1px solid var(--t-200); }
+
+/* Patient workspace: calmer, larger type (16px body, 13px labels) - same scale steps, just one notch up inside this area. */
+#patient-dashboard-root .text-sm { font-size: 1rem; line-height: 1.5rem; }
+#patient-dashboard-root .text-xs,
+#patient-dashboard-root .text-2xs { font-size: 0.8125rem; line-height: 1.25rem; }
+#patient-dashboard-root p, #patient-dashboard-root li { line-height: 1.55; }

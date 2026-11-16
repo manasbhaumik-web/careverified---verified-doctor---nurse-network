@@ -163,10 +163,10 @@ export default function AdminOps({
             >
               {t.label}
               {t.id === 'roster' && openSos.length > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 text-2xs bg-rose-100 text-rose-700 font-mono font-bold rounded-none">{openSos.length}</span>
+                <span className="count-badge ml-1.5 bg-rose-100 text-rose-700">{openSos.length}</span>
               )}
               {t.id === 'pharmacies' && pharmacies.length > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 text-2xs bg-slate-100 text-slate-700 font-mono font-bold rounded-none">{pharmacies.length}</span>
+                <span className="count-badge ml-1.5 bg-slate-100 text-slate-700">{pharmacies.length}</span>
               )}
             </button>
           ))}

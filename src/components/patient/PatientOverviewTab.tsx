@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Video, Pill, MessageSquare, Store } from 'lucide-react';
+import { Video, Pill, MessageSquare, Store, CalendarPlus, HeartPulse } from 'lucide-react';
 import { Booking, DoctorProfile, NurseProfile } from '../../types';
-import { useTr } from '../../locale';
+import { useTr, formatDate } from '../../locale';
 
 interface PatientOverviewTabProps {
   userName: string;
@@ -16,6 +16,9 @@ interface PatientOverviewTabProps {
   patientConditions: string[];
   onCallStatus: { onlineDoctors: number; consultFee: number } | null;
   onOpenAppointments: () => void;
+  onOpenLiveRoom: () => void;
+  onFindDoctor: () => void;
+  onOpenRecords: () => void;
   onConsultNow: () => void;
   onOpenTriage: () => void;
   onOpenMessages: () => void;
@@ -26,10 +29,18 @@ interface PatientOverviewTabProps {
   onSelectProfessional: (id: string) => void;
 }
 
-const card = 'bg-white border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] p-4 sm:p-5 flex flex-col gap-3.5 rounded-none';
-const eyebrow = 'text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)]';
+const card = 'bg-white border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] p-5 sm:p-6 flex flex-col gap-4 rounded-none';
+const eyebrow = 'text-xs font-semibold text-[color:var(--t-700)]';
 const btnP = 'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white border border-[color:var(--t-700)] px-3.5 py-2 text-xs font-bold cursor-pointer transition-colors rounded-none';
 const btnS = 'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-3 py-2 text-xs font-bold cursor-pointer transition-colors rounded-none';
+
+/** Bookings store YYYY-MM-DD; show it the way people say it, e.g. "Sun 12 Jul". */
+const visitDay = (d: string, withYear = false) => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d || '');
+  if (!m) return d;
+  const dt = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  return formatDate(dt, withYear ? { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' } : { weekday: 'short', day: 'numeric', month: 'short' });
+};
 
 export default function PatientOverviewTab(props: PatientOverviewTabProps) {
   const tx = useTr();
@@ -39,6 +50,8 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
   } = props;
 
   const next = upcoming[0];
+  const nextMode = String(next?.mode || '').toLowerCase();
+  const nextIsVideo = nextMode.includes('video') || nextMode.includes('tele') || nextMode.includes('online');
   const meds: { key: string; name: string; note: string }[] = activePrescriptions.flatMap((rx: any) =>
     (Array.isArray(rx.items) && rx.items.length
       ? rx.items.map((it: any, i: number) => ({ key: `${rx.id}-${i}`, name: it.name, note: it.instructions || rx.diagnosis || '' }))
@@ -63,25 +76,25 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
   const dateText = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
 
   const kpis = [
-    { label: tx('Next Consultation'), value: next ? `${next.date} · ${next.timeSlot}` : tx('None scheduled'), sub: next ? next.professionalName : tx('Book a visit to get started') },
-    { label: tx('Active Prescriptions'), value: String(summary?.activeRx ?? activePrescriptions.length ?? 0), sub: meds.slice(0, 2).map(m => m.name).join(' · ') || tx('No active medicines') },
-    { label: tx('Blood Pressure'), value: bpText, sub: summary?.pulse?.value1 != null ? `${tx('HR')} ${summary.pulse.value1} bpm` : tx('No recent reading') },
-    { label: tx('Daily Adherence'), value: `${takenCount} / ${meds.length}`, sub: tx('Doses logged today') },
+    { label: tx('Next visit'), value: next ? visitDay(next.date) : tx('None scheduled'), sub: next ? `${next.timeSlot} · ${next.professionalName}` : tx('Book a visit to get started') },
+    { label: tx('Active medicines'), value: String(summary?.activeRx ?? activePrescriptions.length ?? 0), sub: meds.slice(0, 2).map(m => m.name).join(' · ') || tx('No active medicines') },
+    { label: tx('Blood pressure'), value: bpText, sub: summary?.pulse?.value1 != null ? `${tx('HR')} ${summary.pulse.value1} bpm` : tx('No recent reading') },
+    { label: tx('Medicines taken today'), value: `${takenCount} / ${meds.length}`, sub: tx('Doses logged today') },
   ];
 
   return (
-    <div id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" tabIndex={0} className="space-y-5">
+    <div id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" tabIndex={0} className="space-y-8">
       {/* Title strip */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className={eyebrow}>{tx('Patient Care Overview')} · {dateText}</div>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-[color:var(--ink)]">{greeting}, {userName}</h1>
+          <div className={eyebrow}>{dateText}</div>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-[color:var(--ink)]">{greeting}, {userName}</h1>
         </div>
         <div className="flex flex-wrap gap-2">
           {activeConsult && (
-            <span className="bg-amber-50 text-amber-900 border border-amber-300 text-2xs font-bold uppercase px-2.5 py-1.5 rounded-none">{tx('Consult in progress')}</span>
+            <span className="bg-amber-50 text-amber-900 border border-amber-300 text-xs font-bold px-2.5 py-1.5 rounded-none">{tx('Consult in progress')}</span>
           )}
-          <span className="bg-[color:var(--t-50)] text-[color:var(--t-800)] border border-[color:var(--t-200)] text-2xs font-bold uppercase px-2.5 py-1.5 rounded-none">
+          <span className="bg-[color:var(--t-50)] text-[color:var(--t-800)] border border-[color:var(--t-200)] text-xs font-bold px-2.5 py-1.5 rounded-none">
             {onCallStatus ? tx('{n} doctors online', { n: onCallStatus.onlineDoctors }) : tx('Checking doctor availability')}
           </span>
         </div>
@@ -90,7 +103,7 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
       {/* KPI ribbon */}
       <section className="grid grid-cols-2 lg:grid-cols-4 bg-white border border-[color:var(--t-200)] rounded-none" aria-label={tx('Key figures')}>
         {kpis.map((k, i) => (
-          <div key={k.label} className={`p-4 flex flex-col gap-1 min-w-0 ${i < kpis.length - 1 ? 'lg:border-r border-[color:var(--t-100)]' : ''} ${i % 2 === 0 ? 'border-r lg:border-r' : ''} border-[color:var(--t-100)]`}>
+          <div key={k.label} className={`p-5 flex flex-col gap-1.5 min-w-0 ${i < kpis.length - 1 ? 'lg:border-r border-[color:var(--t-100)]' : ''} ${i % 2 === 0 ? 'border-r lg:border-r' : ''} border-[color:var(--t-100)]`}>
             <div className={eyebrow}>{k.label}</div>
             <div className="text-xl font-bold text-[color:var(--ink)] tabular-nums truncate">{k.value}</div>
             <div className="text-xs text-[color:var(--ink-2)] truncate">{k.sub}</div>
@@ -98,28 +111,52 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
         ))}
       </section>
 
+      {/* What would you like to do? */}
+      <section aria-labelledby="ov-todo" className="space-y-2.5">
+        <h2 id="ov-todo" className="text-base font-bold text-[color:var(--ink)]">{tx('What would you like to do?')}</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { icon: CalendarPlus, label: tx('Book a doctor'), sub: tx('Find a verified doctor and pick a time'), onClick: props.onFindDoctor, primary: true },
+            { icon: HeartPulse, label: tx('Check my symptoms'), sub: tx('Answer a few questions for guidance'), onClick: props.onOpenTriage },
+            { icon: Pill, label: tx('My medicines'), sub: tx('{n} active prescriptions', { n: activePrescriptions.length }), onClick: props.onOpenPrescriptions },
+            { icon: MessageSquare, label: tx('Messages'), sub: tx('Talk to your care team'), onClick: props.onOpenMessages },
+          ].map(t => (
+            <button key={t.label} type="button" onClick={t.onClick} className={`text-left min-h-[104px] p-5 flex flex-col gap-2.5 cursor-pointer transition-colors rounded-none border ${t.primary ? 'bg-[color:var(--t-600)] text-white border-[color:var(--t-700)] hover:bg-[color:var(--t-700)]' : 'bg-white text-[color:var(--ink)] border-[color:var(--t-200)] hover:bg-[color:var(--t-50)]'}`}>
+              <t.icon className={`h-5 w-5 ${t.primary ? 'text-white' : 'text-[color:var(--t-600)]'}`} aria-hidden="true" />
+              <span className="text-sm font-bold">{t.label}</span>
+              <span className={`text-xs ${t.primary ? 'text-white/90' : 'text-[color:var(--ink-2)]'}`}>{t.sub}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
       {/* 12-column grid */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left */}
-        <div className="lg:col-span-5 flex flex-col gap-4">
-          <article className="bg-[color:var(--t-600)] text-white border border-[color:var(--t-700)] border-t-[3px] border-t-[color:var(--t-300)] p-5 flex flex-col justify-between gap-4 rounded-none">
+        <div className="lg:col-span-5 flex flex-col gap-6">
+          <article className="bg-[color:var(--t-600)] text-white border border-[color:var(--t-700)] border-t-[3px] border-t-[color:var(--t-300)] p-6 sm:p-8 flex flex-col justify-between gap-6 rounded-none">
             {next ? (
               <>
                 <div>
-                  <span className="inline-block bg-white/20 border border-white/30 text-2xs font-bold uppercase tracking-wider px-2 py-1">{tx('Next confirmed visit')}</span>
-                  <h2 className="mt-3 mb-1 text-xl font-bold">{next.professionalName}</h2>
-                  <p className="text-xs opacity-90">{next.mode} · {next.date} · {next.timeSlot}</p>
+                  <span className="inline-block bg-white/20 border border-white/30 text-xs font-bold px-2 py-1">{tx('Your next visit')}</span>
+                  <h2 className="mt-4 mb-1.5 text-2xl font-bold">{next.professionalName}</h2>
+                  <p className="text-sm opacity-90">{tx(String(next.mode))} · {visitDay(next.date, true)} · {next.timeSlot}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <button type="button" onClick={props.onOpenAppointments} className="bg-white text-[color:var(--t-800)] px-3.5 py-2 text-xs font-bold cursor-pointer hover:bg-[color:var(--t-50)] rounded-none">{tx('View appointment')}</button>
-                  <button type="button" onClick={() => props.onSelectProfessional(next.professionalId)} className="border border-white/50 text-white px-3 py-2 text-xs font-bold cursor-pointer hover:bg-white/10 rounded-none">{tx('Doctor profile')}</button>
+                  {nextIsVideo ? (
+                    <button type="button" onClick={props.onOpenLiveRoom} className="bg-white text-[color:var(--t-800)] px-4 py-2.5 text-sm font-bold cursor-pointer hover:bg-[color:var(--t-50)] rounded-none inline-flex items-center gap-2"><Video className="h-4 w-4" />{tx('Join video call')}</button>
+                  ) : (
+                    <button type="button" onClick={props.onOpenAppointments} className="bg-white text-[color:var(--t-800)] px-4 py-2.5 text-sm font-bold cursor-pointer hover:bg-[color:var(--t-50)] rounded-none">{tx('View visit details')}</button>
+                  )}
+                  {nextIsVideo && <button type="button" onClick={props.onOpenAppointments} className="border border-white/50 text-white px-3 py-2.5 text-sm font-bold cursor-pointer hover:bg-white/10 rounded-none">{tx('View visit details')}</button>}
+                  <button type="button" onClick={() => props.onSelectProfessional(next.professionalId)} className="border border-white/50 text-white px-3 py-2.5 text-sm font-bold cursor-pointer hover:bg-white/10 rounded-none">{tx('Doctor profile')}</button>
                 </div>
               </>
             ) : (
               <>
                 <div>
-                  <span className="inline-block bg-white/20 border border-white/30 text-2xs font-bold uppercase tracking-wider px-2 py-1">{tx('No upcoming visits')}</span>
-                  <h2 className="mt-3 mb-1 text-xl font-bold">{tx('See a verified doctor today')}</h2>
+                  <span className="inline-block bg-white/20 border border-white/30 text-xs font-bold px-2 py-1">{tx('No upcoming visits')}</span>
+                  <h2 className="mt-4 mb-1.5 text-2xl font-bold">{tx('See a verified doctor today')}</h2>
                   <p className="text-xs opacity-90">{tx('Start a video consult or book a visit with an MMC-verified doctor.')}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -133,17 +170,17 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
           <article className={card}>
             <div className="flex items-center justify-between gap-2">
               <div>
-                <div className={eyebrow}>{tx("Today's Medication Schedule")}</div>
-                <div className="text-sm font-bold mt-0.5">{tx('{a} of {b} doses logged today', { a: takenCount, b: meds.length })}</div>
+                <div className="text-base font-bold">{tx("Today's medicines")}</div>
+                <div className="text-sm text-[color:var(--ink-2)] mt-0.5">{tx('{a} of {b} doses logged today', { a: takenCount, b: meds.length })}</div>
               </div>
               <Pill className="h-4 w-4 text-[color:var(--t-600)]" aria-hidden="true" />
             </div>
             {meds.length === 0 ? (
               <p className="text-xs text-[color:var(--ink-2)]">{tx('No active medicines on your prescriptions.')}</p>
             ) : (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-3">
                 {meds.slice(0, 6).map(m => (
-                  <label key={m.key} className={`flex items-center justify-between gap-3 border px-3 py-2.5 cursor-pointer rounded-none ${taken[m.key] ? 'bg-emerald-50 border-emerald-200' : 'bg-[color:var(--t-50)] border-[color:var(--t-100)]'}`}>
+                  <label key={m.key} className={`flex items-center justify-between gap-3 px-4 py-3 cursor-pointer rounded-none ${taken[m.key] ? 'bg-emerald-50' : 'bg-[color:var(--t-50)]'}`}>
                     <span className="min-w-0">
                       <span className="block text-xs font-bold truncate">{m.name}</span>
                       {m.note && <span className="block text-2xs text-[color:var(--ink-2)] truncate">{m.note}</span>}
@@ -157,21 +194,20 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
         </div>
 
         {/* Right */}
-        <div className="lg:col-span-7 flex flex-col gap-4">
+        <div className="lg:col-span-7 flex flex-col gap-6">
           <article className={card}>
             <div className="flex items-center justify-between gap-2 border-b border-[color:var(--t-100)] pb-3">
               <div>
-                <div className={eyebrow}>{tx('Prescriptions')}</div>
-                <h3 className="text-base font-bold mt-0.5">{tx('Active Prescriptions')} ({activePrescriptions.length})</h3>
+                <h3 className="text-base font-bold">{tx('My medicines')} ({activePrescriptions.length})</h3>
               </div>
               <button type="button" onClick={props.onFindPharmacy} className={`${btnS} inline-flex items-center gap-1.5`}><Store className="h-3.5 w-3.5" />{tx('Find a Pharmacy')}</button>
             </div>
             {activePrescriptions.length === 0 ? (
               <p className="text-xs text-[color:var(--ink-2)]">{tx('You have no active prescriptions.')}</p>
             ) : (
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-3">
                 {activePrescriptions.slice(0, 4).map((rx: any) => (
-                  <div key={rx.id} className="border border-slate-200 px-3.5 py-3 flex flex-wrap items-center justify-between gap-3 rounded-none">
+                  <div key={rx.id} className="bg-[color:var(--t-50)] px-4 py-3.5 flex flex-wrap items-center justify-between gap-3 rounded-none">
                     <div className="min-w-0">
                       <div className="text-sm font-bold truncate">
                         {Array.isArray(rx.items) && rx.items[0]?.name ? rx.items[0].name : rx.diagnosis || tx('Prescribed Medicine')}
@@ -189,8 +225,7 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
           <article className={card}>
             <div className="flex items-center justify-between gap-2">
               <div>
-                <div className={eyebrow}>{tx('Vitals trend')}</div>
-                <h3 className="text-base font-bold mt-0.5">{tx('Blood pressure (systolic)')}</h3>
+                <h3 className="text-base font-bold">{tx('Blood pressure over time')}</h3>
               </div>
               <button type="button" onClick={props.onOpenVitals} className={btnS}>{tx('+ Log Reading')}</button>
             </div>
@@ -208,8 +243,8 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
                 { l: tx('Glucose'), v: summary?.glucose?.value1 != null ? `${summary.glucose.value1}` : '—' },
                 { l: tx('SpO₂'), v: summary?.spo2?.value1 != null ? `${summary.spo2.value1}%` : '—' },
               ].map(x => (
-                <div key={x.l} className="border border-[color:var(--t-100)] bg-[color:var(--t-50)] py-2">
-                  <div className="text-2xs font-bold uppercase text-[color:var(--ink-2)]">{x.l}</div>
+                <div key={x.l} className="bg-[color:var(--t-50)] py-3">
+                  <div className="text-xs font-semibold text-[color:var(--ink-2)]">{x.l}</div>
                   <div className="text-sm font-bold tabular-nums">{x.v}</div>
                 </div>
               ))}
@@ -221,8 +256,7 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
         <article className={`${card} lg:col-span-6 bg-[color:var(--t-50)]`}>
           <div className="border-b border-[color:var(--t-200)] pb-2.5 flex items-center justify-between">
             <div>
-              <div className={eyebrow}>{tx('Verified care network')}</div>
-              <h3 className="text-base font-bold mt-0.5">{tx('My Care Team')}</h3>
+              <h3 className="text-base font-bold">{tx('My Care Team')}</h3>
             </div>
             <button type="button" onClick={props.onOpenCareTeam} className={btnS}>{tx('View all')}</button>
           </div>
@@ -231,7 +265,7 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
           ) : (
             <div className="flex flex-col gap-2">
               {careTeam.slice(0, 3).map(p => (
-                <div key={p.id} className="border border-[color:var(--t-100)] bg-white px-3 py-2.5 flex items-center justify-between gap-3 hover:bg-[color:var(--t-50)] rounded-none">
+                <div key={p.id} className="bg-white px-4 py-3 flex items-center justify-between gap-3 hover:bg-[color:var(--t-50)] rounded-none">
                   <div className="min-w-0">
                     <div className="text-sm font-bold truncate">{p.name}</div>
                     <div className="text-2xs text-[color:var(--ink-2)] truncate">{(p as any).specialty || (p as any).specialization || tx('Verified practitioner')}</div>
@@ -246,31 +280,30 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
         <article className={`${card} lg:col-span-6`}>
           <div className="border-b border-[color:var(--t-100)] pb-2.5 flex items-center justify-between">
             <div>
-              <div className={eyebrow}>{tx('Health profile')}</div>
-              <h3 className="text-base font-bold mt-0.5">{tx('Allergies & conditions')}</h3>
+              <h3 className="text-base font-bold">{tx('Allergies & conditions')}</h3>
             </div>
             <button type="button" onClick={props.onOpenVitals} className={btnS}>{tx('Update')}</button>
           </div>
           <div className="space-y-3">
             <div>
-              <div className="text-2xs font-bold uppercase text-[color:var(--ink-2)] mb-1.5">{tx('Allergies')}</div>
+              <div className="text-xs font-semibold text-[color:var(--ink-2)] mb-1.5">{tx('Allergies')}</div>
               {patientAllergies.length ? (
                 <div className="flex flex-wrap gap-1.5">
-                  {patientAllergies.map(a => <span key={a} className="bg-rose-50 border border-rose-300 text-rose-900 text-2xs font-bold uppercase px-2 py-1 rounded-none">{a}</span>)}
+                  {patientAllergies.map(a => <span key={a} className="bg-rose-50 border border-rose-300 text-rose-900 text-xs font-bold px-2 py-1 rounded-none">{a}</span>)}
                 </div>
               ) : <span className="text-xs text-[color:var(--ink-2)]">{tx('None recorded')}</span>}
             </div>
             <div>
-              <div className="text-2xs font-bold uppercase text-[color:var(--ink-2)] mb-1.5">{tx('Chronic conditions')}</div>
+              <div className="text-xs font-semibold text-[color:var(--ink-2)] mb-1.5">{tx('Chronic conditions')}</div>
               {patientConditions.length ? (
                 <div className="flex flex-wrap gap-1.5">
-                  {patientConditions.map(c => <span key={c} className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-800)] text-2xs font-bold uppercase px-2 py-1 rounded-none">{c}</span>)}
+                  {patientConditions.map(c => <span key={c} className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-800)] text-xs font-bold px-2 py-1 rounded-none">{c}</span>)}
                 </div>
               ) : <span className="text-xs text-[color:var(--ink-2)]">{tx('None recorded')}</span>}
             </div>
             <div className="flex flex-wrap gap-2 pt-1">
               <button type="button" onClick={props.onOpenMessages} className={`${btnP} inline-flex items-center gap-1.5`}><MessageSquare className="h-3.5 w-3.5" />{tx('Message a doctor')}</button>
-              <button type="button" onClick={props.onOpenTriage} className={btnS}>{tx('AI Triage')}</button>
+              <button type="button" onClick={props.onOpenTriage} className={btnS}>{tx('Check my symptoms')}</button>
             </div>
           </div>
         </article>
