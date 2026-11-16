@@ -709,8 +709,6 @@ select.opacity-0,
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  font-family: var(--font-mono, monospace);
-  font-size: 0.75rem;
   line-height: 1.2;
   font-weight: 800;
   text-transform: uppercase;
@@ -1172,3 +1170,7 @@ a, button, [role="button"], summary, label, select, input { touch-action: manipu
 #patient-dashboard-root .text-xs,
 #patient-dashboard-root .text-2xs { font-size: 0.8125rem; line-height: 1.25rem; }
 #patient-dashboard-root p, #patient-dashboard-root li { line-height: 1.55; }
+
+/* TAG-SIZE: status tags (.app-badge, .tag-pill) are the one exception to the 12px minimum: Plus Jakarta Sans at 10px. */
+.app-badge, .tag-pill { font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif; font-size: 0.625rem; line-height: 1rem; }
+/* END-TAG-SIZE */

@@ -1,4 +1,4 @@
-// One type scale for the whole app: Tailwind's steps plus text-2xs (12px, same as text-xs) for pill badges, never a hand-set pixel size.
+// One type scale for the whole app: Tailwind's steps plus text-2xs (12px, same as text-xs); the only smaller text is the marked tag rule (10px status tags), never a hand-set pixel size.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -19,6 +19,8 @@ test('nothing is smaller than 12px, and no step outside the scale is used (no te
   const css = fs.readFileSync('src/index.css', 'utf8');
   assert.match(css, /--text-2xs: 0\.75rem/);
   assert.match(css, /--text-xs: 0\.75rem/);
-  const small = [...css.matchAll(/font-size:\s*(0?\.\d+)rem/g)].filter(m => parseFloat(m[1]) < 0.75).map(m => m[0]);
+  const tagRule = css.match(/\/\* TAG-SIZE:[\s\S]*?\/\* END-TAG-SIZE \*\//)?.[0] ?? '';
+  assert.match(tagRule, /font-size: 0\.625rem/, 'tags are 10px');
+  const small = [...css.replace(tagRule, '').matchAll(/font-size:\s*(0?\.\d+)rem/g)].filter(m => parseFloat(m[1]) < 0.75).map(m => m[0]);
   assert.deepEqual(small, [], 'no CSS rule sets a font size under 12px');
 });

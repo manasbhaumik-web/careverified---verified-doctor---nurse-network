@@ -615,16 +615,16 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
 /** Pill used beside the name: brand, success, neutral, or warning. */
 export function BannerBadge({ tone = 'brand', children }: { tone?: 'brand' | 'success' | 'neutral' | 'warning'; children: React.ReactNode }) {
   if (tone === 'success') {
-    return <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-2xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
+    return <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 tag-pill font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   if (tone === 'neutral') {
-    return <span className="bg-slate-50 text-slate-700 border border-slate-300 text-2xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
+    return <span className="bg-slate-50 text-slate-700 border border-slate-300 tag-pill font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   if (tone === 'warning') {
-    return <span className="bg-amber-50 text-amber-800 border border-amber-300 text-2xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
+    return <span className="bg-amber-50 text-amber-800 border border-amber-300 tag-pill font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>;
   }
   return (
-    <span className="bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] text-2xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>
+    <span className="bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)] tag-pill font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-none inline-flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0">{children}</span>
   );
 }
 
