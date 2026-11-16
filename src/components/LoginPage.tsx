@@ -289,8 +289,8 @@ export default function LoginPage({ onLoginSuccess }: { onLoginSuccess: (user: S
         <p className="text-sm text-[color:var(--t-50)]">{tx.panelFoot}</p>
       </aside>
 
-      <main id="main-content" className="flex-1 min-w-0 px-4 sm:px-8 lg:px-12 py-8 lg:py-12 flex flex-col items-center">
-        <div className={`w-full ${registering ? 'max-w-3xl' : 'max-w-xl'} space-y-6 my-auto`}>
+      <main id="main-content" className="flex-1 min-w-0 px-4 sm:px-6 lg:px-[4%] py-6 lg:py-10 flex flex-col">
+        <div className={`w-full ${registering ? 'max-w-5xl' : 'max-w-3xl'} space-y-5 my-auto mx-auto`}>
         <div className="flex items-center justify-between gap-3">
           <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="inline-flex items-center gap-1.5 min-h-[44px] text-sm font-bold text-[color:var(--t-700)] hover:underline">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" /> {tx.backHome}
@@ -324,7 +324,7 @@ export default function LoginPage({ onLoginSuccess }: { onLoginSuccess: (user: S
           </div>
         </div>
 
-          <div className="p-5 sm:p-8 min-w-0 bg-white panel-edge">
+          <div className="p-4 sm:p-6 min-w-0 bg-white panel-edge">
             {role === 'patient' && (
               <div className="mb-5 pb-4 border-b border-[color:var(--t-100)] flex flex-wrap items-center gap-2">
                 {tx.patientTrustBadges.map((b, i) => (
