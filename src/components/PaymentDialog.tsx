@@ -5,7 +5,7 @@ import { useTr } from '../locale';
 import { formatMoney } from '../locale';
 
 interface Props {
-  kind: 'booking' | 'consult';
+  kind: 'booking' | 'consult' | 'care';
   refId: string;
   description: string;
   onPaid: (paymentId: string) => void;
@@ -93,7 +93,7 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
   const Price = () => b && (
     <div className="space-y-1.5 p-3.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)]">
       <dl className="text-xs grid grid-cols-[1fr_auto] gap-x-4 gap-y-1">
-        <dt className="text-slate-600">{tx('Clinical Consultation Fee')}</dt>
+        <dt className="text-slate-600">{kind === 'care' ? tx('Home care visit') : tx('Clinical Consultation Fee')}</dt>
         <dd className="tabular-nums font-semibold">{formatMoney(b.subtotal)}</dd>
         {b.tax > 0 && (
           <>

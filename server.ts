@@ -38,7 +38,8 @@ import { registerMail, email as sendMail } from "./server/mail";
 import { registerRecovery } from "./server/accountRecovery";
 import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
 import { registerFacilityProfiles, migrateFacilitySchema } from "./server/facilityProfiles";
-import { seedPhase1Demo } from "./server/phase1Seed";
+import { seedPhase1Demo, seedHomecareDemo } from "./server/phase1Seed";
+import { registerHomecare, resolveCarePayable, onCarePaid, onCareRefunded } from "./server/homecare";
 import { CAREGIVER_ROLE, MIN_REFERENCES, cleanReferences, ekycAdapter, type CaregiverChecks } from "./server/caregiverTier";
 
 // Load environment variables
@@ -732,6 +733,7 @@ if (demoEnabled()) ensureDemoData();
 if (demoEnabled()) {
   migrateFacilitySchema(); // the Phase 1 columns must exist before the demo facilities are written
   seedPhase1Demo({ doctors, nurses, jobs, verificationRequests });
+  seedHomecareDemo();
 }
 
 // Seed data added after a database was created: add what is missing, and rename the original demo registration numbers
@@ -1477,6 +1479,7 @@ const paymentRegion = (userId: string): "MY" | "INTL" => {
 setPaymentHandlers({
   resolve: (kind, refId) => {
     if (kind === "consult") return care.resolveConsultPayable(refId);
+    if (kind === "care") return resolveCarePayable(refId);
     if (kind !== "booking") return null;
     const b = bookings.find(x => x.id === refId);
     if (!b || b.status !== "Upcoming" || b.paymentStatus !== "Pending") return null;
@@ -1486,6 +1489,7 @@ setPaymentHandlers({
   },
   onPaid: (p) => {
     if (p.kind === "consult") return care.onConsultPaid(p.ref_id);
+    if (p.kind === "care") return onCarePaid(p);
     const b = bookings.find(x => x.id === p.ref_id);
     if (!b) return;
     b.paymentStatus = "Paid";
@@ -1500,10 +1504,13 @@ setPaymentHandlers({
   patientRegion: paymentRegion,
   onRefunded: (p) => {
     if (p.kind === "consult") { care.onConsultRefunded(p.ref_id); return; }
+    if (p.kind === "care") { onCareRefunded(p); return; }
     const b = bookings.find(x => x.id === p.ref_id);
     if (b) { b.paymentStatus = "Refunded"; b.status = "Cancelled"; persistState(); }
   },
 });
+
+registerHomecare(app, { allProfessionals, findProfessional, paymentRegion });
 
 // -------------------------------------------------------------
 // Bookings & e-prescriptions

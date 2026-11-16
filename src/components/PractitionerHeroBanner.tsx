@@ -3,7 +3,7 @@ import {
   Shield, Check, Eye, Send, CheckCircle2, X, LifeBuoy,
   Stethoscope, Briefcase, ShieldCheck, Wallet, BookOpen,
   LayoutGrid, Calendar, Radio, MessageSquare, Globe,
-  Users, Award, TrendingUp, Star, SlidersHorizontal, BadgeCheck, Bookmark
+  Users, Award, TrendingUp, Star, SlidersHorizontal, BadgeCheck, Bookmark, HeartHandshake
 } from 'lucide-react';
 import { useTr, useLocale, dateLocaleOf } from '../locale';
 import { Professional, Review, Booking, UserRole, VerificationStatus, ConsultationMode } from '../types';
@@ -190,6 +190,10 @@ export default function PractitionerHeroBanner<T extends string = string>({
         { id: 'oncall', label: tx('On-Call Dispatch'), description: tx('Urgent house calls & live patient dispatch requests'), icon: Radio },
         { id: 'messages', label: tx('Messages'), description: tx('Encrypted clinical chat with patients & care teams'), icon: MessageSquare },
         { id: 'global', label: tx('Global Patients'), description: tx('Cross-border consults & MHTC medical travel cases'), icon: Globe },
+        // Caregivers only: families ask them for home visits
+        ...(matchedProfile && (matchedProfile as any).role === 'caregiver'
+          ? [{ id: 'homecare', label: tx('Home Care Requests'), description: tx('Visit requests from families: accept, visit and leave a note'), icon: HeartHandshake }]
+          : []),
       ],
     },
     {

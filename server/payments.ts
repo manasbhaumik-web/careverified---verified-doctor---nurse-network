@@ -44,7 +44,7 @@ for (const col of ["tax_sen INTEGER NOT NULL DEFAULT 0", "tax_rate_pct REAL NOT 
 }
 
 export interface Payable {
-  kind: "booking" | "consult";
+  kind: "booking" | "consult" | "care";
   id: string;
   userId: string;
   professionalId: string | null;
@@ -52,7 +52,7 @@ export interface Payable {
   description: string;
 }
 export interface PaymentRow {
-  id: string; user_id: string; kind: "booking" | "consult"; ref_id: string; professional_id: string | null;
+  id: string; user_id: string; kind: "booking" | "consult" | "care"; ref_id: string; professional_id: string | null;
   amount_sen: number; platform_fee_sen: number; currency: string; status: string; provider: string;
   provider_ref: string | null; payment_intent: string | null; description: string;
   created_at: string; paid_at: string | null; refunded_at: string | null; refund_reason: string | null;

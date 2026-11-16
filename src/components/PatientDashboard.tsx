@@ -29,6 +29,7 @@ const WorkspaceHeader = <T extends string = string>(props: WorkspaceHeaderProps<
   <BaseWorkspaceHeader<T> variant="overview" {...props} />
 );
 import { patientApi } from './patient/api';
+import FamilyHomeCare from '../domains/homecare/FamilyHomeCare';
 import { classifyBp, fmtPatientDate as fmtDate, matchRecommendedSpecialists } from './patient/clinicalHelpers';
 
 const PatientRecords = lazy(() => import('./PatientRecords'));
@@ -56,7 +57,8 @@ export type PatientDashboardTab =
   | 'tourism' 
   | 'registry' 
   | 'nurses'
-  | 'pharmacies' 
+  | 'homecare'
+  | 'pharmacies'
   | 'articles';
 
 export type PatientTabGroup = 'care' | 'records' | 'services' | 'discovery';
@@ -93,6 +95,7 @@ export const PATIENT_GROUPS: Record<PatientTabGroup, {
     tabs: [
       { id: 'registry', label: 'Doctors & Specialists', description: 'Search MMC-verified physicians by specialty', icon: Search },
       { id: 'nurses', label: 'Nurses & Home Care', description: 'LJM-verified nurses for home recovery & care', icon: UserCheck },
+      { id: 'homecare', label: 'Family Home Care', description: 'Ask a verified caregiver to visit someone you care for', icon: HeartHandshake },
       { id: 'pharmacies', label: 'Pharmacies', description: 'Nearby verified dispensaries & cold-chain delivery', icon: Store },
       { id: 'articles', label: 'Health Library', description: 'Clinician-reviewed guides & medication advice', icon: BookOpen },
     ],
@@ -450,6 +453,7 @@ export default function PatientDashboard({
       certs: 'records',
       registry: 'discovery',
       nurses: 'discovery',
+      homecare: 'discovery',
       pharmacies: 'discovery',
       articles: 'discovery',
       packages: 'services',
@@ -1351,6 +1355,9 @@ export default function PatientDashboard({
           </div>
         );
       })()}
+
+      {/* FAMILY HOME CARE TAB: verified caregivers, visits for the people you care for */}
+      {activeTab === 'homecare' && <FamilyHomeCare />}
 
       {/* 14. CLINICAL NURSES TAB */}
       {activeTab === 'nurses' && (() => {
