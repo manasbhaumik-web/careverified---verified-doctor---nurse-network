@@ -6,7 +6,7 @@ import {
   Award, FileText, Loader, 
   CheckCircle2, AlertCircle, Edit, Shield, ShieldCheck, MessageSquare, 
   X, Send, Check, Calendar, TrendingUp, Eye, LayoutGrid, Wallet, Radio,
-  Star, SlidersHorizontal, Globe, ArrowRight, Stethoscope, BookOpen
+  Star, SlidersHorizontal, Globe, ArrowRight, Stethoscope, BookOpen, HeartHandshake
 } from 'lucide-react';
 import { useTr, useLocale, dateLocaleOf } from '../locale';
 import { UserRole, DoctorProfile, NurseProfile, Review, VerificationStatus, Booking, OnCallDispatch } from '../types';
@@ -17,6 +17,7 @@ import PractitionerFeedbackTab from './practitioner/PractitionerFeedbackTab';
 import PractitionerAnalyticsTab from './practitioner/PractitionerAnalyticsTab';
 import PractitionerSettingsTab from './practitioner/PractitionerSettingsTab';
 import PractitionerEarnings from './PractitionerEarnings';
+import CaregiverRequests from '../domains/homecare/CaregiverRequests';
 import PractitionerOnCall from './PractitionerOnCall';
 import PractitionerQuality from './PractitionerQuality';
 import SecureMessenger from '../domains/telemedicine/SecureMessenger';
@@ -27,7 +28,7 @@ import PageBanner from '../shared/ui/PageBanner';
 import { UserAvatar } from '../avatars';
 import WorkspaceHeader from '../shared/ui/WorkspaceHeader';
 
-export type PractitionerDashboardTab = 'home' | 'bookings' | 'oncall' | 'messages' | 'global' | 'earnings' | 'quality' | 'accreditation' | 'reviews' | 'analytics' | 'settings';
+export type PractitionerDashboardTab = 'home' | 'bookings' | 'oncall' | 'messages' | 'global' | 'homecare' | 'earnings' | 'quality' | 'accreditation' | 'reviews' | 'analytics' | 'settings';
 export type PractitionerTabGroup = 'clinical' | 'practice' | 'performance';
 
 export const PRACTITIONER_GROUPS: Record<PractitionerTabGroup, {
@@ -44,6 +45,7 @@ export const PRACTITIONER_GROUPS: Record<PractitionerTabGroup, {
       { id: 'oncall', label: 'On-Call Dispatch', icon: Radio },
       { id: 'messages', label: 'Messages', icon: MessageSquare },
       { id: 'global', label: 'Global Patients', icon: Globe },
+      { id: 'homecare', label: 'Home Care Requests', icon: HeartHandshake }, // shown to caregivers only
     ],
   },
   practice: {
@@ -431,7 +433,7 @@ export default function VerificationTerminal({
       .filter(b => b.status === 'Upcoming')
       .sort((a, b) => new Date(`${a.date} ${a.timeSlot}`).getTime() - new Date(`${b.date} ${b.timeSlot}`).getTime())[0];
 
-    const currentGroupTabs = PRACTITIONER_GROUPS[currentGroup].tabs.map(tab => ({
+    const currentGroupTabs = PRACTITIONER_GROUPS[currentGroup].tabs.filter(tab => tab.id !== 'homecare' || (matchedProfile as any)?.role === 'caregiver').map(tab => ({
       ...tab,
       label: tx(tab.label),
       count: tab.id === 'bookings' ? upcomingBookingsCount : undefined,
@@ -799,6 +801,13 @@ export default function VerificationTerminal({
               reviews={reviews}
               bookings={bookings}
             />
+          </div>
+        )}
+
+        {/* TAB CONTENT: HOME CARE REQUESTS (caregivers only) */}
+        {activeDashboardTab === 'homecare' && (matchedProfile as any)?.role === 'caregiver' && (
+          <div id="panel-homecare" role="tabpanel" aria-labelledby="tab-homecare" tabIndex={0} className="space-y-4 animate-fade-in">
+            <CaregiverRequests />
           </div>
         )}
 

@@ -5,7 +5,7 @@ import { useTr } from '../locale';
 import { formatMoney } from '../locale';
 
 interface Props {
-  kind: 'booking' | 'consult';
+  kind: 'booking' | 'consult' | 'care';
   refId: string;
   description: string;
   onPaid: (paymentId: string) => void;
