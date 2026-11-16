@@ -1139,3 +1139,11 @@ a, button, [role="button"], summary, label, select, input { touch-action: manipu
 /* Application width: percentage-based so layouts fill wide screens at every resolution. */
 .page-w { width: 96%; max-width: none; }
 @media (min-width: 1920px) { .page-w { width: 94%; } }
+
+/* Sign-in brand panel: the facility photo under a theme-coloured overlay, strong enough that white text keeps its contrast. */
+.login-panel {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--t-700) 88%, transparent), color-mix(in srgb, var(--t-800) 93%, transparent)),
+    url('/assets/clinics_hospital_hero_bg.jpg') center / cover no-repeat,
+    var(--t-700);
+}

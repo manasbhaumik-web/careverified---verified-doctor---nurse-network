@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { AlertCircle, ArrowLeft, ArrowRight, Building, Building2, Heart, HeartPulse, PlusCircle, Pill, RefreshCw, Zap, ShieldCheck, Globe } from 'lucide-react';
-import ThemeSwitcher from './ThemeSwitcher';
+import { AlertCircle, ArrowLeft, ArrowRight, Building, Building2, Clock, Heart, HeartPulse, Lock, PlusCircle, Pill, RefreshCw, Zap, ShieldCheck, Globe } from 'lucide-react';
 import LocaleSwitcher from './LocaleSwitcher';
 import BrandLogo from '../shared/ui/BrandLogo';
-import Footer from './Footer';
 import PatientRegistrationForm from './PatientRegistrationForm';
 import PractitionerSignUp from './PractitionerSignUp';
 import { loginUrl, navigate, useLocation, type PortalRole } from '../nav';
@@ -49,6 +47,10 @@ const COPY: Record<Lang, {
   patientTrustBadges: string[];
   fillForm: string;
   oneClickDemo: string;
+  panelHeadline: string;
+  panelLead: string;
+  panelPoints: { title: string; body: string }[];
+  panelFoot: string;
 }> = {
   en: {
     skip: 'Skip to content',
@@ -81,6 +83,14 @@ const COPY: Record<Lang, {
     patientTrustBadges: ['Malaysian MyKad Accepted', 'International Passport Accepted', 'PDPA 2010 Protected'],
     fillForm: 'Fill form',
     oneClickDemo: 'One-click demo',
+    panelHeadline: 'One verified network for care.',
+    panelLead: 'Sign in to the workspace for your role. Everything you see is limited to what that role needs.',
+    panelPoints: [
+      { title: 'Every practitioner is checked', body: 'Licences are reviewed by the board before a profile goes public.' },
+      { title: 'Credentials stay current', body: 'Expiring and expired licences are flagged and hidden automatically.' },
+      { title: 'Access follows your role', body: 'Actions are recorded in an audit log.' },
+    ],
+    panelFoot: 'Verified Doctor & Nurse Network',
   },
   ms: {
     skip: 'Langkau ke kandungan',
@@ -113,6 +123,14 @@ const COPY: Record<Lang, {
     patientTrustBadges: ['MyKad Malaysia Diterima', 'Pasport Antarabangsa Diterima', 'Dilindungi PDPA 2010'],
     fillForm: 'Isi borang',
     oneClickDemo: 'Demo satu klik',
+    panelHeadline: 'Satu rangkaian disahkan untuk penjagaan.',
+    panelLead: 'Log masuk ke ruang kerja untuk peranan anda. Semua yang anda lihat terhad kepada keperluan peranan itu.',
+    panelPoints: [
+      { title: 'Setiap pengamal disemak', body: 'Lesen disemak oleh lembaga sebelum profil dipaparkan kepada umum.' },
+      { title: 'Kelayakan sentiasa terkini', body: 'Lesen yang hampir atau sudah tamat dikenal pasti dan disembunyikan secara automatik.' },
+      { title: 'Akses mengikut peranan', body: 'Tindakan direkodkan dalam log audit.' },
+    ],
+    panelFoot: 'Rangkaian Doktor & Jururawat Disahkan',
   },
   zh: {
     skip: '跳到主要内容',
@@ -145,6 +163,14 @@ const COPY: Record<Lang, {
     patientTrustBadges: ['支持马来西亚 MyKad', '支持国际护照 (Passport)', 'PDPA 2010 隐私保护'],
     fillForm: '填入演示账号',
     oneClickDemo: '一键演示登录',
+    panelHeadline: '一个经过核验的医疗网络。',
+    panelLead: '登录您所属角色的工作台。您看到的内容仅限该角色所需。',
+    panelPoints: [
+      { title: '每位医护人员均经核查', body: '执照经委员会审核后，个人资料才会公开。' },
+      { title: '资质保持有效', body: '即将到期和已过期的执照会被自动标记并隐藏。' },
+      { title: '权限随角色而定', body: '所有操作都会记入审计日志。' },
+    ],
+    panelFoot: '经核验的医生与护士网络',
   },
 };
 
@@ -237,54 +263,68 @@ export default function LoginPage({ onLoginSuccess }: { onLoginSuccess: (user: S
   const roleCopy = tx.roles[role];
 
   return (
-    <div id="login-page" className="min-h-dvh bg-[color:var(--t-bg)] text-[color:var(--ink)] font-body flex flex-col antialiased">
+    <div id="login-page" className="min-h-dvh bg-[color:var(--t-50)] text-[color:var(--ink)] font-body antialiased lg:flex">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-[color:var(--t-700)] focus:px-4 focus:py-2 focus:border focus:border-[color:var(--t-600)] focus:font-bold">{tx.skip}</a>
 
-      <header className="sticky top-0 z-40 bg-[color:var(--t-50)]/95 backdrop-blur-md border-b border-[color:var(--t-200)]">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
-          <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="group min-w-0" aria-label="MediCred home">
-            <BrandLogo tone="light" size="md" />
-          </a>
-          <div className="flex items-center gap-2">
-            <LocaleSwitcher />
-            <ThemeSwitcher />
-          </div>
-        </div>
-      </header>
-
-      <main id="main-content" className="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
-        <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="inline-flex items-center gap-1.5 min-h-[44px] text-sm font-bold text-[color:var(--t-700)] hover:underline">
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> {tx.backHome}
+      {/* Brand panel: no site header or footer on the sign-in screen */}
+      <aside className="login-panel text-white px-6 py-8 sm:px-12 sm:py-12 lg:w-[44%] lg:max-w-[720px] lg:min-h-dvh lg:sticky lg:top-0 lg:self-start flex flex-col justify-between gap-10">
+        <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="inline-block self-start" aria-label="MediCred home">
+          <BrandLogo tone="onColor" size="lg" />
         </a>
+        <div className="max-w-md space-y-6">
+          <p className="font-display font-black text-3xl sm:text-4xl lg:text-5xl leading-[1.08] tracking-tight">{tx.panelHeadline}</p>
+          <p className="text-base sm:text-lg leading-relaxed text-[color:var(--t-50)]">{tx.panelLead}</p>
+          <ul className="space-y-4">
+            {tx.panelPoints.map((pt, i) => {
+              const PointIcon = [ShieldCheck, Clock, Lock][i] ?? ShieldCheck;
+              return (
+                <li key={pt.title} className="flex gap-3.5 items-start">
+                  <PointIcon className="h-5 w-5 shrink-0 mt-0.5 text-emerald-300" aria-hidden="true" />
+                  <span className="text-sm sm:text-base leading-snug"><b className="font-extrabold">{pt.title}</b><br /><span className="text-[color:var(--t-50)]">{pt.body}</span></span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <p className="text-sm text-[color:var(--t-50)]">{tx.panelFoot}</p>
+      </aside>
 
-        <div className="mt-2 mb-6">
+      <main id="main-content" className="flex-1 min-w-0 px-4 sm:px-8 lg:px-12 py-8 lg:py-12 flex flex-col items-center">
+        <div className={`w-full ${registering ? 'max-w-3xl' : 'max-w-xl'} space-y-6 my-auto`}>
+        <div className="flex items-center justify-between gap-3">
+          <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="inline-flex items-center gap-1.5 min-h-[44px] text-sm font-bold text-[color:var(--t-700)] hover:underline">
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" /> {tx.backHome}
+          </a>
+          <LocaleSwitcher />
+        </div>
+
+        <div>
           <h1 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[color:var(--ink)]">{registering ? tx.createTitle : tx.signInTitle}</h1>
           <p className="text-sm sm:text-base text-slate-700 font-medium mt-1">{tx.subtitle}</p>
         </div>
 
-        <div className="grid md:grid-cols-[280px_1fr] bg-white panel-edge">
-          <div className="p-5 bg-[color:var(--t-50)] md:border-r border-b md:border-b-0 border-[color:var(--t-200)]">
-            <p className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-3" id="role-label">{tx.yourRole}</p>
-            <div role="group" aria-labelledby="role-label" className="grid grid-cols-2 md:grid-cols-1 gap-2.5">
-              {ROLE_KEYS.map(key => {
-                const active = role === key;
-                const Icon = ROLE_ICONS[key];
-                const r = tx.roles[key];
-                return (
-                  <button key={key} type="button" onClick={() => pickRole(key)} aria-pressed={active}
-                    className={`p-4 transition-all cursor-pointer flex flex-col md:flex-row md:items-start items-center text-center md:text-left gap-3 border ${active ? 'bg-[color:var(--t-600)] border-[color:var(--t-700)] text-white' : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:bg-[color:var(--t-100)]'}`}>
-                    <Icon className="h-5 w-5 shrink-0 md:mt-0.5" aria-hidden="true" />
-                    <span className="min-w-0">
-                      <span className="block text-sm font-extrabold">{r.label}</span>
-                      <span className={`hidden md:block text-xs mt-0.5 leading-snug ${active ? 'text-white' : 'text-slate-600'}`}>{r.desc}</span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+        <div>
+          <p className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-2.5" id="role-label">{tx.yourRole}</p>
+          <div role="group" aria-labelledby="role-label" className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            {ROLE_KEYS.map(key => {
+              const active = role === key;
+              const Icon = ROLE_ICONS[key];
+              const r = tx.roles[key];
+              return (
+                <button key={key} type="button" onClick={() => pickRole(key)} aria-pressed={active}
+                  className={`px-3 py-3 min-h-[64px] transition-colors cursor-pointer flex items-start text-left gap-2.5 border ${active ? 'bg-[color:var(--t-100)] border-2 border-[color:var(--t-700)] text-[color:var(--ink)]' : 'bg-white border-[color:var(--t-200)] text-[color:var(--ink)] hover:border-[color:var(--t-600)]'}`}>
+                  <Icon className={`h-4 w-4 shrink-0 mt-0.5 ${active ? 'text-[color:var(--t-700)]' : 'text-[color:var(--t-600)]'}`} aria-hidden="true" />
+                  <span className="min-w-0">
+                    <span className="block text-sm font-extrabold leading-tight">{r.label}</span>
+                    <span className="hidden sm:block text-xs mt-0.5 leading-snug text-slate-600">{r.desc}</span>
+                  </span>
+                </button>
+              );
+            })}
           </div>
+        </div>
 
-          <div className="p-5 sm:p-10 min-w-0 bg-white">
+          <div className="p-5 sm:p-8 min-w-0 bg-white panel-edge">
             {role === 'patient' && (
               <div className="mb-5 pb-4 border-b border-[color:var(--t-100)] flex flex-wrap items-center gap-2">
                 {tx.patientTrustBadges.map((b, i) => (
@@ -375,8 +415,6 @@ export default function LoginPage({ onLoginSuccess }: { onLoginSuccess: (user: S
           </div>
         </div>
       </main>
-
-      <Footer variant="landing" onLoginRole={(r, reg) => navigate(loginUrl(r, !!reg))} />
     </div>
   );
 }
