@@ -57,13 +57,27 @@ test('recipients: a family keeps its own list and others cannot see or change it
   assert.equal(add.status, 201);
   recipientId = add.data.data.id;
   assert.equal((await family.call('POST', '/api/me/care-recipients', { name: 'X', birthYear: 1800 })).status, 400, 'bad birth year');
-  assert.equal((await family.call('GET', '/api/me/care-recipients')).data.data.length, 1);
+  assert.equal((await family.call('GET', '/api/me/care-recipients')).data.data.length, 3, 'the two demo people plus the one just added');
   assert.deepEqual((await other.call('GET', '/api/me/care-recipients')).data.data, [], 'another family sees nothing');
   assert.equal((await other.call('PUT', `/api/me/care-recipients/${recipientId}`, { name: 'Hijack' })).status, 404);
   assert.equal((await other.call('DELETE', `/api/me/care-recipients/${recipientId}`)).status, 404);
   assert.equal((await family.call('PUT', `/api/me/care-recipients/${recipientId}`, { name: 'Puan Rohani', relationship: 'Mother', address: '12 Jalan Damai', city: 'Kuala Lumpur' })).status, 200);
   assert.equal((await anon.call('GET', '/api/me/care-recipients')).status, 401);
   assert.equal((await cg.call('GET', '/api/me/care-recipients')).status, 403, 'a caregiver has no family list');
+});
+
+test('demo data: a demo caregiver can sign in and sees the home care inbox; the demo patient has sample people', async () => {
+  const demoCg = srv.client();
+  assert.equal((await demoCg.login('demo.caregiver@careverified.test', DEMO_PASSWORD, 'practitioner')).status, 200);
+  const inbox = await demoCg.call('GET', '/api/homecare/requests');
+  assert.equal(inbox.status, 200, 'the demo account is a caregiver, not a doctor');
+  assert.ok(Array.isArray(inbox.data.data));
+  const names = ((await family.call('GET', '/api/me/care-recipients')).data.data as any[]).map(r => r.name);
+  assert.ok(names.includes('Puan Rohani (demo)') && names.includes('Encik Ali (demo)'));
+  // a doctor account is not a caregiver
+  const doc = srv.client();
+  assert.equal((await doc.login(DEMO.doctor, DEMO_PASSWORD, 'practitioner')).status, 200);
+  assert.equal((await doc.call('GET', '/api/homecare/requests')).status, 403);
 });
 
 test('only verified caregivers with an hourly rate are offered', async () => {

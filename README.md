@@ -47,6 +47,8 @@ It prints the sign-in details, is safe to run repeatedly, uses test-mode payment
 
 What it covers is in [docs/phase-1.md](docs/phase-1.md): the public credential lookup (name, registration number, QR badge), the verification lifecycle with a daily expiry job, the caregiver tier, facility registration and approval, facility staff roles, jobs, locum roles and open shifts, access rules for every role, and English and Bahasa Malaysia text.
 
+Family home care (a family asks a verified caregiver for a visit, pays, and reads the visit note) is described in [docs/HOMECARE.md](docs/HOMECARE.md).
+
 **Environment variables** (all in [.env.example](.env.example); set the first three on a real deployment):
 
 | Variable | What it does |
