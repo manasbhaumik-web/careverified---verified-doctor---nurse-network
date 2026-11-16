@@ -1,0 +1,13 @@
+node_modules
+dist
+data
+.git
+.claude
+.env
+.env.*
+!.env.example
+tests
+scratch
+*.log
+npm-debug.log*
+.DS_Store
