@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTr } from '../locale';
 import { MY_STATES, PREFERRED_LANGUAGES, RELATIONSHIPS } from '../identity';
+import { UserRound } from 'lucide-react';
+import { WorkspaceHeader, BannerBadge } from '../shared/ui';
 
 interface Address { line1: string; line2?: string; city: string; state?: string; postcode: string; country: string }
 interface Profile {
@@ -106,23 +108,22 @@ export default function ProfilePage({ onUserUpdated, onOpenCredentials }: {
   const addrText = (x: Address | null) => x ? [x.line1, x.line2, `${x.postcode} ${x.city}`.trim(), x.state, x.country].filter(Boolean).join(', ') : '';
 
   return (
-    <section aria-labelledby="pf-h" className="space-y-5 max-w-4xl">
-      <div className="flex items-center gap-4">
-        <div aria-hidden="true" className="w-14 h-14 bg-[color:var(--t-100)] text-[color:var(--t-800)] flex items-center justify-center text-xl font-extrabold">
-          {a.name.split(/\s+/).map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()}
-        </div>
-        <div>
-          <h1 id="pf-h" className="text-2xl font-extrabold tracking-tight">{tx('My profile')}</h1>
-          <p className="text-sm text-slate-700">{roleLabel} · {tx('Member since')} {new Date(a.createdAt).toLocaleDateString()}</p>
-        </div>
-      </div>
+    <section aria-label={tx('My profile')} className="page-w mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <WorkspaceHeader
+        icon={UserRound}
+        eyebrow={tx('Account · Personal information and sign-in details')}
+        title={tx('My profile')}
+        description={tx('See and update your own details. Changes apply to your account only.')}
+        badges={<BannerBadge tone="brand">{roleLabel}</BannerBadge>}
+        aside={<span className="text-xs text-[color:var(--ink-2)]">{tx('Member since')} {new Date(a.createdAt).toLocaleDateString()}</span>}
+      />
 
       {msg && <p role={msg.ok ? 'status' : 'alert'} className={`text-sm font-bold p-3 border ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-200' : 'text-rose-900 bg-rose-50 border-rose-200'}`}>{msg.text}</p>}
 
       {/* Account */}
       <div className="app-card space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-extrabold">{tx('Account')}</h2>
+          <h2 className="text-lg font-bold">{tx('Account')}</h2>
           {a.nameEditable && !editName && <button type="button" className="btn btn-sm btn-secondary" onClick={() => { setName(a.name); setEditName(true); setMsg(null); }}>{tx('Edit name')}</button>}
         </div>
         {editName ? (
@@ -132,7 +133,7 @@ export default function ProfilePage({ onUserUpdated, onOpenCredentials }: {
             <button type="button" className="btn btn-sm btn-ghost" onClick={() => setEditName(false)}>{tx('Cancel')}</button>
           </form>
         ) : (
-          <dl className="grid sm:grid-cols-2 gap-3">{row(tx('Full name'), a.name)}{row(tx('Sign-in email'), a.email)}</dl>
+          <dl className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">{row(tx('Full name'), a.name)}{row(tx('Sign-in email'), a.email)}</dl>
         )}
         {!a.nameEditable && <p className="text-xs text-slate-600">{tx('Your name is tied to your verified licence. To change it, contact the board.')}</p>}
       </div>
@@ -141,11 +142,11 @@ export default function ProfilePage({ onUserUpdated, onOpenCredentials }: {
       {pt && (
         <div className="app-card space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-base font-extrabold">{tx('Personal information')}</h2>
+            <h2 className="text-lg font-bold">{tx('Personal information')}</h2>
             {!editPersonal && <button type="button" className="btn btn-sm btn-secondary" onClick={startPersonal}>{tx('Edit details')}</button>}
           </div>
           {!editPersonal ? (
-            <dl className="grid sm:grid-cols-2 gap-3">
+            <dl className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {row(pt.idType === 'passport' ? tx('Passport number') : tx('MyKad number'), pt.idNumberMasked)}
               {row(tx('Date of birth'), pt.dateOfBirth)}
               {row(tx('Nationality'), pt.nationality)}
@@ -204,8 +205,8 @@ export default function ProfilePage({ onUserUpdated, onOpenCredentials }: {
       {/* Professional credentials (practitioners): status only; they are managed in the workspace */}
       {p.professional && (
         <div className="app-card space-y-3">
-          <h2 className="text-base font-extrabold">{tx('Professional credentials')}</h2>
-          <dl className="grid sm:grid-cols-3 gap-3">
+          <h2 className="text-lg font-bold">{tx('Professional credentials')}</h2>
+          <dl className="grid sm:grid-cols-3 gap-4">
             {row(tx('Registration number'), p.professional.licenseNumber)}
             {row(tx('Specialty'), p.professional.specialty)}
             {row(tx('Verification status'), p.professional.verificationStatus)}
@@ -217,7 +218,7 @@ export default function ProfilePage({ onUserUpdated, onOpenCredentials }: {
 
       {/* Sign-in details */}
       <div className="app-card space-y-4">
-        <h2 className="text-base font-extrabold">{tx('Sign-in details')}</h2>
+        <h2 className="text-lg font-bold">{tx('Sign-in details')}</h2>
         <form onSubmit={saveEmail} className="grid sm:grid-cols-3 gap-3 items-end">
           <h3 className="sm:col-span-3 text-sm font-extrabold">{tx('Change sign-in email')}</h3>
           <div><label htmlFor="pf-ne" className="form-label">{tx('New email')}</label><input id="pf-ne" type="email" autoComplete="email" className="form-input" value={email.newEmail} onChange={e => setEmail({ ...email, newEmail: e.target.value })} required /></div>
