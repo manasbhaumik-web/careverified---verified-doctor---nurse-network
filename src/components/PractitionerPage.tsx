@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import BrandLogo from '../shared/ui/BrandLogo';
+import PublicHeader from '../shared/ui/PublicHeader';
 import {
   ArrowRight, BadgeCheck, Building2, ClipboardList, FileSignature, Hourglass, MessageSquare, Pill, Stethoscope, Video, Plane,
   ShieldCheck, CheckCircle2, Shield, UserCheck, Search, Scale, Lock, FileText, Sparkles, Check, Zap, Clock, Award,
   Heart, Activity, Syringe, Bandage, HeartPulse, ChevronLeft, ChevronRight, Pause, Play, Users
 } from 'lucide-react';
-import ThemeSwitcher from './ThemeSwitcher';
-import LocaleSwitcher from './LocaleSwitcher';
 import Footer from './Footer';
 import { loginUrl, navigate } from '../nav';
 import { useLocale } from '../locale/store';
@@ -726,37 +724,11 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
       </a>
 
       {/* TOP HEADER */}
-      <header className="sticky top-0 z-40 bg-[color:var(--t-50)]/95 backdrop-blur-md border-b border-[color:var(--t-200)]">
-        <div className="page-w mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
-          <a
-            href="/"
-            onClick={e => {
-              e.preventDefault();
-              navigate('/');
-            }}
-            className="flex items-center gap-2.5 min-w-0 group"
-            aria-label="MediCred home"
-          >
-            <BrandLogo tone="light" size="md" />
-            <span className="hidden sm:inline-block tag-pill font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
-              Practitioner Network
-            </span>
-          </a>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              type="button"
-              onClick={signIn}
-              className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-4 sm:px-5 text-xs sm:text-sm font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none shadow-xs transition-all cursor-pointer whitespace-nowrap"
-            >
-              <span>Practitioner Sign In</span>
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </button>
-            <LocaleSwitcher />
-            <ThemeSwitcher />
-          </div>
-        </div>
-      </header>
+      <PublicHeader
+        badge="Practitioner Network"
+        ctaLabel="Practitioner Sign In"
+        onCtaClick={signIn}
+      />
 
       <main id="main-content" className="flex-grow w-full">
         {/* ─── SECTION 1: SLIDING HERO SECTION WITH AI DUAL PRACTITIONER IMAGE ─── */}

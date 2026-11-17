@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import BrandLogo from '../shared/ui/BrandLogo';
+import PublicHeader from '../shared/ui/PublicHeader';
 import { 
-  Plane, Globe, Building2, ShieldCheck, Heart, ArrowRight, ArrowLeft, 
+  Plane, Globe, Building2, ShieldCheck, Heart, ArrowRight, 
   Car, Languages, Utensils, HeartHandshake, FileText, CheckCircle2, 
   HelpCircle, Sparkles, DollarSign, ExternalLink, Check
 } from 'lucide-react';
-import ThemeSwitcher from './ThemeSwitcher';
-import LocaleSwitcher from './LocaleSwitcher';
 import Footer from './Footer';
 import TouristAccess from './TouristAccess';
 import { navigate, loginUrl } from '../nav';
@@ -49,57 +47,26 @@ export default function InternationalPatientsPage({ onSignUp }: InternationalPat
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* ─── TOP GLOBAL NAVIGATION BAR ─── */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[color:var(--t-200)] shadow-2xs">
-        <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-6">
-            <a 
-              href="/" 
-              onClick={(e) => { e.preventDefault(); navigate('/'); }}
-              className="group cursor-pointer"
-              aria-label="MediCred home"
-            >
-              <BrandLogo tone="light" size="md" />
-            </a>
-
-            <div className="hidden lg:flex items-center gap-1.5 text-xs font-bold text-slate-500 border-l border-slate-200 pl-4">
-              <a 
-                href="/" 
-                onClick={(e) => { e.preventDefault(); navigate('/'); }}
-                className="hover:text-[color:var(--t-600)] transition-colors flex items-center gap-1"
-              >
-                <ArrowLeft className="h-3.5 w-3.5" />
-                <span>Home</span>
-              </a>
-              <span className="text-slate-300">/</span>
-              <span className="text-[color:var(--t-700)]">International Patients &amp; Travel Guide</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2.5">
-            <LocaleSwitcher />
-            <span className="hidden sm:inline-flex"><ThemeSwitcher /></span>
-            <button
-              type="button"
-              onClick={() => navigate(loginUrl('patient', false))}
-              className="hidden sm:inline-flex px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[color:var(--t-700)] hover:bg-slate-100 border border-transparent transition-colors cursor-pointer"
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={goMemberSignup}
-              className="px-3 sm:px-4 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
-            >
-              <Plane className="h-3.5 w-3.5" />
-              <span className="hidden min-[420px]:inline">Register with Passport</span><span className="min-[420px]:hidden">Register</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      <PublicHeader
+        badge="International Patients"
+        ctaLabel="Register with Passport"
+        onCtaClick={goMemberSignup}
+        secondaryLabel="Sign In"
+        onSecondaryClick={() => navigate(loginUrl('patient', false))}
+      />
 
       {/* ─── FULL-WIDTH APPLICATION HERO BANNER ─── */}
-      <section className="w-full bg-[color:var(--t-50)] text-slate-900 border-b border-[color:var(--t-200)] shadow-2xs">
-        <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 py-10 sm:py-14">
+      <section className="relative overflow-hidden w-full bg-[color:var(--t-50)] text-slate-900 border-b border-[color:var(--t-200)] shadow-2xs">
+        <div
+          className="absolute inset-0 pointer-events-none bg-cover bg-no-repeat"
+          style={{
+            backgroundImage: "url('/assets/medical_tourism_hero_bg.jpg')",
+            backgroundPosition: 'right 20% center',
+            opacity: 0.72,
+          }}
+        />
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-[color:var(--t-50)]/95 via-[color:var(--t-50)]/75 to-transparent" />
+        <div className="relative z-10 page-w mx-auto px-4 sm:px-6 lg:px-12 py-10 sm:py-14">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="max-w-3xl space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-2xs">

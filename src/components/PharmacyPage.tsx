@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import BrandLogo from '../shared/ui/BrandLogo';
+import PublicHeader from '../shared/ui/PublicHeader';
 import {
   ArrowRight, BarChart3, CheckCircle2, ChevronRight, Inbox,
   Lock, Pill, QrCode, Scale, ScrollText, ShieldAlert, ShieldCheck,
   Snowflake, Store, Truck, Users
 } from 'lucide-react';
-import ThemeSwitcher from './ThemeSwitcher';
-import LocaleSwitcher from './LocaleSwitcher';
 import Footer from './Footer';
 import PartnerEnquiryForm from './PartnerEnquiryForm';
 import { loginUrl, navigate } from '../nav';
@@ -606,37 +604,11 @@ export default function PharmacyPage() {
       </a>
 
       {/* TOP HEADER */}
-      <header className="sticky top-0 z-40 bg-[color:var(--t-50)]/95 backdrop-blur-md border-b border-[color:var(--t-200)]">
-        <div className="page-w mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
-          <a
-            href="/"
-            onClick={e => {
-              e.preventDefault();
-              navigate('/');
-            }}
-            className="flex items-center gap-2.5 min-w-0 group"
-            aria-label="MediCred home"
-          >
-            <BrandLogo tone="light" size="md" />
-            <span className="hidden sm:inline-block tag-pill font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
-              {tx.headerBadge}
-            </span>
-          </a>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              type="button"
-              onClick={signIn}
-              className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-4 sm:px-5 text-xs sm:text-sm font-bold text-white bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] border border-[color:var(--t-700)] rounded-none shadow-xs transition-all cursor-pointer whitespace-nowrap"
-            >
-              <span>{tx.hero.ctaSignin}</span>
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </button>
-            <LocaleSwitcher />
-            <ThemeSwitcher />
-          </div>
-        </div>
-      </header>
+      <PublicHeader
+        badge={tx.headerBadge}
+        ctaLabel={tx.hero.ctaSignin}
+        onCtaClick={signIn}
+      />
 
       <main id="main-content" className="flex-grow w-full">
         {/* ─── SECTION 1: HERO SECTION WITH AI PHARMACY IMAGE AT 70% OPACITY ─── */}

@@ -1,5 +1,5 @@
 import { CustomSelect } from '../shared/ui/CustomSelect';
-import BrandLogo from '../shared/ui/BrandLogo';
+import PublicHeader from '../shared/ui/PublicHeader';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
@@ -39,8 +39,6 @@ import {
   UserCheck,
   X,
 } from 'lucide-react';
-import ThemeSwitcher from './ThemeSwitcher';
-import LocaleSwitcher from './LocaleSwitcher';
 import Footer from './Footer';
 import { loginUrl, navigate, useLocation } from '../nav';
 
@@ -1317,13 +1315,18 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
   const [failed, setFailed] = useState(false);
 
-  // Search & Filter state
-  const [q, setQ] = useState('');
+  // Search & Filter state (hydrated from ?q= URL parameter when present)
+  const urlQuery = params.get('q') ?? '';
+  const [q, setQ] = useState(urlQuery);
   const [category, setCategory] = useState('All');
   const [cityFilter, setCityFilter] = useState('All');
   const [sort, setSort] = useState<'featured' | 'price-asc' | 'price-desc' | 'saving'>('featured');
   const [enquiry, setEnquiry] = useState<EnquiryTarget | null>(null);
   const [copied, setCopied] = useState('');
+
+  useEffect(() => {
+    setQ(urlQuery);
+  }, [urlQuery]);
 
   // Determine active view mode from URL params or pathname
   const activeView = useMemo<'overview' | 'packages' | 'clinics' | 'hospitals' | 'nurses' | 'doctors' | 'pharmacies'>(() => {
@@ -1421,62 +1424,31 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
     setTimeout(() => setCopied(''), 2000);
   };
 
-  const goToView = (v: 'overview' | 'packages' | 'clinics' | 'hospitals' | 'nurses' | 'doctors' | 'pharmacies') => {
-    setQ('');
+  const goToView = (v: 'overview' | 'packages' | 'clinics' | 'hospitals' | 'nurses' | 'doctors' | 'pharmacies', nextQ = '') => {
+    setQ(nextQ);
     setCityFilter('All');
-    if (v === 'overview') navigate('/packages');
-    else navigate(`/packages?view=${v}`);
+    if (v === 'overview') navigate(nextQ ? `/packages?q=${encodeURIComponent(nextQ)}` : '/packages');
+    else navigate(`/packages?view=${v}${nextQ ? `&q=${encodeURIComponent(nextQ)}` : ''}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handlePickFacility = (name: string) => {
-    setQ(name);
     setCategory('All');
-    goToView('packages');
+    goToView('packages', name);
   };
 
   return (
     <div className="min-h-dvh flex flex-col bg-[color:var(--t-bg)] text-[color:var(--ink)] antialiased">
       <a href="#pp-main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:px-4 focus:py-2 focus:border focus:border-[color:var(--t-600)] focus:font-bold">Skip to content</a>
 
-      {/* Top Banner Bar */}
-      <div className="bg-[color:var(--t-900)] text-white/90">
-        <nav aria-label="Audiences" className={`${wrap} flex flex-wrap items-center gap-x-5 gap-y-1 py-1 text-sm font-semibold`}>
-          <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="min-h-[44px] inline-flex items-center gap-1 hover:text-white hover:underline cursor-pointer"><ChevronLeft className="h-3.5 w-3.5" aria-hidden="true" />Home</a>
-          <span className="font-extrabold text-white">For patients</span>
-          {([['For hospitals and clinics', '/for-clinics'], ['For doctors and nurses', '/for-practitioners'], ['For pharmacies', '/for-pharmacies']] as const).map(([label, to]) => (
-            <a key={to} href={to} onClick={e => { e.preventDefault(); navigate(to); }} className="min-h-[44px] inline-flex items-center hover:text-white hover:underline cursor-pointer">{label}</a>
-          ))}
-        </nav>
-      </div>
-
-      {/* Header */}
-      <header className="sticky top-0 z-40">
-        <div className="bg-[color:var(--t-50)]/95 backdrop-blur-md border-b border-[color:var(--t-200)]">
-          <div className={`${wrap} min-h-[64px] flex items-center justify-between gap-3`}>
-            <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="group" aria-label="MediCred home">
-              <BrandLogo tone="light" size="md" />
-            </a>
-            <nav aria-label="Marketplace sections" className="hidden lg:flex self-stretch items-stretch gap-2 text-sm font-semibold">
-              <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="relative min-h-[44px] px-3 inline-flex items-center whitespace-nowrap text-slate-700 hover:text-[color:var(--t-700)]">Home</a>
-              <a href="/packages" onClick={e => { e.preventDefault(); goToView('overview'); }} aria-current="page" className="relative min-h-[44px] px-3 inline-flex items-center whitespace-nowrap font-bold text-[color:var(--t-700)] after:absolute after:inset-x-3 after:bottom-0 after:h-[3px] after:bg-[color:var(--t-600)]">Packages & Directory</a>
-              <a href="/verify-practitioners" onClick={e => { e.preventDefault(); navigate('/verify-practitioners'); }} className="relative min-h-[44px] px-3 inline-flex items-center whitespace-nowrap text-slate-700 hover:text-[color:var(--t-700)]">Verify a licence</a>
-            </nav>
-            <div className="flex items-center gap-2">
-              {signedIn ? (
-                <button type="button" onClick={() => navigate('/')} className={`${primaryBtn}`}>My account</button>
-              ) : (
-                <>
-                  <button type="button" onClick={() => navigate('/login')} className="min-h-[44px] px-2 sm:px-3 text-sm font-bold text-[color:var(--t-700)] hover:underline cursor-pointer whitespace-nowrap">Sign in</button>
-                  <button type="button" onClick={() => navigate(loginUrl('patient', true))} className={`${primaryBtn} hidden lg:inline-flex`}>Create account</button>
-                </>
-              )}
-              <LocaleSwitcher />
-              <span className="hidden sm:inline-flex"><ThemeSwitcher /></span>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Standardized Public Navigation */}
+      <PublicHeader
+        badge="Packages & Directory"
+        ctaLabel={signedIn ? 'My account' : 'Create account'}
+        onCtaClick={() => navigate(signedIn ? '/' : loginUrl('patient', true))}
+        secondaryLabel={signedIn ? undefined : 'Sign in'}
+        onSecondaryClick={signedIn ? undefined : () => navigate('/login')}
+      />
 
       <main id="pp-main" className="flex-grow">
         {pkgId ? (
