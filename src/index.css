@@ -1174,3 +1174,6 @@ span.text-2xs[class*="px-"][class*="border"] {
 
 /* Profile page: field labels and values are 13px (the same size the patient workspace uses for its small text). */
 .profile-field { font-size: 0.8125rem; line-height: 1.25rem; }
+
+/* Banner strip (KPI counters and the action buttons beside them): 13px. */
+.banner-13 { font-size: 0.8125rem; }

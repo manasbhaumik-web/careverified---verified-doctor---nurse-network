@@ -542,14 +542,14 @@ export default function DashboardHeader<T extends string>({
  * ---------------------------------------------------------------------------------------------- */
 
 export const bannerPrimaryBtn =
-  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-3.5 h-9 rounded-none shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
+  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white banner-13 font-black px-3.5 h-9 rounded-none shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
 /** Same two buttons for use on the banner: a solid brand button and a crisp bordered white one. */
 export const bannerOnBrandPrimaryBtn =
-  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black px-3.5 h-9 rounded-none shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
+  'bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white banner-13 font-black px-3.5 h-9 rounded-none shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none border border-[color:var(--t-700)]';
 export const bannerOnBrandSecondaryBtn =
-  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold px-3.5 h-9 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
+  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] banner-13 font-bold px-3.5 h-9 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
 export const bannerSecondaryBtn =
-  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-xs font-bold px-3.5 h-9 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
+  'bg-white hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] banner-13 font-bold px-3.5 h-9 rounded-none shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap flex-1 sm:flex-none';
 
 /** Two-column row: identity on the left, KPIs and actions on the right. */
 export function BannerRow({ identity, aside }: { identity: React.ReactNode; aside?: React.ReactNode }) {
@@ -634,8 +634,8 @@ export function BannerKpis({ items }: { items: { value: React.ReactNode; label: 
     <div className="flex items-stretch w-full sm:w-auto sm:h-9 bg-white border border-[color:var(--t-200)] rounded-none shadow-2xs">
       {items.map((k, i) => (
         <div key={k.label} className={`flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-0 min-w-0 ${i > 0 ? 'border-l border-[color:var(--t-100)]' : ''}`}>
-          <span className="text-sm font-extrabold text-[color:var(--ink)] leading-none tabular-nums">{k.value}</span>
-          <span className="text-2xs font-bold text-[color:var(--t-600)] uppercase tracking-wider leading-tight text-center">{k.label}</span>
+          <span className="banner-13 font-extrabold text-[color:var(--ink)] leading-none tabular-nums">{k.value}</span>
+          <span className="banner-13 font-bold text-[color:var(--t-600)] uppercase tracking-wider leading-tight text-center">{k.label}</span>
         </div>
       ))}
     </div>
