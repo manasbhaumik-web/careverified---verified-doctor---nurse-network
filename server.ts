@@ -40,6 +40,7 @@ import { registerCareRoutes, redFlags, emergencyNumbers } from "./server/care";
 import { registerFacilityProfiles, migrateFacilitySchema } from "./server/facilityProfiles";
 import { seedPhase1Demo, seedHomecareDemo } from "./server/phase1Seed";
 import { registerHomecare, resolveCarePayable, onCarePaid, onCareRefunded } from "./server/homecare";
+import { registerProfile } from "./server/profile";
 import { CAREGIVER_ROLE, MIN_REFERENCES, cleanReferences, ekycAdapter, type CaregiverChecks } from "./server/caregiverTier";
 
 // Load environment variables
@@ -1511,6 +1512,7 @@ setPaymentHandlers({
 });
 
 registerHomecare(app, { allProfessionals, findProfessional, paymentRegion });
+registerProfile(app, { patientOf: (userId) => patients.find(p => p.userId === userId), professionalOf: (id) => findProfessional(id), persist: persistState });
 
 // -------------------------------------------------------------
 // Bookings & e-prescriptions

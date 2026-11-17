@@ -13,6 +13,7 @@ const PHASE1_SCREENS = [
   'src/workspaces/admin/AdminFacilityApprovals.tsx',
   'src/domains/homecare/FamilyHomeCare.tsx',
   'src/domains/homecare/CaregiverRequests.tsx',
+  'src/components/ProfilePage.tsx',
 ];
 
 const ms: Record<string, string> = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/locales/ms.json'), 'utf8'));

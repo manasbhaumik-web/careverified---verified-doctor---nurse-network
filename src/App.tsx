@@ -9,6 +9,7 @@ import {
 import DashboardHeader from './shared/ui/DashboardHeader';
 import BrandLogo from './shared/ui/BrandLogo';
 const CaregiverWorkspace = React.lazy(() => import('./components/CaregiverWorkspace'));
+const ProfilePage = React.lazy(() => import('./components/ProfilePage'));
 import NotificationBell from './components/NotificationBell';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import OnCallChip from './components/OnCallChip';
@@ -556,7 +557,8 @@ export default function App() {
 
             {/* Profile Badge embedded with Settings & Close Session Buttons */}
             <div className="flex items-center gap-2 bg-white/15 border-0 shadow-none px-2.5 py-1 rounded-none transition-all">
-              <UserAvatar
+              <button type="button" onClick={() => { setActiveView('my_profile'); setSelectedProfId(null); }} className="flex items-center gap-2 text-left bg-transparent border-0 p-0 cursor-pointer" aria-label={tt('My profile')} title={tt('My profile')}>
+<UserAvatar
                 src={currentUser.avatarUrl}
                 role={currentUser.role}
                 alt={currentUser.name}
@@ -568,6 +570,7 @@ export default function App() {
                   {currentUser.role === 'admin' ? tt('Board Admin') : currentUser.role === 'practitioner' ? tt('Practitioner') : currentUser.role === 'pharmacy' ? tt('Pharmacy') : tt('Member')}
                 </p>
               </div>
+</button>
               <div className="flex items-center gap-0.5 ml-1 pl-1.5 border-l border-white/20">
                 <ThemeSwitcher tone="onColor" variant="embedded" />
                 <button
@@ -686,6 +689,7 @@ export default function App() {
                   );
                 })}
 
+                <button type="button" onClick={() => { setActiveView('my_profile'); setSelectedProfId(null); setMobileMenuOpen(false); }} className="w-full text-left px-1 pt-3 mt-3 border-t border-[color:var(--t-200)] text-sm font-bold text-[color:var(--t-700)] bg-transparent cursor-pointer">{tt('My profile')}</button>
                 <div className="flex items-center justify-between px-1 pt-3 mt-3 border-t border-[color:var(--t-200)]">
                   <span className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ink-2)]">Settings</span>
                   <span className="flex items-center gap-2"><ThemeSwitcher /></span>
@@ -945,6 +949,14 @@ export default function App() {
               />
             )}
 
+            {activeView === 'my_profile' && (
+              <Suspense fallback={routeFallback}>
+                <ProfilePage
+                  onUserUpdated={u => setCurrentUser(cu => (cu ? { ...cu, name: u.name, email: u.email } : cu))}
+                  onOpenCredentials={currentUser.role === 'practitioner' ? () => setActiveView('practice_compliance') : undefined}
+                />
+              </Suspense>
+            )}
             {activeView === 'help' && (
               <SupportDesk
                 currentUser={currentUser}
