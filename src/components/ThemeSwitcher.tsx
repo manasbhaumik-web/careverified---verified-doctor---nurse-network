@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Settings, Check, Globe, Type } from 'lucide-react';
 import { LANGUAGES, REGIONS, setLocale, useLocale, useT, useTr, type RegionCode } from '../locale';
 
-export type ThemeName = 'light-cyan' | 'sky';
+export type ThemeName = 'lagoon' | 'light-cyan' | 'sky';
 export type FontPreset =
   | 'dm-sans'
   | 'clinical-precision'
@@ -12,6 +12,7 @@ export type FontPreset =
   | 'modern-medtech';
 
 const THEMES: { id: ThemeName; label: string; swatch: string }[] = [
+  { id: 'lagoon', label: 'Lagoon', swatch: '#0F766E' },
   { id: 'light-cyan', label: 'Light Cyan', swatch: '#06B6D4' },
   { id: 'sky', label: 'Sky Blue', swatch: '#0270A9' },
 ];
@@ -25,15 +26,15 @@ const FONT_PRESETS: { id: FontPreset; label: string; stack: string; previewFont:
   { id: 'modern-medtech', label: 'Modern MedTech', stack: 'Sora · Inter', previewFont: '"Sora", sans-serif' },
 ];
 
-const STORAGE_KEY = 'medcred-theme-v2';
+const STORAGE_KEY = 'medcred-theme-v3';
 const FONT_STORAGE_KEY = 'medcred-font-v1';
 
 function readTheme(): ThemeName {
   try {
     const t = localStorage.getItem(STORAGE_KEY);
-    if (t === 'light-cyan' || t === 'sky') return t;
+    if (t === 'lagoon' || t === 'light-cyan' || t === 'sky') return t;
   } catch { /* storage unavailable */ }
-  return 'light-cyan';
+  return 'lagoon';
 }
 
 function readFont(): FontPreset {
@@ -47,7 +48,7 @@ function readFont(): FontPreset {
 function applyTheme(theme: ThemeName) {
   document.documentElement.setAttribute('data-theme', theme);
   const color = THEMES.find(t => t.id === theme)?.swatch;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color || '#06B6D4');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color || '#0F766E');
 }
 
 function applyFont(font: FontPreset) {

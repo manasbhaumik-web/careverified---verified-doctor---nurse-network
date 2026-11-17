@@ -231,7 +231,7 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
             </div>
             {spark ? (
               <svg viewBox="0 0 540 72" className="w-full h-[72px] bg-[color:var(--t-50)] border border-[color:var(--t-100)]" role="img" aria-label={tx('Blood pressure trend')}>
-                <polyline fill="none" stroke="#0891B2" strokeWidth="2.5" points={spark} />
+                <polyline fill="none" stroke="#0F766E" strokeWidth="2.5" points={spark} />
               </svg>
             ) : (
               <p className="text-xs text-[color:var(--ink-2)] bg-[color:var(--t-50)] border border-[color:var(--t-100)] p-4">{tx('Log at least two blood pressure readings to see a trend.')}</p>
