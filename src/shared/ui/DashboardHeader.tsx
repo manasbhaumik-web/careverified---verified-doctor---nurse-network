@@ -584,7 +584,7 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
   const initials = typeof name === 'string' ? name.replace(/^Dr\.?\s+/i, '').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() : '';
   return (
     <div className="flex items-center gap-3 sm:gap-5 min-w-0 flex-1">
-      <div className="relative shrink-0">
+      <div className="relative shrink-0 sm:-my-1.5">
         {Icon ? (
           <div aria-hidden="true" className="h-11 w-11 sm:h-13 sm:w-13 rounded-none border border-[color:var(--t-200)] shadow-2xs bg-white text-[color:var(--t-700)] flex items-center justify-center text-lg sm:text-2xl font-bold">
             <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -594,7 +594,7 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
             src={avatarUrl} 
             role={role} 
             alt={typeof name === 'string' ? name : 'User profile'} 
-            className="h-11 w-11 sm:h-13 sm:w-13 rounded-full object-cover border-2 border-white shadow-xs" 
+            className="h-11 w-11 sm:h-18 sm:w-18 rounded-full object-cover border-2 border-white shadow-xs" 
             referrerPolicy="no-referrer" 
           />
         )}
