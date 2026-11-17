@@ -155,7 +155,7 @@ export default function VerificationStatusCard({ onChanged }: { onChanged?: () =
           <ul className="text-xs space-y-1">
             {events.filter((e: any) => e.note).map((e: any, i: number) => (
               <li key={i} className="text-slate-700 flex flex-wrap items-baseline gap-1.5">
-                <span className="text-2xs font-mono font-black uppercase tracking-wider px-1.5 py-0.5 bg-white border border-[color:var(--t-200)] text-[color:var(--t-700)]">
+                <span className="tag-pill font-black uppercase tracking-wider px-1.5 py-0.5 bg-white border border-[color:var(--t-200)] text-[color:var(--t-700)]">
                   {e.action.replace(/_/g, ' ')}
                 </span>
                 <span className="font-medium">{e.note}</span>

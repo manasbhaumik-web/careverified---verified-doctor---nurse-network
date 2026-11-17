@@ -131,7 +131,7 @@ export default function PharmacyFinder({ embedded = false, filterTab = 'all' }: 
                 {tx('Showing')} <strong className="font-black text-[color:var(--ink)]">{shown.length}</strong> {tx(list.length === 1 ? 'of {n} pharmacy' : 'of {n} pharmacies', { n: list.length })}
               </span>
               {city !== ALL && (
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] tag-pill font-black uppercase tracking-wider">
                   {tx('City: ')}{tx(city)}
                   <button type="button" onClick={() => setCity(ALL)} className="hover:text-slate-900 cursor-pointer" aria-label={tx('Remove city filter')}>
                     <X className="h-3 w-3" />
@@ -139,7 +139,7 @@ export default function PharmacyFinder({ embedded = false, filterTab = 'all' }: 
                 </span>
               )}
               {service !== ALL && (
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] tag-pill font-black uppercase tracking-wider">
                   {tx('Service: ')}{tx(service)}
                   <button type="button" onClick={() => setService(ALL)} className="hover:text-slate-900 cursor-pointer" aria-label={tx('Remove service filter')}>
                     <X className="h-3 w-3" />

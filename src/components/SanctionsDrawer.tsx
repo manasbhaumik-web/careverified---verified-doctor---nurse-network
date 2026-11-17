@@ -193,7 +193,7 @@ export default function SanctionsDrawer({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-2xs font-black uppercase tracking-wider px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-300">
+                <span className="tag-pill font-black uppercase tracking-wider px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-300">
                   {tx('Four-Eyes Principle')}
                 </span>
                 <span className="text-xs text-slate-500 font-mono">{tx('Medical Act 1971 / Nurses Act 1950')}</span>
@@ -221,7 +221,7 @@ export default function SanctionsDrawer({
           </div>
           <div className="text-right">
             <span className="text-xs font-mono text-slate-500 block">{tx('Status')}</span>
-            <span className="px-2 py-0.5 text-2xs font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
+            <span className="px-2 py-0.5 tag-pill font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
               {practitioner.verificationStatus}
             </span>
           </div>

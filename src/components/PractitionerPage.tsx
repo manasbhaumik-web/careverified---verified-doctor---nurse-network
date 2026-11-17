@@ -738,7 +738,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
             aria-label="MediCred home"
           >
             <BrandLogo tone="light" size="md" />
-            <span className="hidden sm:inline-block text-xs font-mono font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
+            <span className="hidden sm:inline-block tag-pill font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
               Practitioner Network
             </span>
           </a>

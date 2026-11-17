@@ -280,7 +280,7 @@ export default function ProfessionalProfile({
                     </span>
                   </div>
 
-                  <span className="inline-block text-2xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
+                  <span className="inline-block tag-pill font-bold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
                     {isDoc ? tx('Doctor (MMC Registered)') : tx('Registered Nurse (LJM Registered)')}
                   </span>
 

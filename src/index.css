@@ -427,30 +427,6 @@ footer button.bg-slate-800:hover,
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
 }
 
-:root[data-theme="crimson"] {
-  --ink: #1E293B; --ink-2: #334155; --t-bright: 1; --page: #F8FAFC;
-  --e-50: #ECFDF5; --e-200: #A7F3D0; --e-600: #059669; --e-700: #047857; --e-800: #065F46;
-  --dark: #0F172A;
-  --t-50: #FFF0F2; --t-100: #FFE4E6; --t-200: #FECDD3; --t-300: #FDA4AF; --t-400: #FF8A98;
-  --t-500: #E0243F; --t-600: #C81E1E; --t-700: #B91C1C; --t-800: #86102A; --t-900: #6B0F24;
-  --t-bg: color-mix(in srgb, var(--t-50) 35%, #EEF3F7); --t-hue: 0deg;
-  --band-a: color-mix(in srgb, var(--t-50) 50%, white);
-  --t-text: var(--t-600);
-  --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
-}
-
-:root[data-theme="light-green"] {
-  --ink: #1E293B; --ink-2: #334155; --t-bright: 1; --page: #F8FAFC;
-  --e-50: #ECFDF5; --e-200: #A7F3D0; --e-600: #059669; --e-700: #047857; --e-800: #065F46;
-  --dark: #0F172A;
-  --t-50: #ECFDF5; --t-100: #D1FAE5; --t-200: #A7F3D0; --t-300: #6EE7B7; --t-400: #34D399;
-  --t-500: #10B981; --t-600: #059669; --t-700: #047857; --t-800: #065F46; --t-900: #064E3B;
-  --t-bg: color-mix(in srgb, var(--t-50) 35%, #EEF3F7); --t-hue: 158deg;
-  --band-a: color-mix(in srgb, var(--t-50) 50%, white);
-  --t-text: var(--t-600);
-  --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
-}
-
 /* =============================================================
  * UNIFIED APPLICATION COMPONENT SYSTEM
  * Single source of truth for core UI elements across all MediCred pages:

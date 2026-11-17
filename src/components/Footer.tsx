@@ -50,7 +50,7 @@ export default function Footer({
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-slate-400 text-center md:text-left justify-center md:justify-start">
             <BrandLogo tone="dark" size="sm" />
             <span className="text-slate-600 hidden sm:inline">&bull;</span>
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 flex items-center gap-1.5">
+            <span className="tag-pill font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 bg-emerald-400 animate-pulse shrink-0" />
               {tt('Act 586 Verified')}
             </span>
@@ -106,7 +106,7 @@ export default function Footer({
           <div className="lg:col-span-3 space-y-4">
             <div className="flex items-center gap-2.5">
               <BrandLogo tone="dark" size="md" />
-              <span className="text-xs font-black uppercase tracking-widest bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 px-2 py-0.5">
+              <span className="tag-pill font-black uppercase tracking-widest bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 px-2 py-0.5">
                 Registry v2.4
               </span>
             </div>

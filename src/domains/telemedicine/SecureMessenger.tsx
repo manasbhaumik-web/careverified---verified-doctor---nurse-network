@@ -200,7 +200,7 @@ export default function SecureMessenger({ currentUserId, embedded = false }: { c
                   <div className="min-w-0">
                     <h2 className="text-sm font-bold text-[color:var(--ink)] truncate flex items-center gap-2">
                       {current.name}
-                      {current.verified && <span className="text-2xs font-mono uppercase tracking-wider bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-1.5 py-0.5">{tx('Verified')}</span>}
+                      {current.verified && <span className="tag-pill uppercase tracking-wider bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] px-1.5 py-0.5">{tx('Verified')}</span>}
                     </h2>
                     <p className="text-xs text-[color:var(--ink-2)] truncate">{tx(current.role)}</p>
                   </div>

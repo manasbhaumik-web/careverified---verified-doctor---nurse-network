@@ -109,7 +109,7 @@ export default function PractitionerFeedbackTab({
                         <div className="flex items-center gap-2">
                           <h4 className="text-sm font-extrabold text-slate-800">{rev.patientName}</h4>
                           {rev.isVerifiedPatient && (
-                            <span className="bg-[color:var(--t-50)]/50 text-[color:var(--t-600)] border border-[color:var(--t-200)] text-2xs font-bold px-1.5 py-0.5 rounded-none uppercase tracking-wider">{tx('Verified Patient')}</span>
+                            <span className="bg-[color:var(--t-50)]/50 text-[color:var(--t-600)] border border-[color:var(--t-200)] tag-pill font-bold px-1.5 py-0.5 rounded-none uppercase tracking-wider">{tx('Verified Patient')}</span>
                           )}
                         </div>
                         <p className="text-xs text-slate-400 font-semibold font-mono tabular-nums">{rev.date}</p>

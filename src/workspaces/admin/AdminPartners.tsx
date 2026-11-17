@@ -45,7 +45,7 @@ export default function AdminPartners({ say }: { say: (t: string) => void }) {
         {(data?.rows ?? []).map(r => (
           <li key={r.id}>
             <button type="button" onClick={() => { setOpen(open === r.id ? null : r.id); setNote(r.note ?? ''); }} aria-expanded={open === r.id} className="w-full text-left p-3 cursor-pointer hover:bg-slate-50">
-              <p className="font-bold">{r.org_name} <span className="text-2xs font-extrabold uppercase bg-slate-100 px-1.5 py-0.5 ml-1">{r.kind}</span> <span className="text-2xs font-extrabold uppercase bg-[color:var(--t-50)] text-[color:var(--t-800)] px-1.5 py-0.5 ml-1">{r.status}</span></p>
+              <p className="font-bold">{r.org_name} <span className="tag-pill font-extrabold uppercase bg-slate-100 px-1.5 py-0.5 ml-1">{r.kind}</span> <span className="tag-pill font-extrabold uppercase bg-[color:var(--t-50)] text-[color:var(--t-800)] px-1.5 py-0.5 ml-1">{r.status}</span></p>
               <p className="text-xs text-slate-600">{r.city}, {r.state} · {when(r.created_at)} · {r.id}</p>
             </button>
             {open === r.id && (

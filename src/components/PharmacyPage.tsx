@@ -618,7 +618,7 @@ export default function PharmacyPage() {
             aria-label="MediCred home"
           >
             <BrandLogo tone="light" size="md" />
-            <span className="hidden sm:inline-block text-xs font-mono font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
+            <span className="hidden sm:inline-block tag-pill font-extrabold uppercase px-1.5 py-0.5 bg-[color:var(--t-100)] text-[color:var(--t-700)] border border-[color:var(--t-300)]">
               {tx.headerBadge}
             </span>
           </a>
@@ -790,7 +790,7 @@ export default function PharmacyPage() {
                         <div className="w-10 h-10 bg-[color:var(--t-50)] border border-[color:var(--t-200)] flex items-center justify-center text-[color:var(--t-700)] group-hover:bg-[color:var(--t-600)] group-hover:text-white transition-colors">
                           <IconComponent className="h-5 w-5" />
                         </div>
-                        <span className="text-xs font-mono font-extrabold uppercase px-2 py-0.5 bg-slate-50 border border-slate-200 text-slate-700">
+                        <span className="tag-pill font-extrabold uppercase px-2 py-0.5 bg-slate-50 border border-slate-200 text-slate-700">
                           {c.badge}
                         </span>
                       </div>
@@ -889,7 +889,7 @@ export default function PharmacyPage() {
                       {currentType.name}
                     </span>
                   </div>
-                  <span className="text-xs font-mono font-extrabold uppercase px-2 py-0.5 bg-emerald-950 text-emerald-400 border border-emerald-800">
+                  <span className="tag-pill font-extrabold uppercase px-2 py-0.5 bg-emerald-950 text-emerald-400 border border-emerald-800">
                     {tx.calculator.badgeActive}
                   </span>
                 </div>

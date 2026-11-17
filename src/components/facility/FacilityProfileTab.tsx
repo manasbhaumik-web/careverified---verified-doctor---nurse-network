@@ -145,7 +145,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                           <strong className="text-blue-900 block">{tx('MHTC Elite Healthcare Member')}</strong>
                           <span className="text-blue-700 text-xs">{tx('Malaysia Healthcare Travel Council')}</span>
                         </div>
-                        <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-2xs font-black uppercase border border-blue-300">
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-800 tag-pill font-black uppercase border border-blue-300">
                           {tx('Certified')}
                         </span>
                       </div>

@@ -376,7 +376,7 @@ export default function VerifyPractitionersPage({
                               <h4 className="font-display font-black text-base text-[color:var(--ink)] leading-snug">
                                 {p.name}
                               </h4>
-                              <span className="text-xs font-mono font-extrabold uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                              <span className="tag-pill font-extrabold uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
                                 Active APC 2026
                               </span>
                             </div>
@@ -509,7 +509,7 @@ export default function VerifyPractitionersPage({
         <section className="bg-gradient-to-r from-[color:var(--t-600)] to-[color:var(--t-700)] text-white p-8 sm:p-10 shadow-md">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="max-w-2xl space-y-3">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 border border-white/25 text-white text-xs font-extrabold uppercase tracking-widest">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 border border-white/25 text-white tag-pill font-extrabold uppercase tracking-widest">
                 <Sparkles className="h-3.5 w-3.5" />
                 Become a MediCred Member
               </span>

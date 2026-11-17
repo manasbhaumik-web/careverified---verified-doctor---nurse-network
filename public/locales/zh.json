@@ -370,7 +370,6 @@
  "Application theme": "应用主题",
  "Light Cyan": "浅青色",
  "Sky Blue": "天蓝色",
- "Crimson Red": "绯红色",
  "MediCred home": "MediCred 首页",
  "Care messages": "护理消息",
  "Certificates and referrals": "证明与转诊",
@@ -3865,5 +3864,10 @@
  "Council-verified doctors": "经理事会认证的医生",
  "Your doctor": "您的医生",
  "Council-verified": "经理事会认证",
- "Visits": "就诊"
+ "Visits": "就诊",
+ "Add to your record": "添加到您的记录",
+ "Allergy name": "过敏名称",
+ "Condition name": "病症名称",
+ "Medicine name": "药物名称",
+ "Details (optional)": "详情（选填）"
 }

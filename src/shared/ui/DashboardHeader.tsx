@@ -166,7 +166,7 @@ export default function DashboardHeader<T extends string>({
     <>
       <header
         id={id}
-        className={`relative z-20 mt-0 bg-white overflow-visible ${
+        className={`relative z-20 mt-0 bg-[color:var(--t-50)] overflow-visible ${
           effectiveCollapsed
             ? 'border-b-0 shadow-none'
             : 'border-b border-[color:var(--t-200)] shadow-[0_2px_6px_-1px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.06)]'
@@ -174,7 +174,7 @@ export default function DashboardHeader<T extends string>({
       >
         {(title || children) && (
           <div 
-            className={`dh-brand relative border-t-0 text-[color:var(--ink)] bg-white transition-all duration-200 ease-in-out ${
+            className={`dh-brand relative border-t-0 text-[color:var(--ink)] bg-[color:var(--t-50)] transition-all duration-200 ease-in-out ${
               effectiveCollapsed ? 'max-h-0 opacity-0 overflow-hidden py-0 border-b-0' : 'max-h-[600px] opacity-100 overflow-visible'
             }`}
           >
@@ -246,7 +246,7 @@ export default function DashboardHeader<T extends string>({
           onMouseLeave={() => {
             if (menuStyle === 'mega') scheduleCloseMenu();
           }}
-          className={`sticky top-16 z-30 w-full bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] shadow-[0_2px_6px_-1px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.06)] ${
+          className={`sticky top-16 z-30 w-full bg-white border-b border-[color:var(--t-200)] shadow-[0_2px_6px_-1px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.06)] ${
             fullWidth ? 'border-x-0 px-4 sm:px-6 lg:px-8' : 'border-x'
           }`}
         >
@@ -334,7 +334,7 @@ export default function DashboardHeader<T extends string>({
                       <tab.icon className={`h-4 w-4 transition-colors ${selected ? 'text-[color:var(--t-700)]' : 'text-slate-400'}`} />
                       <span className="whitespace-nowrap">{tab.label}</span>
                       {activeSubItem && activeSubItem.label !== tab.label ? (
-                        <span className="text-2xs px-1.5 py-0.5 rounded-none font-semibold bg-[color:var(--t-600)] text-white leading-none">
+                        <span className="tag-pill px-2 py-0.5 rounded-none font-extrabold bg-[color:var(--t-600)] text-white">
                           {activeSubItem.label}
                         </span>
                       ) : tab.badge ? (
@@ -584,7 +584,7 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
   const initials = typeof name === 'string' ? name.replace(/^Dr\.?\s+/i, '').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() : '';
   return (
     <div className="flex items-center gap-3 sm:gap-5 min-w-0 flex-1">
-      <div className="relative shrink-0">
+      <div className="relative shrink-0 sm:-my-1.5">
         {Icon ? (
           <div aria-hidden="true" className="h-11 w-11 sm:h-13 sm:w-13 rounded-none border border-[color:var(--t-200)] shadow-2xs bg-white text-[color:var(--t-700)] flex items-center justify-center text-lg sm:text-2xl font-bold">
             <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -594,7 +594,7 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
             src={avatarUrl} 
             role={role} 
             alt={typeof name === 'string' ? name : 'User profile'} 
-            className="h-11 w-11 sm:h-13 sm:w-13 rounded-full object-cover border-2 border-white shadow-xs" 
+            className="h-11 w-11 sm:h-18 sm:w-18 rounded-full object-cover border-2 border-white shadow-xs" 
             referrerPolicy="no-referrer" 
           />
         )}

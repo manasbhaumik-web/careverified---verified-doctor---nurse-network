@@ -109,7 +109,7 @@ export default function FacilityLocumsTab({
                   <div>
                     <div className="flex items-center gap-1.5">
                       <span className="text-xs font-black text-slate-900">{loc.name}</span>
-                      <span className="px-1.5 py-0.5 bg-slate-100 text-slate-700 text-2xs font-extrabold uppercase">
+                      <span className="px-1.5 py-0.5 bg-slate-100 text-slate-700 tag-pill font-extrabold uppercase">
                         {loc.role}
                       </span>
                     </div>

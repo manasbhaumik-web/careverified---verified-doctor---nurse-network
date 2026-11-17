@@ -370,7 +370,6 @@
  "Application theme": "Tema aplikasi",
  "Light Cyan": "Cyan Cerah",
  "Sky Blue": "Biru Langit",
- "Crimson Red": "Merah Kemerahan",
  "MediCred home": "Laman utama MediCred",
  "Care messages": "Pesan perawatan",
  "Certificates and referrals": "Sertifikat dan rujukan",
@@ -3865,5 +3864,10 @@
  "Council-verified doctors": "Dokter terverifikasi dewan",
  "Your doctor": "Dokter Anda",
  "Council-verified": "Terverifikasi dewan",
- "Visits": "Kunjungan"
+ "Visits": "Kunjungan",
+ "Add to your record": "Tambahkan ke catatan Anda",
+ "Allergy name": "Nama alergi",
+ "Condition name": "Nama kondisi",
+ "Medicine name": "Nama obat",
+ "Details (optional)": "Detail (opsional)"
 }

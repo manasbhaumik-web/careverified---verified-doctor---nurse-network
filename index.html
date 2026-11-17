@@ -65,7 +65,7 @@
     <script>
       try {
         var t = localStorage.getItem('medcred-theme-v2');
-        if (t !== 'light-cyan' && t !== 'light-green' && t !== 'sky' && t !== 'crimson') t = 'light-cyan';
+        if (t !== 'light-cyan' && t !== 'sky') t = 'light-cyan';
         document.documentElement.setAttribute('data-theme', t);
         var f = localStorage.getItem('medcred-font-v1');
         var validFonts = ['dm-sans', 'clinical-precision', 'swiss-architectural', 'hospital-enterprise', 'compact-geometric', 'modern-medtech'];

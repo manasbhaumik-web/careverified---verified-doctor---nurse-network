@@ -4,7 +4,7 @@ import PrescriptionList, { fmtDate } from '../domains/prescriptions/Prescription
 import CertificatesPanel from './CertificatesPanel';
 import TrendChart from './TrendChart';
 import { useTr } from '../locale';
-import { Activity, AlertTriangle, ClipboardList, FileText, FlaskConical, Pill, Share2, Trash2, CheckCircle2, AlertCircle, Plus } from 'lucide-react';
+import { Activity, AlertTriangle, ClipboardList, FileText, FlaskConical, Pill, Share2, Trash2, CheckCircle2, AlertCircle, Plus, ShieldCheck } from 'lucide-react';
 
 const jpost = (url: string, body?: unknown, method = 'POST') =>
   fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }).then(r => r.json());
@@ -110,6 +110,50 @@ export default function PatientRecords({
   const clearNoKnownAllergies = () => act(() => jpost('/api/records/allergy-status', undefined, 'DELETE'));
   const addAnAllergy = () => { setItem({ type: 'allergy', name: '', detail: '' }); nameRef.current?.focus(); nameRef.current?.scrollIntoView({ block: 'center' }); };
 
+  const nAllergies = data.items.filter((i: any) => i.type === 'allergy').length;
+  const nConditions = data.items.filter((i: any) => i.type === 'condition').length;
+  const nMedicines = data.items.filter((i: any) => i.type === 'medication').length;
+  const startAdd = (type: string) => { setItem({ type, name: '', detail: '' }); nameRef.current?.focus(); nameRef.current?.scrollIntoView({ block: 'center' }); };
+  // Card heading: a coloured icon tile, a sentence-case title and one round count badge
+  const cardHead = (Icon: React.ComponentType<{ className?: string }>, tile: string, title: string, count: number, badge: string) => (
+    <div className="flex items-center justify-between gap-3 mb-4">
+      <div className="flex items-center gap-3 min-w-0">
+        <span className={`h-9 w-9 shrink-0 flex items-center justify-center ${tile}`}><Icon className="h-4 w-4" /></span>
+        <h3 className="font-display font-bold text-base text-[color:var(--ink)] truncate">{tx(title)}</h3>
+      </div>
+      <span className={`inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full border text-xs font-bold tabular-nums ${badge}`}>{count}</span>
+    </div>
+  );
+  const emptyState = (text: string, type: string) => (
+    <div className="py-5 px-4 bg-slate-50 flex flex-wrap items-center justify-between gap-3">
+      <p className="text-xs text-slate-700 font-medium">{tx(text)}</p>
+      <button type="button" onClick={() => startAdd(type)} className="min-h-[44px] px-3 inline-flex items-center gap-1.5 bg-white border border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] text-[color:var(--t-700)] text-xs font-bold cursor-pointer">
+        <Plus className="h-3.5 w-3.5" aria-hidden="true" />{tx('Add Entry')}
+      </button>
+    </div>
+  );
+  // One row per entry on a soft tint, with the remove button shown on hover or keyboard focus (always visible on touch screens)
+  const itemRows = (type: string, tint: string, nameColor: string) => (
+    <ul className="space-y-2">
+      {data.items.filter((i: any) => i.type === type).map((i: any) => (
+        <li key={i.id} className={`group pl-4 pr-1 py-1 flex items-center justify-between gap-2 text-xs ${tint}`}>
+          <div className="min-w-0 py-1.5">
+            <strong className={`${nameColor} font-bold block truncate`}>{tx(i.name)}</strong>
+            {i.detail && <p className="text-xs text-slate-600 truncate">{i.detail}</p>}
+          </div>
+          <button
+            type="button"
+            aria-label={tx('Remove {name}', { name: i.name })}
+            onClick={() => removeItem(i)}
+            className="h-11 w-11 flex items-center justify-center text-slate-600 hover:text-rose-700 hover:bg-white/70 transition-all cursor-pointer shrink-0 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+
   const tabs = [
     ['overview', 'Overview', ClipboardList], ['vitals', 'Readings', Activity], ['rx', 'Prescriptions', Pill], ['rxhist', 'Past prescriptions', Pill], ['docs', 'Certificates & referrals', FileText],
     ['labs', 'Lab tests', FlaskConical], ['notes', 'Doctor notes', FileText], ['sharing', 'Sharing', Share2],
@@ -164,39 +208,84 @@ export default function PatientRecords({
       )}
 
       {tab === 'overview' && (
-        <div className="space-y-3.5">
-          {/* 3-COLUMN CLINICAL PROFILE BENTO GRID */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {/* 1. ALLERGIES */}
-            <div className="bg-white border-t-2 border-t-rose-600 border-x border-b border-[color:var(--t-200)] shadow-xs p-3.5 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between pb-2 mb-2 border-b border-[color:var(--t-100)]">
-                  <div className="flex items-center gap-1.5">
-                    <AlertTriangle className="h-3.5 w-3.5 text-rose-600" />
-                    <h3 className="font-display font-extrabold text-sm text-[color:var(--ink)] uppercase tracking-wider">
-                      {tx('Documented Allergies')}
-                    </h3>
-                  </div>
-                  <span className={`text-2xs font-mono font-bold px-1.5 py-0.2 border ${
-                    data.items.filter((i: any) => i.type === 'allergy').length > 0
-                      ? 'bg-rose-50 text-rose-800 border-rose-200'
-                      : saidNoAllergies
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                        : 'bg-slate-100 text-slate-700 border-slate-300'
-                  }`}>
-                    {data.items.filter((i: any) => i.type === 'allergy').length}
-                  </span>
-                </div>
+        <div className="space-y-5">
+          {/* ADD TO THE RECORD: the main action, kept above the lists it adds to */}
+          <form
+            onSubmit={async e => {
+              e.preventDefault();
+              const d = await act(() => jpost('/api/records/items', item), 'Added.');
+              if (d.status === 'success') setItem({ ...item, name: '', detail: '' });
+            }}
+            className="bg-white border border-[color:var(--t-100)] shadow-sm p-4 sm:p-5 flex flex-col gap-4"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="font-display font-extrabold text-base text-[color:var(--ink)]">{tx('Add to your record')}</h2>
+              <div role="group" aria-label={tx('Entry Type')} className="flex w-full sm:w-auto bg-[color:var(--t-50)] p-1 gap-1">
+                {([['allergy', 'Allergy'], ['condition', 'Condition'], ['medication', 'Medicine']] as const).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={item.type === value}
+                    onClick={() => setItem({ ...item, type: value })}
+                    className={`flex-1 sm:flex-none min-h-[44px] px-4 text-xs font-bold cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 ${item.type === value ? 'bg-[color:var(--t-600)] text-white' : 'text-[color:var(--t-700)] hover:bg-white'}`}
+                  >
+                    {tx(label)}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-                {data.items.filter((i: any) => i.type === 'allergy').length === 0 ? (
+            <div className="flex flex-wrap lg:flex-nowrap items-end gap-3">
+              <label className="flex-1 min-w-[200px] w-full sm:w-auto text-xs font-bold text-slate-700">
+                {tx(item.type === 'allergy' ? 'Allergy name' : item.type === 'condition' ? 'Condition name' : 'Medicine name')}
+                <input
+                  ref={nameRef}
+                  value={item.name}
+                  onChange={e => setItem({ ...item, name: e.target.value })}
+                  required
+                  maxLength={120}
+                  placeholder={tx(item.type === 'allergy' ? 'Allergy name (e.g. Penicillin)' : item.type === 'condition' ? 'Condition (e.g. Hypertension)' : 'Medicine name (e.g. Metformin)')}
+                  className="mt-1.5 block w-full border border-[color:var(--t-200)] bg-white px-3 h-11 text-xs font-semibold text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors"
+                />
+              </label>
+
+              <label className="flex-[2] min-w-[200px] w-full sm:w-auto text-xs font-bold text-slate-700">
+                {tx('Details (optional)')}
+                <input
+                  value={item.detail}
+                  onChange={e => setItem({ ...item, detail: e.target.value })}
+                  maxLength={300}
+                  placeholder={tx('Details (optional, e.g. severe rash, 5mg daily)')}
+                  className="mt-1.5 block w-full border border-[color:var(--t-200)] bg-white px-3 h-11 text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors"
+                />
+              </label>
+
+              <button
+                type="submit"
+                className="w-full sm:w-auto shrink-0 h-11 px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>{tx('Add Entry')}</span>
+              </button>
+            </div>
+          </form>
+
+          {/* Allergies and conditions stack in a narrow column; medicines get the wider one */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 items-start">
+            <div className="lg:col-span-2 space-y-5">
+              {/* ALLERGIES */}
+              <section className="bg-white border border-[color:var(--t-100)] shadow-sm p-5">
+                {cardHead(AlertTriangle, 'bg-rose-50 text-rose-700', 'Documented Allergies', nAllergies,
+                  nAllergies > 0 ? 'bg-rose-50 text-rose-800 border-rose-200' : saidNoAllergies ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-300')}
+                {nAllergies === 0 ? (
                   saidNoAllergies ? (
-                    <div className="py-3 px-3 bg-emerald-50 border border-emerald-200 my-1 space-y-1">
+                    <div className="py-3 px-4 bg-emerald-50 space-y-1">
                       <p className="text-sm text-emerald-900 font-bold">{tx('You told us you have no known allergies.')}</p>
                       <p className="text-xs text-slate-700">{tx('Said on {date}.', { date: new Date(data.allergyStatement.recorded_at).toLocaleDateString() })}</p>
                       <button type="button" onClick={clearNoKnownAllergies} className="min-h-[44px] text-xs font-bold underline text-emerald-900 cursor-pointer">{tx('Change this')}</button>
                     </div>
                   ) : (
-                    <div className="py-3 px-3 bg-slate-50 border border-dashed border-slate-300 my-1 space-y-2">
+                    <div className="py-3 px-4 bg-slate-50 space-y-2">
                       <p className="text-sm text-slate-800 font-bold">{tx('No allergies recorded yet.')}</p>
                       <p className="text-xs text-slate-700 leading-snug">{tx('Doctors and pharmacists cannot tell "none" from "not filled in". Add an allergy, or tell us you have none.')}</p>
                       <div className="flex flex-wrap gap-2">
@@ -205,187 +294,47 @@ export default function PatientRecords({
                       </div>
                     </div>
                   )
-                ) : (
-                  <ul className="divide-y divide-[color:var(--t-100)] max-h-48 overflow-y-auto">
-                    {data.items.filter((i: any) => i.type === 'allergy').map((i: any) => (
-                      <li key={i.id} className="py-1.5 flex items-center justify-between gap-2 text-xs group">
-                        <div className="min-w-0">
-                          <strong className="text-rose-900 font-bold block truncate">{tx(i.name)}</strong>
-                          {i.detail && <p className="text-xs text-slate-600 truncate">{i.detail}</p>}
-                        </div>
-                        <button
-                          type="button"
-                          aria-label={tx('Remove {name}', { name: i.name })}
-                          onClick={() => removeItem(i)}
-                          className="h-11 w-11 flex items-center justify-center text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                ) : itemRows('allergy', 'bg-rose-50/60', 'text-rose-900')}
+              </section>
+
+              {/* CHRONIC CONDITIONS */}
+              <section className="bg-white border border-[color:var(--t-100)] shadow-sm p-5">
+                {cardHead(Activity, 'bg-[color:var(--t-50)] text-[color:var(--t-700)]', 'Chronic Conditions', nConditions, 'bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]')}
+                {nConditions === 0
+                  ? emptyState('No chronic conditions', 'condition')
+                  : itemRows('condition', 'bg-[color:var(--t-50)]', 'text-[color:var(--ink)]')}
+              </section>
+            </div>
+
+            {/* MEDICATIONS */}
+            <section className="lg:col-span-3 bg-white border border-[color:var(--t-100)] shadow-sm p-5">
+              {cardHead(Pill, 'bg-cyan-50 text-cyan-700', 'Active Medications', nMedicines + prescribed.length, 'bg-cyan-50 text-cyan-800 border-cyan-200')}
+
+              {prescribed.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs font-bold text-[color:var(--t-700)] mb-2">{tx('Prescribed by your doctors')}</p>
+                  <ul className="space-y-2">
+                    {prescribed.map((m, k) => (
+                      <li key={k} className="px-4 py-3 bg-[color:var(--t-50)] text-xs">
+                        <strong className="text-[color:var(--ink)] font-bold block">{m.name}{m.strength ? ` ${m.strength}` : ''}</strong>
+                        <p className="mt-0.5 text-xs text-slate-600">{m.detail}{m.doctor ? ` · ${m.doctor}` : ''}{m.until ? tx(' · until {date}', { date: fmt(m.until) }) : ''}</p>
                       </li>
                     ))}
                   </ul>
-                )}
-              </div>
-            </div>
-
-            {/* 2. CHRONIC CONDITIONS */}
-            <div className="bg-white border-t-2 border-t-[color:var(--t-600)] border-x border-b border-[color:var(--t-200)] shadow-xs p-3.5 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between pb-2 mb-2 border-b border-[color:var(--t-100)]">
-                  <div className="flex items-center gap-1.5">
-                    <Activity className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
-                    <h3 className="font-display font-extrabold text-sm text-[color:var(--ink)] uppercase tracking-wider">
-                      {tx('Chronic Conditions')}
-                    </h3>
-                  </div>
-                  <span className="count-badge border bg-[color:var(--t-50)] text-[color:var(--t-700)] border-[color:var(--t-200)]">
-                    {data.items.filter((i: any) => i.type === 'condition').length}
-                  </span>
                 </div>
-
-                {data.items.filter((i: any) => i.type === 'condition').length === 0 ? (
-                  <div className="py-3 px-2 text-center bg-[color:var(--t-50)]/40 border border-dashed border-[color:var(--t-200)] my-1">
-                    <p className="text-xs text-slate-600 font-medium">{tx('No chronic conditions')}</p>
-                  </div>
-                ) : (
-                  <ul className="divide-y divide-[color:var(--t-100)] max-h-48 overflow-y-auto">
-                    {data.items.filter((i: any) => i.type === 'condition').map((i: any) => (
-                      <li key={i.id} className="py-1.5 flex items-center justify-between gap-2 text-xs group">
-                        <div className="min-w-0">
-                          <strong className="text-[color:var(--ink)] font-bold block truncate">{tx(i.name)}</strong>
-                          {i.detail && <p className="text-xs text-slate-600 truncate">{i.detail}</p>}
-                        </div>
-                        <button
-                          type="button"
-                          aria-label={tx('Remove {name}', { name: i.name })}
-                          onClick={() => removeItem(i)}
-                          className="h-11 w-11 flex items-center justify-center text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-
-            {/* 3. MEDICATIONS */}
-            <div className="bg-white border-t-2 border-t-cyan-600 border-x border-b border-[color:var(--t-200)] shadow-xs p-3.5 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between pb-2 mb-2 border-b border-[color:var(--t-100)]">
-                  <div className="flex items-center gap-1.5">
-                    <Pill className="h-3.5 w-3.5 text-cyan-600" />
-                    <h3 className="font-display font-extrabold text-sm text-[color:var(--ink)] uppercase tracking-wider">
-                      {tx('Active Medications')}
-                    </h3>
-                  </div>
-                  <span className="count-badge border bg-cyan-50 text-cyan-800 border-cyan-200">
-                    {data.items.filter((i: any) => i.type === 'medication').length + prescribed.length}
-                  </span>
-                </div>
-
-                {prescribed.length > 0 && (
-                  <div className="mb-2">
-                    <p className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--t-700)] mb-1">{tx('Prescribed by your doctors')}</p>
-                    <ul className="divide-y divide-[color:var(--t-100)] max-h-48 overflow-y-auto">
-                      {prescribed.map((m, k) => (
-                        <li key={k} className="py-1.5 text-xs">
-                          <strong className="text-[color:var(--ink)] font-bold block truncate">{m.name}{m.strength ? ` ${m.strength}` : ''}</strong>
-                          <p className="text-xs text-slate-600">{m.detail}{m.doctor ? ` · ${m.doctor}` : ''}{m.until ? tx(' · until {date}', { date: fmt(m.until) }) : ''}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {data.items.filter((i: any) => i.type === 'medication').length > 0 && prescribed.length > 0 && (
-                  <p className="text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">{tx('You added')}</p>
-                )}
-                {data.items.filter((i: any) => i.type === 'medication').length === 0 ? (prescribed.length > 0 ? null : (
-                  <div className="py-3 px-2 text-center bg-cyan-50/30 border border-dashed border-cyan-200 my-1">
-                    <p className="text-xs text-slate-600 font-medium">{tx('No active medications')}</p>
-                  </div>
-                )) : (
-                  <ul className="divide-y divide-[color:var(--t-100)] max-h-48 overflow-y-auto">
-                    {data.items.filter((i: any) => i.type === 'medication').map((i: any) => (
-                      <li key={i.id} className="py-1.5 flex items-center justify-between gap-2 text-xs group">
-                        <div className="min-w-0">
-                          <strong className="text-[color:var(--ink)] font-bold block truncate">{tx(i.name)}</strong>
-                          {i.detail && <p className="text-xs text-slate-600 truncate">{i.detail}</p>}
-                        </div>
-                        <button
-                          type="button"
-                          aria-label={tx('Remove {name}', { name: i.name })}
-                          onClick={() => removeItem(i)}
-                          className="h-11 w-11 flex items-center justify-center text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
+              )}
+              {nMedicines > 0 && prescribed.length > 0 && (
+                <p className="text-xs font-bold text-slate-700 mb-2">{tx('You added')}</p>
+              )}
+              {nMedicines === 0
+                ? (prescribed.length > 0 ? null : emptyState('No active medications', 'medication'))
+                : itemRows('medication', 'bg-slate-50', 'text-[color:var(--ink)]')}
+            </section>
           </div>
 
-          {/* COMPACT INLINE QUICK-ADD FORM */}
-          <form 
-            onSubmit={async e => {
-              e.preventDefault();
-              const d = await act(() => jpost('/api/records/items', item), 'Added.');
-              if (d.status === 'success') setItem({ ...item, name: '', detail: '' });
-            }}
-            className="bg-white border border-[color:var(--t-200)] p-3 shadow-2xs flex flex-wrap sm:flex-nowrap items-center gap-2.5"
-          >
-            <div className="w-full sm:w-36 shrink-0">
-              <label className="sr-only">{tx('Entry Type')}</label>
-              <CustomSelect 
-                value={item.type} 
-                onChange={e => setItem({ ...item, type: e.target.value })}
-                className="form-select w-full border border-[color:var(--t-200)] bg-white px-2.5 h-11 text-xs font-bold text-[color:var(--ink)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors cursor-pointer"
-              >
-                <option value="allergy">{tx('Allergy')}</option>
-                <option value="condition">{tx('Condition')}</option>
-                <option value="medication">{tx('Medicine')}</option>
-              </CustomSelect>
-            </div>
-
-            <div className="flex-1 min-w-[140px] w-full sm:w-auto">
-              <label className="sr-only">{tx('Name')}</label>
-              <input 
-                ref={nameRef}
-                value={item.name} 
-                onChange={e => setItem({ ...item, name: e.target.value })} 
-                required 
-                maxLength={120} 
-                placeholder={tx(item.type === 'allergy' ? 'Allergy name (e.g. Penicillin)' : item.type === 'condition' ? 'Condition (e.g. Hypertension)' : 'Medicine name (e.g. Metformin)')}
-                className="w-full border border-[color:var(--t-200)] bg-white px-3 h-11 text-xs font-semibold text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors"
-              />
-            </div>
-
-            <div className="flex-1 min-w-[140px] w-full sm:w-auto">
-              <label className="sr-only">{tx('Details')}</label>
-              <input 
-                value={item.detail} 
-                onChange={e => setItem({ ...item, detail: e.target.value })} 
-                maxLength={300} 
-                placeholder={tx('Details (optional, e.g. severe rash, 5mg daily)')}
-                className="w-full border border-[color:var(--t-200)] bg-white px-3 h-11 text-xs font-medium text-[color:var(--ink)] placeholder:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors"
-              />
-            </div>
-
-            <button 
-              type="submit"
-              className="w-full sm:w-auto shrink-0 h-11 px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-black border border-[color:var(--t-700)] shadow-2xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              <span>{tx('Add Entry')}</span>
-            </button>
-          </form>
-
-          <p className="text-xs text-slate-600 font-medium">
-            {tx('Only you can see this unless you share it with a doctor. Each time a doctor opens it, that is logged. Keep it accurate: doctors and pharmacists use it to check that medicines are safe for you.')}
+          <p className="flex items-start gap-3 bg-[color:var(--t-50)] px-4 py-3 text-xs text-slate-700 leading-snug">
+            <ShieldCheck className="h-4 w-4 shrink-0 mt-0.5 text-[color:var(--t-600)]" aria-hidden="true" />
+            <span>{tx('Only you can see this unless you share it with a doctor. Each time a doctor opens it, that is logged. Keep it accurate: doctors and pharmacists use it to check that medicines are safe for you.')}</span>
           </p>
         </div>
       )}

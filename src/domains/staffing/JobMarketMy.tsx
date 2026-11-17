@@ -179,7 +179,7 @@ export function EligibilityInfo() {
           <h3 className="text-base font-black text-[color:var(--ink)] uppercase tracking-wide">{tx('Malaysian Clinical Staffing & Registration Eligibility')}</h3>
           <p className="text-xs text-slate-600 mt-1">{tx('Statutory requirements for doctors (MMC) and nurses (LJM) applying to hospital shifts and locum posts.')}</p>
         </div>
-        <span className="text-2xs font-black uppercase tracking-wider px-2.5 py-1 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
+        <span className="tag-pill font-black uppercase tracking-wider px-2.5 py-1 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
           MMC &amp; LJM Compliance
         </span>
       </div>
@@ -525,7 +525,7 @@ export function LocumBoard({ role, jobs }: { role: string; jobs: any[] }) {
                         <p className="font-display font-extrabold text-xs text-[color:var(--ink)]">{l.name}</p>
                         <p className="text-xs font-bold text-[color:var(--t-700)]">{l.specialization}</p>
                       </div>
-                      <span className="text-2xs font-mono font-black uppercase px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
+                      <span className="tag-pill font-black uppercase px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
                         {l.role}
                       </span>
                     </div>

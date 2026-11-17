@@ -84,7 +84,7 @@ export default function HeaderColorSamples() {
       <div className="max-w-[1440px] mx-auto bg-slate-950 border border-slate-800 p-5 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 text-2xs uppercase tracking-widest font-mono font-bold bg-[color:var(--t-600)] text-white">
+            <span className="px-2 py-0.5 tag-pill uppercase tracking-widest font-bold bg-[color:var(--t-600)] text-white">
               Live Interactive Prototype
             </span>
             <span className="text-xs text-slate-400 font-mono">http://localhost:3000/header-samples</span>
@@ -136,7 +136,7 @@ export default function HeaderColorSamples() {
 
           {/* Role Selector */}
           <div className="flex items-center bg-slate-900 p-1 border border-slate-800 text-xs">
-            <span className="text-2xs font-mono font-bold text-slate-400 uppercase px-2">Role:</span>
+            <span className="tag-pill font-bold text-slate-400 uppercase px-2">Role:</span>
             <div className="flex items-center gap-1">
               {(['practitioner', 'patient', 'pharmacy', 'facility'] as const).map(role => (
                 <button
@@ -181,7 +181,7 @@ export default function HeaderColorSamples() {
           {/* TIER 0: Top Regulatory & Statutory Ribbon */}
           <div className="bg-[color:var(--t-100)] text-[color:var(--t-800)] text-xs font-semibold py-2 px-4 sm:px-6 lg:px-8 border-b border-[color:var(--t-200)] flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 bg-[color:var(--t-600)] text-white px-2 py-0.5 text-2xs uppercase tracking-wider font-extrabold rounded-none">
+              <span className="inline-flex items-center gap-1.5 bg-[color:var(--t-600)] text-white px-2 py-0.5 tag-pill uppercase tracking-wider font-extrabold rounded-none">
                 <ShieldCheck className="h-3 w-3" />
                 {current.regBadge}
               </span>
@@ -303,7 +303,7 @@ export default function HeaderColorSamples() {
               </nav>
 
               <div className="hidden sm:flex items-center gap-2 shrink-0 py-1">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-2xs font-extrabold font-mono uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 tag-pill font-extrabold uppercase tracking-wider">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   On-Call: Active
                 </span>
@@ -316,7 +316,7 @@ export default function HeaderColorSamples() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] text-2xs font-bold uppercase tracking-widest">
+                  <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)] tag-pill font-bold uppercase tracking-widest">
                     {current.heroBadge}
                   </span>
                   <span className="text-xs text-slate-400 font-mono">WORKSPACE ID: 2026-MY</span>

@@ -828,7 +828,7 @@ export default function MedicalAssistanceModule({
                         <div>
                           <div className="flex items-center gap-1.5">
                             <span className="font-mono text-xs font-black text-slate-900">{c.trackingCode}</span>
-                            <span className="inline-flex items-center gap-1 text-2xs uppercase font-extrabold px-1.5 py-0.2 bg-slate-100 text-slate-700">
+                            <span className="inline-flex items-center gap-1 tag-pill uppercase font-extrabold px-1.5 py-0.2 bg-slate-100 text-slate-700">
                               {c.patientType === 'local_malaysian' ? (
                                 <><MapPin className="h-3 w-3 shrink-0" />{tx('Local')}</>
                               ) : c.patientType === 'expat_resident' ? (
@@ -1099,7 +1099,7 @@ export default function MedicalAssistanceModule({
                               </div>
                               <div className="space-y-0.5">
                                 <span className="text-xs font-black text-slate-900">{it.title}</span>
-                                <span className="ml-2 text-2xs font-extrabold uppercase px-1.5 py-0.2 bg-slate-100 text-slate-600">
+                                <span className="ml-2 tag-pill font-extrabold uppercase px-1.5 py-0.2 bg-slate-100 text-slate-600">
                                   {tx(it.kind)}
                                 </span>
                                 {it.note && <p className="text-xs text-slate-600">{it.note}</p>}
@@ -1324,7 +1324,7 @@ export default function MedicalAssistanceModule({
                   {[proformaData.facility.licenceNo && `${tx('Licence: ')}${proformaData.facility.licenceNo}`, proformaData.facility.phone && `${tx('Tel: ')}${proformaData.facility.phone}`].filter(Boolean).join(' · ')}
                 </p>
                 {proformaData.facility.mhtcMember && (
-                  <span className="inline-block mt-1 text-2xs font-black uppercase px-2 py-0.5 bg-sky-50 text-sky-800 border border-sky-300">
+                  <span className="inline-block mt-1 tag-pill font-black uppercase px-2 py-0.5 bg-sky-50 text-sky-800 border border-sky-300">
                     {tx('Malaysia Healthcare Travel Council (MHTC) Endorsed')}
                   </span>
                 )}

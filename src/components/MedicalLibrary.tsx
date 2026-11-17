@@ -503,7 +503,7 @@ export default function MedicalLibrary({
                 </div>
                 <div className="flex-[2_1_380px] min-w-0 p-6 flex flex-col gap-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-2xs font-bold uppercase tracking-wider text-white bg-[color:var(--t-600)] px-2.5 py-1">{tx('Featured')}</span>
+                    <span className="tag-pill font-bold uppercase tracking-wider text-white bg-[color:var(--t-600)] px-2.5 py-1">{tx('Featured')}</span>
                     <span className="text-2xs font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2.5 py-0.5">{tx(featured.category)}</span>
                     <EvidenceBadge article={featured} />
                     <span className="text-xs text-slate-600">{featured.date} · {tx('{n} min read', { n: readingMinutes(featured) })}</span>

@@ -370,7 +370,6 @@
  "Application theme": "مظهر التطبيق",
  "Light Cyan": "سماوي فاتح",
  "Sky Blue": "أزرق سماوي",
- "Crimson Red": "أحمر قرمزي",
  "MediCred home": "الصفحة الرئيسية لـ MediCred",
  "Care messages": "رسائل الرعاية",
  "Certificates and referrals": "الشهادات والإحالات",
@@ -3865,5 +3864,10 @@
  "Council-verified doctors": "أطباء معتمدون من المجلس",
  "Your doctor": "طبيبك",
  "Council-verified": "معتمد من المجلس",
- "Visits": "الزيارات"
+ "Visits": "الزيارات",
+ "Add to your record": "أضف إلى سجلك",
+ "Allergy name": "اسم الحساسية",
+ "Condition name": "اسم الحالة",
+ "Medicine name": "اسم الدواء",
+ "Details (optional)": "التفاصيل (اختياري)"
 }

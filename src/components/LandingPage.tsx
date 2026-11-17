@@ -660,7 +660,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
       {/* ═══════════ TOP BANNER ═══════════ */}
       <div className="hidden sm:flex bg-[color:var(--t-100)] text-[color:var(--t-600)] text-xs font-semibold py-2 px-4 text-center border-b border-[color:var(--t-200)] items-center justify-center gap-2">
-        <span className="inline-flex items-center gap-1.5 bg-[color:var(--t-600)] text-white px-2.5 py-0.5 rounded-none text-xs uppercase tracking-wider font-bold">
+        <span className="inline-flex items-center gap-1.5 bg-[color:var(--t-600)] text-white px-2.5 py-0.5 rounded-none tag-pill uppercase tracking-wider font-bold">
           <Cross className="h-2.5 w-2.5" /> Compassionate Care Standard
         </span>
         <span>Dedicated to Patient Well-Being, Verified Practitioners &amp; Gentle Medical Support Across Malaysia</span>
@@ -1240,7 +1240,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                       <span className="w-8 h-8 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-600)] flex items-center justify-center group-hover:bg-[color:var(--t-600)] group-hover:text-white transition-colors shadow-2xs">
                         <QmIcon className="h-4 w-4" />
                       </span>
-                      <span className="text-xs font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-600)] bg-[color:var(--t-50)] px-2 py-0.5 border border-[color:var(--t-200)]">
+                      <span className="tag-pill font-extrabold uppercase tracking-wider text-[color:var(--t-600)] bg-[color:var(--t-50)] px-2 py-0.5 border border-[color:var(--t-200)]">
                         {qm.badge}
                       </span>
                     </div>
@@ -1434,7 +1434,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
       <section aria-label="Emergency Hotline Protocol" className="relative bg-rose-50/80 border-b border-rose-200 py-3.5">
         <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-start sm:items-center gap-3 min-w-0">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-600 text-white text-xs font-mono font-extrabold uppercase tracking-wider shrink-0">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-600 text-white tag-pill font-extrabold uppercase tracking-wider shrink-0">
               <AlertCircle className="h-3.5 w-3.5 animate-pulse" />
               Emergency 999
             </span>
@@ -1489,7 +1489,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     <span className="w-9 h-9 bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
                       01
                     </span>
-                    <span className="text-xs font-mono font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2.5 py-0.5 border border-[color:var(--t-200)]">
+                    <span className="tag-pill font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2.5 py-0.5 border border-[color:var(--t-200)]">
                       Official Audit
                     </span>
                   </div>
@@ -1514,7 +1514,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     <span className="w-9 h-9 bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
                       02
                     </span>
-                    <span className="text-xs font-mono font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2.5 py-0.5 border border-[color:var(--t-200)]">
+                    <span className="tag-pill font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2.5 py-0.5 border border-[color:var(--t-200)]">
                       Hourly Sync
                     </span>
                   </div>
@@ -1539,7 +1539,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                     <span className="w-9 h-9 bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
                       03
                     </span>
-                    <span className="text-xs font-mono font-extrabold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-0.5 border border-emerald-200">
+                    <span className="tag-pill font-extrabold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-0.5 border border-emerald-200">
                       Patient Safe
                     </span>
                   </div>
@@ -1946,7 +1946,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
               {/* Currency Selector Pill */}
               <div className="flex flex-wrap items-center gap-2 bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-1.5 shadow-2xs max-w-full">
-                <span className="text-xs font-mono font-bold text-slate-500 px-2 uppercase">Currency:</span>
+                <span className="tag-pill font-bold text-slate-500 px-2 uppercase">Currency:</span>
                 {(['MYR', 'USD', 'SGD', 'IDR', 'AUD', 'SAR'] as const).map(curr => (
                   <button
                     key={curr}
@@ -2414,7 +2414,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                   <StaggerItem key={tm.id} index={idx} className="h-full">
                     <article className="bg-white p-7 border border-[color:var(--t-200)] border-t-2 border-t-[color:var(--t-600)] panel-edge flex flex-col justify-between corner-bracket h-full shadow-2xs hover:shadow-xs transition-all">
                       <div>
-                        {tm.demo && <span className="inline-block mb-3 text-xs font-extrabold uppercase tracking-wider text-amber-900 bg-amber-50 border border-amber-300 px-2 py-0.5">Demo testimonial, not a real patient</span>}
+                        {tm.demo && <span className="inline-block mb-3 tag-pill font-extrabold uppercase tracking-wider text-amber-900 bg-amber-50 border border-amber-300 px-2 py-0.5">Demo testimonial, not a real patient</span>}
                         {tm.rating && <div className="flex items-center gap-1 text-amber-500 mb-3" aria-label={`${tm.rating} out of 5`}>{Array.from({ length: tm.rating }).map((_, i) => <span key={i} className="text-sm">★</span>)}</div>}
                         <p className="text-sm text-slate-700 leading-relaxed font-medium mb-6">“{tm.text}”</p>
                       </div>
@@ -2466,7 +2466,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
                   <span className="text-xs font-black font-display text-[color:var(--ink)] leading-none">
                     On-Call Doctor Online
                   </span>
-                  <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 text-xs font-mono font-black uppercase">
+                  <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 tag-pill font-black uppercase">
                     Live
                   </span>
                 </div>

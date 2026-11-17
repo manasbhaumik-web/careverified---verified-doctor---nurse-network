@@ -90,7 +90,7 @@ export default function LandingDesignPreview() {
       <div className="bg-white border-b border-[color:var(--t-200)] py-8 px-4 sm:px-6 lg:px-12">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[color:var(--t-50)] text-[color:var(--t-700)] text-xs font-mono font-extrabold uppercase tracking-wider border border-[color:var(--t-200)] mb-2.5">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[color:var(--t-50)] text-[color:var(--t-700)] tag-pill font-extrabold uppercase tracking-wider border border-[color:var(--t-200)] mb-2.5">
               Visual-First Design Proposal
             </span>
             <h1 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl text-slate-900 tracking-tight">
@@ -468,7 +468,7 @@ export default function LandingDesignPreview() {
                   <span className="w-9 h-9 rounded-none bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
                     01
                   </span>
-                  <span className="text-xs font-mono font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2 py-0.5 border border-[color:var(--t-200)]">
+                  <span className="tag-pill font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2 py-0.5 border border-[color:var(--t-200)]">
                     Official Audit
                   </span>
                 </div>
@@ -493,7 +493,7 @@ export default function LandingDesignPreview() {
                   <span className="w-9 h-9 rounded-none bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
                     02
                   </span>
-                  <span className="text-xs font-mono font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2 py-0.5 border border-[color:var(--t-200)]">
+                  <span className="tag-pill font-extrabold text-[color:var(--t-700)] uppercase tracking-wider bg-white px-2 py-0.5 border border-[color:var(--t-200)]">
                     Hourly Sync
                   </span>
                 </div>
@@ -518,7 +518,7 @@ export default function LandingDesignPreview() {
                   <span className="w-9 h-9 rounded-none bg-[color:var(--t-600)] text-white font-mono font-black text-sm flex items-center justify-center shadow-xs">
                     03
                   </span>
-                  <span className="text-xs font-mono font-extrabold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+                  <span className="tag-pill font-extrabold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2 py-0.5 border border-emerald-200">
                     Patient Safe
                   </span>
                 </div>

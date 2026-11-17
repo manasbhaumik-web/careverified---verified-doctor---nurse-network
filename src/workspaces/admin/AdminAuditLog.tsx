@@ -126,7 +126,7 @@ export default function AdminAuditLog({ onClose, isEmbedded = false }: AdminAudi
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-2xs font-black uppercase tracking-wider px-2 py-0.5 bg-slate-900 text-amber-300 border border-slate-800">
+                <span className="tag-pill font-black uppercase tracking-wider px-2 py-0.5 bg-slate-900 text-amber-300 border border-slate-800">
                   {tx('Statutory Audit Log (WAL Mode)')}
                 </span>
                 <span className="text-xs text-slate-500 font-mono">{tx('SQLite careverified.db')}</span>
