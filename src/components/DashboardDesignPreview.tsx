@@ -397,7 +397,7 @@ export default function DashboardDesignPreview() {
             </div>
 
             {/* 2-Column Split: Scheduled Consult + Prescriptions */}
-            <div className="grid lg:grid-cols-12 gap-5">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
               {/* Upcoming Appointment */}
               <div className="lg:col-span-7 bg-white border border-[color:var(--t-200)] p-6 space-y-4 shadow-xs">
                 <div className="flex items-center justify-between border-b border-[color:var(--t-100)] pb-3">

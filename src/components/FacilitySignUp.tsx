@@ -32,7 +32,7 @@ export default function FacilitySignUp() {
       <form onSubmit={submit} className="page-w max-w-2xl bg-white border border-[color:var(--t-200)] p-6 space-y-4">
         <h1 className="font-display font-black text-xl text-[color:var(--ink)]">{tx('Register your hospital or clinic')}</h1>
         <p className="text-xs text-slate-700">{tx('The board checks your facility licence before your profile is public. You can complete your profile while you wait.')}</p>
-        <div className="grid sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {field('facilityName', 'Facility name')}
           <div><label htmlFor="fs-kind" className="form-label">{tx('Type')}</label><select id="fs-kind" className="form-input" value={f.kind} onChange={e => set('kind', e.target.value)}><option value="clinic">{tx('Clinic')}</option><option value="hospital">{tx('Hospital')}</option></select></div>
           {field('licenceNo', 'Facility licence number')}

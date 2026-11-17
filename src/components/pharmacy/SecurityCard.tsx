@@ -77,7 +77,7 @@ export default function SecurityCard({ twoFactor, email, onChanged }: { twoFacto
       {twoFactor.enabled && !twoFactor.required && (
         <form onSubmit={disable} className="space-y-4 bg-slate-50 border border-slate-200 p-4 rounded-none">
           <p className="text-xs text-slate-600 font-semibold">{tx('To disable two-factor authentication, confirm with your password and a current TOTP token.')}</p>
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label className="block"><span className={fieldLabel}>{tx('Password')}</span><input type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" className="h-10 w-full border border-slate-300 rounded-none px-3 bg-white text-xs font-semibold text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] transition-colors" /></label>
             <label className="block"><span className={fieldLabel}>{tx('Current 6-digit token')}</span><input value={code} onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" required className="h-12 w-full border border-slate-300 rounded-none px-3.5 bg-white font-mono font-bold tracking-widest text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)]" placeholder="000000" /></label>
           </div>

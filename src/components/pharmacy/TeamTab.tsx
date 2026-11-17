@@ -40,7 +40,7 @@ export default function TeamTab() {
   };
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] items-start">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] items-start">
       <section aria-label={tx('Staff logins')} className="app-card rounded-none border border-slate-200 overflow-hidden min-w-0">
         <div className="p-5 border-b border-slate-200 bg-slate-50">
           <h2 className="text-sm font-black uppercase tracking-wider text-slate-800 flex items-center gap-2"><Users className="h-4 w-4 text-[color:var(--t-600)]" /> {tx('Authorized Staff Logins')}</h2>

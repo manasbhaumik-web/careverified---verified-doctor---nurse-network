@@ -122,7 +122,7 @@ function Support({ say }: { say: (t: string) => void }) {
           <div key={l as string} className={`bg-white border p-3 ${l === 'Overdue' && (v as number) > 0 ? 'border-rose-300' : 'border-slate-200'}`}><p className={lab}>{l}</p><p className="text-xl font-black tabular-nums">{v}</p></div>
         ))}</div>}
       <div className="flex gap-2 text-xs font-bold">{(['active', 'resolved'] as const).map(v => <button key={v} onClick={() => setView(v)} className={`px-3 py-1.5 cursor-pointer ${view === v ? 'bg-[color:var(--t-600)] text-white' : 'bg-slate-100'}`}>{v}</button>)}</div>
-      <div className="grid lg:grid-cols-[1fr_1fr] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4">
         <ul className="bg-white border border-slate-200 divide-y divide-slate-100 text-xs max-h-[480px] overflow-y-auto">
           {(data?.tickets ?? []).length === 0 && <li className="p-4 text-xs text-slate-500">{tx('No tickets.')}</li>}
           {(data?.tickets ?? []).map((t: any) => (

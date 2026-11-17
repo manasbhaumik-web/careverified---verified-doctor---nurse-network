@@ -739,7 +739,7 @@ function RxCard({ rx, onChanged }: { rx: Rx; onChanged: () => void; key?: React.
             <p className="text-xs text-slate-700 font-medium leading-relaxed">
               Confirm dispensing to <strong>{rx.patientName}</strong>. This statutory digital entry is permanent and archives to your dispensary ledger.
             </p>
-            <div className="grid sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
                 <label className="text-2xs uppercase tracking-wider font-extrabold text-slate-600 block mb-1">Dispensing Pharmacist *</label>
                 <input value={pharmacist} onChange={e => setPharmacist(e.target.value)} placeholder={tx('e.g. Rph. Sarah Nurhaliza')} aria-label={tx('Dispensing pharmacist')} maxLength={100} className="w-full border border-slate-300 rounded-none px-2.5 py-1.5 text-xs bg-white outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 focus:border-[color:var(--t-600)] font-semibold" />
@@ -996,7 +996,7 @@ function ReportsTab() {
             {tile('Time to dispense', fmtMin(r.dispenseMinutes.median), `median · avg ${fmtMin(r.dispenseMinutes.average)}`)}
           </section>
 
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             <section aria-label={tx('Prescriptions per day')} className="app-card rounded-none border-slate-200 p-5 min-w-0">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
                 <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800">{tx('Daily Prescription Volume')}</h2>
@@ -1076,7 +1076,7 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
   const field = 'form-label';
   const inputCls = 'form-input text-xs';
   return (
-    <div className="grid gap-5 lg:grid-cols-2 items-start">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 items-start">
       <form onSubmit={save} className="app-card rounded-none border border-slate-200 p-6 space-y-5 min-w-0">
         <div className="border-b border-slate-100 pb-3">
           <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800">{tx('Public Pharmacy Registry Listing')}</h2>
@@ -1087,7 +1087,7 @@ function ProfileTab({ me, onSaved }: { me: Me; onSaved: () => void }) {
           <p className="text-base font-bold text-slate-900 [overflow-wrap:anywhere]">{p.name}</p>
         </div>
         <label className="block"><span className={field}>{tx('Street Address')}</span><input value={address} onChange={e => setAddress(e.target.value)} required maxLength={250} className={inputCls} /></label>
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <label className="block"><span className={field}>{tx('City')}</span><input value={city} onChange={e => setCity(e.target.value)} maxLength={60} className={inputCls} /></label>
           <label className="block"><span className={field}>{tx('Contact Phone')}</span><input value={phone} onChange={e => setPhone(e.target.value)} maxLength={30} className={inputCls} /></label>
         </div>

@@ -654,7 +654,7 @@ export default function PharmacyPage() {
           />
 
           <div className="relative z-10 page-w mx-auto px-4 sm:px-6 w-full">
-            <div className="grid lg:grid-cols-12 gap-8 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-8 flex flex-col justify-center max-w-2xl">
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/95 backdrop-blur-xs border border-[color:var(--t-200)] text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] shadow-xs">
@@ -822,7 +822,7 @@ export default function PharmacyPage() {
               <p className="text-sm text-slate-600 mt-1">{tx.calculator.subtitle}</p>
             </div>
 
-            <div className="grid lg:grid-cols-12 gap-8 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Controls Column */}
               <div className="lg:col-span-7 bg-[color:var(--t-50)]/40 border border-[color:var(--t-200)] p-6 sm:p-8 space-y-6">
                 <div>
@@ -976,7 +976,7 @@ export default function PharmacyPage() {
               <p className="text-sm text-slate-600 mt-1">{tx.regulatory.subtitle}</p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {tx.regulatory.items.map(r => (
                 <div
                   key={r.title}
@@ -1000,7 +1000,7 @@ export default function PharmacyPage() {
         {/* ─── SECTION 7: PHARMACY ACCREDITATION & INQUIRY FORM ─── */}
         <section id="apply" aria-labelledby="apply-h" className="py-14 sm:py-20 bg-white scroll-mt-20">
           <div className="page-w mx-auto px-4 sm:px-6">
-            <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10 items-start">
               <div>
                 <p className="text-xs font-mono font-bold uppercase tracking-widest text-[color:var(--t-700)] mb-1">
                   {tx.apply.eyebrow}

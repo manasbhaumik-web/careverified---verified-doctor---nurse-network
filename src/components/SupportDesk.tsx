@@ -126,7 +126,7 @@ export default function SupportDesk({
           </p>
         )}
 
-        <div className="grid gap-6 xl:grid-cols-[440px_minmax(0,1fr)] items-start">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[440px_minmax(0,1fr)] items-start">
       <div className="space-y-5 min-w-0">
 
       <form onSubmit={create} className="bg-white border border-[color:var(--t-200)] p-6 space-y-4 shadow-xs">
@@ -158,7 +158,7 @@ export default function SupportDesk({
       )}
       </div>
 
-      <div className="grid md:grid-cols-[280px_minmax(0,1fr)] gap-5 min-w-0">
+      <div className="grid grid-cols-1 md:grid-cols-[280px_minmax(0,1fr)] gap-5 min-w-0">
         <section className="bg-white border border-slate-200 p-4">
           <h2 className="text-sm font-extrabold mb-2">{tx('Your tickets')}</h2>
           {tickets.length === 0 ? <p className="text-xs text-slate-500">{tx('None yet.')}</p> : (

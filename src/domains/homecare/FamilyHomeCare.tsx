@@ -89,7 +89,7 @@ export default function FamilyHomeCare() {
           ))}
           {recipients.length === 0 && <li className="py-2 text-xs text-slate-600">{tx('Add the first person you care for to ask for a visit.')}</li>}
         </ul>
-        <form onSubmit={saveRecipient} className="grid sm:grid-cols-3 gap-3">
+        <form onSubmit={saveRecipient} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {field('name', 'Name')}{field('relationship', 'Relationship (e.g. Mother)')}{field('birthYear', 'Birth year', 'number')}
           <div className="sm:col-span-2">{field('address', 'Address for the visit')}</div>{field('city', 'City')}
           <div className="sm:col-span-3"><label htmlFor="hc-needs" className="form-label">{tx('Care needs')}</label><textarea id="hc-needs" rows={2} className="form-input" value={rec.needs} onChange={e => setRec({ ...rec, needs: e.target.value })} /></div>
@@ -105,7 +105,7 @@ export default function FamilyHomeCare() {
           <h3 className="text-sm font-extrabold">{tx('Verified caregivers')}</h3>
           <div><label htmlFor="hc-city" className="form-label">{tx('City')}</label><input id="hc-city" className="form-input" value={city} onChange={e => setCity(e.target.value)} /></div>
         </div>
-        <ul className="grid md:grid-cols-2 gap-3">
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {caregivers.map(c => (
             <li key={c.id} className="border border-[color:var(--t-200)] bg-white p-4 space-y-2">
               <div className="flex items-start justify-between gap-2">
@@ -122,7 +122,7 @@ export default function FamilyHomeCare() {
           {caregivers.length === 0 && <li className="text-xs text-slate-600">{tx('No caregivers match yet.')}</li>}
         </ul>
         {askFor && (
-          <form onSubmit={sendRequest} className="border border-[color:var(--t-600)] bg-[color:var(--t-50)] p-4 grid sm:grid-cols-4 gap-3 items-end" aria-label={tx('Request a visit')}>
+          <form onSubmit={sendRequest} className="border border-[color:var(--t-600)] bg-[color:var(--t-50)] p-4 grid grid-cols-1 sm:grid-cols-4 gap-3 items-end" aria-label={tx('Request a visit')}>
             <p className="sm:col-span-4 text-sm font-extrabold">{tx('Request a visit from')} {askFor.name}</p>
             <div><label htmlFor="rq-who" className="form-label">{tx('Care for')}</label><select id="rq-who" className="form-input" value={form.recipientId} onChange={e => setForm({ ...form, recipientId: e.target.value })} required>{recipients.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}</select></div>
             <div><label htmlFor="rq-d" className="form-label">{tx('Date')}</label><input id="rq-d" type="date" className="form-input" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} required /></div>

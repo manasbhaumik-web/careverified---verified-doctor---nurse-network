@@ -440,6 +440,9 @@ footer button.bg-slate-800:hover,
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);
 }
 
+/* Component classes live in the components layer so Tailwind utilities (hidden, lg:inline-flex, w-full, px-3 ...) can override them.
+ * Unlayered CSS beats every utility, which is why responsive classes used to be ignored on .btn, .app-card and the other classes below. */
+@layer components {
 /* =============================================================
  * UNIFIED APPLICATION COMPONENT SYSTEM
  * Single source of truth for core UI elements across all MediCred pages:
@@ -768,6 +771,7 @@ select.opacity-0,
   color: #475569;
   margin-top: 0.125rem;
 }
+} /* end @layer components */
 
 
 /* Printing an open Medical Library article: hide everything except the reader */

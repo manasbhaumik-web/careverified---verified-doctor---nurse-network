@@ -455,7 +455,7 @@ export default function ClinicHospitalPage() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
             <LocaleSwitcher />
-            <ThemeSwitcher />
+            <span className="hidden sm:inline-flex"><ThemeSwitcher /></span>
           </div>
         </div>
       </header>
@@ -477,7 +477,7 @@ export default function ClinicHospitalPage() {
           />
 
           <div className="relative z-10 page-w mx-auto px-4 sm:px-6 w-full">
-            <div className="grid lg:grid-cols-12 gap-8 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               {/* Left Column: Focused Facility Messaging */}
               <div className="lg:col-span-8 flex flex-col justify-center max-w-2xl">
                 <div>
@@ -650,7 +650,7 @@ export default function ClinicHospitalPage() {
               <p className="text-sm text-slate-600 mt-1">{tx.calculator.subtitle}</p>
             </div>
 
-            <div className="grid lg:grid-cols-12 gap-8 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Controls Column */}
               <div className="lg:col-span-7 bg-[color:var(--t-50)]/40 border border-[color:var(--t-200)] p-6 sm:p-8 space-y-6">
                 <div>
@@ -804,7 +804,7 @@ export default function ClinicHospitalPage() {
               <p className="text-sm text-slate-600 mt-1">{tx.regulatory.subtitle}</p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {tx.regulatory.items.map(r => (
                 <div
                   key={r.title}
@@ -828,7 +828,7 @@ export default function ClinicHospitalPage() {
         {/* ─── SECTION 7: FACILITY ACCREDITATION & INQUIRY FORM ─── */}
         <section id="apply" aria-labelledby="apply-h" className="py-14 sm:py-20 bg-white scroll-mt-20">
           <div className="page-w mx-auto px-4 sm:px-6">
-            <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10 items-start">
               <div>
                 <p className="text-xs font-mono font-bold uppercase tracking-widest text-[color:var(--t-700)] mb-1">
                   Begin Your Facility Registration

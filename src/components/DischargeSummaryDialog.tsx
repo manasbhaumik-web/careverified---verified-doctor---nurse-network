@@ -454,7 +454,7 @@ export default function DischargeSummaryDialog({
                   <span className="text-xs font-black uppercase tracking-wider text-slate-700 block">
                     Choose Fulfillment Option
                   </span>
-                  <div className="grid sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button
                       type="button"
                       onClick={() => setFulfillmentType('delivery')}
@@ -517,7 +517,7 @@ export default function DischargeSummaryDialog({
                     <p className="text-xs font-black uppercase tracking-wider text-slate-700">
                       Delivery Address &amp; Courier Contact (Pre-filled from Profile)
                     </p>
-                    <div className="grid sm:grid-cols-2 gap-2.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <div className="sm:col-span-2">
                         <label htmlFor="address-line1" className="sr-only">Street Address</label>
                         <input

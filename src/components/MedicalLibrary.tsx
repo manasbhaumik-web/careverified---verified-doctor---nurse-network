@@ -716,7 +716,7 @@ export default function MedicalLibrary({
                 {patients.length === 0 ? (
                   <p className="text-xs text-slate-500">{tx('You have no patients yet. You can recommend articles to people you have treated.')}</p>
                 ) : (
-                  <div className="grid gap-2 sm:grid-cols-[220px_1fr_auto] items-start">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr_auto] items-start">
                     <CustomSelect value={recPatient} onChange={e => setRecPatient(e.target.value)} aria-label={tx('Patient')} className="form-select h-11 border border-slate-200 bg-white px-3 text-xs">
                       <option value="">{tx('Choose a patient…')}</option>
                       {patients.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -732,7 +732,7 @@ export default function MedicalLibrary({
             {related.length > 0 && (
               <div className="no-print border-t border-[color:var(--t-200)] px-6 py-4 shrink-0 bg-[color:var(--t-bg)]">
                 <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-600 mb-2">{tx('Related articles')}</h3>
-                <ul className="grid gap-2 sm:grid-cols-3">
+                <ul className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                   {related.map(r => (
                     <li key={r.id}>
                       <button type="button" onClick={() => setOpenArticle(r)} className="w-full text-left bg-white border border-[color:var(--t-200)] hover:border-[color:var(--t-600)] p-2.5 cursor-pointer">

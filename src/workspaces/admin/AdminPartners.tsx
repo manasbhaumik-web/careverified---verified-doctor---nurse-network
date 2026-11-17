@@ -50,7 +50,7 @@ export default function AdminPartners({ say }: { say: (t: string) => void }) {
             </button>
             {open === r.id && (
               <div className="px-3 pb-4 space-y-3 text-xs">
-                <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-1.5">
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
                   <div><dt className="font-extrabold text-slate-500 uppercase text-xs">{tx('Contact')}</dt><dd>{r.contact_name}</dd></div>
                   <div><dt className="font-extrabold text-slate-500 uppercase text-xs">{tx('Email')}</dt><dd><a className="underline text-[color:var(--t-700)]" href={`mailto:${r.email}`}>{r.email}</a></dd></div>
                   <div><dt className="font-extrabold text-slate-500 uppercase text-xs">{tx('Phone')}</dt><dd><a className="underline text-[color:var(--t-700)]" href={`tel:${r.phone}`}>{r.phone}</a></dd></div>

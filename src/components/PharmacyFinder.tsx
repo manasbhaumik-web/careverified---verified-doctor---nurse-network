@@ -178,7 +178,7 @@ export default function PharmacyFinder({ embedded = false, filterTab = 'all' }: 
             )}
           </div>
         ) : (
-          <section aria-label={tx('Pharmacies')} className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <section aria-label={tx('Pharmacies')} className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {shown.map(p => {
               const sentHere = activeRx.filter(r => r.pharmacyId === p.id);
               const isOpen = openId === p.id;

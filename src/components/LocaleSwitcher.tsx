@@ -37,11 +37,11 @@ export default function LocaleSwitcher({ className = '', tone = 'light' }: Props
         aria-expanded={open}
         aria-label={tx('Language and region')}
         title={tx('Switch language or audience region (Malaysia / International)')}
-        className={`h-10 px-3 flex items-center gap-1.5 ${tone === 'onColor' ? 'border-0' : 'border'} rounded-none transition-colors cursor-pointer text-xs font-extrabold uppercase tracking-wider ${buttonTone}`}
+        className={`h-10 px-2 sm:px-3 flex items-center gap-1.5 ${tone === 'onColor' ? 'border-0' : 'border'} rounded-none transition-colors cursor-pointer text-xs font-extrabold uppercase tracking-wider ${buttonTone}`}
       >
         <Globe className="h-4 w-4 shrink-0" />
-        <span>{region}</span>
-        <span className="opacity-40">·</span>
+        <span className="hidden min-[400px]:inline">{region}</span>
+        <span className="opacity-40 hidden min-[400px]:inline">·</span>
         <span>{lang}</span>
       </button>
 

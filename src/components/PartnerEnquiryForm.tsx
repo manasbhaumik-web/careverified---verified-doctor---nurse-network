@@ -83,7 +83,7 @@ export default function PartnerEnquiryForm({ kind }: { kind: 'clinic' | 'pharmac
   return (
     <form onSubmit={submit} className="space-y-5" noValidate={false}>
       {error && <div role="alert" className="bg-rose-50 border border-rose-300 text-rose-900 p-3 flex gap-2 text-sm font-bold"><AlertCircle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" /><span>{error}</span></div>}
-      <div className="grid sm:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div className="sm:col-span-2">
           <label htmlFor={id('org')} className={label}>{tx.org[kind]} *</label>
           <input id={id('org')} className={inputCls} value={f.orgName} onChange={e => set({ orgName: e.target.value })} required minLength={2} maxLength={120} autoComplete="organization" />

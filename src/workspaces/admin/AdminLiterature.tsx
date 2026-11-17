@@ -204,7 +204,7 @@ export default function AdminLiterature({
               </div>
             </div>
           ) : (
-            <div className="grid gap-4 xl:grid-cols-2 items-start">
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 items-start">
               {items.map(p => (
                 <article key={p.id} className="bg-white border border-slate-200 p-5 space-y-3 min-w-0 rounded-none shadow-none hover:border-[color:var(--t-200)] transition-colors">
                   <div className="flex flex-wrap gap-1.5 text-xs font-bold">
@@ -296,7 +296,7 @@ export default function AdminLiterature({
               </div>
             </div>
           ) : (
-            <ul className="grid gap-4 xl:grid-cols-2">
+            <ul className="grid grid-cols-1 gap-4 xl:grid-cols-2">
               {sheets.map(s => (
                 <li key={s.id} className="bg-white border border-slate-200 p-5 space-y-3 text-xs min-w-0 rounded-none shadow-none hover:border-[color:var(--t-200)] transition-colors">
                   <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
@@ -326,8 +326,8 @@ export default function AdminLiterature({
       {/* SUBTAB 3: PUBMED DISCOVERY & AUTOMATED TOPIC SYNC */}
       {sub === 'discovery' && (
         <div className="space-y-6">
-          <section className="bg-white border border-[color:var(--t-200)] p-5 grid gap-5 xl:grid-cols-[1fr_auto] items-end rounded-none">
-            <form onSubmit={search} className="grid gap-3 sm:grid-cols-[1fr_140px_auto] items-end">
+          <section className="bg-white border border-[color:var(--t-200)] p-5 grid grid-cols-1 gap-5 xl:grid-cols-[1fr_auto] items-end rounded-none">
+            <form onSubmit={search} className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_140px_auto] items-end">
               <div>
                 <label className={lab} htmlFor="lit-condition">{tx('Medical Condition or Research Topic')}</label>
                 <input id="lit-condition" className={field} value={condition} onChange={e => setCondition(e.target.value)} placeholder={tx('e.g. Type 2 Diabetes, Paediatric Asthma, Hypertension')} required minLength={3} maxLength={80} />

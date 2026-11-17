@@ -148,7 +148,7 @@ export default function ConsultNow({ myUserId, embedded = false, onNavigateToPre
 
       {redFlags.length > 0 && <EmergencyBox reasons={redFlags} />}
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_380px] items-start">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_380px] items-start">
         <div className="space-y-5 min-w-0">
           {open?.status === 'queued' && (
             <div className="bg-white border-2 border-[color:var(--t-600)] p-6 space-y-5 shadow-sm">
@@ -246,7 +246,7 @@ export default function ConsultNow({ myUserId, embedded = false, onNavigateToPre
                 <span className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--ink)] block mb-3">
                   {tx('1. How would you like to consult?')}
                 </span>
-                <div role="radiogroup" aria-label={tx('Consultation type')} className="grid sm:grid-cols-2 gap-3.5">
+                <div role="radiogroup" aria-label={tx('Consultation type')} className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {([['chat', 'Live Text Chat', 'Fast, asynchronous clinical messaging', MessageSquare], ['video', 'Video Consultation', 'Face-to-face encrypted video call', Video]] as const).map(([id, label, hint, Icon]) => (
                     <button type="button" key={id} role="radio" aria-checked={mode === id} onClick={() => setMode(id)}
                       className={`flex items-start gap-3.5 p-4 border text-left cursor-pointer transition-colors ${mode === id ? 'border-[color:var(--t-600)] bg-[color:var(--t-50)] shadow-[inset_0_0_0_1px_var(--t-600)]' : 'border-[color:var(--t-200)] text-[color:var(--ink-2)] hover:bg-slate-50'}`}>

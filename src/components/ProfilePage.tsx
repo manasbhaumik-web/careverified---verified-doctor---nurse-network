@@ -133,7 +133,7 @@ export default function ProfilePage({ onUserUpdated, onOpenCredentials }: {
             <button type="button" className="btn btn-sm btn-ghost" onClick={() => setEditName(false)}>{tx('Cancel')}</button>
           </form>
         ) : (
-          <dl className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">{row(tx('Full name'), a.name)}{row(tx('Sign-in email'), a.email)}</dl>
+          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">{row(tx('Full name'), a.name)}{row(tx('Sign-in email'), a.email)}</dl>
         )}
         {!a.nameEditable && <p className="text-xs text-slate-600">{tx('Your name is tied to your verified licence. To change it, contact the board.')}</p>}
       </div>
@@ -146,7 +146,7 @@ export default function ProfilePage({ onUserUpdated, onOpenCredentials }: {
             {!editPersonal && <button type="button" className="btn btn-sm btn-secondary" onClick={startPersonal}>{tx('Edit details')}</button>}
           </div>
           {!editPersonal ? (
-            <dl className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {row(pt.idType === 'passport' ? tx('Passport number') : tx('MyKad number'), pt.idNumberMasked)}
               {row(tx('Date of birth'), pt.dateOfBirth)}
               {row(tx('Nationality'), pt.nationality)}
@@ -158,14 +158,14 @@ export default function ProfilePage({ onUserUpdated, onOpenCredentials }: {
               {row(tx('Next of kin'), pt.nextOfKin ? `${pt.nextOfKin.name} (${pt.nextOfKin.relationship}) · ${pt.nextOfKin.phone}` : '')}
             </dl>
           ) : (
-            <form onSubmit={savePersonal} className="grid sm:grid-cols-2 gap-3">
+            <form onSubmit={savePersonal} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <p className="sm:col-span-2 text-xs text-slate-600">{tx('Your ID number, date of birth and nationality identify you and cannot be changed here.')}</p>
               <div><label htmlFor="pf-phone" className="form-label">{tx('Phone')}</label><input id="pf-phone" type="tel" autoComplete="tel" className="form-input" value={f.phone} onChange={e => setF({ ...f, phone: e.target.value })} required /></div>
               <div><label htmlFor="pf-gender" className="form-label">{tx('Gender')}</label>
                 <select id="pf-gender" className="form-input" value={f.gender} onChange={e => setF({ ...f, gender: e.target.value })}>{['Male', 'Female', 'Other'].map(g => <option key={g} value={g}>{tx(g)}</option>)}</select></div>
               <div><label htmlFor="pf-lang" className="form-label">{tx('Preferred language')}</label>
                 <select id="pf-lang" className="form-input" value={f.preferredLanguage} onChange={e => setF({ ...f, preferredLanguage: e.target.value })}>{PREFERRED_LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}</select></div>
-              <div className="sm:col-span-2 grid sm:grid-cols-2 gap-3 border-t border-[color:var(--t-100)] pt-3">
+              <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-[color:var(--t-100)] pt-3">
                 <h3 className="sm:col-span-2 text-sm font-extrabold">{tx('Address')}</h3>
                 <div className="sm:col-span-2"><label htmlFor="pf-l1" className="form-label">{tx('Address line 1')}</label><input id="pf-l1" autoComplete="address-line1" className="form-input" value={f.address.line1} onChange={e => setAddr('line1', e.target.value)} required={!!pt.address} /></div>
                 <div className="sm:col-span-2"><label htmlFor="pf-l2" className="form-label">{tx('Address line 2')}</label><input id="pf-l2" autoComplete="address-line2" className="form-input" value={f.address.line2 ?? ''} onChange={e => setAddr('line2', e.target.value)} /></div>
@@ -177,14 +177,14 @@ export default function ProfilePage({ onUserUpdated, onOpenCredentials }: {
                     : <input id="pf-state" autoComplete="address-level1" className="form-input" value={f.address.state ?? ''} onChange={e => setAddr('state', e.target.value)} />}</div>
                 <div><label htmlFor="pf-post" className="form-label">{tx('Postcode')}</label><input id="pf-post" autoComplete="postal-code" className="form-input" value={f.address.postcode} onChange={e => setAddr('postcode', e.target.value)} required={!!pt.address} /></div>
               </div>
-              <div className="sm:col-span-2 grid sm:grid-cols-3 gap-3 border-t border-[color:var(--t-100)] pt-3">
+              <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-[color:var(--t-100)] pt-3">
                 <h3 className="sm:col-span-3 text-sm font-extrabold">{tx('Emergency contact')}</h3>
                 <div><label htmlFor="pf-en" className="form-label">{tx('Name')}</label><input id="pf-en" className="form-input" value={f.emergencyContactName} onChange={e => setF({ ...f, emergencyContactName: e.target.value })} required /></div>
                 <div><label htmlFor="pf-er" className="form-label">{tx('Relationship')}</label>
                   <select id="pf-er" className="form-input" value={f.emergencyContactRelationship} onChange={e => setF({ ...f, emergencyContactRelationship: e.target.value })}>{RELATIONSHIPS.map(r => <option key={r} value={r}>{tx(r)}</option>)}</select></div>
                 <div><label htmlFor="pf-ep" className="form-label">{tx('Phone')}</label><input id="pf-ep" type="tel" className="form-input" value={f.emergencyContactPhone} onChange={e => setF({ ...f, emergencyContactPhone: e.target.value })} required /></div>
               </div>
-              <div className="sm:col-span-2 grid sm:grid-cols-3 gap-3 border-t border-[color:var(--t-100)] pt-3">
+              <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-[color:var(--t-100)] pt-3">
                 <label className="sm:col-span-3 inline-flex items-center gap-2 text-sm font-bold"><input type="checkbox" checked={f.hasNok} onChange={e => setF({ ...f, hasNok: e.target.checked })} />{tx('Add a next of kin')}</label>
                 {f.hasNok && <>
                   <div><label htmlFor="pf-kn" className="form-label">{tx('Name')}</label><input id="pf-kn" className="form-input" value={f.nok.name} onChange={e => setF({ ...f, nok: { ...f.nok, name: e.target.value } })} required /></div>
@@ -206,7 +206,7 @@ export default function ProfilePage({ onUserUpdated, onOpenCredentials }: {
       {p.professional && (
         <div className="app-card space-y-3">
           <h2 className="text-lg font-bold">{tx('Professional credentials')}</h2>
-          <dl className="grid sm:grid-cols-3 gap-4">
+          <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {row(tx('Registration number'), p.professional.licenseNumber)}
             {row(tx('Specialty'), p.professional.specialty)}
             {row(tx('Verification status'), p.professional.verificationStatus)}
@@ -219,13 +219,13 @@ export default function ProfilePage({ onUserUpdated, onOpenCredentials }: {
       {/* Sign-in details */}
       <div className="app-card space-y-4">
         <h2 className="text-lg font-bold">{tx('Sign-in details')}</h2>
-        <form onSubmit={saveEmail} className="grid sm:grid-cols-3 gap-3 items-end">
+        <form onSubmit={saveEmail} className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
           <h3 className="sm:col-span-3 text-sm font-extrabold">{tx('Change sign-in email')}</h3>
           <div><label htmlFor="pf-ne" className="form-label">{tx('New email')}</label><input id="pf-ne" type="email" autoComplete="email" className="form-input" value={email.newEmail} onChange={e => setEmail({ ...email, newEmail: e.target.value })} required /></div>
           <div><label htmlFor="pf-ec" className="form-label">{tx('Current password')}</label><input id="pf-ec" type="password" autoComplete="current-password" className="form-input" value={email.currentPassword} onChange={e => setEmail({ ...email, currentPassword: e.target.value })} required /></div>
           <div><button type="submit" className="btn btn-sm btn-primary">{tx('Change email')}</button></div>
         </form>
-        <form onSubmit={savePassword} className="grid sm:grid-cols-4 gap-3 items-end border-t border-[color:var(--t-100)] pt-4">
+        <form onSubmit={savePassword} className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end border-t border-[color:var(--t-100)] pt-4">
           <h3 className="sm:col-span-4 text-sm font-extrabold">{tx('Change password')}</h3>
           <div><label htmlFor="pf-cp" className="form-label">{tx('Current password')}</label><input id="pf-cp" type="password" autoComplete="current-password" className="form-input" value={pw.currentPassword} onChange={e => setPw({ ...pw, currentPassword: e.target.value })} required /></div>
           <div><label htmlFor="pf-np" className="form-label">{tx('New password')}</label><input id="pf-np" type="password" autoComplete="new-password" className="form-input" value={pw.newPassword} onChange={e => setPw({ ...pw, newPassword: e.target.value })} required /></div>

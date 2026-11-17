@@ -223,7 +223,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
               <p className="text-xs text-slate-500 mt-1">Keep this tab open; newly queued consults will alert immediately.</p>
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {offers.map(o => (
                 <div key={o.id} className="border-2 border-[color:var(--t-600)] bg-white p-5 space-y-3 shadow-xs">
                   {o.redFlags.length > 0 && (
@@ -245,7 +245,7 @@ export default function PractitionerOnCall({ myUserId, embedded = false }: { myU
         </section>
       )}
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_380px] items-start">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_380px] items-start">
         <section className="bg-white border border-slate-200 p-5 space-y-4 min-w-0">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>

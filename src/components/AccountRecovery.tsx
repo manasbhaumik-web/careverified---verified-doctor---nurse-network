@@ -103,7 +103,7 @@ export default function AccountRecovery({ mode }: { mode: 'forgot' | 'reset' }) 
           <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="group min-w-0" aria-label="MediCred home">
             <BrandLogo tone="light" size="md" />
           </a>
-          <div className="flex items-center gap-2"><LocaleSwitcher /><ThemeSwitcher /></div>
+          <div className="flex items-center gap-2"><LocaleSwitcher /><span className="hidden sm:inline-flex"><ThemeSwitcher /></span></div>
         </div>
       </header>
 

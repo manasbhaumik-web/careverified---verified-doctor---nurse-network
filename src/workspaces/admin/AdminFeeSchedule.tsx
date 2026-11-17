@@ -47,7 +47,7 @@ export default function AdminFeeSchedule() {
         <p className="text-xs font-bold">{d.professionalsKeepFull ? tx('Professionals receive 100% of their fee on every kind of payment.') : tx('Some kinds still take a share of the professional fee (the old model). Switch them to a service fee.')} · {tx('Service tax on the platform fee')}: {d.platformFeeTaxPct}%</p>
       </div>
       {msg && <p role={msg.ok ? 'status' : 'alert'} className={`text-xs font-bold p-3 border ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-200' : 'text-rose-900 bg-rose-50 border-rose-200'}`}>{msg.text}</p>}
-      <div className="grid lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {d.schedule.map(l => {
           const x = draft[l.kind]; if (!x) return null;
           const legacy = l.model === 'legacy_percent_of_professional_fee';

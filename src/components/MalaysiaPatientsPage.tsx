@@ -61,7 +61,7 @@ export default function MalaysiaPatientsPage({ onSignUp }: MalaysiaPatientsPageP
               <BrandLogo tone="light" size="md" />
             </a>
 
-            <div className="hidden md:flex items-center gap-1.5 text-xs font-bold text-slate-500 border-l border-slate-200 pl-4">
+            <div className="hidden lg:flex items-center gap-1.5 text-xs font-bold text-slate-500 border-l border-slate-200 pl-4">
               <a 
                 href="/" 
                 onClick={(e) => { e.preventDefault(); navigate('/'); }}
@@ -77,7 +77,7 @@ export default function MalaysiaPatientsPage({ onSignUp }: MalaysiaPatientsPageP
 
           <div className="flex items-center gap-2.5">
             <LocaleSwitcher />
-            <ThemeSwitcher />
+            <span className="hidden sm:inline-flex"><ThemeSwitcher /></span>
             <button
               type="button"
               onClick={() => navigate(loginUrl('patient', false))}
@@ -88,10 +88,10 @@ export default function MalaysiaPatientsPage({ onSignUp }: MalaysiaPatientsPageP
             <button
               type="button"
               onClick={goMemberSignup}
-              className="px-4 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
+              className="px-3 sm:px-4 py-2 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-extrabold border border-[color:var(--t-700)] shadow-xs transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
             >
               <Heart className="h-3.5 w-3.5" />
-              <span>Join as Member (MyKad)</span>
+              <span className="hidden min-[420px]:inline">Join as Member (MyKad)</span><span className="min-[420px]:hidden">Join</span>
             </button>
           </div>
         </div>

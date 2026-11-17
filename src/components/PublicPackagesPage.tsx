@@ -321,7 +321,7 @@ function UniversalEnquiryDialog({ target, onClose }: { target: EnquiryTarget; on
             </div>
           )}
           <p className="text-xs text-slate-600">No account required. Connect directly with verified healthcare providers. In case of emergency, call 999.</p>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="pp-name" className={label}>Your full name</label>
               <input id="pp-name" value={name} onChange={e => setName(e.target.value)} autoComplete="name" className={`${control} w-full`} />
@@ -435,7 +435,7 @@ function Detail({ p, signedIn, onEnquire, more, facilityOffers }: { p: Pkg; sign
       <button type="button" onClick={() => navigate('/packages')} className="inline-flex items-center gap-1 min-h-[44px] text-sm font-bold text-[color:var(--t-700)] hover:underline cursor-pointer">
         <ChevronLeft className="h-4 w-4" aria-hidden="true" />All packages
       </button>
-      <div className="grid gap-6 lg:grid-cols-5 mt-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5 mt-2">
         <div className="lg:col-span-3 space-y-5">
           <div className="aspect-[16/9] overflow-hidden bg-[color:var(--t-100)] border border-[color:var(--t-200)] shadow-xs">
             <Photo src={p.image_url} alt={`${p.category} package`} />
@@ -453,7 +453,7 @@ function Detail({ p, signedIn, onEnquire, more, facilityOffers }: { p: Pkg; sign
           {p.inclusions.length > 0 && (
             <section className="bg-white border border-[color:var(--t-200)] p-5">
               <h2 className={h2}>What is included</h2>
-              <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
                 {p.inclusions.map((i, k) => (
                   <li key={k} className="flex items-start gap-2 text-sm">
                     <Check className="h-4 w-4 mt-1 text-emerald-700 shrink-0" aria-hidden="true" />
@@ -1296,7 +1296,7 @@ function DirectoryBanner({
             </div>
             <p className="text-sm text-slate-700" role="status">{statusText}</p>
           </div>
-          <div className="grid gap-2.5 sm:grid-cols-2">{children}</div>
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">{children}</div>
         </div>
       </div>
     </section>
@@ -1472,7 +1472,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                 </>
               )}
               <LocaleSwitcher />
-              <ThemeSwitcher />
+              <span className="hidden sm:inline-flex"><ThemeSwitcher /></span>
             </div>
           </div>
         </div>
@@ -1522,7 +1522,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                         Showing <b>{shownPackages.length}</b> of {list.length} packages
                       </p>
                     </div>
-                    <div className="grid gap-2.5 sm:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
                       <div className="relative">
                         <Search className="h-4 w-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
                         <input
@@ -1563,7 +1563,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
               <>
                 <div className={`${wrap} -mt-6 relative z-10`}>
                   <div className="bg-white border border-[color:var(--t-200)] p-4 shadow-sm space-y-3">
-                    <form role="search" aria-label="Filter packages" onSubmit={e => e.preventDefault()} className="grid gap-2 md:grid-cols-[minmax(0,1fr)_200px_190px]">
+                    <form role="search" aria-label="Filter packages" onSubmit={e => e.preventDefault()} className="grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_200px_190px]">
                       <div className="relative">
                         <label htmlFor="pp-q" className="sr-only">Search healthcare marketplace</label>
                         <Search className="h-[18px] w-[18px] text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true" />
@@ -1690,7 +1690,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                       viewAllText="View All Clinics"
                       onViewAll={() => goToView('clinics')}
                     />
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                       {clinics.slice(0, 4).map(c => (
                         <ClinicCard key={c.id} c={c} onPickClinic={handlePickFacility} onEnquire={setEnquiry} />
                       ))}
@@ -1717,7 +1717,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                       viewAllText="View All Hospitals"
                       onViewAll={() => goToView('hospitals')}
                     />
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                       {hospitals.slice(0, 4).map(h => (
                         <HospitalCard key={h.id} h={h} onPickHospital={handlePickFacility} onEnquire={setEnquiry} />
                       ))}
@@ -1744,7 +1744,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                       viewAllText="View All Specialized Nurses"
                       onViewAll={() => goToView('nurses')}
                     />
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                       {nurses.slice(0, 4).map(n => (
                         <NurseCard key={n.id} n={n} signedIn={signedIn} onEnquire={setEnquiry} />
                       ))}
@@ -1771,7 +1771,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                       viewAllText="View All Specialist Doctors"
                       onViewAll={() => goToView('doctors')}
                     />
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                       {doctors.slice(0, 4).map(d => (
                         <DoctorCard key={d.id} d={d} signedIn={signedIn} onEnquire={setEnquiry} />
                       ))}
@@ -1798,7 +1798,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                       viewAllText="View All Pharmacies & Offers"
                       onViewAll={() => goToView('pharmacies')}
                     />
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                       {pharmacies.slice(0, 4).map(ph => (
                         <PharmacyCard key={ph.id} ph={ph} onEnquire={setEnquiry} />
                       ))}
@@ -1872,7 +1872,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                     </div>
                 </DirectoryBanner>
                 <div className={`${wrap} py-8 space-y-6`}>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredClinics.map(c => (
                       <ClinicCard key={c.id} c={c} onPickClinic={handlePickFacility} onEnquire={setEnquiry} />
                     ))}
@@ -1916,7 +1916,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                     </div>
                 </DirectoryBanner>
                 <div className={`${wrap} py-8 space-y-6`}>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredHospitals.map(h => (
                       <HospitalCard key={h.id} h={h} onPickHospital={handlePickFacility} onEnquire={setEnquiry} />
                     ))}
@@ -1962,7 +1962,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                     </div>
                 </DirectoryBanner>
                 <div className={`${wrap} py-8 space-y-6`}>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredNurses.map(n => (
                       <NurseCard key={n.id} n={n} signedIn={signedIn} onEnquire={setEnquiry} />
                     ))}
@@ -2006,7 +2006,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                     </div>
                 </DirectoryBanner>
                 <div className={`${wrap} py-8 space-y-6`}>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredDoctors.map(d => (
                       <DoctorCard key={d.id} d={d} signedIn={signedIn} onEnquire={setEnquiry} />
                     ))}
@@ -2060,7 +2060,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                           <p className="text-xs text-slate-600">Click to copy promotion code for checkout or presenting at counter</p>
                         </div>
                       </div>
-                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                         {offers.map(o => (
                           <div key={o.id} className="border border-[color:var(--t-200)] bg-[color:var(--t-50)]/40 p-3.5 flex flex-col justify-between">
                             <div>
@@ -2086,7 +2086,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                     </div>
                   )}
 
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
                     {filteredPharmacies.map(ph => (
                       <PharmacyCard key={ph.id} ph={ph} onEnquire={setEnquiry} />
                     ))}
@@ -2099,7 +2099,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
             <section aria-label="How it works" className="bg-white border-y border-[color:var(--t-100)] mt-8">
               <div className={`${wrap} py-10`}>
                 <h2 className="font-display font-bold text-2xl text-slate-900">How MediCred Works</h2>
-                <ol className="mt-5 grid gap-4 md:grid-cols-3">
+                <ol className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
                   {[
                     ['Compare Upfront', 'View all-inclusive transparent prices, doctor credentials, and facility amenities upfront before making decisions.'],
                     ['Direct Provider Enquiry', 'Ask questions to hospitals, specialist clinics, nurses, and pharmacists directly without needing to sign up.'],

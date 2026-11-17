@@ -116,7 +116,7 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
           <div className="flex items-center gap-2">
             <button type="button" onClick={signIn} className="hidden sm:inline-flex min-h-[44px] px-4 text-sm font-bold text-[color:var(--t-700)] hover:underline cursor-pointer items-center">{tx.hero.signin}</button>
             <LocaleSwitcher />
-            <ThemeSwitcher />
+            <span className="hidden sm:inline-flex"><ThemeSwitcher /></span>
           </div>
         </div>
       </header>
@@ -220,7 +220,7 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
                 <div className={wrap}>
                   <h2 id={`${s.id}-h`} className={h2}><DualTitle text={s.title} /></h2>
                   {s.intro && <p className="mt-2 text-sm sm:text-base text-slate-700 font-medium max-w-2xl">{s.intro}</p>}
-                  <ul className="mt-6 grid md:grid-cols-2 gap-x-8 gap-y-3 text-sm text-slate-800 font-medium list-disc pl-5">
+                  <ul className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-sm text-slate-800 font-medium list-disc pl-5">
                     {s.items.map(x => <li key={x} className="leading-relaxed">{x}</li>)}
                   </ul>
                 </div>
@@ -230,7 +230,7 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
           // split
           return (
             <section key={s.id} aria-labelledby={`${s.id}-h`} className={`py-12 sm:py-16 border-b border-[color:var(--t-200)] ${bg(i)}`}>
-              <div className={`${wrap} grid md:grid-cols-2 gap-8`}>
+              <div className={`${wrap} grid grid-cols-1 md:grid-cols-2 gap-8`}>
                 <div>
                   <h2 id={`${s.id}-h`} className={h2}><DualTitle text={s.left.title} /></h2>
                   <ul className="mt-5 space-y-3 text-sm text-slate-800 font-medium list-disc pl-5">{s.left.items.map(x => <li key={x} className="leading-relaxed">{x}</li>)}</ul>
@@ -255,7 +255,7 @@ export default function AudiencePage({ kind, signInRole, content }: { kind: 'cli
         })}
 
         <section id="apply" aria-labelledby="apply-h" className="py-12 sm:py-16 bg-white scroll-mt-20">
-          <div className={`${wrap} grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10`}>
+          <div className={`${wrap} grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10`}>
             <div>
               <h2 id="apply-h" className={h2}><DualTitle text={tx.apply.title} /></h2>
               <p className="mt-3 text-sm sm:text-base text-slate-700 font-medium leading-relaxed">{tx.apply.intro}</p>

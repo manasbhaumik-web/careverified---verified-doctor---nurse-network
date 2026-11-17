@@ -668,7 +668,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
 
       {/* ═══════════ NAVBAR (LIGHT TONE PRIMARY BACKGROUND) ═══════════ */}
       <nav className="sticky top-0 z-50 bg-[color:var(--t-50)]/95 backdrop-blur-md border-b border-[color:var(--t-200)]">
-        <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 py-2.5 sm:py-3.5 flex flex-nowrap sm:flex-wrap justify-between items-center gap-2 sm:gap-4">
+        <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 py-2.5 sm:py-3.5 flex flex-wrap justify-between items-center gap-2 sm:gap-4">
           <a href="#top" className="group min-w-0">
             <BrandLogo
               tone="light"
@@ -677,7 +677,7 @@ export default function LandingPage({ professionals }: LandingPageProps) {
             />
           </a>
 
-          <div className="flex items-center gap-2 sm:gap-3 sm:flex-wrap shrink-0">
+          <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 min-w-0">
             {/* 1. Quick Views Navmenu Dropdown */}
             <div ref={quickViewsRef} className="relative">
               <button

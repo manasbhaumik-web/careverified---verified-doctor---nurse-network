@@ -62,7 +62,7 @@ export default function FacilityPublicProfile() {
     <section aria-labelledby="fp-h" className="space-y-4">
       <h2 id="fp-h" className="text-sm font-extrabold">{tx('Public profile and staff')}</h2>
       {mustChange && (
-        <form className="app-card grid sm:grid-cols-3 gap-2 items-end border-amber-300" onSubmit={async e => {
+        <form className="app-card grid grid-cols-1 sm:grid-cols-3 gap-2 items-end border-amber-300" onSubmit={async e => {
           e.preventDefault();
           const r = await send('/api/auth/change-password', 'POST', pw);
           if (r.status === 'success') { setMustChange(false); setPw({ currentPassword: '', newPassword: '' }); setMsg({ ok: true, text: tx('Password changed.') }); }
@@ -78,13 +78,13 @@ export default function FacilityPublicProfile() {
       {!admin && <p className="text-xs text-slate-700 bg-white border border-[color:var(--t-200)] p-3">{tx('Only a facility admin can change the profile or the staff. You can read them here.')}</p>}
       {msg && <p role={msg.ok ? 'status' : 'alert'} className={`text-xs font-bold p-3 border ${msg.ok ? 'text-emerald-900 bg-emerald-50 border-emerald-200' : 'text-rose-900 bg-rose-50 border-rose-200'}`}>{msg.text}</p>}
 
-      <form onSubmit={saveProfile} className="app-card grid sm:grid-cols-3 gap-3">
+      <form onSubmit={saveProfile} className="app-card grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="sm:col-span-3"><label htmlFor="fp-desc" className="form-label">{tx('About the facility')}</label><textarea id="fp-desc" rows={3} className="form-input" disabled={!admin} value={p.description ?? ''} onChange={e => set('description', e.target.value)} /></div>
         {([['phone', 'Phone'], ['website', 'Website (https://…)'], ['address', 'Address'], ['city', 'City'], ['state', 'State']] as const).map(([k, l]) => (
           <div key={k}><label htmlFor={`fp-${k}`} className="form-label">{tx(l)}</label><input id={`fp-${k}`} className="form-input" disabled={!admin} value={(p[k] as string | null) ?? ''} onChange={e => set(k, e.target.value)} /></div>
         ))}
 
-        <div className="sm:col-span-3 grid sm:grid-cols-2 gap-3">
+        <div className="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label htmlFor="fp-dept" className="form-label">{tx('Departments')}</label>
             <ul className="flex flex-wrap gap-1.5 mb-2">{p.departments.map(d => <li key={d.name} className="text-xs border border-[color:var(--t-200)] bg-white px-2 py-1">{d.name}{admin && <button type="button" aria-label={`${tx('Remove')} ${d.name}`} className="ml-1.5 font-bold" onClick={() => set('departments', p.departments.filter(x => x.name !== d.name))}>×</button>}</li>)}</ul>
@@ -104,7 +104,7 @@ export default function FacilityPublicProfile() {
         <p className="text-xs text-slate-600">{tx('An accreditation you add here is a claim. It is shown publicly only after the board has checked it.')}</p>
         <ul className="text-xs space-y-1">{p.accreditationClaims.map(c => <li key={c.body}>{c.body} · {c.number} · {c.validUntil} · <span className="font-bold">{tx('Waiting for the board')}</span></li>)}</ul>
         {admin && (
-          <form className="grid sm:grid-cols-4 gap-2 items-end" onSubmit={async e => { e.preventDefault(); if (done(await send('/api/facility/accreditations', 'POST', claim), tx('Claim sent to the board.'))) setClaim({ body: '', number: '', validUntil: '' }); }}>
+          <form className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end" onSubmit={async e => { e.preventDefault(); if (done(await send('/api/facility/accreditations', 'POST', claim), tx('Claim sent to the board.'))) setClaim({ body: '', number: '', validUntil: '' }); }}>
             <div><label htmlFor="ac-b" className="form-label">{tx('Body (e.g. MSQH)')}</label><input id="ac-b" className="form-input" value={claim.body} onChange={e => setClaim({ ...claim, body: e.target.value })} required /></div>
             <div><label htmlFor="ac-n" className="form-label">{tx('Certificate number')}</label><input id="ac-n" className="form-input" value={claim.number} onChange={e => setClaim({ ...claim, number: e.target.value })} required /></div>
             <div><label htmlFor="ac-d" className="form-label">{tx('Valid until')}</label><input id="ac-d" type="date" className="form-input" value={claim.validUntil} onChange={e => setClaim({ ...claim, validUntil: e.target.value })} required /></div>
@@ -138,7 +138,7 @@ export default function FacilityPublicProfile() {
             ) : <span className="font-bold">{s.staffRole === 'admin' ? tx('Admin') : tx('Staff')}</span>}
           </li>))}</ul>
         {admin && (
-          <form className="grid sm:grid-cols-4 gap-2 items-end" onSubmit={async e => {
+          <form className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end" onSubmit={async e => {
             e.preventDefault();
             const r = await send('/api/facility/staff', 'POST', invite);
             if (done(r, tx('Staff account created.'))) { setTemp(r.data.temporaryPassword); setInvite({ name: '', email: '', staffRole: 'staff' }); }

@@ -92,7 +92,7 @@ export default function PractitionerQuality({ profileId, embedded = false }: { p
       {msg && <p role="status" className={`text-xs font-bold p-3 border ${msg.ok ? 'text-emerald-800 bg-emerald-50 border-emerald-200' : 'text-rose-800 bg-rose-50 border-rose-200'}`}>{msg.text}</p>}
 
       {tab === 'reviews' && (
-        <section className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)] items-start">
+        <section className="grid grid-cols-1 gap-5 xl:grid-cols-[320px_minmax(0,1fr)] items-start">
           <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-white border border-[color:var(--t-200)] p-4 shadow-xs"><p className={lab}>{tx('Average Rating')}</p><p className="text-3xl font-black tabular-nums text-[color:var(--ink)]">{cred?.reviews.average ?? '—'}</p></div>
@@ -100,7 +100,7 @@ export default function PractitionerQuality({ profileId, embedded = false }: { p
           </div>
           <p className="text-xs text-[color:var(--ink-2)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-3 leading-relaxed">{tx('Only patients who have concluded a consultation visit can submit ratings. You can report reviews that breach ethical or privacy guidelines.')}</p>
           </div>
-          <div className="grid gap-3 lg:grid-cols-2 items-start">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 items-start">
           {myReviews.length === 0 ? <p className="text-xs text-slate-500 bg-white border border-[color:var(--t-200)] p-8 text-center lg:col-span-2">{tx('No patient reviews recorded yet.')}</p> : myReviews.map(r => (
             <article key={r.id} className="bg-white border border-[color:var(--t-200)] p-5 text-xs space-y-2 shadow-xs">
               <p className="font-bold text-amber-500 flex items-center justify-between">
@@ -191,7 +191,7 @@ function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say:
   };
 
   return (
-    <div className="grid gap-6 xl:grid-cols-2 items-start">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 items-start">
       <div className="space-y-5 min-w-0">
       <section className="bg-white border border-[color:var(--t-200)] p-6 space-y-3 shadow-xs">
         <h3 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)]">CPD Progress for {cred.year}</h3>
@@ -200,7 +200,7 @@ function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say:
         <p className="text-xs text-[color:var(--ink-2)]">{tx('Annual points are audited against MMC / LJM renewal prerequisites before Annual Practising Certificate dispatch.')}</p>
       </section>
 
-      <form onSubmit={addCpd} className="bg-white border border-[color:var(--t-200)] p-6 grid sm:grid-cols-2 gap-4 shadow-xs">
+      <form onSubmit={addCpd} className="bg-white border border-[color:var(--t-200)] p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 shadow-xs">
         <h3 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)] sm:col-span-2">{tx('Log Continuous Professional Development')}</h3>
         <div className="sm:col-span-2"><label className={lab}>{tx('Activity Title')}</label><input className="w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3.5 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors" value={cpd.title} onChange={e => setCpd({ ...cpd, title: e.target.value })} required maxLength={150} placeholder={tx('e.g. National Cardiology Symposium 2026')} /></div>
         <div><label className={lab}>{tx('Category')}</label><CustomSelect className="form-select w-full h-12 border border-[color:var(--t-200)] bg-[color:var(--t-bg)] focus:bg-white px-3 text-xs text-[color:var(--ink)] outline-none focus:border-[color:var(--t-600)] transition-colors cursor-pointer" value={cpd.category} onChange={e => setCpd({ ...cpd, category: e.target.value })}>{['course', 'conference', 'publication', 'teaching', 'self-study'].map(c => <option key={c}>{c}</option>)}</CustomSelect></div>
@@ -227,7 +227,7 @@ function CpdSection({ cred, reload, say }: { cred: any; reload: () => void; say:
         )}
       </section>
 
-      <form onSubmit={addCert} className="bg-white border border-[color:var(--t-200)] p-6 grid sm:grid-cols-2 gap-4 shadow-xs">
+      <form onSubmit={addCert} className="bg-white border border-[color:var(--t-200)] p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 shadow-xs">
         <h3 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)] sm:col-span-2 flex items-center gap-2"><Award className="h-4 w-4 text-[color:var(--t-600)]" /> {tx('Specialty certificates')}</h3>
         <div><label className={lab}>{tx('Certificate')}</label><input className={field} value={cert.name} onChange={e => setCert({ ...cert, name: e.target.value })} required placeholder={tx('e.g. MRCP (UK)')} maxLength={150} /></div>
         <div><label className={lab}>{tx('Issued by')}</label><input className={field} value={cert.issuer} onChange={e => setCert({ ...cert, issuer: e.target.value })} required maxLength={150} /></div>
@@ -266,7 +266,7 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
   };
   const c = open?.content;
   return (
-    <div className="grid gap-5 xl:grid-cols-2 items-start">
+    <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 items-start">
       <section className="bg-white border border-[color:var(--t-200)] p-6 space-y-3 min-w-0 shadow-xs">
         <h3 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)]">{tx('Cases for you to review')}</h3>
         <p className="text-xs text-slate-500">{tx('Colleagues\' work, with the patient and the author hidden. Treat what you read as confidential.')}</p>
@@ -290,7 +290,7 @@ function PeerSection({ say }: { say: (ok: boolean, t: string) => void }) {
               </>
             )}
           </div>}
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div><label className={lab}>{tx('Outcome')}</label><CustomSelect className={`form-select ${field}`} value={form.outcome} onChange={e => setForm({ ...form, outcome: e.target.value })}><option value="no_concerns">{tx('No concerns')}</option><option value="minor_concerns">{tx('Minor concerns')}</option><option value="significant_concerns">{tx('Significant concerns')}</option></CustomSelect></div>
             <div><label className={lab}>{tx('Quality score (1 low, 5 high)')}</label><CustomSelect className={`form-select ${field}`} value={form.score} onChange={e => setForm({ ...form, score: Number(e.target.value) })}>{[1, 2, 3, 4, 5].map(n => <option key={n}>{n}</option>)}</CustomSelect></div>
           </div>
@@ -322,11 +322,11 @@ function IncidentSection({ say }: { say: (ok: boolean, t: string) => void }) {
     if (d.status === 'success') { setForm({ ...form, description: '' }); load(); }
   };
   return (
-    <div className="grid gap-5 xl:grid-cols-2 items-start">
+    <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 items-start">
       <form onSubmit={submit} className="bg-white border border-[color:var(--t-200)] p-6 space-y-4 shadow-xs">
         <h3 className="text-sm font-extrabold uppercase tracking-wider text-[color:var(--ink)]">{tx('Report a patient-safety incident or near miss')}</h3>
         <p className="text-xs text-slate-500">Reporting is how we learn. Do not include patient names; describe what happened. For anyone in immediate danger call 999 first.</p>
-        <div className="grid sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div><label className={lab}>{tx('Type')}</label><CustomSelect className={`form-select ${field}`} value={form.kind} onChange={e => setForm({ ...form, kind: e.target.value })}>
             <option value="near_miss">{tx('Near miss')}</option><option value="adverse_drug_event">{tx('Adverse drug event')}</option><option value="patient_harm">{tx('Patient harm')}</option><option value="misconduct">{tx('Misconduct')}</option><option value="privacy">{tx('Privacy or data issue')}</option><option value="system">{tx('Platform problem')}</option><option value="other">{tx('Other')}</option></CustomSelect></div>
           <div><label className={lab}>{tx('Severity')}</label><CustomSelect className={`form-select ${field}`} value={form.severity} onChange={e => setForm({ ...form, severity: e.target.value })}><option value="low">{tx('Low')}</option><option value="medium">{tx('Medium')}</option><option value="high">{tx('High')}</option><option value="critical">{tx('Critical')}</option></CustomSelect></div>

@@ -209,7 +209,7 @@ function Facilities({ onSent }: { onSent: (caseId: string) => void }) {
         </div>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {shown.map(fa => (
           <article key={fa.id} className={`${card} space-y-3 flex flex-col`}>
             <div>

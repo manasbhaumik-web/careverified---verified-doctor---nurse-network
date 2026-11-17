@@ -218,7 +218,7 @@ export default function PatientAccess() {
             </span>
             <span className="text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] px-2.5 py-1 border border-[color:var(--t-200)]">{tx.a11y.checked}</span>
           </summary>
-          <div className="px-5 pb-5 pt-2 border-t border-[color:var(--t-100)] grid md:grid-cols-2 gap-6 text-xs text-slate-700 font-medium">
+          <div className="px-5 pb-5 pt-2 border-t border-[color:var(--t-100)] grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-700 font-medium">
             <div>
               <h3 className="font-extrabold text-[color:var(--ink)] mb-2">{tx.a11y.doneTitle}</h3>
               <ul className="list-disc pl-5 space-y-1.5">{tx.a11y.done.map(x => <li key={x}>{x}</li>)}</ul>

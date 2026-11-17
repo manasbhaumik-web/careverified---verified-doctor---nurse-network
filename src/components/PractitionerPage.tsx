@@ -861,7 +861,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
             </div>
 
             {/* Slide Content Grid - Static layout heights across all slides */}
-            <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               {/* Left Column: Dynamic Hero Content with Static Vertical Geometry */}
               <div className="lg:col-span-7 flex flex-col justify-center max-w-2xl">
                 <div>
@@ -1123,7 +1123,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
               <p className="mt-2 text-sm text-slate-700 font-medium">{tx.paid.subtitle}</p>
             </div>
 
-            <div className="grid lg:grid-cols-12 gap-8 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Left Column: Interactive Earnings Simulator */}
               <div className="lg:col-span-7 space-y-5">
                 <div className="bg-white border border-[color:var(--t-200)] p-6 shadow-sm">
@@ -1288,7 +1288,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                   {payout && <p className="mt-3 text-xs text-slate-700 font-medium leading-relaxed">{tx.paid.process(payout)}</p>}
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-4 text-xs font-medium text-slate-700">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-medium text-slate-700">
                   <div className="p-4 bg-white border border-slate-200 shadow-2xs">
                     <div className="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
                       <FileText className="h-4 w-4 text-[color:var(--t-600)]" /> Itemised Invoicing
@@ -1351,7 +1351,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
               <p className="mt-2 text-sm text-slate-700 font-medium">{tx.checklists.subtitle}</p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
               {/* Doctor Checklist Card */}
               <div className="border border-[color:var(--t-200)] p-6 bg-white shadow-xs">
                 <div className="flex items-center gap-2.5 pb-4 mb-4 border-b border-[color:var(--t-200)]">
@@ -1411,7 +1411,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
               <p className="mt-2 text-sm text-slate-700 font-medium leading-relaxed">{tx.rules.intro}</p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {tx.rules.items.map((r, idx) => (
                 <div key={idx} className="p-5 bg-white border border-[color:var(--t-200)] shadow-2xs space-y-2">
                   <div className="flex items-center gap-2 text-xs font-bold text-[color:var(--t-700)]">

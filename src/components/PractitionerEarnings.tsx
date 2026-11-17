@@ -92,7 +92,7 @@ export default function PractitionerEarnings({ embedded = false }: { embedded?: 
           </div>
         )}
         {(!d.bank || editing) && d.bankAvailable && (
-          <form onSubmit={save} className="grid sm:grid-cols-3 gap-3">
+          <form onSubmit={save} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <p className="sm:col-span-3 text-xs text-slate-700">{tx('A Malaysian bank account in your own name. Changing details pauses payouts until the board verifies them again, and you must enter your password.')}</p>
             <div>
               <label htmlFor="pb-bank" className={label}>{tx('Bank *')}</label>
