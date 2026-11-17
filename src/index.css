@@ -1171,3 +1171,6 @@ span.text-2xs[class*="px-"][class*="border"] {
 }
 .app-badge, .tag-pill { line-height: 1rem; }
 /* END-TAG-SIZE */
+
+/* Profile page: field labels and values are 13px (the same size the patient workspace uses for its small text). */
+.profile-field { font-size: 0.8125rem; line-height: 1.25rem; }

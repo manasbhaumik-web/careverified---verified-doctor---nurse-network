@@ -103,7 +103,7 @@ export default function ProfilePage({ onUserUpdated, onOpenCredentials }: {
   const setAddr = (k: keyof Address, v: string) => setF({ ...f, address: { ...f.address, [k]: v } });
   const langLabel = (c: string) => PREFERRED_LANGUAGES.find(l => l.code === c)?.label ?? c;
   const row = (label: string, value: React.ReactNode) => (
-    <div><dt className="text-xs font-bold text-slate-600">{label}</dt><dd className="text-sm font-semibold text-[color:var(--ink)] mt-0.5 break-words">{value || '—'}</dd></div>
+    <div><dt className="profile-field font-bold text-slate-600">{label}</dt><dd className="profile-field font-semibold text-[color:var(--ink)] mt-0.5 break-words">{value || '—'}</dd></div>
   );
   const addrText = (x: Address | null) => x ? [x.line1, x.line2, `${x.postcode} ${x.city}`.trim(), x.state, x.country].filter(Boolean).join(', ') : '';
 
