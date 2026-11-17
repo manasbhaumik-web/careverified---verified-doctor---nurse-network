@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { professionalFeeSen } from "./feeSchedule";
 import fs from "fs";
 import path from "path";
 import rateLimit from "express-rate-limit";
@@ -143,7 +144,8 @@ export function earningsFor(getBooking: (id: string) => any, professionalId?: st
     `SELECT p.* FROM payments p WHERE p.professional_id IS NOT NULL AND p.status = 'paid' ${where}
        AND NOT EXISTS (SELECT 1 FROM payout_items i WHERE i.payment_id = p.id AND i.kind = 'earning') ORDER BY p.paid_at`, ...args);
   const earnings: Earning[] = paid.map(p => {
-    const net = p.amount_sen - (p.tax_sen ?? 0) - p.platform_fee_sen;
+    const pro = professionalFeeSen(p); // the professional's own fee: not the tax, and not the platform fee charged to the patient
+    const net = pro - p.platform_fee_sen;
     let serviceDate: string | null = null, done = false;
     if (p.kind === "booking") {
       const b = getBooking(p.ref_id);
@@ -161,7 +163,7 @@ export function earningsFor(getBooking: (id: string) => any, professionalId?: st
     const readyOn = serviceDate ? addDays(serviceDate, hold) : null;
     const ready = done && !!readyOn && readyOn <= now && net > 0;
     return {
-      paymentId: p.id, professionalId: p.professional_id, netSen: net, grossSen: p.amount_sen - (p.tax_sen ?? 0), feeSen: p.platform_fee_sen,
+      paymentId: p.id, professionalId: p.professional_id, netSen: net, grossSen: pro, feeSen: p.platform_fee_sen,
       description: p.description, serviceDate, state: ready ? "ready" : "waiting", readyOn,
       reason: ready ? null : !done ? "Waiting for the visit to be completed" : `Payable from ${readyOn}`, sandbox: p.provider === "sandbox",
     };

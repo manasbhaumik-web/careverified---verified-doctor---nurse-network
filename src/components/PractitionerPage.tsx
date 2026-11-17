@@ -135,7 +135,7 @@ const T: Record<Lang, {
     ],
     metrics: [
       { value: '100%', label: 'Hand-Verified Credentials', sub: 'Every licence and APC cross-checked with official national council registries.' },
-      { value: 'RM 0', label: 'Zero Upfront Platform Fee', sub: 'Join and list for free. Only a transparent commission on completed paid visits.' },
+      { value: 'RM 0', label: 'Zero Upfront Platform Fee', sub: 'Join and list for free. Platform fees are set out openly in the terms below.' },
       { value: '14-Day', label: 'Direct Bank Settlement', sub: 'Automated bank transfers formatted for your accountant and LHDN tax submission.' },
       { value: '100%', label: 'Malaysian Law Compliance', sub: 'Strict adherence to Poisons Act 1952, Medical Act 1971, and Nurses Act 1950.' },
     ],
@@ -159,9 +159,9 @@ const T: Record<Lang, {
     paid: {
       title: 'Transparent Practitioner Economics',
       subtitle: 'Simulate your earnings, understand platform commission, and manage your payouts with total accounting clarity.',
-      lead: pct => (pct === null ? 'We take a commission on your consultation or visit fee.' : `We take ${pct}% of your consultation or procedure fee.`) + ' It is calculated on your fee before service tax, and service tax is not part of your income.',
+      lead: pct => (pct === null ? 'We take a commission on your consultation or visit fee.' : pct === 0 ? 'You keep 100% of the fee you set. The platform charges patients its own service fee, shown to them as a separate line.' : `We take ${pct}% of your consultation or procedure fee.`) + ' It is calculated on your fee before service tax, and service tax is not part of your income.',
       process: t => `Payouts are made by bank transfer, ${t.schedule}. Earnings become payable ${t.holdDays} days after a visit is completed. Anything under RM ${t.minimumPayout} rolls over to the next payout.`,
-      earnings: 'Your earnings dashboard lists every paid visit, commission, and net payout, with downloadable statements for each disbursement.',
+      earnings: 'Your earnings dashboard lists every paid visit, any platform deduction, and the net payout, with downloadable statements for each disbursement.',
       refunds: 'A refunded visit is deducted from your earnings. If already disbursed, it rolls into your next scheduled payout.',
     },
     checklists: {
@@ -277,7 +277,7 @@ const T: Record<Lang, {
     ],
     metrics: [
       { value: '100%', label: 'Kelayakan Disemak Manual', sub: 'Setiap lesen dan APC disemak silang dengan daftar rasmi majlis kebangsaan.' },
-      { value: 'RM 0', label: 'Sifar Yuran Platform Awal', sub: 'Sertai dan disenaraikan secara percuma. Komisen telus hanya atas lawatan berbayar.' },
+      { value: 'RM 0', label: 'Sifar Yuran Platform Awal', sub: 'Sertai dan disenaraikan secara percuma. Yuran platform dinyatakan secara terbuka dalam terma di bawah.' },
       { value: '14-Hari', label: 'Penyelesaian Pindahan Bank', sub: 'Pindahan bank berjadual diformat kemas untuk akauntan dan penyerahan LHDN.' },
       { value: '100%', label: 'Pematuhan Undang-Undang', sub: 'Mematuhi Akta Racun 1952, Akta Perubatan 1971, dan Akta Jururawat 1950.' },
     ],
@@ -301,9 +301,9 @@ const T: Record<Lang, {
     paid: {
       title: 'Ekonomi Pengamal Yang Telus',
       subtitle: 'Simulasikan pendapatan anda, fahami komisen platform, dan uruskan pembayaran anda dengan kejelasan perakaunan sepenuhnya.',
-      lead: pct => (pct === null ? 'Kami mengambil komisen ke atas yuran konsultasi atau lawatan anda.' : `Kami mengambil ${pct}% daripada yuran konsultasi atau prosedur anda.`) + ' Ia dikira atas yuran anda sebelum cukai perkhidmatan, dan cukai perkhidmatan bukan sebahagian daripada pendapatan anda.',
+      lead: pct => (pct === null ? 'Kami mengambil komisen ke atas yuran konsultasi atau lawatan anda.' : pct === 0 ? 'Anda menerima 100% yuran yang anda tetapkan. Platform mengenakan yuran perkhidmatannya sendiri kepada pesakit, dipaparkan sebagai baris berasingan.' : `Kami mengambil ${pct}% daripada yuran konsultasi atau prosedur anda.`) + ' Ia dikira atas yuran anda sebelum cukai perkhidmatan, dan cukai perkhidmatan bukan sebahagian daripada pendapatan anda.',
       process: t => `Bayaran dibuat melalui pindahan bank, ${t.schedule}. Pendapatan boleh dibayar ${t.holdDays} hari selepas lawatan selesai. Jumlah di bawah RM ${t.minimumPayout} dibawa ke bayaran seterusnya.`,
-      earnings: 'Papan pemuka pendapatan anda menyenaraikan setiap lawatan berbayar, komisen, dan bayaran bersih, berserta penyata boleh dimuat turun.',
+      earnings: 'Papan pemuka pendapatan anda menyenaraikan setiap lawatan berbayar, sebarang potongan platform, dan bayaran bersih, berserta penyata boleh dimuat turun.',
       refunds: 'Lawatan yang dibayar balik ditolak daripada pendapatan anda. Jika telah dibayar, ia ditolak daripada bayaran berjadual seterusnya.',
     },
     checklists: {
@@ -419,7 +419,7 @@ const T: Record<Lang, {
     ],
     metrics: [
       { value: '100%', label: '人工审核执业资质', sub: '每张执照与年度执业证书 (APC) 均与国家法定名册直接核实。' },
-      { value: 'RM 0', label: '零前期入驻费用', sub: '免费入驻列名，仅在完成付费问诊或护理服务后收取透明佣金。' },
+      { value: 'RM 0', label: '零前期入驻费用', sub: '免费入驻列名。平台费用在下方条款中公开说明。' },
       { value: '14 天', label: '直接银行自动打款', sub: '定期直接转账至马来西亚银行账户，并提供税务对账凭证。' },
       { value: '100%', label: '严格遵守大马法规', sub: '严格遵循《1952年毒药法令》、《1971年医疗法令》及《1950年护士法令》。' },
     ],
@@ -443,9 +443,9 @@ const T: Record<Lang, {
     paid: {
       title: '透明的医疗人员收益机制',
       subtitle: '即时模拟您的收入，清晰了解服务佣金，享受具备完备税务凭证的银行结算。',
-      lead: pct => (pct === null ? '我们对您的问诊或护理服务费收取佣金。' : `我们收取您服务费的 ${pct}%。`) + ' 佣金按服务税前的实际费用计算，服务税不计入您的收入。',
+      lead: pct => (pct === null ? '我们对您的问诊或护理服务费收取佣金。' : pct === 0 ? '您将获得所设定费用的 100%。平台向患者另行收取自己的服务费，并单独列示。' : `我们收取您服务费的 ${pct}%。`) + ' 佣金按服务税前的实际费用计算，服务税不计入您的收入。',
       process: t => `款项通过银行转账支付，${t.schedule}。服务完成 ${t.holdDays} 天后款项即可结算。低于 RM ${t.minimumPayout} 的金额顺延至下期。`,
-      earnings: '收入控制台清晰列出每笔付费服务、平台佣金与净结算额，并支持下载每次对账单。',
+      earnings: '收入控制台清晰列出每笔付费服务、平台扣款（如有）与净结算额，并支持下载每次对账单。',
       refunds: '退款订单将从您的收入中扣除。若已结算，将在下个结算周期自动轧差扣减。',
     },
     checklists: {
@@ -663,7 +663,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
   const [pct, setPct] = useState<number | null>(null);
   const [payout, setPayout] = useState<PayoutTerms | null>(null);
 
-  const commissionRate = (pct ?? 15) / 100;
+  const commissionRate = (pct ?? 0) / 100;
   const platformFee = Math.round(fee * commissionRate * 100) / 100;
   const netTakeHome = Math.round((fee - platformFee) * 100) / 100;
 
@@ -1132,7 +1132,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                       Net Payout Rate
                     </span>
                     <span className="font-display font-black text-2xl text-[color:var(--t-700)]">
-                      {pct !== null ? `${100 - pct}%` : '85%'} Net Take-Home
+                      {`${100 - (pct ?? 0)}%`} Net Take-Home
                     </span>
                   </div>
 
@@ -1238,7 +1238,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                         <div className="text-sm font-black text-slate-800 mt-0.5">RM {fee}.00</div>
                       </div>
                       <div className="p-2 bg-slate-50 border border-slate-100">
-                        <div className="text-xs font-bold text-slate-500 uppercase">MediCred ({pct ?? 15}%)</div>
+                        <div className="text-xs font-bold text-slate-500 uppercase">MediCred ({pct ?? 0}%)</div>
                         <div className="text-sm font-black text-slate-600 mt-0.5">RM {platformFee.toFixed(2)}</div>
                       </div>
                       <div

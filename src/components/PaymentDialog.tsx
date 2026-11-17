@@ -14,6 +14,8 @@ interface Props {
 
 interface Breakdown {
   amount: number; subtotal: number; tax: number; taxRatePct: number; taxNote: string | null;
+  /** The platform's own fee, charged to the patient on top of the professional's fee, and the service tax on it. */
+  platformFee?: number; platformFeeTax?: number; platformFeeTaxPct?: number;
   methods: { id: string; label: string; note: string; category?: string }[];
   fpxBanks?: { code: string; name: string; status: 'online' | 'maintenance' }[];
   indicative: { currency: string; amount: number; asOf: string | null }[];
@@ -99,6 +101,18 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
           <>
             <dt className="text-slate-600">{tx('Service Tax (SST {pct}%)', { pct: b.taxRatePct })}</dt>
             <dd className="tabular-nums font-semibold">{formatMoney(b.tax)}</dd>
+          </>
+        )}
+        {(b.platformFee ?? 0) > 0 && (
+          <>
+            <dt className="text-slate-600">{tx('Platform service fee')}</dt>
+            <dd className="tabular-nums font-semibold">{formatMoney(b.platformFee ?? 0)}</dd>
+            {(b.platformFeeTax ?? 0) > 0 && (
+              <>
+                <dt className="text-slate-600">{tx('Service tax on the platform fee ({pct}%)', { pct: b.platformFeeTaxPct ?? 0 })}</dt>
+                <dd className="tabular-nums font-semibold">{formatMoney(b.platformFeeTax ?? 0)}</dd>
+              </>
+            )}
           </>
         )}
         <dt className="font-extrabold text-xs text-[color:var(--ink)] pt-1 border-t border-[color:var(--t-200)]">{tx('Total Payable (MYR)')}</dt>
@@ -379,6 +393,18 @@ export default function PaymentDialog({ kind, refId, description, onPaid, onCanc
                   <>
                     <dt className="text-slate-500">{tx('Service Tax (SST {pct}%)', { pct: invoice.taxRatePct })}</dt>
                     <dd className="tabular-nums font-semibold">{formatMoney(invoice.tax)}</dd>
+                  </>
+                )}
+                {invoice.platformFee > 0 && (
+                  <>
+                    <dt className="text-slate-500">{tx('Platform service fee')}</dt>
+                    <dd className="tabular-nums font-semibold">{formatMoney(invoice.platformFee)}</dd>
+                    {invoice.platformFeeTax > 0 && (
+                      <>
+                        <dt className="text-slate-500">{tx('Service tax on the platform fee')}</dt>
+                        <dd className="tabular-nums font-semibold">{formatMoney(invoice.platformFeeTax)}</dd>
+                      </>
+                    )}
                   </>
                 )}
                 <dt className="text-slate-500 font-bold border-t border-slate-200 pt-1">{tx('Total Paid')}</dt>

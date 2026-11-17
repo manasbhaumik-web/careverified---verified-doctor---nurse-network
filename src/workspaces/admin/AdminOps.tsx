@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AdminPayouts from './AdminPayouts';
 import AdminEmail from './AdminEmail';
+import AdminFeeSchedule from './AdminFeeSchedule';
 import { Siren, TrendingUp, BarChart2, CheckCircle2, Clock, Calendar, ShieldCheck } from 'lucide-react';
 import { formatMoney, useTr } from '../../locale';
 import AdminActionModal, { type AdminActionModalConfig } from './AdminActionModal';
@@ -324,6 +325,7 @@ export default function AdminOps({
 
       {sub === 'settlements' && (
         <>
+          <AdminFeeSchedule />
           <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3 rounded-none">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h3 className="text-sm font-extrabold">{tx('Payments')}</h3>

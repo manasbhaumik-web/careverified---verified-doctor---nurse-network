@@ -30,6 +30,7 @@ import { assessConsult, isVirtualMode, normaliseCountry, practitionerMayTreat } 
 import { findRegistry, inferRegistryId, scopeFor, REGISTRIES, REGISTRATION_TYPES } from "./server/registries";
 import { registerVerificationRoutes, notifyAdmins, notify } from "./server/verification";
 import { registerPaymentRoutes, registerPaymentWebhook, setPaymentHandlers, refundPayment } from "./server/payments";
+import { registerFeeSchedule } from "./server/feeSchedule";
 import { refundPolicy } from "./server/paymentPolicy";
 import { demoEnabled, DEMO_ROLES } from "./server/demo";
 import { registerPartners } from "./server/partners";
@@ -1126,8 +1127,8 @@ app.get("/api/admin/telemetry", requireRole("admin"), (_req, res) => {
   const payByDay = new Map(payStats.map(r => [r.day, r]));
   const payTotals = db.prepare(
     `SELECT COALESCE(SUM(CASE WHEN status = 'paid' THEN amount_sen ELSE 0 END), 0) AS grossSen,
-            COALESCE(SUM(CASE WHEN status = 'paid' THEN platform_fee_sen ELSE 0 END), 0) AS platformFeeSen,
-            COALESCE(SUM(CASE WHEN status = 'paid' THEN tax_sen ELSE 0 END), 0) AS taxSen,
+            COALESCE(SUM(CASE WHEN status = 'paid' THEN platform_fee_sen + patient_fee_sen ELSE 0 END), 0) AS platformFeeSen,
+            COALESCE(SUM(CASE WHEN status = 'paid' THEN tax_sen + patient_fee_tax_sen ELSE 0 END), 0) AS taxSen,
             SUM(CASE WHEN status = 'paid' THEN 1 ELSE 0 END) AS paidCount,
             SUM(CASE WHEN status = 'refunded' THEN 1 ELSE 0 END) AS refundedCount
      FROM payments WHERE substr(COALESCE(paid_at, created_at), 1, 10) >= ?`
@@ -1472,6 +1473,7 @@ registerQualityRoutes(app, { reviews: () => reviews, findProfessional, allProfes
 registerPharmacyWorkspace(app, { findProfessional });
 setClinicalHooks(clinical);
 registerPaymentRoutes(app);
+registerFeeSchedule(app);
 const UNPAID_HOLD_MS = 15 * 60_000;
 const paymentRegion = (userId: string): "MY" | "INTL" => {
   const pt = (patients as any[]).find(p => p.userId === userId);

@@ -109,3 +109,19 @@ The existing tax setting stays configurable per line.
 - Will the payment provider offer split settlement in Malaysia on the terms needed? (Unverified.)
 - Who pays the provider's cost: the platform or the patient?
 - Which doctor on the board or management will satisfy the guideline's requirement?
+
+## 10. Build status (2026-11-17)
+
+Done (payment flow, first step):
+- A fee schedule per kind of payment (`booking`, `consult`, `care`) with a switch per kind, a reason and a history for every change, editable by the board under Settlements and Payouts (`server/feeSchedule.ts`, `AdminFeeSchedule.tsx`).
+- Models: a fixed service fee or a percentage service fee, both charged to the patient on top and shown as their own line. The old model (a share of the professional's fee) only exists when an operator sets `PLATFORM_COMMISSION_PCT`; it can be left but not chosen again. With no setting, no fee is charged until the board sets one.
+- Payments store the professional fee, the platform fee and tax on it separately (`patient_fee_sen`, `patient_fee_tax_sen`, `fee_model`). The professional's earnings, payout statements and the patient's receipt use the professional fee only. The board's totals show fees charged to patients and fees deducted from professionals separately.
+- Service tax on the platform's own fee is its own line, set by `PLATFORM_FEE_TAX_PCT` (default 0 until the accountant decides).
+- The doctors' terms page and calculator show 100% when no deduction is in force.
+
+Not done yet:
+- Split settlement through a licensed payment provider. The platform still collects the whole payment and pays professionals later in manual batches, so the "platform holds no funds" gate in section 6 is not met.
+- Gig Workers Act registration and the statutory deduction on caregiver statements.
+- Packages: the fixed fee on hospital confirmation. The 8% success invoice at discharge is still in place.
+- Subscriptions (doctors, facilities, pharmacies) and the pharmacy delivery fee.
+- A lawyer's and accountant's sign-off on every point in sections 5 and 8.

@@ -5,6 +5,7 @@ import express, { Application, Response } from "express";
 import { db } from "./db";
 import { audit } from "./audit";
 import { requireAuth, requireRole } from "./auth";
+import { feeFor, professionalFeeSen, platformFeeTaxPct, feeScheduleSummary, professionalsKeepFull, legacyCommissionPct } from "./feeSchedule";
 
 /**
  * Payments for bookings and instant consultations.
@@ -38,8 +39,8 @@ CREATE TABLE IF NOT EXISTS payments (
 CREATE INDEX IF NOT EXISTS idx_pay_ref ON payments(kind, ref_id);
 CREATE INDEX IF NOT EXISTS idx_pay_pro ON payments(professional_id, status);
 `);
-// Service tax is stored separately: amount_sen is the total charged, amount_sen - tax_sen the professional fee.
-for (const col of ["tax_sen INTEGER NOT NULL DEFAULT 0", "tax_rate_pct REAL NOT NULL DEFAULT 0", "patient_region TEXT NOT NULL DEFAULT 'MY'"]) {
+// Service tax is stored separately. amount_sen is the total charged. The professional fee is amount_sen less tax_sen less the platform fee charged to the patient (patient_fee_sen) and tax on it (patient_fee_tax_sen). See feeSchedule.ts.
+for (const col of ["tax_sen INTEGER NOT NULL DEFAULT 0", "tax_rate_pct REAL NOT NULL DEFAULT 0", "patient_region TEXT NOT NULL DEFAULT 'MY'", "fee_model TEXT NOT NULL DEFAULT 'legacy_percent_of_professional_fee'", "patient_fee_sen INTEGER NOT NULL DEFAULT 0", "patient_fee_tax_sen INTEGER NOT NULL DEFAULT 0"]) {
   try { db.exec("ALTER TABLE payments ADD COLUMN " + col); } catch { /* column already exists */ }
 }
 
@@ -57,6 +58,8 @@ export interface PaymentRow {
   provider_ref: string | null; payment_intent: string | null; description: string;
   created_at: string; paid_at: string | null; refunded_at: string | null; refund_reason: string | null;
   tax_sen: number; tax_rate_pct: number; patient_region: string;
+  /** How the platform is paid on this payment, the platform fee charged to the patient on top, and tax on that fee. */
+  fee_model: string; patient_fee_sen: number; patient_fee_tax_sen: number;
 }
 interface Handlers {
   resolve: (kind: string, refId: string) => Payable | null;
@@ -73,7 +76,7 @@ const provider = (): "stripe" | "sandbox" | null =>
   stripeKey() ? "stripe"
   : process.env.NODE_ENV !== "production" || process.env.ALLOW_SANDBOX_PAYMENTS === "true" || !!process.env.VERCEL ? "sandbox"
   : null;
-const commissionPct = () => Math.min(50, Math.max(0, Number(process.env.PLATFORM_COMMISSION_PCT ?? 15)));
+
 const appUrl = () => (process.env.APP_URL && process.env.APP_URL !== "MY_APP_URL" ? process.env.APP_URL : "http://localhost:3000").replace(/\/$/, "");
 const fail = (res: Response, code: number, message: string) => res.status(code).json({ status: "error", message });
 const getPayment = (id: string) => db.prepare("SELECT * FROM payments WHERE id = ?").get(id) as unknown as PaymentRow | undefined;
@@ -135,7 +138,10 @@ export function registerPaymentRoutes(app: Application) {
   // Public, and registered before /api/payments/:id so that route does not catch it.
   // What a practitioner is told before joining: the commission actually in force, and that payouts are manual.
   app.get("/api/payments/terms", (_req, res) => {
-    res.json({ status: "success", data: { commissionPct: commissionPct(), commissionOn: "professional fee, before service tax", payoutsAutomated: false, currency: "MYR", payout: payoutTerms() } });
+    res.json({ status: "success", data: {
+      commissionPct: legacyCommissionPct(), commissionOn: "professional fee, before service tax", professionalsKeepFull: professionalsKeepFull(),
+      feeSchedule: feeScheduleSummary(), platformFeeTaxPct: platformFeeTaxPct(), payoutsAutomated: false, currency: "MYR", payout: payoutTerms(),
+    } });
   });
 
   app.get("/api/payments/config", (req, res) => {
@@ -163,19 +169,22 @@ export function registerPaymentRoutes(app: Application) {
     if (!(subtotalSen > 0)) return fail(res, 400, "Invalid amount.");
     const region = handlers?.patientRegion(payable.userId) ?? "MY";
     const tax = computeTax(subtotalSen, region);
-    const amountSen = subtotalSen + tax.taxSen;
-    let pay = existing.find(p => p.status === "pending" && p.provider === prov && p.amount_sen === amountSen && p.tax_sen === tax.taxSen);
+    // The platform's own fee (if any) is charged to the patient on top and shown as its own line; the professional's fee is paid in full.
+    const fee = feeFor(kind, subtotalSen);
+    const amountSen = subtotalSen + tax.taxSen + fee.patientFeeSen + fee.patientFeeTaxSen;
+    let pay = existing.find(p => p.status === "pending" && p.provider === prov && p.amount_sen === amountSen && p.tax_sen === tax.taxSen && p.patient_fee_sen === fee.patientFeeSen && p.fee_model === fee.model);
     if (!pay) {
       const id = "pay-" + crypto.randomBytes(8).toString("hex");
-      // The platform commission is on the professional fee only; tax is passed through, not earned.
+      // platform_fee_sen is only what the old model took out of the professional fee (0 now); service tax is passed through, not earned.
       db.prepare(
-        `INSERT INTO payments (id,user_id,kind,ref_id,professional_id,amount_sen,platform_fee_sen,provider,description,created_at,tax_sen,tax_rate_pct,patient_region)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`
-      ).run(id, payable.userId, kind, payable.id, payable.professionalId, amountSen, Math.round(subtotalSen * commissionPct() / 100), prov, payable.description, new Date().toISOString(), tax.taxSen, tax.ratePct, region);
+        `INSERT INTO payments (id,user_id,kind,ref_id,professional_id,amount_sen,platform_fee_sen,provider,description,created_at,tax_sen,tax_rate_pct,patient_region,fee_model,patient_fee_sen,patient_fee_tax_sen)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
+      ).run(id, payable.userId, kind, payable.id, payable.professionalId, amountSen, fee.deductSen, prov, payable.description, new Date().toISOString(), tax.taxSen, tax.ratePct, region, fee.model, fee.patientFeeSen, fee.patientFeeTaxSen);
       pay = getPayment(id)!;
     }
     const breakdown = {
       amount: amountSen / 100, subtotal: subtotalSen / 100, tax: tax.taxSen / 100, taxRatePct: tax.ratePct, taxNote: tax.note,
+      platformFee: fee.patientFeeSen / 100, platformFeeTax: fee.patientFeeTaxSen / 100, platformFeeTaxPct: platformFeeTaxPct(), feeModel: fee.model, professionalReceivesFull: fee.deductSen === 0,
       methods: methodsFor(region), fpxBanks: MALAYSIA_FPX_BANKS, indicative: indicativeConversions(amountSen / 100), policy: refundPolicy(region),
     };
 
@@ -186,16 +195,17 @@ export function registerPaymentRoutes(app: Application) {
     const body = new URLSearchParams({
       mode: "payment",
       ...Object.fromEntries(paymentMethods().map((m, i) => [`payment_method_types[${i}]`, m])),
-      "line_items[0][quantity]": "1",
-      "line_items[0][price_data][currency]": "myr",
-      "line_items[0][price_data][unit_amount]": String(subtotalSen),
-      "line_items[0][price_data][product_data][name]": payable.description,
-      ...(tax.taxSen > 0 ? {
-        "line_items[1][quantity]": "1",
-        "line_items[1][price_data][currency]": "myr",
-        "line_items[1][price_data][unit_amount]": String(tax.taxSen),
-        "line_items[1][price_data][product_data][name]": `Service tax (SST) ${tax.ratePct}%`,
-      } : {}),
+      ...Object.fromEntries(([
+        [payable.description, subtotalSen],
+        [`Service tax (SST) ${tax.ratePct}%`, tax.taxSen],
+        ["Platform service fee", fee.patientFeeSen],
+        [`Service tax on the platform fee ${platformFeeTaxPct()}%`, fee.patientFeeTaxSen],
+      ] as [string, number][]).filter(([, amount]) => amount > 0).flatMap(([name, amount], i) => [
+        [`line_items[${i}][quantity]`, "1"],
+        [`line_items[${i}][price_data][currency]`, "myr"],
+        [`line_items[${i}][price_data][unit_amount]`, String(amount)],
+        [`line_items[${i}][price_data][product_data][name]`, name],
+      ])),
       client_reference_id: pay.id,
       "metadata[payment_id]": pay.id,
       success_url: `${appUrl()}/?payment=success&pid=${pay.id}`,
@@ -244,7 +254,9 @@ export function registerPaymentRoutes(app: Application) {
       data: {
         invoiceNumber: "INV-" + p.id.slice(4).toUpperCase(), paymentId: p.id, issuedAt: p.paid_at,
         billedTo: patient, description: p.description, currency: p.currency, total: p.amount_sen / 100,
-        subtotal: (p.amount_sen - p.tax_sen) / 100, tax: p.tax_sen / 100, taxRatePct: p.tax_rate_pct,
+        // Lines: the professional's fee (subtotal) and tax on it, then the platform's own fee and tax on that.
+        subtotal: professionalFeeSen(p) / 100, tax: p.tax_sen / 100, taxRatePct: p.tax_rate_pct,
+        platformFee: p.patient_fee_sen / 100, platformFeeTax: p.patient_fee_tax_sen / 100,
         seller: { name: process.env.PRIVACY_CONTROLLER_NAME || "MediCred Healthcare Network Sdn Bhd", sstRegistrationNo: sstConfig().registrationNo || null },
         status: p.status, refundedAt: p.refunded_at, provider: p.provider,
         testMode: p.provider === "sandbox",
@@ -257,18 +269,18 @@ export function registerPaymentRoutes(app: Application) {
     const pid = req.user!.profileId;
     if (!pid) return res.json({ status: "success", data: { rows: [], totals: { gross: 0, fee: 0, net: 0 } } });
     const rows = db.prepare(
-      "SELECT id, kind, description, amount_sen, tax_sen, platform_fee_sen, status, paid_at, refunded_at, provider FROM payments WHERE professional_id = ? AND status IN ('paid','refunded') ORDER BY paid_at DESC LIMIT 200"
+      "SELECT id, kind, description, amount_sen, tax_sen, platform_fee_sen, patient_fee_sen, patient_fee_tax_sen, status, paid_at, refunded_at, provider FROM payments WHERE professional_id = ? AND status IN ('paid','refunded') ORDER BY paid_at DESC LIMIT 200"
     ).all(pid) as any[];
     const paid = rows.filter(r => r.status === "paid");
     // Earnings are on the professional fee: service tax collected is passed on, not income.
-    const gross = paid.reduce((s, r) => s + r.amount_sen - r.tax_sen, 0);
+    const gross = paid.reduce((s, r) => s + professionalFeeSen(r), 0);
     const fee = paid.reduce((s, r) => s + r.platform_fee_sen, 0);
     res.json({
       status: "success",
       data: {
-        rows: rows.map(r => ({ ...r, net: (r.amount_sen - r.tax_sen - r.platform_fee_sen) / 100, gross: (r.amount_sen - r.tax_sen) / 100, testMode: r.provider === "sandbox" })),
+        rows: rows.map(r => ({ ...r, net: (professionalFeeSen(r) - r.platform_fee_sen) / 100, gross: professionalFeeSen(r) / 100, testMode: r.provider === "sandbox" })),
         totals: { gross: gross / 100, fee: fee / 100, net: (gross - fee) / 100 },
-        commissionPct: commissionPct(),
+        commissionPct: legacyCommissionPct(),
       },
     });
   });
@@ -278,8 +290,9 @@ export function registerPaymentRoutes(app: Application) {
     const rows = db.prepare(
       `SELECT p.*, u.name AS patientName FROM payments p LEFT JOIN users u ON u.id = p.user_id ORDER BY p.created_at DESC LIMIT 200`
     ).all();
-    const totals = db.prepare("SELECT COALESCE(SUM(amount_sen - tax_sen),0) AS gross, COALESCE(SUM(platform_fee_sen),0) AS fee, COALESCE(SUM(tax_sen),0) AS tax FROM payments WHERE status='paid'").get() as any;
-    res.json({ status: "success", data: { rows, mode: provider(), totals: { gross: totals.gross / 100, platformFee: totals.fee / 100, serviceTaxCollected: totals.tax / 100 } } });
+    const totals = db.prepare("SELECT COALESCE(SUM(amount_sen - tax_sen - patient_fee_sen - patient_fee_tax_sen),0) AS gross, COALESCE(SUM(platform_fee_sen),0) AS deducted, COALESCE(SUM(patient_fee_sen),0) AS charged, COALESCE(SUM(tax_sen + patient_fee_tax_sen),0) AS tax FROM payments WHERE status='paid'").get() as any;
+    // platformFee = everything the platform earns: the old deduction plus fees charged to patients.
+    res.json({ status: "success", data: { rows, mode: provider(), totals: { gross: totals.gross / 100, platformFee: (totals.deducted + totals.charged) / 100, feeDeductedFromProfessionals: totals.deducted / 100, feeChargedToPatients: totals.charged / 100, serviceTaxCollected: totals.tax / 100 } } });
   });
 
   app.post("/api/payments/:id/refund", requireRole("admin"), async (req, res) => {
