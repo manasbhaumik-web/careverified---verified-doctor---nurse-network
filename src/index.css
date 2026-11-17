@@ -1147,6 +1147,14 @@ a, button, [role="button"], summary, label, select, input { touch-action: manipu
 #patient-dashboard-root .text-2xs { font-size: 0.8125rem; line-height: 1.25rem; }
 #patient-dashboard-root p, #patient-dashboard-root li { line-height: 1.55; }
 
-/* TAG-SIZE: status tags (.app-badge, .tag-pill) are the one exception to the 12px minimum: Plus Jakarta Sans at 10px. */
-.app-badge, .tag-pill { font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif; font-size: 0.625rem; line-height: 1rem; }
+/* TAG-SIZE: every tag, badge and chip is Plus Jakarta Sans at 10px. This is the one exception to the 12px minimum.
+   A tag is: .app-badge, .tag-pill, .count-badge, or a small span (text-2xs) with its own padding and a background or border.
+   Buttons and links are not tags. !important is needed to beat the patient workspace's larger-text rule. */
+.app-badge, .tag-pill, .count-badge,
+span.text-2xs[class*="px-"][class*="bg-"],
+span.text-2xs[class*="px-"][class*="border"] {
+  font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.625rem !important;
+}
+.app-badge, .tag-pill { line-height: 1rem; }
 /* END-TAG-SIZE */
