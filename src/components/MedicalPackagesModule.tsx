@@ -374,7 +374,7 @@ export default function MedicalPackagesModule({
                 >
                   <Tag className="h-3 w-3 text-[color:var(--t-600)] shrink-0" />
                   <span className="font-mono font-extrabold text-[color:var(--t-700)]">{pr.code}</span>
-                  <span className="text-2xs text-emerald-800 font-extrabold uppercase px-1 py-0.2 bg-emerald-50 border border-emerald-200">
+                  <span className="tag-pill text-emerald-800 font-extrabold uppercase px-1 py-0.2 bg-emerald-50 border border-emerald-200">
                     {pr.badge_text || (pr.discount_type === 'percentage' ? tx('{pct}% OFF', { pct: pr.discount_value }) : tx('RM {amt} OFF', { amt: pr.discountValueMyr }))}
                   </span>
                   {copiedCode === pr.code ? (
@@ -432,7 +432,7 @@ export default function MedicalPackagesModule({
 
                   {/* 3. Target Audience Segmented Toggle */}
                   <div className="flex items-center h-10 border border-[color:var(--t-200)] bg-[color:var(--t-50)]/40 p-1 gap-1 flex-auto max-w-full overflow-x-auto">
-                    <span className="text-2xs font-mono font-black uppercase tracking-wider text-slate-500 px-2 flex items-center gap-1 shrink-0">
+                    <span className="tag-pill font-black uppercase tracking-wider text-slate-500 px-2 flex items-center gap-1 shrink-0">
                       <Filter className="h-3 w-3 text-[color:var(--t-600)]" />
                       {tx('Audience:')}
                     </span>
@@ -539,7 +539,7 @@ export default function MedicalPackagesModule({
                   >
                     <div className="relative aspect-21/9 overflow-hidden bg-[color:var(--t-50)]">
                       <PackageImage src={pkg.image_url} alt={pkg.title} category={pkg.category} />
-                      <span className="absolute top-2.5 left-2.5 text-2xs font-bold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-600)] text-white shadow-xs">
+                      <span className="absolute top-2.5 left-2.5 tag-pill font-bold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-600)] text-white shadow-xs">
                         {tx(pkg.category)}
                       </span>
                     </div>
@@ -645,7 +645,7 @@ export default function MedicalPackagesModule({
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2">
-                      <span className="text-2xs font-extrabold uppercase px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300">
+                      <span className="tag-pill font-extrabold uppercase px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300">
                         {promo.badge_text || (promo.discount_type === 'percentage' ? tx('{pct}% Discount', { pct: promo.discount_value }) : tx('RM {amt} Rebate', { amt: promo.discountValueMyr }))}
                       </span>
                       <span className="text-xs font-mono text-slate-500">
@@ -726,16 +726,16 @@ export default function MedicalPackagesModule({
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2">
-                        <span className="text-2xs font-black uppercase px-2.5 py-1 bg-slate-900/90 text-white backdrop-blur-xs">
+                        <span className="tag-pill font-black uppercase px-2.5 py-1 bg-slate-900/90 text-white backdrop-blur-xs">
                           {tx(fac.kind.replace('_', ' ')).toUpperCase()}
                         </span>
                         {fac.mhtcMember && (
-                          <span className="text-2xs font-black uppercase px-2.5 py-1 bg-sky-800/95 text-white border border-sky-400/60 backdrop-blur-xs flex items-center gap-1">
+                          <span className="tag-pill font-black uppercase px-2.5 py-1 bg-sky-800/95 text-white border border-sky-400/60 backdrop-blur-xs flex items-center gap-1">
                             🇲🇾 {tx('MHTC Member Hospital')}
                           </span>
                         )}
                         {Boolean(fac.verifiedFacilitator) && (
-                          <span className="text-2xs font-black uppercase px-2.5 py-1 bg-emerald-800/95 text-white border border-emerald-400/60 backdrop-blur-xs flex items-center gap-1">
+                          <span className="tag-pill font-black uppercase px-2.5 py-1 bg-emerald-800/95 text-white border border-emerald-400/60 backdrop-blur-xs flex items-center gap-1">
                             <ShieldCheck className="h-3 w-3" />
                             {tx('Verified Facilitator Partner')}
                           </span>
@@ -762,18 +762,18 @@ export default function MedicalPackagesModule({
                       {/* Licence & Accreditations Badge Row */}
                       <div className="flex flex-wrap items-center gap-2 text-xs">
                         {Boolean(fac.verifiedFacilitator) && (
-                          <span className="px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 text-2xs font-black uppercase flex items-center gap-1">
+                          <span className="px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 tag-pill font-black uppercase flex items-center gap-1">
                             <BadgeCheck className="h-3 w-3 text-emerald-600" />
                             {tx('Verified facilitator')}
                           </span>
                         )}
                         {fac.mhtcMember && (
-                          <span className="px-2.5 py-1 bg-sky-50 text-sky-800 border border-sky-300 text-2xs font-black uppercase flex items-center gap-1">
+                          <span className="px-2.5 py-1 bg-sky-50 text-sky-800 border border-sky-300 tag-pill font-black uppercase flex items-center gap-1">
                             🇲🇾 {tx('MHTC Affiliated')}
                           </span>
                         )}
                         {fac.isLicenceValid && (
-                          <span className="px-2.5 py-1 bg-slate-100 text-slate-800 border border-slate-300 text-2xs font-black uppercase flex items-center gap-1">
+                          <span className="px-2.5 py-1 bg-slate-100 text-slate-800 border border-slate-300 tag-pill font-black uppercase flex items-center gap-1">
                             <ShieldCheck className="h-3 w-3 text-slate-600" />
                             {tx('Licensed hospital')}{fac.licenceNo ? ` (${fac.licenceNo})` : ''}
                           </span>
@@ -869,7 +869,7 @@ export default function MedicalPackagesModule({
             <div className="bg-white border border-slate-300 w-full max-w-2xl max-h-[90vh] flex flex-col shadow-xl my-auto">
               <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                 <div className="flex items-center gap-2">
-                  <span className="text-2xs font-mono font-black uppercase px-2 py-0.5 bg-slate-900 text-white">
+                  <span className="tag-pill font-black uppercase px-2 py-0.5 bg-slate-900 text-white">
                     {selectedPackage.code}
                   </span>
                   <span className="text-xs font-extrabold text-[color:var(--t-700)]">
@@ -1038,7 +1038,7 @@ export default function MedicalPackagesModule({
               <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-2xs font-mono font-black uppercase px-2 py-0.5 bg-slate-900 text-white">
+                    <span className="tag-pill font-black uppercase px-2 py-0.5 bg-slate-900 text-white">
                       {bookingModal.code}
                     </span>
                     <span className="text-xs font-extrabold text-[color:var(--t-700)]">
@@ -1080,7 +1080,7 @@ export default function MedicalPackagesModule({
                         <div className="text-xs font-bold uppercase text-slate-700 tracking-wider">{tx('Request reference')}</div>
                         <div className="text-lg font-mono font-black text-[color:var(--t-700)] tracking-wide">{depositReceipt.depositPaymentRef}</div>
                       </div>
-                      <span className="px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-300 text-2xs font-bold uppercase">{tx('Waiting for the hospital')}</span>
+                      <span className="px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-300 tag-pill font-bold uppercase">{tx('Waiting for the hospital')}</span>
                     </div>
 
                     <dl className="grid grid-cols-2 gap-3 text-xs">

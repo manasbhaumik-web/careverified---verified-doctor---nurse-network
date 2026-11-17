@@ -53,8 +53,8 @@ export default function TeamTab() {
                 <div className="min-w-0">
                   <p className="text-xs font-black text-slate-900 [overflow-wrap:anywhere] flex items-center gap-2">
                     {m.name}
-                    {m.isOwner && <span className="text-2xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 rounded-none">{tx('Owner')}</span>}
-                    {!m.active && <span className="text-2xs font-black uppercase tracking-wider text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-none">{tx('Disabled')}</span>}
+                    {m.isOwner && <span className="tag-pill font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 rounded-none">{tx('Owner')}</span>}
+                    {!m.active && <span className="tag-pill font-black uppercase tracking-wider text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-none">{tx('Disabled')}</span>}
                   </p>
                   <p className="text-xs font-semibold text-slate-600 [overflow-wrap:anywhere] mt-0.5">{m.email} · added {fmtDate(m.createdAt)}</p>
                   <p className="text-xs mt-1 flex flex-wrap gap-x-3">

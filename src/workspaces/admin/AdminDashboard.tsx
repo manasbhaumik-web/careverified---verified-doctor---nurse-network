@@ -137,7 +137,7 @@ function RequestDocuments({ requestId }: { requestId: string }) {
             <FileText className="h-4 w-4 text-[color:var(--t-600)] shrink-0" />
             <span className="font-bold text-slate-800 truncate">{d.originalName}</span>
           </span>
-          <span className="text-2xs bg-slate-100 border border-slate-200 text-slate-600 px-2 py-0.5 rounded-none font-mono font-bold uppercase">
+          <span className="tag-pill bg-slate-100 border border-slate-200 text-slate-600 px-2 py-0.5 rounded-none font-bold uppercase">
             {d.kind} · {Math.max(1, Math.round(d.size / 1024))} KB
           </span>
         </a>
@@ -1075,7 +1075,7 @@ export default function AdminDashboard({
               </div>
               <div className="space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-2xs font-black uppercase tracking-wider px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">
+                  <span className="tag-pill font-black uppercase tracking-wider px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">
                     {tx('Statutory Segregation of Duties (SoD)')}
                   </span>
                   <span className="text-xs text-slate-500 font-mono">{tx('Malaysian Healthcare Regulatory Guard')}</span>
@@ -1170,7 +1170,7 @@ export default function AdminDashboard({
                       <h3 className="text-sm font-black text-amber-950 uppercase tracking-tight">
                         Dual-Signoff Disciplinary &amp; Sanction Inbox
                       </h3>
-                      <span className="px-2 py-0.5 text-2xs font-black uppercase bg-amber-600 text-white">
+                      <span className="px-2 py-0.5 tag-pill font-black uppercase bg-amber-600 text-white">
                         {pendingSanctions.length} Countersignature{pendingSanctions.length > 1 ? 's' : ''} Required
                       </span>
                     </div>
@@ -1221,7 +1221,7 @@ export default function AdminDashboard({
                           <span className="text-2xs font-mono font-bold bg-slate-100 text-slate-700 px-2 py-0.5 border border-slate-200">
                             Ref: {s.reference_no}
                           </span>
-                          <span className="text-2xs font-bold text-amber-800 uppercase px-2 py-0.5 bg-amber-100 border border-amber-200">
+                          <span className="tag-pill font-bold text-amber-800 uppercase px-2 py-0.5 bg-amber-100 border border-amber-200">
                             {s.sanction_type.replace(/_/g, ' ')}
                           </span>
                         </div>
@@ -1764,7 +1764,7 @@ export default function AdminDashboard({
                         <span className="font-bold">{r.userName || r.name}</span>
                         <div className="flex items-center gap-2 font-mono text-xs text-slate-600">
                           <span>{r.licenseNumber}</span>
-                          <span className="bg-slate-200 px-1.5 py-0.5 text-2xs font-bold uppercase">{r.userType || r.role || tx('Doctor')}</span>
+                          <span className="bg-slate-200 px-1.5 py-0.5 tag-pill font-bold uppercase">{r.userType || r.role || tx('Doctor')}</span>
                         </div>
                       </div>
                     ))}
@@ -2213,12 +2213,12 @@ export default function AdminDashboard({
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="text-xs font-black text-slate-900">{roleItem.title}</span>
                             {isActive ? (
-                              <span className="px-2 py-0.5 text-2xs font-black uppercase bg-emerald-600 text-white tracking-wider flex items-center gap-1">
+                              <span className="px-2 py-0.5 tag-pill font-black uppercase bg-emerald-600 text-white tracking-wider flex items-center gap-1">
                                 <Check className="h-3 w-3" />
                                 {tx('Active Mandate')}
                               </span>
                             ) : (
-                              <span className="px-2 py-0.5 text-2xs font-bold uppercase bg-slate-100 text-slate-700 border border-slate-300">
+                              <span className="px-2 py-0.5 tag-pill font-bold uppercase bg-slate-100 text-slate-700 border border-slate-300">
                                 {roleItem.shortTitle}
                               </span>
                             )}
@@ -2387,7 +2387,7 @@ export default function AdminDashboard({
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <span className="font-black text-xs text-slate-900">{wh.facility_name || wh.hospital_name}</span>
-                        <span className="text-2xs font-bold uppercase px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        <span className="tag-pill font-bold uppercase px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300">
                           {tx('Active Endpoint')}
                         </span>
                       </div>
@@ -2460,7 +2460,7 @@ export default function AdminDashboard({
                           </td>
                           <td className="p-2.5 font-mono text-slate-500">{log.execution_time_ms || 48}ms</td>
                           <td className="p-2.5">
-                            <span className="text-2xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300">
+                            <span className="tag-pill font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-1.5 py-0.5 border border-emerald-300">
                               {log.status || 'delivered'}
                             </span>
                           </td>

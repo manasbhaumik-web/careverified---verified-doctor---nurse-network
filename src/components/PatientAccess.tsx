@@ -45,14 +45,14 @@ const T: Record<Lang, {
       doneTitle: 'Inclusive Features Implemented For You',
       done: [
         'Keyboard-accessible "Skip to content" navigation, semantic landmarks, labelled form controls, and descriptive alt attributes.',
-        'Automated WCAG 2.1 Level A and AA compliance verified across light clinical themes (Sky Blue, Bright Cyan, and Crimson Red).',
+        'Automated WCAG 2.1 Level A and AA compliance verified across light clinical themes (Sky Blue and Bright Cyan).',
         'Touch-friendly 44px minimum target heights and 11px minimum mobile typography for comfortable one-handed phone operation.',
         'Responsive layouts engineered down to 375px viewport width with zero horizontal overflow and reduced-motion support.',
       ],
       notTitle: 'Ongoing Accessibility Roadmap & Known Scope',
       not: [
         'Live video consultations currently rely on text chat fallback rather than automated real-time closed captioning or sign-language relay.',
-        'For maximum contrast compliance (WCAG AA 4.5:1), we recommend the default Sky Blue, Bright Cyan, or Crimson Red light themes.',
+        'For maximum contrast compliance (WCAG AA 4.5:1), we recommend the default Sky Blue or Bright Cyan light themes.',
         'Public pages support English, Bahasa Malaysia, and Chinese; certain specialist clinical sub-screens remain in English.',
       ],
       report: 'Need assistance or encountered an accessibility barrier? Sign in and reach our team via Help & Support.',
@@ -86,14 +86,14 @@ const T: Record<Lang, {
       doneTitle: 'Ciri-ciri Inklusif Yang Disediakan',
       done: [
         'Pautan navigasi "Langkau ke kandungan", medan borang berlabel penuh, dan teks alternatif untuk imej.',
-        'Pematuhan WCAG 2.1 Tahap A dan AA disahkan pada tema klinikal cerah (Sky Blue, Bright Cyan, dan Crimson Red).',
+        'Pematuhan WCAG 2.1 Tahap A dan AA disahkan pada tema klinikal cerah (Sky Blue dan Bright Cyan).',
         'Kawalan sentuhan sekurang-kurangnya 44 piksel tinggi dan saiz teks minimum 11 piksel pada skrin telefon.',
         'Susun atur responsif diuji pada lebar skrin 375 piksel tanpa tatal melintang serta menyokong tetapan kurang pergerakan (reduced motion).',
       ],
       notTitle: 'Skop Semasa & Penambahbaikan Berterusan',
       not: [
         'Konsultasi video langsung menggunakan sembang teks terbina dalam sebagai alternatif kepada sari kata masa nyata automatik.',
-        'Untuk kontras bacaan optimum (WCAG AA 4.5:1), kami mengesyorkan tema cerah Sky Blue, Bright Cyan, atau Crimson Red.',
+        'Untuk kontras bacaan optimum (WCAG AA 4.5:1), kami mengesyorkan tema cerah Sky Blue atau Bright Cyan.',
         'Halaman awam tersedia dalam Bahasa Malaysia, Inggeris, dan Cina; beberapa skrin klinikal dalaman masih dalam Bahasa Inggeris.',
       ],
       report: 'Perlukan bantuan atau menghadapi halangan kebolehcapaian? Log masuk dan hubungi pasukan kami melalui Bantuan & Sokongan.',
@@ -127,14 +127,14 @@ const T: Record<Lang, {
       doneTitle: '已为您配备的无障碍功能',
       done: [
         '提供键盘可访问的“跳到主要内容”链接、语义化表单标签与图片替代说明文字。',
-        '明亮临床主题（Sky Blue、Bright Cyan 与 Crimson Red）均已通过 WCAG 2.1 A 级与 AA 级对比度及可访问性核查。',
+        '明亮临床主题（Sky Blue 与 Bright Cyan）均已通过 WCAG 2.1 A 级与 AA 级对比度及可访问性核查。',
         '触屏设备上的所有按钮与输入框高度均不低于 44 像素，手机端字号不小于 11 像素。',
         '全面适配 375 像素手机屏幕宽度，无横向滚动，并支持系统级“减少动态效果”偏好设置。',
       ],
       notTitle: '当前服务范围与持续优化项',
       not: [
         '视频问诊期间可通过内置实时文字聊天辅助沟通，暂未内置自动语音转字幕或手语翻译。',
-        '为获得最佳阅读对比度（WCAG AA 4.5:1），建议使用默认的 Sky Blue、Bright Cyan 或 Crimson Red 明亮主题。',
+        '为获得最佳阅读对比度（WCAG AA 4.5:1），建议使用默认的 Sky Blue 或 Bright Cyan 明亮主题。',
         '公共页面支持中文、马来文与英文；部分专业临床内页目前仍以英文呈现。',
       ],
       report: '在使用中遇到无障碍问题？请登录并通过“帮助与支持”联系我们的客服团队。',
@@ -173,7 +173,7 @@ export default function PatientAccess() {
           {tx.localTrust.map(item => (
             <div key={item.title} className="bg-white p-4 sm:p-5 flex flex-col justify-between">
               <div>
-                <span className="inline-block text-2xs font-mono font-extrabold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] mb-2">
+                <span className="inline-block tag-pill font-extrabold uppercase tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] mb-2">
                   {item.badge}
                 </span>
                 <h3 className="font-display font-extrabold text-sm sm:text-base text-[color:var(--ink)]">{item.title}</h3>

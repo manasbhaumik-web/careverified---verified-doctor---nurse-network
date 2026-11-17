@@ -257,7 +257,7 @@ export const AdminPackagesTab: React.FC<AdminPackagesTabProps> = ({
                                   <span>{tx('Remove')}</span>
                                 </button>
                               ) : (
-                                <span className="text-2xs font-black text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-none uppercase tracking-wider">
+                                <span className="tag-pill font-black text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-none uppercase tracking-wider">
                                   {tx('Core Module')}
                                 </span>
                               )}

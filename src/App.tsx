@@ -1097,7 +1097,7 @@ export default function App() {
                         actions={
                           <>
                             <span className="bg-[color:var(--t-50)] text-[color:var(--t-600)] text-2xs font-extrabold px-2 py-0.5 rounded-lg border border-[color:var(--t-200)]">v{activePkg.version}</span>
-                            <span className="bg-emerald-50 text-emerald-800 text-2xs font-extrabold px-3 py-1.5 rounded-xs border border-emerald-200 uppercase tracking-wider inline-flex items-center gap-1.5">
+                            <span className="bg-emerald-50 text-emerald-800 tag-pill font-extrabold px-3 py-1.5 rounded-xs border border-emerald-200 uppercase tracking-wider inline-flex items-center gap-1.5">
                               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-xs animate-pulse"></span>
                               <span>Active Runtime Package</span>
                             </span>

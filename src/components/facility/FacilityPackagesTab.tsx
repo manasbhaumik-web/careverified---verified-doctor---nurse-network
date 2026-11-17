@@ -169,10 +169,10 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                                 className="w-full h-full object-cover"
                               />
                               <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 flex-wrap">
-                                <span className="text-2xs font-mono font-bold uppercase px-2 py-0.5 bg-slate-900/90 text-white">
+                                <span className="tag-pill font-bold uppercase px-2 py-0.5 bg-slate-900/90 text-white">
                                   {pkg.code}
                                 </span>
-                                <span className="text-2xs font-bold uppercase px-2 py-0.5 bg-[color:var(--t-600)] text-white">
+                                <span className="tag-pill font-bold uppercase px-2 py-0.5 bg-[color:var(--t-600)] text-white">
                                   {pkg.category}
                                 </span>
                               </div>
@@ -285,7 +285,7 @@ export const FacilityPackagesTab: React.FC<FacilityPackagesTabProps> = ({
                       >
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
-                            <span className="text-2xs font-black uppercase px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">
+                            <span className="tag-pill font-black uppercase px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">
                               {pr.badge_text || (pr.discount_type === 'percentage' ? `${pr.discount_value}% OFF` : `RM ${pr.discountValueMyr} OFF`)}
                             </span>
                             <span className={`text-2xs font-black uppercase px-1.5 py-0.2 ${

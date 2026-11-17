@@ -803,7 +803,7 @@ export default function PatientDashboard({
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1" /> {onCallLabel(onCall)}
                 </BannerBadge>
               ) : (
-                <span className="bg-amber-50 text-amber-900 border border-amber-300 text-2xs font-black uppercase px-2.5 py-0.5">{onCallLabel(onCall)}</span>
+                <span className="bg-amber-50 text-amber-900 border border-amber-300 tag-pill font-black uppercase px-2.5 py-0.5">{onCallLabel(onCall)}</span>
               )
             }
             tabs={[
@@ -1226,7 +1226,7 @@ export default function PatientDashboard({
                     {tx('Showing')} <strong className="font-black text-[color:var(--ink)]">{filteredDoctors.length}</strong> {tx(allDoctors.length === 1 ? 'of {n} verified doctor' : 'of {n} verified doctors', { n: allDoctors.length })}
                   </span>
                   {effectiveSpecialty && (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] tag-pill font-black uppercase tracking-wider">
                       {selectedSpecialtyFilter ? tx('AI Triage: ') : tx('Specialty: ')}{effectiveSpecialty}
                       <button
                         type="button"
@@ -1242,7 +1242,7 @@ export default function PatientDashboard({
                     </span>
                   )}
                   {registryCity !== 'all' && (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] tag-pill font-black uppercase tracking-wider">
                       {tx('City: ')}{registryCity}
                       <button type="button" onClick={() => setRegistryCity('all')} className="hover:text-slate-900 cursor-pointer" aria-label={tx('Clear city filter')}>
                         <X className="h-3 w-3" />
@@ -1330,7 +1330,7 @@ export default function PatientDashboard({
                           </p>
                         )}
                         <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                          <span className="text-2xs font-bold uppercase tracking-wider text-slate-600 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-0.5">
+                          <span className="tag-pill font-bold uppercase tracking-wider text-slate-600 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-0.5">
                             {tx('{n} yrs exp', { n: prof.experienceYears })}
                           </span>
                           {prof.consultationModes?.map(mode => (
@@ -1481,7 +1481,7 @@ export default function PatientDashboard({
                     {tx('Showing')} <strong className="font-black text-[color:var(--ink)]">{filteredNurses.length}</strong> {tx(allNurses.length === 1 ? 'of {n} registered nurse' : 'of {n} registered nurses', { n: allNurses.length })}
                   </span>
                   {nursesSpecialty !== 'all' && (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] tag-pill font-black uppercase tracking-wider">
                       {tx('Specialty: ')}{nursesSpecialty}
                       <button type="button" onClick={() => setNursesSpecialty('all')} className="hover:text-slate-900 cursor-pointer" aria-label={tx('Clear nurse specialty filter')}>
                         <X className="h-3 w-3" />
@@ -1489,7 +1489,7 @@ export default function PatientDashboard({
                     </span>
                   )}
                   {nursesCity !== 'all' && (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] tag-pill font-black uppercase tracking-wider">
                       {tx('City: ')}{nursesCity}
                       <button type="button" onClick={() => setNursesCity('all')} className="hover:text-slate-900 cursor-pointer" aria-label={tx('Clear nurse city filter')}>
                         <X className="h-3 w-3" />
@@ -1576,7 +1576,7 @@ export default function PatientDashboard({
                           </p>
                         )}
                         <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                          <span className="text-2xs font-bold uppercase tracking-wider text-slate-600 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-0.5">
+                          <span className="tag-pill font-bold uppercase tracking-wider text-slate-600 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-0.5">
                             {tx('{n} yrs exp', { n: prof.experienceYears })}
                           </span>
                           {prof.consultationModes?.map(mode => (

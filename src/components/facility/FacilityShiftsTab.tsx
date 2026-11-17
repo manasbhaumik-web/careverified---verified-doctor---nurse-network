@@ -227,7 +227,7 @@ export default function FacilityShiftsTab({
                         >
                           {job.status}
                         </span>
-                        <span className="text-xs font-mono font-bold uppercase px-1.5 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
+                        <span className="tag-pill font-bold uppercase px-1.5 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
                           {job.roleRequired === 'doctor'
                             ? tx('Doctor')
                             : job.roleRequired === 'nurse'
@@ -277,10 +277,10 @@ export default function FacilityShiftsTab({
                       >
                         {selectedJob.status}
                       </span>
-                      <span className="text-xs uppercase font-mono font-bold tracking-wider px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200">
+                      <span className="tag-pill uppercase font-bold tracking-wider px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200">
                         {selectedJob.type}
                       </span>
-                      <span className="text-xs uppercase font-mono font-bold tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
+                      <span className="tag-pill uppercase font-bold tracking-wider px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
                         {selectedJob.roleRequired === 'doctor'
                           ? tx('Doctor')
                           : selectedJob.roleRequired === 'nurse'
@@ -357,10 +357,10 @@ export default function FacilityShiftsTab({
                             <div className="space-y-1">
                               <div className="flex flex-wrap items-center gap-2">
                                 <span className="text-sm font-black text-[color:var(--ink)]">{app.applicantName}</span>
-                                <span className="px-1.5 py-0.5 bg-slate-100 text-slate-700 text-xs font-mono font-extrabold uppercase border border-slate-200">
+                                <span className="px-1.5 py-0.5 bg-slate-100 text-slate-700 tag-pill font-extrabold uppercase border border-slate-200">
                                   {app.applicantRole}
                                 </span>
-                                <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 text-xs font-mono font-black uppercase border border-emerald-200">
+                                <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 tag-pill font-black uppercase border border-emerald-200">
                                   {tx('APC Active')}
                                 </span>
                               </div>
@@ -410,7 +410,7 @@ export default function FacilityShiftsTab({
                                 </>
                               ) : app.status === 'accepted' ? (
                                 <>
-                                  <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-mono font-black uppercase border border-emerald-300 flex items-center gap-1">
+                                  <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 tag-pill font-black uppercase border border-emerald-300 flex items-center gap-1">
                                     <CheckCircle2 className="h-3 w-3" />
                                     {tx('Confirmed')}
                                   </span>

@@ -270,7 +270,7 @@ export default function DischargeSummaryDialog({
               <CheckCircle2 className="h-6 w-6" />
             </div>
             <div>
-              <span className="text-2xs font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-none">
+              <span className="tag-pill font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-none">
                 Consultation Concluded · MMC Attested
               </span>
               <h2 id="discharge-dialog-title" className="text-base font-black text-[color:var(--ink)] mt-1">
@@ -364,7 +364,7 @@ export default function DischargeSummaryDialog({
           <div className="border-2 border-[color:var(--t-600)] bg-[color:var(--t-bg)] p-5 space-y-4 rounded-none">
             <div className="flex items-start justify-between">
               <div>
-                <span className="text-2xs font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 rounded-none">
+                <span className="tag-pill font-black uppercase tracking-wider text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5 rounded-none">
                   Smart Pharmacy Dispatch Loop
                 </span>
                 <h3 className="text-sm font-black text-slate-900 mt-1 flex items-center gap-1.5">

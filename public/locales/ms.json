@@ -370,7 +370,6 @@
  "Application theme": "Tema aplikasi",
  "Light Cyan": "Cyan Cerah",
  "Sky Blue": "Biru Langit",
- "Crimson Red": "Merah Kemerahan",
  "MediCred home": "Laman utama MediCred",
  "Care messages": "Mesej penjagaan",
  "Certificates and referrals": "Sijil dan rujukan",
@@ -3971,11 +3970,15 @@
  "Today's medicines": "Ubat hari ini",
  "visits": "lawatan",
  "No matching visits found": "Tiada lawatan sepadan ditemui",
- "Your visits": "Lawatan anda",
  "Fee": "Yuran",
  "Date and time": "Tarikh dan masa",
  "Council-verified doctors": "Doktor disahkan majlis",
  "Your doctor": "Doktor anda",
  "Council-verified": "Disahkan majlis",
- "Visits": "Lawatan"
+ "Visits": "Lawatan",
+ "Add to your record": "Tambah ke rekod anda",
+ "Allergy name": "Nama alahan",
+ "Condition name": "Nama keadaan",
+ "Medicine name": "Nama ubat",
+ "Details (optional)": "Butiran (pilihan)"
 }

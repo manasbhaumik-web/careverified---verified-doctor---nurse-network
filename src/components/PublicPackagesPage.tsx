@@ -2064,7 +2064,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                         {offers.map(o => (
                           <div key={o.id} className="border border-[color:var(--t-200)] bg-[color:var(--t-50)]/40 p-3.5 flex flex-col justify-between">
                             <div>
-                              <span className="inline-block text-2xs font-extrabold uppercase text-white bg-[color:var(--t-700)] px-2 py-0.5 mb-1.5">
+                              <span className="inline-block tag-pill font-extrabold uppercase text-white bg-[color:var(--t-700)] px-2 py-0.5 mb-1.5">
                                 {o.badge_text || 'Active Promo'}
                               </span>
                               <div className="font-bold text-sm text-slate-900 line-clamp-2 leading-snug">{o.title}</div>

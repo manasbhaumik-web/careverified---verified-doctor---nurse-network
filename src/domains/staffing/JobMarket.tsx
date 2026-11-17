@@ -250,17 +250,17 @@ export default function JobMarket({
         <div className="flex items-center justify-between gap-2">
           <span className="font-bold text-[color:var(--ink)]">{tx('Application:')}</span>
           {isAccepted && (
-            <span className="inline-flex items-center gap-1 text-2xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5">
+            <span className="inline-flex items-center gap-1 tag-pill font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5">
               <CheckCircle2 className="h-3 w-3 text-emerald-600" /> Accepted & Escrow Secured
             </span>
           )}
           {isDeclined && (
-            <span className="inline-flex items-center gap-1 text-2xs font-black uppercase tracking-wider text-rose-800 bg-rose-100 border border-rose-300 px-2 py-0.5">
+            <span className="inline-flex items-center gap-1 tag-pill font-black uppercase tracking-wider text-rose-800 bg-rose-100 border border-rose-300 px-2 py-0.5">
               <X className="h-3 w-3 text-rose-600" /> Declined
             </span>
           )}
           {isPending && (
-            <span className="inline-flex items-center gap-1 text-2xs font-black uppercase tracking-wider text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5">
+            <span className="inline-flex items-center gap-1 tag-pill font-black uppercase tracking-wider text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5">
               <Clock className="h-3 w-3 text-amber-600" /> {tx('Under Hospital Review')}
             </span>
           )}
@@ -770,31 +770,31 @@ export default function JobMarket({
                     {tx('Showing')} <strong className="font-black text-[color:var(--ink)]">{filteredJobs.length}</strong> {tx(baseJobs.length === 1 ? 'of {n} listing' : 'of {n} listings', { n: baseJobs.length })}
                   </span>
                   {filter.role !== 'all' && (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] tag-pill font-black uppercase tracking-wider">
                       {tx('Role: ')}{filter.role === 'doctor' ? tx('Doctors Only') : filter.role === 'nurse' ? tx('Nurses Only') : filter.role}
                       <button type="button" onClick={() => setFilter({ ...filter, role: 'all' })} className="hover:text-slate-900 cursor-pointer"><X className="h-3 w-3" /></button>
                     </span>
                   )}
                   {selectedType !== 'all' && (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] tag-pill font-black uppercase tracking-wider">
                       {tx('Contract: ')}{tx(selectedType)}
                       <button type="button" onClick={() => setSelectedType('all')} className="hover:text-slate-900 cursor-pointer"><X className="h-3 w-3" /></button>
                     </span>
                   )}
                   {selectedCity !== 'all' && (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] tag-pill font-black uppercase tracking-wider">
                       City: {selectedCity}
                       <button type="button" onClick={() => setSelectedCity('all')} className="hover:text-slate-900 cursor-pointer"><X className="h-3 w-3" /></button>
                     </span>
                   )}
                   {filter.state !== 'all' && (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] tag-pill font-black uppercase tracking-wider">
                       {tx('State: ')}{tx(filter.state)}
                       <button type="button" onClick={() => setFilter({ ...filter, state: 'all' })} className="hover:text-slate-900 cursor-pointer"><X className="h-3 w-3" /></button>
                     </span>
                   )}
                   {filter.sector !== 'all' && (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] tag-pill font-black uppercase tracking-wider">
                       Sector: {filter.sector}
                       <button type="button" onClick={() => setFilter({ ...filter, sector: 'all' })} className="hover:text-slate-900 cursor-pointer"><X className="h-3 w-3" /></button>
                     </span>
@@ -1038,7 +1038,7 @@ export default function JobMarket({
                   <span className="text-xs text-[color:var(--t-700)] block font-black uppercase tracking-wider">{tx('Estimated Allowance')}</span>
                   <span className="font-mono text-base font-extrabold text-[color:var(--ink)] leading-tight block">{selectedModalJob.salaryRange}</span>
                 </div>
-                <span className="bg-[color:var(--t-600)] text-white text-2xs font-black uppercase px-3 py-1.5 rounded-none tracking-wider">
+                <span className="bg-[color:var(--t-600)] text-white tag-pill font-black uppercase px-3 py-1.5 rounded-none tracking-wider">
                   {tx(selectedModalJob.type)}
                 </span>
               </div>

@@ -108,11 +108,11 @@ export default function FacilityCasesTab({
                           <><MapPin className="h-3 w-3 shrink-0" /> Local Citizen</>
                         )}
                       </span>
-                      <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-2xs font-extrabold uppercase">
+                      <span className="px-2 py-0.5 bg-slate-100 text-slate-700 tag-pill font-extrabold uppercase">
                         Origin: {c.country}
                       </span>
                       {c.urgency && c.urgency !== 'routine' && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-700 border border-red-300 text-2xs font-black uppercase">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-700 border border-red-300 tag-pill font-black uppercase">
                           {c.urgency === 'urgent' ? (
                             <><AlertTriangle className="h-3 w-3 shrink-0" /> Urgent</>
                           ) : (
@@ -121,12 +121,12 @@ export default function FacilityCasesTab({
                         </span>
                       )}
                       {c.guaranteeLetter && (
-                        <span className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 text-2xs font-black uppercase">
+                        <span className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 tag-pill font-black uppercase">
                           {tx('LOG / Direct Billing')}
                         </span>
                       )}
                       {c.specialty && (
-                        <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] text-2xs font-black uppercase border border-[color:var(--t-200)]">
+                        <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] tag-pill font-black uppercase border border-[color:var(--t-200)]">
                           {c.specialty}
                         </span>
                       )}
@@ -355,7 +355,7 @@ export default function FacilityCasesTab({
                           <span className="text-xs text-slate-500">{lc.country}</span>
                         </td>
                         <td className="p-3">
-                          <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] text-2xs font-black uppercase border border-[color:var(--t-200)]">
+                          <span className="px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] tag-pill font-black uppercase border border-[color:var(--t-200)]">
                             {lc.specialty || tx('General Care')}
                           </span>
                         </td>

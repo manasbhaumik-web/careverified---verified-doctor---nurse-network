@@ -174,7 +174,7 @@ export default function AdminPayouts() {
             {o.batches.map(b => (
               <li key={b.id}>
                 <button type="button" aria-expanded={open === b.id} onClick={() => setOpen(open === b.id ? null : b.id)} className="w-full text-left p-3 cursor-pointer hover:bg-slate-50 flex flex-wrap justify-between gap-2">
-                  <span><b className="font-mono">{b.id}</b> <span className="ml-1 px-1.5 py-0.5 text-2xs font-extrabold uppercase bg-[color:var(--t-50)] text-[color:var(--t-800)]">{b.status}</span> {b.note ? <span className="text-slate-600">· {b.note}</span> : null}</span>
+                  <span><b className="font-mono">{b.id}</b> <span className="ml-1 px-1.5 py-0.5 tag-pill font-extrabold uppercase bg-[color:var(--t-50)] text-[color:var(--t-800)]">{b.status}</span> {b.note ? <span className="text-slate-600">· {b.note}</span> : null}</span>
                   <span className="tabular-nums">{b.count} payout{b.count === 1 ? '' : 's'} · <b>{sen(b.totalSen)}</b> · {when(b.createdAt)}</span>
                 </button>
                 {open === b.id && batch && batch.id === b.id && (

@@ -302,7 +302,7 @@ export default function MalaysiaPatientsPage({ onSignUp }: MalaysiaPatientsPageP
         {/* Section 2: Malaysian Payment Rails & LHDN Tax Relief */}
         <section className="bg-white border border-[color:var(--t-200)] p-6 sm:p-8 shadow-xs space-y-6">
           <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-xs font-mono font-extrabold uppercase tracking-wider text-[color:var(--t-700)] mb-1.5">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] tag-pill font-extrabold uppercase tracking-wider text-[color:var(--t-700)] mb-1.5">
               <CreditCard className="h-3 w-3 text-[color:var(--t-600)]" />
               Malaysian Payment Rails &amp; Tax Deductions
             </span>
@@ -405,7 +405,7 @@ export default function MalaysiaPatientsPage({ onSignUp }: MalaysiaPatientsPageP
         <section className="bg-gradient-to-r from-[color:var(--t-600)] to-[color:var(--t-700)] text-white p-8 sm:p-10 shadow-md">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="max-w-2xl space-y-3">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 border border-white/25 text-white text-xs font-extrabold uppercase tracking-widest">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 border border-white/25 text-white tag-pill font-extrabold uppercase tracking-widest">
                 <Sparkles className="h-3.5 w-3.5" />
                 Join Over 14,000+ Malaysian Patients
               </span>

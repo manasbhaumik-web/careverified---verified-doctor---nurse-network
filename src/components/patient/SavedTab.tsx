@@ -35,12 +35,12 @@ function Standing({ p }: { p: Pro }) {
   const isDoc = p.role === UserRole.DOCTOR;
   const verified = p.verificationStatus === VerificationStatus.VERIFIED;
   return verified ? (
-    <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
+    <span className="inline-flex items-center gap-1 tag-pill font-bold uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
       <CheckCircle2 className="h-3 w-3 shrink-0 text-emerald-600" aria-hidden="true" />
       {isDoc ? tx('MMC Verified') : tx('LJM Verified')}
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1 text-2xs font-mono font-bold uppercase px-2 py-0.5 bg-amber-50 text-amber-900 border border-amber-300">
+    <span className="inline-flex items-center gap-1 tag-pill font-bold uppercase px-2 py-0.5 bg-amber-50 text-amber-900 border border-amber-300">
       <AlertTriangle className="h-3 w-3 shrink-0" aria-hidden="true" />
       {tx('Pending Verification')}
     </span>
@@ -207,7 +207,7 @@ export default function SavedTab({
               )}
             </span>
             {specialty !== 'all' && (
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] tag-pill font-black uppercase tracking-wider">
                 {tx('Specialty: ')}{tx(specialty)}
                 <button type="button" onClick={() => setSpecialty('all')} className="hover:text-slate-900 cursor-pointer" aria-label={tx('Remove specialty filter')}>
                   <X className="h-3 w-3" />
@@ -215,7 +215,7 @@ export default function SavedTab({
               </span>
             )}
             {city !== 'all' && (
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] text-2xs font-black uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] tag-pill font-black uppercase tracking-wider">
                 {tx('City: ')}{tx(city)}
                 <button type="button" onClick={() => setCity('all')} className="hover:text-slate-900 cursor-pointer" aria-label={tx('Remove city filter')}>
                   <X className="h-3 w-3" />
@@ -244,7 +244,7 @@ export default function SavedTab({
               <h3 id="care-team-seen" className="font-display font-black text-base text-[color:var(--ink)]">{tx('Doctors & Nurses You Have Seen')}</h3>
               <p className="text-xs text-slate-600">{tx('Book a follow-up consultation or send a direct clinical message.')}</p>
             </div>
-            <span className="text-2xs font-mono font-bold uppercase px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
+            <span className="tag-pill font-bold uppercase px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
               {tx('{n} Seen', { n: filteredCareTeam.length })}
             </span>
           </div>
@@ -310,7 +310,7 @@ export default function SavedTab({
             <h3 id="care-team-saved" className="font-display font-black text-base text-[color:var(--ink)]">Saved for Later</h3>
             <p className="text-xs text-slate-600">Practitioners you bookmarked for future consultations or home care.</p>
           </div>
-          <span className="text-2xs font-mono font-bold uppercase px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
+          <span className="tag-pill font-bold uppercase px-2 py-0.5 bg-[color:var(--t-50)] text-[color:var(--t-700)] border border-[color:var(--t-200)]">
             {tx('{n} Saved', { n: filteredSaved.length })}
           </span>
         </div>
@@ -380,7 +380,7 @@ export default function SavedTab({
                         <span className="truncate">{tx(p.city)}{p.practiceAddress ? ` • ${p.practiceAddress.split(',')[0]}` : ''}</span>
                       </p>
                       <div className="flex items-center justify-between pt-1 flex-wrap gap-2">
-                        <span className="text-2xs font-bold uppercase tracking-wider text-slate-600 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-0.5">
+                        <span className="tag-pill font-bold uppercase tracking-wider text-slate-600 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-0.5">
                           {tx('{n} yrs exp', { n: p.experienceYears })}
                         </span>
                         <span className="text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">
@@ -440,7 +440,7 @@ export default function SavedTab({
                 {tx('Save specialists or staff nurses to your personal care team for instant access and follow-up booking.')}
               </p>
             </div>
-            <span className="text-2xs font-mono font-bold uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <span className="tag-pill font-bold uppercase px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">
               {tx('MMC & LJM Verified')}
             </span>
           </div>
@@ -482,7 +482,7 @@ export default function SavedTab({
                       </p>
                     )}
                     <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                      <span className="text-2xs font-bold uppercase tracking-wider text-slate-600 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-0.5">
+                      <span className="tag-pill font-bold uppercase tracking-wider text-slate-600 bg-[color:var(--t-bg)] border border-[color:var(--t-200)] px-2 py-0.5">
                         {tx('{n} yrs exp', { n: prof.experienceYears })}
                       </span>
                       <span className="text-2xs font-mono font-bold text-[color:var(--t-700)] bg-[color:var(--t-50)] border border-[color:var(--t-200)] px-2 py-0.5">

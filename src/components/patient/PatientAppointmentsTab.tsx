@@ -183,7 +183,7 @@ export default function PatientAppointmentsTab({
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-2xs font-mono font-black uppercase tracking-wider px-2 py-0.5 bg-emerald-600 text-white">
+                <span className="tag-pill font-black uppercase tracking-wider px-2 py-0.5 bg-emerald-600 text-white">
                   {activeConsult.status === 'active'
                     ? tx('Live Room Open')
                     : activeConsult.status === 'queued'

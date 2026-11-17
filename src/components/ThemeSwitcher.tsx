@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Settings, Check, Globe, Type } from 'lucide-react';
 import { LANGUAGES, REGIONS, setLocale, useLocale, useT, useTr, type RegionCode } from '../locale';
 
-export type ThemeName = 'light-cyan' | 'light-green' | 'sky' | 'crimson';
+export type ThemeName = 'light-cyan' | 'sky';
 export type FontPreset =
   | 'dm-sans'
   | 'clinical-precision'
@@ -13,9 +13,7 @@ export type FontPreset =
 
 const THEMES: { id: ThemeName; label: string; swatch: string }[] = [
   { id: 'light-cyan', label: 'Light Cyan', swatch: '#06B6D4' },
-  { id: 'light-green', label: 'Clinical Light Green', swatch: '#10B981' },
   { id: 'sky', label: 'Sky Blue', swatch: '#0270A9' },
-  { id: 'crimson', label: 'Crimson Red', swatch: '#C81E1E' },
 ];
 
 const FONT_PRESETS: { id: FontPreset; label: string; stack: string; previewFont: string }[] = [
@@ -33,7 +31,7 @@ const FONT_STORAGE_KEY = 'medcred-font-v1';
 function readTheme(): ThemeName {
   try {
     const t = localStorage.getItem(STORAGE_KEY);
-    if (t === 'light-cyan' || t === 'light-green' || t === 'sky' || t === 'crimson') return t;
+    if (t === 'light-cyan' || t === 'sky') return t;
   } catch { /* storage unavailable */ }
   return 'light-cyan';
 }
@@ -209,7 +207,7 @@ export default function ThemeSwitcher({ className = '', tone = 'light', variant 
               <Globe className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
               <span>{t('common.language')}</span>
             </span>
-            <span className="text-xs font-mono font-extrabold uppercase px-1.5 py-0.5 bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)]">
+            <span className="tag-pill font-extrabold uppercase px-1.5 py-0.5 bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)]">
               {region} · {lang.toUpperCase()}
             </span>
           </div>

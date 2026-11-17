@@ -73,10 +73,11 @@ export default function WorkspaceHeader<T extends string = string>({
         )}
 
         {tabs && tabs.length > 0 && (
+          // Segmented control: one pale rail, the open tab is solid teal
           <div
             role="tablist"
             aria-label={tabsLabel || tx('Workspace section tabs')}
-            className="flex items-stretch gap-0.5 bg-white border border-[color:var(--t-200)] overflow-x-auto"
+            className="flex max-w-full items-stretch gap-1 self-start bg-[color:var(--t-50)] border border-[color:var(--t-100)] p-1 overflow-x-auto w-fit"
           >
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
@@ -88,27 +89,27 @@ export default function WorkspaceHeader<T extends string = string>({
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => onTabChange?.(tab.id)}
-                  className={`px-3.5 py-3 text-xs flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 border-b-[3px] transition-colors focus:outline-none focus-visible:bg-[color:var(--t-50)] ${
+                  className={`min-h-[44px] px-4 text-xs flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--t-500)]/40 ${
                     isActive
-                      ? 'bg-[color:var(--t-50)] border-b-[color:var(--t-600)] text-[color:var(--t-800)] font-bold'
-                      : 'border-b-transparent text-[color:var(--ink-2)] font-semibold hover:bg-[color:var(--t-50)] hover:text-[color:var(--t-800)]'
+                      ? 'bg-[color:var(--t-600)] text-white font-bold'
+                      : 'text-[color:var(--t-800)] font-semibold hover:bg-white'
                   }`}
                 >
-                  {TabIcon && <TabIcon className={`h-3.5 w-3.5 ${isActive ? 'text-[color:var(--t-700)]' : 'text-slate-400'}`} />}
+                  {TabIcon && <TabIcon className={`h-3.5 w-3.5 ${isActive ? 'text-white' : 'text-[color:var(--t-600)]'}`} />}
                   <span>{tab.label}</span>
                   {tab.count !== undefined && (
                     <span
-                      className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold leading-none tabular-nums border ${
+                      className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold leading-none tabular-nums ${
                         isActive
-                          ? 'bg-[color:var(--t-100)] text-[color:var(--t-900)] border-[color:var(--t-300)]'
-                          : 'bg-slate-50 text-slate-600 border-slate-200'
+                          ? 'bg-white text-[color:var(--t-900)]'
+                          : 'bg-white text-[color:var(--t-700)] border border-[color:var(--t-200)]'
                       }`}
                     >
                       {tab.count}
                     </span>
                   )}
                   {tab.badge && (
-                    <span className="text-2xs font-bold uppercase tracking-wider px-1.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">{tab.badge}</span>
+                    <span className="tag-pill font-bold uppercase tracking-wider px-1.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200">{tab.badge}</span>
                   )}
                 </button>
               );
@@ -203,7 +204,7 @@ export default function WorkspaceHeader<T extends string = string>({
                     </span>
                   )}
                   {tab.badge && (
-                    <span className="text-2xs font-mono font-bold uppercase tracking-wider px-1.5 py-0.2 bg-slate-100 text-slate-700">
+                    <span className="tag-pill font-bold uppercase tracking-wider px-1.5 py-0.2 bg-slate-100 text-slate-700">
                       {tab.badge}
                     </span>
                   )}

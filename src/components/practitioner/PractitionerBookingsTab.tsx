@@ -121,7 +121,7 @@ export default function PractitionerBookingsTab({
               <Ambulance className="h-4 w-4 text-rose-600" />
               {tx('Urgent On-Call Emergency Center')} ({activeDispatches.length})
             </h3>
-            <span className="bg-rose-50 text-rose-700 border border-rose-200 text-2xs font-bold px-2 py-0.5 rounded-none uppercase tracking-wider animate-pulse">{tx('Live Radar Active')}</span>
+            <span className="bg-rose-50 text-rose-700 border border-rose-200 tag-pill font-bold px-2 py-0.5 rounded-none uppercase tracking-wider animate-pulse">{tx('Live Radar Active')}</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {activeDispatches.map(dispatch => {
@@ -134,7 +134,7 @@ export default function PractitionerBookingsTab({
                 }`}>
                   <div className="flex justify-between items-start gap-2">
                     <div>
-                      <span className="bg-red-50 text-red-700 border border-red-200 text-2xs font-black px-1.5 py-0.5 rounded-none uppercase tracking-wider">{tx('CRITICAL ALERT')}</span>
+                      <span className="bg-red-50 text-red-700 border border-red-200 tag-pill font-black px-1.5 py-0.5 rounded-none uppercase tracking-wider">{tx('CRITICAL ALERT')}</span>
                       <h4 className="text-sm font-bold text-slate-900 mt-1">{dispatch.patientName}</h4>
                       <p className="text-xs text-slate-400">{(dispatch as any).timestamp}</p>
                     </div>
