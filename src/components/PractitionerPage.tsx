@@ -1111,11 +1111,11 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
                   {/* Calculator Widget */}
                   <div className="mt-5 space-y-4">
                     {/* Role Presets Toggle */}
-                    <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-100">
                       <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
                         Calculator Role:
                       </span>
-                      <div className="inline-flex p-0.5 bg-slate-100 border border-slate-200">
+                      <div className="inline-flex max-w-full p-0.5 bg-slate-100 border border-slate-200">
                         <button
                           type="button"
                           onClick={() => {
