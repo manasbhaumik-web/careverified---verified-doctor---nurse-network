@@ -13,3 +13,6 @@ data/
 # Images made by npm run image
 generated-images/
 .claude/
+
+# Demo snapshot: the database is committed, the admin password file is not
+demo-data/ADMIN_PASSWORD.txt

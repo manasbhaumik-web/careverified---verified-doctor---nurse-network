@@ -1,6 +1,11 @@
 {
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
+  "functions": {
+    "api/index.mjs": {
+      "includeFiles": "demo-data/careverified.db"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",

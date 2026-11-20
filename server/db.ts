@@ -13,6 +13,19 @@ try {
   // Ignore on read-only filesystems; openDb falls back to :memory:
 }
 
+/**
+ * Vercel demo (docs/VERCEL_DEMO.md): the data folder there is empty and temporary, so copy a ready-made demo database into it once per
+ * instance. Only when VERCEL is set and DATA_DIR is not, and never over an existing database. Made by scripts/make-demo-snapshot.ts.
+ */
+if (process.env.VERCEL && !process.env.DATA_DIR) {
+  try {
+    const target = path.join(dataDir, "careverified.db");
+    const snapshot = path.join(process.cwd(), "demo-data", "careverified.db");
+    if (!fs.existsSync(target) && fs.existsSync(snapshot)) fs.copyFileSync(snapshot, target);
+  } catch {
+    // Not fatal: the app starts with an empty database instead.
+  }
+}
 function openDb(): DatabaseSync {
   try {
     const instance = new DatabaseSync(path.join(dataDir, "careverified.db"));
