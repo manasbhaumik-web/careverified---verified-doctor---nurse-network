@@ -98,7 +98,7 @@ export default function Footer({
       <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 pt-6 pb-5 md:pt-7 md:pb-6 space-y-4">
 
         {/* ─── TIER 1: NAVIGATION ─── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 pb-5 border-b border-[color:var(--t-800)]">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-12 gap-6 pb-5 border-b border-[color:var(--t-800)]">
 
           {/* Column 1: identity */}
           <div className="lg:col-span-3 space-y-2.5">
@@ -123,7 +123,7 @@ export default function Footer({
             <h4 className="text-xs font-black uppercase text-white tracking-widest border-b border-slate-800 pb-1.5">
               {tt('Packages & Directory')}
             </h4>
-            <ul className="space-y-1 text-xs text-slate-400">
+            <ul className="grid grid-cols-1 min-[360px]:grid-cols-2 md:grid-cols-1 gap-x-4 gap-y-1 text-xs text-slate-400">
               {([
                 ['/packages', 'Healthcare Packages & Offers'],
                 ['/packages?view=hospitals', 'Hospitals'],

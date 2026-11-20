@@ -439,7 +439,7 @@ export default function App() {
     else if (route.path === '/reset-password') publicView = <AccountRecovery mode="reset" />;
     else if (route.path === '/for-pharmacies') publicView = <PharmacyPage />;
     else if (route.path === '/for-clinics' || route.path === '/for-hospitals') publicView = <ClinicHospitalPage />;
-    else if (route.path === '/assistance' || route.path === '/medical-assistance' || route.path === '/enquiries-quotes') publicView = <MedicalAssistanceModule />;
+    else if (route.path === '/assistance' || route.path === '/medical-assistance' || route.path === '/enquiries-quotes') publicView = <><MedicalAssistanceModule /><Footer variant="landing" /></>;
     return <Suspense fallback={routeFallback}>{publicView}</Suspense>;
   }
 
