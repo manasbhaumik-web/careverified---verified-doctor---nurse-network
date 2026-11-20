@@ -1,8 +1,8 @@
 import { useTr } from '../locale';
 import React from 'react';
 import { openLegal } from '../legal';
-import { navigate } from '../nav';
-import { Globe, ChevronRight, LogOut } from 'lucide-react';
+import { navigate, loginUrl, type PortalRole } from '../nav';
+import { ChevronRight, LogOut } from 'lucide-react';
 import BrandLogo from '../shared/ui/BrandLogo';
 
 export interface NavItem {
@@ -16,6 +16,7 @@ export interface FooterProps {
   navItems?: NavItem[];
   activeView?: string;
   onNavigateView?: (viewId: string) => void;
+  /** Where the portal links go. Defaults to the sign-in page for that role, so every page works without passing it. */
   onLoginRole?: (role: 'patient' | 'practitioner' | 'admin' | 'pharmacy', register?: boolean) => void;
   onLogout?: () => void;
 }
@@ -29,6 +30,14 @@ function Cross({ className = '' }: { className?: string }) {
   );
 }
 
+/** The company's real address and contact email are set per deployment. When they are not set, nothing is shown. */
+const env = (import.meta as any).env ?? {};
+const COMPANY_ADDRESS: string = env.VITE_COMPANY_ADDRESS || '';
+const CONTACT_EMAIL: string = env.VITE_CONTACT_EMAIL || '';
+
+const linkCls = 'hover:text-white transition-colors cursor-pointer block';
+const legalBtn = 'hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0 text-inherit';
+
 export default function Footer({
   variant = 'landing',
   navItems = [],
@@ -39,38 +48,27 @@ export default function Footer({
 }: FooterProps) {
   const currentYear = new Date().getFullYear();
   const tt = useTr();
+  const goRole = (role: 'patient' | 'practitioner' | 'admin' | 'pharmacy', register?: boolean) =>
+    onLoginRole ? onLoginRole(role, register) : navigate(loginUrl(role as PortalRole, !!register));
 
   // ─── STREAMLINED COMPACT FOOTER FOR USER DASHBOARDS ───
   if (variant === 'app') {
     return (
       <footer className="app-dark-footer bg-[color:var(--dark)] text-slate-400 border-t border-[color:var(--t-800)]/60 shrink-0 mt-auto py-3.5 px-4 sm:px-6 lg:px-8">
         <div className="page-w mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
-          
-          {/* Left: Brand Emblem, Act 586 Status & Copyright */}
+
+          {/* Left: Brand Emblem & Copyright */}
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-slate-400 text-center md:text-left justify-center md:justify-start">
             <BrandLogo tone="dark" size="sm" />
-            <span className="text-slate-600 hidden sm:inline">&bull;</span>
-            <span className="tag-pill font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 bg-emerald-400 animate-pulse shrink-0" />
-              {tt('Act 586 Verified')}
-            </span>
             <span className="text-slate-600 hidden sm:inline">&bull;</span>
             <span className="text-xs text-slate-400">&copy; {currentYear} MediCred Healthcare Network Sdn Bhd</span>
           </div>
 
-          {/* Right: Essential Legal Links, Emergency Dispatch & Sign Out */}
+          {/* Right: Essential Legal Links, Emergency & Sign Out */}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-400 justify-center">
-            <button type="button" onClick={() => openLegal('notice')} className="hover:text-white transition-colors cursor-pointer">
-              {tt('Privacy Policy')}
-            </button>
+            <button type="button" onClick={() => openLegal('notice')} className={legalBtn}>{tt('Privacy Policy')}</button>
             <span className="text-slate-700">&bull;</span>
-            <button type="button" onClick={() => openLegal('terms')} className="hover:text-white transition-colors cursor-pointer">
-              {tt('Terms of Care')}
-            </button>
-            <span className="text-slate-700">&bull;</span>
-            <span className="hover:text-white transition-colors cursor-pointer">
-              {tt('Clinical Governance')}
-            </span>
+            <button type="button" onClick={() => openLegal('terms')} className={legalBtn}>{tt('Terms of Care')}</button>
             <span className="text-slate-700">&bull;</span>
             <span className="text-slate-400">
               {tt('Emergency:')} <strong className="text-white font-bold">{tt('Call 999')}</strong>
@@ -98,20 +96,15 @@ export default function Footer({
   return (
     <footer className="app-dark-footer bg-[color:var(--dark)] text-slate-300 border-t border-[color:var(--t-800)] shrink-0 mt-auto">
       <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 pt-8 pb-8 md:pt-12 md:pb-10 space-y-5 md:space-y-6">
-        
-        {/* ─── TIER 1: 5-COLUMN STRUCTURED NAVIGATION & TELEMETRY HUB ─── */}
+
+        {/* ─── TIER 1: NAVIGATION ─── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-6 md:pb-8 border-b border-[color:var(--t-800)]">
-          
-          {/* Column 1: Ecosystem Identity & Live Status Telemetry (3 Cols) */}
+
+          {/* Column 1: identity */}
           <div className="lg:col-span-3 space-y-4">
-            <div className="flex items-center gap-2.5">
-              <BrandLogo tone="dark" size="md" />
-              <span className="tag-pill font-black uppercase tracking-widest bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 px-2 py-0.5">
-                Registry v2.4
-              </span>
-            </div>
+            <BrandLogo tone="dark" size="md" />
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
-{tt("Malaysia's council-verified healthcare network: transparent hospital packages, MMC doctors, LJM home nurses, and licensed community pharmacies.")}
+              {tt('A Malaysian healthcare directory and booking platform: hospital packages, registered doctors and nurses, and community pharmacies, with the credential checks shown on each profile.')}
             </p>
             <div className="pt-1">
               <a
@@ -119,184 +112,101 @@ export default function Footer({
                 onClick={e => { e.preventDefault(); navigate('/packages'); }}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors shadow-2xs"
               >
-                <span>Browse Marketplace</span>
+                <span>{tt('Browse Marketplace')}</span>
                 <ChevronRight className="h-3.5 w-3.5" />
               </a>
             </div>
           </div>
 
-          {/* Column 2: Packages & Medical Directory (3 Cols) */}
+          {/* Column 2: Packages & directory (no counts: they would be fixed text, not the real number) */}
           <div className="space-y-3 lg:col-span-3">
-            <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2 flex items-center justify-between">
-              <span>Packages & Directory</span>
-              <span className="text-2xs font-mono font-bold text-[color:var(--t-300)] uppercase">Act 586</span>
+            <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
+              {tt('Packages & Directory')}
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
-              <li>
-                <a href="/packages" onClick={e => { e.preventDefault(); navigate('/packages'); }} className="hover:text-white transition-colors cursor-pointer flex items-center justify-between group">
-                  <span className="group-hover:text-white font-medium">Healthcare Packages & Offers</span>
-                  <span className="text-2xs font-mono text-[color:var(--t-300)]">14 pkgs</span>
-                </a>
-              </li>
-              <li>
-                <a href="/packages?view=hospitals" onClick={e => { e.preventDefault(); navigate('/packages?view=hospitals'); }} className="hover:text-white transition-colors cursor-pointer flex items-center justify-between group">
-                  <span className="group-hover:text-white font-medium">Accredited Hospitals (MHTC)</span>
-                  <span className="text-2xs font-mono text-slate-500">5 tertiary</span>
-                </a>
-              </li>
-              <li>
-                <a href="/packages?view=clinics" onClick={e => { e.preventDefault(); navigate('/packages?view=clinics'); }} className="hover:text-white transition-colors cursor-pointer flex items-center justify-between group">
-                  <span className="group-hover:text-white font-medium">Specialist & Ambulatory Clinics</span>
-                  <span className="text-2xs font-mono text-slate-500">5 clinics</span>
-                </a>
-              </li>
-              <li>
-                <a href="/packages?view=doctors" onClick={e => { e.preventDefault(); navigate('/packages?view=doctors'); }} className="hover:text-white transition-colors cursor-pointer flex items-center justify-between group">
-                  <span className="group-hover:text-white font-medium">Specialized Doctors (MMC)</span>
-                  <span className="text-2xs font-mono text-slate-500">13 doctors</span>
-                </a>
-              </li>
-              <li>
-                <a href="/packages?view=nurses" onClick={e => { e.preventDefault(); navigate('/packages?view=nurses'); }} className="hover:text-white transition-colors cursor-pointer flex items-center justify-between group">
-                  <span className="group-hover:text-white font-medium">Specialized Nurses (LJM Home Care)</span>
-                  <span className="text-2xs font-mono text-slate-500">10 nurses</span>
-                </a>
-              </li>
-              <li>
-                <a href="/packages?view=pharmacies" onClick={e => { e.preventDefault(); navigate('/packages?view=pharmacies'); }} className="hover:text-white transition-colors cursor-pointer flex items-center justify-between group">
-                  <span className="group-hover:text-white font-medium">Licensed Pharmacies & Vouchers</span>
-                  <span className="text-2xs font-mono text-slate-500">6 centers</span>
-                </a>
-              </li>
+              {([
+                ['/packages', 'Healthcare Packages & Offers'],
+                ['/packages?view=hospitals', 'Hospitals'],
+                ['/packages?view=clinics', 'Specialist & Ambulatory Clinics'],
+                ['/packages?view=doctors', 'Doctors'],
+                ['/packages?view=nurses', 'Nurses'],
+                ['/packages?view=pharmacies', 'Pharmacies & Vouchers'],
+              ] as const).map(([to, label]) => (
+                <li key={to}>
+                  <a href={to} onClick={e => { e.preventDefault(); navigate(to); }} className={`${linkCls} font-medium`}>{tt(label)}</a>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Column 2: Portals & Navigation (2 Cols) */}
+          {/* Column 3: Portals */}
           <div className="hidden md:block lg:col-span-2 space-y-3">
             <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
               {tt('Portal Lounges')}
             </h4>
-            
             <ul className="space-y-2 text-xs">
-                <li>
-                  <button type="button" onClick={() => onLoginRole?.('patient')} className="text-slate-400 hover:text-white transition-colors cursor-pointer text-left flex items-center justify-between w-full group">
-                    <span>{tt('Patient Lounge')}</span>
+              {([
+                ['patient', 'Patient Lounge'],
+                ['practitioner', 'Doctor Console'],
+                ['practitioner', 'Nurse Shift Hub'],
+                ['pharmacy', 'Pharmacy Queue'],
+                ['admin', 'Board Admin Desk'],
+              ] as const).map(([role, label]) => (
+                <li key={label}>
+                  <button type="button" onClick={() => goRole(role)} className="text-slate-400 hover:text-white transition-colors cursor-pointer text-left flex items-center justify-between w-full group">
+                    <span>{tt(label)}</span>
                     <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-[color:var(--t-600)]" />
                   </button>
                 </li>
-                <li>
-                  <button type="button" onClick={() => onLoginRole?.('practitioner')} className="text-slate-400 hover:text-white transition-colors cursor-pointer text-left flex items-center justify-between w-full group">
-                    <span>{tt('Doctor Console')}</span>
-                    <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-[color:var(--t-600)]" />
-                  </button>
-                </li>
-                <li>
-                  <button type="button" onClick={() => onLoginRole?.('practitioner')} className="text-slate-400 hover:text-white transition-colors cursor-pointer text-left flex items-center justify-between w-full group">
-                    <span>{tt('Nurse Shift Hub')}</span>
-                    <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-[color:var(--t-600)]" />
-                  </button>
-                </li>
-                <li>
-                  <button type="button" onClick={() => onLoginRole?.('pharmacy')} className="text-slate-400 hover:text-white transition-colors cursor-pointer text-left flex items-center justify-between w-full group">
-                    <span>{tt('Pharmacy Queue')}</span>
-                    <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-[color:var(--t-600)]" />
-                  </button>
-                </li>
-                <li>
-                  <button type="button" onClick={() => onLoginRole?.('admin')} className="text-slate-400 hover:text-white transition-colors cursor-pointer text-left flex items-center justify-between w-full group">
-                    <span>{tt('Board Admin Desk')}</span>
-                    <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-[color:var(--t-600)]" />
-                  </button>
-                </li>
-                <li className="pt-1">
-                  <button type="button" onClick={() => onLoginRole?.('patient', true)} className="text-[color:var(--t-600)] hover:text-white font-bold transition-colors cursor-pointer text-left flex items-center gap-1">
-                    <span>{tt('Register as Patient →')}</span>
-                  </button>
-                </li>
-              </ul>
+              ))}
+              <li className="pt-1">
+                <button type="button" onClick={() => goRole('patient', true)} className="text-[color:var(--t-300)] hover:text-white font-bold transition-colors cursor-pointer text-left flex items-center gap-1">
+                  <span>{tt('Register as Patient →')}</span>
+                </button>
+              </li>
+            </ul>
           </div>
 
-          {/* Column 3: Verification & Registers (2 Cols) */}
+          {/* Column 4: Verification & audiences */}
           <div className="hidden md:block lg:col-span-2 space-y-3">
             <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
               {tt('Verification Hub')}
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
-              <li>
-                <a href="/verify-practitioners" onClick={e => { e.preventDefault(); navigate('/verify-practitioners'); }} className="hover:text-white transition-colors cursor-pointer block">
-                  {tt('Practitioner Licence Verification')}
-                </a>
-              </li>
-              <li>
-                <a href="/for-patients" onClick={e => { e.preventDefault(); navigate('/for-patients'); }} className="hover:text-white transition-colors cursor-pointer block">
-                  {tt('Malaysian Patients (MyKad)')}
-                </a>
-              </li>
-              <li>
-                <a href="/medical-tourism" onClick={e => { e.preventDefault(); navigate('/medical-tourism'); }} className="hover:text-white transition-colors cursor-pointer block">
-                  {tt('International Medical Tourism')}
-                </a>
-              </li>
-              <li>
-                <a href="/for-clinics" onClick={e => { e.preventDefault(); navigate('/for-clinics'); }} className="hover:text-white transition-colors cursor-pointer block">
-                  {tt('Clinics & Hospitals Hub')}
-                </a>
-              </li>
-              <li>
-                <a href="/for-doctors" onClick={e => { e.preventDefault(); navigate('/for-doctors'); }} className="hover:text-white transition-colors cursor-pointer block">
-                  {tt('MMC Doctor Portal')}
-                </a>
-              </li>
-              <li>
-                <a href="/for-nurses" onClick={e => { e.preventDefault(); navigate('/for-nurses'); }} className="hover:text-white transition-colors cursor-pointer block">
-                  {tt('LJM Nurse Portal')}
-                </a>
-              </li>
+              {([
+                ['/verify-practitioners', 'Practitioner Licence Verification'],
+                ['/for-patients', 'Malaysian Patients (MyKad)'],
+                ['/medical-tourism', 'International Medical Tourism'],
+                ['/for-clinics', 'Clinics & Hospitals Hub'],
+                ['/for-doctors', 'MMC Doctor Portal'],
+                ['/for-nurses', 'LJM Nurse Portal'],
+              ] as const).map(([to, label]) => (
+                <li key={to}>
+                  <a href={to} onClick={e => { e.preventDefault(); navigate(to); }} className={linkCls}>{tt(label)}</a>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Column 4: Compliance & Medical Governance (2 Cols) */}
+          {/* Column 5: Legal and contact: real links only */}
           <div className="hidden md:block lg:col-span-2 space-y-3">
             <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
-              {tt('Governance & Law')}
+              {tt('Legal & Help')}
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
-              <li className="hover:text-slate-200 cursor-pointer transition-colors">PHFSA Act 1998</li>
-              <li className="hover:text-slate-200 cursor-pointer transition-colors">{tt('KKM Telemedicine Norms')}</li>
-              <li onClick={() => openLegal('notice')} className="hover:text-slate-200 cursor-pointer transition-colors">{tt('PDPA 2010 Privacy')}</li>
-              <li className="hover:text-slate-200 cursor-pointer transition-colors">{tt('E-E-A-T Medical Review')}</li>
-              <li className="hover:text-slate-200 cursor-pointer transition-colors">{tt('MMA Clinical Ethics')}</li>
-              <li className="hover:text-slate-200 cursor-pointer transition-colors">{tt('Indemnity Protocols')}</li>
+              <li><button type="button" onClick={() => openLegal('notice')} className={`${legalBtn} text-left`}>{tt('Privacy Policy')}</button></li>
+              <li><button type="button" onClick={() => openLegal('terms')} className={`${legalBtn} text-left`}>{tt('Terms of Service')}</button></li>
+              <li>
+                <a href="/assistance" onClick={e => { e.preventDefault(); navigate('/assistance'); }} className={linkCls}>{tt('Help & enquiries')}</a>
+              </li>
+              {CONTACT_EMAIL && <li><a href={`mailto:${CONTACT_EMAIL}`} className={linkCls}>{CONTACT_EMAIL}</a></li>}
+              {COMPANY_ADDRESS && <li className="text-slate-300 leading-tight pt-1">{COMPANY_ADDRESS}</li>}
             </ul>
-          </div>
-
-          {/* Column 5: Headquarters & Session Desk (2 Cols) */}
-          <div className="hidden md:block lg:col-span-2 space-y-3">
-            <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
-              {tt('Operational HQ')}
-            </h4>
-            <div className="text-xs text-slate-400 space-y-2.5">
-              <div>
-                <span className="block text-xs uppercase font-bold text-slate-500">{tt('Kuala Lumpur Center')}</span>
-                <p className="text-slate-300 text-xs leading-tight mt-0.5">
-                  Level 28, The Horizon, Bangsar South, 59200 Kuala Lumpur
-                </p>
-              </div>
-              <div>
-                <span className="block text-xs uppercase font-bold text-slate-500">{tt('Registry Helpdesk')}</span>
-                <p className="text-slate-300 font-mono text-xs">registry@medcred.gov.my</p>
-              </div>
-              <div>
-                <span className="block text-xs uppercase font-bold text-slate-500">{tt('Audit Hours')}</span>
-                <p className="text-slate-300 text-xs">{tt('Mon-Sun: 08:00 - 22:00 MYT')}</p>
-              </div>
-            </div>
           </div>
 
         </div>
 
-
-        {/* ─── TIER 2: CLINICAL & REGULATORY DISCLAIMER CALLOUT ─── */}
+        {/* ─── TIER 2: DISCLAIMER ─── */}
         <div className="bg-black/25 border border-[color:var(--t-800)] p-4 sm:p-5 text-xs leading-relaxed">
           <div className="flex items-start gap-3">
             <span className="w-6 h-6 shrink-0 bg-[color:var(--t-600)]/20 border border-[color:var(--t-600)]/40 text-white flex items-center justify-center mt-0.5">
@@ -306,39 +216,18 @@ export default function Footer({
               <strong className="text-white uppercase tracking-wider text-xs mr-1.5 font-bold">
                 {tt('Medical Disclaimer:')}
               </strong>
-{tt('MediCred operates as an independent medical directory, credential validation authority, and tele-consultation facilitation network. It is not an acute emergency response dispatch. Medical opinions, diagnoses, and prescriptions issued through the platform are rendered solely by autonomous, board-verified practitioners who maintain active Annual Practising Certificates (APC) under the Malaysian Medical Council or Lembaga Jururawat Malaysia. In the event of an urgent or life-threatening emergency, immediately contact national dispatch services at')} <strong className="text-white font-bold">999</strong> {tt('(112 from a mobile phone) or present at the nearest accredited hospital casualty department.')}
+              {tt('MediCred is an independent directory, credential-checking service and booking platform. It is not a regulator, a healthcare provider or an emergency service. Medical opinions, diagnoses and prescriptions are given by the registered practitioners themselves, who are not employed by MediCred. In an urgent or life-threatening emergency, call 999 (112 from a mobile phone) or go to the nearest hospital casualty department.')}
             </p>
           </div>
         </div>
 
-        {/* ─── TIER 4: BOTTOM UTILITY BAR & LOCALIZATION ─── */}
-        <div className="pt-2 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 justify-center md:justify-start">
-<span>{tt('© {year} MediCred Healthcare Network Sdn Bhd. All rights reserved.', { year: currentYear })}</span>
-            <span className="text-slate-700 hidden sm:inline">&bull;</span>
-            <span onClick={() => openLegal('notice')} className="hover:text-slate-200 cursor-pointer transition-colors">{tt('Privacy Policy')}</span>
-            <span className="text-slate-700 hidden sm:inline">&bull;</span>
-            <span onClick={() => openLegal('terms')} className="hover:text-slate-200 cursor-pointer transition-colors">{tt('Terms of Service')}</span>
-            <span className="text-slate-700 hidden sm:inline">&bull;</span>
-            <span className="hover:text-slate-200 cursor-pointer transition-colors">{tt('Clinical Governance')}</span>
-            <span className="text-slate-700 hidden sm:inline">&bull;</span>
-            <span className="hover:text-slate-200 cursor-pointer transition-colors">{tt('Security Disclosure')}</span>
-          </div>
-
-          <div className="flex items-center gap-4 font-bold text-slate-300 shrink-0">
-            <span className="flex items-center gap-1.5 text-xs text-slate-300">
-              <Globe className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> English
-            </span>
-            <span className="text-slate-700">|</span>
-            <span className="flex items-center gap-1.5 text-xs text-slate-300">
-              Bahasa Melayu
-            </span>
-            <span className="text-slate-700">|</span>
-            <span className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5">
-              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-none animate-pulse" />
-              MY-KUL-01
-            </span>
-          </div>
+        {/* ─── TIER 3: BOTTOM BAR ─── */}
+        <div className="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-1 text-xs text-slate-400">
+          <span>{tt('© {year} MediCred Healthcare Network Sdn Bhd. All rights reserved.', { year: currentYear })}</span>
+          <span className="text-slate-700 hidden sm:inline">&bull;</span>
+          <button type="button" onClick={() => openLegal('notice')} className={legalBtn}>{tt('Privacy Policy')}</button>
+          <span className="text-slate-700 hidden sm:inline">&bull;</span>
+          <button type="button" onClick={() => openLegal('terms')} className={legalBtn}>{tt('Terms of Service')}</button>
         </div>
 
       </div>
