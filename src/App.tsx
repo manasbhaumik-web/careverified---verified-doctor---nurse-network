@@ -503,8 +503,8 @@ export default function App() {
       )}
 
       {/* MediCred Elevated Primary Header */}
-      <header className="bg-[color:var(--t-600)]/95 lg:backdrop-blur-md text-white border-0 sticky top-0 z-40 px-4 sm:px-6 lg:px-8 shrink-0 shadow-[0_2px_6px_-1px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.06)]">
-        <div className="page-w mx-auto flex items-center justify-between h-16">
+      <header className="bg-[color:var(--t-600)]/95 lg:backdrop-blur-md text-white border-0 sticky top-0 z-40 shrink-0 shadow-[0_2px_6px_-1px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.06)]">
+        <div className="page-w mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
 
           {/* Brand Logo */}
           <button

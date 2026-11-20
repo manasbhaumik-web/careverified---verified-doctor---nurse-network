@@ -159,7 +159,7 @@ const place = (p: { facility_city?: string; facility_state?: string; city?: stri
 };
 const audience = (a: Pkg['target_audience']) => (a === 'international' ? 'International visitors' : a === 'local' ? 'Malaysian residents' : 'Residents and visitors');
 
-const wrap = 'page-w mx-auto px-4 sm:px-6';
+const wrap = 'page-w mx-auto px-4 sm:px-6 lg:px-12';
 const control = 'form-input';
 const primaryBtn = 'btn btn-md btn-primary';
 const ghostBtn = 'btn btn-md btn-secondary';

@@ -448,7 +448,7 @@ export default function ClinicHospitalPage() {
             }}
           />
 
-          <div className="relative z-10 page-w mx-auto px-4 sm:px-6 w-full">
+          <div className="relative z-10 page-w mx-auto px-4 sm:px-6 lg:px-12 w-full">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               {/* Left Column: Focused Facility Messaging */}
               <div className="lg:col-span-8 flex flex-col justify-center max-w-2xl">
@@ -508,7 +508,7 @@ export default function ClinicHospitalPage() {
 
         {/* ─── SECTION 2: STATUTORY COMPLIANCE & PLATFORM METRICS STRIP ─── */}
         <section aria-label="Facility Network Metrics" className="py-8 bg-white border-b border-[color:var(--t-200)]">
-          <div className="page-w mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {tx.metrics.map(m => (
                 <div
@@ -528,7 +528,7 @@ export default function ClinicHospitalPage() {
 
         {/* ─── SECTION 3: PLATFORM CAPABILITIES BENTO GRID WITH FILTER ─── */}
         <section className="py-14 sm:py-18 bg-[color:var(--t-50)]/30 border-b border-[color:var(--t-200)]">
-          <div className="page-w mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
               <div>
                 <p className="text-xs font-mono font-bold uppercase tracking-widest text-[color:var(--t-700)] mb-1">
@@ -613,7 +613,7 @@ export default function ClinicHospitalPage() {
 
         {/* ─── SECTION 4: INTERACTIVE LOCUM STAFFING & CAPACITY SIMULATOR ─── */}
         <section className="py-14 sm:py-18 bg-white border-b border-[color:var(--t-200)]">
-          <div className="page-w mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
             <div className="max-w-3xl mb-8">
               <p className="text-xs font-mono font-bold uppercase tracking-widest text-[color:var(--t-700)] mb-1">
                 Transparent Operational Economics
@@ -734,7 +734,7 @@ export default function ClinicHospitalPage() {
 
         {/* ─── SECTION 5: 4-STEP ONBOARDING JOURNEY ─── */}
         <section className="py-14 sm:py-18 bg-[color:var(--t-50)]/30 border-b border-[color:var(--t-200)]">
-          <div className="page-w mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
             <div className="max-w-2xl mb-8">
               <p className="text-xs font-mono font-bold uppercase tracking-widest text-[color:var(--t-700)] mb-1">
                 Streamlined Facility Verification
@@ -767,7 +767,7 @@ export default function ClinicHospitalPage() {
 
         {/* ─── SECTION 6: MALAYSIAN STATUTORY COMPLIANCE & LEGAL GUARDRAILS ─── */}
         <section className="py-14 sm:py-18 bg-white border-b border-[color:var(--t-200)]">
-          <div className="page-w mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
             <div className="max-w-3xl mb-8">
               <p className="text-xs font-mono font-bold uppercase tracking-widest text-[color:var(--t-700)] mb-1">
                 Legal & Regulatory Framework
@@ -799,7 +799,7 @@ export default function ClinicHospitalPage() {
 
         {/* ─── SECTION 7: FACILITY ACCREDITATION & INQUIRY FORM ─── */}
         <section id="apply" aria-labelledby="apply-h" className="py-14 sm:py-20 bg-white scroll-mt-20">
-          <div className="page-w mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10 items-start">
               <div>
                 <p className="text-xs font-mono font-bold uppercase tracking-widest text-[color:var(--t-700)] mb-1">

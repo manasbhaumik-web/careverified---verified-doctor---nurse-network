@@ -180,7 +180,7 @@ export default function DashboardHeader<T extends string>({
           >
           {title && (
             <div className={`relative z-10 py-3 sm:py-3.5 ${
-              fullWidth ? 'page-w mx-auto' : 'px-4 sm:px-7'
+              fullWidth ? 'page-w mx-auto px-4 sm:px-6 lg:px-8' : 'px-4 sm:px-7'
             }`}>
               <BannerRow
                 identity={<BannerIdentity as="h1" icon={icon ?? ShieldCheck} name={title} badges={eyebrow ? <BannerBadge>{eyebrow}</BannerBadge> : undefined} description={description} />}
@@ -208,7 +208,7 @@ export default function DashboardHeader<T extends string>({
 
           {children && (
             <div className={`relative z-10 py-3 sm:py-3.5 ${
-              fullWidth ? 'page-w mx-auto' : 'px-5 sm:px-7'
+              fullWidth ? 'page-w mx-auto px-4 sm:px-6 lg:px-8' : 'px-5 sm:px-7'
             }`}>
               {children}
             </div>
@@ -219,7 +219,7 @@ export default function DashboardHeader<T extends string>({
       {!hasTabsBar && effectiveCollapsed && (
         <div className="w-full bg-[color:var(--t-50)] border-b border-[color:var(--t-200)] shadow-2xs">
           <div className={`flex items-center justify-end py-1.5 ${
-            fullWidth ? 'page-w mx-auto' : 'px-3 sm:px-5'
+            fullWidth ? 'page-w mx-auto px-4 sm:px-6 lg:px-8' : 'px-3 sm:px-5'
           }`}>
             <button
               type="button"
@@ -247,7 +247,7 @@ export default function DashboardHeader<T extends string>({
             if (menuStyle === 'mega') scheduleCloseMenu();
           }}
           className={`sticky top-16 z-30 w-full bg-white border-b border-[color:var(--t-200)] shadow-[0_2px_6px_-1px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.06)] ${
-            fullWidth ? 'border-x-0 px-4 sm:px-6 lg:px-8' : 'border-x'
+            fullWidth ? 'border-x-0' : 'border-x'
           }`}
         >
           <div
@@ -255,7 +255,7 @@ export default function DashboardHeader<T extends string>({
             role="tablist"
             aria-label={tabsLabel}
             className={`relative flex items-center gap-1 overflow-x-auto overflow-y-hidden lg:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
-              fullWidth ? 'page-w mx-auto' : 'px-3 sm:px-5'
+              fullWidth ? 'page-w mx-auto px-4 sm:px-6 lg:px-8' : 'px-3 sm:px-5'
             }`}
           >
             {tabs?.map((tab, idx) => {
@@ -456,8 +456,8 @@ export default function DashboardHeader<T extends string>({
           </div>
 
           {megaTab && megaTab.subItems && (
-            <div className={`absolute left-0 right-0 top-full z-50 pointer-events-none ${fullWidth ? 'px-4 sm:px-6 lg:px-8' : 'px-3 sm:px-5'}`}>
-              <div className={fullWidth ? 'page-w mx-auto' : ''}>
+            <div className={`absolute left-0 right-0 top-full z-50 pointer-events-none ${fullWidth ? '' : 'px-3 sm:px-5'}`}>
+              <div className={fullWidth ? 'page-w mx-auto px-4 sm:px-6 lg:px-8' : ''}>
                 <div
                   role="menu"
                   aria-label={`${megaTab.label} mega menu`}

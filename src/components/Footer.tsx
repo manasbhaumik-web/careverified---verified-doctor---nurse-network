@@ -54,8 +54,8 @@ export default function Footer({
   // ─── STREAMLINED COMPACT FOOTER FOR USER DASHBOARDS ───
   if (variant === 'app') {
     return (
-      <footer className="app-dark-footer bg-[color:var(--dark)] text-slate-400 border-t border-[color:var(--t-800)]/60 shrink-0 mt-auto py-3.5 px-4 sm:px-6 lg:px-8">
-        <div className="page-w mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+      <footer className="app-dark-footer bg-[color:var(--dark)] text-slate-400 border-t border-[color:var(--t-800)]/60 shrink-0 mt-auto py-2.5">
+        <div className="page-w mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-2 text-xs">
 
           {/* Left: Brand Emblem & Copyright */}
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-slate-400 text-center md:text-left justify-center md:justify-start">
@@ -95,22 +95,22 @@ export default function Footer({
 
   return (
     <footer className="app-dark-footer bg-[color:var(--dark)] text-slate-300 border-t border-[color:var(--t-800)] shrink-0 mt-auto">
-      <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 pt-8 pb-8 md:pt-12 md:pb-10 space-y-5 md:space-y-6">
+      <div className="page-w mx-auto px-4 sm:px-6 lg:px-12 pt-6 pb-5 md:pt-7 md:pb-6 space-y-4">
 
         {/* ─── TIER 1: NAVIGATION ─── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-6 md:pb-8 border-b border-[color:var(--t-800)]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 pb-5 border-b border-[color:var(--t-800)]">
 
           {/* Column 1: identity */}
-          <div className="lg:col-span-3 space-y-4">
-            <BrandLogo tone="dark" size="md" />
-            <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
+          <div className="lg:col-span-3 space-y-2.5">
+            <BrandLogo tone="dark" size="sm" />
+            <p className="text-xs text-slate-400 leading-snug max-w-sm">
               {tt('A Malaysian healthcare directory and booking platform: hospital packages, registered doctors and nurses, and community pharmacies, with the credential checks shown on each profile.')}
             </p>
-            <div className="pt-1">
+            <div className="pt-0.5">
               <a
                 href="/packages"
                 onClick={e => { e.preventDefault(); navigate('/packages'); }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors shadow-2xs"
               >
                 <span>{tt('Browse Marketplace')}</span>
                 <ChevronRight className="h-3.5 w-3.5" />
@@ -119,11 +119,11 @@ export default function Footer({
           </div>
 
           {/* Column 2: Packages & directory (no counts: they would be fixed text, not the real number) */}
-          <div className="space-y-3 lg:col-span-3">
-            <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
+          <div className="space-y-2 lg:col-span-3">
+            <h4 className="text-xs font-black uppercase text-white tracking-widest border-b border-slate-800 pb-1.5">
               {tt('Packages & Directory')}
             </h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+            <ul className="space-y-1 text-xs text-slate-400">
               {([
                 ['/packages', 'Healthcare Packages & Offers'],
                 ['/packages?view=hospitals', 'Hospitals'],
@@ -140,11 +140,11 @@ export default function Footer({
           </div>
 
           {/* Column 3: Portals */}
-          <div className="hidden md:block lg:col-span-2 space-y-3">
-            <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
+          <div className="hidden md:block lg:col-span-2 space-y-2">
+            <h4 className="text-xs font-black uppercase text-white tracking-widest border-b border-slate-800 pb-1.5">
               {tt('Portal Lounges')}
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-1 text-xs">
               {([
                 ['patient', 'Patient Lounge'],
                 ['practitioner', 'Doctor Console'],
@@ -159,7 +159,7 @@ export default function Footer({
                   </button>
                 </li>
               ))}
-              <li className="pt-1">
+              <li className="pt-0.5">
                 <button type="button" onClick={() => goRole('patient', true)} className="text-[color:var(--t-300)] hover:text-white font-bold transition-colors cursor-pointer text-left flex items-center gap-1">
                   <span>{tt('Register as Patient →')}</span>
                 </button>
@@ -168,11 +168,11 @@ export default function Footer({
           </div>
 
           {/* Column 4: Verification & audiences */}
-          <div className="hidden md:block lg:col-span-2 space-y-3">
-            <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
+          <div className="hidden md:block lg:col-span-2 space-y-2">
+            <h4 className="text-xs font-black uppercase text-white tracking-widest border-b border-slate-800 pb-1.5">
               {tt('Verification Hub')}
             </h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+            <ul className="space-y-1 text-xs text-slate-400">
               {([
                 ['/verify-practitioners', 'Practitioner Licence Verification'],
                 ['/for-patients', 'Malaysian Patients (MyKad)'],
@@ -189,11 +189,11 @@ export default function Footer({
           </div>
 
           {/* Column 5: Legal and contact: real links only */}
-          <div className="hidden md:block lg:col-span-2 space-y-3">
-            <h4 className="text-sm font-black uppercase text-white tracking-widest border-b border-slate-800 pb-2">
+          <div className="hidden md:block lg:col-span-2 space-y-2">
+            <h4 className="text-xs font-black uppercase text-white tracking-widest border-b border-slate-800 pb-1.5">
               {tt('Legal & Help')}
             </h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+            <ul className="space-y-1 text-xs text-slate-400">
               <li><button type="button" onClick={() => openLegal('notice')} className={`${legalBtn} text-left`}>{tt('Privacy Policy')}</button></li>
               <li><button type="button" onClick={() => openLegal('terms')} className={`${legalBtn} text-left`}>{tt('Terms of Service')}</button></li>
               <li>
@@ -207,12 +207,12 @@ export default function Footer({
         </div>
 
         {/* ─── TIER 2: DISCLAIMER ─── */}
-        <div className="bg-black/25 border border-[color:var(--t-800)] p-4 sm:p-5 text-xs leading-relaxed">
-          <div className="flex items-start gap-3">
-            <span className="w-6 h-6 shrink-0 bg-[color:var(--t-600)]/20 border border-[color:var(--t-600)]/40 text-white flex items-center justify-center mt-0.5">
-              <Cross className="h-3.5 w-3.5 text-[color:var(--t-200)]" />
+        <div className="bg-black/25 border border-[color:var(--t-800)] px-3.5 py-2.5 text-xs leading-snug">
+          <div className="flex items-start gap-2.5">
+            <span className="w-5 h-5 shrink-0 bg-[color:var(--t-600)]/20 border border-[color:var(--t-600)]/40 text-white flex items-center justify-center mt-0.5">
+              <Cross className="h-3 w-3 text-[color:var(--t-200)]" />
             </span>
-            <p className="flex-1 text-xs text-slate-400 leading-relaxed">
+            <p className="flex-1 text-xs text-slate-400 leading-snug">
               <strong className="text-white uppercase tracking-wider text-xs mr-1.5 font-bold">
                 {tt('Medical Disclaimer:')}
               </strong>
@@ -222,7 +222,7 @@ export default function Footer({
         </div>
 
         {/* ─── TIER 3: BOTTOM BAR ─── */}
-        <div className="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-1 text-xs text-slate-400">
+        <div className="pt-0.5 flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-1 text-xs text-slate-400">
           <span>{tt('© {year} MediCred Healthcare Network Sdn Bhd. All rights reserved.', { year: currentYear })}</span>
           <span className="text-slate-700 hidden sm:inline">&bull;</span>
           <button type="button" onClick={() => openLegal('notice')} className={legalBtn}>{tt('Privacy Policy')}</button>

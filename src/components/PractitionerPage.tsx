@@ -748,7 +748,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
             }}
           />
 
-          <div className="relative z-10 page-w mx-auto px-4 sm:px-6 w-full">
+          <div className="relative z-10 page-w mx-auto px-4 sm:px-6 lg:px-12 w-full">
             {/* Top Interactive Slide Switcher Tabs */}
             <div className="flex flex-wrap items-center justify-between gap-3 mb-5 sm:mb-6">
               <div className="inline-flex p-1 bg-white/95 backdrop-blur-md border border-[color:var(--t-200)] shadow-sm">
@@ -898,7 +898,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
 
         {/* ─── SECTION 2: UNIFIED TRUST & COMPLIANCE METRIC STRIP ─── */}
         <section aria-label="Key Platform Metrics" className="py-8 bg-white border-b border-[color:var(--t-200)]">
-          <div className="page-w mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {tx.metrics.map(m => (
                 <div
@@ -918,7 +918,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
 
         {/* ─── SECTION 3: UNIFIED 4-STEP ONBOARDING JOURNEY ─── */}
         <section aria-labelledby="steps-h" className="py-14 sm:py-20 border-b border-[color:var(--t-200)] bg-[color:var(--t-bg)]">
-          <div className="page-w mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
             <div className="max-w-2xl mb-10">
               <p className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
                 <span className="w-2 h-2 bg-[color:var(--t-600)] inline-block" />
@@ -963,7 +963,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
 
         {/* ─── SECTION 4: UNIFIED CLINICAL PRACTICE SCOPES (BENTO GRID) ─── */}
         <section aria-labelledby="scopes-h" className="py-14 sm:py-20 bg-white border-b border-[color:var(--t-200)]">
-          <div className="page-w mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
               <div className="max-w-2xl">
                 <p className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
@@ -1083,7 +1083,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
 
         {/* ─── SECTION 5: UNIFIED INTERACTIVE EARNINGS & PAYOUT CALCULATOR ─── */}
         <section aria-labelledby="paid-h" className="py-14 sm:py-20 border-b border-[color:var(--t-200)] bg-[color:var(--t-bg)]">
-          <div className="page-w mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
             <div className="max-w-2xl mb-8">
               <p className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
                 <span className="w-2 h-2 bg-[color:var(--t-600)] inline-block" />
@@ -1311,7 +1311,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
 
         {/* ─── SECTION 6: CREDENTIALING & VERIFICATION CHECKLIST (SIDE-BY-SIDE) ─── */}
         <section aria-labelledby="checklists-h" className="py-14 sm:py-20 bg-white border-b border-[color:var(--t-200)]">
-          <div className="page-w mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
             <div className="max-w-2xl mb-10">
               <p className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
                 <span className="w-2 h-2 bg-[color:var(--t-600)] inline-block" />
@@ -1371,7 +1371,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
 
         {/* ─── SECTION 7: MALAYSIAN REGULATORY FRAMEWORK & RULES ─── */}
         <section aria-labelledby="rules-h" className="py-14 sm:py-20 border-b border-[color:var(--t-200)] bg-[color:var(--t-bg)]">
-          <div className="page-w mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
             <div className="max-w-3xl mb-8">
               <p className="text-xs font-extrabold uppercase tracking-widest text-[color:var(--t-700)] mb-1 flex items-center gap-2">
                 <span className="w-2 h-2 bg-[color:var(--t-600)] inline-block" />
@@ -1399,7 +1399,7 @@ export default function PractitionerPage({ initialRole = 'all' }: PractitionerPa
 
         {/* ─── SECTION 8: FACILITY & CLINIC STAFFING CALLOUT ─── */}
         <section className="py-8 bg-white border-b border-[color:var(--t-200)]">
-          <div className="page-w mx-auto px-4 sm:px-6">
+          <div className="page-w mx-auto px-4 sm:px-6 lg:px-12">
             <div className="bg-[color:var(--t-50)] border border-[color:var(--t-200)] p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs">
               <div className="flex items-start sm:items-center gap-4">
                 <span className="w-12 h-12 bg-white border border-[color:var(--t-200)] text-[color:var(--t-700)] flex items-center justify-center shrink-0">
