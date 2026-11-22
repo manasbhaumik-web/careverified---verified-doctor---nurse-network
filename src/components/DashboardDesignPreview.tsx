@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Activity, Video, Heart, Calendar, FolderHeart, Pill, ShieldCheck, 
   ArrowRight, Clock, CheckCircle2, ChevronRight, User, AlertCircle, 
-  Sparkles, MessageSquare, PhoneCall, HeartPulse, RefreshCw, Layers, Check,
+  BadgeCheck, MessageSquare, PhoneCall, HeartPulse, RefreshCw, Layers, Check,
   Plane, BookOpen, LifeBuoy, Search, X, Menu, Bell
 } from 'lucide-react';
 import ThemeSwitcher from './ThemeSwitcher';
@@ -308,8 +308,8 @@ export default function DashboardDesignPreview() {
                 type="button" 
                 className="h-11 px-4 bg-white text-[color:var(--t-700)] font-bold text-xs border border-[color:var(--t-200)] hover:bg-[color:var(--t-50)] transition-all flex items-center gap-2 shadow-2xs cursor-pointer whitespace-nowrap"
               >
-                <Sparkles className="h-3.5 w-3.5" />
-                <span>AI Triage</span>
+                <BadgeCheck className="h-3.5 w-3.5" />
+                <span>Symptom Triage</span>
               </button>
             </div>
           </div>

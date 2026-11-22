@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Video, Pill, MessageSquare, Store, CalendarPlus, HeartPulse } from 'lucide-react';
+import { Video, Pill, MessageSquare, Store, CalendarPlus, HeartPulse, ShieldCheck, Calendar, Clock } from 'lucide-react';
 import { Booking, DoctorProfile, NurseProfile } from '../../types';
 import { useTr, formatDate } from '../../locale';
+import { UserAvatar } from '../../avatars';
 
 interface PatientOverviewTabProps {
   userName: string;
@@ -12,6 +13,8 @@ interface PatientOverviewTabProps {
   recordsData: any | null;
   activePrescriptions: any[];
   careTeam: (DoctorProfile | NurseProfile)[];
+  /** All professionals, used to find the photo of the doctor for the next visit. */
+  professionals?: (DoctorProfile | NurseProfile)[];
   patientAllergies: string[];
   patientConditions: string[];
   onCallStatus: { onlineDoctors: number; consultFee: number } | null;
@@ -50,6 +53,7 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
   } = props;
 
   const next = upcoming[0];
+  const nextProf = next ? (props.professionals || careTeam).find(p => p.id === next.professionalId) : undefined;
   const nextMode = String(next?.mode || '').toLowerCase();
   const nextIsVideo = nextMode.includes('video') || nextMode.includes('tele') || nextMode.includes('online');
   const meds: { key: string; name: string; note: string }[] = activePrescriptions.flatMap((rx: any) =>
@@ -59,6 +63,7 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
   ).filter((m: any) => m.name);
   const [taken, setTaken] = useState<Record<string, boolean>>({});
   const takenCount = meds.filter(m => taken[m.key]).length;
+  const dosePct = meds.length ? Math.round((takenCount / meds.length) * 100) : 0;
 
   const bpSeries: number[] = (recordsData?.vitals || [])
     .filter((v: any) => v.kind === 'bp' && v.value1 != null)
@@ -75,12 +80,6 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
   const bpText = summary?.bp ? `${summary.bp.value1}/${summary.bp.value2}` : '—';
   const dateText = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
 
-  const kpis = [
-    { label: tx('Next visit'), value: next ? visitDay(next.date) : tx('None scheduled'), sub: next ? `${next.timeSlot} · ${next.professionalName}` : tx('Book a visit to get started') },
-    { label: tx('Active medicines'), value: String(summary?.activeRx ?? activePrescriptions.length ?? 0), sub: meds.slice(0, 2).map(m => m.name).join(' · ') || tx('No active medicines') },
-    { label: tx('Blood pressure'), value: bpText, sub: summary?.pulse?.value1 != null ? `${tx('HR')} ${summary.pulse.value1} bpm` : tx('No recent reading') },
-    { label: tx('Medicines taken today'), value: `${takenCount} / ${meds.length}`, sub: tx('Doses logged today') },
-  ];
 
   return (
     <div id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" tabIndex={0} className="space-y-8">
@@ -94,21 +93,93 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
           {activeConsult && (
             <span className="bg-amber-50 text-amber-900 border border-amber-300 text-xs font-bold px-2.5 py-1.5 rounded-none">{tx('Consult in progress')}</span>
           )}
-          <span className="bg-[color:var(--t-50)] text-[color:var(--t-800)] border border-[color:var(--t-200)] text-xs font-bold px-2.5 py-1.5 rounded-none">
-            {onCallStatus ? tx('{n} doctors online', { n: onCallStatus.onlineDoctors }) : tx('Checking doctor availability')}
-          </span>
+          {onCallStatus && onCallStatus.onlineDoctors > 0 && (
+            <span className="bg-[color:var(--t-50)] text-[color:var(--t-800)] border border-[color:var(--t-200)] text-xs font-bold px-2.5 py-1.5 rounded-none">
+              {tx('{n} doctors online', { n: onCallStatus.onlineDoctors })}
+            </span>
+          )}
         </div>
       </div>
 
-      {/* KPI ribbon */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 bg-white border border-[color:var(--t-200)] rounded-none" aria-label={tx('Key figures')}>
-        {kpis.map((k, i) => (
-          <div key={k.label} className={`p-5 flex flex-col gap-1.5 min-w-0 ${i < kpis.length - 1 ? 'lg:border-r border-[color:var(--t-100)]' : ''} ${i % 2 === 0 ? 'border-r lg:border-r' : ''} border-[color:var(--t-100)]`}>
-            <div className={eyebrow}>{k.label}</div>
-            <div className="text-xl font-bold text-[color:var(--ink)] tabular-nums truncate">{k.value}</div>
-            <div className="text-xs text-[color:var(--ink-2)] truncate">{k.sub}</div>
-          </div>
-        ))}
+      {/* Today: next visit and medicines */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <article className="lg:col-span-7 bg-[color:var(--t-600)] text-white border border-[color:var(--t-700)] p-6 sm:p-7 flex flex-col justify-between gap-6 rounded-none">
+            {next ? (
+              <>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="bg-white/20 border border-white/30 text-xs font-bold px-2.5 py-1">{tx('Your next visit')}</span>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold"><ShieldCheck className="h-4 w-4" aria-hidden="true" />{tx('Verified doctor')}</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="h-16 w-16 shrink-0 bg-white overflow-hidden">
+                    <UserAvatar src={nextProf?.avatar} role={nextProf?.role || 'doctor'} alt="" className="h-full w-full object-cover" />
+                  </div>
+                  <h2 className="min-w-0 text-2xl sm:text-3xl font-bold leading-tight">{next.professionalName}</h2>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {[
+                    { icon: Video, label: tx('Format'), value: tx(String(next.mode)) },
+                    { icon: Calendar, label: tx('Date'), value: visitDay(next.date, true) },
+                    { icon: Clock, label: tx('Time'), value: next.timeSlot },
+                  ].map(x => (
+                    <div key={x.label} className="bg-white/15 px-3.5 py-3 flex flex-col gap-1.5 min-w-0">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider"><x.icon className="h-3.5 w-3.5" aria-hidden="true" />{x.label}</span>
+                      <span className="text-base font-bold">{x.value}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-2.5">
+                  {nextIsVideo ? (
+                    <button type="button" onClick={props.onOpenLiveRoom} className="bg-white text-[color:var(--t-800)] px-4 py-3 text-sm font-bold cursor-pointer hover:bg-[color:var(--t-50)] rounded-none inline-flex items-center gap-2"><Video className="h-4 w-4" />{tx('Join video call')}</button>
+                  ) : (
+                    <button type="button" onClick={props.onOpenAppointments} className="bg-white text-[color:var(--t-800)] px-4 py-3 text-sm font-bold cursor-pointer hover:bg-[color:var(--t-50)] rounded-none">{tx('View visit details')}</button>
+                  )}
+                  {nextIsVideo && <button type="button" onClick={props.onOpenAppointments} className="border border-white/60 text-white px-4 py-3 text-sm font-bold cursor-pointer hover:bg-white/10 rounded-none">{tx('View visit details')}</button>}
+                  <button type="button" onClick={() => props.onSelectProfessional(next.professionalId)} className="border border-white/60 text-white px-4 py-3 text-sm font-bold cursor-pointer hover:bg-white/10 rounded-none">{tx('Doctor profile')}</button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <span className="inline-block bg-white/20 border border-white/30 text-xs font-bold px-2 py-1">{tx('No upcoming visits')}</span>
+                  <h2 className="mt-4 mb-1.5 text-2xl font-bold">{tx('See a verified doctor today')}</h2>
+                  <p className="text-xs opacity-90">{tx('Start a video consult or book a visit with an MMC-verified doctor.')}</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" onClick={props.onConsultNow} className="bg-white text-[color:var(--t-800)] px-3.5 py-2 text-xs font-bold cursor-pointer hover:bg-[color:var(--t-50)] rounded-none inline-flex items-center gap-1.5"><Video className="h-3.5 w-3.5" />{tx('Start Instant Consult')}</button>
+                  <button type="button" onClick={props.onOpenTriage} className="border border-white/50 text-white px-3 py-2 text-xs font-bold cursor-pointer hover:bg-white/10 rounded-none">{tx('Symptom Triage')}</button>
+                </div>
+              </>
+            )}
+          </article>
+
+        <article className={`${card} lg:col-span-5`}>
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <div className="text-base font-bold">{tx("Today's medicines")}</div>
+                <div className="text-sm text-[color:var(--ink-2)] mt-0.5">{tx('{a} of {b} doses logged today', { a: takenCount, b: meds.length })}</div>
+              </div>
+              <Pill className="h-4 w-4 text-[color:var(--t-600)]" aria-hidden="true" />
+            </div>
+            <div className="h-2 bg-[color:var(--t-100)]" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={dosePct} aria-label={tx('Medicines taken today')}>
+              <div className="h-full bg-[color:var(--t-600)] transition-all" style={{ width: `${dosePct}%` }} />
+            </div>
+            {meds.length === 0 ? (
+              <p className="text-xs text-[color:var(--ink-2)]">{tx('No active medicines on your prescriptions.')}</p>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {meds.slice(0, 6).map(m => (
+                  <label key={m.key} className={`flex items-center justify-between gap-3 px-4 py-3 cursor-pointer rounded-none ${taken[m.key] ? 'bg-emerald-50' : 'bg-[color:var(--t-50)]'}`}>
+                    <span className="min-w-0">
+                      <span className="block text-xs font-bold truncate">{m.name}</span>
+                      {m.note && <span className="block text-2xs text-[color:var(--ink-2)] truncate">{m.note}</span>}
+                    </span>
+                    <input type="checkbox" checked={!!taken[m.key]} onChange={e => setTaken(prev => ({ ...prev, [m.key]: e.target.checked }))} className="h-4 w-4 accent-[color:var(--t-600)] cursor-pointer" />
+                  </label>
+                ))}
+              </div>
+            )}
+          </article>
       </section>
 
       {/* What would you like to do? */}
@@ -130,99 +201,9 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
         </div>
       </section>
 
-      {/* 12-column grid */}
+      {/* Health: vitals and allergies */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
-          <article className="bg-[color:var(--t-600)] text-white border border-[color:var(--t-700)] border-t-[3px] border-t-[color:var(--t-300)] p-6 sm:p-8 flex flex-col justify-between gap-6 rounded-none">
-            {next ? (
-              <>
-                <div>
-                  <span className="inline-block bg-white/20 border border-white/30 text-xs font-bold px-2 py-1">{tx('Your next visit')}</span>
-                  <h2 className="mt-4 mb-1.5 text-2xl font-bold">{next.professionalName}</h2>
-                  <p className="text-sm opacity-90">{tx(String(next.mode))} · {visitDay(next.date, true)} · {next.timeSlot}</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {nextIsVideo ? (
-                    <button type="button" onClick={props.onOpenLiveRoom} className="bg-white text-[color:var(--t-800)] px-4 py-2.5 text-sm font-bold cursor-pointer hover:bg-[color:var(--t-50)] rounded-none inline-flex items-center gap-2"><Video className="h-4 w-4" />{tx('Join video call')}</button>
-                  ) : (
-                    <button type="button" onClick={props.onOpenAppointments} className="bg-white text-[color:var(--t-800)] px-4 py-2.5 text-sm font-bold cursor-pointer hover:bg-[color:var(--t-50)] rounded-none">{tx('View visit details')}</button>
-                  )}
-                  {nextIsVideo && <button type="button" onClick={props.onOpenAppointments} className="border border-white/50 text-white px-3 py-2.5 text-sm font-bold cursor-pointer hover:bg-white/10 rounded-none">{tx('View visit details')}</button>}
-                  <button type="button" onClick={() => props.onSelectProfessional(next.professionalId)} className="border border-white/50 text-white px-3 py-2.5 text-sm font-bold cursor-pointer hover:bg-white/10 rounded-none">{tx('Doctor profile')}</button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div>
-                  <span className="inline-block bg-white/20 border border-white/30 text-xs font-bold px-2 py-1">{tx('No upcoming visits')}</span>
-                  <h2 className="mt-4 mb-1.5 text-2xl font-bold">{tx('See a verified doctor today')}</h2>
-                  <p className="text-xs opacity-90">{tx('Start a video consult or book a visit with an MMC-verified doctor.')}</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <button type="button" onClick={props.onConsultNow} className="bg-white text-[color:var(--t-800)] px-3.5 py-2 text-xs font-bold cursor-pointer hover:bg-[color:var(--t-50)] rounded-none inline-flex items-center gap-1.5"><Video className="h-3.5 w-3.5" />{tx('Start Instant Consult')}</button>
-                  <button type="button" onClick={props.onOpenTriage} className="border border-white/50 text-white px-3 py-2 text-xs font-bold cursor-pointer hover:bg-white/10 rounded-none">{tx('AI Triage')}</button>
-                </div>
-              </>
-            )}
-          </article>
-
-          <article className={card}>
-            <div className="flex items-center justify-between gap-2">
-              <div>
-                <div className="text-base font-bold">{tx("Today's medicines")}</div>
-                <div className="text-sm text-[color:var(--ink-2)] mt-0.5">{tx('{a} of {b} doses logged today', { a: takenCount, b: meds.length })}</div>
-              </div>
-              <Pill className="h-4 w-4 text-[color:var(--t-600)]" aria-hidden="true" />
-            </div>
-            {meds.length === 0 ? (
-              <p className="text-xs text-[color:var(--ink-2)]">{tx('No active medicines on your prescriptions.')}</p>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {meds.slice(0, 6).map(m => (
-                  <label key={m.key} className={`flex items-center justify-between gap-3 px-4 py-3 cursor-pointer rounded-none ${taken[m.key] ? 'bg-emerald-50' : 'bg-[color:var(--t-50)]'}`}>
-                    <span className="min-w-0">
-                      <span className="block text-xs font-bold truncate">{m.name}</span>
-                      {m.note && <span className="block text-2xs text-[color:var(--ink-2)] truncate">{m.note}</span>}
-                    </span>
-                    <input type="checkbox" checked={!!taken[m.key]} onChange={e => setTaken(prev => ({ ...prev, [m.key]: e.target.checked }))} className="h-4 w-4 accent-[color:var(--t-600)] cursor-pointer" />
-                  </label>
-                ))}
-              </div>
-            )}
-          </article>
-        </div>
-
-        {/* Right */}
-        <div className="lg:col-span-7 flex flex-col gap-6">
-          <article className={card}>
-            <div className="flex items-center justify-between gap-2 border-b border-[color:var(--t-100)] pb-3">
-              <div>
-                <h3 className="text-base font-bold">{tx('My medicines')} ({activePrescriptions.length})</h3>
-              </div>
-              <button type="button" onClick={props.onFindPharmacy} className={`${btnS} inline-flex items-center gap-1.5`}><Store className="h-3.5 w-3.5" />{tx('Find a Pharmacy')}</button>
-            </div>
-            {activePrescriptions.length === 0 ? (
-              <p className="text-xs text-[color:var(--ink-2)]">{tx('You have no active prescriptions.')}</p>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {activePrescriptions.slice(0, 4).map((rx: any) => (
-                  <div key={rx.id} className="bg-[color:var(--t-50)] px-4 py-3.5 flex flex-wrap items-center justify-between gap-3 rounded-none">
-                    <div className="min-w-0">
-                      <div className="text-sm font-bold truncate">
-                        {Array.isArray(rx.items) && rx.items[0]?.name ? rx.items[0].name : rx.diagnosis || tx('Prescribed Medicine')}
-                        {rx.code && <span className="ml-2 text-xs font-medium text-[color:var(--ink-2)]">{rx.code}</span>}
-                      </div>
-                      {rx.diagnosis && <div className="text-2xs text-[color:var(--ink-2)] mt-0.5 truncate">{rx.diagnosis}</div>}
-                    </div>
-                    <button type="button" onClick={props.onOpenPrescriptions} className={btnS}>{tx('Open')}</button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </article>
-
-          <article className={card}>
+        <article className={`${card} lg:col-span-7`}>
             <div className="flex items-center justify-between gap-2">
               <div>
                 <h3 className="text-base font-bold">{tx('Blood pressure over time')}</h3>
@@ -231,7 +212,7 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
             </div>
             {spark ? (
               <svg viewBox="0 0 540 72" className="w-full h-[72px] bg-[color:var(--t-50)] border border-[color:var(--t-100)]" role="img" aria-label={tx('Blood pressure trend')}>
-                <polyline fill="none" stroke="#0F766E" strokeWidth="2.5" points={spark} />
+                <polyline fill="none" stroke="#0A7A63" strokeWidth="2.5" points={spark} />
               </svg>
             ) : (
               <p className="text-xs text-[color:var(--ink-2)] bg-[color:var(--t-50)] border border-[color:var(--t-100)] p-4">{tx('Log at least two blood pressure readings to see a trend.')}</p>
@@ -250,34 +231,8 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
               ))}
             </div>
           </article>
-        </div>
 
-        {/* Bottom row */}
-        <article className={`${card} lg:col-span-6 bg-[color:var(--t-50)]`}>
-          <div className="border-b border-[color:var(--t-200)] pb-2.5 flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-bold">{tx('My Care Team')}</h3>
-            </div>
-            <button type="button" onClick={props.onOpenCareTeam} className={btnS}>{tx('View all')}</button>
-          </div>
-          {careTeam.length === 0 ? (
-            <p className="text-xs text-[color:var(--ink-2)]">{tx('Your care team appears here after your first paid visit.')}</p>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {careTeam.slice(0, 3).map(p => (
-                <div key={p.id} className="bg-white px-4 py-3 flex items-center justify-between gap-3 hover:bg-[color:var(--t-50)] rounded-none">
-                  <div className="min-w-0">
-                    <div className="text-sm font-bold truncate">{p.name}</div>
-                    <div className="text-2xs text-[color:var(--ink-2)] truncate">{(p as any).specialty || (p as any).specialization || tx('Verified practitioner')}</div>
-                  </div>
-                  <button type="button" onClick={() => props.onSelectProfessional(p.id)} className={btnS}>{tx('Profile')}</button>
-                </div>
-              ))}
-            </div>
-          )}
-        </article>
-
-        <article className={`${card} lg:col-span-6`}>
+        <article className={`${card} lg:col-span-5`}>
           <div className="border-b border-[color:var(--t-100)] pb-2.5 flex items-center justify-between">
             <div>
               <h3 className="text-base font-bold">{tx('Allergies & conditions')}</h3>
@@ -306,6 +261,60 @@ export default function PatientOverviewTab(props: PatientOverviewTabProps) {
               <button type="button" onClick={props.onOpenTriage} className={btnS}>{tx('Check my symptoms')}</button>
             </div>
           </div>
+        </article>
+      </section>
+
+      {/* Prescriptions and care team */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <article className={`${card} lg:col-span-7`}>
+            <div className="flex items-center justify-between gap-2 border-b border-[color:var(--t-100)] pb-3">
+              <div>
+                <h3 className="text-base font-bold">{tx('My medicines')} ({activePrescriptions.length})</h3>
+              </div>
+              <button type="button" onClick={props.onFindPharmacy} className={`${btnS} inline-flex items-center gap-1.5`}><Store className="h-3.5 w-3.5" />{tx('Find a Pharmacy')}</button>
+            </div>
+            {activePrescriptions.length === 0 ? (
+              <p className="text-xs text-[color:var(--ink-2)]">{tx('You have no active prescriptions.')}</p>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {activePrescriptions.slice(0, 4).map((rx: any) => (
+                  <div key={rx.id} className="bg-[color:var(--t-50)] px-4 py-3.5 flex flex-wrap items-center justify-between gap-3 rounded-none">
+                    <div className="min-w-0">
+                      <div className="text-sm font-bold truncate">
+                        {Array.isArray(rx.items) && rx.items[0]?.name ? rx.items[0].name : rx.diagnosis || tx('Prescribed Medicine')}
+                        {rx.code && <span className="ml-2 text-xs font-medium text-[color:var(--ink-2)]">{rx.code}</span>}
+                      </div>
+                      {rx.diagnosis && <div className="text-2xs text-[color:var(--ink-2)] mt-0.5 truncate">{rx.diagnosis}</div>}
+                    </div>
+                    <button type="button" onClick={props.onOpenPrescriptions} className={btnS}>{tx('Open')}</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </article>
+
+        <article className={`${card} lg:col-span-5 bg-[color:var(--t-50)]`}>
+          <div className="border-b border-[color:var(--t-200)] pb-2.5 flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-bold">{tx('My Care Team')}</h3>
+            </div>
+            <button type="button" onClick={props.onOpenCareTeam} className={btnS}>{tx('View all')}</button>
+          </div>
+          {careTeam.length === 0 ? (
+            <p className="text-xs text-[color:var(--ink-2)]">{tx('Your care team appears here after your first paid visit.')}</p>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {careTeam.slice(0, 3).map(p => (
+                <div key={p.id} className="bg-white px-4 py-3 flex items-center justify-between gap-3 hover:bg-[color:var(--t-50)] rounded-none">
+                  <div className="min-w-0">
+                    <div className="text-sm font-bold truncate">{p.name}</div>
+                    <div className="text-2xs text-[color:var(--ink-2)] truncate">{(p as any).specialty || (p as any).specialization || tx('Verified practitioner')}</div>
+                  </div>
+                  <button type="button" onClick={() => props.onSelectProfessional(p.id)} className={btnS}>{tx('Profile')}</button>
+                </div>
+              ))}
+            </div>
+          )}
         </article>
       </section>
     </div>

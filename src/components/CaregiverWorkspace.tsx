@@ -16,7 +16,7 @@ import {
   MessageSquare,
   Plus,
   ShieldCheck,
-  Sparkles,
+  BadgeCheck,
   UserCheck,
   Wallet,
 } from 'lucide-react';
@@ -363,7 +363,7 @@ export default function CaregiverWorkspace({
                 { label: tx('Upcoming Home Visits'), value: upcomingVisits.length, sub: tx('Scheduled patient visits'), icon: Home },
                 { label: tx('Pending Care Tasks'), value: pendingTasksCount, sub: tx('Vitals, meds & ADLs today'), icon: ClipboardCheck },
                 { label: tx('Matching Open Shifts'), value: nurseOpenJobs.length, sub: tx('Clinics, wards & home care'), icon: Briefcase },
-                { label: tx('Patient Rating'), value: matchedNurse?.rating ? `${matchedNurse.rating.toFixed(1)} ★` : '4.9 ★', sub: tx('Verified family feedback'), icon: Sparkles },
+                { label: tx('Patient Rating'), value: matchedNurse?.rating ? `${matchedNurse.rating.toFixed(1)} ★` : '4.9 ★', sub: tx('Verified family feedback'), icon: BadgeCheck },
               ].map((stat) => {
                 const Icon = stat.icon;
                 return (

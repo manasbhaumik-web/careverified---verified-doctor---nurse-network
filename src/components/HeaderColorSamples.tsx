@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Activity, Video, Heart, Calendar, FolderHeart, Pill, ShieldCheck, ChevronDown, 
   ArrowRight, Clock, CheckCircle2, ChevronRight, User, AlertCircle, 
-  Sparkles, MessageSquare, PhoneCall, HeartPulse, RefreshCw, Layers, Check,
+  MessageSquare, PhoneCall, HeartPulse, RefreshCw, Layers, Check,
   Plane, BookOpen, LifeBuoy, Search, X, Menu, Bell, Settings, Plus, Stethoscope, Building2
 } from 'lucide-react';
 import { navigate } from '../nav';

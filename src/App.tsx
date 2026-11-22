@@ -12,7 +12,6 @@ const CaregiverWorkspace = React.lazy(() => import('./components/CaregiverWorksp
 const ProfilePage = React.lazy(() => import('./components/ProfilePage'));
 import NotificationBell from './components/NotificationBell';
 import ThemeSwitcher from './components/ThemeSwitcher';
-import OnCallChip from './components/OnCallChip';
 import { useLocale, useTr } from './locale';
 import SOSButton from './components/SOSButton';
 import { navigate, useLocation, loginUrl } from './nav';
@@ -542,13 +541,12 @@ export default function App() {
 
           {/* Right-Side Desktop Actions & User Session Details - Standardized Gaps & Round Outlines */}
           <div className="hidden lg:flex items-center gap-2.5 sm:gap-3">
-            <OnCallChip />
             <div className="hidden 2xl:flex items-center gap-2 bg-white/15 border-0 shadow-none px-3 py-1.5 rounded-none text-xs font-bold text-white whitespace-nowrap" title={tt('Council-Verified Network (Act 586)')}>
               <ShieldCheck className="h-3.5 w-3.5 text-white" aria-hidden="true" />
               <span>{tt('Council-verified doctors')}</span>
             </div>
 
-            <div className="h-5 w-px bg-white/20 mx-0.5" aria-hidden="true" />
+            <div className="hidden 2xl:block h-5 w-px bg-white/20 mx-0.5" aria-hidden="true" />
 
             {currentUser.role === 'patient' && <SOSButton />}
             <NotificationBell tone="onColor" />

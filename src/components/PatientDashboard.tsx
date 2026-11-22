@@ -4,7 +4,7 @@ import { navigate } from '../nav';
 import { 
   BookOpen, Calendar, Clock, FolderHeart, Heart, Video, 
   CheckCircle2, Search, MessageSquare, ShieldCheck, ArrowRight, User,
-  AlertTriangle, Stethoscope, Sparkles, Pill, Activity, PhoneCall,
+  AlertTriangle, Stethoscope, Pill, Activity, PhoneCall,
   HeartPulse, ShieldAlert, ChevronRight, ExternalLink, LifeBuoy,
   Send, X, Star, MapPin, Radio, AlertCircle, FileText, PackagePlus,
   HeartHandshake, Plane, Store, UserCheck, Tag, FlaskConical, ClipboardList, Share2, LayoutDashboard
@@ -74,7 +74,7 @@ export const PATIENT_GROUPS: Record<PatientTabGroup, {
     tabs: [
       { id: 'overview', label: 'Overview', description: 'Today at a glance: visits, medicines, vitals & care team', icon: LayoutDashboard },
       { id: 'appointments', label: 'Appointments', description: 'Manage upcoming visits, reschedules & history', icon: Calendar },
-      { id: 'consult', label: 'Instant Consult', description: '24/7 video consults & AI symptom triage', icon: Video },
+      { id: 'consult', label: 'Instant Consult', description: '24/7 video consults & symptom triage', icon: Video },
       { id: 'messages', label: 'Messages', description: 'Encrypted chat with your doctors & clinics', icon: MessageSquare },
       { id: 'saved', label: 'My Care Team', description: 'Bookmarked specialists, nurses & clinics', icon: Heart },
     ],
@@ -122,7 +122,7 @@ export interface PatientDashboardProps {
   onOpenArticle: (articleId: string) => void;
   /** Navigates to the practitioner directory to find/book a doctor */
   onFindDoctors?: () => void;
-  /** Opens the AI Symptom Checker / Clinical Triage flow */
+  /** Opens the Symptom Checker / Clinical Triage flow */
   onOpenTriage?: () => void;
   /** Opens the Pharmacy Dispensary directory */
   onOpenPharmacies?: () => void;
@@ -626,6 +626,7 @@ export default function PatientDashboard({
           recordsData={recordsData}
           activePrescriptions={activePrescriptions}
           careTeam={careTeam}
+          professionals={professionals}
           patientAllergies={patientAllergies}
           patientConditions={patientConditions}
           onCallStatus={onCallStatus}
@@ -802,13 +803,11 @@ export default function PatientDashboard({
                 <BannerBadge tone="success">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1" /> {onCallLabel(onCall)}
                 </BannerBadge>
-              ) : (
-                <span className="bg-amber-50 text-amber-900 border border-amber-300 tag-pill font-black uppercase px-2.5 py-0.5">{onCallLabel(onCall)}</span>
-              )
+              ) : undefined
             }
             tabs={[
               { id: 'instant', label: tx('Video or Chat'), icon: Video },
-              { id: 'triage', label: tx('AI Symptom Check'), icon: Sparkles },
+              { id: 'triage', label: tx('Symptom Check'), icon: Stethoscope },
             ]}
             activeTab={consultSubTab}
             onTabChange={(t) => setConsultSubTab(t as any)}
@@ -1227,7 +1226,7 @@ export default function PatientDashboard({
                   </span>
                   {effectiveSpecialty && (
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[color:var(--t-50)] border border-[color:var(--t-200)] text-[color:var(--t-700)] tag-pill font-black uppercase tracking-wider">
-                      {selectedSpecialtyFilter ? tx('AI Triage: ') : tx('Specialty: ')}{effectiveSpecialty}
+                      {selectedSpecialtyFilter ? tx('Triage: ') : tx('Specialty: ')}{effectiveSpecialty}
                       <button
                         type="button"
                         onClick={() => {

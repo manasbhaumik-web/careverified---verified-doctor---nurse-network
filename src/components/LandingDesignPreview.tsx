@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   ShieldCheck, CheckCircle2, ArrowRight, Video, Pill,
   UserCheck, Hospital, Heart, Clock, Check,
-  ChevronRight, Sparkles, RefreshCw, AlertCircle, PhoneCall
+  ChevronRight, BadgeCheck, RefreshCw, AlertCircle, PhoneCall
 } from 'lucide-react';
 import { navigate } from '../nav';
 import ThemeSwitcher from './ThemeSwitcher';
@@ -38,7 +38,7 @@ export default function LandingDesignPreview() {
           </button>
           <span className="text-slate-600">|</span>
           <span className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">
-            <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+            <BadgeCheck className="h-3.5 w-3.5 text-cyan-400" />
             Landing Page Visual Redesign Samples (Less Text, More Visuals)
           </span>
         </div>
@@ -97,7 +97,7 @@ export default function LandingDesignPreview() {
               Transforming Text Walls into Photographic Storytelling
             </h1>
             <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-3xl leading-relaxed">
-              Replacing dense monospace audit tables, repetitive statutory disclaimers, and lengthy paragraph tabs with high-impact AI healthcare imagery, scannable data chips, and human doctor cards.
+              Replacing dense monospace audit tables, repetitive statutory disclaimers, and lengthy paragraph tabs with high-impact healthcare imagery, scannable data chips, and human doctor cards.
             </p>
           </div>
           <div className="grid grid-cols-3 gap-3 bg-[color:var(--t-50)]/70 border border-[color:var(--t-200)] p-4 text-center shrink-0">

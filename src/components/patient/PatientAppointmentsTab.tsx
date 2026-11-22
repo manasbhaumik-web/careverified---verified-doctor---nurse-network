@@ -14,7 +14,7 @@ import {
   Radio,
   Search,
   ShieldCheck,
-  Sparkles,
+  BadgeCheck,
   Stethoscope,
   Video,
   X,
@@ -380,7 +380,7 @@ export default function PatientAppointmentsTab({
                 onClick={onOpenTriageTab}
                 className="btn btn-sm btn-secondary rounded-none"
               >
-                <Sparkles className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
+                <BadgeCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" />
                 <span>{tx('Check Symptoms')}</span>
               </button>
             )}

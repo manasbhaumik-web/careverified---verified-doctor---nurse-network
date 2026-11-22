@@ -402,14 +402,15 @@ footer button.bg-slate-800:hover,
  * Default: light-cyan (clinical mint-cyan palette). See components/ThemeSwitcher.tsx
  * ------------------------------------------------------------- */
 :root,
+:root[data-theme="ice-mint"],
 :root[data-theme="lagoon"] {
   --ink: #1E293B; --ink-2: #334155; --t-bright: 1; --page: #F8FAFC;
   --e-50: #ECFDF5; --e-200: #A7F3D0; --e-600: #059669; --e-700: #047857; --e-800: #065F46;
   --dark: #0F172A;
-  /* Lagoon: deep teal. Action colour is 600 (white on it is about 5.5:1). */
-  --t-50: #F0FDFA; --t-100: #CCFBF1; --t-200: #99F6E4; --t-300: #5EEAD4; --t-400: #2DD4BF;
-  --t-500: #14B8A6; --t-600: #0F766E; --t-700: #115E59; --t-800: #134E4A; --t-900: #042F2E;
-  --t-bg: color-mix(in srgb, var(--t-50) 35%, #EEF3F7); --t-hue: 175deg;
+  /* Ice Mint: icy mint tints with a deep mint action colour (600: white on it is about 5.3:1). */
+  --t-50: #F2FCF9; --t-100: #D9F7EF; --t-200: #B3EEDD; --t-300: #7FE0C8; --t-400: #4CCDAE;
+  --t-500: #26B394; --t-600: #0A7A63; --t-700: #0A6350; --t-800: #0B4F41; --t-900: #05332A;
+  --t-bg: color-mix(in srgb, var(--t-50) 35%, #EEF3F7); --t-hue: 165deg;
   --band-a: color-mix(in srgb, var(--t-50) 50%, white);
   --t-text: var(--t-600);
   --t-btn: var(--t-600); --t-btn-hover: var(--t-700);

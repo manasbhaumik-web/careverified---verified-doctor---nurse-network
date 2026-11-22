@@ -9,7 +9,7 @@ import {
   ExternalLink,
   HeartPulse,
   Check,
-  Sparkles,
+  BadgeCheck,
   DollarSign,
   Lock,
   FileText,
@@ -305,7 +305,7 @@ export const FacilityProfileTab: React.FC<FacilityProfileTabProps> = ({
                       key={i}
                       className="px-3 py-1.5 bg-amber-50 text-amber-900 text-2xs font-bold border border-amber-300 flex items-center gap-2"
                     >
-                      <Sparkles className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+                      <BadgeCheck className="h-3.5 w-3.5 text-amber-600 shrink-0" />
                       <span>{am}</span>
                       <button
                         type="button"

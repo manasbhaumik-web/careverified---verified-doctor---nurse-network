@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTr } from '../locale';
 import {
-  CheckCircle2, LifeBuoy, Video, Sparkles, FolderHeart,
+  CheckCircle2, LifeBuoy, Video, Stethoscope, FolderHeart,
   Heart, Calendar, MessageSquare, Pill, FlaskConical, FileText,
   Search, UserCheck, Store, BookOpen, PackagePlus, HeartHandshake, Plane, LayoutDashboard
 } from 'lucide-react';
@@ -132,7 +132,7 @@ export default function PatientHeroBanner<T extends string = string>({
       subItems: [
         { id: 'overview', label: tx('Overview'), description: tx('Today at a glance: visits, medicines, vitals & care team'), icon: LayoutDashboard },
         { id: 'appointments', label: tx('Appointments'), description: tx('Manage upcoming visits, reschedules & history'), icon: Calendar, count: upcomingCount || undefined },
-        { id: 'consult', label: tx('Instant Consult'), description: tx('24/7 video consults & AI symptom triage'), icon: Video },
+        { id: 'consult', label: tx('Instant Consult'), description: tx('24/7 video consults & symptom triage'), icon: Video },
         { id: 'messages', label: tx('Messages'), description: tx('Encrypted chat with your doctors & clinics'), icon: MessageSquare },
         { id: 'saved', label: tx('My Care Team'), description: tx('Bookmarked specialists, nurses & clinics'), icon: Heart, count: careTeamCount || undefined },
       ],
@@ -254,8 +254,8 @@ export default function PatientHeroBanner<T extends string = string>({
               )}
               {onOpenTriage && (
                 <button type="button" onClick={onOpenTriage} className={bannerOnBrandSecondaryBtn}>
-                  <Sparkles className="h-3.5 w-3.5" />
-                  <span>{tx('AI Triage')}</span>
+                  <Stethoscope className="h-3.5 w-3.5" />
+                  <span>{tx('Symptom Triage')}</span>
                 </button>
               )}
               {onOpenRecords && (

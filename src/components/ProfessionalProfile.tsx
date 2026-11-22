@@ -663,7 +663,7 @@ export default function ProfessionalProfile({
                     <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--ink)]">{tx('Consultation Notes (Optional)')}</label>
                     {prefilledSymptoms && symptoms === prefilledSymptoms && (
                       <span className="text-2xs font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5">
-                        {tx('Pre-filled from AI Triage')}
+                        {tx('Pre-filled from Symptom Triage')}
                       </span>
                     )}
                   </div>

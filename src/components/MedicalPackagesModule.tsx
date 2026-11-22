@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   PackagePlus, Search, Tag, Building2, Check, Clock, ShieldCheck,
   AlertCircle, ChevronRight, X, Calendar, Phone, Mail, Globe, MapPin,
-  Sparkles, Gift, Filter, ArrowRight, Copy, CheckCircle2, FileText,
+  Gift, Filter, ArrowRight, Copy, CheckCircle2, FileText,
   BadgeCheck, HeartPulse, CreditCard, Lock, Receipt, Download, Printer
 } from 'lucide-react';
 import { useTr } from '../locale';
@@ -347,7 +347,7 @@ export default function MedicalPackagesModule({
         {activeTab === 'packages' && promotions.length > 0 && (
           <div className="bg-white border border-[color:var(--t-200)] border-l-4 border-l-[color:var(--t-600)] px-3 py-2 rounded-none shadow-2xs flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
-              <Sparkles className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
+              <BadgeCheck className="h-3.5 w-3.5 text-[color:var(--t-600)] shrink-0" />
               <span className="text-xs font-extrabold uppercase tracking-wider text-[color:var(--ink)] whitespace-nowrap">
                 {tx('Partner Offers')}
               </span>

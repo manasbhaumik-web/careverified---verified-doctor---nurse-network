@@ -14,7 +14,7 @@ import {
   Building, ChevronRight, Zap, Globe, Award, FileText,
   Stethoscope, Activity, Check,
   Clock, PhoneCall, Pill, Hospital, ChevronLeft, ChevronDown, UserCheck, Users, Video, X,
-  CreditCard, Receipt, Plane, Heart, Sparkles, Building2
+  CreditCard, Receipt, Plane, Heart, Building2
 } from 'lucide-react';
 import { DoctorProfile, NurseProfile } from '../types';
 import { loginUrl, navigate } from '../nav';

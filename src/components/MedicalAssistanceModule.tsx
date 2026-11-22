@@ -14,7 +14,6 @@ import {
   Printer,
   ChevronRight,
   ArrowRight,
-  Sparkles,
   Plane,
   Shield,
   BadgeCheck,

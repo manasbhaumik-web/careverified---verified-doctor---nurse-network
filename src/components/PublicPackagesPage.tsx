@@ -30,7 +30,6 @@ import {
   Search,
   Shield,
   ShieldCheck,
-  Sparkles,
   Star,
   Stethoscope,
   Tag,
@@ -1568,7 +1567,7 @@ export default function PublicPackagesPage({ signedIn = false }: { signedIn?: bo
                     {/* Clean Category Navigation: flex-wrap with ZERO horizontal scrollbar */}
                     <div className="pt-3 border-t border-[color:var(--t-100)] flex flex-wrap items-center gap-1.5 sm:gap-2">
                       <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1 mr-1">
-                        <Sparkles className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> Explore:
+                        <BadgeCheck className="h-3.5 w-3.5 text-[color:var(--t-600)]" /> Explore:
                       </span>
                       <button
                         type="button"

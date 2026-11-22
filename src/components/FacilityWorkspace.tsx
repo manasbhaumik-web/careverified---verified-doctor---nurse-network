@@ -3,7 +3,7 @@ import {
   Building2, Calendar, Users, ShieldCheck, CheckCircle2, XCircle, Plus,
   Search, FileText, Send, Phone, Mail, MapPin, ExternalLink,
   RefreshCw, ChevronDown, ChevronUp, Stethoscope, Check,
-  MessageSquare, Lock, DollarSign, Tag, PackagePlus, Sparkles, Clock,
+  MessageSquare, Lock, DollarSign, Tag, PackagePlus, Clock,
   Trash2, Edit3, Copy, HeartPulse, AlertCircle, BadgeCheck, Receipt,
   Printer, Download, CreditCard, LifeBuoy
 } from 'lucide-react';

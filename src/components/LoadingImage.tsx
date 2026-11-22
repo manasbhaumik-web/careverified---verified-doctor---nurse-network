@@ -22,7 +22,7 @@ export default function LoadingImage({ className = '', size = 80 }: LoadingImage
       role="img"
     >
       <g className="brand-load-shield">
-        <path d="M24 3 40 9v13c0 10-7 18-16 23C15 40 8 32 8 22V9z" fill="var(--t-600, #0F766E)" />
+        <path d="M24 3 40 9v13c0 10-7 18-16 23C15 40 8 32 8 22V9z" fill="var(--t-600, #0A7A63)" />
       </g>
       <path
         className="brand-load-pulse"

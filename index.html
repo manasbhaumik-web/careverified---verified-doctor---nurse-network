@@ -10,7 +10,7 @@
     <meta name="format-detection" content="telephone=no" />
     <title>MediCred — Verified Doctor & Nurse Network | Medical Credential Verification</title>
     <meta name="description" content="MediCred is an online medical assistance platform. Check that a doctor or nurse holds a current licence, take online consultations, and keep digital prescriptions in one place." />
-    <meta name="theme-color" content="#0F766E" />
+    <meta name="theme-color" content="#0A7A63" />
     
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -44,14 +44,14 @@
             @media (prefers-reduced-motion: reduce) { #app-init-loader .brand-load-pulse, #app-init-loader .brand-load-shield { animation: none; stroke-dashoffset: 0; } }
           </style>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="88" height="88" fill="none" role="img" aria-label="MediCred">
-            <g class="brand-load-shield"><path d="M24 3 40 9v13c0 10-7 18-16 23C15 40 8 32 8 22V9z" fill="var(--t-600, #0F766E)" /></g>
+            <g class="brand-load-shield"><path d="M24 3 40 9v13c0 10-7 18-16 23C15 40 8 32 8 22V9z" fill="var(--t-600, #0A7A63)" /></g>
             <path class="brand-load-pulse" pathLength="1" d="M13 26h5.5l3-9.5 5 15.5 3.5-10 1.5 4H35" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
             <circle cx="36" cy="38" r="8" fill="#10B981" stroke="#FFFFFF" stroke-width="2.5" />
             <path d="m32.5 38 2.5 2.5 4.5-5" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </div>
         <div style="font-size: 18px; font-weight: 800; color: var(--ink, #0f172a); letter-spacing: -0.02em; margin-bottom: 6px;">
-          Medi<span style="color: var(--t-600, #0F766E);">Cred</span>
+          Medi<span style="color: var(--t-600, #0A7A63);">Cred</span>
         </div>
         <div style="font-size: 12px; font-weight: 600; color: var(--ink-2, #64748b); letter-spacing: 0.08em; text-transform: uppercase;">
           Connecting to Medical Network…
@@ -61,7 +61,8 @@
     <script>
       try {
         var t = localStorage.getItem('medcred-theme-v3');
-        if (t !== 'lagoon' && t !== 'light-cyan' && t !== 'sky') t = 'lagoon';
+        if (t === 'lagoon') t = 'ice-mint';
+        if (t !== 'ice-mint' && t !== 'light-cyan' && t !== 'sky') t = 'ice-mint';
         document.documentElement.setAttribute('data-theme', t);
         var f = localStorage.getItem('medcred-font-v1');
         var validFonts = ['dm-sans', 'clinical-precision', 'swiss-architectural', 'hospital-enterprise', 'compact-geometric', 'modern-medtech'];

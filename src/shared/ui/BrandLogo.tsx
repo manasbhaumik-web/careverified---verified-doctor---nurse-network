@@ -103,7 +103,7 @@ export function BrandLogo({
           </span>
         </span>
         <span className="hidden sm:block w-px h-8 bg-white/40" aria-hidden="true" />
-        <span className="hidden sm:inline-flex items-center gap-2 h-8 px-3 bg-white/15 border border-white/40 text-white tag-pill font-extrabold uppercase tracking-[0.14em] whitespace-nowrap rounded-none">
+        <span className="hidden sm:inline-flex items-center gap-2 h-8 text-white tag-pill font-extrabold uppercase tracking-[0.14em] whitespace-nowrap rounded-none">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-300 shrink-0" aria-hidden="true" />
           {subtitle}
         </span>

@@ -1,6 +1,6 @@
 import { CustomSelect } from '../../shared/ui/CustomSelect';
 import React, { useCallback, useEffect, useState } from 'react';
-import { BookOpenCheck, ExternalLink, RefreshCw, Search, FileText, Sparkles, CheckCircle2 } from 'lucide-react';
+import { BookOpenCheck, ExternalLink, RefreshCw, Search, FileText, CheckCircle2 } from 'lucide-react';
 import { useTr } from '../../locale';
 
 const jreq = (url: string, method = 'POST', body?: unknown) =>

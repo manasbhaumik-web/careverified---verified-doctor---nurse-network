@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import PublicHeader from '../shared/ui/PublicHeader';
 import {
   ArrowRight, BadgeCheck, Building2, ClipboardList, FileSignature, Hourglass, MessageSquare, Pill, Stethoscope, Video, Plane,
-  ShieldCheck, CheckCircle2, Shield, UserCheck, Search, Scale, Lock, FileText, Sparkles, Check, Zap, Clock, Award,
+  ShieldCheck, CheckCircle2, Shield, UserCheck, Search, Scale, Lock, FileText, Check, Zap, Clock, Award,
   Heart, Activity, Syringe, Bandage, HeartPulse, ChevronLeft, ChevronRight, Pause, Play, Users
 } from 'lucide-react';
 import Footer from './Footer';
@@ -595,7 +595,7 @@ const UNIFIED_CAPABILITIES: {
   {
     id: 'maternal-care',
     role: 'nurse',
-    icon: Sparkles,
+    icon: BadgeCheck,
     tag: 'Nurse Exclusive',
     t: { en: 'Maternal Postnatal & Newborn Visits', ms: 'Lawatan Ibu Bersalin & Bayi', zh: '产后母婴护理与新生儿访视' },
     d: {

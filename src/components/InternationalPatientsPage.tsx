@@ -3,7 +3,7 @@ import PublicHeader from '../shared/ui/PublicHeader';
 import { 
   Plane, Globe, Building2, ShieldCheck, Heart, ArrowRight, 
   Car, Languages, Utensils, HeartHandshake, FileText, CheckCircle2, 
-  HelpCircle, Sparkles, DollarSign, ExternalLink, Check
+  HelpCircle, BadgeCheck, DollarSign, ExternalLink, Check
 } from 'lucide-react';
 import Footer from './Footer';
 import TouristAccess from './TouristAccess';
@@ -170,7 +170,7 @@ export default function InternationalPatientsPage({ onSignUp }: InternationalPat
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
               <div className="max-w-2xl space-y-3">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 border border-white/25 text-white tag-pill font-extrabold uppercase tracking-widest">
-                  <Sparkles className="h-3.5 w-3.5" />
+                  <BadgeCheck className="h-3.5 w-3.5" />
                   International Patient Membership
                 </span>
                 <h3 className="font-display font-black text-2xl sm:text-3xl text-white tracking-tight leading-tight">
