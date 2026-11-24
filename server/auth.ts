@@ -3,6 +3,7 @@ import type { NextFunction, Request, Response } from "express";
 import { db } from "./db";
 import { audit } from "./audit";
 import { verifyTotp } from "./totp";
+import { ADMIN_SUB_ROLES, type AdminSubRole } from "../src/types";
 
 export type Role = "patient" | "practitioner" | "admin" | "pharmacy" | "facility" | "nurse";
 export interface AuthUser {
@@ -13,6 +14,44 @@ export interface AuthUser {
   avatarUrl: string | null;
   profileId: string | null;
   facilityId?: string | null;
+  adminSubRole?: AdminSubRole;
+}
+
+const ROLE_LABELS: Record<Role, string> = {
+  patient: "Patient / Member",
+  practitioner: "Practitioner",
+  nurse: "Nurse / Caring Attendant",
+  pharmacy: "Pharmacy",
+  facility: "Clinic / Hospital",
+  admin: "Board Admin",
+};
+
+export function normalizeAdminSubRole(v: unknown): AdminSubRole {
+  return typeof v === "string" && v in ADMIN_SUB_ROLES ? (v as AdminSubRole) : "super_admin";
+}
+
+export function entityAccessProblem(row: {
+  role: Role;
+  status?: string | null;
+  profile_id?: string | null;
+  profileId?: string | null;
+  facility_id?: string | null;
+  facilityId?: string | null;
+}): string | null {
+  if (row.status && row.status !== "active") {
+    return "Your account has been suspended or deactivated. Please contact Board Support.";
+  }
+  const pid = row.profile_id ?? row.profileId ?? null;
+  const fid = row.facility_id ?? row.facilityId ?? pid;
+  if (row.role === "pharmacy") {
+    const ok = pid && db.prepare("SELECT 1 AS x FROM pharmacies WHERE id = ? AND active = 1 AND verified_at IS NOT NULL").get(pid);
+    if (!ok) return "Your pharmacy account is suspended or awaiting Board verification.";
+  }
+  if (row.role === "facility") {
+    const ok = fid && db.prepare("SELECT 1 AS x FROM tourism_facilities WHERE id = ? AND (active = 1 OR approval_status = 'pending')").get(fid);
+    if (!ok) return "Your facility account has been deactivated or rejected by the Board.";
+  }
+  return null;
 }
 
 declare global {
@@ -25,6 +64,7 @@ declare global {
 }
 
 try { db.exec("ALTER TABLE users ADD COLUMN sessions_valid_after TEXT"); } catch { /* column already exists */ }
+try { db.exec("ALTER TABLE users ADD COLUMN admin_sub_role TEXT DEFAULT 'super_admin'"); } catch { /* column already exists */ }
 
 const COOKIE = "cv_session";
 const SESSION_DAYS = 7;
@@ -137,22 +177,40 @@ export function loadSession(req: Request, _res: Response, next: NextFunction) {
   const token = readCookie(req, COOKIE);
   if (token && !revokedTokens.has(sha(token))) {
     const row = db.prepare(
-      `SELECT u.id, u.email, u.name, u.role, u.avatar_url AS avatarUrl, u.profile_id AS profileId, u.facility_id AS facilityId, u.status, s.expires_at AS expiresAt
+      `SELECT u.id, u.email, u.name, u.role, u.avatar_url AS avatarUrl, u.profile_id AS profileId, u.facility_id AS facilityId, u.admin_sub_role AS adminSubRole, u.status, s.expires_at AS expiresAt
        FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ?`
     ).get(sha(token)) as any;
-    if (row && row.status === "active" && new Date(row.expiresAt) > new Date()) {
-      req.user = { id: row.id, email: row.email, name: row.name, role: row.role, avatarUrl: row.avatarUrl, profileId: row.profileId, facilityId: row.facilityId ?? null };
+    if (row && new Date(row.expiresAt) > new Date() && !entityAccessProblem(row)) {
+      req.user = {
+        id: row.id,
+        email: row.email,
+        name: row.name,
+        role: row.role,
+        avatarUrl: row.avatarUrl,
+        profileId: row.profileId,
+        facilityId: row.facilityId ?? null,
+        adminSubRole: row.role === "admin" ? normalizeAdminSubRole(row.adminSubRole) : undefined,
+      };
     } else {
       // Serverless fallback when request lands on a freshly started instance
       const signed = verifySignedToken(token);
       if (signed) {
         const uRow = db.prepare(
-          `SELECT id, email, name, role, avatar_url AS avatarUrl, profile_id AS profileId, facility_id AS facilityId, status, sessions_valid_after AS validAfter FROM users WHERE id = ?`
+          `SELECT id, email, name, role, avatar_url AS avatarUrl, profile_id AS profileId, facility_id AS facilityId, admin_sub_role AS adminSubRole, status, sessions_valid_after AS validAfter FROM users WHERE id = ?`
         ).get(signed.userId) as any;
         // Deleting a person's session rows must really end their sessions: a token made before the last password change is refused.
         const revoked = uRow?.validAfter && signed.issuedAt < Date.parse(uRow.validAfter);
-        if (uRow && uRow.status === "active" && !revoked) {
-          req.user = { id: uRow.id, email: uRow.email, name: uRow.name, role: uRow.role, avatarUrl: uRow.avatarUrl, profileId: uRow.profileId, facilityId: uRow.facilityId ?? null };
+        if (uRow && !revoked && !entityAccessProblem(uRow)) {
+          req.user = {
+            id: uRow.id,
+            email: uRow.email,
+            name: uRow.name,
+            role: uRow.role,
+            avatarUrl: uRow.avatarUrl,
+            profileId: uRow.profileId,
+            facilityId: uRow.facilityId ?? null,
+            adminSubRole: uRow.role === "admin" ? normalizeAdminSubRole(uRow.adminSubRole) : undefined,
+          };
         }
       }
     }
@@ -176,8 +234,28 @@ export function requireRole(...roles: Role[]) {
   };
 }
 
+export function requireAdminGroup(...groups: ("registry" | "ops" | "facilities" | "growth")[]) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) return res.status(401).json({ status: "error", message: "Please sign in to continue." });
+    if (req.user.role !== "admin") {
+      audit(req, "access.denied", { details: { path: req.path, method: req.method } });
+      return res.status(403).json({ status: "error", message: "You do not have permission to do this." });
+    }
+    const subRole = normalizeAdminSubRole(req.user.adminSubRole);
+    const allowed = ADMIN_SUB_ROLES[subRole]?.allowedGroups || ["registry", "ops", "facilities", "growth"];
+    if (!groups.some(g => allowed.includes(g))) {
+      audit(req, "access.denied", { details: { path: req.path, method: req.method, adminSubRole: subRole, requiredGroups: groups } });
+      return res.status(403).json({
+        status: "error",
+        message: `Access restricted: Your Board role (${ADMIN_SUB_ROLES[subRole]?.shortTitle || subRole}) does not have authority for this operation.`,
+      });
+    }
+    next();
+  };
+}
+
 // ---------- login with lockout ----------
-export function attemptLogin(req: Request, email: string, password: string, role?: Role, code?: string): AuthUser | { error: string; needsCode?: boolean } {
+export function attemptLogin(req: Request, email: string, password: string, role?: Role, code?: string): AuthUser | { error: string; needsCode?: boolean; expectedRole?: Role } {
   const generic = { error: "Invalid email or password." };
   const row = db.prepare("SELECT * FROM users WHERE email = ?").get(email) as any;
   if (!row) {
@@ -190,17 +268,26 @@ export function attemptLogin(req: Request, email: string, password: string, role
     return { error: "Too many failed attempts. Try again in a few minutes." };
   }
   const ok = verifyPassword(password, row.password_hash);
-  // A pharmacy login only works while the pharmacy is active and has been verified by the board.
-  const pharmacyOff = row.role === "pharmacy" && !db.prepare("SELECT 1 AS x FROM pharmacies WHERE id = ? AND active = 1 AND verified_at IS NOT NULL").get(row.profile_id);
-  const facilityOff = row.role === "facility" && !db.prepare("SELECT 1 AS x FROM tourism_facilities WHERE id = ? AND (active = 1 OR approval_status = 'pending')").get(row.facility_id || row.profile_id);
-  if (!ok || row.status !== "active" || pharmacyOff || facilityOff || (role && role !== row.role)) {
-    if (!ok) {
-      const failed = row.failed_logins + 1;
-      const lock = failed >= MAX_FAILED ? new Date(Date.now() + LOCK_MINUTES * 60_000).toISOString() : null;
-      db.prepare("UPDATE users SET failed_logins = ?, locked_until = ? WHERE id = ?").run(lock ? 0 : failed, lock, row.id);
-    }
-    audit(req, "auth.login.failed", { actor: { id: row.id, role: row.role }, details: { reason: ok ? "role_or_status" : "bad_password" } });
+  if (!ok) {
+    const failed = row.failed_logins + 1;
+    const lock = failed >= MAX_FAILED ? new Date(Date.now() + LOCK_MINUTES * 60_000).toISOString() : null;
+    db.prepare("UPDATE users SET failed_logins = ?, locked_until = ? WHERE id = ?").run(lock ? 0 : failed, lock, row.id);
+    audit(req, "auth.login.failed", { actor: { id: row.id, role: row.role }, details: { reason: "bad_password" } });
     return generic;
+  }
+  // Role card validation: do not count a role-tab selection mistake towards password lockout.
+  if (role && role !== row.role) {
+    const trueLabel = ROLE_LABELS[row.role as Role] || row.role;
+    audit(req, "auth.login.failed", { actor: { id: row.id, role: row.role }, details: { reason: "role_mismatch", selectedRole: role } });
+    return {
+      error: `This account is registered under "${trueLabel}". Please select "${trueLabel}" under Your Role to sign in.`,
+      expectedRole: row.role as Role,
+    };
+  }
+  const statusProblem = entityAccessProblem(row);
+  if (statusProblem) {
+    audit(req, "auth.login.failed", { actor: { id: row.id, role: row.role }, details: { reason: "entity_status" } });
+    return { error: statusProblem };
   }
   // Second factor: asked only once the password is right; a wrong code counts towards the same lockout.
   if (row.totp_enabled) {
@@ -214,7 +301,16 @@ export function attemptLogin(req: Request, email: string, password: string, role
     }
   }
   db.prepare("UPDATE users SET failed_logins = 0, locked_until = NULL WHERE id = ?").run(row.id);
-  return { id: row.id, email: row.email, name: row.name, role: row.role, avatarUrl: row.avatar_url, profileId: row.profile_id, facilityId: row.facility_id ?? null };
+  return {
+    id: row.id,
+    email: row.email,
+    name: row.name,
+    role: row.role,
+    avatarUrl: row.avatar_url,
+    profileId: row.profile_id,
+    facilityId: row.facility_id ?? null,
+    adminSubRole: row.role === "admin" ? normalizeAdminSubRole(row.admin_sub_role) : undefined,
+  };
 }
 
 // ---------- user creation ----------

@@ -602,7 +602,7 @@ export function BannerIdentity({ name, avatarUrl, role, icon: Icon, as: Heading 
       </div>
       <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
         <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
-          <Heading className="text-lg sm:text-2xl font-black text-[color:var(--ink)] tracking-tight leading-tight min-w-0">{name}</Heading>
+          <Heading className="text-base sm:text-xl font-black text-[color:var(--ink)] tracking-tight leading-tight min-w-0">{name}</Heading>
           {badges && <div className="inline-flex items-center gap-1.5 max-w-full flex-wrap">{badges}</div>}
         </div>
         {description && <p className="text-xs font-medium text-[color:var(--ink-2)] leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-none">{description}</p>}

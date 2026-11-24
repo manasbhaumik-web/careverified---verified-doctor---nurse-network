@@ -18,7 +18,7 @@ import { db, loadCollection, saveCollections } from "./server/db";
 import { audit } from "./server/audit";
 import {
   AuthUser, Role, attemptLogin, changePassword, createSession, createUser, destroySession, emailTaken,
-  ensureAdmin, hashPassword, loadSession, passwordProblem, requireAuth, requireRole, verifyPassword,
+  ensureAdmin, hashPassword, loadSession, normalizeAdminSubRole, passwordProblem, requireAdminGroup, requireAuth, requireRole, verifyPassword,
 } from "./server/auth";
 import { documentsRouter, setRequestOwnerLookup, setClinicalHooks } from "./server/documents";
 import { registerClinicalRoutes, createGrant, seedHealthItems, sign, rxPayload } from "./server/clinical";
@@ -783,25 +783,39 @@ const fail = (res: express.Response, code: number, message: string) =>
   res.status(code).json({ status: "error", message });
 
 const publicUser = (u: AuthUser) => ({
-  id: u.id, role: u.role, name: u.name, email: u.email, avatarUrl: u.avatarUrl ?? undefined, profileId: u.profileId, facilityId: u.facilityId,
+  id: u.id,
+  role: u.role,
+  name: u.name,
+  email: u.email,
+  avatarUrl: u.avatarUrl ?? undefined,
+  profileId: u.profileId,
+  facilityId: u.facilityId,
+  adminSubRole: u.role === "admin" ? normalizeAdminSubRole(u.adminSubRole) : undefined,
 });
 
-// Chat/booking identity: practitioners are addressed by their profile id, patients by their user id.
-const chatIdOf = (u: AuthUser) => (u.role === "practitioner" && u.profileId ? u.profileId : u.id);
+// Chat/booking identity: practitioners and nurses are addressed by their profile id, patients by their user id.
+const chatIdOf = (u: AuthUser) => ((u.role === "practitioner" || u.role === "nurse") && u.profileId ? u.profileId : u.id);
 
 const allProfessionals = () => [...doctors, ...nurses];
 const findProfessional = (id: string) => allProfessionals().find(p => p.id === id);
 const isOwnerOrAdmin = (u: AuthUser | undefined, profileId: string) =>
-  !!u && (u.role === "admin" || (u.role === "practitioner" && u.profileId === profileId));
+  !!u && (u.role === "admin" || ((u.role === "practitioner" || u.role === "nurse") && u.profileId === profileId));
 
 app.post("/api/auth/login", (req, res) => {
   const email = str(req.body.email, 254).toLowerCase();
   const password = typeof req.body.password === "string" ? req.body.password : "";
-  const role = ["patient", "practitioner", "admin", "pharmacy", "facility"].includes(req.body.role) ? (req.body.role as Role) : undefined;
+  const role = ["patient", "practitioner", "nurse", "admin", "pharmacy", "facility"].includes(req.body.role) ? (req.body.role as Role) : undefined;
   if (!email || !password) return fail(res, 400, "Please fill in all fields.");
 
   const result = attemptLogin(req, email, password, role, str(req.body.code, 12));
-  if ("error" in result) return res.status(401).json({ status: "error", message: result.error, needsCode: result.needsCode === true });
+  if ("error" in result) {
+    return res.status(401).json({
+      status: "error",
+      message: result.error,
+      needsCode: result.needsCode === true,
+      expectedRole: result.expectedRole,
+    });
+  }
 
   createSession(req, res, result.id);
   audit(req, "auth.login", { actor: result });
@@ -1061,8 +1075,17 @@ app.post("/api/me/deletion-request", requireAuth, (req, res) => {
   res.json({ status: "success", message: "Deletion request recorded. Our team will respond within 21 days. Medical records may have to be kept for the legal retention period." });
 });
 
+// Admin: update or switch Board Sub-Role (persisted in SQLite users.admin_sub_role)
+app.put("/api/admin/sub-role", requireRole("admin"), (req, res) => {
+  const nextSubRole = normalizeAdminSubRole(req.body?.subRole ?? req.body?.role);
+  db.prepare("UPDATE users SET admin_sub_role = ? WHERE id = ?").run(nextSubRole, req.user!.id);
+  req.user!.adminSubRole = nextSubRole;
+  audit(req, "admin.subrole.change", { details: { adminSubRole: nextSubRole } });
+  res.json({ status: "success", data: { adminSubRole: nextSubRole } });
+});
+
 // Admin: audit trail
-app.get("/api/admin/audit-log", requireRole("admin"), (req, res) => {
+app.get("/api/admin/audit-log", requireAdminGroup("registry", "ops"), (req, res) => {
   const limit = Math.min(Number(req.query.limit) || 100, 500);
   const action = typeof req.query.action === "string" ? req.query.action : null;
   const rows = action
@@ -1072,7 +1095,7 @@ app.get("/api/admin/audit-log", requireRole("admin"), (req, res) => {
 });
 
 // Admin: real 30-day SQLite operational & SLA telemetry
-app.get("/api/admin/telemetry", requireRole("admin"), (_req, res) => {
+app.get("/api/admin/telemetry", requireAdminGroup("ops"), (_req, res) => {
   const nowMs = Date.now();
   const sinceIso = new Date(nowMs - 29 * 86400_000).toISOString().slice(0, 10);
   const days: string[] = [];
@@ -1216,7 +1239,7 @@ app.get("/api/professionals/:id", (req, res) => {
   res.json({ status: "success", data: prof });
 });
 
-app.get("/api/admin/registry-integrations", requireRole("admin"), (_req, res) => res.json({ status: "success", data: integrationStatus() }));
+app.get("/api/admin/registry-integrations", requireAdminGroup("registry"), (_req, res) => res.json({ status: "success", data: integrationStatus() }));
 
 app.get("/api/registries", (_req, res) => res.json({ status: "success", data: { registries: REGISTRIES, registrationTypes: REGISTRATION_TYPES } }));
 
@@ -1270,13 +1293,13 @@ async function registerCaregiver(req: express.Request, res: express.Response) {
   });
 }
 
-// Submit practitioner profile + licence details for verification (one profile per account)
-app.post("/api/register", requireRole("practitioner"), (req, res) => {
+// Submit practitioner or nurse profile + licence details for verification (one profile per account)
+app.post("/api/register", requireRole("practitioner", "nurse"), (req, res) => {
   const user = req.user!;
   if (user.profileId) return fail(res, 409, "A professional profile already exists for this account.");
   if (req.body.role === CAREGIVER_ROLE) return void registerCaregiver(req, res).catch(() => fail(res, 500, "Could not register."));
 
-  const role = req.body.role === UserRole.NURSE ? UserRole.NURSE : UserRole.DOCTOR;
+  const role = user.role === "nurse" || req.body.role === UserRole.NURSE ? UserRole.NURSE : UserRole.DOCTOR;
   const name = str(req.body.name, 100);
   const specialization = str(req.body.specialization, 100);
   const licenseNumber = str(req.body.licenseNumber, 50);
@@ -1401,7 +1424,7 @@ app.post("/api/register", requireRole("practitioner"), (req, res) => {
   });
 });
 
-app.post("/api/professionals/:id/edit", requireRole("practitioner", "admin"), (req, res) => {
+app.post("/api/professionals/:id/edit", requireRole("practitioner", "nurse", "admin"), (req, res) => {
   const { id } = req.params;
   const { bio, fee, practiceAddress, city, availability, certifications } = req.body;
 
@@ -1539,8 +1562,8 @@ app.get("/api/bookings", requireAuth, (req, res) => {
   const u = req.user!;
   let list: any[] = [];
   if (u.role === "admin") list = bookings;
-  // Practitioners only see bookings that have been paid for.
-  else if (u.role === "practitioner") list = u.profileId ? bookings.filter(b => b.professionalId === u.profileId && b.paymentStatus !== "Pending") : [];
+  // Practitioners and nurses only see bookings assigned to their profile that have been paid for.
+  else if (u.role === "practitioner" || u.role === "nurse") list = u.profileId ? bookings.filter(b => b.professionalId === u.profileId && b.paymentStatus !== "Pending") : [];
   else list = bookings.filter(b => b.patientUserId === u.id);
   res.json({ status: "success", data: list });
 });
@@ -1641,10 +1664,11 @@ app.post("/api/bookings/:id/cancel", requireRole("patient"), async (req, res) =>
 app.get("/api/jobs", (req, res) => {
   // Applicant identities stay private: callers only ever see their own application.
   const me = req.user?.id;
-  const prof: any = req.user?.role === "practitioner" && req.user.profileId ? findProfessional(req.user.profileId) : null;
+  const isClinicalApplicant = req.user?.role === "practitioner" || req.user?.role === "nurse";
+  const prof: any = isClinicalApplicant && req.user?.profileId ? findProfessional(req.user.profileId) : null;
   res.json({ status: "success", data: jobs.map(j => {
     let myApplication: any = null;
-    if (me && (req.user?.role === "practitioner" || j.appliedUserIds.includes(me))) {
+    if (me && (isClinicalApplicant || j.appliedUserIds.includes(me))) {
       const appRow = db.prepare("SELECT * FROM job_applications WHERE job_id = ? AND applicant_user_id = ?").get(j.id, me) as any;
       if (appRow) {
         myApplication = {
@@ -1733,7 +1757,7 @@ app.post("/api/jobs", requireRole("practitioner", "admin", "facility"), (req, re
   res.status(201).json({ status: "success", message: "Job listing published successfully.", data: newJob });
 });
 
-app.post("/api/jobs/:id/apply", requireRole("practitioner"), (req, res) => {
+app.post("/api/jobs/:id/apply", requireRole("practitioner", "nurse"), (req, res) => {
   const { id } = req.params;
   const userId = req.user!.id;
 
@@ -1823,7 +1847,7 @@ app.post("/api/reviews", requireRole("patient"), (req, res) => {
   res.status(201).json({ status: "success", message: "Review posted successfully.", data: newReview });
 });
 
-app.post("/api/reviews/:id/reply", requireRole("practitioner"), (req, res) => {
+app.post("/api/reviews/:id/reply", requireRole("practitioner", "nurse"), (req, res) => {
   const { id } = req.params;
   const rev = reviews.find(r => r.id === id);
   if (!rev || rev.professionalId !== req.user!.profileId) {
@@ -1836,7 +1860,7 @@ app.post("/api/reviews/:id/reply", requireRole("practitioner"), (req, res) => {
 // -------------------------------------------------------------
 // Secure messaging (participants only)
 // -------------------------------------------------------------
-app.get("/api/chats", requireRole("patient", "practitioner"), (req, res) => {
+app.get("/api/chats", requireRole("patient", "practitioner", "nurse"), (req, res) => {
   const me = chatIdOf(req.user!);
   let list = chats.filter(m => m.senderId === me || m.receiverId === me);
   const withId = typeof req.query.with === "string" ? req.query.with : null;
@@ -1844,7 +1868,7 @@ app.get("/api/chats", requireRole("patient", "practitioner"), (req, res) => {
   res.json({ status: "success", data: list });
 });
 
-app.post("/api/chats", requireRole("patient", "practitioner"), (req, res) => {
+app.post("/api/chats", requireRole("patient", "practitioner", "nurse"), (req, res) => {
   const receiverId = str(req.body.receiverId, 60);
   const text = str(req.body.text, 2000);
   if (!receiverId || !text) {
@@ -1960,7 +1984,7 @@ app.get("/api/packages", (req, res) => {
 });
 
 // Install or add a new package
-app.post("/api/packages", requireRole("admin"), (req, res) => {
+app.post("/api/packages", requireAdminGroup("ops"), (req, res) => {
   const { id, name, description, icon, category, version, author, isRemovable } = req.body;
 
   if (!id || !name || !description) {
@@ -1989,7 +2013,7 @@ app.post("/api/packages", requireRole("admin"), (req, res) => {
 });
 
 // Toggle enabled status of a package
-app.post("/api/packages/:id/toggle", requireRole("admin"), (req, res) => {
+app.post("/api/packages/:id/toggle", requireAdminGroup("ops"), (req, res) => {
   const { id } = req.params;
   const pkg = appPackages.find(p => p.id === id);
   if (!pkg) {
@@ -2001,7 +2025,7 @@ app.post("/api/packages/:id/toggle", requireRole("admin"), (req, res) => {
 });
 
 // Uninstall / Remove a package
-app.delete("/api/packages/:id", requireRole("admin"), (req, res) => {
+app.delete("/api/packages/:id", requireAdminGroup("ops"), (req, res) => {
   const { id } = req.params;
   const idx = appPackages.findIndex(p => p.id === id);
   if (idx === -1) {

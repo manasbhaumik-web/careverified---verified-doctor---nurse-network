@@ -217,21 +217,6 @@ export default function PatientHeroBanner<T extends string = string>({
                 <span className="font-extrabold text-[color:var(--ink)]">{greeting}</span>
                 <span className="text-slate-400">&bull;</span>
                 <span className="text-[color:var(--ink-2)]">{nextVisitText}</span>
-                {bpSummary && (
-                  <>
-                    <span className="text-slate-400">&bull;</span>
-                    <span
-                      className={
-                        bpSummary.flag?.level === 'urgent'
-                          ? 'text-2xs text-white font-bold bg-rose-700 px-1.5 py-0.5 inline-flex items-center gap-1.5'
-                          : 'text-2xs font-mono font-bold text-[color:var(--t-700)] bg-white px-1.5 py-0.5 border border-[color:var(--t-200)] shadow-2xs inline-flex items-center gap-1.5'
-                      }
-                      title={tx('Latest recorded blood pressure')}
-                    >
-                      <span>{tx('BP: {a}/{b} mmHg', { a: bpSummary.value1 ?? '', b: bpSummary.value2 ?? '' })}</span>
-                    </span>
-                  </>
-                )}
               </>
             }
           />

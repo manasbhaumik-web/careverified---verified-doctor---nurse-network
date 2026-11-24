@@ -21,6 +21,8 @@ import { UserAvatar } from './avatars';
 import PageBanner from './shared/ui/PageBanner';
 import {
   buildNavItems,
+  canAccessView,
+  defaultViewForRole,
   getAdminGroup,
   getFacilityGroup,
   getPatientGroup,
@@ -95,7 +97,16 @@ export default function App() {
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
 
   // User Session State (server-side session cookie; nothing sensitive is kept in localStorage)
-  type SessionUser = { id: string; role: 'patient' | 'practitioner' | 'nurse' | 'admin' | 'pharmacy' | 'facility'; name: string; email: string; avatarUrl?: string; profileId?: string | null };
+  type SessionUser = {
+    id: string;
+    role: 'patient' | 'practitioner' | 'nurse' | 'admin' | 'pharmacy' | 'facility';
+    name: string;
+    email: string;
+    avatarUrl?: string;
+    profileId?: string | null;
+    facilityId?: string | null;
+    adminSubRole?: AdminSubRole;
+  };
   const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
   const route = useLocation();
   // Emails to a signed-in person are sent in the language they use in the app
@@ -161,6 +172,10 @@ export default function App() {
       .then(d => {
         if (d?.status === 'success') {
           setCurrentUser(d.data.user);
+          if (d.data.user?.adminSubRole) {
+            setAdminSubRole(d.data.user.adminSubRole);
+            try { localStorage.setItem('cv_admin_subrole', d.data.user.adminSubRole); } catch { /* ignore */ }
+          }
           rememberPatient(d.data.patient);
           routeForRole(d.data.user.role);
         }
@@ -188,6 +203,10 @@ export default function App() {
     const search = window.location.search;
     if (window.location.pathname === '/login') navigate('/' + search, { replace: true });
     setCurrentUser(user);
+    if (user.adminSubRole) {
+      setAdminSubRole(user.adminSubRole);
+      try { localStorage.setItem('cv_admin_subrole', user.adminSubRole); } catch { /* ignore */ }
+    }
     rememberPatient(patient);
     routeForRole(user.role);
     loadData();
@@ -292,18 +311,29 @@ export default function App() {
     return (localStorage.getItem('cv_admin_subrole') as AdminSubRole) || 'super_admin';
   });
 
+  const applyAdminSubRole = (role: AdminSubRole, syncBackend = true) => {
+    setAdminSubRole(role);
+    try { localStorage.setItem('cv_admin_subrole', role); } catch { /* ignore */ }
+    if (syncBackend && currentUser?.role === 'admin') {
+      fetch('/api/admin/sub-role', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subRole: role }),
+      }).catch(() => {});
+    }
+  };
+
   useEffect(() => {
     const handleSubRoleChanged = (e: Event) => {
       const custom = e as CustomEvent<any>;
       const role = typeof custom.detail === 'string' ? custom.detail : custom.detail?.role;
-      if (role) {
-        setAdminSubRole(role);
-        localStorage.setItem('cv_admin_subrole', role);
+      if (role && role in ADMIN_SUB_ROLES) {
+        applyAdminSubRole(role as AdminSubRole, true);
       }
     };
     window.addEventListener('medcred-admin-subrole-changed', handleSubRoleChanged);
     return () => window.removeEventListener('medcred-admin-subrole-changed', handleSubRoleChanged);
-  }, []);
+  }, [currentUser?.role]);
 
   // Check if a modular package is enabled in the runtime state
   const isPackageEnabled = (id: string) => {
@@ -324,22 +354,23 @@ export default function App() {
     }
   };
 
-  // Safety Redirect: if active view becomes disabled, redirect back to patient hub
+  // Centralized Role & Sub-Role View Access Guard + Safety Redirect when a package is disabled
   useEffect(() => {
-    if (packages.length > 0) {
-      const activePkg = packages.find(p => p.id === activeView);
-      if (activePkg && !activePkg.isEnabled) {
-        // Find first enabled standard module
-        const firstEnabled = ['patient_dashboard', 'registry', 'recruitment', 'articles', 'onboard', 'messages', 'seo']
-          .find(id => isPackageEnabled(id));
-        if (firstEnabled) {
-          setActiveView(firstEnabled);
-        } else {
-          setActiveView('admin'); // Fallback to admin if everything is disabled
-        }
+    if (!currentUser || loading) return;
+    const allowed = canAccessView(activeView, currentUser.role, {
+      adminSubRole,
+      isPackageEnabled,
+      packages,
+    });
+    if (!allowed) {
+      const fallback = defaultViewForRole(currentUser.role, adminSubRole);
+      if (activeView !== fallback) {
+        setActiveView(fallback);
+        setSelectedProfId(null);
+        setNotice(tt('Access restricted: Your role does not have permission to open that module.'));
       }
     }
-  }, [packages, activeView]);
+  }, [currentUser, loading, activeView, adminSubRole, packages]);
 
   // Handlers for state updates
   const handleNewBookingCreated = (newBooking: Booking) => {
@@ -722,6 +753,39 @@ export default function App() {
 
       {/* Primary Screen Area */}
       <main id="main-content" tabIndex={-1} className="flex-grow mt-0 pt-0 pb-4 sm:pb-8 w-full px-0 max-w-none focus:outline-none">
+        {!loading && (currentUser.role === 'practitioner' || currentUser.role === 'nurse') && (() => {
+          const myProf = currentUser.profileId ? professionals.find(p => p.id === currentUser.profileId) : null;
+          const todayIso = new Date().toISOString().slice(0, 10);
+          const isUnverified = !myProf || myProf.verificationStatus !== 'Verified';
+          const isExpired = !!myProf?.licenseExpiry && myProf.licenseExpiry < todayIso;
+          if (!isUnverified && !isExpired) return null;
+          const credView = currentUser.role === 'nurse' ? 'nurse_credentials' : 'practice_compliance';
+          return (
+            <div role="status" className="bg-amber-50 border-b border-amber-200 text-amber-950">
+              <div className="page-w mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2 font-semibold">
+                  <ShieldCheck className="h-4 w-4 text-amber-700 shrink-0" aria-hidden="true" />
+                  <span>
+                    {isExpired
+                      ? tt('Annual Practising Certificate (APC) expired on {date}. Clinical consultations, e-Rx, and shift applications are restricted until renewed.', { date: myProf?.licenseExpiry || '' })
+                      : !myProf
+                      ? tt('Board credentialing required: Submit your licence and registration details to unlock clinical consultations and shift applications.')
+                      : tt('Credential verification status: {status}. Clinical consultations, e-Rx, and shift applications unlock once verified by the Board.', { status: myProf.verificationStatus })}
+                  </span>
+                </div>
+                {activeView !== credView && (
+                  <button
+                    type="button"
+                    onClick={() => { setActiveView(credView); setSelectedProfId(null); }}
+                    className="font-bold text-amber-900 bg-white border border-amber-300 hover:bg-amber-100 px-3 py-1 cursor-pointer transition-colors"
+                  >
+                    {tt('Open Credentials & Licensing')}
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })()}
         {loading ? (
           <div role="status" aria-live="polite" className="text-center min-h-[60vh] space-y-4 animate-fade-in flex flex-col items-center justify-center">
             <div className="relative flex items-center justify-center">
@@ -828,7 +892,7 @@ export default function App() {
             )}
 
             {/* VIEW 3: PRACTITIONER PORTAL PARENT VIEWS */}
-            {activeView === 'onboard' && (
+            {activeView === 'onboard' && currentUser.role === 'practitioner' && (
               <VerificationTerminal
                 currentUser={currentUser}
                 professionals={professionals}
@@ -840,7 +904,7 @@ export default function App() {
               />
             )}
 
-            {activeView === 'practice_compliance' && (
+            {activeView === 'practice_compliance' && currentUser.role === 'practitioner' && (
               <VerificationTerminal
                 currentUser={currentUser}
                 professionals={professionals}
@@ -852,7 +916,7 @@ export default function App() {
               />
             )}
 
-            {activeView === 'performance_profile' && (
+            {activeView === 'performance_profile' && currentUser.role === 'practitioner' && (
               <VerificationTerminal
                 currentUser={currentUser}
                 professionals={professionals}
@@ -865,7 +929,7 @@ export default function App() {
             )}
 
             {/* VIEW 4: RECRUITMENT MARKET */}
-            {activeView === 'recruitment' && (
+            {activeView === 'recruitment' && ['practitioner', 'nurse', 'facility', 'admin'].includes(currentUser.role) && (
               <JobMarket
                 jobs={jobs}
                 onNewJobCreated={handleNewJobCreated}
@@ -1038,12 +1102,12 @@ export default function App() {
                 reviews={reviews}
                 bookings={bookings}
                 adminSubRole={adminSubRole}
-                onAdminSubRoleChange={setAdminSubRole}
+                onAdminSubRoleChange={(role) => applyAdminSubRole(role, true)}
               />
             )}
 
             {/* VIEW 7: SEO DASHBOARD */}
-            {activeView === 'seo' && currentUser.role !== 'admin' && (
+            {activeView === 'seo' && currentUser.role === 'admin' && (
               <SEODashboard professionals={professionals} />
             )}
 

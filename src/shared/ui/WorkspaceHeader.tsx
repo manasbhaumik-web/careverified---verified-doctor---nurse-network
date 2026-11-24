@@ -57,8 +57,8 @@ export default function WorkspaceHeader<T extends string = string>({
             {eyebrow && (
               <div className="text-2xs font-bold uppercase tracking-widest text-[color:var(--t-700)]">{eyebrow}</div>
             )}
-            <div className="mt-1 flex flex-wrap items-center gap-2.5">
-              <h2 className="text-2xl font-bold tracking-tight text-[color:var(--ink)] leading-tight">{title}</h2>
+            <div className="mt-0.5 flex flex-wrap items-center gap-2.5">
+              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-[color:var(--ink)] leading-tight">{title}</h2>
               {badges}
             </div>
             {description && (

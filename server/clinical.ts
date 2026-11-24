@@ -241,7 +241,9 @@ interface Ctx {
 export function registerClinicalRoutes(app: Application, ctx: Ctx) {
   const verifiedPro = (profileId: string | null | undefined) => {
     const p = profileId ? ctx.findProfessional(profileId) : null;
-    return p && p.verificationStatus === VerificationStatus.VERIFIED ? p : null;
+    if (!p || p.verificationStatus !== VerificationStatus.VERIFIED) return null;
+    if (p.licenseExpiry && p.licenseExpiry < new Date().toISOString().slice(0, 10)) return null;
+    return p;
   };
   const userName = (id: string) => (row("SELECT name FROM users WHERE id = ?", id)?.name as string) ?? "Patient";
   const maskName = (full: string) => { const [first, ...rest] = full.split(" "); return rest.length ? `${first} ${rest[rest.length - 1][0]}.` : first; };
@@ -393,9 +395,9 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
   });
 
   // =========================================================
-  // Practitioner: clinical workspace for one booking/consult
+  // Practitioner / Nurse: clinical workspace for one booking/consult
   // =========================================================
-  app.get("/api/clinical/context/:kind/:refId", requireRole("practitioner"), (req, res) => {
+  app.get("/api/clinical/context/:kind/:refId", requireRole("practitioner", "nurse"), (req, res) => {
     const rel = relation(req, req.params.kind, req.params.refId);
     if (!rel) return fail(res, 404, "No treatment relationship found.");
     const pid = req.user!.profileId!;
@@ -428,7 +430,7 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
   });
 
   // ---------- SOAP notes ----------
-  app.put("/api/encounters/:kind/:refId", requireRole("practitioner"), (req, res) => {
+  app.put("/api/encounters/:kind/:refId", requireRole("practitioner", "nurse"), (req, res) => {
     const rel = relation(req, req.params.kind, req.params.refId);
     if (!rel) return fail(res, 404, "No treatment relationship found.");
     const f = (k: string) => str(req.body[k], 4000);
@@ -443,7 +445,7 @@ export function registerClinicalRoutes(app: Application, ctx: Ctx) {
     res.json({ status: "success" });
   });
 
-  app.post("/api/encounters/:kind/:refId/sign", requireRole("practitioner"), (req, res) => {
+  app.post("/api/encounters/:kind/:refId/sign", requireRole("practitioner", "nurse"), (req, res) => {
     const rel = relation(req, req.params.kind, req.params.refId);
     if (!rel) return fail(res, 404, "No treatment relationship found.");
     const e = row("SELECT * FROM encounters WHERE kind = ? AND ref_id = ?", rel.kind, rel.refId);

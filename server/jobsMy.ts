@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS locum_profiles (
 export function registerJobsMy(app: Application, ctx: { findProfessional: (id: string) => any | undefined; allProfessionals: () => any[]; jobs: () => any[] }) {
   // Licensed employers a practitioner may post for: facilities they are staff of (admins: all active)
   // The signed-in practitioner's confirmed upcoming shifts (applications a facility has accepted), soonest first.
-  app.get("/api/practitioner/shifts", requireRole("practitioner"), (req, res) => {
+  app.get("/api/practitioner/shifts", requireRole("practitioner", "nurse"), (req, res) => {
     const t = today();
     const out: any[] = [];
     for (const a of rows("SELECT * FROM job_applications WHERE applicant_user_id = ? AND status = 'accepted'", req.user!.id)) {
@@ -169,14 +169,14 @@ export function registerJobsMy(app: Application, ctx: { findProfessional: (id: s
     verified: p?.verificationStatus === VerificationStatus.VERIFIED,
   });
 
-  app.get("/api/locum/me", requireRole("practitioner"), (req, res) => {
+  app.get("/api/locum/me", requireRole("practitioner", "nurse"), (req, res) => {
     const p = profileOf(req);
     if (!p) return fail(res, 404, "Create your professional profile first.");
     const l = row("SELECT * FROM locum_profiles WHERE profile_id = ?", p.id);
     res.json({ status: "success", data: l ? view(l, p) : null, apc: { validUntil: p.licenseExpiry ?? null, verified: p.verificationStatus === VerificationStatus.VERIFIED } });
   });
 
-  app.put("/api/locum/me", requireRole("practitioner"), (req, res) => {
+  app.put("/api/locum/me", requireRole("practitioner", "nurse"), (req, res) => {
     const p = profileOf(req);
     if (!p || p.verificationStatus !== VerificationStatus.VERIFIED) return fail(res, 403, "Only verified practitioners can list for locum work.");
     const b = req.body ?? {};

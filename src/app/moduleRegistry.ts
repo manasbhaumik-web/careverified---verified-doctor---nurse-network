@@ -367,3 +367,57 @@ export function getAdminGroup(view: string): 'registry' | 'ops' | 'facilities' |
   if (['admin_growth', 'tourism_desk', 'literature', 'seo'].includes(view)) return 'growth';
   return 'registry';
 }
+
+export function defaultViewForRole(role: SessionRole, adminSubRole: AdminSubRole = 'super_admin'): string {
+  if (role === 'patient') return 'patient_care';
+  if (role === 'practitioner') return 'onboard';
+  if (role === 'nurse') return 'nurse_care';
+  if (role === 'pharmacy') return 'pharmacy_dispensing';
+  if (role === 'facility') return 'facility_staffing';
+  const firstGroup = ADMIN_SUB_ROLES[adminSubRole]?.allowedGroups?.[0] || 'registry';
+  if (firstGroup === 'ops') return 'admin_ops';
+  if (firstGroup === 'facilities') return 'admin_facilities';
+  if (firstGroup === 'growth') return 'admin_growth';
+  return 'admin_registry';
+}
+
+export function canAccessView(
+  view: string,
+  role: SessionRole,
+  opts: {
+    adminSubRole: AdminSubRole;
+    isPackageEnabled: (id: string) => boolean;
+    packages: AppPackage[];
+  }
+): boolean {
+  if (view === 'my_profile' || view === 'help') return true;
+
+  const allowedAdmin = ADMIN_SUB_ROLES[opts.adminSubRole]?.allowedGroups || ['registry', 'ops', 'facilities', 'growth'];
+  const roleModules = ROLE_MODULES[role] || [];
+
+  for (const mod of roleModules) {
+    if (mod.id === view || mod.aliases.includes(view)) {
+      if (mod.packageGate && !opts.isPackageEnabled(mod.packageGate)) return false;
+      if (role === 'admin' && mod.adminGroup && !allowedAdmin.includes(mod.adminGroup)) return false;
+      return true;
+    }
+  }
+
+  if (role === 'practitioner' && ['tourism_desk', 'quality', 'earnings', 'oncall', 'messages'].includes(view)) {
+    return opts.isPackageEnabled('onboard');
+  }
+
+  if (
+    role === 'admin' &&
+    ['facility_workspace', 'facility_staffing', 'facility_care', 'facility_profile'].includes(view)
+  ) {
+    return allowedAdmin.includes('facilities');
+  }
+
+  if (!STANDARD_MODULE_IDS.has(view)) {
+    if (role === 'pharmacy' || role === 'facility') return false;
+    return opts.packages.some((p) => !(p as any).facility_id && p.id === view && p.isEnabled);
+  }
+
+  return false;
+}

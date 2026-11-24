@@ -196,7 +196,8 @@ export default function MedicalLibrary({
   embedded = false,
 }: MedicalLibraryProps) {
   const tx = useTr();
-  const isPractitioner = canRecommend || currentUser?.role === 'practitioner';
+  const isPractitioner = canRecommend || currentUser?.role === 'practitioner' || currentUser?.role === 'nurse';
+  const isPatientWorkspace = !isPractitioner && (!currentUser || currentUser?.role === 'patient');
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>(ALL);
   const [source, setSource] = useState<SourceFilter>('all');
@@ -478,7 +479,7 @@ export default function MedicalLibrary({
                   </a>
                 </div>
               )}
-              {hubSpecialty && (
+              {isPatientWorkspace && hubSpecialty && (
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="text-xs text-slate-600">{tx('Specialists: ')}{hubSpecialists.length ? hubSpecialists.map(p => p.name).join(', ') : tx(hubSpecialty)}</span>
                   <button type="button" onClick={() => onFindDoctor(hubSpecialty)} className="min-h-[36px] px-4 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer">{tx('Find a {name}', { name: tx(hubSpecialty) })}</button>
@@ -588,17 +589,19 @@ export default function MedicalLibrary({
             </p>
           </section>
 
-          <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
-            <h2 className="text-base font-bold text-[color:var(--ink)]">{tx('Need to speak to a clinician?')}</h2>
-            <p className="text-xs leading-relaxed text-[color:var(--ink-2)]">{tx('Articles are for education. For personal medical advice, book a consultation.')}</p>
-            <button
-              type="button"
-              onClick={() => onFindDoctor()}
-              className="w-full min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors cursor-pointer"
-            >
-              {tx('Find a doctor')}
-            </button>
-          </section>
+          {isPatientWorkspace && (
+            <section className="bg-white border border-[color:var(--t-200)] p-5 space-y-3">
+              <h2 className="text-base font-bold text-[color:var(--ink)]">{tx('Need to speak to a clinician?')}</h2>
+              <p className="text-xs leading-relaxed text-[color:var(--ink-2)]">{tx('Articles are for education. For personal medical advice, book a consultation.')}</p>
+              <button
+                type="button"
+                onClick={() => onFindDoctor()}
+                className="w-full min-h-[44px] bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold transition-colors cursor-pointer"
+              >
+                {tx('Find a doctor')}
+              </button>
+            </section>
+          )}
         </aside>
       </div>
 
@@ -771,13 +774,15 @@ export default function MedicalLibrary({
               >
                 {tx('Close')}
               </button>
-              <button
-                type="button"
-                onClick={() => { const sp = specialtyFor(openArticle, professionals); setOpenArticle(null); onFindDoctor(sp ?? undefined); }}
-                className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer"
-              >
-                {(() => { const sp = specialtyFor(openArticle, professionals); return sp ? tx('Find a {name}', { name: tx(sp) }) : tx('Find a doctor'); })()}
-              </button>
+              {isPatientWorkspace && (
+                <button
+                  type="button"
+                  onClick={() => { const sp = specialtyFor(openArticle, professionals); setOpenArticle(null); onFindDoctor(sp ?? undefined); }}
+                  className="min-h-[44px] px-5 bg-[color:var(--t-600)] hover:bg-[color:var(--t-700)] text-white text-xs font-bold cursor-pointer"
+                >
+                  {(() => { const sp = specialtyFor(openArticle, professionals); return sp ? tx('Find a {name}', { name: tx(sp) }) : tx('Find a doctor'); })()}
+                </button>
+              )}
             </div>
           </div>
         </div>
